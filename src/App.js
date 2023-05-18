@@ -1,11 +1,12 @@
 import logo from "./logo.svg";
 import "./App.css";
 import "leaflet/dist/leaflet.css";
+import countries from "./data/countries.json";  // import countries data
 
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, GeoJSON } from "react-leaflet";
 import { Icon, divIcon, point } from "leaflet";
 
-export default function Map() {
+export default function GeoQuizzPlacement() {
   // create custom icon
   const customIcon = new Icon({
     // iconUrl: "https://cdn-icons-png.flaticon.com/128/5195/5195685.png",
@@ -25,8 +26,17 @@ export default function Map() {
       popUp: "Hello, I am pop up 2",
     }
   ];
+
+  var countryStyle = {
+    fillColor: "red",
+    stroke: "black",
+    fillOpacity: 1,
+    weight: 2,
+    }
+
+  console.log(countries);
   return (
-    <MapContainer center={position} zoom={13}>
+    <MapContainer center={position} zoom={2.5} style={{}}>
 
       {/* Normal Map */}
       {/* <TileLayer
@@ -35,10 +45,10 @@ export default function Map() {
       /> */}
 
       {/* Lava Map */}
-      {/* <TileLayer 
+      <TileLayer 
       attribution="ThunderForest"
       url="https://{s}.tile.thunderforest.com/spinal-map/{z}/{x}/{y}.png?apikey=258b9cf0d7ab4f8cabfffb496606dfa4"
-      /> */}
+      />
 
       {/* Toner Map */}
       <TileLayer 
@@ -47,6 +57,8 @@ export default function Map() {
       minZoom={0}
       maxZoom={20}
       />
+
+      <GeoJSON style={{countryStyle}} data={countries.features} />
       {markers.map((marker) => (
         <Marker position={marker.geocode} icon={customIcon}>
           <Popup>{marker.popUp}</Popup>

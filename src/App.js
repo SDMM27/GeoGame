@@ -1,14 +1,14 @@
 import logo from "./logo.svg";
 import "./App.css";
 import "leaflet/dist/leaflet.css";
-import countries from "./data/countries.json";  // import countries data
-import React, { useState } from "react";
+import countries from "./data/countries_FR.json"; // import countries data
+import React, { useState, useEffect } from "react";
 
 import { MapContainer, TileLayer, Marker, Popup, GeoJSON } from "react-leaflet";
 import { Icon, divIcon, point } from "leaflet";
 
 const countryStyle = {
-  fillColor: "white", 
+  fillColor: "transparent",
   color: "black",
   fillOpacity: 1,
   weight: 0.85,
@@ -16,6 +16,10 @@ const countryStyle = {
 
 export default function GeoQuizzPlacement() {
   const [highlightedCountry, setHighlightedCountry] = useState(null);
+  const [targetCountry, setTargetCountry] = useState(null);
+  const [markerPosition, setMarkerPosition] = useState(null);
+  const [score, setScore] = useState(0);
+
 
   // create custom icon
   const customIcon = new Icon({
@@ -23,7 +27,18 @@ export default function GeoQuizzPlacement() {
     iconSize: [38, 38],
   });
 
-  const position = [55.16444, 61.436844];
+  const position = [36.737232, 3.086472];
+  
+  const getRandomCountry = () => {
+    const randomIndex = Math.floor(Math.random() * countries.features.length);
+    const randomCountry = countries.features[randomIndex].properties.ADMIN;
+    console.log(randomCountry);
+    return randomCountry;
+  };
+
+  useEffect(() => {
+    setTargetCountry(getRandomCountry());
+  }, []);
 
   const onCountryMouseOver = (event) => {
     const layer = event.target;
@@ -41,54 +56,54 @@ export default function GeoQuizzPlacement() {
     setHighlightedCountry(null);
   };
 
+  const onMapClick = (event) => {
+    if (highlightedCountry === targetCountry) {
+      setScore(score + 1);
+      setTargetCountry(getRandomCountry());
+    }
+    setMarkerPosition(event.latlng);
+  };
   return (
-    <MapContainer center={position} zoom={2.5} style={{ height: "100vh" }}>
-         {/* Normal Map */}
-      {/* <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      /> */}
+    <div style={{ width: "100%", height: "100vh" }}>
+      <h1 id="gameTitle">Geo Country Placement</h1>
+      <div id="scoreContainer">
+        <h2>Score: {score}</h2>
+      </div>
+      <div className="mapContainer">
+        <MapContainer center={position} zoom={2} scrollWheelZoom="center" dragging={false} onClick={onMapClick}>
+          {/* Toner Map */}
+          <TileLayer
+            attribution="Stamen Toner"
+            url="https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png"
+            noWrap={true}
+            minZoom={2}
+            maxZoom={20}
+          />
 
-      {/* Lava Map */}
-      {/* <TileLayer 
-      attribution="ThunderForest"
-      url="https://{s}.tile.thunderforest.com/spinal-map/{z}/{x}/{y}.png?apikey=258b9cf0d7ab4f8cabfffb496606dfa4"
-      /> */}
+          <GeoJSON
+            style={countryStyle}
+            data={countries.features}
+            onEachFeature={(feature, layer) => {
+              layer.on({
+                mouseover: onCountryMouseOver,
+                mouseout: onCountryMouseOut,
+              });
+            }}
+          />
+        </MapContainer>
 
-      {/* Toner Map */}
-      <TileLayer 
-      attribution="Stamen Toner"
-      url="https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png"
-      noWrap={true}
-      minZoom={0}
-      maxZoom={20}
-      />
+        {targetCountry && (
+          <Marker position={position} icon={customIcon}>
+            <Popup>{targetCountry}</Popup>
+          </Marker>
+        )}
 
-      <GeoJSON
-        style={countryStyle}
-        data={countries.features}
-        onEachFeature={(feature, layer) => {
-          layer.on({
-            mouseover: onCountryMouseOver,
-            mouseout: onCountryMouseOut,
-          });
-        }}
-      />
-
-      {highlightedCountry && (
-        <div
-          style={{
-            position: "absolute",
-            top: 10,
-            left: 10,
-            zIndex: 1000,
-            backgroundColor: "white",
-            padding: "5px",
-          }}
-        >
-          <h2>{highlightedCountry}</h2>
-        </div>
-      )}
-    </MapContainer>
+        {markerPosition && (
+          <Marker position={markerPosition}>
+            <Popup>Clicked location</Popup>
+          </Marker>
+        )}
+    </div>
+    </div>
   );
 }

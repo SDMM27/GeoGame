@@ -1,7 +1,7 @@
 import logo from "./logo.svg";
 import "./App.css";
 import "leaflet/dist/leaflet.css";
-import countries from "./data/countries_FR.json"; // import countries data
+import countries from "./data/countriesWithDifficulty_FR.json"; // import countries data
 import React, { useState, useEffect } from "react";
 
 import { MapContainer, TileLayer, Marker, Popup, GeoJSON } from "react-leaflet";
@@ -76,6 +76,9 @@ export default function GeoQuizzPlacement() {
         setTargetCountry(targetCountry);
         console.log(targetCountry + ' a été choisi comme nouvelle cible !');
         score = score + 1;
+        setScore(score);
+      } else if(score > 0) {
+        score = score - 1;
         setScore(score);
       }
       setMarkerPosition(event.latlng);

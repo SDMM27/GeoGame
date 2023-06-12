@@ -5,7 +5,7 @@ import countries from "./data/countries_FR.json"; // import countries data
 import React, { useState, useEffect } from "react";
 
 import { MapContainer, TileLayer, Marker, Popup, GeoJSON } from "react-leaflet";
-import { Icon, divIcon, point } from "leaflet";
+import { Icon } from "leaflet";
 
 const countryStyle = {
   fillColor: "transparent",
@@ -14,12 +14,18 @@ const countryStyle = {
   weight: 0.85,
 };
 
-export default function GeoQuizzPlacement() {
-  const [highlightedCountry, setHighlightedCountry] = useState(null);
-  const [targetCountry, setTargetCountry] = useState(null);
-  const [markerPosition, setMarkerPosition] = useState(null);
-  const [score, setScore] = useState(0);
+const getRandomCountry = () => {
+  const randomIndex = Math.floor(Math.random() * countries.features.length);
+  const randomCountry = countries.features[randomIndex].properties.ADMIN;
+  return randomCountry;
+};
 
+export default function GeoQuizzPlacement() {
+  let [highlightedCountry, setHighlightedCountry] = useState(null);
+  let [targetCountry, setTargetCountry] = useState(null);
+  let [markerPosition, setMarkerPosition] = useState(null);
+  let [score, setScore] = useState(0);
+  let [gameStarted, setGameStarted] = useState(false);
 
   // create custom icon
   const customIcon = new Icon({
@@ -28,82 +34,108 @@ export default function GeoQuizzPlacement() {
   });
 
   const position = [36.737232, 3.086472];
-  
-  const getRandomCountry = () => {
-    const randomIndex = Math.floor(Math.random() * countries.features.length);
-    const randomCountry = countries.features[randomIndex].properties.ADMIN;
-    console.log(randomCountry);
-    return randomCountry;
-  };
 
   useEffect(() => {
-    setTargetCountry(getRandomCountry());
+    document.title = "Geo Country Placement";
   }, []);
+  
+
+  const startGame = () => {
+    setGameStarted(true);
+    setScore(0);
+    setTargetCountry(getRandomCountry());
+  };
 
   const onCountryMouseOver = (event) => {
-    const layer = event.target;
-    layer.setStyle({
-      fillColor: "green",
-      weight: 2,
-      fillOpacity: 0.5,
-    });
-    setHighlightedCountry(layer.feature.properties.ADMIN);
+    if (gameStarted) {
+      const layer = event.target;
+      layer.setStyle({
+        fillColor: "green",
+        weight: 2,
+        fillOpacity: 0.5,
+      });
+      setHighlightedCountry(layer.feature.properties.ADMIN);
+    }
   };
 
   const onCountryMouseOut = (event) => {
-    const layer = event.target;
-    layer.setStyle(countryStyle);
-    setHighlightedCountry(null);
+    if (gameStarted) {
+      const layer = event.target;
+      layer.setStyle(countryStyle);
+      setHighlightedCountry(null);
+    }
   };
 
-  const onMapClick = (event) => {
-    if (highlightedCountry === targetCountry) {
-      setScore(score + 1);
-      setTargetCountry(getRandomCountry());
+  const onCountryClick = (event) => {
+    if (gameStarted) {
+      console.log(event.target.feature.properties.ADMIN);
+      console.log(targetCountry);
+      if (event.target.feature.properties.ADMIN === targetCountry) {
+        console.log("Bravo ! " + targetCountry + " est la bonne réponse !");
+        targetCountry = getRandomCountry();
+        setTargetCountry(targetCountry);
+        console.log(targetCountry + ' a été choisi comme nouvelle cible !');
+        score = score + 1;
+        setScore(score);
+      }
+      setMarkerPosition(event.latlng);
     }
-    setMarkerPosition(event.latlng);
   };
+  
+
   return (
     <div style={{ width: "100%", height: "100vh" }}>
       <h1 id="gameTitle">Geo Country Placement</h1>
       <div id="scoreContainer">
         <h2>Score: {score}</h2>
       </div>
-      <div className="mapContainer">
-        <MapContainer center={position} zoom={2} scrollWheelZoom="center" dragging={false} onClick={onMapClick}>
-          {/* Toner Map */}
-          <TileLayer
-            attribution="Stamen Toner"
-            url="https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png"
-            noWrap={true}
-            minZoom={2}
-            maxZoom={20}
-          />
+      {!gameStarted && (
+        <div id="startContainer">
+          <button onClick={startGame}>Start</button>
+        </div>
+      )}
+      {gameStarted && (   
+        <div id="targetCountryContainer">
+          <h2>Target: {targetCountry}</h2>
+        </div>)}
+      {gameStarted && (
+        <div className="mapContainer">
+          <MapContainer
+            center={position}
+            zoom={2}
+            scrollWheelZoom={true}
+            dragging={true}
+            doubleClickZoom={false}
+          >
+            {/* Toner Map */}
+            <TileLayer
+              attribution="Stamen Toner"
+              url="https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png"
+              noWrap={true}
+              minZoom={2}
+              maxZoom={20}
+            />
 
-          <GeoJSON
-            style={countryStyle}
-            data={countries.features}
-            onEachFeature={(feature, layer) => {
-              layer.on({
-                mouseover: onCountryMouseOver,
-                mouseout: onCountryMouseOut,
-              });
-            }}
-          />
-        </MapContainer>
+            <GeoJSON
+              style={countryStyle}
+              data={countries.features}
+              onEachFeature={(feature, layer) => {
+                layer.on({
+                  click: onCountryClick,
+                  mouseover: onCountryMouseOver,
+                  mouseout: onCountryMouseOut,
+                });
+              }}
+            />
 
-        {targetCountry && (
-          <Marker position={position} icon={customIcon}>
-            <Popup>{targetCountry}</Popup>
-          </Marker>
-        )}
-
-        {markerPosition && (
-          <Marker position={markerPosition}>
-            <Popup>Clicked location</Popup>
-          </Marker>
-        )}
-    </div>
+            {markerPosition && (
+              <Marker position={markerPosition} icon={customIcon}>
+              </Marker>
+            )}
+          </MapContainer>
+        </div>
+      )}
     </div>
   );
 }
+

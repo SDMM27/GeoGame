@@ -1,0 +1,4 @@
+Filtrer les pays par niveau et mettre des difficultés
+Esthétiser le jeu ( mettre notamment une animation lorsque cela trouve le pays et lorsque l'on se trompe)
+
+Si le joueur clique sur un pays cela décrémente son score

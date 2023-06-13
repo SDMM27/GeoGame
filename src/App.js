@@ -2,7 +2,7 @@ import logo from "./logo.svg";
 import "./App.css";
 import "leaflet/dist/leaflet.css";
 import countries from "./data/countriesWithDifficulty_FR.json"; // import countries data
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import { MapContainer, TileLayer, Marker, Popup, GeoJSON } from "react-leaflet";
 import { Icon } from "leaflet";
@@ -38,6 +38,7 @@ const getRandomCountry = (difficulty) => {
 export default function GeoQuizzPlacement() {
   let [highlightedCountry, setHighlightedCountry] = useState(null);
   let [targetCountry, setTargetCountry] = useState(null);
+  const targetCountryRef = useRef(targetCountry); // Create a ref
   let [markerPosition, setMarkerPosition] = useState(null);
   let [score, setScore] = useState(0);
   let [gameStarted, setGameStarted] = useState(false);
@@ -54,8 +55,8 @@ export default function GeoQuizzPlacement() {
 
   useEffect(() => {
     document.title = "Geo Country Placement";
-  }, []);
-  
+    targetCountryRef.current = targetCountry; // Update the ref whenever targetCountry changes
+  }, [targetCountry]);
 
   const startGame = () => {
     setGameStarted(true);
@@ -63,23 +64,13 @@ export default function GeoQuizzPlacement() {
     setTargetCountry(getRandomCountry(difficulty));
   };
 
-  const passCountry = () => {
-    console.log('le pays était: ' + targetCountry);
-    changeCountry();
-    console.log(targetCountry + " a été choisi comme nouvelle cible !");
-   decrementScore('Difficile');
-  }
+  
 
   const restart = () => {
     setGameStarted(false);
     setScore(0);
     setTargetCountry(null);
     setMarkerPosition(null);
-  }
-
-  const changeCountry = (event) => {
-    targetCountry = getRandomCountry(difficulty);
-    setTargetCountry(targetCountry);
   }
 
   const decrementScore = (difficulty) => {
@@ -139,15 +130,27 @@ export default function GeoQuizzPlacement() {
     }
   };
 
+  const changeCountry = () => {
+    targetCountry = getRandomCountry(difficulty);
+    setTargetCountry(targetCountry);
+  }
+
+  const passCountry = () => {
+    console.log('le pays était: ' + targetCountry);
+    changeCountry();
+    console.log(targetCountry + " a été choisi comme nouvelle cible !");
+   decrementScore('Difficile');
+  }
+
   const onCountryClick = (event) => {
     if (gameStarted) {
-      console.log(event.target.feature.properties.ADMIN);
-      console.log(targetCountry);
+      console.log('pays cliqué : ' + event.target.feature.properties.ADMIN);
+      console.log('pays recherché : ' + targetCountryRef.current); // Use the ref instead of the state variable
       let targetDifficulty = countries.features.find(
-          (country) => country.properties.ADMIN === targetCountry
+          (country) => country.properties.ADMIN === targetCountryRef.current // Use the ref instead of the state variable
         ).properties.Difficulty;
-      if (event.target.feature.properties.ADMIN === targetCountry) {
-        console.log("Bravo ! " + targetCountry + " est la bonne réponse !");
+      if (event.target.feature.properties.ADMIN === targetCountryRef.current) { // Use the ref instead of the state variable
+        console.log("Bravo ! " + targetCountryRef.current + " est la bonne réponse !"); // Use the ref instead of the state variable
         changeCountry();
         incrementScore(targetDifficulty);
       } else {

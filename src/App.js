@@ -14,11 +14,15 @@ const countryStyle = {
   weight: 0.85,
 };
 
-const getRandomCountry = () => {
-  const randomIndex = Math.floor(Math.random() * countries.features.length);
-  const randomCountry = countries.features[randomIndex].properties.ADMIN;
+const getRandomCountry = (difficulty) => {
+  const filteredCountries = countries.features.filter(
+    (country) => country.properties.Difficulty === difficulty
+  );
+  const randomIndex = Math.floor(Math.random() * filteredCountries.length);
+  const randomCountry = filteredCountries[randomIndex].properties.ADMIN;
   return randomCountry;
 };
+
 
 export default function GeoQuizzPlacement() {
   let [highlightedCountry, setHighlightedCountry] = useState(null);
@@ -26,6 +30,8 @@ export default function GeoQuizzPlacement() {
   let [markerPosition, setMarkerPosition] = useState(null);
   let [score, setScore] = useState(0);
   let [gameStarted, setGameStarted] = useState(false);
+  let [difficulty, setDifficulty] = useState("Difficile");
+
 
   // create custom icon
   const customIcon = new Icon({
@@ -43,8 +49,9 @@ export default function GeoQuizzPlacement() {
   const startGame = () => {
     setGameStarted(true);
     setScore(0);
-    setTargetCountry(getRandomCountry());
+    setTargetCountry(getRandomCountry(difficulty));
   };
+  
 
   const onCountryMouseOver = (event) => {
     if (gameStarted) {
@@ -72,12 +79,12 @@ export default function GeoQuizzPlacement() {
       console.log(targetCountry);
       if (event.target.feature.properties.ADMIN === targetCountry) {
         console.log("Bravo ! " + targetCountry + " est la bonne réponse !");
-        targetCountry = getRandomCountry();
+        targetCountry = getRandomCountry(difficulty);
         setTargetCountry(targetCountry);
-        console.log(targetCountry + ' a été choisi comme nouvelle cible !');
+        console.log(targetCountry + " a été choisi comme nouvelle cible !");
         score = score + 1;
         setScore(score);
-      } else if(score > 0) {
+      } else if (score > 0) {
         score = score - 1;
         setScore(score);
       }
@@ -92,6 +99,15 @@ export default function GeoQuizzPlacement() {
       <div id="scoreContainer">
         <h2>Score: {score}</h2>
       </div>
+      <div id="difficultyContainer">
+  <h2>Difficulté :</h2>
+  <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
+    <option value="Facile">Facile</option>
+    <option value="Moyen">Moyen</option>
+    <option value="Difficile">Difficile</option>
+  </select>
+</div>
+
       {!gameStarted && (
         <div id="startContainer">
           <button onClick={startGame}>Start</button>

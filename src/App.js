@@ -143,12 +143,15 @@ export default function GeoQuizzPlacement() {
     if (gameStarted) {
       console.log(event.target.feature.properties.ADMIN);
       console.log(targetCountry);
+      let targetDifficulty = countries.features.find(
+          (country) => country.properties.ADMIN === targetCountry
+        ).properties.Difficulty;
       if (event.target.feature.properties.ADMIN === targetCountry) {
         console.log("Bravo ! " + targetCountry + " est la bonne réponse !");
         changeCountry();
-        incrementScore(difficulty);
+        incrementScore(targetDifficulty);
       } else {
-        decrementScore(difficulty);
+        decrementScore(targetDifficulty);
       }
       setMarkerPosition(event.latlng);
     }

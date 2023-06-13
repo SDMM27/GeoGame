@@ -6,7 +6,7 @@
       "properties":{
         "ADMIN":"Aruba",
         "ISO_A3":"ABW",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"Polygon",
@@ -12877,7 +12877,7 @@
       "properties":{
         "ADMIN":"Anguilla",
         "ISO_A3":"AIA",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -15253,7 +15253,7 @@
       "properties":{
         "ADMIN":"Aland",
         "ISO_A3":"ALA",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -41326,7 +41326,7 @@
       "properties":{
         "ADMIN":"Samoa américaines",
         "ISO_A3":"ASM",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -137680,7 +137680,7 @@
       "properties":{
         "ADMIN":"Îles Ashmore et Cartier",
         "ISO_A3":"-99",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"Polygon",
@@ -137715,7 +137715,7 @@
       "properties":{
         "ADMIN":"Terres australes et antarctiques françaises",
         "ISO_A3":"ATF",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -139932,7 +139932,7 @@
       "properties":{
         "ADMIN":"Antigua-et-Barbuda",
         "ISO_A3":"ATG",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -236595,7 +236595,7 @@
       "properties":{
         "ADMIN":"Bajo Nuevo Bank (îles Petrel)",
         "ISO_A3":"-99",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"Polygon",
@@ -236630,7 +236630,7 @@
       "properties":{
         "ADMIN":"Saint-Barthélemy",
         "ISO_A3":"BLM",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"Polygon",
@@ -294470,7 +294470,7 @@
       "properties":{
         "ADMIN":"Barbade",
         "ISO_A3":"BRB",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"Polygon",
@@ -717898,7 +717898,7 @@
       "properties":{
         "ADMIN":"Île Clipperton",
         "ISO_A3":"-99",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"Polygon",
@@ -723788,7 +723788,7 @@
       "properties":{
         "ADMIN":"Zone non gouvernée de Chypre",
         "ISO_A3":"-99",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -741605,7 +741605,7 @@
       "properties":{
         "ADMIN":"Îles Cook",
         "ISO_A3":"COK",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -760922,7 +760922,7 @@
       "properties":{
         "ADMIN":"Îles de la mer de Corail",
         "ISO_A3":"-99",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"Polygon",
@@ -771922,7 +771922,7 @@
       "properties":{
         "ADMIN":"Curaçao",
         "ISO_A3":"CUW",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"Polygon",
@@ -772113,7 +772113,7 @@
       "properties":{
         "ADMIN":"Îles Caïmans",
         "ISO_A3":"CYM",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -791347,7 +791347,7 @@
       "properties":{
         "ADMIN":"Dominique",
         "ISO_A3":"DMA",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"Polygon",
@@ -825758,7 +825758,7 @@
       "properties":{
         "ADMIN":"Zone de souveraineté de Dhekelia",
         "ISO_A3":"-99",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"Polygon",
@@ -866030,7 +866030,7 @@
       "properties":{
         "ADMIN":"Îles Malouines",
         "ISO_A3":"FLK",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -892131,7 +892131,7 @@
       "properties":{
         "ADMIN":"États fédérés de Micronésie",
         "ISO_A3":"FSM",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -929989,7 +929989,7 @@
       "properties":{
         "ADMIN":"Guernesey",
         "ISO_A3":"GGY",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -972737,7 +972737,7 @@
       "properties":{
         "ADMIN":"Grenade",
         "ISO_A3":"GRD",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1055938,7 +1055938,7 @@
       "properties":{
         "ADMIN":"Guam",
         "ISO_A3":"GUM",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"Polygon",
@@ -1062283,7 +1062283,7 @@
       "properties":{
         "ADMIN":"Îles Heard et MacDonald",
         "ISO_A3":"HMD",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"Polygon",
@@ -1162165,7 +1162165,7 @@
       "properties":{
         "ADMIN":"Île de Man",
         "ISO_A3":"IMN",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"Polygon",
@@ -1193809,7 +1193809,7 @@
       "properties":{
         "ADMIN":"Territoires de l'océan Indien",
         "ISO_A3":"-99",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1194050,7 +1194050,7 @@
       "properties":{
         "ADMIN":"Territoire britannique de l'océan Indien",
         "ISO_A3":"IOT",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1247372,7 +1247372,7 @@
       "properties":{
         "ADMIN":"Jersey",
         "ISO_A3":"JEY",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"Polygon",
@@ -1277319,7 +1277319,7 @@
       "properties":{
         "ADMIN":"Cosmodrome de Baïkonour",
         "ISO_A3":"-99",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"Polygon",
@@ -1277594,7 +1277594,7 @@
       "properties":{
         "ADMIN":"Glacier de Siachen",
         "ISO_A3":"-99",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"Polygon",
@@ -1308007,7 +1308007,7 @@
       "properties":{
         "ADMIN":"Kiribati",
         "ISO_A3":"KIR",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1311004,7 +1311004,7 @@
       "properties":{
         "ADMIN":"Saint-Christophe-et-Niévès",
         "ISO_A3":"KNA",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1339634,7 +1339634,7 @@
       "properties":{
         "ADMIN":"Sainte-Lucie",
         "ISO_A3":"LCA",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"Polygon",
@@ -1350163,7 +1350163,7 @@
       "properties":{
         "ADMIN":"Macao R.A.S.",
         "ISO_A3":"MAC",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1350556,7 +1350556,7 @@
       "properties":{
         "ADMIN":"Saint-Martin",
         "ISO_A3":"MAF",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"Polygon",
@@ -1400967,7 +1400967,7 @@
       "properties":{
         "ADMIN":"Îles Marshall",
         "ISO_A3":"MHL",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1436698,7 +1436698,7 @@
       "properties":{
         "ADMIN":"Îles Mariannes du Nord",
         "ISO_A3":"MNP",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1451497,7 +1451497,7 @@
       "properties":{
         "ADMIN":"Montserrat",
         "ISO_A3":"MSR",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"Polygon",
@@ -1478570,7 +1478570,7 @@
       "properties":{
         "ADMIN":"Île Norfolk",
         "ISO_A3":"NFK",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"Polygon",
@@ -1489551,7 +1489551,7 @@
       "properties":{
         "ADMIN":"Niue",
         "ISO_A3":"NIU",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"Polygon",
@@ -1561087,7 +1561087,7 @@
       "properties":{
         "ADMIN":"Nauru",
         "ISO_A3":"NRU",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"Polygon",
@@ -1600148,7 +1600148,7 @@
       "properties":{
         "ADMIN":"Îles Pitcairn",
         "ISO_A3":"PCN",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1610054,7 +1610054,7 @@
       "properties":{
         "ADMIN":"Îles Spratly",
         "ISO_A3":"-99",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1640480,7 +1640480,7 @@
       "properties":{
         "ADMIN":"Palaos",
         "ISO_A3":"PLW",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1853499,7 +1853499,7 @@
       "properties":{
         "ADMIN":"Récif Scarborough",
         "ISO_A3":"-99",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"Polygon",
@@ -1868429,7 +1868429,7 @@
       "properties":{
         "ADMIN":"Banc Serranilla",
         "ISO_A3":"-99",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"Polygon",
@@ -1868635,7 +1868635,7 @@
       "properties":{
         "ADMIN":"Géorgie du Sud et les îles Sandwich du Sud",
         "ISO_A3":"SGS",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1871040,7 +1871040,7 @@
       "properties":{
         "ADMIN":"Sainte-Hélène",
         "ISO_A3":"SHN",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1871401,7 +1871401,7 @@
       "properties":{
         "ADMIN":"Îles Salomon",
         "ISO_A3":"SLB",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1888741,7 +1888741,7 @@
       "properties":{
         "ADMIN":"Saint-Pierre-et-Miquelon",
         "ISO_A3":"SPM",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1919831,7 +1919831,7 @@
       "properties":{
         "ADMIN":"Saint-Martin",
         "ISO_A3":"SXM",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"Polygon",
@@ -1923730,7 +1923730,7 @@
       "properties":{
         "ADMIN":"Îles Turques-et-Caïques",
         "ISO_A3":"TCA",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1956644,7 +1956644,7 @@
       "properties":{
         "ADMIN":"Timor oriental",
         "ISO_A3":"TLS",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1957789,7 +1957789,7 @@
       "properties":{
         "ADMIN":"Tonga",
         "ISO_A3":"TON",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1976949,7 +1976949,7 @@
       "properties":{
         "ADMIN":"Tuvalu",
         "ISO_A3":"TUV",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -2001124,7 +2001124,7 @@
       "properties":{
         "ADMIN":"Îles mineures éloignées des États-Unis",
         "ISO_A3":"UMI",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -2149637,7 +2149637,7 @@
       "properties":{
         "ADMIN":"Base navale américaine de la baie de Guantánamo",
         "ISO_A3":"-99",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -2156672,7 +2156672,7 @@
       "properties":{
         "ADMIN":"Saint-Vincent-et-les Grenadines",
         "ISO_A3":"VCT",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -2169982,7 +2169982,7 @@
       "properties":{
         "ADMIN":"Îles Vierges britanniques",
         "ISO_A3":"VGB",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -2170391,7 +2170391,7 @@
       "properties":{
         "ADMIN":"Îles Vierges américaines",
         "ISO_A3":"VIR",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -2187509,7 +2187509,7 @@
       "properties":{
         "ADMIN":"Vanuatu",
         "ISO_A3":"VUT",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -2191690,7 +2191690,7 @@
       "properties":{
         "ADMIN":"Wallis-et-Futuna",
         "ISO_A3":"WLF",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -2191863,7 +2191863,7 @@
       "properties":{
         "ADMIN":"Zone de souveraineté d'Akrotiri",
         "ISO_A3":"-99",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"Polygon",
@@ -2192066,7 +2192066,7 @@
       "properties":{
         "ADMIN":"Samoa",
         "ISO_A3":"WSM",
-        "Difficulty":"Difficile"
+        "Difficulty":"Impossible"
       },
       "geometry":{
         "type":"MultiPolygon",

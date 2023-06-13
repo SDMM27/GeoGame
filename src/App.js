@@ -15,9 +15,20 @@ const countryStyle = {
 };
 
 const getRandomCountry = (difficulty) => {
+  const difficulties = ["Facile", "Moyen", "Difficile", "Impossible", "ImpossibleOnly"];
+  const selectedDifficultyIndex = difficulties.indexOf(difficulty);
+
+  let availableDifficulties;
+  if (difficulty === "ImpossibleOnly") {
+    availableDifficulties = ["Impossible"];
+  } else {
+    availableDifficulties = difficulties.slice(0, selectedDifficultyIndex + 1);
+  }
+
   const filteredCountries = countries.features.filter(
-    (country) => country.properties.Difficulty === difficulty
+    (country) => availableDifficulties.includes(country.properties.Difficulty)
   );
+
   const randomIndex = Math.floor(Math.random() * filteredCountries.length);
   const randomCountry = filteredCountries[randomIndex].properties.ADMIN;
   return randomCountry;
@@ -30,7 +41,7 @@ export default function GeoQuizzPlacement() {
   let [markerPosition, setMarkerPosition] = useState(null);
   let [score, setScore] = useState(0);
   let [gameStarted, setGameStarted] = useState(false);
-  let [difficulty, setDifficulty] = useState("Difficile");
+  let [difficulty, setDifficulty] = useState("Facile");
 
 
   // create custom icon
@@ -51,13 +62,68 @@ export default function GeoQuizzPlacement() {
     setScore(0);
     setTargetCountry(getRandomCountry(difficulty));
   };
-  
 
+  const passCountry = () => {
+    console.log('le pays était: ' + targetCountry);
+    changeCountry();
+    console.log(targetCountry + " a été choisi comme nouvelle cible !");
+   decrementScore('Difficile');
+  }
+
+  const restart = () => {
+    setGameStarted(false);
+    setScore(0);
+    setTargetCountry(null);
+    setMarkerPosition(null);
+  }
+
+  const changeCountry = (event) => {
+    targetCountry = getRandomCountry(difficulty);
+    setTargetCountry(targetCountry);
+  }
+
+  const decrementScore = (difficulty) => {
+    let decrementAmount = 0;
+    if (difficulty === "Facile") {
+      decrementAmount = 3;
+    } else if (difficulty === "Moyen") {
+      decrementAmount = 2;
+    } else if (difficulty === "Difficile") {
+      decrementAmount = 1;
+    } else if (difficulty === "Impossible") {
+      decrementAmount = 0.5;
+    }
+    
+    setScore(prevScore => {
+      const newScore = prevScore - decrementAmount;
+      return Math.max(0, newScore);
+    });
+  };
+
+  const incrementScore = (difficulty) => {
+    let incrementAmount = 0;
+    if (difficulty === "Facile") {
+      incrementAmount = 1;
+    } else if (difficulty === "Moyen") {
+      incrementAmount = 2;
+    } else if (difficulty === "Difficile") {
+      incrementAmount = 3;
+    } else if (difficulty === "Impossible") {
+      incrementAmount = 4;
+    }
+    
+    setScore(prevScore => {
+      const newScore = prevScore + incrementAmount;
+      return newScore;
+    });
+  };
+  
+  
   const onCountryMouseOver = (event) => {
     if (gameStarted) {
       const layer = event.target;
       layer.setStyle({
-        fillColor: "green",
+        fillColor: "purple",
         weight: 2,
         fillOpacity: 0.5,
       });
@@ -79,14 +145,10 @@ export default function GeoQuizzPlacement() {
       console.log(targetCountry);
       if (event.target.feature.properties.ADMIN === targetCountry) {
         console.log("Bravo ! " + targetCountry + " est la bonne réponse !");
-        targetCountry = getRandomCountry(difficulty);
-        setTargetCountry(targetCountry);
-        console.log(targetCountry + " a été choisi comme nouvelle cible !");
-        score = score + 1;
-        setScore(score);
-      } else if (score > 0) {
-        score = score - 1;
-        setScore(score);
+        changeCountry();
+        incrementScore(difficulty);
+      } else {
+        decrementScore(difficulty);
       }
       setMarkerPosition(event.latlng);
     }
@@ -99,14 +161,18 @@ export default function GeoQuizzPlacement() {
       <div id="scoreContainer">
         <h2>Score: {score}</h2>
       </div>
+
+      {!gameStarted && (
       <div id="difficultyContainer">
   <h2>Difficulté :</h2>
   <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
     <option value="Facile">Facile</option>
     <option value="Moyen">Moyen</option>
     <option value="Difficile">Difficile</option>
+    <option value="Impossible">Impossible</option>
+    <option value="ImpossibleOnly">Hardcore</option>
   </select>
-</div>
+</div>)}
 
       {!gameStarted && (
         <div id="startContainer">
@@ -115,8 +181,18 @@ export default function GeoQuizzPlacement() {
       )}
       {gameStarted && (   
         <div id="targetCountryContainer">
-          <h2>Target: {targetCountry}</h2>
+          <h2>Pays à trouver : {targetCountry}</h2>
         </div>)}
+        {gameStarted && (
+          <div id="passTheCountry">
+          <button onClick={passCountry}>Passer le pays</button>
+        </div>
+        )}
+        {gameStarted && (
+          <div id="restart">
+          <button onClick={restart}>Recommencer</button>
+        </div>
+        )}
       {gameStarted && (
         <div className="mapContainer">
           <MapContainer

@@ -1,3 +1,3 @@
-Si passCOuntry fonctionne pas, faire comme sur online.seterra avec 3 chances.
 Esthétiser le jeu ( mettre notamment une animation lorsque cela trouve le pays et lorsque l'on se trompe)
-Enlever les points en fonction de la difficulté du pays
+Faire un menu d'accueil ( éventuellement )
+Faire un tableau des meilleurs scores.

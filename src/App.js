@@ -1,10 +1,18 @@
 import logo from "./logo.svg";
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import "leaflet/dist/leaflet.css";
 import countries from "./data/countriesWithDifficulty_FR.json"; // import countries data
 import React, { useState, useEffect, useRef } from "react";
 
-import { MapContainer, TileLayer, Marker, Popup, GeoJSON, useMap } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  GeoJSON,
+  useMap,
+} from "react-leaflet";
 import { Icon, LatLngBounds } from "leaflet";
 
 const countryStyle = {
@@ -15,7 +23,13 @@ const countryStyle = {
 };
 
 const getRandomCountry = (difficulty) => {
-  const difficulties = ["Facile", "Moyen", "Difficile", "Impossible", "ImpossibleOnly"];
+  const difficulties = [
+    "Facile",
+    "Moyen",
+    "Difficile",
+    "Impossible",
+    "ImpossibleOnly",
+  ];
   const selectedDifficultyIndex = difficulties.indexOf(difficulty);
 
   let availableDifficulties;
@@ -25,15 +39,14 @@ const getRandomCountry = (difficulty) => {
     availableDifficulties = difficulties.slice(0, selectedDifficultyIndex + 1);
   }
 
-  const filteredCountries = countries.features.filter(
-    (country) => availableDifficulties.includes(country.properties.Difficulty)
+  const filteredCountries = countries.features.filter((country) =>
+    availableDifficulties.includes(country.properties.Difficulty)
   );
 
   const randomIndex = Math.floor(Math.random() * filteredCountries.length);
   const randomCountry = filteredCountries[randomIndex].properties.ADMIN;
   return randomCountry;
 };
-
 
 export default function GeoQuizzPlacement() {
   let [highlightedCountry, setHighlightedCountry] = useState(null);
@@ -48,7 +61,6 @@ export default function GeoQuizzPlacement() {
   const geoJsonRef = useRef(null);
   const [mapRef, setMapRef] = useState(null);
 
-
   // create custom icon
   const customIcon = new Icon({
     iconUrl: require("./img/marker.png"),
@@ -62,16 +74,15 @@ export default function GeoQuizzPlacement() {
     let targetDifficulty = countries.features.find(
       (country) => country.properties.ADMIN === targetCountryRef.current // Use the ref instead of the state variable
     ).properties.Difficulty;
-    if (targetDifficulty === "Difficile") {
-      mapRef.setView([lat, lng], 6);
-    } 
-    else if (targetDifficulty === "Impossible") {
+    if (targetCountryRef.current === "Vatican") {
+      mapRef.setView([lat, lng], 20);
+    } else if (targetDifficulty === "Difficile") {
+      mapRef.setView([lat, lng], 7);
+    } else if (targetDifficulty === "Impossible") {
       mapRef.setView([lat, lng], 9);
+    } else {
+      mapRef.setView([lat, lng], 4);
     }
-    else {
-      mapRef.setView([lat, lng], 3);
-    }
-   
   }
 
   useEffect(() => {
@@ -80,10 +91,13 @@ export default function GeoQuizzPlacement() {
     consecutiveErrorsRef.current = consecutiveErrors; // Update the ref whenever consecutiveErrors changes
     if (geoJsonRef.current && mapRef.current) {
       if (consecutiveErrors >= 3) {
-        const targetLayer = geoJsonRef.current.getLayers().find(
-          (layer) => layer.feature.properties.ADMIN === targetCountryRef.current
-        );
-    
+        const targetLayer = geoJsonRef.current
+          .getLayers()
+          .find(
+            (layer) =>
+              layer.feature.properties.ADMIN === targetCountryRef.current
+          );
+
         if (targetLayer) {
           targetLayer.setStyle({
             fillColor: "red",
@@ -92,11 +106,8 @@ export default function GeoQuizzPlacement() {
           });
 
           // Zoom to the target country
-        const bounds = targetLayer.getBounds();
-        let centerlat = (bounds._southWest.lat + bounds._northEast.lat)/2;
-        let centerlng = (bounds._southWest.lng + bounds._northEast.lng)/2;
-        // LatLngBounds center = new LatLngBounds(centerlat, centerlng);
-        zoomCountryMap(centerlat, centerlng);
+          const countryCenter = targetLayer.getBounds().getCenter();
+          zoomCountryMap(countryCenter.lat, countryCenter.lng);
         }
       } else {
         // Reset the style of all layers when the error count is less than 3
@@ -113,14 +124,13 @@ export default function GeoQuizzPlacement() {
     setTargetCountry(getRandomCountry(difficulty));
   };
 
-  
-
   const restart = () => {
     setGameStarted(false);
     setScore(0);
     setTargetCountry(null);
     setMarkerPosition(null);
-  }
+    setConsecutiveErrors(0);
+  };
 
   const decrementScore = (difficulty) => {
     let decrementAmount = 0;
@@ -133,8 +143,8 @@ export default function GeoQuizzPlacement() {
     } else if (difficulty === "Impossible") {
       decrementAmount = 0.5;
     }
-    
-    setScore(prevScore => {
+
+    setScore((prevScore) => {
       const newScore = prevScore - decrementAmount;
       return Math.max(0, newScore);
     });
@@ -151,14 +161,13 @@ export default function GeoQuizzPlacement() {
     } else if (difficulty === "Impossible") {
       incrementAmount = 4;
     }
-    
-    setScore(prevScore => {
+
+    setScore((prevScore) => {
       const newScore = prevScore + incrementAmount;
       return newScore;
     });
   };
-  
-  
+
   const onCountryMouseOver = (event) => {
     if (gameStarted) {
       const layer = event.target;
@@ -182,24 +191,27 @@ export default function GeoQuizzPlacement() {
   const changeCountry = () => {
     targetCountry = getRandomCountry(difficulty);
     setTargetCountry(targetCountry);
-  }
+  };
 
   const passCountry = () => {
     setConsecutiveErrors(0);
     changeCountry();
-   decrementScore('Difficile');
-  }
+    decrementScore("Difficile");
+  };
 
   const onCountryClick = (event) => {
     if (gameStarted) {
-      console.log('erreurs consécutives : ' + consecutiveErrorsRef.current);
+      console.log("erreurs consécutives : " + consecutiveErrorsRef.current);
       // console.log('pays cliqué : ' + event.target.feature.properties.ADMIN);
       // console.log('pays recherché : ' + targetCountryRef.current); // Use the ref instead of the state variable
       let targetDifficulty = countries.features.find(
-          (country) => country.properties.ADMIN === targetCountryRef.current // Use the ref instead of the state variable
-        ).properties.Difficulty;
-      if (event.target.feature.properties.ADMIN === targetCountryRef.current) { // Use the ref instead of the state variable
-        console.log("Bravo ! " + targetCountryRef.current + " est la bonne réponse !"); // Use the ref instead of the state variable
+        (country) => country.properties.ADMIN === targetCountryRef.current // Use the ref instead of the state variable
+      ).properties.Difficulty;
+      if (event.target.feature.properties.ADMIN === targetCountryRef.current) {
+        // Use the ref instead of the state variable
+        console.log(
+          "Bravo ! " + targetCountryRef.current + " est la bonne réponse !"
+        ); // Use the ref instead of the state variable
         changeCountry();
         if (consecutiveErrorsRef.current < 3) {
           incrementScore(targetDifficulty);
@@ -207,92 +219,95 @@ export default function GeoQuizzPlacement() {
         setConsecutiveErrors(0); // Reset the error count on correct guess
       } else {
         decrementScore(targetDifficulty);
-        setConsecutiveErrors(prevErrors => prevErrors + 1); // Increment the error count on incorrect guess
+        setConsecutiveErrors((prevErrors) => prevErrors + 1); // Increment the error count on incorrect guess
       }
       setMarkerPosition(event.latlng);
     }
   };
-  
 
   return (
-    <div style={{ width: "100%", height: "100vh" }}>
-      <h1 id="gameTitle">Geo Country Placement</h1>
-      <div id="scoreContainer">
-        <h2>Score: {score}</h2>
+    <div className="container">
+      <h1 className="text-center my-4">Geo Country Placement</h1>
+      <div className="row">
+        <div className="col-12 col-md-4">
+          <h2>Score: {score}</h2>
+          {!gameStarted && (
+            <div className="form-group">
+              <label htmlFor="difficulty">Difficulté :</label>
+              <select
+                id="difficulty"
+                className="form-control"
+                value={difficulty}
+                onChange={(e) => setDifficulty(e.target.value)}
+              >
+                <option value="Facile">Facile</option>
+                <option value="Moyen">Moyen</option>
+                <option value="Difficile">Difficile</option>
+                <option value="Impossible">Impossible</option>
+                <option value="ImpossibleOnly">Hardcore</option>
+              </select>
+            </div>
+          )}
+          {!gameStarted && (
+            <button className="btn btn-primary" onClick={startGame}>
+              Start
+            </button>
+          )}
+          {gameStarted && <h2>Pays à trouver : {targetCountry}</h2>}
+          {gameStarted && (
+            <button className="btn btn-secondary" onClick={passCountry}>
+              Passer le pays
+            </button>
+          )}
+          {gameStarted && (
+            <button className="btn btn-danger" onClick={restart}>
+              Recommencer
+            </button>
+          )}
+        </div>
+        <div className="col-12 col-md-12">
+          {gameStarted && (
+            <div className="mapContainer">
+              <MapContainer
+                ref={mapRef}
+                center={position}
+                zoom={2}
+                scrollWheelZoom={true}
+                dragging={true}
+                doubleClickZoom={false}
+                maxBounds={[[90, -180], [-90, 180]]}
+                whenReady={({ target }) => setMapRef(target)}
+              >
+                {/* Toner Map */}
+                <TileLayer
+                  attribution="Stamen Toner"
+                  url="https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png"
+                  noWrap={true}
+                  minZoom={2}
+                  maxZoom={20}
+                />
+
+                <GeoJSON
+                  ref={geoJsonRef}
+                  style={countryStyle}
+                  data={countries.features}
+                  onEachFeature={(feature, layer) => {
+                    layer.on({
+                      click: onCountryClick,
+                      mouseover: onCountryMouseOver,
+                      mouseout: onCountryMouseOut,
+                    });
+                  }}
+                />
+
+                {markerPosition && (
+                  <Marker position={markerPosition} icon={customIcon}></Marker>
+                )}
+              </MapContainer>
+            </div>
+          )}
+        </div>
       </div>
-
-      {!gameStarted && (
-      <div id="difficultyContainer">
-  <h2>Difficulté :</h2>
-  <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
-    <option value="Facile">Facile</option>
-    <option value="Moyen">Moyen</option>
-    <option value="Difficile">Difficile</option>
-    <option value="Impossible">Impossible</option>
-    <option value="ImpossibleOnly">Hardcore</option>
-  </select>
-</div>)}
-
-      {!gameStarted && (
-        <div id="startContainer">
-          <button onClick={startGame}>Start</button>
-        </div>
-      )}
-      {gameStarted && (   
-        <div id="targetCountryContainer">
-          <h2>Pays à trouver : {targetCountry}</h2>
-        </div>)}
-        {gameStarted && (
-          <div id="passTheCountry">
-          <button onClick={passCountry}>Passer le pays</button>
-        </div>
-        )}
-        {gameStarted && (
-          <div id="restart">
-          <button onClick={restart}>Recommencer</button>
-        </div>
-        )}
-      {gameStarted && (
-        <div className="mapContainer">
-          <MapContainer
-            ref={mapRef}
-            center={position}
-            zoom={2}
-            scrollWheelZoom={true}
-            dragging={true}
-            doubleClickZoom={false}
-            whenReady={({ target }) => setMapRef(target)}
-          >
-            {/* Toner Map */}
-            <TileLayer
-              attribution="Stamen Toner"
-              url="https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png"
-              noWrap={true}
-              minZoom={2}
-              maxZoom={20}
-            />
-
-            <GeoJSON
-              ref={geoJsonRef}
-              style={countryStyle}
-              data={countries.features}
-              onEachFeature={(feature, layer) => {
-                layer.on({
-                  click: onCountryClick,
-                  mouseover: onCountryMouseOver,
-                  mouseout: onCountryMouseOut,
-                });
-              }}
-            />
-
-            {markerPosition && (
-              <Marker position={markerPosition} icon={customIcon}>
-              </Marker>
-            )}
-          </MapContainer>
-        </div>
-      )}
     </div>
   );
 }
-

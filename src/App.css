@@ -45,12 +45,12 @@
 }
 
 .mapContainer {
-  height: 100vh;
+  height: 100%;
   margin-left: auto;
   margin-right: auto;
   margin-top: auto;
   margin-bottom: 50%;
-  width: 80%;
+  width: 100%;
 }
 
 #gameTitle {

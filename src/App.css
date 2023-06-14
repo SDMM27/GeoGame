@@ -49,8 +49,9 @@
   margin-left: auto;
   margin-right: auto;
   margin-top: auto;
-  margin-bottom: 50%;
+  margin-bottom: auto;
   width: 100%;
+  background-color: #222121;
 }
 
 #gameTitle {
@@ -59,9 +60,62 @@
   margin-bottom: 2%;
 }
 
-#mapContainer{
-  
+body {
+  background-color: #222121;/* This creates a gradient that goes from dark blue, to red, to yellow */
 }
+
+/* body, html, .container, .mapContainer {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+} */
+
+.btn {
+  margin-top: 1%;
+  margin-bottom: 1%;
+  margin-left: 1%;
+  margin-right: 1%;
+}
+
+.score {
+  color: white;
+  background-color: rgb(192, 9, 9); /* Change the color of the score to blue */
+  font-size: 24px; /* Increase the font size */
+  font-weight: bold; /* Make the text bold */
+  padding: 10px;
+  border: 3px solid rgb(192, 9, 9);
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.target-country {
+  padding: 10px;
+  background-color: purple;
+  border: 3px solid purple; /* Green border for the target country */
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  color: white; /* Change the color of the target country to green */
+  font-size: 20px; /* Increase the font size */
+  font-style: italic; /* Make the text italic */
+}
+
+.app-title {
+  font-size: 2.5em;
+  color: #ffffff;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  border-bottom: 2px solid #343a40;
+  padding-bottom: 10px;
+}
+
+h1 {
+  font-size: 2.5em; /* Adjust the size of the text */
+  color: #343a40; /* Change the color of the text */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Add a shadow to the text */
+  border-bottom: 2px solid #343a40; /* Add a bottom border */
+  padding-bottom: 10px; /* Add some padding */
+}
+
 
 @keyframes App-logo-spin {
   from {

@@ -227,10 +227,10 @@ export default function GeoQuizzPlacement() {
 
   return (
     <div className="container">
-      <h1 className="text-center my-4">Geo Country Placement</h1>
+      <h1 className="app-title text-center my-4">Geo Country Placement</h1>
       <div className="row">
         <div className="col-12 col-md-4">
-          <h2>Score: {score}</h2>
+          {gameStarted && <h2 className="score">Score: {score}</h2>}
           {!gameStarted && (
             <div className="form-group">
               <label htmlFor="difficulty">Difficulté :</label>
@@ -253,7 +253,7 @@ export default function GeoQuizzPlacement() {
               Start
             </button>
           )}
-          {gameStarted && <h2>Pays à trouver : {targetCountry}</h2>}
+          {gameStarted && <h2 className="target-country">Pays à trouver : {targetCountry}</h2>}
           {gameStarted && (
             <button className="btn btn-secondary" onClick={passCountry}>
               Passer le pays
@@ -276,7 +276,12 @@ export default function GeoQuizzPlacement() {
                 dragging={true}
                 doubleClickZoom={false}
                 maxBounds={[[90, -180], [-90, 180]]}
-                whenReady={({ target }) => setMapRef(target)}
+                whenReady={({ target }) => {
+                  setMapRef(target);
+                  setTimeout(() => {
+                    target.invalidateSize();
+                  }, 100);
+                }}
               >
                 {/* Toner Map */}
                 <TileLayer

@@ -43,6 +43,10 @@ export default function GeoQuizzPlacement() {
   let [score, setScore] = useState(0);
   let [gameStarted, setGameStarted] = useState(false);
   let [difficulty, setDifficulty] = useState("Facile");
+  let [consecutiveErrors, setConsecutiveErrors] = useState(0);
+  const geoJsonRef = useRef(null);
+
+
 
 
   // create custom icon
@@ -56,7 +60,27 @@ export default function GeoQuizzPlacement() {
   useEffect(() => {
     document.title = "Geo Country Placement";
     targetCountryRef.current = targetCountry; // Update the ref whenever targetCountry changes
-  }, [targetCountry]);
+    if (geoJsonRef.current) {
+      if (consecutiveErrors >= 3) {
+        const targetLayer = geoJsonRef.current.getLayers().find(
+          (layer) => layer.feature.properties.ADMIN === targetCountryRef.current
+        );
+    
+        if (targetLayer) {
+          targetLayer.setStyle({
+            fillColor: "red",
+            weight: 2,
+            fillOpacity: 0.5,
+          });
+        }
+      } else {
+        // Reset the style of all layers when the error count is less than 3
+        geoJsonRef.current.eachLayer((layer) => {
+          layer.setStyle(countryStyle);
+        });
+      }
+    }
+  }, [targetCountry, consecutiveErrors]);
 
   const startGame = () => {
     setGameStarted(true);
@@ -153,8 +177,10 @@ export default function GeoQuizzPlacement() {
         console.log("Bravo ! " + targetCountryRef.current + " est la bonne réponse !"); // Use the ref instead of the state variable
         changeCountry();
         incrementScore(targetDifficulty);
+        setConsecutiveErrors(0); // Reset the error count on correct guess
       } else {
         decrementScore(targetDifficulty);
+        setConsecutiveErrors(prevErrors => prevErrors + 1); // Increment the error count on incorrect guess
       }
       setMarkerPosition(event.latlng);
     }
@@ -218,6 +244,7 @@ export default function GeoQuizzPlacement() {
             />
 
             <GeoJSON
+              ref={geoJsonRef}
               style={countryStyle}
               data={countries.features}
               onEachFeature={(feature, layer) => {

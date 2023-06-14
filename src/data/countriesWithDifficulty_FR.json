@@ -207530,7 +207530,7 @@
       "properties":{
         "ADMIN":"Bénin",
         "ISO_A3":"BEN",
-        "Difficulty":"Moyen"
+        "Difficulty":"Difficile"
       },
       "geometry":{
         "type":"Polygon",
@@ -236595,7 +236595,7 @@
       "properties":{
         "ADMIN":"Bajo Nuevo Bank (îles Petrel)",
         "ISO_A3":"-99",
-        "Difficulty":"Impossible"
+        "Difficulty":""
       },
       "geometry":{
         "type":"Polygon",
@@ -760922,7 +760922,7 @@
       "properties":{
         "ADMIN":"Îles de la mer de Corail",
         "ISO_A3":"-99",
-        "Difficulty":"Impossible"
+        "Difficulty":""
       },
       "geometry":{
         "type":"Polygon",
@@ -1193809,7 +1193809,7 @@
       "properties":{
         "ADMIN":"Territoires de l'océan Indien",
         "ISO_A3":"-99",
-        "Difficulty":"Impossible"
+        "Difficulty":""
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1308007,7 +1308007,7 @@
       "properties":{
         "ADMIN":"Kiribati",
         "ISO_A3":"KIR",
-        "Difficulty":"Impossible"
+        "Difficulty":""
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1610054,7 +1610054,7 @@
       "properties":{
         "ADMIN":"Îles Spratly",
         "ISO_A3":"-99",
-        "Difficulty":"Impossible"
+        "Difficulty":""
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1853499,7 +1853499,7 @@
       "properties":{
         "ADMIN":"Récif Scarborough",
         "ISO_A3":"-99",
-        "Difficulty":"Impossible"
+        "Difficulty":""
       },
       "geometry":{
         "type":"Polygon",
@@ -1871040,7 +1871040,7 @@
       "properties":{
         "ADMIN":"Sainte-Hélène",
         "ISO_A3":"SHN",
-        "Difficulty":"Impossible"
+        "Difficulty":""
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1883115,7 +1883115,7 @@
       "properties":{
         "ADMIN":"Salvador",
         "ISO_A3":"SLV",
-        "Difficulty":"Moyen"
+        "Difficulty":"Difficile"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -2001124,7 +2001124,7 @@
       "properties":{
         "ADMIN":"Îles mineures éloignées des États-Unis",
         "ISO_A3":"UMI",
-        "Difficulty":"Impossible"
+        "Difficulty":""
       },
       "geometry":{
         "type":"MultiPolygon",

@@ -14,7 +14,7 @@ import {
   useMap,
 } from "react-leaflet";
 import { Icon, LatLngBounds } from "leaflet";
-
+ 
 const countryStyle = {
   fillColor: "transparent",
   color: "black",
@@ -86,6 +86,10 @@ export default function GeoQuizzPlacement() {
   }
 
   useEffect(() => {
+    let leafletContainer = document.getElementsByClassName("leaflet-container")[0];
+    if (leafletContainer) {
+      leafletContainer.style.background = 'none';
+    }
     document.title = "Geo Country Placement";
     targetCountryRef.current = targetCountry; // Update the ref whenever targetCountry changes
     consecutiveErrorsRef.current = consecutiveErrors; // Update the ref whenever consecutiveErrors changes

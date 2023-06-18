@@ -22,12 +22,53 @@ medium_countries = [
 
 # Liste des pays difficiles à trouver
 difficult_countries = [
-    "Andorre", "Antigua-et-Barbuda", "Bahamas", "Barbade", "Belize", "Bhoutan", "Cap-Vert", "Comores",
-    "Dominique", "Fidji", "Gambie", "Grenade", "Guinée-Bissau", "Guyana", "Îles Marshall", "Kiribati",
-    "Lesotho", "Liechtenstein", "Maldives", "Malte", "Monaco", "Nauru", "Palaos", "Papouasie-Nouvelle-Guinée",
-    "Saint-Christophe-et-Niévès", "Saint-Marin", "Sao Tomé-et-Principe", "Seychelles", "Slovaquie",
-    "Somalie", "Soudan du Sud", "Suriname", "Timor oriental", "Tonga", "Tuvalu", "Vanuatu", "Vatican"
+    "Andorre", "Bahamas", "Belize", "Bhoutan", "Cap-Vert", "Comores",
+    "Fidji", "Gambie", "Guinée-Bissau", "Guyana", "Lesotho", "Liechtenstein", "Maldives", "Malte", "Monaco", "Papouasie-Nouvelle-Guinée","Saint-Marin", 
+    "Sao Tomé-et-Principe", "Seychelles", "Slovaquie",
+    "Somalie", "Soudan du Sud", "Suriname", "Vatican"
 ]
+
+impossible_countries = ["Aruba",
+"Anguilla",
+"Aland",
+"Samoa américaines",
+"Îles Ashmore et Cartier",
+"Terres australes et antarctiques françaises",
+"Bajo Nuevo Bank (îles Petrel)",
+"Antigua-et-Barbuda",
+"Saint-Barthélemy",
+"Île Clipperton",
+"Zone non gouvernée de Chypre",
+"Îles Cook",
+"Îles de la mer de Corail","Curaçao",
+"Îles Caïmans","Dominique",
+"Barbade",
+"Zone de souveraineté de Dhekelia",
+"Îles Malouines",
+"États fédérés de Micronésie",
+"Guernesey","Grenade",
+"Guam",
+"Îles Heard et MacDonald",
+"Île de Man",
+"Territoires de l'océan Indien","Territoire britannique de l'océan Indien",
+"Jersey",
+"Cosmodrome de Baïkonour",
+"Glacier de Siachen",
+"Kiribati",
+"Saint-Christophe-et-Niévès",
+"Sainte-Lucie",
+"Macao R.A.S.","Saint-Martin",
+"Îles Marshall",
+"Îles Mariannes du Nord",
+"Montserrat",
+"Île Norfolk",
+"Niue",
+"Nauru",
+"Îles Pitcairn",
+"Îles Spratly","Palaos","Récif Scarborough","Banc Serranilla","Géorgie du Sud et les îles Sandwich du Sud",
+"Sainte-Hélène","Îles Salomon","Saint-Pierre-et-Miquelon","Saint-Martin","Îles Turques-et-Caïques","Timor oriental","Tonga","Tuvalu",
+"Îles mineures éloignées des États-Unis","Base navale américaine de la baie de Guantánamo","Saint-Vincent-et-les Grenadines","Îles Vierges britanniques","Îles Vierges américaines","Vanuatu","Wallis-et-Futuna",
+"Zone de souveraineté d'Akrotiri","Samoa"]
 
 # Charger le fichier GeoJSON initial
 with open('src/data/countries_FR.json', 'r', encoding='utf-8') as file:
@@ -45,6 +86,8 @@ for feature in new_geojson_data['features']:
         feature['properties']['Difficulty'] = 'Moyen'
     elif country in difficult_countries:
         feature['properties']['Difficulty'] = 'Difficile'
+    elif country in impossible_countries:
+        feature['properties']['Difficulty'] = 'Impossible'
     else:
         feature['properties']['Difficulty'] = 'Difficile'
 

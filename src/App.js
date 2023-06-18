@@ -154,6 +154,7 @@ export default function GeoQuizzPlacement() {
     setGameStarted(true);
     setScore(0);
     setTargetCountry(getRandomCountry(difficulty));
+    setTimer(65);
   };
 
   const restart = () => {

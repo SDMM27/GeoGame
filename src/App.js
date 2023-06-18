@@ -154,7 +154,7 @@ export default function GeoQuizzPlacement() {
     setGameStarted(true);
     setScore(0);
     setTargetCountry(getRandomCountry(difficulty));
-    setTimer(65);
+    setTimer(65); 
   };
 
   const restart = () => {
@@ -332,6 +332,7 @@ export default function GeoQuizzPlacement() {
                   left: "10px",
                   zIndex: 1000,
                 }}
+                className="gameInfos"
               >
                 <h2 className="textContainer targetCountry">
                   Pays à trouver : {targetCountry}

@@ -87,6 +87,14 @@ body {
   width: 100%;
 } */
 
+.gameInfos{
+  width: auto;
+  color: white;
+  font-size: 5%;
+  font-style: italic;
+  z-index: 9999;
+}
+
 .btn-primary {
   margin-top: 1%;
 }
@@ -119,7 +127,7 @@ body {
   border: 3px solid #DC3545; /* Green border for the target country */
   border-radius: 10px;
   color: white; /* Change the color of the target country to green */
-  font-size: 20px; /* Increase the font size */
+  font-size: 27em; /* Increase the font size */
   font-style: italic; /* Make the text italic */
   z-index: 9999;
 }

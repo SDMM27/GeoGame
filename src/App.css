@@ -13,6 +13,23 @@
   }
 }
 
+.Toastify__toast-container {
+  width: 15% !important; /* Régler la largeur du conteneur de toast ici */
+}
+
+.Toastify__toast {
+  border-radius: 10px !important;
+  font-size: 14px !important; /* Vous pouvez régler la taille de la police ici */
+  padding: 10px !important;
+}
+
+/* Vous pouvez ajuster la taille du texte à l'intérieur du toast en utilisant ce code */
+.Toastify__toast-body {
+  font-size: 12px;
+}
+
+
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;

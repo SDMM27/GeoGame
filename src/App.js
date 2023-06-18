@@ -2,8 +2,11 @@ import logo from "./logo.svg";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import "leaflet/dist/leaflet.css";
+import "react-toastify/dist/ReactToastify.css";
 import countries from "./data/countriesWithDifficulty_FR.json"; // import countries data
 import React, { useState, useEffect, useRef } from "react";
+import { toast, ToastContainer } from "react-toastify";
+
 
 import {
   MapContainer,
@@ -130,6 +133,9 @@ export default function GeoQuizzPlacement() {
     if (gameStarted) {
       // clear the timer when it reaches 0
       if (timer <= 0) {
+        setGameStarted(false);
+        toast.info("Le temps est écoulé !");
+        setConsecutiveErrors(0);
         return;
       }
       
@@ -139,22 +145,14 @@ export default function GeoQuizzPlacement() {
       
       return () => clearInterval(id); // this will clear the interval on unmount or when gameStarted changes
     }
-  }, [gameStarted, timer]); // this effect runs every time gameStarted or timer changes
 
-  useEffect(() => {
-    if (timer === 0) {
-      // stop the game when timer reaches 0
-      setGameStarted(false);
-      alert('Le temps est écoulé !'); // this is just a simple way to notify the user, consider using a nicer way
-    }
-  }, [timer]); // this effect runs every time timer changes
-  
+  }, [gameStarted, timer]); // this effect runs every time gameStarted or timer changes  
 
   const startGame = () => {
     setGameStarted(true);
     setScore(0);
     setTargetCountry(getRandomCountry(difficulty));
-    setTimer(65); 
+    setTimer(7); 
   };
 
   const restart = () => {
@@ -234,29 +232,27 @@ export default function GeoQuizzPlacement() {
 
   const onCountryClick = (event) => {
     if (gameStarted) {
-      console.log("erreurs consécutives : " + consecutiveErrorsRef.current);
-      // console.log('pays cliqué : ' + event.target.feature.properties.ADMIN);
-      // console.log('pays recherché : ' + targetCountryRef.current); // Use the ref instead of the state variable
       let targetDifficulty = countries.features.find(
-        (country) => country.properties.ADMIN === targetCountryRef.current // Use the ref instead of the state variable
+        (country) => country.properties.ADMIN === targetCountryRef.current
       ).properties.Difficulty;
       if (event.target.feature.properties.ADMIN === targetCountryRef.current) {
-        // Use the ref instead of the state variable
-        console.log(
+        toast.success(
           "Bravo ! " + targetCountryRef.current + " est la bonne réponse !"
-        ); // Use the ref instead of the state variable
+        );
         changeCountry();
         if (consecutiveErrorsRef.current < 3) {
           incrementScore(targetDifficulty);
         }
-        setConsecutiveErrors(0); // Reset the error count on correct guess
+        setConsecutiveErrors(0);
       } else {
+        toast.error("Dommage ! Vous n'avez pas trouvé le bon pays.");
         decrementScore(targetDifficulty);
-        setConsecutiveErrors((prevErrors) => prevErrors + 1); // Increment the error count on incorrect guess
+        setConsecutiveErrors((prevErrors) => prevErrors + 1);
       }
       setMarkerPosition(event.latlng);
     }
   };
+  
 
   return (
     <div className="container">
@@ -304,6 +300,8 @@ export default function GeoQuizzPlacement() {
                 Recommencer
               </button>
             </div> )}
+
+              <ToastContainer position="top-right" autoClose={2500} theme="colored" hideProgressBar />
 
           {gameStarted && (
             <MapContainer

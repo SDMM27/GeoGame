@@ -5,3 +5,4 @@ Bouton pour découvrir le pays
 Ecrire les règles du jeu
 Faire un menu d'accueil ( éventuellement )
 Faire un tableau des meilleurs scores.
+Mettre un timer en en secondes plus précises genre

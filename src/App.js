@@ -14,7 +14,7 @@ import {
   useMap,
 } from "react-leaflet";
 import { Icon, LatLngBounds } from "leaflet";
- 
+
 const countryStyle = {
   fillColor: "transparent",
   color: "black",
@@ -86,9 +86,10 @@ export default function GeoQuizzPlacement() {
   }
 
   useEffect(() => {
-    let leafletContainer = document.getElementsByClassName("leaflet-container")[0];
+    let leafletContainer =
+      document.getElementsByClassName("leaflet-container")[0];
     if (leafletContainer) {
-      leafletContainer.style.background = 'none';
+      leafletContainer.style.background = "none";
     }
     document.title = "Geo Country Placement";
     targetCountryRef.current = targetCountry; // Update the ref whenever targetCountry changes
@@ -232,88 +233,109 @@ export default function GeoQuizzPlacement() {
   return (
     <div className="container">
       <h1 className="app-title text-center my-4">Geo Country Placement</h1>
-      <div className="row">
-        <div className="col-12 col-md-4">
-          {gameStarted && <h2 className="score">Score: {score}</h2>}
-          {!gameStarted && (
-            <div className="form-group">
-              <label htmlFor="difficulty">Difficulté :</label>
-              <select
-                id="difficulty"
-                className="form-control"
-                value={difficulty}
-                onChange={(e) => setDifficulty(e.target.value)}
-              >
-                <option value="Facile">Facile</option>
-                <option value="Moyen">Moyen</option>
-                <option value="Difficile">Difficile</option>
-                <option value="Impossible">Impossible</option>
-                <option value="ImpossibleOnly">Hardcore</option>
-              </select>
-            </div>
-          )}
-          {!gameStarted && (
-            <button className="btn btn-primary" onClick={startGame}>
-              Start
-            </button>
-          )}
-          {gameStarted && <h2 className="target-country">Pays à trouver : {targetCountry}</h2>}
+
+      <div className="col-12 col-md-12">
+        <div className="mapContainer">
+          <div className="col-12 col-md-5">
+            {!gameStarted && (
+              <div className="form-group">
+                <label htmlFor="difficulty">Difficulté :</label>
+                <select
+                  id="difficulty"
+                  className="form-control"
+                  value={difficulty}
+                  onChange={(e) => setDifficulty(e.target.value)}
+                >
+                  <option value="Facile">Facile</option>
+                  <option value="Moyen">Moyen</option>
+                  <option value="Difficile">Difficile</option>
+                  <option value="Impossible">Impossible</option>
+                  <option value="ImpossibleOnly">Hardcore</option>
+                </select>
+              </div>
+            )}
+            {!gameStarted && (
+              <button className="btn btn-primary" onClick={startGame}>
+                Start
+              </button>
+            )}
+          </div>
           {gameStarted && (
-            <button className="btn btn-secondary" onClick={passCountry}>
-              Passer le pays
-            </button>
-          )}
+          <div 
+              style={{
+                position: 'relative',
+                top: '10px',
+                left: '10px',
+                zIndex: 1000
+            }}
+            >
+              <button className="btn btn-secondary" onClick={passCountry}>
+                Passer le pays
+              </button>
+              <button className="btn btn-danger" onClick={restart}>
+                Recommencer
+              </button>
+            </div> )}
+
           {gameStarted && (
-            <button className="btn btn-danger" onClick={restart}>
-              Recommencer
-            </button>
-          )}
-        </div>
-        <div className="col-12 col-md-12">
-          {gameStarted && (
-            <div className="mapContainer">
-              <MapContainer
-                ref={mapRef}
-                center={position}
-                zoom={2}
-                scrollWheelZoom={true}
-                dragging={true}
-                doubleClickZoom={false}
-                maxBounds={[[90, -180], [-90, 180]]}
-                whenReady={({ target }) => {
-                  setMapRef(target);
-                  setTimeout(() => {
-                    target.invalidateSize();
-                  }, 100);
+            <MapContainer
+              ref={mapRef}
+              center={position}
+              zoom={2}
+              scrollWheelZoom={true}
+              zoomControl={false}
+              dragging={true}
+              doubleClickZoom={false}
+              maxBounds={[
+                [90, -180],
+                [-90, 180],
+              ]}
+              whenReady={({ target }) => {
+                setMapRef(target);
+                setTimeout(() => {
+                  target.invalidateSize();
+                }, 100);
+              }}
+            >
+              <div
+                style={{
+                  position: "absolute",
+                  top: "10px",
+                  left: "10px",
+                  zIndex: 1000,
                 }}
               >
-                {/* Toner Map */}
-                <TileLayer
-                  attribution="Stamen Toner"
-                  url="https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png"
-                  noWrap={true}
-                  minZoom={2}
-                  maxZoom={20}
-                />
+                <h2 className="textContainer targetCountry">
+                  Pays à trouver : {targetCountry}
+                </h2>
+                <h2 className="textContainer">Score : {score}</h2>
+              </div>
+              {/* Toner Map */}
+              <TileLayer
+                attribution="Stamen Toner"
+                url="https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png"
+                noWrap={true}
+                minZoom={2}
+                maxZoom={20}
+              />
 
-                <GeoJSON
-                  ref={geoJsonRef}
-                  style={countryStyle}
-                  data={countries.features}
-                  onEachFeature={(feature, layer) => {
-                    layer.on({
-                      click: onCountryClick,
-                      mouseover: onCountryMouseOver,
-                      mouseout: onCountryMouseOut,
-                    });
-                  }}
-                />
+              <GeoJSON
+                ref={geoJsonRef}
+                style={countryStyle}
+                data={countries.features}
+                onEachFeature={(feature, layer) => {
+                  layer.on({
+                    click: onCountryClick,
+                    mouseover: onCountryMouseOver,
+                    mouseout: onCountryMouseOut,
+                  });
+                }}
+              />
 
-                {markerPosition && (
-                  <Marker position={markerPosition} icon={customIcon}></Marker>
-                )}
-              </MapContainer>
-            </div>
+              {markerPosition && (
+                <Marker position={markerPosition} icon={customIcon}></Marker>
+              )}
+            </MapContainer>
           )}
         </div>
       </div>

@@ -1868429,7 +1868429,7 @@
       "properties":{
         "ADMIN":"Banc Serranilla",
         "ISO_A3":"-99",
-        "Difficulty":"Impossible"
+        "Difficulty":""
       },
       "geometry":{
         "type":"Polygon",

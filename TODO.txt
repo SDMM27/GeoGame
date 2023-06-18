@@ -1,5 +1,4 @@
 Esthétiser le jeu ( mettre notamment une animation lorsque cela trouve le pays et lorsque l'on se trompe)
-Message de retour si le pays est trouvé ou non après le click
 Changer le wording du bouton recommencer
 Bouton pour découvrir le pays
 Ecrire les règles du jeu

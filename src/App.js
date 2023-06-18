@@ -152,7 +152,7 @@ export default function GeoQuizzPlacement() {
     setGameStarted(true);
     setScore(0);
     setTargetCountry(getRandomCountry(difficulty));
-    setTimer(7); 
+    setTimer(65); 
   };
 
   const restart = () => {
@@ -256,7 +256,7 @@ export default function GeoQuizzPlacement() {
 
   return (
     <div className="container">
-      <h1 className="app-title text-center my-4">Geo Country Placement</h1>
+      {!gameStarted && (<h1 className="app-title text-center my-4">Geo Country Placement</h1>)}
 
       <div className="col-12 col-md-12">
         <div className="mapContainer">
@@ -297,7 +297,7 @@ export default function GeoQuizzPlacement() {
                 Passer le pays
               </button>
               <button className="btn btn-danger" onClick={restart}>
-                Recommencer
+                Revenir à l'accueil
               </button>
             </div> )}
 

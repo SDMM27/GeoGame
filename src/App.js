@@ -60,6 +60,8 @@ export default function GeoQuizzPlacement() {
   const consecutiveErrorsRef = useRef(consecutiveErrors); // Create a ref
   const geoJsonRef = useRef(null);
   const [mapRef, setMapRef] = useState(null);
+  let [timer, setTimer] = useState(65); // timer set to 60 seconds
+
 
   // create custom icon
   const customIcon = new Icon({
@@ -122,6 +124,31 @@ export default function GeoQuizzPlacement() {
       }
     }
   }, [targetCountry, consecutiveErrors]);
+
+  useEffect(() => {
+    // only start the timer when the game has started
+    if (gameStarted) {
+      // clear the timer when it reaches 0
+      if (timer <= 0) {
+        return;
+      }
+      
+      const id = setInterval(() => {
+        setTimer(timer => timer - 1);
+      }, 1000);
+      
+      return () => clearInterval(id); // this will clear the interval on unmount or when gameStarted changes
+    }
+  }, [gameStarted, timer]); // this effect runs every time gameStarted or timer changes
+
+  useEffect(() => {
+    if (timer === 0) {
+      // stop the game when timer reaches 0
+      setGameStarted(false);
+      alert('Le temps est écoulé !'); // this is just a simple way to notify the user, consider using a nicer way
+    }
+  }, [timer]); // this effect runs every time timer changes
+  
 
   const startGame = () => {
     setGameStarted(true);
@@ -281,7 +308,7 @@ export default function GeoQuizzPlacement() {
             <MapContainer
               ref={mapRef}
               center={position}
-              zoom={2}
+              zoom={3}
               scrollWheelZoom={true}
               zoomControl={false}
               dragging={true}
@@ -309,6 +336,7 @@ export default function GeoQuizzPlacement() {
                   Pays à trouver : {targetCountry}
                 </h2>
                 <h2 className="textContainer">Score : {score}</h2>
+                <h2 className="textContainer">Temps restant : {timer}</h2>
               </div>
               {/* Toner Map */}
               <TileLayer
@@ -332,9 +360,9 @@ export default function GeoQuizzPlacement() {
                 }}
               />
 
-              {markerPosition && (
+              {/* {markerPosition && (
                 <Marker position={markerPosition} icon={customIcon}></Marker>
-              )}
+              )} */}
             </MapContainer>
           )}
         </div>

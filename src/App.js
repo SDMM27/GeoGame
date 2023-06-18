@@ -7,7 +7,6 @@ import countries from "./data/countriesWithDifficulty_FR.json"; // import countr
 import React, { useState, useEffect, useRef } from "react";
 import { toast, ToastContainer } from "react-toastify";
 
-
 import {
   MapContainer,
   TileLayer,
@@ -65,7 +64,6 @@ export default function GeoQuizzPlacement() {
   const [mapRef, setMapRef] = useState(null);
   let [timer, setTimer] = useState(65); // timer set to 60 seconds
 
-
   // create custom icon
   const customIcon = new Icon({
     iconUrl: require("./img/marker.png"),
@@ -119,12 +117,7 @@ export default function GeoQuizzPlacement() {
           const countryCenter = targetLayer.getBounds().getCenter();
           zoomCountryMap(countryCenter.lat, countryCenter.lng);
         }
-      } else {
-        // Reset the style of all layers when the error count is less than 3
-        geoJsonRef.current.eachLayer((layer) => {
-          layer.setStyle(countryStyle);
-        });
-      }
+      } 
     }
   }, [targetCountry, consecutiveErrors]);
 
@@ -138,21 +131,20 @@ export default function GeoQuizzPlacement() {
         setConsecutiveErrors(0);
         return;
       }
-      
+
       const id = setInterval(() => {
-        setTimer(timer => timer - 1);
+        setTimer((timer) => timer - 1);
       }, 1000);
-      
+
       return () => clearInterval(id); // this will clear the interval on unmount or when gameStarted changes
     }
-
-  }, [gameStarted, timer]); // this effect runs every time gameStarted or timer changes  
+  }, [gameStarted, timer]); // this effect runs every time gameStarted or timer changes
 
   const startGame = () => {
     setGameStarted(true);
     setScore(0);
     setTargetCountry(getRandomCountry(difficulty));
-    setTimer(65); 
+    setTimer(65);
   };
 
   const restart = () => {
@@ -230,6 +222,40 @@ export default function GeoQuizzPlacement() {
     decrementScore("Difficile");
   };
 
+  const seeCountry = () => {
+    setConsecutiveErrors(0);
+    const targetLayer = geoJsonRef.current
+      .getLayers()
+      .find(
+        (layer) => layer.feature.properties.ADMIN === targetCountryRef.current
+      );
+
+    if (!targetLayer) {
+      console.log(`Could not find layer for country: ${targetCountryRef.current}`);
+      return;
+    }
+
+    console.log(`Found layer for country: ${targetCountryRef.current}`);
+
+    targetLayer.setStyle({
+      fillColor: "red",
+      weight: 2,
+      fillOpacity: 0.5,
+    });
+
+    const countryCenter = targetLayer.getBounds().getCenter();
+    zoomCountryMap(countryCenter.lat, countryCenter.lng);
+
+    setTimeout(() => {
+      targetLayer.setStyle(countryStyle);
+    }, 3000); // Change this to change the delay, in milliseconds
+
+    // Change country
+    changeCountry();
+    decrementScore("Difficile");
+  };
+
+
   const onCountryClick = (event) => {
     if (gameStarted) {
       let targetDifficulty = countries.features.find(
@@ -252,11 +278,12 @@ export default function GeoQuizzPlacement() {
       setMarkerPosition(event.latlng);
     }
   };
-  
 
   return (
     <div className="container">
-      {!gameStarted && (<h1 className="app-title text-center my-4">Geo Country Placement</h1>)}
+      {!gameStarted && (
+        <h1 className="app-title text-center my-4">Geo Country Placement</h1>
+      )}
 
       <div className="col-12 col-md-12">
         <div className="mapContainer">
@@ -285,23 +312,32 @@ export default function GeoQuizzPlacement() {
             )}
           </div>
           {gameStarted && (
-          <div 
+            <div
               style={{
-                position: 'relative',
-                top: '10px',
-                left: '10px',
-                zIndex: 1000
-            }}
+                position: "relative",
+                top: "10px",
+                left: "10px",
+                zIndex: 1000,
+              }}
             >
-              <button className="btn btn-secondary" onClick={passCountry}>
-                Passer le pays
-              </button>
               <button className="btn btn-danger" onClick={restart}>
                 Revenir à l'accueil
               </button>
-            </div> )}
+              <button className="btn btn-warning" onClick={seeCountry}>
+                Voir le pays
+              </button>
+              <button className="btn btn-secondary" onClick={passCountry}>
+                Passer le pays
+              </button>
+            </div>
+          )}
 
-              <ToastContainer position="top-right" autoClose={2500} theme="colored" hideProgressBar />
+          <ToastContainer
+            position="top-right"
+            autoClose={2500}
+            theme="colored"
+            hideProgressBar
+          />
 
           {gameStarted && (
             <MapContainer

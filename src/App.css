@@ -116,6 +116,13 @@ body {
   margin-top: 1%;
 }
 
+.btn-warning {
+  margin-top: 0.5%;
+  margin-bottom: 2%;
+  margin-left: 2%;
+  z-index: 9999;
+}
+
 .btn-secondary {
   margin-top: 0.5%;
   margin-bottom: 2%;

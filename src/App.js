@@ -55,7 +55,7 @@ export default function GeoQuizzPlacement() {
   let [highlightedCountry, setHighlightedCountry] = useState(null);
   let [targetCountry, setTargetCountry] = useState(null);
   const targetCountryRef = useRef(targetCountry); // Create a ref
-  let [setMarkerPosition] = useState(null);
+  let [markerPosition, setMarkerPosition] = useState(null);
   let [score, setScore] = useState(0);
   let [gameStarted, setGameStarted] = useState(false);
   let [difficulty, setDifficulty] = useState("Facile");
@@ -150,7 +150,7 @@ export default function GeoQuizzPlacement() {
     setGameStarted(true);
     setScore(0);
     setTargetCountry(getRandomCountry(difficulty));
-    setTimer(65);
+    setTimer(2);
   };
 
   const restart = () => {
@@ -159,6 +159,7 @@ export default function GeoQuizzPlacement() {
     setTimer(65);
     setTargetCountry(null);
     setMarkerPosition(null);
+    console.log(markerPosition);
     setConsecutiveErrors(0);
   };
 

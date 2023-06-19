@@ -149,6 +149,10 @@ body {
 
 }
 
+option {
+  color: black;
+}
+
 .form-group {
   color: white;
   margin-left: auto;

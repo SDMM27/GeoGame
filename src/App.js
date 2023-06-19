@@ -1,4 +1,5 @@
 import logo from "./logo.svg";
+import Form from "./pages/form";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import "leaflet/dist/leaflet.css";
@@ -126,7 +127,14 @@ export default function GeoQuizzPlacement() {
     if (gameStarted) {
       // clear the timer when it reaches 0
       if (timer <= 0) {
-        setGameStarted(false);
+        // setGameStarted(false);
+        let mapElements =
+        document.getElementsByClassName("mapElement");
+      if (mapElements) {
+        for (let i = 0; i < mapElements.length; i++) {
+          mapElements[i].style.pointerEvents = "none";
+        }
+      }
         toast.info("Le temps est écoulé !");
         setConsecutiveErrors(0);
         return;
@@ -144,12 +152,13 @@ export default function GeoQuizzPlacement() {
     setGameStarted(true);
     setScore(0);
     setTargetCountry(getRandomCountry(difficulty));
-    setTimer(65);
+    setTimer(3);
   };
 
   const restart = () => {
     setGameStarted(false);
     setScore(0);
+    setTimer(65);
     setTargetCountry(null);
     setMarkerPosition(null);
     setConsecutiveErrors(0);
@@ -231,11 +240,8 @@ export default function GeoQuizzPlacement() {
       );
 
     if (!targetLayer) {
-      console.log(`Could not find layer for country: ${targetCountryRef.current}`);
       return;
     }
-
-    console.log(`Found layer for country: ${targetCountryRef.current}`);
 
     targetLayer.setStyle({
       fillColor: "red",
@@ -285,6 +291,10 @@ export default function GeoQuizzPlacement() {
         <h1 className="app-title text-center my-4">Geo Country Placement</h1>
       )}
 
+      {timer <= 0 && (
+        <Form />
+      )}
+
       <div className="col-12 col-md-12">
         <div className="mapContainer">
           <div className="col-12 col-md-5">
@@ -323,10 +333,10 @@ export default function GeoQuizzPlacement() {
               <button className="btn btn-danger" onClick={restart}>
                 Revenir à l'accueil
               </button>
-              <button className="btn btn-warning" onClick={seeCountry}>
+              <button className="btn btn-warning mapElement" onClick={seeCountry}>
                 Voir le pays
               </button>
-              <button className="btn btn-secondary" onClick={passCountry}>
+              <button className="btn btn-secondary mapElement" onClick={passCountry}>
                 Passer le pays
               </button>
             </div>
@@ -342,6 +352,7 @@ export default function GeoQuizzPlacement() {
           {gameStarted && (
             <MapContainer
               ref={mapRef}
+              className="mapElement"
               center={position}
               zoom={3}
               scrollWheelZoom={true}
@@ -376,6 +387,7 @@ export default function GeoQuizzPlacement() {
               </div>
               {/* Toner Map */}
               <TileLayer
+                className="mapElement"
                 attribution="Stamen Toner"
                 url="https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png"
                 noWrap={true}
@@ -384,6 +396,7 @@ export default function GeoQuizzPlacement() {
               />
 
               <GeoJSON
+                className="mapElement"
                 ref={geoJsonRef}
                 style={countryStyle}
                 data={countries.features}

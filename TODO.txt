@@ -1,6 +1,7 @@
 Esthétiser le jeu ( mettre notamment une animation lorsque cela trouve le pays et lorsque l'on se trompe)
-Bouton pour découvrir le pays
 Ecrire les règles du jeu
 Faire un menu d'accueil ( éventuellement )
 Faire un tableau des meilleurs scores.
-Mettre un timer en en secondes plus précises genre
+Faire un compte du nombre d'erreurs au total pour l inclure dans la base de données.
+Mettre un bouton recommencer une fois que la partie est finie
+Mettre un timer en en secondes plus précises

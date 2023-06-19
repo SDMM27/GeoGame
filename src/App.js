@@ -261,6 +261,10 @@ export default function GeoQuizzPlacement() {
     decrementScore("Difficile");
   };
 
+  const restartTimer = () => {
+    setTimer(65);
+  }
+
   const onCountryClick = (event) => {
     if (gameStarted) {
       let targetDifficulty = countries.features.find(
@@ -337,7 +341,7 @@ export default function GeoQuizzPlacement() {
 
       {gameStarted && (
         <div
-          className="gameButtons"
+          className="gameButtons "
           style={{
             position: "relative",
             top: "10px",
@@ -356,6 +360,9 @@ export default function GeoQuizzPlacement() {
             onClick={passCountry}
           >
             Passer le pays
+          </button>
+          <button className="btn btn-danger mapElement restartBtn" onClick={restartTimer}>
+            Recommencer
           </button>
         </div>
       )}

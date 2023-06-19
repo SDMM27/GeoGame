@@ -137,7 +137,6 @@ body {
   margin-top: 0.5%;
   margin-bottom: 2%;
   margin-left: 2%;
-  margin-right: auto;
   z-index: 9999;
 }
 
@@ -146,7 +145,11 @@ body {
   margin-bottom: 2%;
   margin-left: auto;
   z-index: 9999;
+}
 
+.restartBtn {
+  margin-left: 2%;
+  margin-right: auto;
 }
 
 option {

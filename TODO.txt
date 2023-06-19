@@ -1,4 +1,6 @@
 Esthétiser le jeu ( mettre notamment une animation lorsque cela trouve le pays et lorsque l'on se trompe)
+Mettre le chrono en haut à droite
+Changer de couleur le chrono en fonction du temps restant
 Ecrire les règles du jeu
 Faire un menu d'accueil ( éventuellement )
 Faire un tableau des meilleurs scores.

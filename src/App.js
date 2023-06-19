@@ -323,6 +323,7 @@ export default function GeoQuizzPlacement() {
           </div>
           {gameStarted && (
             <div
+            className="gameButtons"
               style={{
                 position: "relative",
                 top: "10px",

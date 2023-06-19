@@ -118,7 +118,7 @@ export default function GeoQuizzPlacement() {
           const countryCenter = targetLayer.getBounds().getCenter();
           zoomCountryMap(countryCenter.lat, countryCenter.lng);
         }
-      } 
+      }
     }
   }, [targetCountry, consecutiveErrors]);
 
@@ -128,13 +128,12 @@ export default function GeoQuizzPlacement() {
       // clear the timer when it reaches 0
       if (timer <= 0) {
         // setGameStarted(false);
-        let mapElements =
-        document.getElementsByClassName("mapElement");
-      if (mapElements) {
-        for (let i = 0; i < mapElements.length; i++) {
-          mapElements[i].style.pointerEvents = "none";
+        let mapElements = document.getElementsByClassName("mapElement");
+        if (mapElements) {
+          for (let i = 0; i < mapElements.length; i++) {
+            mapElements[i].style.pointerEvents = "none";
+          }
         }
-      }
         toast.info("Le temps est écoulé !");
         setConsecutiveErrors(0);
         return;
@@ -261,7 +260,6 @@ export default function GeoQuizzPlacement() {
     decrementScore("Difficile");
   };
 
-
   const onCountryClick = (event) => {
     if (gameStarted) {
       let targetDifficulty = countries.features.find(
@@ -286,137 +284,133 @@ export default function GeoQuizzPlacement() {
   };
 
   return (
-    <div className="container">
+    <div className="container start-container">
       {!gameStarted && (
         <h1 className="app-title text-center my-4">Geo Country Placement</h1>
       )}
 
-      {timer <= 0 && (
-        <Form />
+      {timer <= 0 && <Form />}
+
+      {!gameStarted && (
+        <div className="center">
+          <div className="form-group">
+            <label htmlFor="difficulty">Difficulté :</label>
+            <select
+              id="difficulty"
+              className="form-control"
+              value={difficulty}
+              onChange={(e) => setDifficulty(e.target.value)}
+            >
+              <option value="Facile">Facile</option>
+              <option value="Moyen">Moyen</option>
+              <option value="Difficile">Difficile</option>
+              <option value="Impossible">Impossible</option>
+              <option value="ImpossibleOnly">Hardcore</option>
+            </select>
+          </div>
+          <button className="btn btn-primary" onClick={startGame}>
+            Start
+          </button>
+        </div>
       )}
 
-      <div className="col-12 col-md-12">
-        <div className="mapContainer">
-          <div className="col-12 col-md-5">
-            {!gameStarted && (
-              <div className="form-group">
-                <label htmlFor="difficulty">Difficulté :</label>
-                <select
-                  id="difficulty"
-                  className="form-control"
-                  value={difficulty}
-                  onChange={(e) => setDifficulty(e.target.value)}
-                >
-                  <option value="Facile">Facile</option>
-                  <option value="Moyen">Moyen</option>
-                  <option value="Difficile">Difficile</option>
-                  <option value="Impossible">Impossible</option>
-                  <option value="ImpossibleOnly">Hardcore</option>
-                </select>
-              </div>
-            )}
-            {!gameStarted && (
-              <button className="btn btn-primary" onClick={startGame}>
-                Start
-              </button>
-            )}
-          </div>
-          {gameStarted && (
-            <div
-            className="gameButtons"
-              style={{
-                position: "relative",
-                top: "10px",
-                left: "10px",
-                zIndex: 1000,
-              }}
-            >
-              <button className="btn btn-danger" onClick={restart}>
-                Revenir à l'accueil
-              </button>
-              <button className="btn btn-warning mapElement" onClick={seeCountry}>
-                Voir le pays
-              </button>
-              <button className="btn btn-secondary mapElement" onClick={passCountry}>
-                Passer le pays
-              </button>
-            </div>
-          )}
+      {gameStarted && (
+        <div
+          className="gameButtons"
+          style={{
+            position: "relative",
+            top: "10px",
+            left: "10px",
+            zIndex: 1000,
+          }}
+        >
+          <button className="btn btn-danger" onClick={restart}>
+            Revenir à l'accueil
+          </button>
+          <button className="btn btn-warning mapElement" onClick={seeCountry}>
+            Voir le pays
+          </button>
+          <button
+            className="btn btn-secondary mapElement"
+            onClick={passCountry}
+          >
+            Passer le pays
+          </button>
+        </div>
+      )}
 
-          <ToastContainer
-            position="top-right"
-            autoClose={2500}
-            theme="colored"
-            hideProgressBar
+      <ToastContainer
+        position="top-right"
+        autoClose={2500}
+        theme="colored"
+        hideProgressBar
+      />
+
+      {gameStarted && (
+        <MapContainer
+          ref={mapRef}
+          className="mapElement"
+          center={position}
+          zoom={3}
+          scrollWheelZoom={true}
+          zoomControl={false}
+          dragging={true}
+          doubleClickZoom={false}
+          maxBounds={[
+            [90, -180],
+            [-90, 180],
+          ]}
+          whenReady={({ target }) => {
+            setMapRef(target);
+            setTimeout(() => {
+              target.invalidateSize();
+            }, 100);
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              top: "10px",
+              left: "10px",
+              zIndex: 1000,
+            }}
+            className="gameInfos"
+          >
+            <h2 className="textContainer targetCountry">
+              Pays à trouver : {targetCountry}
+            </h2>
+            <h2 className="textContainer">Score : {score}</h2>
+            <h2 className="textContainer">Temps restant : {timer}</h2>
+          </div>
+          {/* Toner Map */}
+          <TileLayer
+            className="mapElement"
+            attribution="Stamen Toner"
+            url="https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png"
+            noWrap={true}
+            minZoom={2}
+            maxZoom={20}
           />
 
-          {gameStarted && (
-            <MapContainer
-              ref={mapRef}
-              className="mapElement"
-              center={position}
-              zoom={3}
-              scrollWheelZoom={true}
-              zoomControl={false}
-              dragging={true}
-              doubleClickZoom={false}
-              maxBounds={[
-                [90, -180],
-                [-90, 180],
-              ]}
-              whenReady={({ target }) => {
-                setMapRef(target);
-                setTimeout(() => {
-                  target.invalidateSize();
-                }, 100);
-              }}
-            >
-              <div
-                style={{
-                  position: "absolute",
-                  top: "10px",
-                  left: "10px",
-                  zIndex: 1000,
-                }}
-                className="gameInfos"
-              >
-                <h2 className="textContainer targetCountry">
-                  Pays à trouver : {targetCountry}
-                </h2>
-                <h2 className="textContainer">Score : {score}</h2>
-                <h2 className="textContainer">Temps restant : {timer}</h2>
-              </div>
-              {/* Toner Map */}
-              <TileLayer
-                className="mapElement"
-                attribution="Stamen Toner"
-                url="https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png"
-                noWrap={true}
-                minZoom={2}
-                maxZoom={20}
-              />
+          <GeoJSON
+            className="mapElement"
+            ref={geoJsonRef}
+            style={countryStyle}
+            data={countries.features}
+            onEachFeature={(feature, layer) => {
+              layer.on({
+                click: onCountryClick,
+                mouseover: onCountryMouseOver,
+                mouseout: onCountryMouseOut,
+              });
+            }}
+          />
 
-              <GeoJSON
-                className="mapElement"
-                ref={geoJsonRef}
-                style={countryStyle}
-                data={countries.features}
-                onEachFeature={(feature, layer) => {
-                  layer.on({
-                    click: onCountryClick,
-                    mouseover: onCountryMouseOver,
-                    mouseout: onCountryMouseOut,
-                  });
-                }}
-              />
-
-              {/* {markerPosition && (
+          {/* {markerPosition && (
                 <Marker position={markerPosition} icon={customIcon}></Marker>
               )} */}
-            </MapContainer>
-          )}
-        </div>
-      </div>
+        </MapContainer>
+      )}
     </div>
   );
 }

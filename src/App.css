@@ -13,12 +13,17 @@
   }
 }
 
+.container {
+  max-width: 100% !important;
+  justify-content: center;
+}
+
 .gameButtons {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
-  margin-top: 2%;
+  /* margin-top: 2%; */
   margin-left: auto;
   margin-right: auto;
 }
@@ -67,34 +72,33 @@
 
 /* sizing of map containe */
 .leaflet-container {
- width: 100%;
+ width: 100% !important;
  height: 100vh;
 }
 
-.mapContainer {
+.center {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
+}
+
+
+/* .mapContainer {
   position: relative;
-  width: 95%; /* Ajustez cette valeur en fonction de vos besoins */
-  height: calc(100vh - Xpx); /* Remplacez X par la hauteur du titre */
+  width: 10%;
+  height: calc(100vh - Xpx); 
   margin: auto;
   background-color: #222121;
-}
-
-
-
-.btnsContainer {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  /* Le reste de votre CSS pour btnsContainer */
-}
-
-
+} */
 
 .form-control {
-  margin-top: 1%;
-  margin-bottom: 1%;
-  margin-right: 1%;
+  margin-top: 0.35%;
   width: auto;
+}
+
+.btn-primary {
+  margin-top: 0.45%;
 }
 
 #gameTitle {
@@ -122,10 +126,6 @@ body {
   z-index: 9999;
 }
 
-.btn-primary {
-  margin-top: 1%;
-}
-
 .btn-warning {
   margin-top: 0.5%;
   margin-bottom: 2%;
@@ -151,9 +151,9 @@ body {
 
 .form-group {
   color: white;
+  margin-left: auto;
+  margin-right: auto;
   margin-top: 1%;
-  margin-bottom: 1%;
-  margin-right: 5%;
 }
 
 .textContainer {

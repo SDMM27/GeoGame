@@ -1,4 +1,5 @@
 Esthétiser le jeu ( mettre notamment une animation lorsque cela trouve le pays et lorsque l'on se trompe)
+Enlever le pays si il a été selectionné dans la partie
 Mettre le chrono en haut à droite
 Changer de couleur le chrono en fonction du temps restant
 Ecrire les règles du jeu
@@ -8,3 +9,10 @@ Faire un tableau des meilleurs scores.
 Faire un compte du nombre d'erreurs au total pour l inclure dans la base de données.
 Mettre un bouton recommencer une fois que la partie est finie
 Mettre un timer en en secondes plus précises
+
+
+
+
+
+To do des jeux à implémenter :
+Mode Geo Country Placement mais avec les drapeaux et non les noms.

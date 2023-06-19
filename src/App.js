@@ -1,5 +1,7 @@
 import logo from "./logo.svg";
 import Form from "./pages/form";
+import { BrowserRouter as Router, Route, Link, Routes } from "react-router-dom";
+import Scoreboard from "./pages/Scoreboard";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import "leaflet/dist/leaflet.css";
@@ -290,7 +292,7 @@ export default function GeoQuizzPlacement() {
         <h1 className="app-title text-center my-4">Geo Country Placement</h1>
       )}
 
-      {timer <= 0 && <Form finalScore={score}/>}
+      {timer <= 0 && <Form finalScore={score} />}
 
       {!gameStarted && (
         <div className="center">
@@ -313,6 +315,26 @@ export default function GeoQuizzPlacement() {
             Start
           </button>
         </div>
+      )}
+
+      {!gameStarted && (
+        <Router>
+          <div className="app">
+            <header className="app-header">
+              <Link className="app-link" to="/scores">
+                Voir les scores des joueurs
+              </Link>
+            </header>
+
+            <Routes>
+              <Route
+                path="/"
+                element={<> {/* Votre jeu et votre formulaire ici */} </>}
+              />
+              <Route path="/scores" element={<Scoreboard />} />
+            </Routes>
+          </div>
+        </Router>
       )}
 
       {gameStarted && (

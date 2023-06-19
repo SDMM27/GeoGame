@@ -176,9 +176,30 @@ body {
   margin-top: 50%;
 }
 
+.app {
+  margin-top: 5%;
+  text-align: center;
+}
+
+.app-header {
+  background-color: #282c34;
+  min-height: 20vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.app-link {
+  color: #61dafb;
+}
+
+
 h1 {
   font-size: 2.5em; /* Adjust the size of the text */
-  color: #343a40; /* Change the color of the text */
+  color: white; /* Change the color of the text */
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Add a shadow to the text */
   border-bottom: 2px solid #343a40; /* Add a bottom border */
   padding-bottom: 10px; /* Add some padding */

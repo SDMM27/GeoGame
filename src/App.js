@@ -7,7 +7,7 @@ import "./App.css";
 import "leaflet/dist/leaflet.css";
 import "react-toastify/dist/ReactToastify.css";
 import countries from "./data/countriesWithDifficulty_FR.json"; // import countries data
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { toast, ToastContainer } from "react-toastify";
 
 import {
@@ -77,7 +77,7 @@ export default function GeoQuizzPlacement() {
 
   const position = [36.737232, 3.086472];
 
-  function zoomCountryMap(lat, lng) {
+  const zoomCountryMap = useCallback((lat, lng) => {
     //function to zoom in on selected country
     let targetDifficulty = countries.features.find(
       (country) => country.properties.ADMIN === targetCountryRef.current // Use the ref instead of the state variable
@@ -91,7 +91,7 @@ export default function GeoQuizzPlacement() {
     } else {
       mapRef.setView([lat, lng], 4);
     }
-  }
+}, [countries, targetCountryRef, mapRef]);
 
   useEffect(() => {
     let leafletContainer =

@@ -18,6 +18,8 @@ import {
 } from "react-leaflet";
 import { Icon, LatLngBounds } from "leaflet";
 
+// const [finalScore, setFinalScore] = useState(0);
+
 const countryStyle = {
   fillColor: "transparent",
   color: "black",
@@ -127,7 +129,6 @@ export default function GeoQuizzPlacement() {
     if (gameStarted) {
       // clear the timer when it reaches 0
       if (timer <= 0) {
-        // setGameStarted(false);
         let mapElements = document.getElementsByClassName("mapElement");
         if (mapElements) {
           for (let i = 0; i < mapElements.length; i++) {
@@ -151,7 +152,7 @@ export default function GeoQuizzPlacement() {
     setGameStarted(true);
     setScore(0);
     setTargetCountry(getRandomCountry(difficulty));
-    setTimer(3);
+    setTimer(7);
   };
 
   const restart = () => {
@@ -284,12 +285,12 @@ export default function GeoQuizzPlacement() {
   };
 
   return (
-    <div className="container start-container">
+    <div className="container">
       {!gameStarted && (
         <h1 className="app-title text-center my-4">Geo Country Placement</h1>
       )}
 
-      {timer <= 0 && <Form />}
+      {timer <= 0 && <Form finalScore={score}/>}
 
       {!gameStarted && (
         <div className="center">

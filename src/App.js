@@ -52,7 +52,7 @@ const getRandomCountry = (difficulty) => {
 };
 
 export default function GeoQuizzPlacement() {
-  let [setHighlightedCountry] = useState(null);
+  let [highlightedCountry, setHighlightedCountry] = useState(null);
   let [targetCountry, setTargetCountry] = useState(null);
   const targetCountryRef = useRef(targetCountry); // Create a ref
   let [setMarkerPosition] = useState(null);
@@ -206,6 +206,7 @@ export default function GeoQuizzPlacement() {
         weight: 2,
         fillOpacity: 0.5,
       });
+      console.log(highlightedCountry);
       setHighlightedCountry(layer.feature.properties.ADMIN);
     }
   };
@@ -390,7 +391,7 @@ export default function GeoQuizzPlacement() {
             style={{
               position: "absolute",
               top: "10px",
-              left: "10px",
+              left: "10%",
               zIndex: 1000,
             }}
             className="gameInfos"

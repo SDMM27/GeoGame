@@ -2,6 +2,7 @@ Esthétiser le jeu ( mettre notamment une animation lorsque cela trouve le pays 
 Mettre le chrono en haut à droite
 Changer de couleur le chrono en fonction du temps restant
 Ecrire les règles du jeu
+Mettre d'autres infos dans la bdd
 Faire un menu d'accueil ( éventuellement )
 Faire un tableau des meilleurs scores.
 Faire un compte du nombre d'erreurs au total pour l inclure dans la base de données.

@@ -91,7 +91,7 @@ export default function GeoQuizzPlacement() {
     } else {
       mapRef.setView([lat, lng], 4);
     }
-}, [countries, targetCountryRef, mapRef]);
+}, [targetCountryRef, mapRef]);
 
   useEffect(() => {
     let leafletContainer =

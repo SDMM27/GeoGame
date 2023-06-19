@@ -124,7 +124,7 @@ export default function GeoQuizzPlacement() {
         }
       }
     }
-  }, [targetCountry, consecutiveErrors]);
+  }, [targetCountry, consecutiveErrors, mapRef, zoomCountryMap]);
 
   useEffect(() => {
     // only start the timer when the game has started

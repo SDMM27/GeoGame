@@ -3,8 +3,8 @@ import "./form.css";
 import "react-toastify/dist/ReactToastify.css";
 import { firestore } from "../Firebase";
 import { addDoc, collection } from "firebase/firestore";
-import { toast, ToastContainer } from "react-toastify";
-import { finalScore } from "../App";
+import { toast } from "react-toastify";
+// import { finalScore } from "../App";
 
 
 export default function Form({ finalScore }) {

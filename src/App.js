@@ -1,4 +1,3 @@
-import logo from "./logo.svg";
 import Form from "./pages/form";
 import { BrowserRouter as Router, Route, Link, Routes } from "react-router-dom";
 import Scoreboard from "./pages/Scoreboard";
@@ -13,12 +12,9 @@ import { toast, ToastContainer } from "react-toastify";
 import {
   MapContainer,
   TileLayer,
-  Marker,
-  Popup,
   GeoJSON,
-  useMap,
 } from "react-leaflet";
-import { Icon, LatLngBounds } from "leaflet";
+// import { Icon} from "leaflet";
 
 // const [finalScore, setFinalScore] = useState(0);
 
@@ -56,10 +52,10 @@ const getRandomCountry = (difficulty) => {
 };
 
 export default function GeoQuizzPlacement() {
-  let [highlightedCountry, setHighlightedCountry] = useState(null);
+  let [setHighlightedCountry] = useState(null);
   let [targetCountry, setTargetCountry] = useState(null);
   const targetCountryRef = useRef(targetCountry); // Create a ref
-  let [markerPosition, setMarkerPosition] = useState(null);
+  let [setMarkerPosition] = useState(null);
   let [score, setScore] = useState(0);
   let [gameStarted, setGameStarted] = useState(false);
   let [difficulty, setDifficulty] = useState("Facile");
@@ -70,10 +66,10 @@ export default function GeoQuizzPlacement() {
   let [timer, setTimer] = useState(65); // timer set to 60 seconds
 
   // create custom icon
-  const customIcon = new Icon({
-    iconUrl: require("./img/marker.png"),
-    iconSize: [38, 38],
-  });
+  // const customIcon = new Icon({
+  //   iconUrl: require("./img/marker.png"),
+  //   iconSize: [38, 38],
+  // });
 
   const position = [36.737232, 3.086472];
 

@@ -137715,7 +137715,7 @@
       "properties":{
         "ADMIN":"Terres australes et antarctiques françaises",
         "ISO_A3":"ATF",
-        "Difficulty":"Impossible"
+        "Difficulty":""
       },
       "geometry":{
         "type":"MultiPolygon",

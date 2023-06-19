@@ -262,6 +262,8 @@ export default function GeoQuizzPlacement() {
   };
 
   const restartTimer = () => {
+    setScore(0);
+    changeCountry();
     setTimer(65);
   }
 

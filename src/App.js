@@ -136,6 +136,7 @@ export default function GeoQuizzPlacement() {
         let mapElements = document.getElementsByClassName("mapElement");
         if (mapElements) {
           for (let i = 0; i < mapElements.length; i++) {
+            mapElements[i].style.display = "none";
             mapElements[i].style.pointerEvents = "none";
           }
         }
@@ -273,6 +274,7 @@ export default function GeoQuizzPlacement() {
     let mapElements = document.getElementsByClassName("mapElement");
     if (mapElements) {
       for (let i = 0; i < mapElements.length; i++) {
+        mapElements[i].style.display = "block";
         mapElements[i].style.pointerEvents = "auto";
       }
     }
@@ -289,6 +291,14 @@ export default function GeoQuizzPlacement() {
         toast.success(
           "Bravo ! " + targetCountryRef.current + " est la bonne réponse !"
         );
+        event.target.setStyle({
+            fillColor: "green",
+            weight: 2,
+            fillOpacity: 0.5,
+        }); // reset the style
+        setTimeout(() => {
+          event.target.setStyle(countryStyle);
+        }, 3000); // Change this to change the delay, in milliseconds
         changeCountry();
         if (consecutiveErrorsRef.current < 3) {
           incrementScore(targetDifficulty);
@@ -296,7 +306,7 @@ export default function GeoQuizzPlacement() {
         setConsecutiveErrors(0);
       } else {
         toast.error("Dommage ! Vous n'avez pas trouvé le bon pays.");
-        decrementScore(targetDifficulty);
+        decrementScore("Difficile");
         setConsecutiveErrors((prevErrors) => prevErrors + 1);
       }
       setMarkerPosition(event.latlng);

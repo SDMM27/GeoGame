@@ -137715,7 +137715,7 @@
       "properties":{
         "ADMIN":"Terres australes et antarctiques françaises",
         "ISO_A3":"ATF",
-        "Difficulty":"Impossible"
+        "Difficulty":""
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -741605,7 +741605,7 @@
       "properties":{
         "ADMIN":"Îles Cook",
         "ISO_A3":"COK",
-        "Difficulty":"Impossible"
+        "Difficulty":""
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1082828,7 +1082828,7 @@
       "properties":{
         "ADMIN":"Indonésie",
         "ISO_A3":"IDN",
-        "Difficulty":"Facile"
+        "Difficulty":"Moyen"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1455366,7 +1455366,7 @@
       "properties":{
         "ADMIN":"Malaisie",
         "ISO_A3":"MYS",
-        "Difficulty":"Facile"
+        "Difficulty":"Moyen"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1610523,7 +1610523,7 @@
       "properties":{
         "ADMIN":"Philippines",
         "ISO_A3":"PHL",
-        "Difficulty":"Facile"
+        "Difficulty":"Moyen"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1843946,7 +1843946,7 @@
       "properties":{
         "ADMIN":"Arabie saoudite",
         "ISO_A3":"SAU",
-        "Difficulty":"Facile"
+        "Difficulty":"Moyen"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1931489,7 +1931489,7 @@
       "properties":{
         "ADMIN":"Thaïlande",
         "ISO_A3":"THA",
-        "Difficulty":"Facile"
+        "Difficulty":"Moyen"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1962328,7 +1962328,7 @@
       "properties":{
         "ADMIN":"Turquie",
         "ISO_A3":"TUR",
-        "Difficulty":"Facile"
+        "Difficulty":"Moyen"
       },
       "geometry":{
         "type":"MultiPolygon",

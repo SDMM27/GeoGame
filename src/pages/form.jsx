@@ -24,8 +24,9 @@ export default function Form({ finalScore }) {
     try {
       if (data.name === "" || data.score === "") throw new Error("Veuillez remplir tous les champs")
       addDoc(ref, data);
-      toast.success("Score associé au pseudo sauvegardé");
+      toast.success(`Score de ${data.name} sauvegardé !`);
       const submitBtn = document.getElementById("submitBtn");
+      submitBtn.style.display = "none";
       submitBtn.disabled = true;
       submitBtn.style.pointerEvents = "none";
     } catch(e) {

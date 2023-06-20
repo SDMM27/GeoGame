@@ -1,18 +1,28 @@
 Esthétiser le jeu ( mettre notamment une animation lorsque cela trouve le pays et lorsque l'on se trompe)
+
+Enlever le pays si il a été selectionné dans la partie
+Ranger le score par difficulté et par appareil
+Mettre pseudo aléatoire pour les sans pseudo
+Mettre le nom du pays sur lequel tu viens de cliquer si tu te trompes comme quand tu trouves le bon pays
 Enlever le pays si il a été selectionné dans la partie
 Mettre le chrono en haut à droite
 Changer de couleur le chrono en fonction du temps restant
 Ecrire les règles du jeu
+
+MULTI : Faire des rounds, chacun doit trouver le pays le plus rapidement et le dernier à avoir du temps gagne
+
 Mettre d'autres infos dans la bdd
+
+
 Faire un menu d'accueil ( éventuellement )
 Faire un tableau des meilleurs scores.
 Faire un compte du nombre d'erreurs au total pour l inclure dans la base de données.
 Mettre un bouton recommencer une fois que la partie est finie
 Mettre un timer en en secondes plus précises
+Mettre comme sur online.seterra pour les pays vraiment petit
 
 
-
-
+Faire un bot discord pour informer des améliorations
 
 To do des jeux à implémenter :
 Mode Geo Country Placement mais avec les drapeaux et non les noms.

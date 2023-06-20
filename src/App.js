@@ -9,11 +9,7 @@ import countries from "./data/countriesWithDifficulty_FR.json"; // import countr
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { toast, ToastContainer } from "react-toastify";
 
-import {
-  MapContainer,
-  TileLayer,
-  GeoJSON,
-} from "react-leaflet";
+import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 // import { Icon} from "leaflet";
 
 // const [finalScore, setFinalScore] = useState(0);
@@ -24,6 +20,8 @@ const countryStyle = {
   fillOpacity: 1,
   weight: 0.85,
 };
+
+let alreadyChosenCountries = [];
 
 export default function GeoQuizzPlacement() {
   let [highlightedCountry, setHighlightedCountry] = useState(null);
@@ -38,6 +36,7 @@ export default function GeoQuizzPlacement() {
   const geoJsonRef = useRef(null);
   const [mapRef, setMapRef] = useState(null);
   let [timer, setTimer] = useState(65); // timer set to 60 seconds
+  let [showScoreboard, setShowScoreboard] = useState(false);
 
   // create custom icon
   // const customIcon = new Icon({
@@ -56,44 +55,54 @@ export default function GeoQuizzPlacement() {
       "ImpossibleOnly",
     ];
     const selectedDifficultyIndex = difficulties.indexOf(difficulty);
-  
+
     let availableDifficulties;
     if (difficulty === "ImpossibleOnly") {
       availableDifficulties = ["Impossible"];
     } else {
-      availableDifficulties = difficulties.slice(0, selectedDifficultyIndex + 1);
+      availableDifficulties = difficulties.slice(
+        0,
+        selectedDifficultyIndex + 1
+      );
     }
-  
-    const filteredCountries = countries.features.filter((country) =>
-      availableDifficulties.includes(country.properties.Difficulty)
+
+    const filteredCountries = countries.features.filter(
+      (country) =>
+        availableDifficulties.includes(country.properties.Difficulty) &&
+        !alreadyChosenCountries.includes(country.properties.ADMIN)
     );
 
     if (filteredCountries.length === 0) {
       setTimer(0);
-      toast.success("Bravo ! Vous avez trouvé tous les pays de la difficulté !");
-    }
-  
-    const randomIndex = Math.floor(Math.random() * filteredCountries.length);
-    const randomCountry = filteredCountries[randomIndex].properties.ADMIN;
+      toast.success(
+        "Bravo ! Vous avez trouvé tous les pays de la difficulté !", { containerId: "centerToast" }
+      );
+    } else {
+      const randomIndex = Math.floor(Math.random() * filteredCountries.length);
+      const randomCountry = filteredCountries[randomIndex].properties.ADMIN;
 
-    return randomCountry;
+      return randomCountry;
+    }
   };
 
-  const zoomCountryMap = useCallback((lat, lng) => {
-    //function to zoom in on selected country
-    let targetDifficulty = countries.features.find(
-      (country) => country.properties.ADMIN === targetCountryRef.current // Use the ref instead of the state variable
-    ).properties.Difficulty;
-    if (targetCountryRef.current === "Vatican") {
-      mapRef.setView([lat, lng], 20);
-    } else if (targetDifficulty === "Difficile") {
-      mapRef.setView([lat, lng], 7);
-    } else if (targetDifficulty === "Impossible") {
-      mapRef.setView([lat, lng], 9);
-    } else {
-      mapRef.setView([lat, lng], 4);
-    }
-}, [targetCountryRef, mapRef]);
+  const zoomCountryMap = useCallback(
+    (lat, lng) => {
+      //function to zoom in on selected country
+      let targetDifficulty = countries.features.find(
+        (country) => country.properties.ADMIN === targetCountryRef.current // Use the ref instead of the state variable
+      ).properties.Difficulty;
+      if (targetCountryRef.current === "Vatican") {
+        mapRef.setView([lat, lng], 20);
+      } else if (targetDifficulty === "Difficile") {
+        mapRef.setView([lat, lng], 7);
+      } else if (targetDifficulty === "Impossible") {
+        mapRef.setView([lat, lng], 9);
+      } else {
+        mapRef.setView([lat, lng], 4);
+      }
+    },
+    [targetCountryRef, mapRef]
+  );
 
   useEffect(() => {
     let leafletContainer =
@@ -140,7 +149,7 @@ export default function GeoQuizzPlacement() {
             mapElements[i].style.pointerEvents = "none";
           }
         }
-        toast.info("Le temps est écoulé !");
+        toast.info("Le temps est écoulé !", { containerId: "centerToast" });
         setConsecutiveErrors(0);
         return;
       }
@@ -154,21 +163,28 @@ export default function GeoQuizzPlacement() {
   }, [gameStarted, timer]); // this effect runs every time gameStarted or timer changes
 
   const startGame = () => {
+    setShowScoreboard(false);
     setGameStarted(true);
     setScore(0);
     let firstCountry = getRandomCountry(difficulty);
+    alreadyChosenCountries.push(firstCountry);
+    console.log(alreadyChosenCountries);
     setTargetCountry(firstCountry);
-    setTimer(65);
+    setTimer(10);
   };
 
   const goHome = () => {
+    alreadyChosenCountries = [];
     setGameStarted(false);
     setScore(0);
     setTimer(65);
     setTargetCountry(null);
     setMarkerPosition(null);
-    console.log(markerPosition);
     setConsecutiveErrors(0);
+  };
+
+  const displayScoreboard = () => {
+    setShowScoreboard(true);
   };
 
   const decrementScore = (difficulty) => {
@@ -229,6 +245,8 @@ export default function GeoQuizzPlacement() {
 
   const changeCountry = () => {
     let newCountry = getRandomCountry(difficulty);
+    alreadyChosenCountries.push(newCountry);
+    console.log(alreadyChosenCountries);
     setTargetCountry(newCountry);
   };
 
@@ -269,6 +287,7 @@ export default function GeoQuizzPlacement() {
   };
 
   const restartTimer = () => {
+    alreadyChosenCountries = [];
     setScore(0);
     setConsecutiveErrors(0);
     let mapElements = document.getElementsByClassName("mapElement");
@@ -280,7 +299,7 @@ export default function GeoQuizzPlacement() {
     }
     changeCountry();
     setTimer(65);
-  }
+  };
 
   const onCountryClick = (event) => {
     if (gameStarted) {
@@ -289,12 +308,12 @@ export default function GeoQuizzPlacement() {
       ).properties.Difficulty;
       if (event.target.feature.properties.ADMIN === targetCountryRef.current) {
         toast.success(
-          "Bravo ! " + targetCountryRef.current + " est la bonne réponse !"
+          "Bravo ! " + targetCountryRef.current + " est la bonne réponse !", { containerId: "topRightToast" }
         );
         event.target.setStyle({
-            fillColor: "green",
-            weight: 2,
-            fillOpacity: 0.5,
+          fillColor: "green",
+          weight: 2,
+          fillOpacity: 0.5,
         }); // reset the style
         setTimeout(() => {
           event.target.setStyle(countryStyle);
@@ -305,7 +324,7 @@ export default function GeoQuizzPlacement() {
         }
         setConsecutiveErrors(0);
       } else {
-        toast.error("Dommage ! Vous n'avez pas trouvé le bon pays.");
+        toast.error("Dommage ! Vous n'avez pas trouvé le bon pays.", { containerId: "topRightToast" });
         decrementScore("Difficile");
         setConsecutiveErrors((prevErrors) => prevErrors + 1);
       }
@@ -345,23 +364,21 @@ export default function GeoQuizzPlacement() {
       )}
 
       {!gameStarted && (
-        <Router>
-          <div className="app">
-            <header className="app-header">
-              <Link className="app-link" to="/scores">
-                Voir les scores des joueurs
-              </Link>
-            </header>
+        <div className="center">
+          <button
+            id="displayScoreboard"
+            className="btn btn-scoreboard"
+            onClick={displayScoreboard}
+          >
+            Voir les scores des joueurs
+          </button>
+        </div>
+      )}
 
-            <Routes>
-              <Route
-                path="/"
-                element={<> {/* Votre jeu et votre formulaire ici */} </>}
-              />
-              <Route path="/scores" element={<Scoreboard />} />
-            </Routes>
-          </div>
-        </Router>
+      {showScoreboard && !gameStarted && (
+        <div className="center">
+          <Scoreboard />
+        </div>
       )}
 
       {gameStarted && (
@@ -393,8 +410,20 @@ export default function GeoQuizzPlacement() {
       )}
 
       <ToastContainer
+        enableMultiContainer
+        className={"centerToastContainer"}
+        containerId={"centerToast"}
+        position="bottom-center"
+        theme="colored"
+        hideProgressBar
+      />
+
+      <ToastContainer
+        enableMultiContainer  
+        className={"topRightToastContainer"}
+        containerId={"topRightToast"}
         position="top-right"
-        autoClose={2500}
+        autoClose={1500}
         theme="colored"
         hideProgressBar
       />

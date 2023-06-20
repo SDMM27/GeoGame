@@ -4,7 +4,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { firestore } from "../Firebase";
 import { addDoc, collection } from "firebase/firestore";
 import { toast } from "react-toastify";
-// import { finalScore } from "../App";
 
 
 export default function Form({ finalScore }) {
@@ -24,13 +23,13 @@ export default function Form({ finalScore }) {
     try {
       if (data.name === "" || data.score === "") throw new Error("Veuillez remplir tous les champs")
       addDoc(ref, data);
-      toast.success(`Score de ${data.name} sauvegardé !`);
+      toast.success('Score de '+ data.name + ' sauvegardé !');
       const submitBtn = document.getElementById("submitBtn");
       submitBtn.style.display = "none";
       submitBtn.disabled = true;
       submitBtn.style.pointerEvents = "none";
     } catch(e) {
-      toast.error("Erreur lors de la sauvegarde du score");
+      toast.error("Veuillez rentrer un pseudo");
       console.error("Error adding document: ", e);
     }
   };
@@ -45,5 +44,6 @@ export default function Form({ finalScore }) {
         <button id="submitBtn" type="submit">Sauvegarder votre score</button>
       </form>
     </div>
+
   );
 }

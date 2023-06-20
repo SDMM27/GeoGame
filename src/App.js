@@ -36,7 +36,7 @@ export default function GeoQuizzPlacement() {
   const consecutiveErrorsRef = useRef(consecutiveErrors); // Create a ref
   const geoJsonRef = useRef(null);
   const [mapRef, setMapRef] = useState(null);
-  let [timer, setTimer] = useState(65); // timer set to 60 seconds
+  let [timer, setTimer] = useState(60); // timer set to 60 seconds
   const timerRef = useRef(timer); // Create a ref
   let [showScoreboard, setShowScoreboard] = useState(false);
 
@@ -117,6 +117,14 @@ export default function GeoQuizzPlacement() {
     document.title = "Geo Country Placement";
     targetCountryRef.current = targetCountry; // Update the ref whenever targetCountry changes
     consecutiveErrorsRef.current = consecutiveErrors; // Update the ref whenever consecutiveErrors changes
+    if (consecutiveErrorsRef.current >= 3) {
+      setScore((prevScore) => prevScore - 1);
+      console.log('feuuuuuuuuuuuuuur');
+      toast.error("Dommage ! C'est ici que se trouvait " + targetCountryRef.current, {
+        containerId: "topRightToast",
+      });
+    }
+    
     if (geoJsonRef.current && mapRef.current) {
       if (consecutiveErrors >= 3) {
         const targetLayer = geoJsonRef.current
@@ -174,14 +182,14 @@ export default function GeoQuizzPlacement() {
     let firstCountry = getRandomCountry(difficulty);
     alreadyChosenCountries.push(firstCountry);
     setTargetCountry(firstCountry);
-    setTimer(65);
+    setTimer(60);
   };
 
   const goHome = () => {
     alreadyChosenCountries = [];
     setGameStarted(false);
     setScore(0);
-    setTimer(65);
+    setTimer(60);
     setTargetCountry(null);
     setMarkerPosition(null);
     setConsecutiveErrors(0);
@@ -301,7 +309,7 @@ export default function GeoQuizzPlacement() {
       }
     }
     changeCountry();
-    setTimer(65);
+    setTimer(60);
   };
 
   const onCountryClick = (event) => {
@@ -327,11 +335,11 @@ export default function GeoQuizzPlacement() {
           incrementScore(targetDifficulty);
         }
         setConsecutiveErrors(0);
-      } else {
+      } 
+       else {
         toast.error("Dommage ! Vous n'avez pas trouvé le bon pays.", {
           containerId: "topRightToast",
         });
-        decrementScore("Difficile");
         setConsecutiveErrors((prevErrors) => prevErrors + 1);
       }
       setMarkerPosition(event.latlng);
@@ -346,14 +354,24 @@ export default function GeoQuizzPlacement() {
 
       {!gameStarted && (
         <div className="rulesDiv">
-        <p className="rules">Le but est de trouver le plus de pays possible en 65 secondes. <br/>
-        Si vous trouvez tous les pays de la difficulté avant la fin du chrono, votre temps restant s'ajoute à votre score. <br/>
-        Alors, soyez vifs ! <br/>
-        Moins la difficulté est grande, moins il y a de pays à trouver, les pays faciles sont compris dans les difficultés supérieurs et ainsi de suite. <br/>
-        Sauf pour la difficulté hardcore qui nécessite une connaissance parfaite des territoires les plus méconnus.  <br/>
-        Cette difficulté inclut uniquement des territoires dont vous n'avez sûrement jamais entendu l'existence. <br/>
-        Bonne chance !
-        </p>
+          <p className="rules">
+            Le but est de trouver le plus de pays possible en 65 secondes.
+            <br />
+            Tu as 3 essais pour trouver chaque pays, au bout de ces 3 essais, le pays t'est révélé et tu dois cliquer dessus pour passer au pays suivant. <br />
+            Si vous trouvez tous les pays de la difficulté avant la fin du
+            chrono, votre temps restant s'ajoute à votre score. <br />
+            Alors, soyez vifs ! <br />  <br /> 
+            Moins la difficulté est grande, moins il y a de pays à trouver, les
+            pays faciles sont compris dans les difficultés supérieures et ainsi
+            de suite. <br />
+            Sauf pour la difficulté hardcore qui nécessite une connaissance
+            parfaite des territoires les plus méconnus. <br />
+            Cette difficulté inclut uniquement des territoires dont vous ne soupçonniez pas l'existence ... <br /> <br /><br />
+
+            Vous gagnez 1 point pour un pays facile de trouver, 2 points pour un pays moyen, 3 points pour un pays difficile et 4 points pour un pays 'impossible'. <br />
+            Pour chaque erreur, vous perdez 1 point. Sinon, c'est trop facile. <br />
+            Bonne chance !
+          </p>
         </div>
       )}
 
@@ -432,6 +450,13 @@ export default function GeoQuizzPlacement() {
         enableMultiContainer
         className={"centerToastContainer"}
         containerId={"centerToast"}
+        position="bottom-center"
+        theme="colored"
+        hideProgressBar
+      />
+
+      <ToastContainer
+        enableMultiContainer
         position="bottom-center"
         theme="colored"
         hideProgressBar

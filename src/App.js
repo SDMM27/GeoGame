@@ -346,14 +346,21 @@ export default function GeoQuizzPlacement() {
 
       {!gameStarted && (
         <div className="rulesDiv">
-        <p className="rules">Le but est de trouver le plus de pays possible en 65 secondes. <br/>
-        Si vous trouvez tous les pays de la difficulté avant la fin du chrono, votre temps restant s'ajoute à votre score. <br/>
-        Alors, soyez vifs ! <br/>
-        Moins la difficulté est grande, moins il y a de pays à trouver, les pays faciles sont compris dans les difficultés supérieurs et ainsi de suite. <br/>
-        Sauf pour la difficulté hardcore qui nécessite une connaissance parfaite des territoires les plus méconnus.  <br/>
-        Cette difficulté inclut uniquement des territoires dont vous n'avez sûrement jamais entendu l'existence. <br/>
-        Bonne chance !
-        </p>
+          <p className="rules">
+            Le but est de trouver le plus de pays possible en 65 secondes.
+            <br />
+            Si vous trouvez tous les pays de la difficulté avant la fin du
+            chrono, votre temps restant s'ajoute à votre score. <br />
+            Alors, soyez vifs ! <br />
+            Moins la difficulté est grande, moins il y a de pays à trouver, les
+            pays faciles sont compris dans les difficultés supérieurs et ainsi
+            de suite. <br />
+            Sauf pour la difficulté hardcore qui nécessite une connaissance
+            parfaite des territoires les plus méconnus. <br />
+            Cette difficulté inclut uniquement des territoires dont vous n'avez
+            sûrement jamais entendu l'existence. <br />
+            Bonne chance !
+          </p>
         </div>
       )}
 
@@ -432,6 +439,13 @@ export default function GeoQuizzPlacement() {
         enableMultiContainer
         className={"centerToastContainer"}
         containerId={"centerToast"}
+        position="bottom-center"
+        theme="colored"
+        hideProgressBar
+      />
+
+      <ToastContainer
+        enableMultiContainer
         position="bottom-center"
         theme="colored"
         hideProgressBar

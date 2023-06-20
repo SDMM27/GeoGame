@@ -10,10 +10,11 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { toast, ToastContainer } from "react-toastify";
 
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
-// import { Icon} from "leaflet";
 
-// const [finalScore, setFinalScore] = useState(0);
-
+// const TEST_COUNTRIES = ["France", "Italie", "Belgique", "Suisse", "Espagne"];
+// countries.features = countries.features.filter((c) =>
+//   TEST_COUNTRIES.includes(c.properties.ADMIN)
+// );
 const countryStyle = {
   fillColor: "transparent",
   color: "black",
@@ -36,6 +37,7 @@ export default function GeoQuizzPlacement() {
   const geoJsonRef = useRef(null);
   const [mapRef, setMapRef] = useState(null);
   let [timer, setTimer] = useState(65); // timer set to 60 seconds
+  const timerRef = useRef(timer); // Create a ref
   let [showScoreboard, setShowScoreboard] = useState(false);
 
   // create custom icon
@@ -73,9 +75,11 @@ export default function GeoQuizzPlacement() {
     );
 
     if (filteredCountries.length === 0) {
+      setScore((prevScore) => prevScore + timerRef.current);
       setTimer(0);
       toast.success(
-        "Bravo ! Vous avez trouvé tous les pays de la difficulté !", { containerId: "centerToast" }
+        "Bravo ! Vous avez trouvé tous les pays de la difficulté ! Votre temps restant a été ajouté à votre score.",
+        { containerId: "centerToast" }
       );
     } else {
       const randomIndex = Math.floor(Math.random() * filteredCountries.length);
@@ -156,6 +160,7 @@ export default function GeoQuizzPlacement() {
 
       const id = setInterval(() => {
         setTimer((timer) => timer - 1);
+        timerRef.current = timer; // Update the ref whenever timer changes
       }, 1000);
 
       return () => clearInterval(id); // this will clear the interval on unmount or when gameStarted changes
@@ -168,9 +173,8 @@ export default function GeoQuizzPlacement() {
     setScore(0);
     let firstCountry = getRandomCountry(difficulty);
     alreadyChosenCountries.push(firstCountry);
-    console.log(alreadyChosenCountries);
     setTargetCountry(firstCountry);
-    setTimer(10);
+    setTimer(65);
   };
 
   const goHome = () => {
@@ -246,7 +250,6 @@ export default function GeoQuizzPlacement() {
   const changeCountry = () => {
     let newCountry = getRandomCountry(difficulty);
     alreadyChosenCountries.push(newCountry);
-    console.log(alreadyChosenCountries);
     setTargetCountry(newCountry);
   };
 
@@ -308,7 +311,8 @@ export default function GeoQuizzPlacement() {
       ).properties.Difficulty;
       if (event.target.feature.properties.ADMIN === targetCountryRef.current) {
         toast.success(
-          "Bravo ! " + targetCountryRef.current + " est la bonne réponse !", { containerId: "topRightToast" }
+          "Bravo ! " + targetCountryRef.current + " est la bonne réponse !",
+          { containerId: "topRightToast" }
         );
         event.target.setStyle({
           fillColor: "green",
@@ -324,7 +328,9 @@ export default function GeoQuizzPlacement() {
         }
         setConsecutiveErrors(0);
       } else {
-        toast.error("Dommage ! Vous n'avez pas trouvé le bon pays.", { containerId: "topRightToast" });
+        toast.error("Dommage ! Vous n'avez pas trouvé le bon pays.", {
+          containerId: "topRightToast",
+        });
         decrementScore("Difficile");
         setConsecutiveErrors((prevErrors) => prevErrors + 1);
       }
@@ -336,6 +342,19 @@ export default function GeoQuizzPlacement() {
     <div className="container">
       {!gameStarted && (
         <h1 className="app-title text-center my-4">Geo Country Placement</h1>
+      )}
+
+      {!gameStarted && (
+        <div className="rulesDiv">
+        <p className="rules">Le but est de trouver le plus de pays possible en 65 secondes. <br/>
+        Si vous trouvez tous les pays de la difficulté avant la fin du chrono, votre temps restant s'ajoute à votre score. <br/>
+        Alors, soyez vifs ! <br/>
+        Moins la difficulté est grande, moins il y a de pays à trouver, les pays faciles sont compris dans les difficultés supérieurs et ainsi de suite. <br/>
+        Sauf pour la difficulté hardcore qui nécessite une connaissance parfaite des territoires les plus méconnus.  <br/>
+        Cette difficulté inclut uniquement des territoires dont vous n'avez sûrement jamais entendu l'existence. <br/>
+        Bonne chance !
+        </p>
+        </div>
       )}
 
       {timer <= 0 && <Form finalScore={score} />}
@@ -376,7 +395,7 @@ export default function GeoQuizzPlacement() {
       )}
 
       {showScoreboard && !gameStarted && (
-        <div className="center">
+        <div className="center scoreBoard">
           <Scoreboard />
         </div>
       )}
@@ -419,7 +438,7 @@ export default function GeoQuizzPlacement() {
       />
 
       <ToastContainer
-        enableMultiContainer  
+        enableMultiContainer
         className={"topRightToastContainer"}
         containerId={"topRightToast"}
         position="top-right"

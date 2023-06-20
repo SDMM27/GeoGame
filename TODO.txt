@@ -1,11 +1,10 @@
-Esthétiser le jeu ( mettre notamment une animation lorsque cela trouve le pays et lorsque l'on se trompe)
-
-Enlever le pays si il a été selectionné dans la partie
+Faire en sorte que si le joueur avait du temps restant, ce temps soit ajouté au score
 Ranger le score par difficulté et par appareil
 Mettre pseudo aléatoire pour les sans pseudo
 Mettre le nom du pays sur lequel tu viens de cliquer si tu te trompes comme quand tu trouves le bon pays
 Enlever le pays si il a été selectionné dans la partie
 Mettre le chrono en haut à droite
+Mettre le nom du pays en bas
 Changer de couleur le chrono en fonction du temps restant
 Ecrire les règles du jeu
 

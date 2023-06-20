@@ -1,6 +1,4 @@
-Esthétiser le jeu ( mettre notamment une animation lorsque cela trouve le pays et lorsque l'on se trompe)
-
-Enlever le pays si il a été selectionné dans la partie
+Mettre le nom du pays en bas
 Ranger le score par difficulté et par appareil
 Mettre pseudo aléatoire pour les sans pseudo
 Mettre le nom du pays sur lequel tu viens de cliquer si tu te trompes comme quand tu trouves le bon pays

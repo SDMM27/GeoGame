@@ -170,7 +170,7 @@ export default function GeoQuizzPlacement() {
     alreadyChosenCountries.push(firstCountry);
     console.log(alreadyChosenCountries);
     setTargetCountry(firstCountry);
-    setTimer(10);
+    setTimer(65);
   };
 
   const goHome = () => {

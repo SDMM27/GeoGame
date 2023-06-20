@@ -36,7 +36,7 @@ export default function GeoQuizzPlacement() {
   const consecutiveErrorsRef = useRef(consecutiveErrors); // Create a ref
   const geoJsonRef = useRef(null);
   const [mapRef, setMapRef] = useState(null);
-  let [timer, setTimer] = useState(65); // timer set to 60 seconds
+  let [timer, setTimer] = useState(60); // timer set to 60 seconds
   const timerRef = useRef(timer); // Create a ref
   let [showScoreboard, setShowScoreboard] = useState(false);
 
@@ -174,14 +174,14 @@ export default function GeoQuizzPlacement() {
     let firstCountry = getRandomCountry(difficulty);
     alreadyChosenCountries.push(firstCountry);
     setTargetCountry(firstCountry);
-    setTimer(65);
+    setTimer(60);
   };
 
   const goHome = () => {
     alreadyChosenCountries = [];
     setGameStarted(false);
     setScore(0);
-    setTimer(65);
+    setTimer(60);
     setTargetCountry(null);
     setMarkerPosition(null);
     setConsecutiveErrors(0);
@@ -301,7 +301,7 @@ export default function GeoQuizzPlacement() {
       }
     }
     changeCountry();
-    setTimer(65);
+    setTimer(60);
   };
 
   const onCountryClick = (event) => {

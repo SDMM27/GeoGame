@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 Faire en sorte que si le joueur avait du temps restant, ce temps soit ajouté au score
+=======
+Mettre le nom du pays en bas
+>>>>>>> master
 Ranger le score par difficulté et par appareil
 Mettre pseudo aléatoire pour les sans pseudo
 Mettre le nom du pays sur lequel tu viens de cliquer si tu te trompes comme quand tu trouves le bon pays

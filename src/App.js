@@ -9,21 +9,12 @@ import countries from "./data/countriesWithDifficulty_FR.json"; // import countr
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { toast, ToastContainer } from "react-toastify";
 
-<<<<<<< Updated upstream
 import {
   MapContainer,
   TileLayer,
   GeoJSON,
 } from "react-leaflet";
-<<<<<<< HEAD
-import { Icon, LatLngBounds } from "leaflet";
-=======
-import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 // import { Icon} from "leaflet";
->>>>>>> Stashed changes
-=======
-// import { Icon} from "leaflet";
->>>>>>> master
 
 // const [finalScore, setFinalScore] = useState(0);
 
@@ -32,32 +23,6 @@ const countryStyle = {
   color: "black",
   fillOpacity: 1,
   weight: 0.85,
-};
-
-const getRandomCountry = (difficulty) => {
-  const difficulties = [
-    "Facile",
-    "Moyen",
-    "Difficile",
-    "Impossible",
-    "ImpossibleOnly",
-  ];
-  const selectedDifficultyIndex = difficulties.indexOf(difficulty);
-
-  let availableDifficulties;
-  if (difficulty === "ImpossibleOnly") {
-    availableDifficulties = ["Impossible"];
-  } else {
-    availableDifficulties = difficulties.slice(0, selectedDifficultyIndex + 1);
-  }
-
-  const filteredCountries = countries.features.filter((country) =>
-    availableDifficulties.includes(country.properties.Difficulty)
-  );
-
-  const randomIndex = Math.floor(Math.random() * filteredCountries.length);
-  const randomCountry = filteredCountries[randomIndex].properties.ADMIN;
-  return randomCountry;
 };
 
 export default function GeoQuizzPlacement() {
@@ -82,12 +47,39 @@ export default function GeoQuizzPlacement() {
 
   const position = [36.737232, 3.086472];
 
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-  function zoomCountryMap(lat, lng) {
-=======
+  const getRandomCountry = (difficulty) => {
+    const difficulties = [
+      "Facile",
+      "Moyen",
+      "Difficile",
+      "Impossible",
+      "ImpossibleOnly",
+    ];
+    const selectedDifficultyIndex = difficulties.indexOf(difficulty);
+  
+    let availableDifficulties;
+    if (difficulty === "ImpossibleOnly") {
+      availableDifficulties = ["Impossible"];
+    } else {
+      availableDifficulties = difficulties.slice(0, selectedDifficultyIndex + 1);
+    }
+  
+    const filteredCountries = countries.features.filter((country) =>
+      availableDifficulties.includes(country.properties.Difficulty)
+    );
+
+    if (filteredCountries.length === 0) {
+      setTimer(0);
+      toast.success("Bravo ! Vous avez trouvé tous les pays de la difficulté !");
+    }
+  
+    const randomIndex = Math.floor(Math.random() * filteredCountries.length);
+    const randomCountry = filteredCountries[randomIndex].properties.ADMIN;
+
+    return randomCountry;
+  };
+
   const zoomCountryMap = useCallback((lat, lng) => {
->>>>>>> master
     //function to zoom in on selected country
     let targetDifficulty = countries.features.find(
       (country) => country.properties.ADMIN === targetCountryRef.current // Use the ref instead of the state variable
@@ -101,31 +93,7 @@ export default function GeoQuizzPlacement() {
     } else {
       mapRef.setView([lat, lng], 4);
     }
-<<<<<<< HEAD
-  }
-=======
-  const zoomCountryMap = useCallback(
-    (lat, lng) => {
-      //function to zoom in on selected country
-      let targetDifficulty = countries.features.find(
-        (country) => country.properties.ADMIN === targetCountryRef.current // Use the ref instead of the state variable
-      ).properties.Difficulty;
-      if (targetCountryRef.current === "Vatican") {
-        mapRef.setView([lat, lng], 20);
-      } else if (targetDifficulty === "Difficile") {
-        mapRef.setView([lat, lng], 7);
-      } else if (targetDifficulty === "Impossible") {
-        mapRef.setView([lat, lng], 9);
-      } else {
-        mapRef.setView([lat, lng], 4);
-      }
-    },
-    [targetCountryRef, mapRef]
-  );
->>>>>>> Stashed changes
-=======
 }, [targetCountryRef, mapRef]);
->>>>>>> master
 
   useEffect(() => {
     let leafletContainer =
@@ -187,11 +155,12 @@ export default function GeoQuizzPlacement() {
   const startGame = () => {
     setGameStarted(true);
     setScore(0);
-    setTargetCountry(getRandomCountry(difficulty));
+    let firstCountry = getRandomCountry(difficulty);
+    setTargetCountry(firstCountry);
     setTimer(65);
   };
 
-  const restart = () => {
+  const goHome = () => {
     setGameStarted(false);
     setScore(0);
     setTimer(65);
@@ -245,7 +214,6 @@ export default function GeoQuizzPlacement() {
         weight: 2,
         fillOpacity: 0.5,
       });
-      console.log(highlightedCountry);
       setHighlightedCountry(layer.feature.properties.ADMIN);
     }
   };
@@ -259,8 +227,8 @@ export default function GeoQuizzPlacement() {
   };
 
   const changeCountry = () => {
-    targetCountry = getRandomCountry(difficulty);
-    setTargetCountry(targetCountry);
+    let newCountry = getRandomCountry(difficulty);
+    setTargetCountry(newCountry);
   };
 
   const passCountry = () => {
@@ -299,23 +267,19 @@ export default function GeoQuizzPlacement() {
     decrementScore("Difficile");
   };
 
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
-=======
->>>>>>> master
   const restartTimer = () => {
     setScore(0);
+    setConsecutiveErrors(0);
+    let mapElements = document.getElementsByClassName("mapElement");
+    if (mapElements) {
+      for (let i = 0; i < mapElements.length; i++) {
+        mapElements[i].style.pointerEvents = "auto";
+      }
+    }
     changeCountry();
     setTimer(65);
-<<<<<<< HEAD
-  };
-
->>>>>>> Stashed changes
-=======
   }
 
->>>>>>> master
   const onCountryClick = (event) => {
     if (gameStarted) {
       let targetDifficulty = countries.features.find(
@@ -326,86 +290,50 @@ export default function GeoQuizzPlacement() {
           "Bravo ! " + targetCountryRef.current + " est la bonne réponse !"
         );
         changeCountry();
-
         if (consecutiveErrorsRef.current < 3) {
           incrementScore(targetDifficulty);
         }
         setConsecutiveErrors(0);
-        } else {
-                  // Highlight the correct country in green
-        event.target.setStyle({
-          fillColor: "green",
-          weight: 2,
-          fillOpacity: 0.5,
-        });
-
-        const targetLayer = geoJsonRef.current
-          .getLayers()
-          .find(
-            (layer) =>
-              layer.feature.properties.ADMIN === targetCountryRef.current
-          );
-
-        if (targetLayer) {
-          targetLayer.setStyle({
-            fillColor: "green",
-            weight: 2,
-            fillOpacity: 0.5,
-          });
-
-          // Revert back to original style after 3 seconds
-          setTimeout(() => {
-            targetLayer.setStyle(countryStyle);
-          }, 3000);
-          toast.error("Dommage ! Vous n'avez pas trouvé le bon pays.");
-          decrementScore(targetDifficulty);
-          setConsecutiveErrors((prevErrors) => prevErrors + 1);
-        }
+      } else {
+        toast.error("Dommage ! Vous n'avez pas trouvé le bon pays.");
+        decrementScore(targetDifficulty);
+        setConsecutiveErrors((prevErrors) => prevErrors + 1);
       }
+      setMarkerPosition(event.latlng);
     }
+  };
 
-    return (
-      <div className="container">
-        {!gameStarted && (
-          <h1 className="app-title text-center my-4">Geo Country Placement</h1>
-        )}
+  return (
+    <div className="container">
+      {!gameStarted && (
+        <h1 className="app-title text-center my-4">Geo Country Placement</h1>
+      )}
 
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-      {timer <= 0 && <Form finalScore={score}/>}
-=======
-        {timer <= 0 && <Form finalScore={score} />}
->>>>>>> Stashed changes
-=======
       {timer <= 0 && <Form finalScore={score} />}
->>>>>>> master
 
-        {!gameStarted && (
-          <div className="center">
-            <div className="form-group">
-              <label htmlFor="difficulty">Difficulté :</label>
-              <select
-                id="difficulty"
-                className="form-control"
-                value={difficulty}
-                onChange={(e) => setDifficulty(e.target.value)}
-              >
-                <option value="Facile">Facile</option>
-                <option value="Moyen">Moyen</option>
-                <option value="Difficile">Difficile</option>
-                <option value="Impossible">Impossible</option>
-                <option value="ImpossibleOnly">Hardcore</option>
-              </select>
-            </div>
-            <button className="btn btn-primary" onClick={startGame}>
-              Start
-            </button>
+      {!gameStarted && (
+        <div className="center">
+          <div className="form-group">
+            <label htmlFor="difficulty">Difficulté :</label>
+            <select
+              id="difficulty"
+              className="form-control"
+              value={difficulty}
+              onChange={(e) => setDifficulty(e.target.value)}
+            >
+              <option value="Facile">Facile</option>
+              <option value="Moyen">Moyen</option>
+              <option value="Difficile">Difficile</option>
+              <option value="Impossible">Impossible</option>
+              <option value="ImpossibleOnly">Hardcore</option>
+            </select>
           </div>
-        )}
+          <button className="btn btn-primary" onClick={startGame}>
+            Start
+          </button>
+        </div>
+      )}
 
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
       {!gameStarted && (
         <Router>
           <div className="app">
@@ -426,7 +354,6 @@ export default function GeoQuizzPlacement() {
         </Router>
       )}
 
->>>>>>> master
       {gameStarted && (
         <div
           className="gameButtons "
@@ -437,7 +364,7 @@ export default function GeoQuizzPlacement() {
             zIndex: 1000,
           }}
         >
-          <button className="btn btn-danger" onClick={restart}>
+          <button className="btn btn-danger" onClick={goHome}>
             Revenir à l'accueil
           </button>
           <button className="btn btn-warning mapElement" onClick={seeCountry}>
@@ -449,7 +376,7 @@ export default function GeoQuizzPlacement() {
           >
             Passer le pays
           </button>
-          <button className="btn btn-danger mapElement restartBtn" onClick={restartTimer}>
+          <button className="btn btn-danger restartBtn" onClick={restartTimer}>
             Recommencer
           </button>
         </div>
@@ -483,132 +410,50 @@ export default function GeoQuizzPlacement() {
             }, 100);
           }}
         >
-=======
-        {!gameStarted && (
-          <Router>
-            <div className="app">
-              <header className="app-header">
-                <Link className="app-link" to="/scores">
-                  Voir les scores des joueurs
-                </Link>
-              </header>
-
-              <Routes>
-                <Route
-                  path="/"
-                  element={<> {/* Votre jeu et votre formulaire ici */} </>}
-                />
-                <Route path="/scores" element={<Scoreboard />} />
-              </Routes>
-            </div>
-          </Router>
-        )}
-
-        {gameStarted && (
->>>>>>> Stashed changes
           <div
-            className="gameButtons "
             style={{
-              position: "relative",
+              position: "absolute",
               top: "10px",
-              left: "10%",
+              left: "1.5%",
               zIndex: 1000,
             }}
+            className="gameInfos"
           >
-            <button className="btn btn-danger" onClick={restart}>
-              Revenir à l'accueil
-            </button>
-            <button className="btn btn-warning mapElement" onClick={seeCountry}>
-              Voir le pays
-            </button>
-            <button
-              className="btn btn-secondary mapElement"
-              onClick={passCountry}
-            >
-              Passer le pays
-            </button>
-            <button
-              className="btn btn-danger mapElement restartBtn"
-              onClick={restartTimer}
-            >
-              Recommencer
-            </button>
+            <h2 className="textContainer targetCountry">
+              Pays à trouver : {targetCountry}
+            </h2>
+            <h2 className="textContainer">Score : {score}</h2>
+            <h2 className="textContainer">Temps restant : {timer}</h2>
           </div>
-        )}
-
-        <ToastContainer
-          position="top-right"
-          autoClose={2500}
-          theme="colored"
-          hideProgressBar
-        />
-
-        {gameStarted && (
-          <MapContainer
-            ref={mapRef}
+          {/* Toner Map */}
+          <TileLayer
             className="mapElement"
-            center={position}
-            zoom={3}
-            scrollWheelZoom={true}
-            zoomControl={false}
-            dragging={true}
-            doubleClickZoom={false}
-            maxBounds={[
-              [90, -180],
-              [-90, 180],
-            ]}
-            whenReady={({ target }) => {
-              setMapRef(target);
-              setTimeout(() => {
-                target.invalidateSize();
-              }, 100);
+            attribution="Stamen Toner"
+            url="https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png"
+            noWrap={true}
+            minZoom={2}
+            maxZoom={20}
+          />
+
+          <GeoJSON
+            className="mapElement"
+            ref={geoJsonRef}
+            style={countryStyle}
+            data={countries.features}
+            onEachFeature={(feature, layer) => {
+              layer.on({
+                click: onCountryClick,
+                mouseover: onCountryMouseOver,
+                mouseout: onCountryMouseOut,
+              });
             }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                top: "10px",
-                left: "10%",
-                zIndex: 1000,
-              }}
-              className="gameInfos"
-            >
-              <h2 className="textContainer targetCountry">
-                Pays à trouver : {targetCountry}
-              </h2>
-              <h2 className="textContainer">Score : {score}</h2>
-              <h2 className="textContainer">Temps restant : {timer}</h2>
-            </div>
-            {/* Toner Map */}
-            <TileLayer
-              className="mapElement"
-              attribution="Stamen Toner"
-              url="https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png"
-              noWrap={true}
-              minZoom={2}
-              maxZoom={20}
-            />
+          />
 
-            <GeoJSON
-              className="mapElement"
-              ref={geoJsonRef}
-              style={countryStyle}
-              data={countries.features}
-              onEachFeature={(feature, layer) => {
-                layer.on({
-                  click: onCountryClick,
-                  mouseover: onCountryMouseOver,
-                  mouseout: onCountryMouseOut,
-                });
-              }}
-            />
-
-            {/* {markerPosition && (
+          {/* {markerPosition && (
                 <Marker position={markerPosition} icon={customIcon}></Marker>
               )} */}
-          </MapContainer>
-        )}
-      </div>
-    );
-  };
+        </MapContainer>
+      )}
+    </div>
+  );
 }

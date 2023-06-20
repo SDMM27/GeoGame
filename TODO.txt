@@ -1,4 +1,5 @@
 Esthétiser le jeu ( mettre notamment une animation lorsque cela trouve le pays et lorsque l'on se trompe)
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
 Ranger le score par difficulté et par appareil
@@ -6,6 +7,9 @@ Mettre pseudo aléatoire pour les sans pseudo
 Mettre le nom du pays sur lequel tu viens de cliquer si tu te trompes comme quand tu trouves le bon pays
 Enlever le pays si il a été selectionné dans la partie
 >>>>>>> Stashed changes
+=======
+Enlever le pays si il a été selectionné dans la partie
+>>>>>>> master
 Mettre le chrono en haut à droite
 Changer de couleur le chrono en fonction du temps restant
 Ecrire les règles du jeu
@@ -19,6 +23,7 @@ Faire un menu d'accueil ( éventuellement )
 Faire un tableau des meilleurs scores.
 Faire un compte du nombre d'erreurs au total pour l inclure dans la base de données.
 Mettre un bouton recommencer une fois que la partie est finie
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 Mettre un timer en en secondes plus précises
 =======
@@ -32,3 +37,13 @@ Faire un bot discord pour informer des améliorations
 To do des jeux à implémenter :
 Mode Geo Country Placement mais avec les drapeaux et non les noms.
 >>>>>>> Stashed changes
+=======
+Mettre un timer en en secondes plus précises
+
+
+
+
+
+To do des jeux à implémenter :
+Mode Geo Country Placement mais avec les drapeaux et non les noms.
+>>>>>>> master

@@ -1,27 +1,29 @@
-import logo from "./logo.svg";
 import Form from "./pages/form";
+import { BrowserRouter as Router, Route, Link, Routes } from "react-router-dom";
+import Scoreboard from "./pages/Scoreboard";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import "leaflet/dist/leaflet.css";
 import "react-toastify/dist/ReactToastify.css";
 import countries from "./data/countriesWithDifficulty_FR.json"; // import countries data
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { toast, ToastContainer } from "react-toastify";
 
 <<<<<<< Updated upstream
 import {
   MapContainer,
   TileLayer,
-  Marker,
-  Popup,
   GeoJSON,
-  useMap,
 } from "react-leaflet";
+<<<<<<< HEAD
 import { Icon, LatLngBounds } from "leaflet";
 =======
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 // import { Icon} from "leaflet";
 >>>>>>> Stashed changes
+=======
+// import { Icon} from "leaflet";
+>>>>>>> master
 
 // const [finalScore, setFinalScore] = useState(0);
 
@@ -73,15 +75,19 @@ export default function GeoQuizzPlacement() {
   let [timer, setTimer] = useState(65); // timer set to 60 seconds
 
   // create custom icon
-  const customIcon = new Icon({
-    iconUrl: require("./img/marker.png"),
-    iconSize: [38, 38],
-  });
+  // const customIcon = new Icon({
+  //   iconUrl: require("./img/marker.png"),
+  //   iconSize: [38, 38],
+  // });
 
   const position = [36.737232, 3.086472];
 
+<<<<<<< HEAD
 <<<<<<< Updated upstream
   function zoomCountryMap(lat, lng) {
+=======
+  const zoomCountryMap = useCallback((lat, lng) => {
+>>>>>>> master
     //function to zoom in on selected country
     let targetDifficulty = countries.features.find(
       (country) => country.properties.ADMIN === targetCountryRef.current // Use the ref instead of the state variable
@@ -95,6 +101,7 @@ export default function GeoQuizzPlacement() {
     } else {
       mapRef.setView([lat, lng], 4);
     }
+<<<<<<< HEAD
   }
 =======
   const zoomCountryMap = useCallback(
@@ -116,6 +123,9 @@ export default function GeoQuizzPlacement() {
     [targetCountryRef, mapRef]
   );
 >>>>>>> Stashed changes
+=======
+}, [targetCountryRef, mapRef]);
+>>>>>>> master
 
   useEffect(() => {
     let leafletContainer =
@@ -148,7 +158,7 @@ export default function GeoQuizzPlacement() {
         }
       }
     }
-  }, [targetCountry, consecutiveErrors]);
+  }, [targetCountry, consecutiveErrors, mapRef, zoomCountryMap]);
 
   useEffect(() => {
     // only start the timer when the game has started
@@ -187,6 +197,7 @@ export default function GeoQuizzPlacement() {
     setTimer(65);
     setTargetCountry(null);
     setMarkerPosition(null);
+    console.log(markerPosition);
     setConsecutiveErrors(0);
   };
 
@@ -234,6 +245,7 @@ export default function GeoQuizzPlacement() {
         weight: 2,
         fillOpacity: 0.5,
       });
+      console.log(highlightedCountry);
       setHighlightedCountry(layer.feature.properties.ADMIN);
     }
   };
@@ -287,15 +299,23 @@ export default function GeoQuizzPlacement() {
     decrementScore("Difficile");
   };
 
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
+=======
+>>>>>>> master
   const restartTimer = () => {
     setScore(0);
     changeCountry();
     setTimer(65);
+<<<<<<< HEAD
   };
 
 >>>>>>> Stashed changes
+=======
+  }
+
+>>>>>>> master
   const onCountryClick = (event) => {
     if (gameStarted) {
       let targetDifficulty = countries.features.find(
@@ -350,11 +370,15 @@ export default function GeoQuizzPlacement() {
           <h1 className="app-title text-center my-4">Geo Country Placement</h1>
         )}
 
+<<<<<<< HEAD
 <<<<<<< Updated upstream
       {timer <= 0 && <Form finalScore={score}/>}
 =======
         {timer <= 0 && <Form finalScore={score} />}
 >>>>>>> Stashed changes
+=======
+      {timer <= 0 && <Form finalScore={score} />}
+>>>>>>> master
 
         {!gameStarted && (
           <div className="center">
@@ -379,10 +403,33 @@ export default function GeoQuizzPlacement() {
           </div>
         )}
 
+<<<<<<< HEAD
 <<<<<<< Updated upstream
+=======
+      {!gameStarted && (
+        <Router>
+          <div className="app">
+            <header className="app-header">
+              <Link className="app-link" to="/scores">
+                Voir les scores des joueurs
+              </Link>
+            </header>
+
+            <Routes>
+              <Route
+                path="/"
+                element={<> {/* Votre jeu et votre formulaire ici */} </>}
+              />
+              <Route path="/scores" element={<Scoreboard />} />
+            </Routes>
+          </div>
+        </Router>
+      )}
+
+>>>>>>> master
       {gameStarted && (
         <div
-          className="gameButtons"
+          className="gameButtons "
           style={{
             position: "relative",
             top: "10px",
@@ -401,6 +448,9 @@ export default function GeoQuizzPlacement() {
             onClick={passCountry}
           >
             Passer le pays
+          </button>
+          <button className="btn btn-danger mapElement restartBtn" onClick={restartTimer}>
+            Recommencer
           </button>
         </div>
       )}
@@ -461,7 +511,7 @@ export default function GeoQuizzPlacement() {
             style={{
               position: "relative",
               top: "10px",
-              left: "10px",
+              left: "10%",
               zIndex: 1000,
             }}
           >

@@ -368,7 +368,7 @@ export default function GeoQuizzPlacement() {
             parfaite des territoires les plus méconnus. <br />
             Cette difficulté inclut uniquement des territoires dont vous ne soupçonniez pas l'existence ... <br /> <br /><br />
 
-            Vous gagnez 1 point pour un pays facile de trouver, 2 points pour un pays moyen, 3 points pour un pays difficile et 4 points pour un pays 'impossible'. <br />
+            Vous gagnez 1 point pour un pays facile de trouvé, 2 points pour un pays moyen, 3 points pour un pays difficile et 4 points pour un pays 'impossible'. <br />
             Pour chaque erreur, vous perdez 1 point. Sinon, c'est trop facile. <br />
             Bonne chance !
           </p>

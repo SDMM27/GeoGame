@@ -377,9 +377,14 @@ export default function GeoQuizzPlacement() {
             <br />
             Tu as 3 essais pour trouver chaque pays, au bout de ces 3 essais, le
             pays t'est révélé et tu dois cliquer dessus pour passer au pays
-            suivant. <br />
-            Si vous trouvez tous les pays de la difficulté avant la fin du
-            chrono, votre temps restant s'ajoute à votre score. <br />
+            suivant. <br /><br />
+            Vous gagnez 1 point pour un pays facile trouvé, 2 points pour un
+            pays moyen, 3 points pour un pays difficile et 4 points pour un pays
+            "impossible". <br />
+            Si tu te trompes 3 fois sur le même pays à trouver, tu perds 1 point. Sinon, c'est trop facile.
+            <br /><br />
+            Si tu trouves tous les pays de la difficulté avant la fin du
+            chrono, ton temps restant s'ajoute à ton score. <br />
             Alors, soyez vifs ! <br /> <br />
             Moins la difficulté est grande, moins il y a de pays à trouver, les
             pays faciles sont compris dans les difficultés supérieures et ainsi
@@ -388,11 +393,6 @@ export default function GeoQuizzPlacement() {
             parfaite des territoires les plus méconnus. <br />
             Cette difficulté inclut uniquement des territoires dont vous ne
             soupçonniez pas l'existence ... <br /> <br />
-            <br />
-            Vous gagnez 1 point pour un pays facile de trouver, 2 points pour un
-            pays moyen, 3 points pour un pays difficile et 4 points pour un pays
-            'impossible'. <br />
-            Pour chaque erreur, vous perdez 1 point. Sinon, c'est trop facile.{" "}
             <br />
             Bonne chance !
           </p>

@@ -1,14 +1,16 @@
+Changer de place le pays à trouver ( eventuellement le mettre carrément sur la souris )
+Reset la map quand on recommence
 Ranger le score par difficulté et par appareil
-Mettre pseudo aléatoire pour les sans pseudo
-Mettre le nom du pays sur lequel tu viens de cliquer si tu te trompes comme quand tu trouves le bon pays
+Changer la police
+Peut-etre changer l'enregistrement des scores et en enregistrer un par niveau
+Mettre bonus quand tu es sur une série
+Mettre le nom du pays sur lequel tu viens de cliquer si tu te trompes
 Mettre le chrono en haut à droite
 Changer de couleur le chrono en fonction du temps restant
-Mettre le nom du pays en bas
 
 MULTI : Faire des rounds, chacun doit trouver le pays le plus rapidement et le dernier à avoir du temps gagne
 
 Mettre d'autres infos dans la bdd
-
 
 Faire un menu d'accueil ( éventuellement )
 Faire un tableau des meilleurs scores.

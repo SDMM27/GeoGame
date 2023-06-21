@@ -1,3 +1,13 @@
 * {
-    color: whitesmoke;
+    color: wheat;
+}
+
+.scoreboard {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    margin-top: 1%;
+    margin-right: 20%;
+    margin-left: 20%;
+    color: white;
 }

@@ -22,7 +22,7 @@ export default function Scoreboard() {
   }, []);
 
   return (
-    <div>
+    <div className='scoreboard'>
       <h1>Tableau des scores</h1>
       {scores.map((score, index) => (
         <div key={index}>

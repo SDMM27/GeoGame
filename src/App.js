@@ -31,7 +31,7 @@ export default function GeoQuizzPlacement() {
   let [markerPosition, setMarkerPosition] = useState(null);
   let [score, setScore] = useState(0);
   let [gameStarted, setGameStarted] = useState(false);
-  let [difficulty, setDifficulty] = useState("Facile");
+  let [difficulty, setDifficulty] = useState(null);
   let [consecutiveErrors, setConsecutiveErrors] = useState(0);
   const consecutiveErrorsRef = useRef(consecutiveErrors); // Create a ref
   const geoJsonRef = useRef(null);
@@ -118,13 +118,15 @@ export default function GeoQuizzPlacement() {
     targetCountryRef.current = targetCountry; // Update the ref whenever targetCountry changes
     consecutiveErrorsRef.current = consecutiveErrors; // Update the ref whenever consecutiveErrors changes
     if (consecutiveErrorsRef.current >= 3) {
-      setScore((prevScore) => prevScore - 1);
-      console.log('feuuuuuuuuuuuuuur');
-      toast.error("Dommage ! C'est ici que se trouvait " + targetCountryRef.current, {
-        containerId: "topRightToast",
-      });
+      decrementScore("Difficile");
+      toast.error(
+        "Dommage ! C'est ici que se trouvait " + targetCountryRef.current,
+        {
+          containerId: "topRightToast",
+        }
+      );
     }
-    
+
     if (geoJsonRef.current && mapRef.current) {
       if (consecutiveErrors >= 3) {
         const targetLayer = geoJsonRef.current
@@ -175,7 +177,22 @@ export default function GeoQuizzPlacement() {
     }
   }, [gameStarted, timer]); // this effect runs every time gameStarted or timer changes
 
+  const showRules = () => {
+    let rules = document.getElementsByClassName("rulesDiv")[0];
+    if (rules.style.display === "block") {
+      rules.style.display = "none";
+    } else {
+      rules.style.display = "block";
+    }
+  };
+
   const startGame = () => {
+    if (!difficulty) {
+      toast.error("Veuillez choisir une difficulté", {
+        containerId: "centerToast",
+      });
+      return;
+    }
     setShowScoreboard(false);
     setGameStarted(true);
     setScore(0);
@@ -187,6 +204,7 @@ export default function GeoQuizzPlacement() {
 
   const goHome = () => {
     alreadyChosenCountries = [];
+    setDifficulty(null);
     setGameStarted(false);
     setScore(0);
     setTimer(60);
@@ -261,12 +279,6 @@ export default function GeoQuizzPlacement() {
     setTargetCountry(newCountry);
   };
 
-  const passCountry = () => {
-    setConsecutiveErrors(0);
-    changeCountry();
-    decrementScore("Difficile");
-  };
-
   const seeCountry = () => {
     setConsecutiveErrors(0);
     const targetLayer = geoJsonRef.current
@@ -335,8 +347,7 @@ export default function GeoQuizzPlacement() {
           incrementScore(targetDifficulty);
         }
         setConsecutiveErrors(0);
-      } 
-       else {
+      } else {
         toast.error("Dommage ! Vous n'avez pas trouvé le bon pays.", {
           containerId: "topRightToast",
         });
@@ -353,23 +364,37 @@ export default function GeoQuizzPlacement() {
       )}
 
       {!gameStarted && (
+        <div className="rulesBtn">
+          <button className="btn showRulesBtn" onClick={showRules}>
+            Règles
+          </button>
+        </div>
+      )}
+
+      {!gameStarted && (
         <div className="rulesDiv">
           <p className="rules">
-            Le but est de trouver le plus de pays possible en 65 secondes.
+            Le but est de trouver le plus de pays possible en 60 secondes.
             <br />
-            Tu as 3 essais pour trouver chaque pays, au bout de ces 3 essais, le pays t'est révélé et tu dois cliquer dessus pour passer au pays suivant. <br />
+            Tu as 3 essais pour trouver chaque pays, au bout de ces 3 essais, le
+            pays t'est révélé et tu dois cliquer dessus pour passer au pays
+            suivant. <br />
             Si vous trouvez tous les pays de la difficulté avant la fin du
             chrono, votre temps restant s'ajoute à votre score. <br />
-            Alors, soyez vifs ! <br />  <br /> 
+            Alors, soyez vifs ! <br /> <br />
             Moins la difficulté est grande, moins il y a de pays à trouver, les
             pays faciles sont compris dans les difficultés supérieures et ainsi
             de suite. <br />
             Sauf pour la difficulté hardcore qui nécessite une connaissance
             parfaite des territoires les plus méconnus. <br />
-            Cette difficulté inclut uniquement des territoires dont vous ne soupçonniez pas l'existence ... <br /> <br /><br />
-
-            Vous gagnez 1 point pour un pays facile de trouver, 2 points pour un pays moyen, 3 points pour un pays difficile et 4 points pour un pays 'impossible'. <br />
-            Pour chaque erreur, vous perdez 1 point. Sinon, c'est trop facile. <br />
+            Cette difficulté inclut uniquement des territoires dont vous ne
+            soupçonniez pas l'existence ... <br /> <br />
+            <br />
+            Vous gagnez 1 point pour un pays facile de trouver, 2 points pour un
+            pays moyen, 3 points pour un pays difficile et 4 points pour un pays
+            'impossible'. <br />
+            Pour chaque erreur, vous perdez 1 point. Sinon, c'est trop facile.{" "}
+            <br />
             Bonne chance !
           </p>
         </div>
@@ -378,15 +403,19 @@ export default function GeoQuizzPlacement() {
       {timer <= 0 && <Form finalScore={score} />}
 
       {!gameStarted && (
-        <div className="center">
+        <div className="menuBtns">
+          <div className="center"> </div>
+          <div className="center"> </div>
+          <div className="center"> </div>
+          <div className="center"> </div>
+          <div className="center"> </div>
           <div className="form-group">
-            <label htmlFor="difficulty">Difficulté :</label>
             <select
               id="difficulty"
               className="form-control"
-              value={difficulty}
               onChange={(e) => setDifficulty(e.target.value)}
             >
+              <option value="" selected disabled hidden>Difficulté</option>
               <option value="Facile">Facile</option>
               <option value="Moyen">Moyen</option>
               <option value="Difficile">Difficile</option>
@@ -397,26 +426,25 @@ export default function GeoQuizzPlacement() {
           <button className="btn btn-primary" onClick={startGame}>
             Start
           </button>
+          <div className="center"> </div>
+          <div className="center"> </div>
+          <div className="center"> </div>
+          <div className="center"> </div>
+          <div className="center"> </div>
         </div>
       )}
 
       {!gameStarted && (
-        <div className="center">
-          <button
-            id="displayScoreboard"
-            className="btn btn-scoreboard"
-            onClick={displayScoreboard}
-          >
-            Voir les scores des joueurs
-          </button>
-        </div>
+        <button
+          id="displayScoreboard"
+          className="btn btn-scoreboard"
+          onClick={displayScoreboard}
+        >
+          Voir les scores des joueurs
+        </button>
       )}
 
-      {showScoreboard && !gameStarted && (
-        <div className="center scoreBoard">
-          <Scoreboard />
-        </div>
-      )}
+      {showScoreboard && !gameStarted && <Scoreboard />}
 
       {gameStarted && (
         <div
@@ -428,17 +456,11 @@ export default function GeoQuizzPlacement() {
             zIndex: 1000,
           }}
         >
-          <button className="btn btn-danger" onClick={goHome}>
+          <button className="btn btn-goHome" onClick={goHome}>
             Revenir à l'accueil
           </button>
           <button className="btn btn-warning mapElement" onClick={seeCountry}>
             Voir le pays
-          </button>
-          <button
-            className="btn btn-secondary mapElement"
-            onClick={passCountry}
-          >
-            Passer le pays
           </button>
           <button className="btn btn-danger restartBtn" onClick={restartTimer}>
             Recommencer
@@ -450,6 +472,7 @@ export default function GeoQuizzPlacement() {
         enableMultiContainer
         className={"centerToastContainer"}
         containerId={"centerToast"}
+        autoClose={3000}
         position="bottom-center"
         theme="colored"
         hideProgressBar
@@ -493,22 +516,16 @@ export default function GeoQuizzPlacement() {
             }, 100);
           }}
         >
-          <div
-            style={{
-              position: "absolute",
-              top: "10px",
-              left: "1.5%",
-              zIndex: 1000,
-            }}
-            className="gameInfos"
-          >
-            <h2 className="textContainer targetCountry">
-              Pays à trouver : {targetCountry}
-            </h2>
+          <div className="gameInfos">
             <h2 className="textContainer">Score : {score}</h2>
             <h2 className="textContainer">Temps restant : {timer}</h2>
           </div>
-          {/* Toner Map */}
+
+          <div className="targetCountryContainer">
+            <h2 className="textContainer targetCountry">
+              Pays à trouver : {targetCountry}
+            </h2>
+          </div>
           <TileLayer
             className="mapElement"
             attribution="Stamen Toner"

@@ -22,8 +22,7 @@
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: center;
-  /* margin-top: 2%; */
+  justify-content: center;  
   margin-left: auto;
   margin-right: auto;
 }
@@ -80,6 +79,7 @@
 }
 
 .center {
+  width: 10%;
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -95,14 +95,42 @@
   background-color: #222121;
 } */
 
-.form-control {
-  margin-top: 0.35%;
-  width: auto;
+.difficultyLabel {
+  color: white;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1%;
+  text-align: center;
 }
+
+.menuBtns {
+  display: flex;
+  align-items: end;
+  flex-direction: row;
+}
+
+.form-group {
+  color: white;
+  margin-left: auto;
+  margin-right: 1.75%;
+  margin-top: 1%;
+}
+
+.form-control {
+  text-align: center;
+  width: 100%;
+  margin-top: 0.45%;
+}
+
+.form-control, .btn-primary {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 
 .btn-primary {
   margin-top: 0.45%;
-  width: auto;
 }
 
 #gameTitle {
@@ -121,14 +149,6 @@ body {
   height: 100%;
   width: 100%;
 } */
-
-.gameInfos{
-  width: auto;
-  color: white;
-  font-size: 5%;
-  font-style: italic;
-  z-index: 9999;
-}
 
 .btn-warning {
   margin-top: 0.5%;
@@ -151,25 +171,36 @@ body {
   z-index: 9999;
 }
 
+.btn-goHome {
+  color: white;
+  background-color: #007BFF;
+  margin-top: 0.5%;
+  margin-bottom: 2%;
+  margin-left: auto;
+  z-index: 9999;
+}
+
+.btn-goHome:hover {
+  background-color: #343a40;
+  color: white;
+}
+
 .restartBtn {
   margin-left: 2%;
   margin-right: auto;
 }
 
 option {
+  text-align: center;
   color: black;
 }
 
-.form-group {
-  color: white;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 1%;
-}
-
 .btn-scoreboard {
-  margin-top: 5%;
+  margin-top: 2%;
   margin-bottom: 2%;
+  margin-left: 45%;
+  width: 10%;
+  margin-right: 45%;
   background-color: rgb(100, 99, 99);
   color: white;
   /* width: 20%; */
@@ -180,28 +211,55 @@ option {
   color: white;
 }
 
-.scoreBoard {
-  margin-top: 1%;
-  margin-bottom: 10%;
-  margin-right: auto;
-  margin-left: auto;
-  color: white;
-}
-
 .rules {
-  text-align: center;
-      font-size: 18px;
-      line-height: 1.6;
+      text-align: center;
       color: white;
+      font-size: 90%;
 }
 
 .rulesDiv {
-    margin: 20px;
-    padding: 10px;
+    display: none;
+    font-size: large;
+    margin-left: 30%;
+    margin-right: 30%;
+    padding-top: 0.75%;
+    padding-bottom: 0.5%;
+    padding-left: 0;
+    padding-right: 0;
     background-color: rgb(100, 99, 99);
     border-radius: 10px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
+
+.rulesBtn { 
+  text-align: center
+}
+
+.showRulesBtn {
+  color: white;
+  background-color: #DC3545;
+  margin-left: auto;
+  margin-bottom: 1%;
+  margin-right: auto;
+}
+
+.showRulesBtn:hover {
+  background-color: #343a40;
+  color: white;
+}
+
+.gameInfos{
+  position: absolute;
+  top: 10px;
+  left: 1.5%;
+  z-index: 1000;
+  width: auto;
+  color: white;
+  font-size: 5%;
+  font-style: italic;
+  z-index: 9999;
+}
+
 
 .textContainer {
   padding: 10px;
@@ -214,8 +272,23 @@ option {
   z-index: 9999;
 }
 
-.targetCountry {
+.targetCountryContainer {
+  display: block;
+  margin-top: 0.75%;
+  margin-left: 45%;
+  margin-right: 45%;
+  position: relative;
+  z-index: 1000;
+  width: 10%;
+  color: white;
+  font-size: 6%;
+  font-style: italic;
+  z-index: 9999;
+}
 
+.targetCountry {
+  background-color: green;
+  border: green;
 }
 
 .app-title {

@@ -1,4 +1,7 @@
+Regrouper pouton passer et voir
+Reset la map quand on recommence
 Ranger le score par difficulté et par appareil
+Mettre bonus quand tu es sur une série
 Mettre pseudo aléatoire pour les sans pseudo
 Mettre le nom du pays sur lequel tu viens de cliquer si tu te trompes comme quand tu trouves le bon pays
 Mettre le chrono en haut à droite

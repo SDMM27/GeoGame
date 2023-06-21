@@ -305,7 +305,6 @@ export default function GeoQuizzPlacement() {
     }, 3000); // Change this to change the delay, in milliseconds
 
     // Change country
-    changeCountry();
     decrementScore("Difficile");
   };
 

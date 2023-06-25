@@ -210013,7 +210013,7 @@
       "properties":{
         "ADMIN":"Burkina Faso",
         "ISO_A3":"BFA",
-        "Difficulty":"Moyen"
+        "Difficulty":"Difficile"
       },
       "geometry":{
         "type":"Polygon",
@@ -296605,7 +296605,7 @@
       "properties":{
         "ADMIN":"Botswana",
         "ISO_A3":"BWA",
-        "Difficulty":"Moyen"
+        "Difficulty":"Difficile"
       },
       "geometry":{
         "type":"Polygon",
@@ -800459,7 +800459,7 @@
       "properties":{
         "ADMIN":"République dominicaine",
         "ISO_A3":"DOM",
-        "Difficulty":"Moyen"
+        "Difficulty":"Difficile"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -802804,7 +802804,7 @@
       "properties":{
         "ADMIN":"Algérie",
         "ISO_A3":"DZA",
-        "Difficulty":"Moyen"
+        "Difficulty":"Facile"
       },
       "geometry":{
         "type":"Polygon",
@@ -1076772,7 +1076772,7 @@
       "properties":{
         "ADMIN":"Haïti",
         "ISO_A3":"HTI",
-        "Difficulty":"Moyen"
+        "Difficulty":"Difficile"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1354786,7 +1354786,7 @@
       "properties":{
         "ADMIN":"Monaco",
         "ISO_A3":"MCO",
-        "Difficulty":"Moyen"
+        "Difficulty":"Difficile"
       },
       "geometry":{
         "type":"Polygon",
@@ -1410647,7 +1410647,7 @@
       "properties":{
         "ADMIN":"Myanmar",
         "ISO_A3":"MMR",
-        "Difficulty":"Moyen"
+        "Difficulty":"Difficile"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1451604,7 +1451604,7 @@
       "properties":{
         "ADMIN":"Maurice",
         "ISO_A3":"MUS",
-        "Difficulty":"Moyen"
+        "Difficulty":"Difficile"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1485810,7 +1485810,7 @@
       "properties":{
         "ADMIN":"Nicaragua",
         "ISO_A3":"NIC",
-        "Difficulty":"Moyen"
+        "Difficulty":"Difficile"
       },
       "geometry":{
         "type":"MultiPolygon",
@@ -1868460,7 +1868460,7 @@
       "properties":{
         "ADMIN":"Singapour",
         "ISO_A3":"SGP",
-        "Difficulty":"Moyen"
+        "Difficulty":"Difficile"
       },
       "geometry":{
         "type":"Polygon",
@@ -1924643,7 +1924643,7 @@
       "properties":{
         "ADMIN":"Tchad",
         "ISO_A3":"TCD",
-        "Difficulty":"Moyen"
+        "Difficulty":"Difficile"
       },
       "geometry":{
         "type":"Polygon",
@@ -1929522,7 +1929522,7 @@
       "properties":{
         "ADMIN":"Togo",
         "ISO_A3":"TGO",
-        "Difficulty":"Moyen"
+        "Difficulty":"Difficile"
       },
       "geometry":{
         "type":"Polygon",
@@ -1986652,7 +1986652,7 @@
       "properties":{
         "ADMIN":"Ouganda",
         "ISO_A3":"UGA",
-        "Difficulty":"Moyen"
+        "Difficulty":"Difficile"
       },
       "geometry":{
         "type":"Polygon",
@@ -2205651,7 +2205651,7 @@
       "properties":{
         "ADMIN":"Zambie",
         "ISO_A3":"ZMB",
-        "Difficulty":"Moyen"
+        "Difficulty":"Difficile"
       },
       "geometry":{
         "type":"Polygon",
@@ -2211698,7 +2211698,7 @@
       "properties":{
         "ADMIN":"Zimbabwe",
         "ISO_A3":"ZWE",
-        "Difficulty":"Moyen"
+        "Difficulty":"Difficile"
       },
       "geometry":{
         "type":"Polygon",

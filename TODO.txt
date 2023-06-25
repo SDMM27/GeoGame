@@ -1,21 +1,22 @@
-Changer de place le pays à trouver ( eventuellement le mettre carrément sur la souris )
+Laisser le pays en vert quand tu l'as trouvé
+
+Bdd ajouts (scoreboard)
+Faire un mode de jeu moins tryhard
 Reset la map quand on recommence
 Ranger le score par difficulté et par appareil
 Changer la police
-Peut-etre changer l'enregistrement des scores et en enregistrer un par niveau
+changer l'enregistrement des scores et en enregistrer un par niveau
 Mettre bonus quand tu es sur une série
+Mettre un menu défilant sur les côtés qui informe les meilleurs scores 
 Mettre le nom du pays sur lequel tu viens de cliquer si tu te trompes
 Mettre le chrono en haut à droite
 Changer de couleur le chrono en fonction du temps restant
 
+Mode jeu avec des vies et multiplicateur ( faire une jauge ) 
 MULTI : Faire des rounds, chacun doit trouver le pays le plus rapidement et le dernier à avoir du temps gagne
 
-Mettre d'autres infos dans la bdd
-
 Faire un menu d'accueil ( éventuellement )
-Faire un tableau des meilleurs scores.
-Faire un compte du nombre d'erreurs au total pour l inclure dans la base de données.
-Mettre un bouton recommencer une fois que la partie est finie
+
 Mettre un timer en en secondes plus précises
 Mettre comme sur online.seterra pour les pays vraiment petit
 
@@ -23,4 +24,5 @@ Mettre comme sur online.seterra pour les pays vraiment petit
 Faire un bot discord pour informer des améliorations
 
 To do des jeux à implémenter :
+Changer de place le pays à trouver ( eventuellement le mettre carrément sur la souris )
 Mode Geo Country Placement mais avec les drapeaux et non les noms.

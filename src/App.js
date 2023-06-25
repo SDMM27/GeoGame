@@ -205,6 +205,10 @@ export default function GeoQuizzPlacement() {
     setTimer(60);
   };
 
+  const startTraining = () => {
+    console.log('pas encore fait');
+  }
+
   const goHome = () => {
     alreadyChosenCountries = [];
     setDifficulty(null);
@@ -259,20 +263,28 @@ export default function GeoQuizzPlacement() {
   const onCountryMouseOver = (event) => {
     if (gameStarted) {
       const layer = event.target;
-      layer.setStyle({
-        fillColor: "purple",
-        weight: 2,
-        fillOpacity: 0.5,
-      });
-      setHighlightedCountry(layer.feature.properties.ADMIN);
+      if (layer.options.fillColor === "green") {
+        return;
+      } else {
+        layer.setStyle({
+          fillColor: "purple",
+          weight: 2,
+          fillOpacity: 0.5,
+        });
+        setHighlightedCountry(layer.feature.properties.ADMIN);
+      }
     }
   };
 
   const onCountryMouseOut = (event) => {
     if (gameStarted) {
       const layer = event.target;
-      layer.setStyle(countryStyle);
-      setHighlightedCountry(null);
+      if (layer.options.fillColor === "green") {
+        return;
+      } else {
+        layer.setStyle(countryStyle);
+        setHighlightedCountry(null);
+      }
     }
   };
 
@@ -334,19 +346,23 @@ export default function GeoQuizzPlacement() {
         (country) => country.properties.ADMIN === targetCountryRef.current
       ).properties.Difficulty;
       if (event.target.feature.properties.ADMIN === targetCountryRef.current) {
-        if(consecutiveErrorsRef.current < 3) {
+        if (consecutiveErrorsRef.current < 3) {
           toast.success(
             "Bravo ! " + targetCountryRef.current + " est la bonne réponse !",
             { containerId: "topRightToast" }
           );
-        } 
+        }
         event.target.setStyle({
           fillColor: "green",
           weight: 2,
           fillOpacity: 0.5,
-        }); // reset the style
+        });
+        console.log(event.target);
         changeCountry();
-        if (consecutiveErrorsRef.current < 3 && clickOnSeeCountryRef.current === false) {
+        if (
+          consecutiveErrorsRef.current < 3 &&
+          clickOnSeeCountryRef.current === false
+        ) {
           incrementScore(targetDifficulty);
         }
         setConsecutiveErrors(0);
@@ -363,9 +379,7 @@ export default function GeoQuizzPlacement() {
 
   return (
     <div className="container">
-      {!gameStarted && (
-        <h1 className="app-title text-center my-4">Geo Game</h1> 
-      )}
+      {!gameStarted && <h1 className="app-title text-center my-4">Geo Game</h1>}
 
       {!gameStarted && (
         <div className="rulesBtn">
@@ -382,14 +396,17 @@ export default function GeoQuizzPlacement() {
             <br />
             Tu as 3 essais pour trouver chaque pays, au bout de ces 3 essais, le
             pays t'est révélé et tu dois cliquer dessus pour passer au pays
-            suivant. <br /><br />
+            suivant. <br />
+            <br />
             Vous gagnez 1 point pour un pays facile trouvé, 2 points pour un
             pays moyen, 3 points pour un pays difficile et 4 points pour un pays
             "impossible". <br />
-            Si tu te trompes 3 fois sur le même pays à trouver, tu perds 1 point. Sinon, c'est trop facile.
-            <br /><br />
-            Si tu trouves tous les pays de la difficulté avant la fin du
-            chrono, ton temps restant s'ajoute à ton score. <br />
+            Si tu te trompes 3 fois sur le même pays à trouver, tu perds 1
+            point. Sinon, c'est trop facile.
+            <br />
+            <br />
+            Si tu trouves tous les pays de la difficulté avant la fin du chrono,
+            ton temps restant s'ajoute à ton score. <br />
             Alors, soyez vifs ! <br /> <br />
             Moins la difficulté est grande, moins il y a de pays à trouver, les
             pays faciles sont compris dans les difficultés supérieures et ainsi
@@ -419,7 +436,9 @@ export default function GeoQuizzPlacement() {
               className="form-control"
               onChange={(e) => setDifficulty(e.target.value)}
             >
-              <option value="" selected disabled hidden>Difficulté</option>
+              <option value="" selected disabled hidden>
+                Difficulté
+              </option>
               <option value="Facile">Facile</option>
               <option value="Moyen">Moyen</option>
               <option value="Difficile">Difficile</option>
@@ -436,6 +455,10 @@ export default function GeoQuizzPlacement() {
           <div className="center"> </div>
           <div className="center"> </div>
         </div>
+      )}
+
+      {!gameStarted && (
+        <button className="btn trainingBtn" hidden onClick={startTraining}> Entrainement </button>
       )}
 
       {!gameStarted && (

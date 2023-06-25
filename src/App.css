@@ -243,6 +243,23 @@ option {
   margin-right: auto;
 }
 
+.trainingBtn {
+  color: white;
+  display: block;
+  background-color: green;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 2%;
+  margin-bottom: 1.25%;
+  margin-left: auto;
+  z-index: 9999;
+}
+
+.trainingBtn:hover {
+  background-color: #343a40;
+  color: white;
+}
+
 .showRulesBtn:hover {
   background-color: #343a40;
   color: white;

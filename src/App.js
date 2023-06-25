@@ -39,6 +39,8 @@ export default function GeoQuizzPlacement() {
   let [timer, setTimer] = useState(60); // timer set to 60 seconds
   const timerRef = useRef(timer); // Create a ref
   let [showScoreboard, setShowScoreboard] = useState(false);
+  let [clickOnSeeCountry, setClickOnSeeCountry] = useState(false);
+  const clickOnSeeCountryRef = useRef(clickOnSeeCountry); // Create a ref
 
   // create custom icon
   // const customIcon = new Icon({
@@ -114,7 +116,7 @@ export default function GeoQuizzPlacement() {
     if (leafletContainer) {
       leafletContainer.style.background = "none";
     }
-    document.title = "Geo Country Placement";
+    document.title = "Geo Game";
     targetCountryRef.current = targetCountry; // Update the ref whenever targetCountry changes
     consecutiveErrorsRef.current = consecutiveErrors; // Update the ref whenever consecutiveErrors changes
     if (consecutiveErrorsRef.current >= 3) {
@@ -152,6 +154,7 @@ export default function GeoQuizzPlacement() {
   }, [targetCountry, consecutiveErrors, mapRef, zoomCountryMap]);
 
   useEffect(() => {
+    clickOnSeeCountryRef.current = clickOnSeeCountry; // Update the ref whenever clickOnSeeCountry changes
     // only start the timer when the game has started
     if (gameStarted) {
       // clear the timer when it reaches 0
@@ -175,7 +178,7 @@ export default function GeoQuizzPlacement() {
 
       return () => clearInterval(id); // this will clear the interval on unmount or when gameStarted changes
     }
-  }, [gameStarted, timer]); // this effect runs every time gameStarted or timer changes
+  }, [gameStarted, timer, clickOnSeeCountry]); // this effect runs every time gameStarted or timer changes
 
   const showRules = () => {
     let rules = document.getElementsByClassName("rulesDiv")[0];
@@ -280,7 +283,9 @@ export default function GeoQuizzPlacement() {
   };
 
   const seeCountry = () => {
-    setConsecutiveErrors(0);
+    setClickOnSeeCountry(true);
+    console.log(clickOnSeeCountryRef.current);
+    console.log(clickOnSeeCountry);
     const targetLayer = geoJsonRef.current
       .getLayers()
       .find(
@@ -300,9 +305,9 @@ export default function GeoQuizzPlacement() {
     const countryCenter = targetLayer.getBounds().getCenter();
     zoomCountryMap(countryCenter.lat, countryCenter.lng);
 
-    setTimeout(() => {
-      targetLayer.setStyle(countryStyle);
-    }, 3000); // Change this to change the delay, in milliseconds
+    // setTimeout(() => {
+    //   targetLayer.setStyle(countryStyle);
+    // }, 3000); // Change this to change the delay, in milliseconds
 
     // Change country
     decrementScore("Difficile");
@@ -329,23 +334,23 @@ export default function GeoQuizzPlacement() {
         (country) => country.properties.ADMIN === targetCountryRef.current
       ).properties.Difficulty;
       if (event.target.feature.properties.ADMIN === targetCountryRef.current) {
-        toast.success(
-          "Bravo ! " + targetCountryRef.current + " est la bonne réponse !",
-          { containerId: "topRightToast" }
-        );
+        if(consecutiveErrorsRef.current < 3) {
+          toast.success(
+            "Bravo ! " + targetCountryRef.current + " est la bonne réponse !",
+            { containerId: "topRightToast" }
+          );
+        } 
         event.target.setStyle({
           fillColor: "green",
           weight: 2,
           fillOpacity: 0.5,
         }); // reset the style
-        setTimeout(() => {
-          event.target.setStyle(countryStyle);
-        }, 3000); // Change this to change the delay, in milliseconds
         changeCountry();
-        if (consecutiveErrorsRef.current < 3) {
+        if (consecutiveErrorsRef.current < 3 && clickOnSeeCountryRef.current === false) {
           incrementScore(targetDifficulty);
         }
         setConsecutiveErrors(0);
+        setClickOnSeeCountry(false);
       } else {
         toast.error("Dommage ! Vous n'avez pas trouvé le bon pays.", {
           containerId: "topRightToast",
@@ -359,7 +364,7 @@ export default function GeoQuizzPlacement() {
   return (
     <div className="container">
       {!gameStarted && (
-        <h1 className="app-title text-center my-4">Geo Country Placement</h1>
+        <h1 className="app-title text-center my-4">Geo Game</h1> 
       )}
 
       {!gameStarted && (
@@ -399,7 +404,7 @@ export default function GeoQuizzPlacement() {
         </div>
       )}
 
-      {timer <= 0 && <Form finalScore={score} />}
+      {timer <= 0 && <Form finalScore={score} difficulty={difficulty} />}
 
       {!gameStarted && (
         <div className="menuBtns">

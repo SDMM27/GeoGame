@@ -41,6 +41,7 @@ export default function GeoQuizzPlacement() {
   let [showScoreboard, setShowScoreboard] = useState(false);
   let [clickOnSeeCountry, setClickOnSeeCountry] = useState(false);
   const clickOnSeeCountryRef = useRef(clickOnSeeCountry); // Create a ref
+  let [isTraining, setIsTraining] = useState(false);
 
   // create custom icon
   // const customIcon = new Icon({
@@ -206,6 +207,7 @@ export default function GeoQuizzPlacement() {
   };
 
   const startTraining = () => {
+    setIsTraining(true);
     if (!difficulty) {
       toast.error("Veuillez choisir une difficulté", {
         containerId: "centerToast",
@@ -224,6 +226,7 @@ export default function GeoQuizzPlacement() {
   const goHome = () => {
     alreadyChosenCountries = [];
     setDifficulty(null);
+    setIsTraining(false);
     setGameStarted(false);
     setScore(0);
     setTimer(60);
@@ -354,7 +357,11 @@ export default function GeoQuizzPlacement() {
       layer.setStyle(countryStyle);
     });
     changeCountry();
-    setTimer(60);
+    if (!isTraining) {
+      setTimer(60);
+    } else {
+      setTimer(99999);
+    }
   };
 
   const onCountryClick = (event) => {
@@ -438,7 +445,7 @@ export default function GeoQuizzPlacement() {
         </div>
       )}
 
-      {timer <= 0 && <Form finalScore={score} difficulty={difficulty} />}
+      {timer <= 0 && !isTraining && <Form finalScore={score} difficulty={difficulty} />}
 
       {!gameStarted && (
         <div className="menuBtns">
@@ -475,7 +482,7 @@ export default function GeoQuizzPlacement() {
       )}
 
       {!gameStarted && (
-        <button className="btn trainingBtn" hidden onClick={startTraining}> Entrainement </button>
+        <button className="btn trainingBtn" onClick={startTraining}> Entrainement </button>
       )}
 
       {!gameStarted && (

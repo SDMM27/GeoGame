@@ -206,7 +206,19 @@ export default function GeoQuizzPlacement() {
   };
 
   const startTraining = () => {
-    console.log('pas encore fait');
+    if (!difficulty) {
+      toast.error("Veuillez choisir une difficulté", {
+        containerId: "centerToast",
+      });
+      return;
+    }
+    setShowScoreboard(false);
+    setGameStarted(true);
+    setScore(0);
+    let firstCountry = getRandomCountry(difficulty);
+    alreadyChosenCountries.push(firstCountry);
+    setTargetCountry(firstCountry);
+    setTimer(99999);
   }
 
   const goHome = () => {
@@ -336,6 +348,11 @@ export default function GeoQuizzPlacement() {
         mapElements[i].style.pointerEvents = "auto";
       }
     }
+    //reset map
+    const layers = geoJsonRef.current.getLayers();
+    layers.forEach((layer) => {
+      layer.setStyle(countryStyle);
+    });
     changeCountry();
     setTimer(60);
   };

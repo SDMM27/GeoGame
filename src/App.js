@@ -41,6 +41,7 @@ export default function GeoQuizzPlacement() {
   let [showScoreboard, setShowScoreboard] = useState(false);
   let [clickOnSeeCountry, setClickOnSeeCountry] = useState(false);
   const clickOnSeeCountryRef = useRef(clickOnSeeCountry); // Create a ref
+  let [isTraining, setIsTraining] = useState(false);
 
   // create custom icon
   // const customIcon = new Icon({
@@ -206,12 +207,26 @@ export default function GeoQuizzPlacement() {
   };
 
   const startTraining = () => {
-    console.log('pas encore fait');
+    setIsTraining(true);
+    if (!difficulty) {
+      toast.error("Veuillez choisir une difficulté", {
+        containerId: "centerToast",
+      });
+      return;
+    }
+    setShowScoreboard(false);
+    setGameStarted(true);
+    setScore(0);
+    let firstCountry = getRandomCountry(difficulty);
+    alreadyChosenCountries.push(firstCountry);
+    setTargetCountry(firstCountry);
+    setTimer(99999);
   }
 
   const goHome = () => {
     alreadyChosenCountries = [];
     setDifficulty(null);
+    setIsTraining(false);
     setGameStarted(false);
     setScore(0);
     setTimer(60);
@@ -336,8 +351,17 @@ export default function GeoQuizzPlacement() {
         mapElements[i].style.pointerEvents = "auto";
       }
     }
+    //reset map
+    const layers = geoJsonRef.current.getLayers();
+    layers.forEach((layer) => {
+      layer.setStyle(countryStyle);
+    });
     changeCountry();
-    setTimer(60);
+    if (!isTraining) {
+      setTimer(60);
+    } else {
+      setTimer(99999);
+    }
   };
 
   const onCountryClick = (event) => {
@@ -421,7 +445,7 @@ export default function GeoQuizzPlacement() {
         </div>
       )}
 
-      {timer <= 0 && <Form finalScore={score} difficulty={difficulty} />}
+      {timer <= 0 && !isTraining && <Form finalScore={score} difficulty={difficulty} />}
 
       {!gameStarted && (
         <div className="menuBtns">
@@ -458,7 +482,7 @@ export default function GeoQuizzPlacement() {
       )}
 
       {!gameStarted && (
-        <button className="btn trainingBtn" hidden onClick={startTraining}> Entrainement </button>
+        <button className="btn trainingBtn" onClick={startTraining}> Entrainement </button>
       )}
 
       {!gameStarted && (

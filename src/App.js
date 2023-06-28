@@ -119,6 +119,7 @@ export default function GeoQuizzPlacement() {
     }
     document.title = "Geo Game";
     targetCountryRef.current = targetCountry; // Update the ref whenever targetCountry changes
+    announceCountry(targetCountryRef.current);
     consecutiveErrorsRef.current = consecutiveErrors; // Update the ref whenever consecutiveErrors changes
     if (consecutiveErrorsRef.current >= 3) {
       decrementScore("Difficile");
@@ -221,7 +222,7 @@ export default function GeoQuizzPlacement() {
     alreadyChosenCountries.push(firstCountry);
     setTargetCountry(firstCountry);
     setTimer(99999);
-  }
+  };
 
   const goHome = () => {
     alreadyChosenCountries = [];
@@ -301,6 +302,11 @@ export default function GeoQuizzPlacement() {
         setHighlightedCountry(null);
       }
     }
+  };
+
+  const announceCountry = (countryName) => {
+    const utterance = new SpeechSynthesisUtterance(countryName);
+    window.speechSynthesis.speak(utterance);
   };
 
   const changeCountry = () => {
@@ -445,7 +451,9 @@ export default function GeoQuizzPlacement() {
         </div>
       )}
 
-      {timer <= 0 && !isTraining && <Form finalScore={score} difficulty={difficulty} />}
+      {timer <= 0 && !isTraining && (
+        <Form finalScore={score} difficulty={difficulty} />
+      )}
 
       {!gameStarted && (
         <div className="menuBtns">
@@ -482,7 +490,10 @@ export default function GeoQuizzPlacement() {
       )}
 
       {!gameStarted && (
-        <button className="btn trainingBtn" onClick={startTraining}> Entrainement </button>
+        <button className="btn trainingBtn" onClick={startTraining}>
+          {" "}
+          Entrainement{" "}
+        </button>
       )}
 
       {!gameStarted && (

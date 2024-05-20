@@ -19,7 +19,7 @@ const countryStyle = {
   fillColor: "transparent",
   color: "black",
   fillOpacity: 1,
-  weight: 0.85,
+  weight: 0.85
 };
 
 let alreadyChosenCountries = [];
@@ -57,7 +57,7 @@ export default function GeoQuizzPlacement() {
       "Moyen",
       "Difficile",
       "Impossible",
-      "Hardcore",
+      "Hardcore"
     ];
     const selectedDifficultyIndex = difficulties.indexOf(difficulty);
 
@@ -126,7 +126,7 @@ export default function GeoQuizzPlacement() {
       toast.error(
         "Dommage ! C'est ici que se trouvait " + targetCountryRef.current,
         {
-          containerId: "topRightToast",
+          containerId: "topRightToast"
         }
       );
     }
@@ -144,7 +144,7 @@ export default function GeoQuizzPlacement() {
           targetLayer.setStyle({
             fillColor: "red",
             weight: 2,
-            fillOpacity: 0.5,
+            fillOpacity: 0.5
           });
 
           // Zoom to the target country
@@ -194,7 +194,7 @@ export default function GeoQuizzPlacement() {
   const startGame = () => {
     if (!difficulty) {
       toast.error("Veuillez choisir une difficulté", {
-        containerId: "centerToast",
+        containerId: "centerToast"
       });
       return;
     }
@@ -211,7 +211,7 @@ export default function GeoQuizzPlacement() {
     setIsTraining(true);
     if (!difficulty) {
       toast.error("Veuillez choisir une difficulté", {
-        containerId: "centerToast",
+        containerId: "centerToast"
       });
       return;
     }
@@ -285,7 +285,7 @@ export default function GeoQuizzPlacement() {
         layer.setStyle({
           fillColor: "purple",
           weight: 2,
-          fillOpacity: 0.5,
+          fillOpacity: 0.5
         });
         setHighlightedCountry(layer.feature.properties.ADMIN);
       }
@@ -332,7 +332,7 @@ export default function GeoQuizzPlacement() {
     targetLayer.setStyle({
       fillColor: "red",
       weight: 2,
-      fillOpacity: 0.5,
+      fillOpacity: 0.5
     });
 
     const countryCenter = targetLayer.getBounds().getCenter();
@@ -385,7 +385,7 @@ export default function GeoQuizzPlacement() {
         event.target.setStyle({
           fillColor: "green",
           weight: 2,
-          fillOpacity: 0.5,
+          fillOpacity: 0.5
         });
         console.log(event.target);
         changeCountry();
@@ -399,7 +399,7 @@ export default function GeoQuizzPlacement() {
         setClickOnSeeCountry(false);
       } else {
         toast.error("Dommage ! Vous n'avez pas trouvé le bon pays.", {
-          containerId: "topRightToast",
+          containerId: "topRightToast"
         });
         setConsecutiveErrors((prevErrors) => prevErrors + 1);
       }
@@ -515,7 +515,7 @@ export default function GeoQuizzPlacement() {
             position: "relative",
             top: "10px",
             left: "10px",
-            zIndex: 1000,
+            zIndex: 1000
           }}
         >
           <button className="btn btn-goHome" onClick={goHome}>
@@ -569,7 +569,7 @@ export default function GeoQuizzPlacement() {
           doubleClickZoom={false}
           maxBounds={[
             [90, -180],
-            [-90, 180],
+            [-90, 180]
           ]}
           whenReady={({ target }) => {
             setMapRef(target);
@@ -591,7 +591,7 @@ export default function GeoQuizzPlacement() {
           <TileLayer
             className="mapElement"
             attribution="Stamen Toner"
-            url="https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png"
+            url="https://tiles.stadiamaps.com/tiles/stamen_toner_background/{z}/{x}/{y}{r}.png"
             noWrap={true}
             minZoom={2}
             maxZoom={20}
@@ -606,7 +606,7 @@ export default function GeoQuizzPlacement() {
               layer.on({
                 click: onCountryClick,
                 mouseover: onCountryMouseOver,
-                mouseout: onCountryMouseOut,
+                mouseout: onCountryMouseOut
               });
             }}
           />

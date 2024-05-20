@@ -1,4 +1,4 @@
-Laisser le pays en vert quand tu l'as trouvé
+
 
 Bdd ajouts (scoreboard)
 Faire un mode de jeu moins tryhard

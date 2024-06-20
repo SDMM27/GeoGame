@@ -1,9 +1,9 @@
 
-# Mon Projet React
+# GeoGame
 
 ## Description
 
-Ce projet est une application React créée pour [insérer ici la description de votre application]. Ce README fournit des instructions pour cloner le projet, installer les dépendances et lancer l'application en mode développement.
+Ce projet est une application React créée pour jouer à des minis-jeux de géographie. Ce README fournit des instructions pour cloner le projet, installer les dépendances et lancer l'application en mode développement.
 
 ## Prérequis
 
@@ -17,7 +17,7 @@ Assurez-vous d'avoir installé les éléments suivants sur votre machine :
 1. **Cloner le dépôt**
 
    ```sh
-   git clone https://github.com/votre-utilisateur/votre-repo.git
+   git clone https://github.com/votre-utilisateur/votre-repo.git](https://github.com/SDMM27/GeoGame.git)
    ```
 
 2. **Accéder au répertoire du projet**
@@ -107,7 +107,3 @@ Si vous souhaitez contribuer à ce projet, veuillez suivre les étapes suivantes
 ## Licence
 
 Ce projet est sous licence [MIT](LICENSE).
-
-## Remerciements
-
-Merci à [insérer ici les contributeurs ou les bibliothèques tierces] pour leur soutien et leurs contributions.

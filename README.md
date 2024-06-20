@@ -17,7 +17,7 @@ Assurez-vous d'avoir installé les éléments suivants sur votre machine :
 1. **Cloner le dépôt**
 
    ```sh
-   git clone https://github.com/votre-utilisateur/votre-repo.git](https://github.com/SDMM27/GeoGame.git
+   git clone https://github.com/SDMM27/GeoGame.git
    ```
 
 2. **Accéder au répertoire du projet**

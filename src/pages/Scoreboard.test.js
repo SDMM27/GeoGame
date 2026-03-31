@@ -1,0 +1,33 @@
+import { describe, it, expect } from 'vitest'
+
+const DIFFICULTY_ORDER = ["Facile", "Moyen", "Difficile", "Impossible", "Hardcore"];
+
+const sortByDifficulty = (scores) =>
+  [...scores].sort(
+    (a, b) =>
+      DIFFICULTY_ORDER.indexOf(a.difficulty) -
+      DIFFICULTY_ORDER.indexOf(b.difficulty)
+  );
+
+describe('sortByDifficulty', () => {
+  it('trie les scores dans l\'ordre de difficulté croissant', () => {
+    const input = [
+      { name: 'Alice', score: 10, difficulty: 'Difficile' },
+      { name: 'Bob', score: 8, difficulty: 'Facile' },
+      { name: 'Carol', score: 12, difficulty: 'Moyen' },
+    ]
+    const result = sortByDifficulty(input)
+    expect(result[0].difficulty).toBe('Facile')
+    expect(result[1].difficulty).toBe('Moyen')
+    expect(result[2].difficulty).toBe('Difficile')
+  })
+
+  it('ne retourne pas NaN pour des strings (bug original)', () => {
+    const input = [
+      { name: 'X', score: 5, difficulty: 'Impossible' },
+      { name: 'Y', score: 3, difficulty: 'Facile' },
+    ]
+    const result = sortByDifficulty(input)
+    expect(result[0].difficulty).toBe('Facile')
+  })
+})

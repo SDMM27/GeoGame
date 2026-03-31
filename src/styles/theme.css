@@ -1,0 +1,53 @@
+:root {
+  --bg-primary:       #0f0f1a;
+  --bg-secondary:     #1a1a2e;
+  --bg-card:          #16213e;
+  --bg-card-hover:    #1e2a4a;
+  --bg-glass:         rgba(15, 15, 26, 0.85);
+
+  --accent-cyan:      #00d4ff;
+  --accent-cyan-dim:  rgba(0, 212, 255, 0.15);
+  --accent-cyan-border: rgba(0, 212, 255, 0.3);
+  --accent-purple:    #7b2ff7;
+
+  --success:          #4ade80;
+  --success-dim:      rgba(74, 222, 128, 0.15);
+  --warning:          #fbbf24;
+  --warning-dim:      rgba(251, 191, 36, 0.15);
+  --danger:           #ff4d4d;
+  --danger-dim:       rgba(255, 77, 77, 0.15);
+
+  --text-primary:     #ffffff;
+  --text-muted:       #888888;
+  --text-dim:         #555555;
+
+  --border-color:     rgba(0, 212, 255, 0.2);
+  --border-subtle:    rgba(255, 255, 255, 0.08);
+
+  --radius-sm:        6px;
+  --radius-md:        10px;
+  --radius-lg:        16px;
+  --radius-pill:      999px;
+
+  --shadow-card:      0 4px 24px rgba(0, 0, 0, 0.4);
+  --shadow-glow:      0 0 20px rgba(0, 212, 255, 0.15);
+
+  --font-main:        'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-primary);
+  font-family: var(--font-main);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  height: 100vh;
+}

@@ -31,3 +31,39 @@ describe('sortByDifficulty', () => {
     expect(result[0].difficulty).toBe('Facile')
   })
 })
+
+// append to src/pages/Scoreboard.test.js
+
+const sortScores = (scores) =>
+  [...scores].sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score
+    const tA = a.elapsedTime ?? Infinity
+    const tB = b.elapsedTime ?? Infinity
+    return tA - tB
+  })
+
+describe('sortScores', () => {
+  it('trie par score décroissant', () => {
+    const input = [
+      { name: 'A', score: 5,  difficulty: 'Facile', elapsedTime: 120 },
+      { name: 'B', score: 10, difficulty: 'Facile', elapsedTime: 90 },
+    ]
+    expect(sortScores(input)[0].name).toBe('B')
+  })
+
+  it('à score égal, trie par temps croissant', () => {
+    const input = [
+      { name: 'Slow', score: 10, difficulty: 'Facile', elapsedTime: 180 },
+      { name: 'Fast', score: 10, difficulty: 'Facile', elapsedTime: 90 },
+    ]
+    expect(sortScores(input)[0].name).toBe('Fast')
+  })
+
+  it('place les scores sans elapsedTime en dernier à score égal', () => {
+    const input = [
+      { name: 'NoTime',  score: 10, difficulty: 'Facile' },
+      { name: 'HasTime', score: 10, difficulty: 'Facile', elapsedTime: 90 },
+    ]
+    expect(sortScores(input)[0].name).toBe('HasTime')
+  })
+})

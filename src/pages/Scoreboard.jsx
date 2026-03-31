@@ -1,43 +1,47 @@
-import React, { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { firestore } from "../Firebase";
-import "./scoreboard.css";
+// src/pages/Scoreboard.jsx
+import React, { useEffect, useState } from 'react'
+import { collection, getDocs } from 'firebase/firestore'
+import { firestore } from '../Firebase'
+import { formatTime } from '../utils/formatTime'
+import './scoreboard.css'
 
-const DIFFICULTY_ORDER = ["Facile", "Moyen", "Difficile", "Impossible", "Hardcore"];
+const DIFFICULTY_ORDER = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
+const MEDAL = ['🥇', '🥈', '🥉']
 
-const MEDAL = ["🥇", "🥈", "🥉"];
+const sortScores = (scores) =>
+  [...scores].sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score
+    const tA = a.elapsedTime ?? Infinity
+    const tB = b.elapsedTime ?? Infinity
+    return tA - tB
+  })
 
 export default function Scoreboard() {
-  const [allScores, setAllScores] = useState([]);
-  const [scores, setScores] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [allScores, setAllScores] = useState([])
+  const [scores, setScores] = useState([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchScores = async () => {
       try {
-        const scoresCollection = collection(firestore, "scores");
-        const scoresSnapshot = await getDocs(scoresCollection);
-        const scoresList = scoresSnapshot.docs.map((doc) => doc.data());
-        scoresList.sort((a, b) => b.score - a.score);
-        setAllScores(scoresList);
-        setScores(scoresList);
+        const snap = await getDocs(collection(firestore, 'scores'))
+        const list = sortScores(snap.docs.map(d => d.data()))
+        setAllScores(list)
+        setScores(list)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-    fetchScores();
-  }, []);
+    }
+    fetchScores()
+  }, [])
 
   const changeDifficultyDisplayed = (difficulty) => {
-    if (difficulty === "AllScores") {
-      setScores([...allScores]);
-      return;
+    if (difficulty === 'AllScores') {
+      setScores([...allScores])
+      return
     }
-    const filtered = allScores
-      .filter((s) => s.difficulty === difficulty)
-      .sort((a, b) => b.score - a.score);
-    setScores(filtered);
-  };
+    setScores(sortScores(allScores.filter(s => s.difficulty === difficulty)))
+  }
 
   return (
     <div className="scoreboard">
@@ -45,16 +49,12 @@ export default function Scoreboard() {
 
       <select
         className="scoreboard-select"
-        onChange={(e) => changeDifficultyDisplayed(e.target.value)}
+        onChange={e => changeDifficultyDisplayed(e.target.value)}
         defaultValue=""
       >
-        <option value="" disabled>
-          Filtrer par difficulté
-        </option>
-        {DIFFICULTY_ORDER.map((d) => (
-          <option key={d} value={d}>
-            {d}
-          </option>
+        <option value="" disabled>Filtrer par difficulté</option>
+        {DIFFICULTY_ORDER.map(d => (
+          <option key={d} value={d}>{d}</option>
         ))}
         <option value="AllScores">Tous les scores</option>
       </select>
@@ -69,23 +69,27 @@ export default function Scoreboard() {
             <span>#</span>
             <span>Joueur</span>
             <span>Score</span>
+            <span>Temps</span>
             <span>Difficulté</span>
           </div>
           {scores.map((s, index) => (
             <div
               key={index}
-              className={`scoreboard-row ${index < 3 ? "scoreboard-row--top" : ""}`}
+              className={`scoreboard-row ${index < 3 ? 'scoreboard-row--top' : ''}`}
             >
               <span className="scoreboard-rank">
                 {index < 3 ? MEDAL[index] : `#${index + 1}`}
               </span>
               <span className="scoreboard-name">{s.name}</span>
               <span className="scoreboard-score">{s.score} pts</span>
+              <span className="scoreboard-time">
+                {s.elapsedTime != null ? formatTime(s.elapsedTime) : '—'}
+              </span>
               <span className="scoreboard-difficulty">{s.difficulty}</span>
             </div>
           ))}
         </div>
       )}
     </div>
-  );
+  )
 }

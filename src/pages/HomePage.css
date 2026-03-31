@@ -248,3 +248,50 @@
     padding: 32px 16px;
   }
 }
+
+/* ── Difficulty Grid ── */
+.difficulty-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.difficulty-btn {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 8px 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: border-color 0.15s, background 0.15s;
+  font-family: var(--font-main);
+  text-align: left;
+}
+
+.difficulty-btn:hover {
+  background: var(--bg-card);
+}
+
+.difficulty-btn--active {
+  border-color: var(--accent-purple);
+  background: rgba(123, 47, 247, 0.12);
+}
+
+.difficulty-btn--wide {
+  grid-column: 1 / -1;
+  align-items: center;
+}
+
+.difficulty-btn-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.difficulty-btn-count {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}

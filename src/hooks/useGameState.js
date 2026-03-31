@@ -128,7 +128,7 @@ export default function useGameState(difficulty, isTraining) {
       setTimer(t => { timerRef.current = t + 1; return t + 1 })
     }, 1000)
     return () => clearInterval(id)
-  }, [gameStarted, timer, allProcessed]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [gameStarted, allProcessed]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Toast when training mode finishes all countries
   useEffect(() => {

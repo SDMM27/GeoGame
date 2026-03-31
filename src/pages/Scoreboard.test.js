@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+import { sortScores } from './Scoreboard'
 
 const DIFFICULTY_ORDER = ["Facile", "Moyen", "Difficile", "Impossible", "Hardcore"];
 
@@ -31,14 +32,6 @@ describe('sortByDifficulty', () => {
     expect(result[0].difficulty).toBe('Facile')
   })
 })
-
-const sortScores = (scores) =>
-  [...scores].sort((a, b) => {
-    if (b.score !== a.score) return b.score - a.score
-    const tA = a.elapsedTime ?? Infinity
-    const tB = b.elapsedTime ?? Infinity
-    return tA - tB
-  })
 
 describe('sortScores', () => {
   it('trie par score décroissant', () => {

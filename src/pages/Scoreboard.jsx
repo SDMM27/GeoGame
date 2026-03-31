@@ -8,7 +8,7 @@ import './scoreboard.css'
 const DIFFICULTY_ORDER = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
 const MEDAL = ['🥇', '🥈', '🥉']
 
-const sortScores = (scores) =>
+export const sortScores = (scores) =>
   [...scores].sort((a, b) => {
     if (b.score !== a.score) return b.score - a.score
     const tA = a.elapsedTime ?? Infinity

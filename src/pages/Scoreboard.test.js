@@ -32,8 +32,6 @@ describe('sortByDifficulty', () => {
   })
 })
 
-// append to src/pages/Scoreboard.test.js
-
 const sortScores = (scores) =>
   [...scores].sort((a, b) => {
     if (b.score !== a.score) return b.score - a.score

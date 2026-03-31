@@ -4,8 +4,9 @@ import "react-toastify/dist/ReactToastify.css";
 import { firestore } from "../Firebase";
 import { addDoc, collection, getDocs, query, where, deleteDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
+import { formatTime } from "../utils/formatTime";
 
-export default function Form({ finalScore, difficulty }) {
+export default function Form({ finalScore, difficulty, elapsedTime }) {
   const nameRef = useRef();
   const ref = collection(firestore, "scores");
 
@@ -13,11 +14,11 @@ export default function Form({ finalScore, difficulty }) {
     e.preventDefault();
     const name = nameRef.current.value.trim();
     if (!name) {
-      toast.error("Veuillez rentrer un pseudo");
+      toast.error("Veuillez rentrer un pseudo", { containerId: "topRightToast" });
       return;
     }
 
-    const data = { name, score: finalScore, difficulty };
+    const data = { name, score: finalScore, difficulty, elapsedTime };
 
     const existingSnapshot = await getDocs(
       query(ref, where("name", "==", name), where("difficulty", "==", difficulty))
@@ -33,14 +34,14 @@ export default function Form({ finalScore, difficulty }) {
 
     try {
       await addDoc(ref, data);
-      toast.success(`Score de ${name} sauvegardé !`);
+      toast.success(`Score de ${name} sauvegardé !`, { containerId: "topRightToast" });
       const submitBtn = document.getElementById("submitBtn");
       if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.textContent = "Score sauvegardé ✓";
       }
     } catch (err) {
-      toast.error("Erreur lors de la sauvegarde");
+      toast.error("Erreur lors de la sauvegarde", { containerId: "topRightToast" });
       console.error(err);
     }
   };
@@ -50,6 +51,9 @@ export default function Form({ finalScore, difficulty }) {
       <h2 className="form-title">Partie terminée !</h2>
       <p className="form-score-display">
         Score : <strong>{finalScore} pts</strong> — {difficulty}
+      </p>
+      <p className="form-score-display">
+        Temps : <strong>{formatTime(elapsedTime)}</strong>
       </p>
       <form onSubmit={handleSave}>
         <label htmlFor="name" className="form-label">Pseudo</label>

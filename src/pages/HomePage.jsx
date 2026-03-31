@@ -3,14 +3,20 @@ import { useNavigate } from "react-router-dom";
 import Scoreboard from "./Scoreboard";
 import "./HomePage.css";
 
-const DIFFICULTIES = ["Facile", "Moyen", "Difficile", "Impossible", "Hardcore"];
+const DIFFICULTIES = [
+  { name: 'Facile',     count: 29,  color: '#4ade80' },
+  { name: 'Moyen',      count: 83,  color: '#00d4ff' },
+  { name: 'Difficile',  count: 191, color: '#fbbf24' },
+  { name: 'Impossible', count: 244, color: '#f97316' },
+  { name: 'Hardcore',   count: 53,  color: '#f87171' },
+];
 
 const GAMES = [
   {
     id: "country",
     icon: "🌍",
     title: "Trouve le Pays",
-    description: "Clique sur le bon pays en 60 secondes",
+    description: "Trouve tous les pays de la difficulté choisie.",
     active: true,
   },
   {
@@ -74,28 +80,30 @@ export default function HomePage() {
                 <p className="game-card-desc">{game.description}</p>
 
                 <div className="game-card-controls">
-                  <select
-                    className="difficulty-select"
-                    value={difficulty}
-                    onChange={(e) => setDifficulty(e.target.value)}
-                  >
-                    {DIFFICULTIES.map((d) => (
-                      <option key={d} value={d}>
-                        {d}
-                      </option>
+                  <div className="difficulty-grid">
+                    {DIFFICULTIES.map(d => (
+                      <button
+                        key={d.name}
+                        className={`difficulty-btn${d.name === 'Hardcore' ? ' difficulty-btn--wide' : ''}${difficulty === d.name ? ' difficulty-btn--active' : ''}`}
+                        onClick={() => setDifficulty(d.name)}
+                      >
+                        <span
+                          className="difficulty-btn-name"
+                          style={{ color: d.color }}
+                        >
+                          {d.name === 'Hardcore' ? '💀 Hardcore' : d.name}
+                        </span>
+                        <span className="difficulty-btn-count">
+                          {d.count} pays
+                        </span>
+                      </button>
                     ))}
-                  </select>
+                  </div>
                   <div className="game-card-buttons">
-                    <button
-                      className="btn-play"
-                      onClick={() => handlePlay(false)}
-                    >
+                    <button className="btn-play" onClick={() => handlePlay(false)}>
                       Jouer
                     </button>
-                    <button
-                      className="btn-training"
-                      onClick={() => handlePlay(true)}
-                    >
+                    <button className="btn-training" onClick={() => handlePlay(true)}>
                       Entraînement
                     </button>
                   </div>

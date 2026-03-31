@@ -1,3 +1,4 @@
+/* src/pages/GamePage.css */
 .game-page {
   position: relative;
   width: 100%;
@@ -6,72 +7,61 @@
   background: var(--bg-primary);
 }
 
-/* ── HUD Score (top-left) ── */
-.hud-score {
+/* ── HUD container (top-left, stacks main + stats) ── */
+.hud-container {
   position: absolute;
   top: 16px;
   left: 16px;
   z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 320px;
+}
+
+/* ── HUD Main block ── */
+.hud-main {
   background: var(--bg-glass);
   backdrop-filter: blur(10px);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  padding: 10px 16px;
+  padding: 10px 16px 10px;
+}
+
+.hud-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.hud-cell {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 70px;
+  min-width: 64px;
 }
 
-/* ── HUD Timer (top-right) ── */
-.hud-timer {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  z-index: 1000;
-  background: var(--bg-glass);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 10px 16px;
-  display: flex;
-  flex-direction: column;
+.hud-cell--target {
+  flex: 1;
   align-items: center;
-  min-width: 70px;
-}
-
-/* ── HUD Target Country (top-center) ── */
-.hud-target {
-  position: absolute;
-  top: 16px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
-  background: var(--bg-glass);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--accent-cyan-border);
-  border-radius: var(--radius-pill);
-  padding: 10px 24px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  white-space: nowrap;
+  padding: 0 10px;
 }
 
 .hud-target-label {
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   color: var(--text-muted);
   letter-spacing: 1px;
   text-transform: uppercase;
 }
 
 .hud-target-name {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--text-primary);
+  white-space: nowrap;
 }
 
-/* ── Shared HUD text ── */
 .hud-value {
   font-size: 1.4rem;
   font-weight: 900;
@@ -82,6 +72,69 @@
   font-size: 0.65rem;
   color: var(--text-muted);
   letter-spacing: 2px;
+  margin-top: 2px;
+}
+
+/* ── Progress bar ── */
+.hud-progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-progress-track {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  height: 6px;
+  overflow: hidden;
+}
+
+.hud-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #4ade80, #00d4ff);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.hud-progress-text {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+}
+
+/* ── HUD Stats block ── */
+.hud-stats {
+  background: var(--bg-glass);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 8px 16px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.hud-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hud-stat-value {
+  font-size: 1.2rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.hud-stat-value--found     { color: #4ade80; }
+.hud-stat-value--skipped   { color: #f87171; }
+.hud-stat-value--remaining { color: #fbbf24; }
+
+.hud-stat-label {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  letter-spacing: 1.5px;
   margin-top: 2px;
 }
 
@@ -115,20 +168,9 @@
   transform: translateY(-1px);
 }
 
-.hud-btn--home {
-  color: var(--accent-cyan);
-  border-color: var(--accent-cyan-border);
-}
-
-.hud-btn--see {
-  color: var(--warning);
-  border-color: rgba(251, 191, 36, 0.3);
-}
-
-.hud-btn--restart {
-  color: var(--danger);
-  border-color: rgba(255, 77, 77, 0.3);
-}
+.hud-btn--home    { color: var(--accent-cyan);  border-color: var(--accent-cyan-border); }
+.hud-btn--see     { color: var(--warning);       border-color: rgba(251, 191, 36, 0.3); }
+.hud-btn--restart { color: var(--danger);        border-color: rgba(255, 77, 77, 0.3); }
 
 /* ── Game over overlay ── */
 .game-over-overlay {
@@ -143,10 +185,4 @@
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-/* ── Timer pulse animation ── */
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
 }

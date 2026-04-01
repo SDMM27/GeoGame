@@ -1,3 +1,5 @@
+# ONE-SHOT SCRIPT — do not re-run after aliases have been manually populated.
+# Requires: pip install pycountry
 import json
 import pycountry
 
@@ -18,7 +20,8 @@ for feature in data['features']:
         else:
             not_found.append(iso_a3)
     props['ISO_A2'] = iso_a2
-    props['aliases'] = []
+    if 'aliases' not in props:
+        props['aliases'] = []
 
 with open(INPUT, 'w', encoding='utf-8') as f:
     json.dump(data, f, ensure_ascii=False, separators=(',', ':'))

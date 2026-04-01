@@ -1,31 +1,114 @@
 .scoreboard {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    margin-top: 1%;
-    margin-right: 20%;
-    margin-left: 20%;
-    color: white;
+  padding: 40px 24px;
+  max-width: 700px;
+  margin: 0 auto;
+  color: var(--text-primary);
+  font-family: var(--font-main);
 }
 
-.scoreboardElement {
-    color: wheat;
-    display: grid;
-  grid-template-columns: 1fr 1fr;
-  justify-items: center;
+.scoreboard-title {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  border: none;
+  padding: 0;
+  margin-bottom: 24px;
+  text-shadow: none;
+  text-align: center;
+}
+
+.scoreboard-filters {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.scoreboard-filters .scoreboard-select {
+  margin: 0;
+}
+
+.scoreboard-select {
+  display: block;
+  margin: 0 auto 32px;
+  width: 100%;
+  max-width: 320px;
+  padding: 10px 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.scoreboard-loading,
+.scoreboard-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 32px;
+}
+
+.scoreboard-table {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.scoreboard-header {
+  display: grid;
+  grid-template-columns: 48px 1fr 100px 80px 120px;
+  padding: 8px 16px;
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.scoreboard-row {
+  display: grid;
+  grid-template-columns: 48px 1fr 100px 80px 120px;
   align-items: center;
-  margin-bottom: 1%;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  transition: background 0.15s;
 }
 
-#difficultySelect {
-    margin-top: 2%;
-    margin-bottom: 3%;
-    margin-left: auto;
-    margin-right: auto;
-    width: 50%; 
-    display: block;
+.scoreboard-row:hover {
+  background: var(--bg-card-hover);
 }
 
-option {
-    text-align: center;
+.scoreboard-row--top {
+  border-color: var(--accent-cyan-border);
+}
+
+.scoreboard-rank {
+  font-size: 1rem;
+}
+
+.scoreboard-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.scoreboard-score {
+  color: var(--accent-cyan);
+  font-weight: 700;
+}
+
+.scoreboard-difficulty {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.scoreboard-time {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
 }

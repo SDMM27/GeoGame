@@ -1,0 +1,126 @@
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import NavBar from "../components/NavBar";
+import "./HomePage.css";
+
+const DIFFICULTIES = [
+  { name: 'Facile', count: 29, color: '#4ade80' },
+  { name: 'Moyen', count: 83, color: '#00d4ff' },
+  { name: 'Difficile', count: 191, color: '#fbbf24' },
+  { name: 'Impossible', count: 244, color: '#f97316' },
+  { name: 'Hardcore', count: 53, color: '#f87171' },
+];
+
+const GAMES = [
+  {
+    id: "country",
+    icon: "🌍",
+    title: "Trouve le Pays",
+    description: "Trouve tous les pays de la difficulté choisie.",
+    active: true,
+  },
+  {
+    id: "flags",
+    icon: "🚩",
+    title: "Trouve le Drapeau",
+    description: "Identifie le pays à partir de son drapeau",
+    active: false,
+  },
+  {
+    id: "placement",
+    icon: "📍",
+    title: "Placement Pays",
+    description: "Place le pays au bon endroit sur la carte",
+    active: false,
+  },
+  {
+    id: "lives",
+    icon: "⚡",
+    title: "Mode Vies",
+    description: "Trouve un maximum de pays sans te tromper",
+    active: false,
+  },
+];
+
+export default function HomePage() {
+  const navigate = useNavigate();
+  const [difficulty, setDifficulty] = useState("Moyen");
+
+  const handlePlay = (isTraining = false) => {
+    navigate("/game", { state: { difficulty, isTraining } });
+  };
+
+  return (
+    <div className="home-page">
+      <NavBar />
+
+      <main className="home-main">
+        <div className="home-hero">
+          <h1 className="home-title">Choisissez votre jeu</h1>
+          <p className="home-subtitle">Explore • Découvre • Compète</p>
+        </div>
+
+        <div className="games-grid">
+          {GAMES.map((game) =>
+            game.active ? (
+              <div key={game.id} className="game-card game-card--active">
+                <div className="game-card-icon">{game.icon}</div>
+                <h2 className="game-card-title">{game.title}</h2>
+                <p className="game-card-desc">{game.description}</p>
+
+                <div className="game-card-controls">
+                  <div className="difficulty-grid">
+                    {DIFFICULTIES.map(d => (
+                      <button
+                        key={d.name}
+                        className={`difficulty-btn${d.name === 'Hardcore' ? ' difficulty-btn--wide' : ''}${difficulty === d.name ? ' difficulty-btn--active' : ''}`}
+                        onClick={() => setDifficulty(d.name)}
+                      >
+                        <span
+                          className="difficulty-btn-name"
+                          style={{ color: d.color }}
+                        >
+                          {d.name === 'Hardcore' ? '💀 Hardcore' : d.name}
+                        </span>
+                        <span className="difficulty-btn-count">
+                          {d.count} pays
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    className="nav-scores-btn"
+                    onClick={() => navigate(`/scores?game=${game.id}`)}
+                  >
+                    🏆 Scores
+                  </button>
+                  <div className="game-card-buttons">
+                    <button className="btn-play" onClick={() => handlePlay(false)}>
+                      Jouer
+                    </button>
+                    <button className="btn-training" onClick={() => handlePlay(true)}>
+                      Entraînement
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div key={game.id} className="game-card game-card--soon">
+                <div className="game-card-icon game-card-icon--dim">
+                  {game.icon}
+                </div>
+                <h2 className="game-card-title game-card-title--dim">
+                  {game.title}
+                </h2>
+                <p className="game-card-desc game-card-desc--dim">
+                  {game.description}
+                </p>
+                <span className="badge-soon">BIENTÔT</span>
+              </div>
+            )
+          )}
+        </div>
+      </main>
+    </div>
+  );
+}

@@ -1,7 +1,7 @@
 
 
 Bdd ajouts (scoreboard)
-Faire un mode de jeu moins tryhard
+Faire un multi comme geoquizz
 Reset la map quand on recommence
 Ranger le score par difficulté et par appareil
 Changer la police

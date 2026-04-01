@@ -1,63 +1,116 @@
-import React, { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import "./scoreboard.css";
-import { firestore } from "../Firebase";
+// src/pages/Scoreboard.jsx
+import React, { useEffect, useState } from 'react'
+import { collection, getDocs } from 'firebase/firestore'
+import { firestore } from '../Firebase'
+import { formatTime } from '../utils/formatTime'
+import './scoreboard.css'
 
-export default function Scoreboard() {
-  const [allScores, setAllScores] = useState([]);
-  const [scores, setScores] = useState([]);
+const DIFFICULTY_ORDER = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
+const MEDAL = ['🥇', '🥈', '🥉']
+const ACTIVE_GAMES = [
+  { id: 'country', label: 'Trouve le Pays' },
+]
+
+export const sortScores = (scores) =>
+  [...scores].sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score
+    const tA = a.elapsedTime ?? Infinity
+    const tB = b.elapsedTime ?? Infinity
+    return tA - tB
+  })
+
+export const filterByGame = (scores, game) => {
+  if (!game || game === 'AllGames') return scores
+  return scores.filter(s => (s.gameId ?? 'country') === game)
+}
+
+export default function Scoreboard({ defaultGame = 'country' }) {
+  const [allScores, setAllScores] = useState([])
+  const [selectedGame, setSelectedGame] = useState(defaultGame)
+  const [selectedDifficulty, setSelectedDifficulty] = useState('AllScores')
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    setSelectedGame(defaultGame)
+  }, [defaultGame])
 
   useEffect(() => {
     const fetchScores = async () => {
-      const scoresCollection = collection(firestore, "scores");
-      const scoresSnapshot = await getDocs(scoresCollection);
-      const scoresList = scoresSnapshot.docs.map((doc) => doc.data());
+      try {
+        const snap = await getDocs(collection(firestore, 'scores'))
+        setAllScores(snap.docs.map(d => d.data()))
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchScores()
+  }, [])
 
-      // Sort scores in descending order
-      scoresList.sort((a, b) => b.score - a.score);
-
-      setAllScores(scoresList);
-      setScores(scoresList);
-    };
-
-    fetchScores();
-  }, []);
-
-  const changeDifficultyDisplayed = (difficulty) => {
-    if (difficulty === "AllScores") return setScores(allScores);
-    const filteredScores = allScores.filter(
-      (score) => score.difficulty === difficulty
-    );
-    setScores(filteredScores);
-  };
+  const scores = sortScores(
+    filterByGame(allScores, selectedGame).filter(
+      s => selectedDifficulty === 'AllScores' || s.difficulty === selectedDifficulty
+    )
+  )
 
   return (
     <div className="scoreboard">
-      <h1>Tableau des scores</h1>
-      <select
-        name="difficulty"
-        id="difficultySelect"
-        onChange={(e) => changeDifficultyDisplayed(e.target.value)}
-      >
-        <option value="" selected disabled hidden>
-          Choissisez les scores par difficulté
-        </option>
-        <option value="Facile">Facile</option>
-        <option value="Moyen">Moyen</option>
-        <option value="Difficile">Difficile</option>
-        <option value="Impossible">Impossible</option>
-        <option value="Hardcore">Hardcore</option>
-        <option value="AllScores">Tous les scores</option>
-      </select>
-      {scores
-        .sort((a, b) => a.difficulty - b.difficulty) // assuming difficulty is a numeric value
-        .map((score, index) => (
-          <div className="scoreboardElement" key={index}>
-            <h2>{score.name}</h2>
-            <p>{score.score}</p>
-            <p>{score.difficulty}</p>
+      <h1 className="scoreboard-title">Tableau des scores</h1>
+
+      <div className="scoreboard-filters">
+        <select
+          className="scoreboard-select"
+          value={selectedGame}
+          onChange={e => setSelectedGame(e.target.value)}
+        >
+          {ACTIVE_GAMES.map(g => (
+            <option key={g.id} value={g.id}>{g.label}</option>
+          ))}
+          <option value="AllGames">Tous les jeux</option>
+        </select>
+
+        <select
+          className="scoreboard-select"
+          value={selectedDifficulty}
+          onChange={e => setSelectedDifficulty(e.target.value)}
+        >
+          {DIFFICULTY_ORDER.map(d => (
+            <option key={d} value={d}>{d}</option>
+          ))}
+          <option value="AllScores">Toutes les difficultés</option>
+        </select>
+      </div>
+
+      {loading ? (
+        <p className="scoreboard-loading">Chargement...</p>
+      ) : scores.length === 0 ? (
+        <p className="scoreboard-empty">Aucun score pour cette difficulté.</p>
+      ) : (
+        <div className="scoreboard-table">
+          <div className="scoreboard-header">
+            <span>#</span>
+            <span>Joueur</span>
+            <span>Score</span>
+            <span>Temps</span>
+            <span>Difficulté</span>
           </div>
-        ))}
+          {scores.map((s, index) => (
+            <div
+              key={index}
+              className={`scoreboard-row ${index < 3 ? 'scoreboard-row--top' : ''}`}
+            >
+              <span className="scoreboard-rank">
+                {index < 3 ? MEDAL[index] : `#${index + 1}`}
+              </span>
+              <span className="scoreboard-name">{s.name}</span>
+              <span className="scoreboard-score">{s.score} pts</span>
+              <span className="scoreboard-time">
+                {s.elapsedTime != null ? formatTime(s.elapsedTime) : '—'}
+              </span>
+              <span className="scoreboard-difficulty">{s.difficulty}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
-  );
+  )
 }

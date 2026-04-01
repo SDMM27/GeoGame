@@ -1,0 +1,201 @@
+/* src/pages/GamePage.css */
+.game-page {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-primary);
+}
+
+/* ── HUD container (top-left, stacks main + stats) ── */
+.hud-container {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 320px;
+}
+
+/* ── HUD Main block ── */
+.hud-main {
+  background: var(--bg-glass);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 10px 16px 10px;
+}
+
+.hud-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.hud-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 64px;
+}
+
+.hud-cell--target {
+  flex: 1;
+  align-items: center;
+  padding: 0 10px;
+}
+
+.hud-target-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.hud-target-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.hud-value {
+  font-size: 1.4rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.hud-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  margin-top: 2px;
+}
+
+/* ── Progress bar ── */
+.hud-progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-progress-track {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  height: 6px;
+  overflow: hidden;
+}
+
+.hud-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #4ade80, #00d4ff);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.hud-progress-text {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+}
+
+/* ── HUD Stats block ── */
+.hud-stats {
+  background: var(--bg-glass);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 8px 16px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.hud-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hud-stat-value {
+  font-size: 1.2rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.hud-stat-value--found     { color: #4ade80; }
+.hud-stat-value--skipped   { color: #f87171; }
+.hud-stat-value--remaining { color: #fbbf24; }
+
+.hud-stat-label {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  letter-spacing: 1.5px;
+  margin-top: 2px;
+}
+
+/* ── HUD Actions (bottom-center) ── */
+.hud-actions {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  gap: 10px;
+}
+
+.hud-btn {
+  padding: 10px 18px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-main);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--bg-glass);
+  backdrop-filter: blur(10px);
+  transition: background 0.2s, transform 0.1s;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+}
+
+.hud-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
+}
+
+.hud-btn--home    { color: var(--accent-cyan);  border-color: var(--accent-cyan-border); }
+.hud-btn--see     { color: var(--warning);       border-color: rgba(251, 191, 36, 0.3); }
+.hud-btn--restart { color: var(--danger);        border-color: rgba(255, 77, 77, 0.3); }
+
+/* ── Game over overlay ── */
+.game-over-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2000;
+  background: rgba(15, 15, 26, 0.85);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-over-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.game-over-actions {
+  display: flex;
+  gap: 12px;
+}

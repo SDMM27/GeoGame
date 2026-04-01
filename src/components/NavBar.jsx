@@ -1,14 +1,13 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import './NavBar.css'
 
 export default function NavBar() {
-  const navigate = useNavigate()
   return (
     <nav className="navbar">
-      <span className="navbar-logo" onClick={() => navigate('/')}>
+      <Link to="/" className="navbar-logo">
         GEO<span className="navbar-logo-accent">GAME</span>
-      </span>
+      </Link>
     </nav>
   )
 }

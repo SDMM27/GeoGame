@@ -13,6 +13,7 @@
   color: var(--accent-cyan);
   cursor: pointer;
   user-select: none;
+  text-decoration: none;
 }
 
 .navbar-logo-accent {

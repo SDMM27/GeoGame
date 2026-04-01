@@ -100,3 +100,10 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+/* Disabled state for shared HUD buttons used in this page */
+.flag-game-page .hud-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}

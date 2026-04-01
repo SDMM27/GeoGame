@@ -116,7 +116,7 @@ export default function FlagGamePage() {
             onClick={handleSubmit}
             disabled={!!revealedName || isGameOver || !inputValue.trim()}
           >
-            →
+            <span aria-label="Valider">→</span>
           </button>
         </div>
       </div>

@@ -26,3 +26,5 @@ Faire un bot discord pour informer des améliorations
 To do des jeux à implémenter :
 Changer de place le pays à trouver ( eventuellement le mettre carrément sur la souris )
 Mode Geo Country Placement mais avec les drapeaux et non les noms.
+
+Losque erreur dans geo country placement, faire un zoom mais pas trop zoomé, et si le pays est petit, mettre une flèche pour faire comprendre à l'utilisateur où se trouvait le pays ?

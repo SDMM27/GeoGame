@@ -246,6 +246,8 @@ export default function useGameState(difficulty, isTraining) {
 
   const goHome = () => {
     alreadyChosenCountries = []
+    foundCountriesRef.current.clear()
+    shownCountriesRef.current.clear()
     navigate('/')
   }
 

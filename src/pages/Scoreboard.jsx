@@ -9,6 +9,7 @@ const DIFFICULTY_ORDER = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcor
 const MEDAL = ['🥇', '🥈', '🥉']
 const ACTIVE_GAMES = [
   { id: 'country', label: 'Trouve le Pays' },
+  { id: 'flags',   label: 'Trouve le Drapeau' },
 ]
 
 export const sortScores = (scores) =>

@@ -142,6 +142,8 @@ export default function useFlagGameState(difficulty, isTraining) {
   }, [revealedName, changeCountry])
 
   const handleSubmit = () => {
+    // revealedName is read from state (render closure) as a gate — correct here.
+    // consecutiveErrors is read from ref because it may be incremented in the same call.
     if (!gameStartedRef.current || !targetCountryRef.current || revealedName) return
     const props = targetCountryRef.current.properties
     const isCorrect = checkAnswer(inputValue, props.ADMIN, props.aliases ?? [])

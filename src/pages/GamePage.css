@@ -192,6 +192,46 @@
   border-color: rgba(255, 77, 77, 0.3);
 }
 
+/* ── Controls hint (top-right) ── */
+.controls-hint {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: var(--bg-glass);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.controls-hint-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.controls-key {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--accent-cyan);
+  background: rgba(0, 212, 255, 0.08);
+  border: 1px solid var(--accent-cyan-border);
+  border-radius: 4px;
+  padding: 1px 5px;
+  white-space: nowrap;
+}
+
+.controls-desc {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
 /* ── Game over overlay ── */
 .game-over-overlay {
   position: absolute;

@@ -1,7 +1,8 @@
 // src/pages/GamePage.jsx
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet'
+import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet'
+import L from 'leaflet'
 import { ToastContainer } from 'react-toastify'
 import useGameState from '../hooks/useGameState'
 import countries from '../data/countriesWithDifficulty_FR.json'
@@ -11,6 +12,58 @@ import 'react-toastify/dist/ReactToastify.css'
 import './GamePage.css'
 
 const GEO_STYLE = { fillColor: 'transparent', color: '#334155', fillOpacity: 1, weight: 0.85 }
+
+function RightClickDrag() {
+  const map = useMap()
+
+  useEffect(() => {
+    const container = map.getContainer()
+    let isDragging = false
+    let lastX = 0
+    let lastY = 0
+
+    const onMouseDown = (e) => {
+      if (e.button !== 2) return
+      isDragging = true
+      lastX = e.clientX
+      lastY = e.clientY
+      container.style.cursor = 'grabbing'
+      e.preventDefault()
+    }
+
+    const onMouseMove = (e) => {
+      if (!isDragging) return
+      const dx = lastX - e.clientX
+      const dy = lastY - e.clientY
+      lastX = e.clientX
+      lastY = e.clientY
+      map._rawPanBy(L.point(dx, dy))
+    }
+
+    const onMouseUp = (e) => {
+      if (e.button !== 2) return
+      isDragging = false
+      container.style.cursor = ''
+      map.fire('moveend')
+    }
+
+    const onContextMenu = (e) => e.preventDefault()
+
+    container.addEventListener('mousedown', onMouseDown)
+    window.addEventListener('mousemove', onMouseMove)
+    window.addEventListener('mouseup', onMouseUp)
+    container.addEventListener('contextmenu', onContextMenu)
+
+    return () => {
+      container.removeEventListener('mousedown', onMouseDown)
+      window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('mouseup', onMouseUp)
+      container.removeEventListener('contextmenu', onContextMenu)
+    }
+  }, [map])
+
+  return null
+}
 
 export default function GamePage() {
   const { difficulty, isTraining } = useLocation().state || {}
@@ -81,6 +134,12 @@ export default function GamePage() {
         </div>
       </div>
 
+      <div className="controls-hint">
+        <div className="controls-hint-row"><span className="controls-key">Clic gauche</span><span className="controls-desc">Sélectionner un pays</span></div>
+        <div className="controls-hint-row"><span className="controls-key">Clic droit</span><span className="controls-desc">Déplacer la carte</span></div>
+        <div className="controls-hint-row"><span className="controls-key">Molette</span><span className="controls-desc">Zoomer / Dézoomer</span></div>
+      </div>
+
       <div className="hud-actions">
         <button className="hud-btn hud-btn--home" onClick={goHome}>
           ← Accueil
@@ -131,7 +190,7 @@ export default function GamePage() {
         zoom={2}
         scrollWheelZoom
         zoomControl={false}
-        dragging
+        dragging={false}
         doubleClickZoom={false}
         maxBounds={[[90, -180], [-90, 180]]}
         style={{ width: '100%', height: '100vh' }}
@@ -160,6 +219,7 @@ export default function GamePage() {
             })
           }}
         />
+        <RightClickDrag />
       </MapContainer>
     </div>
   )

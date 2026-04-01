@@ -95,7 +95,17 @@ export default function GamePage() {
 
       {isGameOver && (
         <div className="game-over-overlay">
-          <Form finalScore={score} difficulty={difficulty} elapsedTime={timer} />
+          <div className="game-over-content">
+            <Form finalScore={score} difficulty={difficulty} elapsedTime={timer} />
+            <div className="game-over-actions">
+              <button className="hud-btn hud-btn--restart" onClick={restartGame}>
+                ↺ Recommencer
+              </button>
+              <button className="hud-btn hud-btn--home" onClick={goHome}>
+                ← Accueil
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

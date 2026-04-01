@@ -10,6 +10,8 @@ import 'leaflet/dist/leaflet.css'
 import 'react-toastify/dist/ReactToastify.css'
 import './GamePage.css'
 
+const GEO_STYLE = { fillColor: 'transparent', color: '#334155', fillOpacity: 1, weight: 0.85 }
+
 export default function GamePage() {
   const { difficulty, isTraining } = useLocation().state || {}
   const {
@@ -138,7 +140,7 @@ export default function GamePage() {
         />
         <GeoJSON
           ref={geoJsonRef}
-          style={{ fillColor: 'transparent', color: '#334155', fillOpacity: 1, weight: 0.85 }}
+          style={GEO_STYLE}
           data={countries.features}
           onEachFeature={(feature, layer) => {
             layer.on({

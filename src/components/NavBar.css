@@ -1,0 +1,26 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 40px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.navbar-logo {
+  font-size: 1.6rem;
+  font-weight: 900;
+  letter-spacing: 4px;
+  color: var(--accent-cyan);
+  cursor: pointer;
+  user-select: none;
+}
+
+.navbar-logo-accent {
+  color: var(--accent-purple);
+}
+
+@media (max-width: 600px) {
+  .navbar {
+    padding: 16px 20px;
+  }
+}

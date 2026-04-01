@@ -149,9 +149,18 @@ export default function useGameState(difficulty, isTraining) {
     setScore(prev => Math.max(0, prev - (amounts[diff] ?? 1)))
   }
 
-  const incrementScore = (diff) => {
-    const amounts = { Facile: 1, Moyen: 2, Difficile: 3, Impossible: 4 }
-    setScore(prev => prev + (amounts[diff] ?? 1))
+  const SCORE_TABLE = {
+    Facile:     [3, 2, 1],
+    Moyen:      [5, 3, 2],
+    Difficile:  [7, 5, 3],
+    Impossible: [9, 7, 5],
+  }
+
+  const incrementScore = (diff, errorCount = 0) => {
+    const row = SCORE_TABLE[diff]
+    if (!row) return
+    const gain = row[Math.min(errorCount, 2)]
+    setScore(prev => prev + gain)
   }
 
   const changeCountry = useCallback(() => {

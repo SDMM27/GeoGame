@@ -111,6 +111,7 @@ export default function useGameState(difficulty, isTraining) {
       )
       if (layer) {
         layer.setStyle({ fillColor: '#ff4d4d', weight: 2, fillOpacity: 0.5 })
+        shownCountriesRef.current.add(targetCountryRef.current)
         const center = layer.getBounds().getCenter()
         zoomCountryMap(center.lat, center.lng)
       }
@@ -220,6 +221,7 @@ export default function useGameState(difficulty, isTraining) {
     )
     if (!layer) return
     layer.setStyle({ fillColor: '#ff4d4d', weight: 2, fillOpacity: 0.5 })
+    shownCountriesRef.current.add(targetCountryRef.current)
     const center = layer.getBounds().getCenter()
     zoomCountryMap(center.lat, center.lng)
     decrementScore('Difficile')

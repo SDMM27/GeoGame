@@ -164,13 +164,17 @@ export default function useGameState(difficulty, isTraining) {
 
   const onCountryMouseOver = (event) => {
     const layer = event.target
-    if (layer.options.fillColor === '#4ade80') return
+    const name = layer.feature.properties.ADMIN
+    if (foundCountriesRef.current.has(name)) return
+    if (shownCountriesRef.current.has(name)) return
     layer.setStyle({ fillColor: '#7b2ff7', weight: 2, fillOpacity: 0.4 })
   }
 
   const onCountryMouseOut = (event) => {
     const layer = event.target
-    if (layer.options.fillColor === '#4ade80') return
+    const name = layer.feature.properties.ADMIN
+    if (foundCountriesRef.current.has(name)) return
+    if (shownCountriesRef.current.has(name)) return
     layer.setStyle(COUNTRY_STYLE)
   }
 
@@ -191,6 +195,8 @@ export default function useGameState(difficulty, isTraining) {
         incrementScore(targetDiff)
       }
       event.target.setStyle({ fillColor: '#4ade80', weight: 2, fillOpacity: 0.5 })
+      shownCountriesRef.current.delete(clickedName)
+      foundCountriesRef.current.add(clickedName)
       setStats(prev =>
         wasSkipped
           ? { ...prev, skipped: prev.skipped + 1 }
@@ -242,6 +248,8 @@ export default function useGameState(difficulty, isTraining) {
 
   const goHome = () => {
     alreadyChosenCountries = []
+    foundCountriesRef.current.clear()
+    shownCountriesRef.current.clear()
     navigate('/')
   }
 

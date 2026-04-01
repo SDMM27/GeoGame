@@ -40,7 +40,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 64px;
+  min-width: 120px;
 }
 
 .hud-cell--target {
@@ -128,9 +128,17 @@
   line-height: 1;
 }
 
-.hud-stat-value--found     { color: #4ade80; }
-.hud-stat-value--skipped   { color: #f87171; }
-.hud-stat-value--remaining { color: #fbbf24; }
+.hud-stat-value--found {
+  color: #4ade80;
+}
+
+.hud-stat-value--skipped {
+  color: #f87171;
+}
+
+.hud-stat-value--remaining {
+  color: #fbbf24;
+}
 
 .hud-stat-label {
   font-size: 0.6rem;
@@ -169,9 +177,20 @@
   transform: translateY(-1px);
 }
 
-.hud-btn--home    { color: var(--accent-cyan);  border-color: var(--accent-cyan-border); }
-.hud-btn--see     { color: var(--warning);       border-color: rgba(251, 191, 36, 0.3); }
-.hud-btn--restart { color: var(--danger);        border-color: rgba(255, 77, 77, 0.3); }
+.hud-btn--home {
+  color: var(--accent-cyan);
+  border-color: var(--accent-cyan-border);
+}
+
+.hud-btn--see {
+  color: var(--warning);
+  border-color: rgba(251, 191, 36, 0.3);
+}
+
+.hud-btn--restart {
+  color: var(--danger);
+  border-color: rgba(255, 77, 77, 0.3);
+}
 
 /* ── Game over overlay ── */
 .game-over-overlay {

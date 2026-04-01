@@ -194,6 +194,8 @@ export default function useGameState(difficulty, isTraining) {
         incrementScore(targetDiff)
       }
       event.target.setStyle({ fillColor: '#4ade80', weight: 2, fillOpacity: 0.5 })
+      shownCountriesRef.current.delete(clickedName)
+      foundCountriesRef.current.add(clickedName)
       setStats(prev =>
         wasSkipped
           ? { ...prev, skipped: prev.skipped + 1 }

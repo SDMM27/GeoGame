@@ -46,6 +46,8 @@ export default function useGameState(difficulty, isTraining) {
   const clickOnSeeCountryRef = useRef(false)
   const [stats, setStats] = useState({ found: 0, skipped: 0, total: 0 })
   const gameOverToastShownRef = useRef(false)
+  const foundCountriesRef = useRef(new Set())
+  const shownCountriesRef = useRef(new Set())
 
   // Redirect if no difficulty
   useEffect(() => {
@@ -161,13 +163,17 @@ export default function useGameState(difficulty, isTraining) {
 
   const onCountryMouseOver = (event) => {
     const layer = event.target
-    if (layer.options.fillColor === '#4ade80') return
+    const name = layer.feature.properties.ADMIN
+    if (foundCountriesRef.current.has(name)) return
+    if (shownCountriesRef.current.has(name)) return
     layer.setStyle({ fillColor: '#7b2ff7', weight: 2, fillOpacity: 0.4 })
   }
 
   const onCountryMouseOut = (event) => {
     const layer = event.target
-    if (layer.options.fillColor === '#4ade80') return
+    const name = layer.feature.properties.ADMIN
+    if (foundCountriesRef.current.has(name)) return
+    if (shownCountriesRef.current.has(name)) return
     layer.setStyle(COUNTRY_STYLE)
   }
 

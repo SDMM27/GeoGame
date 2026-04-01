@@ -106,7 +106,7 @@ export default function useGameState(difficulty, isTraining) {
   useEffect(() => { consecutiveErrorsRef.current = consecutiveErrors }, [consecutiveErrors])
   useEffect(() => { clickOnSeeCountryRef.current = clickOnSeeCountry }, [clickOnSeeCountry])
 
-  // 3 consecutive errors: highlight country, decrement score
+  // 3 consecutive errors: highlight country
   useEffect(() => {
     if (consecutiveErrors < 3) return
     toast.error('Dommage ! C\'est ici que se trouvait ' + targetCountryRef.current, {
@@ -123,10 +123,6 @@ export default function useGameState(difficulty, isTraining) {
         zoomCountryMap(center.lat, center.lng)
       }
     }
-    decrementScore(
-      countries.features.find(c => c.properties.ADMIN === targetCountryRef.current)
-        ?.properties.Difficulty || 'Difficile'
-    )
   }, [consecutiveErrors, zoomCountryMap]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Timer counts UP; stops when all processed
@@ -150,11 +146,6 @@ export default function useGameState(difficulty, isTraining) {
       })
     }
   }, [allProcessed, gameStarted, isTraining])
-
-  const decrementScore = (diff) => {
-    const amounts = { Facile: 3, Moyen: 2, Difficile: 1, Impossible: 0.5 }
-    setScore(prev => Math.max(0, prev - (amounts[diff] ?? 1)))
-  }
 
   const incrementScore = (diff, errorCount = 0) => {
     const row = SCORE_TABLE[diff]
@@ -201,7 +192,7 @@ export default function useGameState(difficulty, isTraining) {
         toast.success('Bravo ! ' + targetCountryRef.current + ' !', {
           containerId: 'topRightToast',
         })
-        incrementScore(targetDiff)
+        incrementScore(targetDiff, consecutiveErrorsRef.current)
       }
       event.target.setStyle({ fillColor: '#4ade80', weight: 2, fillOpacity: 0.5 })
       shownCountriesRef.current.delete(clickedName)
@@ -233,7 +224,6 @@ export default function useGameState(difficulty, isTraining) {
     shownCountriesRef.current.add(targetCountryRef.current)
     const center = layer.getBounds().getCenter()
     zoomCountryMap(center.lat, center.lng)
-    decrementScore('Difficile')
   }
 
   const restartGame = () => {

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 
 // Helper: builds a fake Leaflet layer with a name and a mutable style
 function makeLayer(name, initialStyle = {}) {

@@ -7,6 +7,9 @@ import './scoreboard.css'
 
 const DIFFICULTY_ORDER = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
 const MEDAL = ['🥇', '🥈', '🥉']
+const ACTIVE_GAMES = [
+  { id: 'country', label: 'Trouve le Pays' },
+]
 
 export const sortScores = (scores) =>
   [...scores].sort((a, b) => {
@@ -21,18 +24,17 @@ export const filterByGame = (scores, game) => {
   return scores.filter(s => (s.gameId ?? 'country') === game)
 }
 
-export default function Scoreboard() {
+export default function Scoreboard({ defaultGame = 'country' }) {
   const [allScores, setAllScores] = useState([])
-  const [scores, setScores] = useState([])
+  const [selectedGame, setSelectedGame] = useState(defaultGame)
+  const [selectedDifficulty, setSelectedDifficulty] = useState('AllScores')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchScores = async () => {
       try {
         const snap = await getDocs(collection(firestore, 'scores'))
-        const list = sortScores(snap.docs.map(d => d.data()))
-        setAllScores(list)
-        setScores(list)
+        setAllScores(snap.docs.map(d => d.data()))
       } finally {
         setLoading(false)
       }
@@ -40,29 +42,39 @@ export default function Scoreboard() {
     fetchScores()
   }, [])
 
-  const changeDifficultyDisplayed = (difficulty) => {
-    if (difficulty === 'AllScores') {
-      setScores([...allScores])
-      return
-    }
-    setScores(sortScores(allScores.filter(s => s.difficulty === difficulty)))
-  }
+  const scores = sortScores(
+    filterByGame(allScores, selectedGame).filter(
+      s => selectedDifficulty === 'AllScores' || s.difficulty === selectedDifficulty
+    )
+  )
 
   return (
     <div className="scoreboard">
       <h1 className="scoreboard-title">Tableau des scores</h1>
 
-      <select
-        className="scoreboard-select"
-        onChange={e => changeDifficultyDisplayed(e.target.value)}
-        defaultValue=""
-      >
-        <option value="" disabled>Filtrer par difficulté</option>
-        {DIFFICULTY_ORDER.map(d => (
-          <option key={d} value={d}>{d}</option>
-        ))}
-        <option value="AllScores">Tous les scores</option>
-      </select>
+      <div className="scoreboard-filters">
+        <select
+          className="scoreboard-select"
+          value={selectedGame}
+          onChange={e => setSelectedGame(e.target.value)}
+        >
+          {ACTIVE_GAMES.map(g => (
+            <option key={g.id} value={g.id}>{g.label}</option>
+          ))}
+          <option value="AllGames">Tous les jeux</option>
+        </select>
+
+        <select
+          className="scoreboard-select"
+          value={selectedDifficulty}
+          onChange={e => setSelectedDifficulty(e.target.value)}
+        >
+          {DIFFICULTY_ORDER.map(d => (
+            <option key={d} value={d}>{d}</option>
+          ))}
+          <option value="AllScores">Toutes les difficultés</option>
+        </select>
+      </div>
 
       {loading ? (
         <p className="scoreboard-loading">Chargement...</p>

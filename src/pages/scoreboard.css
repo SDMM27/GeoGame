@@ -17,6 +17,18 @@
   text-align: center;
 }
 
+.scoreboard-filters {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.scoreboard-filters .scoreboard-select {
+  margin: 0;
+}
+
 .scoreboard-select {
   display: block;
   margin: 0 auto 32px;

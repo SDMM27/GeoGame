@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Scoreboard from "./Scoreboard";
+import NavBar from "../components/NavBar";
 import "./HomePage.css";
 
 const DIFFICULTIES = [
-  { name: 'Facile',     count: 29,  color: '#4ade80' },
-  { name: 'Moyen',      count: 83,  color: '#00d4ff' },
-  { name: 'Difficile',  count: 191, color: '#fbbf24' },
+  { name: 'Facile', count: 29, color: '#4ade80' },
+  { name: 'Moyen', count: 83, color: '#00d4ff' },
+  { name: 'Difficile', count: 191, color: '#fbbf24' },
   { name: 'Impossible', count: 244, color: '#f97316' },
-  { name: 'Hardcore',   count: 53,  color: '#f87171' },
+  { name: 'Hardcore', count: 53, color: '#f87171' },
 ];
 
 const GAMES = [
@@ -45,7 +45,6 @@ const GAMES = [
 export default function HomePage() {
   const navigate = useNavigate();
   const [difficulty, setDifficulty] = useState("Moyen");
-  const [showScoreboard, setShowScoreboard] = useState(false);
 
   const handlePlay = (isTraining = false) => {
     navigate("/game", { state: { difficulty, isTraining } });
@@ -53,17 +52,7 @@ export default function HomePage() {
 
   return (
     <div className="home-page">
-      <nav className="home-nav">
-        <span className="home-logo">
-          GEO<span className="home-logo-accent">GAME</span>
-        </span>
-        <button
-          className="nav-scores-btn"
-          onClick={() => setShowScoreboard((v) => !v)}
-        >
-          🏆 Scores
-        </button>
-      </nav>
+      <NavBar />
 
       <main className="home-main">
         <div className="home-hero">
@@ -99,6 +88,12 @@ export default function HomePage() {
                       </button>
                     ))}
                   </div>
+                  <button
+                    className="nav-scores-btn"
+                    onClick={() => navigate(`/scores?game=${game.id}`)}
+                  >
+                    🏆 Scores
+                  </button>
                   <div className="game-card-buttons">
                     <button className="btn-play" onClick={() => handlePlay(false)}>
                       Jouer
@@ -125,12 +120,6 @@ export default function HomePage() {
             )
           )}
         </div>
-
-        {showScoreboard && (
-          <div className="scoreboard-section">
-            <Scoreboard />
-          </div>
-        )}
       </main>
     </div>
   );

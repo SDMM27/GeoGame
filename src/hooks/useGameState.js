@@ -15,9 +15,9 @@ const COUNTRY_STYLE = {
 }
 
 const SCORE_TABLE = {
-  Facile:     [3, 2, 1],
-  Moyen:      [5, 3, 2],
-  Difficile:  [7, 5, 3],
+  Facile: [3, 2, 1],
+  Moyen: [5, 3, 2],
+  Difficile: [7, 5, 3],
   Impossible: [9, 7, 5],
 }
 
@@ -49,6 +49,7 @@ export default function useGameState(difficulty, isTraining) {
   const [mapRef, setMapRef] = useState(null)
   const [timer, setTimer] = useState(0)
   const timerRef = useRef(0)
+  const startTimeRef = useRef(null)
   const [clickOnSeeCountry, setClickOnSeeCountry] = useState(false)
   const clickOnSeeCountryRef = useRef(false)
   const [stats, setStats] = useState({ found: 0, skipped: 0, total: 0 })
@@ -129,12 +130,25 @@ export default function useGameState(difficulty, isTraining) {
   const allProcessed = stats.total > 0 && (stats.found + stats.skipped >= stats.total)
 
   useEffect(() => {
-    if (!gameStarted || allProcessed) return
+    if (!gameStarted || allProcessed) {
+      // Si le jeu s'arrête, on s'assure que timerRef a la valeur exacte finale
+      if (allProcessed && startTimeRef.current) {
+        timerRef.current = performance.now() - startTimeRef.current;
+      }
+      return;
+    }
+
+    // On fixe le point de départ
+    startTimeRef.current = performance.now() - (timerRef.current || 0);
+
     const id = setInterval(() => {
-      setTimer(t => { timerRef.current = t + 1; return t + 1 })
-    }, 1000)
-    return () => clearInterval(id)
-  }, [gameStarted, allProcessed]) // eslint-disable-line react-hooks/exhaustive-deps
+      const currentTime = performance.now() - startTimeRef.current;
+      setTimer(currentTime);
+      timerRef.current = currentTime; // La vérité est ici (en ms avec décimales)
+    }, 100); // 100ms suffit pour l'affichage, le calcul reste précis à la ms près
+
+    return () => clearInterval(id);
+  }, [gameStarted, allProcessed]);
 
   // Toast when training mode finishes all countries
   useEffect(() => {
@@ -227,10 +241,14 @@ export default function useGameState(difficulty, isTraining) {
   }
 
   const restartGame = () => {
+    setGameStarted(false);
+    gameStartedRef.current = false;
+
     alreadyChosenCountries = []
     setScore(0)
     setConsecutiveErrors(0)
     setClickOnSeeCountry(false)
+
     clickOnSeeCountryRef.current = false
     gameOverToastShownRef.current = false
     foundCountriesRef.current.clear()
@@ -238,11 +256,20 @@ export default function useGameState(difficulty, isTraining) {
     if (geoJsonRef.current) {
       geoJsonRef.current.getLayers().forEach(l => l.setStyle(COUNTRY_STYLE))
     }
-    setTimer(0)
-    timerRef.current = 0
-    const total = getTotalCountries(difficulty)
-    setStats({ found: 0, skipped: 0, total })
-    changeCountry()
+    startTimeRef.current = null;
+    timerRef.current = 0;
+    setTimer(0);
+    setTimeout(() => {
+      const total = getTotalCountries(difficulty);
+      setStats({ found: 0, skipped: 0, total });
+      const next = getRandomCountry(difficulty);
+      if (next) {
+        alreadyChosenCountries.push(next);
+        setTargetCountry(next);
+        setGameStarted(true);
+        gameStartedRef.current = true;
+      }
+    }, 0);
   }
 
   const goHome = () => {

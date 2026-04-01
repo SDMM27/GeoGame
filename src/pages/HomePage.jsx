@@ -33,6 +33,7 @@ const GAMES = [
     icon: "📍",
     title: "Placement Pays",
     description: "Place le pays au bon endroit sur la carte",
+    route: null,
     active: false,
   },
   {
@@ -40,6 +41,7 @@ const GAMES = [
     icon: "⚡",
     title: "Mode Vies",
     description: "Trouve un maximum de pays sans te tromper",
+    route: null,
     active: false,
   },
 ];

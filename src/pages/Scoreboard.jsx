@@ -16,6 +16,11 @@ export const sortScores = (scores) =>
     return tA - tB
   })
 
+export const filterByGame = (scores, game) => {
+  if (!game || game === 'AllGames') return scores
+  return scores.filter(s => (s.gameId ?? 'country') === game)
+}
+
 export default function Scoreboard() {
   const [allScores, setAllScores] = useState([])
   const [scores, setScores] = useState([])

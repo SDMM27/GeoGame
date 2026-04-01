@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { sortScores } from './Scoreboard'
+import { sortScores, filterByGame } from './Scoreboard'
 
 const DIFFICULTY_ORDER = ["Facile", "Moyen", "Difficile", "Impossible", "Hardcore"];
 
@@ -56,5 +56,31 @@ describe('sortScores', () => {
       { name: 'HasTime', score: 10, difficulty: 'Facile', elapsedTime: 90 },
     ]
     expect(sortScores(input)[0].name).toBe('HasTime')
+  })
+})
+
+describe('filterByGame', () => {
+  it('returns all scores when game is AllGames', () => {
+    const scores = [{ gameId: 'country' }, { gameId: 'flags' }]
+    expect(filterByGame(scores, 'AllGames')).toHaveLength(2)
+  })
+
+  it('treats missing gameId as country', () => {
+    const scores = [
+      { name: 'A' },
+      { name: 'B', gameId: 'country' },
+      { name: 'C', gameId: 'flags' },
+    ]
+    expect(filterByGame(scores, 'country')).toHaveLength(2)
+  })
+
+  it('filters by gameId when specified', () => {
+    const scores = [{ gameId: 'country' }, { gameId: 'flags' }, { gameId: 'country' }]
+    expect(filterByGame(scores, 'flags')).toHaveLength(1)
+  })
+
+  it('returns all scores when game is falsy', () => {
+    const scores = [{ gameId: 'country' }, { gameId: 'flags' }]
+    expect(filterByGame(scores, null)).toHaveLength(2)
   })
 })

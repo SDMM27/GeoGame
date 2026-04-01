@@ -46,6 +46,8 @@ export default function useGameState(difficulty, isTraining) {
   const clickOnSeeCountryRef = useRef(false)
   const [stats, setStats] = useState({ found: 0, skipped: 0, total: 0 })
   const gameOverToastShownRef = useRef(false)
+  const foundCountriesRef = useRef(new Set())
+  const shownCountriesRef = useRef(new Set())
 
   // Redirect if no difficulty
   useEffect(() => {
@@ -109,6 +111,7 @@ export default function useGameState(difficulty, isTraining) {
       )
       if (layer) {
         layer.setStyle({ fillColor: '#ff4d4d', weight: 2, fillOpacity: 0.5 })
+        shownCountriesRef.current.add(targetCountryRef.current)
         const center = layer.getBounds().getCenter()
         zoomCountryMap(center.lat, center.lng)
       }
@@ -212,6 +215,7 @@ export default function useGameState(difficulty, isTraining) {
     )
     if (!layer) return
     layer.setStyle({ fillColor: '#ff4d4d', weight: 2, fillOpacity: 0.5 })
+    shownCountriesRef.current.add(targetCountryRef.current)
     const center = layer.getBounds().getCenter()
     zoomCountryMap(center.lat, center.lng)
     decrementScore('Difficile')
@@ -224,6 +228,8 @@ export default function useGameState(difficulty, isTraining) {
     setClickOnSeeCountry(false)
     clickOnSeeCountryRef.current = false
     gameOverToastShownRef.current = false
+    foundCountriesRef.current.clear()
+    shownCountriesRef.current.clear()
     if (geoJsonRef.current) {
       geoJsonRef.current.getLayers().forEach(l => l.setStyle(COUNTRY_STYLE))
     }

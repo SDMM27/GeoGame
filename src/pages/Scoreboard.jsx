@@ -31,6 +31,10 @@ export default function Scoreboard({ defaultGame = 'country' }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    setSelectedGame(defaultGame)
+  }, [defaultGame])
+
+  useEffect(() => {
     const fetchScores = async () => {
       try {
         const snap = await getDocs(collection(firestore, 'scores'))

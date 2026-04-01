@@ -14,6 +14,13 @@ const COUNTRY_STYLE = {
   weight: 0.85,
 }
 
+const SCORE_TABLE = {
+  Facile:     [3, 2, 1],
+  Moyen:      [5, 3, 2],
+  Difficile:  [7, 5, 3],
+  Impossible: [9, 7, 5],
+}
+
 function getAvailableDifficulties(difficulty) {
   if (difficulty === 'Hardcore') return ['Impossible']
   return DIFFICULTIES.slice(0, DIFFICULTIES.indexOf(difficulty) + 1)
@@ -147,13 +154,6 @@ export default function useGameState(difficulty, isTraining) {
   const decrementScore = (diff) => {
     const amounts = { Facile: 3, Moyen: 2, Difficile: 1, Impossible: 0.5 }
     setScore(prev => Math.max(0, prev - (amounts[diff] ?? 1)))
-  }
-
-  const SCORE_TABLE = {
-    Facile:     [3, 2, 1],
-    Moyen:      [5, 3, 2],
-    Difficile:  [7, 5, 3],
-    Impossible: [9, 7, 5],
   }
 
   const incrementScore = (diff, errorCount = 0) => {

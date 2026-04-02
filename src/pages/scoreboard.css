@@ -17,6 +17,41 @@
   text-align: center;
 }
 
+.scoreboard-era-tabs {
+  display: flex;
+  gap: 0;
+  justify-content: center;
+  margin-bottom: 24px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.scoreboard-era-tab {
+  padding: 8px 20px;
+  background: var(--bg-secondary);
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font-main);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.scoreboard-era-tab:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+}
+
+.scoreboard-era-tab--active {
+  background: var(--accent-cyan);
+  color: #000;
+  font-weight: 700;
+}
+
 .scoreboard-filters {
   display: flex;
   gap: 12px;

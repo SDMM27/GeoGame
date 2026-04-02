@@ -29,3 +29,4 @@ yarn-error.log*
 .superpowers
 
 putAllScoresToPlacementGameType.js
+archiveScoresToV1.js

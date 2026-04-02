@@ -1990149,7 +1990149,7 @@
         "ISO_A2": "UA",
         "aliases": [],
         "capital": "Kyiv",
-        "capitalAliases": []
+        "capitalAliases": ["Kiev"]
       },
       "geometry": {
         "type": "MultiPolygon",

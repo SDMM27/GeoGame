@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import "./form.css";
 import "react-toastify/dist/ReactToastify.css";
 import { firestore } from "../Firebase";
@@ -6,9 +6,16 @@ import { addDoc, collection, getDocs, query, where, deleteDoc } from "firebase/f
 import { toast } from "react-toastify";
 import { formatTime } from "../utils/formatTime";
 
+function isBetter(newScore, newTime, existingScore, existingTime) {
+  if (newScore > existingScore) return true;
+  if (newScore === existingScore && newTime < existingTime) return true;
+  return false;
+}
+
 export default function Form({ finalScore, difficulty, elapsedTime, gameType }) {
   const nameRef = useRef();
   const ref = collection(firestore, "scores");
+  const [blockedByBetterScore, setBlockedByBetterScore] = useState(null);
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -23,7 +30,7 @@ export default function Form({ finalScore, difficulty, elapsedTime, gameType }) 
       score: finalScore,
       difficulty,
       elapsedTime,
-      gameType: gameType
+      gameType,
     };
 
     const existingSnapshot = await getDocs(
@@ -37,7 +44,8 @@ export default function Form({ finalScore, difficulty, elapsedTime, gameType }) 
 
     if (!existingSnapshot.empty) {
       const existing = existingSnapshot.docs[0].data();
-      if (!window.confirm(`Remplacer votre score de ${existing.score} pts par ${finalScore} pts ?`)) {
+      if (!isBetter(finalScore, elapsedTime, existing.score, existing.elapsedTime)) {
+        setBlockedByBetterScore({ score: existing.score, elapsedTime: existing.elapsedTime });
         return;
       }
       await deleteDoc(existingSnapshot.docs[0].ref);
@@ -45,7 +53,11 @@ export default function Form({ finalScore, difficulty, elapsedTime, gameType }) 
 
     try {
       await addDoc(ref, data);
-      toast.success(`Score de ${name} sauvegardé !`, { containerId: "topRightToast" });
+      const wasReplaced = !existingSnapshot.empty;
+      toast.success(
+        wasReplaced ? "Score mis à jour !" : `Score de ${name} sauvegardé !`,
+        { containerId: "topRightToast" }
+      );
       const submitBtn = document.getElementById("submitBtn");
       if (submitBtn) {
         submitBtn.disabled = true;
@@ -66,6 +78,18 @@ export default function Form({ finalScore, difficulty, elapsedTime, gameType }) 
       <p className="form-score-display">
         Temps : <strong>{formatTime(elapsedTime)}</strong>
       </p>
+
+      {blockedByBetterScore && (
+        <div className="form-blocked">
+          <p className="form-blocked-message">
+            ⚠️ Ce pseudo a déjà un meilleur score dans cette difficulté&nbsp;:
+          </p>
+          <p className="form-blocked-score">
+            <strong>{blockedByBetterScore.score} pts</strong> — {formatTime(blockedByBetterScore.elapsedTime)}
+          </p>
+          <p className="form-blocked-hint">Veuillez enregistrer votre score sous un autre nom.</p>
+        </div>
+      )}
       <form onSubmit={handleSave}>
         <label htmlFor="name" className="form-label">Pseudo</label>
         <input

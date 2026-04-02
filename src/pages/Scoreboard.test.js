@@ -84,3 +84,24 @@ describe('filterByGame', () => {
     expect(filterByGame(scores, null)).toHaveLength(2)
   })
 })
+
+describe('filterByGame — flags', () => {
+  const scores = [
+    { name: 'Alice', score: 10, gameId: 'country' },
+    { name: 'Bob',   score: 8,  gameId: 'flags' },
+    { name: 'Carol', score: 6 }, // no gameId → defaults to 'country'
+  ]
+
+  it('filters to flags only', () => {
+    const result = filterByGame(scores, 'flags')
+    expect(result).toHaveLength(1)
+    expect(result[0].name).toBe('Bob')
+  })
+
+  it('country filter excludes flags', () => {
+    const result = filterByGame(scores, 'country')
+    expect(result).toHaveLength(2)
+    expect(result.map(s => s.name)).toContain('Alice')
+    expect(result.map(s => s.name)).toContain('Carol')
+  })
+})

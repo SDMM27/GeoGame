@@ -1,0 +1,109 @@
+/* src/pages/FlagGamePage.css */
+.flag-game-page {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* Reuse the same HUD classes from GamePage.css — no duplication needed */
+
+.flag-game-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 2rem;
+  padding: 2rem 1rem;
+  width: 100%;
+  max-width: 600px;
+}
+
+.flag-display {
+  width: 320px;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border-color, #334155);
+}
+
+.flag-placeholder {
+  width: 320px;
+  height: 213px;
+  background: var(--bg-secondary, #1e293b);
+  border-radius: 8px;
+  border: 1px dashed #334155;
+}
+
+.flag-revealed-name {
+  font-size: 1.4rem;
+  color: #ff4d4d;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-align: center;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.flag-input-row {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.flag-input {
+  flex: 1;
+  background: var(--bg-secondary, #1e293b);
+  border: 1px solid #334155;
+  border-radius: 6px;
+  padding: 0.65rem 1rem;
+  color: var(--text-primary, #e2e8f0);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.flag-input:focus {
+  border-color: #7b2ff7;
+}
+
+.flag-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.flag-submit-btn {
+  background: #7b2ff7;
+  border: none;
+  border-radius: 6px;
+  padding: 0.65rem 1.2rem;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.flag-submit-btn:hover {
+  background: #6d28d9;
+}
+
+.flag-submit-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Disabled state for shared HUD buttons used in this page */
+.flag-game-page .hud-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}

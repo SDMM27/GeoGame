@@ -1,0 +1,50 @@
+/* src/pages/CapitalsGamePage.css */
+.capitals-game-page {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.capitals-game-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 1.5rem;
+  padding: 2rem 1rem;
+  width: 100%;
+  max-width: 600px;
+}
+
+.capitals-country-name {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.capitals-country-label {
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.capitals-country-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-primary, #e2e8f0);
+}
+
+/* Désactivation des boutons HUD pour cette page */
+.capitals-game-page .hud-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}

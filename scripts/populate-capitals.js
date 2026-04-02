@@ -6,6 +6,9 @@ const fs = require('fs')
 const path = require('path')
 
 const DATA_PATH = path.join(__dirname, '../src/data/countriesWithDifficulty_FR.json')
+// WARNING: This script overwrites capitalAliases with [] on every run.
+// All manually entered aliases will be LOST if you run this again.
+// This is a one-shot script — only run it once on a fresh dataset.
 
 async function fetchCapitalsMap() {
   const res = await fetch('https://restcountries.com/v3.1/all?fields=cca2,capital')

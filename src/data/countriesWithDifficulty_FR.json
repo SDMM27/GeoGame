@@ -1490450,7 +1490450,11 @@
         "ISO_A2": "NL",
         "aliases": [],
         "capital": "Amsterdam",
-        "capitalAliases": []
+        "capitalAliases": [
+          "La Haye",
+          "The Hague",
+          "Den Haag"
+        ]
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2197903,7 +2197907,9 @@
         "ISO_A2": "ZA",
         "aliases": [],
         "capital": "Pretoria",
-        "capitalAliases": []
+        "capitalAliases": [
+          "Tshwane"
+        ]
       },
       "geometry": {
         "type": "MultiPolygon",

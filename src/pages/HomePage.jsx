@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../components/NavBar";
+import { GAME_TYPES } from "../utils/gameTypes";
 import "./HomePage.css";
 
 const DIFFICULTIES = [
@@ -13,7 +14,7 @@ const DIFFICULTIES = [
 
 const GAMES = [
   {
-    id: "country",
+    id: GAME_TYPES.PLACEMENT,
     icon: "🌍",
     title: "Trouve le Pays",
     description: "Trouve tous les pays de la difficulté choisie.",
@@ -21,7 +22,7 @@ const GAMES = [
     active: true,
   },
   {
-    id: "flags",
+    id: GAME_TYPES.FLAGS,
     icon: "🚩",
     title: "Trouve le Drapeau",
     description: "Identifie le pays à partir de son drapeau",

@@ -6,7 +6,7 @@ import { addDoc, collection, getDocs, query, where, deleteDoc } from "firebase/f
 import { toast } from "react-toastify";
 import { formatTime } from "../utils/formatTime";
 
-export default function Form({ finalScore, difficulty, elapsedTime, gameId = 'country' }) {
+export default function Form({ finalScore, difficulty, elapsedTime, gameType }) {
   const nameRef = useRef();
   const ref = collection(firestore, "scores");
 
@@ -18,10 +18,21 @@ export default function Form({ finalScore, difficulty, elapsedTime, gameId = 'co
       return;
     }
 
-    const data = { name, score: finalScore, difficulty, elapsedTime, gameId };
+    const data = {
+      name,
+      score: finalScore,
+      difficulty,
+      elapsedTime,
+      gameType: gameType
+    };
 
     const existingSnapshot = await getDocs(
-      query(ref, where("name", "==", name), where("difficulty", "==", difficulty))
+      query(
+        ref,
+        where("name", "==", name),
+        where("difficulty", "==", difficulty),
+        where("gameType", "==", gameType)
+      )
     );
 
     if (!existingSnapshot.empty) {

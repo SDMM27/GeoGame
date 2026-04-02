@@ -1,0 +1,4 @@
+export const GAME_TYPES = {
+    PLACEMENT: 'PLACEMENT',
+    FLAGS: 'FLAGS',
+};

@@ -3,13 +3,15 @@ import React, { useEffect, useState } from 'react'
 import { collection, getDocs } from 'firebase/firestore'
 import { firestore } from '../Firebase'
 import { formatTime } from '../utils/formatTime'
+import { GAME_TYPES } from '../utils/gameTypes'
 import './scoreboard.css'
 
 const DIFFICULTY_ORDER = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
 const MEDAL = ['🥇', '🥈', '🥉']
+const LEGACY_GAME_ID_MAP = { country: GAME_TYPES.PLACEMENT, flags: GAME_TYPES.FLAGS }
 const ACTIVE_GAMES = [
-  { id: 'country', label: 'Trouve le Pays' },
-  { id: 'flags',   label: 'Trouve le Drapeau' },
+  { id: GAME_TYPES.PLACEMENT, label: 'Trouve le Pays' },
+  { id: GAME_TYPES.FLAGS, label: 'Trouve le Drapeau' },
 ]
 
 export const sortScores = (scores) =>
@@ -21,11 +23,14 @@ export const sortScores = (scores) =>
   })
 
 export const filterByGame = (scores, game) => {
-  if (!game || game === 'AllGames') return scores
-  return scores.filter(s => (s.gameId ?? 'country') === game)
+  if (!game || game === 'AllGames') return scores;
+  return scores.filter(s => {
+    const type = s.gameType ?? LEGACY_GAME_ID_MAP[s.gameId ?? 'country'] ?? s.gameId
+    return type === game
+  })
 }
 
-export default function Scoreboard({ defaultGame = 'country' }) {
+export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT }) {
   const [allScores, setAllScores] = useState([])
   const [selectedGame, setSelectedGame] = useState(defaultGame)
   const [selectedDifficulty, setSelectedDifficulty] = useState('AllScores')
@@ -39,6 +44,8 @@ export default function Scoreboard({ defaultGame = 'country' }) {
     const fetchScores = async () => {
       try {
         const snap = await getDocs(collection(firestore, 'scores'))
+        const data = snap.docs.map(d => d.data())
+        console.log("Scores bruts de la BDD :", data)
         setAllScores(snap.docs.map(d => d.data()))
       } finally {
         setLoading(false)

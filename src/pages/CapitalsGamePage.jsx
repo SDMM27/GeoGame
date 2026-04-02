@@ -134,7 +134,7 @@ export default function CapitalsGamePage() {
         </div>
       </div>
 
-      {/* Overlay fin de partie */}
+      {/* Overlay fin de partie — targetCountry guard évite un flash pendant restartGame */}
       {isGameOver && targetCountry && (
         <div className="game-over-overlay">
           <div className="game-over-content">

@@ -5,11 +5,11 @@ import { GAME_TYPES } from "../utils/gameTypes";
 import "./HomePage.css";
 
 const DIFFICULTIES = [
-  { name: 'Facile',     count: 28,  color: '#4ade80' },
-  { name: 'Moyen',      count: 53,  color: '#00d4ff' },
-  { name: 'Difficile',  count: 107, color: '#fbbf24' },
+  { name: 'Facile',     count: 29,  color: '#4ade80' },
+  { name: 'Moyen',      count: 47,  color: '#00d4ff' },
+  { name: 'Difficile',  count: 106, color: '#fbbf24' },
   { name: 'Impossible', count: 56,  color: '#f97316' },
-  { name: 'Hardcore',   count: 244, color: '#f87171' },
+  { name: 'Hardcore',   count: 238, color: '#f87171' },
 ];
 
 const GAMES = [

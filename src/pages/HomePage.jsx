@@ -30,6 +30,14 @@ const GAMES = [
     active: true,
   },
   {
+    id: GAME_TYPES.CAPITALS,
+    icon: "🏛️",
+    title: "Trouve la Capitale",
+    description: "Trouve la capitale à partir du drapeau et du nom du pays",
+    route: "/capitals-game",
+    active: true,
+  },
+  {
     id: "placement",
     icon: "📍",
     title: "Placement Pays",

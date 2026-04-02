@@ -12,6 +12,7 @@ const LEGACY_GAME_ID_MAP = { country: GAME_TYPES.PLACEMENT, flags: GAME_TYPES.FL
 const ACTIVE_GAMES = [
   { id: GAME_TYPES.PLACEMENT, label: 'Trouve le Pays' },
   { id: GAME_TYPES.FLAGS, label: 'Trouve le Drapeau' },
+  { id: GAME_TYPES.CAPITALS, label: 'Trouve la Capitale' },
 ]
 
 export const sortScores = (scores) =>

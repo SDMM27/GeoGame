@@ -27,3 +27,5 @@ yarn-error.log*
 
 .claude
 .superpowers
+
+putAllScoresToPlacementGameType.js

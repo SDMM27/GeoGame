@@ -6,10 +6,10 @@ import "./HomePage.css";
 
 const DIFFICULTIES = [
   { name: 'Facile',     count: 29,  color: '#4ade80' },
-  { name: 'Moyen',      count: 83,  color: '#00d4ff' },
-  { name: 'Difficile',  count: 191, color: '#fbbf24' },
-  { name: 'Impossible', count: 244, color: '#f97316' },
-  { name: 'Hardcore',   count: 53,  color: '#f87171' },
+  { name: 'Moyen',      count: 47,  color: '#00d4ff' },
+  { name: 'Difficile',  count: 106, color: '#fbbf24' },
+  { name: 'Impossible', count: 56,  color: '#f97316' },
+  { name: 'Hardcore',   count: 238, color: '#f87171' },
 ];
 
 const GAMES = [
@@ -69,7 +69,7 @@ function ActiveGameCard({ game }) {
               onClick={() => setDifficulty(d.name)}
             >
               <span className="difficulty-btn-name" style={{ color: d.color }}>
-                {d.name === 'Hardcore' ? '💀 Hardcore' : d.name}
+                {d.name === 'Hardcore' ? '💀 Hardcore — Tous les pays' : d.name}
               </span>
               <span className="difficulty-btn-count">{d.count} pays</span>
             </button>

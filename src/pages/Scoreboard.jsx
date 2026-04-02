@@ -35,6 +35,7 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT }) {
   const [selectedGame, setSelectedGame] = useState(defaultGame)
   const [selectedDifficulty, setSelectedDifficulty] = useState('AllScores')
   const [loading, setLoading] = useState(true)
+  const [isLegacy, setIsLegacy] = useState(false)
 
   useEffect(() => {
     setSelectedGame(defaultGame)
@@ -42,17 +43,17 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT }) {
 
   useEffect(() => {
     const fetchScores = async () => {
+      setLoading(true)
       try {
-        const snap = await getDocs(collection(firestore, 'scores'))
-        const data = snap.docs.map(d => d.data())
-        console.log("Scores bruts de la BDD :", data)
+        const collectionName = isLegacy ? 'scores_v1' : 'scores'
+        const snap = await getDocs(collection(firestore, collectionName))
         setAllScores(snap.docs.map(d => d.data()))
       } finally {
         setLoading(false)
       }
     }
     fetchScores()
-  }, [])
+  }, [isLegacy])
 
   const scores = sortScores(
     filterByGame(allScores, selectedGame).filter(
@@ -63,6 +64,21 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT }) {
   return (
     <div className="scoreboard">
       <h1 className="scoreboard-title">Tableau des scores</h1>
+
+      <div className="scoreboard-era-tabs">
+        <button
+          className={`scoreboard-era-tab ${!isLegacy ? 'scoreboard-era-tab--active' : ''}`}
+          onClick={() => setIsLegacy(false)}
+        >
+          Classement actuel <br />(nouvelles difficultés)
+        </button>
+        <button
+          className={`scoreboard-era-tab ${isLegacy ? 'scoreboard-era-tab--active' : ''}`}
+          onClick={() => setIsLegacy(true)}
+        >
+          Ancien classement
+        </button>
+      </div>
 
       <div className="scoreboard-filters">
         <select

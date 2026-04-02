@@ -15,8 +15,8 @@ const SCORE_TABLE = {
 }
 
 function getAvailableDifficulties(difficulty) {
-  if (difficulty === 'Hardcore') return ['Impossible']
-  return DIFFICULTIES.slice(0, DIFFICULTIES.indexOf(difficulty) + 1)
+  if (difficulty === 'Hardcore') return ['Facile', 'Moyen', 'Difficile', 'Impossible']
+  return [difficulty]
 }
 
 export function getTotalFlagCountries(difficulty) {

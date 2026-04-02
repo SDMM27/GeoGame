@@ -2,15 +2,32 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../components/NavBar";
 import { GAME_TYPES } from "../utils/gameTypes";
+import { getTotalCountries } from "../hooks/useGameState";
+import { getTotalFlagCountries } from "../hooks/useFlagGameState";
+import { getTotalCapitalCountries } from "../hooks/useCapitalsGameState";
 import "./HomePage.css";
 
-const DIFFICULTIES = [
-  { name: 'Facile',     count: 29,  color: '#4ade80' },
-  { name: 'Moyen',      count: 47,  color: '#00d4ff' },
-  { name: 'Difficile',  count: 106, color: '#fbbf24' },
-  { name: 'Impossible', count: 56,  color: '#f97316' },
-  { name: 'Hardcore',   count: 238, color: '#f87171' },
-];
+const DIFFICULTY_COLORS = {
+  Facile:     '#4ade80',
+  Moyen:      '#00d4ff',
+  Difficile:  '#fbbf24',
+  Impossible: '#f97316',
+  Hardcore:   '#f87171',
+};
+
+function getDifficultiesForGame(gameId) {
+  const countFn =
+    gameId === GAME_TYPES.FLAGS     ? getTotalFlagCountries :
+    gameId === GAME_TYPES.CAPITALS  ? getTotalCapitalCountries :
+                                      getTotalCountries;
+  return [
+    { name: 'Facile',     count: countFn('Facile'),     color: DIFFICULTY_COLORS.Facile },
+    { name: 'Moyen',      count: countFn('Moyen'),      color: DIFFICULTY_COLORS.Moyen },
+    { name: 'Difficile',  count: countFn('Difficile'),  color: DIFFICULTY_COLORS.Difficile },
+    { name: 'Impossible', count: countFn('Impossible'), color: DIFFICULTY_COLORS.Impossible },
+    { name: 'Hardcore',   count: countFn('Hardcore'),   color: DIFFICULTY_COLORS.Hardcore },
+  ];
+}
 
 const GAMES = [
   {
@@ -58,6 +75,7 @@ const GAMES = [
 function ActiveGameCard({ game }) {
   const navigate = useNavigate();
   const [difficulty, setDifficulty] = useState("Moyen");
+  const difficulties = getDifficultiesForGame(game.id);
 
   const handlePlay = (isTraining = false) => {
     navigate(game.route, { state: { difficulty, isTraining } });
@@ -70,7 +88,7 @@ function ActiveGameCard({ game }) {
       <p className="game-card-desc">{game.description}</p>
       <div className="game-card-controls">
         <div className="difficulty-grid">
-          {DIFFICULTIES.map(d => (
+          {difficulties.map(d => (
             <button
               key={d.name}
               className={`difficulty-btn${d.name === 'Hardcore' ? ' difficulty-btn--wide' : ''}${difficulty === d.name ? ' difficulty-btn--active' : ''}`}

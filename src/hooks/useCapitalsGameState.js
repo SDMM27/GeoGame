@@ -21,7 +21,7 @@ function getAvailableDifficulties(difficulty) {
 export function getTotalCapitalCountries(difficulty) {
   const available = getAvailableDifficulties(difficulty)
   return countries.features.filter(c =>
-    available.includes(c.properties.Difficulty) &&
+    available.includes(c.properties.DifficultyCapitals) &&
     c.properties.ISO_A2 &&
     c.properties.capital
   ).length
@@ -56,7 +56,7 @@ export default function useCapitalsGameState(difficulty, isTraining) {
   const getRandomCountry = useCallback((diff) => {
     const available = getAvailableDifficulties(diff)
     const filtered = countries.features.filter(c =>
-      available.includes(c.properties.Difficulty) &&
+      available.includes(c.properties.DifficultyCapitals) &&
       c.properties.ISO_A2 &&
       c.properties.capital &&
       !alreadyChosenCountries.includes(c.properties.ADMIN)
@@ -154,7 +154,7 @@ export default function useCapitalsGameState(difficulty, isTraining) {
       const wasSkipped = clickOnSeeCountryRef.current
       if (!wasSkipped) {
         toast.success('Bravo ! ' + props.capital + ' !', { containerId: 'topRightToast' })
-        incrementScore(props.Difficulty, consecutiveErrorsRef.current)
+        incrementScore(props.DifficultyCapitals, consecutiveErrorsRef.current)
       }
       setStats(prev =>
         wasSkipped

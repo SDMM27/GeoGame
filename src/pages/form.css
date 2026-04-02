@@ -85,3 +85,25 @@
   background: var(--success);
   cursor: default;
 }
+
+.form-blocked {
+  text-align: center;
+  padding: 8px 0;
+}
+
+.form-blocked-message {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+}
+
+.form-blocked-score {
+  color: var(--accent-cyan);
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.form-blocked-hint {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+}

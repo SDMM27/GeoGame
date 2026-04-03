@@ -10,7 +10,9 @@
         "ISO_A2": "AW",
         "aliases": [],
         "capital": "Oranjestad",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "Polygon",
@@ -135,7 +137,9 @@
         "capital": "Kaboul",
         "capitalAliases": [
           "Kabul"
-        ]
+        ],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "Polygon",
@@ -6286,7 +6290,9 @@
         "ISO_A2": "AO",
         "aliases": [],
         "capital": "Luanda",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -12895,7 +12901,9 @@
         "ISO_A2": "AI",
         "aliases": [],
         "capital": "The Valley",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -13032,7 +13040,9 @@
         "ISO_A2": "AL",
         "aliases": [],
         "capital": "Tirana",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -15279,7 +15289,9 @@
         "ISO_A2": "AX",
         "aliases": [],
         "capital": "Mariehamn",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -17248,7 +17260,9 @@
         "ISO_A2": "AD",
         "aliases": [],
         "capital": "Andorra la Vella",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -17471,7 +17485,9 @@
         "ISO_A2": "AE",
         "aliases": [],
         "capital": "Abu Dhabi",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -20750,7 +20766,9 @@
         "ISO_A2": "AR",
         "aliases": [],
         "capital": "Buenos Aires",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -39605,7 +39623,9 @@
         "capital": "Erevan",
         "capitalAliases": [
           "Yerevan"
-        ]
+        ],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -41374,7 +41394,9 @@
         "ISO_A2": "AS",
         "aliases": [],
         "capital": "Pago Pago",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -137736,7 +137758,9 @@
         "ISO_A2": null,
         "aliases": [],
         "capital": "",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "Polygon",
@@ -139996,7 +140020,9 @@
         "ISO_A2": "AG",
         "aliases": [],
         "capital": "Saint John's",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -140453,7 +140479,9 @@
         "ISO_A2": "AU",
         "aliases": [],
         "capital": "Canberra",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -195448,7 +195476,9 @@
         "capital": "Vienne",
         "capitalAliases": [
           "Vienna"
-        ]
+        ],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "Polygon",
@@ -199855,7 +199885,9 @@
         "ISO_A2": "AZ",
         "aliases": [],
         "capital": "Baku",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -203742,7 +203774,9 @@
         "ISO_A2": "BI",
         "aliases": [],
         "capital": "Gitega",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -204991,7 +205025,9 @@
         "capital": "Bruxelles",
         "capitalAliases": [
           "Brussels"
-        ]
+        ],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "Polygon",
@@ -207622,7 +207658,9 @@
         "ISO_A2": "BJ",
         "aliases": [],
         "capital": "Porto-Novo",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -210109,7 +210147,9 @@
         "ISO_A2": "BF",
         "aliases": [],
         "capital": "Ouagadougou",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -214574,7 +214614,9 @@
         "capital": "Dacca",
         "capitalAliases": [
           "Dhaka"
-        ]
+        ],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -223815,7 +223857,9 @@
         "ISO_A2": "BG",
         "aliases": [],
         "capital": "Sofia",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "Polygon",
@@ -227354,7 +227398,9 @@
         "ISO_A2": "BH",
         "aliases": [],
         "capital": "Manama",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -227585,7 +227631,9 @@
         "ISO_A2": "BS",
         "aliases": [],
         "capital": "Nassau",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -234206,7 +234254,9 @@
         "ISO_A2": "BA",
         "aliases": [],
         "capital": "Sarajevo",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -236756,7 +236806,9 @@
         "ISO_A2": "BL",
         "aliases": [],
         "capital": "Gustavia",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "Polygon",
@@ -236819,7 +236871,9 @@
         "ISO_A2": "BY",
         "aliases": [],
         "capital": "Minsk",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "Polygon",
@@ -241542,7 +241596,9 @@
         "ISO_A2": "BZ",
         "aliases": [],
         "capital": "Belmopan",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -243575,7 +243631,9 @@
         "ISO_A2": "BM",
         "aliases": [],
         "capital": "Hamilton",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -243940,7 +243998,9 @@
         "ISO_A2": "BO",
         "aliases": [],
         "capital": "Sucre",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "Polygon",
@@ -249937,7 +249997,9 @@
         "capital": "Brasília",
         "capitalAliases": [
           "Brasilia"
-        ]
+        ],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -256634,7 +256696,7 @@
             [
               [
                 -50.437729327999904,
-                -0.000032628999904
+                -3.2628999904e-05
               ],
               [
                 -50.44749915299994,
@@ -256786,7 +256848,7 @@
               ],
               [
                 -50.437729327999904,
-                -0.000032628999904
+                -3.2628999904e-05
               ]
             ]
           ],
@@ -294622,7 +294684,9 @@
         "ISO_A2": "BB",
         "aliases": [],
         "capital": "Bridgetown",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "Polygon",
@@ -294781,7 +294845,9 @@
         "ISO_A2": "BN",
         "aliases": [],
         "capital": "Bandar Seri Begawan",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -295434,7 +295500,9 @@
         "ISO_A2": "BT",
         "aliases": [],
         "capital": "Thimphu",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -296769,7 +296837,9 @@
         "ISO_A2": "BW",
         "aliases": [],
         "capital": "Gaborone",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -300612,7 +300682,9 @@
         "ISO_A2": "CF",
         "aliases": [],
         "capital": "Bangui",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -307799,7 +307871,9 @@
         "ISO_A2": "CA",
         "aliases": [],
         "capital": "Ottawa",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -582094,7 +582168,9 @@
         "capital": "Berne",
         "capitalAliases": [
           "Bern"
-        ]
+        ],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "Polygon",
@@ -585113,7 +585189,9 @@
         "ISO_A2": "CL",
         "aliases": [],
         "capital": "Santiago",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -654585,7 +654663,9 @@
         "capitalAliases": [
           "Beijing",
           "Pekin"
-        ]
+        ],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -711654,7 +711734,9 @@
         "ISO_A2": "CI",
         "aliases": [],
         "capital": "Yamoussoukro",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -718095,7 +718177,9 @@
         "ISO_A2": null,
         "aliases": [],
         "capital": "",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "Polygon",
@@ -718142,7 +718226,9 @@
         "ISO_A2": "CM",
         "aliases": [],
         "capital": "Yaoundé",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "Polygon",
@@ -723993,7 +724079,9 @@
         "ISO_A2": null,
         "aliases": [],
         "capital": "",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -724926,7 +725014,9 @@
         "ISO_A2": "CD",
         "aliases": [],
         "capital": "Kinshasa",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -736423,7 +736513,9 @@
         "ISO_A2": "CG",
         "aliases": [],
         "capital": "Brazzaville",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -742421,7 +742513,9 @@
         "capital": "Bogotá",
         "capitalAliases": [
           "Bogota"
-        ]
+        ],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -755634,7 +755728,9 @@
         "ISO_A2": "KM",
         "aliases": [],
         "capital": "Moroni",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -756171,7 +756267,9 @@
         "ISO_A2": "CV",
         "aliases": [],
         "capital": "Praia",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -757860,7 +757958,9 @@
         "ISO_A2": "CR",
         "aliases": [],
         "capital": "San José",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -761198,7 +761298,9 @@
         "capital": "La Havane",
         "capitalAliases": [
           "Havana"
-        ]
+        ],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -772171,7 +772273,9 @@
         "ISO_A2": "CW",
         "aliases": [],
         "capital": "Willemstad",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "Polygon",
@@ -772366,7 +772470,9 @@
         "ISO_A2": "KY",
         "aliases": [],
         "capital": "George Town",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -772719,7 +772825,9 @@
         "ISO_A2": null,
         "aliases": [],
         "capital": "",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -773564,7 +773672,9 @@
         "ISO_A2": "CY",
         "aliases": [],
         "capital": "Nicosia",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -774829,7 +774939,9 @@
         "ISO_A2": "CZ",
         "aliases": [],
         "capital": "Prague",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "Polygon",
@@ -778540,7 +778652,9 @@
         "ISO_A2": "DE",
         "aliases": [],
         "capital": "Berlin",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -790769,7 +790883,9 @@
         "ISO_A2": "DJ",
         "aliases": [],
         "capital": "Djibouti",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -791624,7 +791740,9 @@
         "ISO_A2": "DM",
         "aliases": [],
         "capital": "Roseau",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "Polygon",
@@ -791945,7 +792063,9 @@
         "capital": "Copenhague",
         "capitalAliases": [
           "Copenhagen"
-        ]
+        ],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -800748,7 +800868,9 @@
         "capital": "Saint-Domingue",
         "capitalAliases": [
           "Santo Domingo"
-        ]
+        ],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -803099,7 +803221,9 @@
         "capital": "Alger",
         "capitalAliases": [
           "Algiers"
-        ]
+        ],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "Polygon",
@@ -808114,7 +808238,9 @@
         "ISO_A2": "EC",
         "aliases": [],
         "capital": "Quito",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -814261,7 +814387,9 @@
         "capital": "Le Caire",
         "capitalAliases": [
           "Cairo"
-        ]
+        ],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -821990,7 +822118,9 @@
         "ISO_A2": "ER",
         "aliases": [],
         "capital": "Asmara",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -826071,7 +826201,9 @@
         "ISO_A2": null,
         "aliases": [],
         "capital": "",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "Polygon",
@@ -826536,7 +826668,9 @@
         "ISO_A2": "ES",
         "aliases": [],
         "capital": "Madrid",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -838565,7 +838699,9 @@
         "ISO_A2": "EE",
         "aliases": [],
         "capital": "Tallinn",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -842800,7 +842936,9 @@
         "capital": "Addis-Abeba",
         "capitalAliases": [
           "Addis Ababa"
-        ]
+        ],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -847119,7 +847257,9 @@
         "ISO_A2": "FI",
         "aliases": [],
         "capital": "Helsinki",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -860228,7 +860368,9 @@
         "ISO_A2": "FJ",
         "aliases": [],
         "capital": "Suva",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -866369,7 +866511,9 @@
         "ISO_A2": "FK",
         "aliases": [],
         "capital": "Stanley",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -871806,7 +871950,9 @@
         "ISO_A2": "FR",
         "aliases": [],
         "capital": "Paris",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -890481,7 +890627,9 @@
         "ISO_A2": "FO",
         "aliases": [],
         "capital": "Tórshavn",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -892482,7 +892630,9 @@
         "ISO_A2": "FM",
         "aliases": [],
         "capital": "Palikir",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -893595,7 +893745,9 @@
         "ISO_A2": "GA",
         "aliases": [],
         "capital": "Libreville",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -899474,7 +899626,9 @@
         "capital": "Londres",
         "capitalAliases": [
           "London"
-        ]
+        ],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -911670,7 +911824,7 @@
                 53.570379950000174
               ],
               [
-                0.000091993000098,
+                9.1993000098e-05,
                 53.53534577000009
               ],
               [
@@ -928197,7 +928351,9 @@
         "capital": "Tbilissi",
         "capitalAliases": [
           "Tbilisi"
-        ]
+        ],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "Polygon",
@@ -930360,7 +930516,9 @@
         "ISO_A2": "GG",
         "aliases": [],
         "capital": "St. Peter Port",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -930629,7 +930787,9 @@
         "ISO_A2": "GH",
         "aliases": [],
         "capital": "Accra",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -934015,7 +934175,9 @@
         "ISO_A2": "GN",
         "aliases": [],
         "capital": "Conakry",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -940554,7 +940716,9 @@
         "ISO_A2": "GM",
         "aliases": [],
         "capital": "Banjul",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -942201,7 +942365,9 @@
         "ISO_A2": "GW",
         "aliases": [],
         "capital": "Bissau",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -947402,7 +947568,9 @@
         "ISO_A2": "GQ",
         "aliases": [],
         "capital": "Ciudad de la Paz",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -948441,7 +948609,9 @@
         "capital": "Athènes",
         "capitalAliases": [
           "Athens"
-        ]
+        ],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -973142,7 +973312,9 @@
         "ISO_A2": "GD",
         "aliases": [],
         "capital": "St. George's",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -973423,7 +973595,9 @@
         "ISO_A2": "GL",
         "aliases": [],
         "capital": "Nuuk",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1054494,7 +1054668,9 @@
         "capital": "Guatemala",
         "capitalAliases": [
           "Guatemala City"
-        ]
+        ],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1056357,7 +1056533,9 @@
         "ISO_A2": "GU",
         "aliases": [],
         "capital": "Hagåtña",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "Polygon",
@@ -1056572,7 +1056750,9 @@
         "ISO_A2": "GY",
         "aliases": [],
         "capital": "Georgetown",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1062714,7 +1062894,9 @@
         "ISO_A2": "HM",
         "aliases": [],
         "capital": "",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "Polygon",
@@ -1062949,7 +1063131,9 @@
         "ISO_A2": "HN",
         "aliases": [],
         "capital": "Tegucigalpa",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1067738,7 +1067922,9 @@
         "ISO_A2": "HR",
         "aliases": [],
         "capital": "Zagreb",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1077215,7 +1077401,9 @@
         "ISO_A2": "HT",
         "aliases": [],
         "capital": "Port-au-Prince",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1079860,7 +1080048,9 @@
         "ISO_A2": "HU",
         "aliases": [],
         "capital": "Budapest",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1083279,7 +1083469,9 @@
         "ISO_A2": "ID",
         "aliases": [],
         "capital": "Jakarta",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1162620,7 +1162812,9 @@
         "ISO_A2": "IM",
         "aliases": [],
         "capital": "Douglas",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "Polygon",
@@ -1162933,7 +1163127,9 @@
         "capital": "New Delhi",
         "capitalAliases": [
           "Delhi"
-        ]
+        ],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1194519,7 +1194715,9 @@
         "ISO_A2": "IO",
         "aliases": [],
         "capital": "Diego Garcia",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1194984,7 +1195182,9 @@
         "ISO_A2": "IE",
         "aliases": [],
         "capital": "Dublin",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1204615,7 +1204815,9 @@
         "capital": "Téhéran",
         "capitalAliases": [
           "Tehran"
-        ]
+        ],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1215646,7 +1215848,9 @@
         "capital": "Bagdad",
         "capitalAliases": [
           "Baghdad"
-        ]
+        ],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "Polygon",
@@ -1219049,7 +1219253,9 @@
         "ISO_A2": "IS",
         "aliases": [],
         "capital": "Reykjavik",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1231556,7 +1231762,9 @@
         "capital": "Jérusalem",
         "capitalAliases": [
           "Jerusalem"
-        ]
+        ],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "Polygon",
@@ -1233263,7 +1233471,9 @@
         "ISO_A2": "IT",
         "aliases": [],
         "capital": "Rome",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1246844,7 +1247054,9 @@
         "ISO_A2": "JM",
         "aliases": [],
         "capital": "Kingston",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1247879,7 +1248091,9 @@
         "ISO_A2": "JE",
         "aliases": [],
         "capital": "Saint Helier",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "Polygon",
@@ -1248086,7 +1248300,9 @@
         "ISO_A2": "JO",
         "aliases": [],
         "capital": "Amman",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1249577,7 +1249793,9 @@
         "ISO_A2": "JP",
         "aliases": [],
         "capital": "Tokyo",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1277838,7 +1278056,9 @@
         "ISO_A2": null,
         "aliases": [],
         "capital": "",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "Polygon",
@@ -1278117,7 +1278337,9 @@
         "ISO_A2": null,
         "aliases": [],
         "capital": "",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "Polygon",
@@ -1278291,7 +1278513,9 @@
         "capitalAliases": [
           "Nur-Sultan",
           "Nursultan"
-        ]
+        ],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1295278,7 +1295502,9 @@
         "ISO_A2": "KE",
         "aliases": [],
         "capital": "Nairobi",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1298809,7 +1299035,9 @@
         "capital": "Bichkek",
         "capitalAliases": [
           "Bishkek"
-        ]
+        ],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1303670,7 +1303898,9 @@
         "ISO_A2": "KH",
         "aliases": [],
         "capital": "Phnom Penh",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1308555,7 +1308785,9 @@
         "ISO_A2": "KI",
         "aliases": [],
         "capital": "South Tarawa",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1311556,7 +1311788,9 @@
         "ISO_A2": "KN",
         "aliases": [],
         "capital": "Basseterre",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1311755,7 +1311989,9 @@
         "capital": "Séoul",
         "capitalAliases": [
           "Seoul"
-        ]
+        ],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1324236,7 +1324472,9 @@
         "ISO_A2": null,
         "aliases": [],
         "capital": "",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1325346,7 +1325584,9 @@
         "capitalAliases": [
           "Kuwait City",
           "Kuwait"
-        ]
+        ],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1326379,7 +1326619,9 @@
         "ISO_A2": "LA",
         "aliases": [],
         "capital": "Vientiane",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1333476,7 +1333718,9 @@
         "capital": "Beyrouth",
         "capitalAliases": [
           "Beirut"
-        ]
+        ],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1334751,7 +1334995,9 @@
         "ISO_A2": "LR",
         "aliases": [],
         "capital": "Monrovia",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1337562,7 +1337808,9 @@
         "ISO_A2": "LY",
         "aliases": [],
         "capital": "Tripoli",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "Polygon",
@@ -1340225,7 +1340473,9 @@
         "ISO_A2": "LC",
         "aliases": [],
         "capital": "Castries",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "Polygon",
@@ -1340444,7 +1340694,9 @@
         "ISO_A2": "LI",
         "aliases": [],
         "capital": "Vaduz",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1340579,7 +1340831,9 @@
         "ISO_A2": "LK",
         "aliases": [],
         "capital": "Colombo",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1344184,7 +1344438,9 @@
         "ISO_A2": "LS",
         "aliases": [],
         "capital": "Maseru",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1345499,7 +1345755,9 @@
         "ISO_A2": "LT",
         "aliases": [],
         "capital": "Vilnius",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1347780,7 +1348038,9 @@
         "ISO_A2": "LU",
         "aliases": [],
         "capital": "Luxembourg",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "Polygon",
@@ -1348587,7 +1348847,9 @@
         "ISO_A2": "LV",
         "aliases": [],
         "capital": "Riga",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "Polygon",
@@ -1350782,7 +1351044,9 @@
         "ISO_A2": "MO",
         "aliases": [],
         "capital": "",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1351179,7 +1351443,9 @@
         "ISO_A2": "MF",
         "aliases": [],
         "capital": "Marigot",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "Polygon",
@@ -1351294,7 +1351560,9 @@
         "ISO_A2": "MA",
         "aliases": [],
         "capital": "Rabat",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1355417,7 +1355685,9 @@
         "ISO_A2": "MC",
         "aliases": [],
         "capital": "Monaco",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "Polygon",
@@ -1355484,7 +1355754,9 @@
         "ISO_A2": "MD",
         "aliases": [],
         "capital": "Chișinău",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1358399,7 +1358671,9 @@
         "ISO_A2": "MG",
         "aliases": [],
         "capital": "Antananarivo",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1365024,7 +1365298,9 @@
         "ISO_A2": "MV",
         "aliases": [],
         "capital": "Malé",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1371707,7 +1371983,9 @@
         "capital": "Mexico",
         "capitalAliases": [
           "Mexico City"
-        ]
+        ],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1401620,7 +1401898,9 @@
         "ISO_A2": "MH",
         "aliases": [],
         "capital": "Majuro",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1402569,7 +1402849,9 @@
         "ISO_A2": "MK",
         "aliases": [],
         "capital": "Skopje",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "Polygon",
@@ -1404048,7 +1404330,9 @@
         "ISO_A2": "ML",
         "aliases": [],
         "capital": "Bamako",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "Polygon",
@@ -1411071,7 +1411355,9 @@
         "ISO_A2": "MT",
         "aliases": [],
         "capital": "Valletta",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1411316,7 +1411602,9 @@
         "ISO_A2": "MM",
         "aliases": [],
         "capital": "Naypyidaw",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1429921,7 +1430209,9 @@
         "ISO_A2": "ME",
         "aliases": [],
         "capital": "Podgorica",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1431383,7 +1431673,9 @@
         "capitalAliases": [
           "Ulaanbaatar",
           "Ulan Bator"
-        ]
+        ],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1437382,7 +1437674,9 @@
         "ISO_A2": "MP",
         "aliases": [],
         "capital": "Saipan",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1438179,7 +1438473,9 @@
         "ISO_A2": "MZ",
         "aliases": [],
         "capital": "Maputo",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1447556,7 +1447852,9 @@
         "ISO_A2": "MR",
         "aliases": [],
         "capital": "Nouakchott",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1452193,7 +1452491,9 @@
         "ISO_A2": "MS",
         "aliases": [],
         "capital": "Plymouth",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "Polygon",
@@ -1452304,7 +1452604,9 @@
         "ISO_A2": "MU",
         "aliases": [],
         "capital": "Port Louis",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1452785,7 +1453087,9 @@
         "ISO_A2": "MW",
         "aliases": [],
         "capital": "Lilongwe",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1456074,7 +1456378,9 @@
         "ISO_A2": "MY",
         "aliases": [],
         "capital": "Kuala Lumpur",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1466351,7 +1466657,9 @@
         "ISO_A2": "NA",
         "aliases": [],
         "capital": "Windhoek",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1471102,7 +1471410,9 @@
         "ISO_A2": "NC",
         "aliases": [],
         "capital": "Nouméa",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1475107,7 +1475417,9 @@
         "ISO_A2": "NE",
         "aliases": [],
         "capital": "Niamey",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1479294,7 +1479606,9 @@
         "ISO_A2": "NF",
         "aliases": [],
         "capital": "Kingston",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "Polygon",
@@ -1479417,7 +1479731,9 @@
         "ISO_A2": "NG",
         "aliases": [],
         "capital": "Abuja",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1486542,7 +1486858,9 @@
         "ISO_A2": "NI",
         "aliases": [],
         "capital": "Managua",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1490287,7 +1490605,9 @@
         "ISO_A2": "NU",
         "aliases": [],
         "capital": "Alofi",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "Polygon",
@@ -1490454,7 +1490774,9 @@
           "La Haye",
           "The Hague",
           "Den Haag"
-        ]
+        ],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1493943,7 +1494265,9 @@
         "ISO_A2": "NO",
         "aliases": [],
         "capital": "Oslo",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1557726,7 +1558050,9 @@
         "capital": "Katmandou",
         "capitalAliases": [
           "Kathmandu"
-        ]
+        ],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1561845,7 +1562171,9 @@
         "ISO_A2": "NR",
         "aliases": [],
         "capital": "Yaren",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "Polygon",
@@ -1561900,7 +1562228,9 @@
         "ISO_A2": "NZ",
         "aliases": [],
         "capital": "Wellington",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1580055,7 +1580385,9 @@
         "capital": "Mascate",
         "capitalAliases": [
           "Muscat"
-        ]
+        ],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1584250,7 +1584582,9 @@
         "ISO_A2": "PK",
         "aliases": [],
         "capital": "Islamabad",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1592853,7 +1593187,9 @@
         "capital": "Panama",
         "capitalAliases": [
           "Panama City"
-        ]
+        ],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1600930,7 +1601266,9 @@
         "ISO_A2": "PN",
         "aliases": [],
         "capital": "Adamstown",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1601115,7 +1601453,9 @@
         "ISO_A2": "PE",
         "aliases": [],
         "capital": "Lima",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1611317,7 +1611657,9 @@
         "ISO_A2": "PH",
         "aliases": [],
         "capital": "Manila",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1641278,7 +1641620,9 @@
         "ISO_A2": "PW",
         "aliases": [],
         "capital": "Ngerulmud",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1641991,7 +1642335,9 @@
         "ISO_A2": "PG",
         "aliases": [],
         "capital": "Port Moresby",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1661422,7 +1661768,9 @@
         "capital": "Varsovie",
         "capitalAliases": [
           "Warsaw"
-        ]
+        ],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1666785,7 +1667133,9 @@
         "ISO_A2": "PR",
         "aliases": [],
         "capital": "San Juan",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1668030,7 +1668380,9 @@
         "ISO_A2": "KP",
         "aliases": [],
         "capital": "Pyongyang",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1675229,7 +1675581,9 @@
         "capital": "Lisbonne",
         "capitalAliases": [
           "Lisbon"
-        ]
+        ],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1680334,7 +1680688,9 @@
         "ISO_A2": "PY",
         "aliases": [],
         "capital": "Asunción",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1684929,7 +1685285,9 @@
         "ISO_A2": "PS",
         "aliases": [],
         "capital": "Ramallah",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1685686,11 +1686044,13 @@
       "properties": {
         "ADMIN": "Polynésie française",
         "ISO_A3": "PYF",
-        "Difficulty": "Difficile",
+        "Difficulty": "Impossible",
         "ISO_A2": "PF",
         "aliases": [],
         "capital": "Papeetē",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1690231,7 +1690591,9 @@
         "ISO_A2": "QA",
         "aliases": [],
         "capital": "Doha",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1691216,7 +1691578,9 @@
         "capital": "Bucarest",
         "capitalAliases": [
           "Bucharest"
-        ]
+        ],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "Polygon",
@@ -1696041,7 +1696405,9 @@
         "capital": "Moscou",
         "capitalAliases": [
           "Moscow"
-        ]
+        ],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1842318,7 +1842684,9 @@
         "ISO_A2": "RW",
         "aliases": [],
         "capital": "Kigali",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1843621,7 +1843989,9 @@
         "ISO_A2": "EH",
         "aliases": [],
         "capital": "El Aaiún",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1844810,7 +1845180,9 @@
         "capital": "Riyad",
         "capitalAliases": [
           "Riyadh"
-        ]
+        ],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1854406,7 +1854778,9 @@
         "ISO_A2": "SD",
         "aliases": [],
         "capital": "Khartoum",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1859135,7 +1859509,9 @@
         "ISO_A2": "SS",
         "aliases": [],
         "capital": "Juba",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1863778,7 +1864154,9 @@
         "ISO_A2": "SN",
         "aliases": [],
         "capital": "Dakar",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "Polygon",
@@ -1869348,7 +1869726,9 @@
         "ISO_A2": "SG",
         "aliases": [],
         "capital": "Singapore",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1869527,7 +1869907,9 @@
         "ISO_A2": "GS",
         "aliases": [],
         "capital": "King Edward Point",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1872301,7 +1872683,9 @@
         "ISO_A2": "SB",
         "aliases": [],
         "capital": "Honiara",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1881218,7 +1881602,9 @@
         "ISO_A2": "SL",
         "aliases": [],
         "capital": "Freetown",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1884023,7 +1884409,9 @@
         "ISO_A2": "SV",
         "aliases": [],
         "capital": "San Salvador",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1885572,7 +1885960,9 @@
         "ISO_A2": "SM",
         "aliases": [],
         "capital": "City of San Marino",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1885667,7 +1886057,9 @@
         "ISO_A2": null,
         "aliases": [],
         "capital": "",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1886968,7 +1887360,9 @@
         "capital": "Mogadiscio",
         "capitalAliases": [
           "Mogadishu"
-        ]
+        ],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1889667,7 +1890061,9 @@
         "ISO_A2": "PM",
         "aliases": [],
         "capital": "Saint-Pierre",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1890020,7 +1890416,9 @@
         "ISO_A2": "RS",
         "aliases": [],
         "capital": "Belgrade",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "Polygon",
@@ -1893791,7 +1894189,9 @@
         "ISO_A2": "ST",
         "aliases": [],
         "capital": "São Tomé",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1894200,7 +1894600,9 @@
         "ISO_A2": "SR",
         "aliases": [],
         "capital": "Paramaribo",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1897171,7 +1897573,9 @@
         "ISO_A2": "SK",
         "aliases": [],
         "capital": "Bratislava",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "Polygon",
@@ -1899482,7 +1899886,9 @@
         "ISO_A2": "SI",
         "aliases": [],
         "capital": "Ljubljana",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "Polygon",
@@ -1901577,7 +1901983,9 @@
         "ISO_A2": "SE",
         "aliases": [],
         "capital": "Stockholm",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1920426,7 +1920834,9 @@
         "ISO_A2": "SZ",
         "aliases": [],
         "capital": "Mbabane",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1920789,7 +1921199,9 @@
         "ISO_A2": "SX",
         "aliases": [],
         "capital": "Philipsburg",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "Polygon",
@@ -1920844,7 +1921256,9 @@
         "ISO_A2": "SC",
         "aliases": [],
         "capital": "Victoria",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1922287,7 +1922701,9 @@
         "capital": "Damas",
         "capitalAliases": [
           "Damascus"
-        ]
+        ],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "Polygon",
@@ -1924702,7 +1925118,9 @@
         "ISO_A2": "TC",
         "aliases": [],
         "capital": "Cockburn Town",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1925619,7 +1926037,9 @@
         "ISO_A2": "TD",
         "aliases": [],
         "capital": "N'Djamena",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1930502,7 +1930922,9 @@
         "ISO_A2": "TG",
         "aliases": [],
         "capital": "Lomé",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1932475,7 +1932897,9 @@
         "capital": "Bangkok",
         "capitalAliases": [
           "Krung Thep"
-        ]
+        ],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1945866,7 +1946290,9 @@
         "capital": "Douchanbé",
         "capitalAliases": [
           "Dushanbe"
-        ]
+        ],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1950949,7 +1951375,9 @@
         "capital": "Achgabat",
         "capitalAliases": [
           "Ashgabat"
-        ]
+        ],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1957646,7 +1958074,9 @@
         "ISO_A2": "TL",
         "aliases": [],
         "capital": "Dili",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1958795,7 +1959225,9 @@
         "ISO_A2": "TO",
         "aliases": [],
         "capital": "Nuku'alofa",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1959700,7 +1960132,9 @@
         "ISO_A2": "TT",
         "aliases": [],
         "capital": "Port of Spain",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1960509,7 +1960943,9 @@
         "ISO_A2": "TN",
         "aliases": [],
         "capital": "Tunis",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1963346,7 +1963782,9 @@
         "ISO_A2": "TR",
         "aliases": [],
         "capital": "Ankara",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1977971,7 +1978409,9 @@
         "ISO_A2": "TV",
         "aliases": [],
         "capital": "Funafuti",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1978300,7 +1978740,9 @@
         "ISO_A2": "TW",
         "aliases": [],
         "capital": "Taipei",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1980593,7 +1981035,9 @@
         "ISO_A2": "TZ",
         "aliases": [],
         "capital": "Dodoma",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1987686,7 +1988130,9 @@
         "ISO_A2": "UG",
         "aliases": [],
         "capital": "Kampala",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -1990149,7 +1990595,11 @@
         "ISO_A2": "UA",
         "aliases": [],
         "capital": "Kyiv",
-        "capitalAliases": ["Kiev"]
+        "capitalAliases": [
+          "Kiev"
+        ],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2002727,7 +2003177,9 @@
         "ISO_A2": "UY",
         "aliases": [],
         "capital": "Montevideo",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "Polygon",
@@ -2005077,7 +2005529,9 @@
         "capitalAliases": [
           "Washington D.C.",
           "Washington DC"
-        ]
+        ],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Facile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2150694,7 +2151148,9 @@
         "ISO_A2": null,
         "aliases": [],
         "capital": "",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2150897,7 +2151353,9 @@
         "capital": "Tachkent",
         "capitalAliases": [
           "Tashkent"
-        ]
+        ],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2157696,7 +2158154,8 @@
         "ISO_A2": "VA",
         "aliases": [],
         "capital": "Vatican City",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen"
       },
       "geometry": {
         "type": "Polygon",
@@ -2157743,7 +2158202,9 @@
         "ISO_A2": "VC",
         "aliases": [],
         "capital": "Kingstown",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2158112,7 +2158573,9 @@
         "ISO_A2": "VE",
         "aliases": [],
         "capital": "Caracas",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2171061,7 +2171524,9 @@
         "ISO_A2": "VG",
         "aliases": [],
         "capital": "Road Town",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2171474,7 +2171939,9 @@
         "ISO_A2": "VI",
         "aliases": [],
         "capital": "Charlotte Amalie",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2171789,7 +2172256,9 @@
         "capital": "Hanoï",
         "capitalAliases": [
           "Hanoi"
-        ]
+        ],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2188604,7 +2189073,9 @@
         "capital": "Port-Vila",
         "capitalAliases": [
           "Port Vila"
-        ]
+        ],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2192789,7 +2193260,9 @@
         "ISO_A2": "WF",
         "aliases": [],
         "capital": "Mata-Utu",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2192966,7 +2193439,9 @@
         "ISO_A2": null,
         "aliases": [],
         "capital": "",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "Polygon",
@@ -2193173,7 +2193648,9 @@
         "ISO_A2": "WS",
         "aliases": [],
         "capital": "Apia",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2193726,7 +2194203,9 @@
         "ISO_A2": "YE",
         "aliases": [],
         "capital": "Sana'a",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2197909,7 +2198388,9 @@
         "capital": "Pretoria",
         "capitalAliases": [
           "Tshwane"
-        ]
+        ],
+        "DifficultyFlag": "Facile",
+        "DifficultyCapitals": "Moyen"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2206772,7 +2207253,9 @@
         "ISO_A2": "ZM",
         "aliases": [],
         "capital": "Lusaka",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Difficile",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",
@@ -2212823,7 +2213306,9 @@
         "ISO_A2": "ZW",
         "aliases": [],
         "capital": "Harare",
-        "capitalAliases": []
+        "capitalAliases": [],
+        "DifficultyFlag": "Moyen",
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "Polygon",

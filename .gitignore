@@ -27,6 +27,7 @@ yarn-error.log*
 
 .claude
 .superpowers
+.worktrees
 
 putAllScoresToPlacementGameType.js
 archiveScoresToV1.js

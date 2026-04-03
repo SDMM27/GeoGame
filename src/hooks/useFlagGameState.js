@@ -22,7 +22,7 @@ function getAvailableDifficulties(difficulty) {
 export function getTotalFlagCountries(difficulty) {
   const available = getAvailableDifficulties(difficulty)
   return countries.features.filter(c =>
-    available.includes(c.properties.Difficulty) && c.properties.ISO_A2
+    available.includes(c.properties.DifficultyFlag) && c.properties.ISO_A2
   ).length
 }
 
@@ -55,7 +55,7 @@ export default function useFlagGameState(difficulty, isTraining) {
   const getRandomCountry = useCallback((diff) => {
     const available = getAvailableDifficulties(diff)
     const filtered = countries.features.filter(c =>
-      available.includes(c.properties.Difficulty) &&
+      available.includes(c.properties.DifficultyFlag) &&
       c.properties.ISO_A2 &&
       !alreadyChosenCountries.includes(c.properties.ADMIN)
     )
@@ -152,7 +152,7 @@ export default function useFlagGameState(difficulty, isTraining) {
       const wasSkipped = clickOnSeeCountryRef.current
       if (!wasSkipped) {
         toast.success('Bravo ! ' + props.ADMIN + ' !', { containerId: 'topRightToast' })
-        incrementScore(props.Difficulty, consecutiveErrorsRef.current)
+        incrementScore(props.DifficultyFlag, consecutiveErrorsRef.current)
       }
       setStats(prev =>
         wasSkipped

@@ -4,21 +4,25 @@ import { useLocation } from 'react-router-dom'
 import * as Flags from 'country-flag-icons/react/3x2'
 import { ToastContainer } from 'react-toastify'
 import useCapitalsGameState from '../hooks/useCapitalsGameState'
+import useAscensionState from '../hooks/useAscensionState'
+import { GAME_TYPES } from '../utils/gameTypes'
+import PhaseIndicator from '../components/PhaseIndicator'
 import Form from './form'
+import AscensionForm from './AscensionForm'
 import 'react-toastify/dist/ReactToastify.css'
 import './GamePage.css'
 import './FlagGamePage.css'
 import './CapitalsGamePage.css'
 
-export default function CapitalsGamePage() {
-  const { difficulty, isTraining } = useLocation().state || {}
+function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, state }) {
   const {
     targetCountry, score, timer, stats,
     isGameOver, displayTimer,
     inputValue, setInputValue, handleSubmit,
     revealedName,
     seeCountry, restartGame, goHome,
-  } = useCapitalsGameState(difficulty, isTraining)
+    currentPhase, phaseCountRemaining, totalPhaseCount, phaseStats,
+  } = state
 
   const inputRef = useRef(null)
 
@@ -40,8 +44,15 @@ export default function CapitalsGamePage() {
 
   return (
     <div className="capitals-game-page">
+      {isAscension && (
+        <PhaseIndicator
+          currentPhase={currentPhase}
+          phaseCountRemaining={phaseCountRemaining}
+          totalPhaseCount={totalPhaseCount}
+        />
+      )}
       {/* HUD — structure identique à FlagGamePage */}
-      <div className="hud-container">
+      <div className={`hud-container${isAscension ? ' hud-container--with-phase' : ''}`}>
         <div className="hud-main">
           <div className="hud-row">
             <div className="hud-cell">
@@ -138,7 +149,19 @@ export default function CapitalsGamePage() {
       {isGameOver && targetCountry && (
         <div className="game-over-overlay">
           <div className="game-over-content">
-            <Form finalScore={score} difficulty={difficulty} elapsedTime={timer} gameType="CAPITALS" />
+            {isAscension ? (
+              <AscensionForm
+                score={score}
+                timer={timer}
+                stats={stats}
+                phaseStats={phaseStats}
+                gameType={GAME_TYPES.CAPITALS}
+                presetName={presetName ?? null}
+                isTraining={isTraining}
+              />
+            ) : (
+              <Form finalScore={score} difficulty={difficulty} elapsedTime={timer} gameType="CAPITALS" />
+            )}
             <div className="game-over-actions">
               <button className="hud-btn hud-btn--restart" onClick={restartGame}>↺ Recommencer</button>
               <button className="hud-btn hud-btn--home" onClick={goHome}>← Accueil</button>
@@ -165,4 +188,46 @@ export default function CapitalsGamePage() {
       />
     </div>
   )
+}
+
+function StandardCapitalsGame({ difficulty, isTraining }) {
+  const state = useCapitalsGameState(difficulty, isTraining)
+  return (
+    <CapitalsGameLayout
+      difficulty={difficulty}
+      isTraining={isTraining}
+      isAscension={false}
+      presetName={null}
+      state={state}
+    />
+  )
+}
+
+function AscensionCapitalsGame({ phases, isTraining, presetName }) {
+  const state = useAscensionState(GAME_TYPES.CAPITALS, phases, isTraining, true)
+  return (
+    <CapitalsGameLayout
+      difficulty={null}
+      isTraining={isTraining}
+      isAscension
+      presetName={presetName}
+      state={state}
+    />
+  )
+}
+
+export default function CapitalsGamePage() {
+  const { difficulty, isTraining, isAscension, phases, presetName } = useLocation().state || {}
+
+  if (isAscension) {
+    return (
+      <AscensionCapitalsGame
+        phases={phases}
+        isTraining={isTraining}
+        presetName={presetName ?? null}
+      />
+    )
+  }
+
+  return <StandardCapitalsGame difficulty={difficulty} isTraining={isTraining} />
 }

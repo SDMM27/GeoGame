@@ -5,7 +5,7 @@
   flex-direction: column;
 }
 
-/* ── Main ── */
+/* Main */
 .home-main {
   flex: 1;
   display: flex;
@@ -14,7 +14,7 @@
   padding: 48px 24px;
 }
 
-/* ── Hero ── */
+/* Hero */
 .home-hero {
   text-align: center;
   margin-bottom: 48px;
@@ -37,7 +37,7 @@
   text-transform: uppercase;
 }
 
-/* ── Grid ── */
+/* Grid */
 .games-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -46,7 +46,7 @@
   max-width: 800px;
 }
 
-/* ── Cards ── */
+/* Cards */
 .game-card {
   border-radius: var(--radius-lg);
   padding: 28px;
@@ -117,7 +117,7 @@
   width: fit-content;
 }
 
-/* ── Controls ── */
+/* Controls */
 .game-card-controls {
   margin-top: 8px;
   display: flex;
@@ -264,6 +264,16 @@
   gap: 10px;
 }
 
+.border-guess-card-note {
+  padding: 12px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
 .btn-play {
   flex: 1;
   padding: 12px;
@@ -302,7 +312,7 @@
   background: var(--success-dim);
 }
 
-/* ── Navbar Scores Button ── */
+/* Navbar Scores Button */
 .nav-scores-btn {
   background: transparent;
   border: 1px solid var(--border-color);
@@ -320,17 +330,18 @@
   border-color: var(--accent-cyan-border);
 }
 
-/* ── Responsive ── */
+/* Responsive */
 @media (max-width: 600px) {
   .games-grid {
     grid-template-columns: 1fr;
   }
+
   .home-main {
     padding: 32px 16px;
   }
 }
 
-/* ── Difficulty Grid ── */
+/* Difficulty Grid */
 .difficulty-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

@@ -2,7 +2,8 @@
 .game-page {
   position: relative;
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
+  min-height: 100dvh;
   overflow: hidden;
   background: var(--bg-primary);
 }
@@ -261,4 +262,65 @@
 .game-over-actions {
   display: flex;
   gap: 12px;
+}
+
+@media (max-width: 760px) {
+  .hud-container {
+    position: static;
+    transform: none;
+    width: min(100%, calc(100vw - 24px));
+    min-width: 0;
+    margin: 12px auto 0;
+  }
+
+  .hud-container--with-phase {
+    top: auto;
+  }
+
+  .hud-main,
+  .hud-stats {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .hud-row {
+    gap: 8px;
+  }
+
+  .hud-cell {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .hud-value {
+    font-size: 1.1rem;
+  }
+
+  .hud-target-name {
+    font-size: 0.88rem;
+  }
+
+  .hud-actions {
+    position: static;
+    transform: none;
+    width: min(100%, calc(100vw - 24px));
+    margin: 0 auto 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .hud-btn {
+    flex: 1 1 30%;
+    min-width: 110px;
+    padding: 10px 12px;
+  }
+
+  .game-over-overlay {
+    padding: 16px;
+  }
+
+  .game-over-actions {
+    width: 100%;
+    flex-direction: column;
+  }
 }

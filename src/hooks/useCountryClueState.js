@@ -107,6 +107,10 @@ const COUNTRY_AREA_MAP = new Map(
   COUNTRY_CLUE_COUNTRIES.map((country) => [country.properties.ADMIN, getCountryAreaKm2(country)])
 )
 
+const COUNTRY_POPULATION_MAP = new Map(
+  COUNTRY_CLUE_COUNTRIES.map((country) => [country.properties.ADMIN, country.properties.population ?? 0])
+)
+
 const COUNTRY_LOOKUP = (() => {
   const entries = new Map()
 
@@ -157,6 +161,31 @@ function readDailyProgress(dateKey) {
   } catch {
     return null
   }
+}
+
+function getPopulationHint(guessName, targetName) {
+  const guessedPop = COUNTRY_POPULATION_MAP.get(guessName)
+  const targetPop = COUNTRY_POPULATION_MAP.get(targetName)
+
+  if (!guessedPop || !targetPop) {
+    return { label: 'Inconnue', arrow: '•', tone: 'neutral' }
+  }
+
+  const ratio = guessedPop / targetPop
+  if (ratio >= 0.85 && ratio <= 1.15) {
+    return { label: 'Pop. similaire', arrow: '≈', tone: 'match' }
+  }
+
+  return ratio < 1
+    ? { label: 'Plus peuplé', arrow: '↑', tone: 'higher' }
+    : { label: 'Moins peuplé', arrow: '↓', tone: 'lower' }
+}
+
+function formatPopulation(pop) {
+  if (!pop) return 'n/a'
+  if (pop >= 1000000) return `${(pop / 1000000).toFixed(1).replace('.', ',')} M`
+  if (pop >= 1000) return `${(pop / 1000).toFixed(0)} k`
+  return pop.toLocaleString('fr-FR')
 }
 
 function writeDailyProgress(dateKey, progress) {
@@ -307,6 +336,10 @@ function buildGuessRecord(guessInput, targetName) {
       ? { label: 'Exact', arrow: '◎', tone: 'match' }
       : getAreaHint(guessedName, targetName),
     areaLabel: formatArea(area),
+    populationHint: isCorrect
+      ? { label: 'Exact', arrow: '◎', tone: 'match' }
+      : getPopulationHint(guessedName, targetName),
+    populationLabel: formatPopulation(guessedName ? COUNTRY_POPULATION_MAP.get(guessedName) : null),
   }
 }
 
@@ -333,8 +366,8 @@ export default function useCountryClueState(mode) {
       const selectedCountry = getCountryByName(savedProgress?.targetName) ?? getDailyCountry(todayKey)
       const hydratedGuesses = Array.isArray(savedProgress?.guesses)
         ? savedProgress.guesses
-            .map((guess) => buildGuessRecord(guess, selectedCountry.properties.ADMIN))
-            .filter((guess) => guess.value)
+          .map((guess) => buildGuessRecord(guess, selectedCountry.properties.ADMIN))
+          .filter((guess) => guess.value)
         : []
 
       setDailyKey(todayKey)

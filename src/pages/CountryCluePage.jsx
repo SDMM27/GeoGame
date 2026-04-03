@@ -33,6 +33,12 @@ function GuessRow({ guess }) {
         <strong>{guess.areaHint.arrow} {guess.areaHint.label}</strong>
         <small>{guess.areaLabel}</small>
       </div>
+
+      <div className={`country-clue-metric country-clue-metric--${guess.populationHint.tone}`}>
+        <span className="country-clue-metric-label">Population</span>
+        <strong>{guess.populationHint.arrow} {guess.populationHint.label}</strong>
+        <small>{guess.populationLabel}</small>
+      </div>
     </article>
   )
 }
@@ -168,7 +174,7 @@ export default function CountryCluePage() {
               {!isComplete && (
                 <>
                   <h3>Comment lire les indices</h3>
-                  <p>Direction pointe vers le pays cible. Hémisphère indique s’il se trouve au nord ou au sud de l’équateur. Surface indique si le pays recherché est plus grand ou plus petit.</p>
+                  <p>Direction pointe vers le pays cible. Hémisphère indique la position par rapport à l'équateur. Surface et Population indiquent si le pays recherché est plus grand/petit ou plus/moins peuplé.</p>
                 </>
               )}
             </div>

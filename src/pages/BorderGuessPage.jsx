@@ -2,114 +2,21 @@
 import { useLocation } from 'react-router-dom'
 import { GeoJSON, MapContainer, useMap } from 'react-leaflet'
 import { ToastContainer } from 'react-toastify'
-import L from 'leaflet'
 import NavBar from '../components/NavBar'
 import useBorderGuessState from '../hooks/useBorderGuessState'
+import { getCountryStyle, getFocusCountry, getViewportSettings } from '../utils/borderGuessMap'
 import 'leaflet/dist/leaflet.css'
 import 'react-toastify/dist/ReactToastify.css'
 import './BorderGuessPage.css'
-
-function getPolygonArea(ring = []) {
-  let area = 0
-
-  for (let index = 0; index < ring.length; index += 1) {
-    const [x1, y1] = ring[index]
-    const [x2, y2] = ring[(index + 1) % ring.length]
-    area += x1 * y2 - x2 * y1
-  }
-
-  return Math.abs(area / 2)
-}
-
-function getFocusCountry(country) {
-  if (!country || country.geometry?.type !== 'MultiPolygon') {
-    return country
-  }
-
-  const polygons = country.geometry.coordinates
-  if (polygons.length <= 1) {
-    return country
-  }
-
-  const largestPolygon = polygons.reduce((bestPolygon, polygon) => {
-    const bestArea = getPolygonArea(bestPolygon?.[0] ?? [])
-    const currentArea = getPolygonArea(polygon?.[0] ?? [])
-    return currentArea > bestArea ? polygon : bestPolygon
-  }, polygons[0])
-
-  const fullBounds = L.geoJSON(country).getBounds()
-  const fullSpan = Math.max(
-    Math.abs(fullBounds.getNorth() - fullBounds.getSouth()),
-    Math.abs(fullBounds.getEast() - fullBounds.getWest())
-  )
-
-  const primaryFeature = {
-    ...country,
-    geometry: {
-      type: 'Polygon',
-      coordinates: largestPolygon,
-    },
-  }
-
-  const primaryBounds = L.geoJSON(primaryFeature).getBounds()
-  const primarySpan = Math.max(
-    Math.abs(primaryBounds.getNorth() - primaryBounds.getSouth()),
-    Math.abs(primaryBounds.getEast() - primaryBounds.getWest())
-  )
-
-  if (primarySpan <= 0) {
-    return country
-  }
-
-  const spreadRatio = fullSpan / primarySpan
-  return spreadRatio > 1.35 || fullSpan < 1.2 ? primaryFeature : country
-}
-
-function getCountryMetrics(country) {
-  const focusCountry = getFocusCountry(country)
-  const bounds = L.geoJSON(focusCountry).getBounds()
-  const latSpan = Math.abs(bounds.getNorth() - bounds.getSouth())
-  const lngSpan = Math.abs(bounds.getEast() - bounds.getWest())
-  const maxSpan = Math.max(latSpan, lngSpan)
-
-  return { bounds, maxSpan, focusCountry }
-}
-
-function getCountryStyle(country) {
-  const { maxSpan } = getCountryMetrics(country)
-
-  return {
-    fillColor: 'rgba(0, 212, 255, 0.16)',
-    color: '#7dd3fc',
-    fillOpacity: maxSpan < 0.35 ? 0.78 : maxSpan < 1 ? 0.68 : 0.55,
-    weight: maxSpan < 0.35 ? 5 : maxSpan < 1 ? 4 : maxSpan < 3 ? 3 : 2,
-  }
-}
 
 function FitCountryBounds({ country }) {
   const map = useMap()
 
   useEffect(() => {
     if (!country) return
-    const { bounds, maxSpan } = getCountryMetrics(country)
+    const { bounds, zoom, padding } = getViewportSettings(country)
     if (bounds.isValid()) {
-      const maxZoom =
-        maxSpan < 0.04 ? 18 :
-        maxSpan < 0.08 ? 16 :
-        maxSpan < 0.16 ? 14 :
-        maxSpan < 0.3 ? 12 :
-        maxSpan < 0.6 ? 9 :
-        maxSpan < 1.4 ? 7 :
-        5
-
-      const padding =
-        maxSpan < 0.08 ? [0, 0] :
-        maxSpan < 0.3 ? [2, 2] :
-        maxSpan < 0.6 ? [6, 6] :
-        maxSpan < 1.4 ? [12, 12] :
-        [28, 28]
-
-      map.fitBounds(bounds, { padding, maxZoom })
+      map.fitBounds(bounds, { padding, maxZoom: zoom, animate: false })
     }
   }, [country, map])
 

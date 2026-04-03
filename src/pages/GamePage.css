@@ -20,6 +20,10 @@
   min-width: 320px;
 }
 
+.hud-container--with-phase {
+  top: 64px;
+}
+
 /* ── HUD Main block ── */
 .hud-main {
   background: var(--bg-glass);

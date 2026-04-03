@@ -30,6 +30,32 @@
   margin-right: auto;
 }
 
+.scoreboard-mode-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 32px auto 0;
+  padding: 0 24px;
+}
+
+.scoreboard-mode-tab {
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.scoreboard-mode-tab--active {
+  color: var(--text-primary);
+  border-color: var(--accent-cyan-border);
+  background: rgba(0, 212, 255, 0.12);
+}
+
 .scoreboard-era-tab {
   padding: 8px 20px;
   background: var(--bg-secondary);
@@ -146,4 +172,14 @@
   color: var(--text-muted);
   font-size: 0.85rem;
   font-variant-numeric: tabular-nums;
+}
+
+.scoreboard-time--strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.scoreboard-preset {
+  color: var(--text-muted);
+  font-size: 0.82rem;
 }

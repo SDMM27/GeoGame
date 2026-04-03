@@ -6292,7 +6292,7 @@
         "capital": "Luanda",
         "capitalAliases": [],
         "DifficultyFlag": "Moyen",
-        "DifficultyCapitals": "Moyen"
+        "DifficultyCapitals": "Difficile"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1686044,13 +1686044,13 @@
       "properties": {
         "ADMIN": "Polynésie française",
         "ISO_A3": "PYF",
-        "Difficulty": "Difficile",
+        "Difficulty": "Impossible",
         "ISO_A2": "PF",
         "aliases": [],
         "capital": "Papeetē",
         "capitalAliases": [],
-        "DifficultyFlag": "Difficile",
-        "DifficultyCapitals": "Difficile"
+        "DifficultyFlag": "Impossible",
+        "DifficultyCapitals": "Impossible"
       },
       "geometry": {
         "type": "MultiPolygon",

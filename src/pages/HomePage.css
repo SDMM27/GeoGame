@@ -125,6 +125,119 @@
   gap: 10px;
 }
 
+.game-mode-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.game-mode-tab {
+  flex: 1;
+  padding: 10px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-family: var(--font-main);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.game-mode-tab--active {
+  color: var(--text-primary);
+  border-color: var(--accent-cyan-border);
+  background: rgba(0, 212, 255, 0.12);
+}
+
+.ascension-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+}
+
+.ascension-presets {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.ascension-preset {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  padding: 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  cursor: pointer;
+}
+
+.ascension-preset--active {
+  border-color: var(--accent-cyan-border);
+  background: rgba(0, 212, 255, 0.12);
+}
+
+.ascension-preset-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.ascension-preset-count {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.ascension-status {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ascension-status-label,
+.ascension-status-total {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.ascension-status-value {
+  color: var(--text-primary);
+}
+
+.ascension-slider-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ascension-slider-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.8rem;
+}
+
+.ascension-slider-name {
+  font-weight: 700;
+}
+
+.ascension-slider-value {
+  color: var(--text-muted);
+}
+
+.ascension-slider {
+  width: 100%;
+}
+
 .difficulty-select {
   width: 100%;
   padding: 10px 14px;

@@ -1,4 +1,4 @@
-// src/pages/Scoreboard.jsx
+﻿// src/pages/Scoreboard.jsx
 import React, { useEffect, useState } from 'react'
 import { collection, getDocs } from 'firebase/firestore'
 import { firestore } from '../Firebase'
@@ -7,7 +7,7 @@ import { GAME_TYPES } from '../utils/gameTypes'
 import './scoreboard.css'
 
 const DIFFICULTY_ORDER = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
-const MEDAL = ['🥇', '🥈', '🥉']
+const MEDAL = ['\uD83E\uDD47', '\uD83E\uDD48', '\uD83E\uDD49']
 const LEGACY_GAME_ID_MAP = { country: GAME_TYPES.PLACEMENT, flags: GAME_TYPES.FLAGS }
 const ACTIVE_GAMES = [
   { id: GAME_TYPES.PLACEMENT, label: 'Trouve le Pays' },
@@ -24,9 +24,9 @@ export const sortScores = (scores) =>
   })
 
 export const filterByGame = (scores, game) => {
-  if (!game || game === 'AllGames') return scores;
-  return scores.filter(s => {
-    const type = s.gameType ?? LEGACY_GAME_ID_MAP[s.gameId ?? 'country'] ?? s.gameId
+  if (!game || game === 'AllGames') return scores
+  return scores.filter((score) => {
+    const type = score.gameType ?? LEGACY_GAME_ID_MAP[score.gameId ?? 'country'] ?? score.gameId
     return type === game
   })
 }
@@ -47,18 +47,19 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT }) {
       setLoading(true)
       try {
         const collectionName = isLegacy ? 'scores_v1' : 'scores'
-        const snap = await getDocs(collection(firestore, collectionName))
-        setAllScores(snap.docs.map(d => d.data()))
+        const snapshot = await getDocs(collection(firestore, collectionName))
+        setAllScores(snapshot.docs.map((doc) => doc.data()))
       } finally {
         setLoading(false)
       }
     }
+
     fetchScores()
   }, [isLegacy])
 
   const scores = sortScores(
     filterByGame(allScores, selectedGame).filter(
-      s => selectedDifficulty === 'AllScores' || s.difficulty === selectedDifficulty
+      (score) => selectedDifficulty === 'AllScores' || score.difficulty === selectedDifficulty
     )
   )
 
@@ -85,10 +86,10 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT }) {
         <select
           className="scoreboard-select"
           value={selectedGame}
-          onChange={e => setSelectedGame(e.target.value)}
+          onChange={(event) => setSelectedGame(event.target.value)}
         >
-          {ACTIVE_GAMES.map(g => (
-            <option key={g.id} value={g.id}>{g.label}</option>
+          {ACTIVE_GAMES.map((game) => (
+            <option key={game.id} value={game.id}>{game.label}</option>
           ))}
           <option value="AllGames">Tous les jeux</option>
         </select>
@@ -96,10 +97,10 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT }) {
         <select
           className="scoreboard-select"
           value={selectedDifficulty}
-          onChange={e => setSelectedDifficulty(e.target.value)}
+          onChange={(event) => setSelectedDifficulty(event.target.value)}
         >
-          {DIFFICULTY_ORDER.map(d => (
-            <option key={d} value={d}>{d}</option>
+          {DIFFICULTY_ORDER.map((difficulty) => (
+            <option key={difficulty} value={difficulty}>{difficulty}</option>
           ))}
           <option value="AllScores">Toutes les difficultés</option>
         </select>
@@ -118,7 +119,7 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT }) {
             <span>Temps</span>
             <span>Difficulté</span>
           </div>
-          {scores.map((s, index) => (
+          {scores.map((score, index) => (
             <div
               key={index}
               className={`scoreboard-row ${index < 3 ? 'scoreboard-row--top' : ''}`}
@@ -126,12 +127,12 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT }) {
               <span className="scoreboard-rank">
                 {index < 3 ? MEDAL[index] : `#${index + 1}`}
               </span>
-              <span className="scoreboard-name">{s.name}</span>
-              <span className="scoreboard-score">{s.score} pts</span>
+              <span className="scoreboard-name">{score.name}</span>
+              <span className="scoreboard-score">{score.score} pts</span>
               <span className="scoreboard-time">
-                {s.elapsedTime != null ? formatTime(s.elapsedTime) : '—'}
+                {score.elapsedTime != null ? formatTime(score.elapsedTime) : '—'}
               </span>
-              <span className="scoreboard-difficulty">{s.difficulty}</span>
+              <span className="scoreboard-difficulty">{score.difficulty}</span>
             </div>
           ))}
         </div>

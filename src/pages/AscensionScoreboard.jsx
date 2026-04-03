@@ -1,11 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react'
+﻿import React, { useEffect, useMemo, useState } from 'react'
 import { collection, getDocs } from 'firebase/firestore'
 import { firestore } from '../Firebase'
 import { formatTime } from '../utils/formatTime'
 import { GAME_TYPES } from '../utils/gameTypes'
 import { ASCENSION_PRESETS } from '../utils/ascensionPresets'
 
-const MEDAL = ['🥇', '🥈', '🥉']
+const MEDAL = ['\uD83E\uDD47', '\uD83E\uDD48', '\uD83E\uDD49']
 const ACTIVE_GAMES = [
   { id: GAME_TYPES.PLACEMENT, label: 'Trouve le Pays' },
   { id: GAME_TYPES.FLAGS, label: 'Trouve le Drapeau' },
@@ -35,8 +35,8 @@ export default function AscensionScoreboard({ defaultGame = GAME_TYPES.PLACEMENT
     const fetchScores = async () => {
       setLoading(true)
       try {
-        const snap = await getDocs(collection(firestore, 'ascension_scores'))
-        setAllScores(snap.docs.map(d => d.data()))
+        const snapshot = await getDocs(collection(firestore, 'ascension_scores'))
+        setAllScores(snapshot.docs.map((doc) => doc.data()))
       } finally {
         setLoading(false)
       }
@@ -62,10 +62,10 @@ export default function AscensionScoreboard({ defaultGame = GAME_TYPES.PLACEMENT
         <select
           className="scoreboard-select"
           value={selectedGame}
-          onChange={e => setSelectedGame(e.target.value)}
+          onChange={(event) => setSelectedGame(event.target.value)}
         >
-          {ACTIVE_GAMES.map(g => (
-            <option key={g.id} value={g.id}>{g.label}</option>
+          {ACTIVE_GAMES.map((game) => (
+            <option key={game.id} value={game.id}>{game.label}</option>
           ))}
           <option value="AllGames">Tous les jeux</option>
         </select>
@@ -73,7 +73,7 @@ export default function AscensionScoreboard({ defaultGame = GAME_TYPES.PLACEMENT
         <select
           className="scoreboard-select"
           value={selectedPreset}
-          onChange={e => setSelectedPreset(e.target.value)}
+          onChange={(event) => setSelectedPreset(event.target.value)}
         >
           {ASCENSION_PRESETS.map((preset) => (
             <option key={preset.name} value={preset.name}>{preset.icon} {preset.name}</option>

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+﻿import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../components/NavBar";
 import { GAME_TYPES } from "../utils/gameTypes";
@@ -9,24 +9,27 @@ import { ASCENSION_PRESETS, matchPreset } from "../utils/ascensionPresets";
 import "./HomePage.css";
 
 const DIFFICULTY_COLORS = {
-  Facile:     '#4ade80',
-  Moyen:      '#00d4ff',
-  Difficile:  '#fbbf24',
-  Impossible: '#f97316',
-  Hardcore:   '#f87171',
+  Facile: "#4ade80",
+  Moyen: "#00d4ff",
+  Difficile: "#fbbf24",
+  Impossible: "#f97316",
+  Hardcore: "#f87171",
 };
 
 function getDifficultiesForGame(gameId) {
   const countFn =
-    gameId === GAME_TYPES.FLAGS     ? getTotalFlagCountries :
-    gameId === GAME_TYPES.CAPITALS  ? getTotalCapitalCountries :
-                                      getTotalCountries;
+    gameId === GAME_TYPES.FLAGS
+      ? getTotalFlagCountries
+      : gameId === GAME_TYPES.CAPITALS
+        ? getTotalCapitalCountries
+        : getTotalCountries;
+
   return [
-    { name: 'Facile',     count: countFn('Facile'),     color: DIFFICULTY_COLORS.Facile },
-    { name: 'Moyen',      count: countFn('Moyen'),      color: DIFFICULTY_COLORS.Moyen },
-    { name: 'Difficile',  count: countFn('Difficile'),  color: DIFFICULTY_COLORS.Difficile },
-    { name: 'Impossible', count: countFn('Impossible'), color: DIFFICULTY_COLORS.Impossible },
-    { name: 'Hardcore',   count: countFn('Hardcore'),   color: DIFFICULTY_COLORS.Hardcore },
+    { name: "Facile", count: countFn("Facile"), color: DIFFICULTY_COLORS.Facile },
+    { name: "Moyen", count: countFn("Moyen"), color: DIFFICULTY_COLORS.Moyen },
+    { name: "Difficile", count: countFn("Difficile"), color: DIFFICULTY_COLORS.Difficile },
+    { name: "Impossible", count: countFn("Impossible"), color: DIFFICULTY_COLORS.Impossible },
+    { name: "Hardcore", count: countFn("Hardcore"), color: DIFFICULTY_COLORS.Hardcore },
   ];
 }
 
@@ -47,7 +50,7 @@ function buildPresetPhases(name) {
 const GAMES = [
   {
     id: GAME_TYPES.PLACEMENT,
-    icon: "🌍",
+    icon: "\u{1F30D}",
     title: "Trouve le Pays",
     description: "Trouve tous les pays de la difficulté choisie.",
     route: "/game",
@@ -55,37 +58,84 @@ const GAMES = [
   },
   {
     id: GAME_TYPES.FLAGS,
-    icon: "🚩",
+    icon: "\u{1F6A9}",
     title: "Trouve le Drapeau",
-    description: "Identifie le pays à partir de son drapeau",
+    description: "Identifie le pays à partir de son drapeau.",
     route: "/flag-game",
     active: true,
   },
   {
     id: GAME_TYPES.CAPITALS,
-    icon: "🏛️",
+    icon: "\u{1F3DB}\uFE0F",
     title: "Trouve la Capitale",
-    description: "Trouve la capitale à partir du drapeau et du nom du pays",
+    description: "Trouve la capitale à partir du drapeau et du nom du pays.",
     route: "/capitals-game",
     active: true,
   },
   {
+    id: GAME_TYPES.BORDER_GUESS,
+    icon: "\u{1F9ED}",
+    title: "BorderGuess",
+    description: "Devine un pays uniquement à partir de ses frontières.",
+    route: "/border-guess",
+    active: true,
+  },
+  {
     id: "placement",
-    icon: "📍",
+    icon: "\u{1F4CD}",
     title: "Placement Pays",
-    description: "Place le pays au bon endroit sur la carte",
+    description: "Place le pays au bon endroit sur la carte.",
     route: null,
     active: false,
   },
   {
     id: "lives",
-    icon: "⚡",
+    icon: "\u26A1",
     title: "Mode Vies",
-    description: "Trouve un maximum de pays sans te tromper",
+    description: "Trouve un maximum de pays sans te tromper.",
     route: null,
     active: false,
   },
 ];
+
+function BorderGuessCard({ game }) {
+  const navigate = useNavigate();
+  const [mode, setMode] = useState("daily");
+
+  return (
+    <div className="game-card game-card--active">
+      <div className="game-card-icon">{game.icon}</div>
+      <h2 className="game-card-title">{game.title}</h2>
+      <p className="game-card-desc">{game.description}</p>
+      <div className="game-card-controls">
+        <div className="game-mode-tabs">
+          <button
+            className={`game-mode-tab${mode === "daily" ? " game-mode-tab--active" : ""}`}
+            onClick={() => setMode("daily")}
+          >
+            Journalier
+          </button>
+          <button
+            className={`game-mode-tab${mode === "infinite" ? " game-mode-tab--active" : ""}`}
+            onClick={() => setMode("infinite")}
+          >
+            Infini
+          </button>
+        </div>
+        <div className="border-guess-card-note">
+          {mode === "daily"
+            ? "Un seul pays par jour, avec progression sauvegardée localement."
+            : "Enchaîne des silhouettes sans limite, avec un nouveau pays à chaque manche."}
+        </div>
+        <div className="game-card-buttons">
+          <button className="btn-play" onClick={() => navigate(game.route, { state: { mode } })}>
+            Jouer
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function ActiveGameCard({ game }) {
   const navigate = useNavigate();
@@ -146,24 +196,24 @@ function ActiveGameCard({ game }) {
             className={`game-mode-tab${mode === "ascension" ? " game-mode-tab--active" : ""}`}
             onClick={() => setMode("ascension")}
           >
-            🚀 Ascension
+            {"\uD83D\uDE80"} Ascension
           </button>
         </div>
         {mode === "standard" ? (
-        <div className="difficulty-grid">
-          {difficulties.map(d => (
-            <button
-              key={d.name}
-              className={`difficulty-btn${d.name === 'Hardcore' ? ' difficulty-btn--wide' : ''}${difficulty === d.name ? ' difficulty-btn--active' : ''}`}
-              onClick={() => setDifficulty(d.name)}
-            >
-              <span className="difficulty-btn-name" style={{ color: d.color }}>
-                {d.name === 'Hardcore' ? '💀 Hardcore — Tous les pays' : d.name}
-              </span>
-              <span className="difficulty-btn-count">{d.count} pays</span>
-            </button>
-          ))}
-        </div>
+          <div className="difficulty-grid">
+            {difficulties.map((difficultyOption) => (
+              <button
+                key={difficultyOption.name}
+                className={`difficulty-btn${difficultyOption.name === "Hardcore" ? " difficulty-btn--wide" : ""}${difficulty === difficultyOption.name ? " difficulty-btn--active" : ""}`}
+                onClick={() => setDifficulty(difficultyOption.name)}
+              >
+                <span className="difficulty-btn-name" style={{ color: difficultyOption.color }}>
+                  {difficultyOption.name === "Hardcore" ? "\uD83D\uDC80 Hardcore - Tous les pays" : difficultyOption.name}
+                </span>
+                <span className="difficulty-btn-count">{difficultyOption.count} pays</span>
+              </button>
+            ))}
+          </div>
         ) : (
           <div className="ascension-panel">
             <div className="ascension-presets">
@@ -205,7 +255,7 @@ function ActiveGameCard({ game }) {
                     min="0"
                     max={maxCount}
                     value={ascensionPhases[difficultyName] ?? 0}
-                    onChange={(e) => handleSliderChange(difficultyName, e.target.value)}
+                    onChange={(event) => handleSliderChange(difficultyName, event.target.value)}
                   />
                 </label>
               );
@@ -216,11 +266,15 @@ function ActiveGameCard({ game }) {
           className="nav-scores-btn"
           onClick={() => navigate(`/scores?game=${game.id}${mode === "ascension" ? "&mode=ascension" : ""}`)}
         >
-          🏆 Scores
+          {"\uD83C\uDFC6"} Scores
         </button>
         <div className="game-card-buttons">
-          <button className="btn-play" onClick={() => handlePlay(false)} disabled={mode === "ascension" && totalAscensionCountries === 0}>Jouer</button>
-          <button className="btn-training" onClick={() => handlePlay(true)}>Entraînement</button>
+          <button className="btn-play" onClick={() => handlePlay(false)} disabled={mode === "ascension" && totalAscensionCountries === 0}>
+            Jouer
+          </button>
+          <button className="btn-training" onClick={() => handlePlay(true)}>
+            Entraînement
+          </button>
         </div>
       </div>
     </div>
@@ -234,11 +288,13 @@ export default function HomePage() {
       <main className="home-main">
         <div className="home-hero">
           <h1 className="home-title">Choisissez votre jeu</h1>
-          <p className="home-subtitle">Explore • Découvre • Compète</p>
+          <p className="home-subtitle">Explore - Découvre - Compète</p>
         </div>
         <div className="games-grid">
           {GAMES.map((game) =>
-            game.active ? (
+            game.active && game.id === GAME_TYPES.BORDER_GUESS ? (
+              <BorderGuessCard key={game.id} game={game} />
+            ) : game.active ? (
               <ActiveGameCard key={game.id} game={game} />
             ) : (
               <div key={game.id} className="game-card game-card--soon">

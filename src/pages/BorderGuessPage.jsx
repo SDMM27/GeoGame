@@ -1,0 +1,328 @@
+﻿import React, { useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
+import { GeoJSON, MapContainer, useMap } from 'react-leaflet'
+import { ToastContainer } from 'react-toastify'
+import L from 'leaflet'
+import NavBar from '../components/NavBar'
+import useBorderGuessState from '../hooks/useBorderGuessState'
+import 'leaflet/dist/leaflet.css'
+import 'react-toastify/dist/ReactToastify.css'
+import './BorderGuessPage.css'
+
+function getPolygonArea(ring = []) {
+  let area = 0
+
+  for (let index = 0; index < ring.length; index += 1) {
+    const [x1, y1] = ring[index]
+    const [x2, y2] = ring[(index + 1) % ring.length]
+    area += x1 * y2 - x2 * y1
+  }
+
+  return Math.abs(area / 2)
+}
+
+function getFocusCountry(country) {
+  if (!country || country.geometry?.type !== 'MultiPolygon') {
+    return country
+  }
+
+  const polygons = country.geometry.coordinates
+  if (polygons.length <= 1) {
+    return country
+  }
+
+  const largestPolygon = polygons.reduce((bestPolygon, polygon) => {
+    const bestArea = getPolygonArea(bestPolygon?.[0] ?? [])
+    const currentArea = getPolygonArea(polygon?.[0] ?? [])
+    return currentArea > bestArea ? polygon : bestPolygon
+  }, polygons[0])
+
+  const fullBounds = L.geoJSON(country).getBounds()
+  const fullSpan = Math.max(
+    Math.abs(fullBounds.getNorth() - fullBounds.getSouth()),
+    Math.abs(fullBounds.getEast() - fullBounds.getWest())
+  )
+
+  const primaryFeature = {
+    ...country,
+    geometry: {
+      type: 'Polygon',
+      coordinates: largestPolygon,
+    },
+  }
+
+  const primaryBounds = L.geoJSON(primaryFeature).getBounds()
+  const primarySpan = Math.max(
+    Math.abs(primaryBounds.getNorth() - primaryBounds.getSouth()),
+    Math.abs(primaryBounds.getEast() - primaryBounds.getWest())
+  )
+
+  if (primarySpan <= 0) {
+    return country
+  }
+
+  const spreadRatio = fullSpan / primarySpan
+  return spreadRatio > 1.35 || fullSpan < 1.2 ? primaryFeature : country
+}
+
+function getCountryMetrics(country) {
+  const focusCountry = getFocusCountry(country)
+  const bounds = L.geoJSON(focusCountry).getBounds()
+  const latSpan = Math.abs(bounds.getNorth() - bounds.getSouth())
+  const lngSpan = Math.abs(bounds.getEast() - bounds.getWest())
+  const maxSpan = Math.max(latSpan, lngSpan)
+
+  return { bounds, maxSpan, focusCountry }
+}
+
+function getCountryStyle(country) {
+  const { maxSpan } = getCountryMetrics(country)
+
+  return {
+    fillColor: 'rgba(0, 212, 255, 0.16)',
+    color: '#7dd3fc',
+    fillOpacity: maxSpan < 0.35 ? 0.78 : maxSpan < 1 ? 0.68 : 0.55,
+    weight: maxSpan < 0.35 ? 5 : maxSpan < 1 ? 4 : maxSpan < 3 ? 3 : 2,
+  }
+}
+
+function FitCountryBounds({ country }) {
+  const map = useMap()
+
+  useEffect(() => {
+    if (!country) return
+    const { bounds, maxSpan } = getCountryMetrics(country)
+    if (bounds.isValid()) {
+      const maxZoom =
+        maxSpan < 0.04 ? 18 :
+        maxSpan < 0.08 ? 16 :
+        maxSpan < 0.16 ? 14 :
+        maxSpan < 0.3 ? 12 :
+        maxSpan < 0.6 ? 9 :
+        maxSpan < 1.4 ? 7 :
+        5
+
+      const padding =
+        maxSpan < 0.08 ? [0, 0] :
+        maxSpan < 0.3 ? [2, 2] :
+        maxSpan < 0.6 ? [6, 6] :
+        maxSpan < 1.4 ? [12, 12] :
+        [28, 28]
+
+      map.fitBounds(bounds, { padding, maxZoom })
+    }
+  }, [country, map])
+
+  return null
+}
+
+function GuessHistory({ guesses }) {
+  if (guesses.length === 0) {
+    return <p className="border-guess-empty">Aucune tentative pour l'instant.</p>
+  }
+
+  return (
+    <div className="border-guess-history">
+      {guesses.map((guess, index) => (
+        <div
+          key={`${guess.value}-${index}`}
+          className={`border-guess-chip ${guess.isCorrect ? 'border-guess-chip--correct' : 'border-guess-chip--wrong'}`}
+        >
+          <div className="border-guess-chip-main">
+            <span>{guess.value}</span>
+            {!guess.isCorrect && guess.distanceKm != null && (
+              <div className="border-guess-hint">
+                {guess.direction && guess.directionArrow && (
+                  <span className="border-guess-arrow" aria-hidden="true">
+                    {guess.directionArrow}
+                  </span>
+                )}
+                <small>
+                  {guess.distanceKm.toLocaleString('fr-FR')} km
+                  {guess.direction ? ` • ${guess.direction}` : ''}
+                </small>
+              </div>
+            )}
+          </div>
+          <strong>{guess.isCorrect ? 'Trouvé' : 'Raté'}</strong>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+export default function BorderGuessPage() {
+  const location = useLocation()
+  const mode = location.state?.mode ?? 'daily'
+  const {
+    currentCountry,
+    inputValue,
+    setInputValue,
+    guesses,
+    isSolved,
+    isLost,
+    isComplete,
+    attemptsRemaining,
+    maxAttempts,
+    answerName,
+    filteredCountrySuggestions,
+    dailyKey,
+    handleSubmit,
+    startNextInfiniteRound,
+    revealCountry,
+    goHome,
+  } = useBorderGuessState(mode)
+
+  const title = mode === 'daily' ? 'BorderGuess Journalier' : 'BorderGuess Infini'
+  const subtitle =
+    mode === 'daily'
+      ? `Un seul pays par jour, partagé pour tout le monde. Puzzle du ${dailyKey ?? 'jour'}.`
+      : 'Enchaîne autant de silhouettes que tu veux, sans attendre demain.'
+  const trimmedInputValue = inputValue.trim()
+  const shouldShowSuggestions =
+    !isComplete &&
+    filteredCountrySuggestions.length > 0 &&
+    !filteredCountrySuggestions.some((countryName) => countryName === trimmedInputValue)
+
+  const onKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      handleSubmit()
+    }
+  }
+
+  const displayCountry = currentCountry ? getFocusCountry(currentCountry) : null
+
+  return (
+    <div className="border-guess-page">
+      <NavBar />
+      <main className="border-guess-main">
+        <section className="border-guess-panel border-guess-panel--hero">
+          <div>
+            <p className="border-guess-eyebrow">Nouveau jeu</p>
+            <h1>{title}</h1>
+            <p className="border-guess-subtitle">{subtitle}</p>
+          </div>
+          <div className="border-guess-stats">
+            <div className="border-guess-stat">
+              <span className="border-guess-stat-value">{guesses.length}</span>
+              <span className="border-guess-stat-label">Tentatives</span>
+            </div>
+            <div className="border-guess-stat">
+              <span className="border-guess-stat-value">{attemptsRemaining}</span>
+              <span className="border-guess-stat-label">Restantes</span>
+            </div>
+            <div className="border-guess-stat">
+              <span className="border-guess-stat-value">{maxAttempts}</span>
+              <span className="border-guess-stat-label">Maximum</span>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-guess-layout">
+          <div className="border-guess-panel border-guess-panel--map">
+            <div className="border-guess-map-frame">
+              {currentCountry && (
+                <MapContainer
+                  key={currentCountry.properties.ADMIN}
+                  className="border-guess-map"
+                  center={[20, 0]}
+                  zoom={2}
+                  zoomControl={false}
+                  attributionControl={false}
+                  dragging={false}
+                  doubleClickZoom={false}
+                  scrollWheelZoom={false}
+                  boxZoom={false}
+                  keyboard={false}
+                  touchZoom={false}
+                >
+                  <GeoJSON data={displayCountry} style={() => getCountryStyle(currentCountry)} />
+                  <FitCountryBounds country={currentCountry} />
+                </MapContainer>
+              )}
+            </div>
+            <p className="border-guess-map-caption">
+              Observe uniquement les frontières du pays, puis propose ta réponse.
+            </p>
+          </div>
+
+          <div className="border-guess-panel border-guess-panel--side">
+            <div className="border-guess-input-wrap">
+              <label htmlFor="border-guess-input" className="border-guess-label">
+                Ton pays
+              </label>
+              <div className="border-guess-input-overlay">
+                <input
+                  id="border-guess-input"
+                  className="border-guess-input"
+                  type="text"
+                  placeholder="Ex : Japon, Brésil, Maroc..."
+                  value={inputValue}
+                  onChange={(event) => setInputValue(event.target.value)}
+                  onKeyDown={onKeyDown}
+                  disabled={isComplete}
+                />
+                {shouldShowSuggestions && (
+                  <div className="border-guess-suggestions">
+                    {filteredCountrySuggestions.map((countryName) => (
+                      <button
+                        key={countryName}
+                        type="button"
+                        className="border-guess-suggestion"
+                        onClick={() => setInputValue(countryName)}
+                      >
+                        {countryName}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <button
+                className="border-guess-submit"
+                onClick={handleSubmit}
+                disabled={!inputValue.trim() || isComplete}
+              >
+                Valider
+              </button>
+            </div>
+
+            <GuessHistory guesses={guesses} />
+
+            <div className={`border-guess-result${isSolved ? ' border-guess-result--win' : isLost ? ' border-guess-result--lose' : ''}`}>
+              {isSolved && <p>Bien joué, la bonne réponse était <strong>{answerName}</strong>.</p>}
+              {isLost && (
+                <p>
+                  La bonne réponse était <strong>{answerName}</strong>.
+                  {mode === 'daily' ? ' Reviens demain pour un nouveau pays.' : ' Lance un nouveau pays pour continuer.'}
+                </p>
+              )}
+              {!isComplete && (
+                <p>
+                  Il te reste <strong>{attemptsRemaining}</strong> tentative{attemptsRemaining > 1 ? 's' : ''}.
+                </p>
+              )}
+            </div>
+
+            <div className="border-guess-actions">
+              <button className="border-guess-secondary" onClick={goHome}>
+                Retour à l'accueil
+              </button>
+              {!isComplete && (
+                <button className="border-guess-secondary border-guess-secondary--warning" onClick={revealCountry}>
+                  Révéler le pays
+                </button>
+              )}
+              {mode === 'infinite' && (
+                <button className="border-guess-primary border-guess-action-button" onClick={startNextInfiniteRound}>
+                  Nouveau pays
+                </button>
+              )}
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <ToastContainer enableMultiContainer containerId="topRightToast" position="top-right" autoClose={1800} theme="dark" hideProgressBar />
+    </div>
+  )
+}

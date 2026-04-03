@@ -275,6 +275,7 @@
 }
 
 .country-clue-result {
+  color: white;
   padding: 18px;
   border-radius: 22px;
   border: 1px solid rgba(255, 255, 255, 0.08);

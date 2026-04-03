@@ -1,5 +1,5 @@
 // src/pages/FlagGamePage.jsx
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import * as Flags from 'country-flag-icons/react/3x2'
 import { ToastContainer } from 'react-toastify'
@@ -24,6 +24,7 @@ function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state
   } = state
 
   const inputRef = useRef(null)
+  const [isInputFocused, setIsInputFocused] = useState(false)
   useEffect(() => {
     if (targetCountry && !revealedName) inputRef.current?.focus()
   }, [targetCountry, revealedName])
@@ -34,7 +35,7 @@ function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state
   const onKeyDown = (e) => { if (e.key === 'Enter') handleSubmit() }
 
   return (
-    <div className="flag-game-page">
+    <div className={`flag-game-page${isInputFocused ? ' flag-game-page--input-active' : ''}`}>
       {isAscension && (
         <PhaseIndicator
           currentPhase={currentPhase}
@@ -105,6 +106,11 @@ function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state
             value={inputValue}
             onChange={e => setInputValue(e.target.value)}
             onKeyDown={onKeyDown}
+            onFocus={() => {
+              setIsInputFocused(true)
+              window.setTimeout(() => inputRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' }), 120)
+            }}
+            onBlur={() => setIsInputFocused(false)}
             disabled={!!revealedName || isGameOver}
           />
           <button

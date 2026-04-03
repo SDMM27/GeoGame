@@ -1,5 +1,5 @@
 // src/pages/CapitalsGamePage.jsx
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import * as Flags from 'country-flag-icons/react/3x2'
 import { ToastContainer } from 'react-toastify'
@@ -25,6 +25,7 @@ function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, s
   } = state
 
   const inputRef = useRef(null)
+  const [isInputFocused, setIsInputFocused] = useState(false)
 
   // Focus input à chaque nouveau pays
   useEffect(() => {
@@ -43,7 +44,7 @@ function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, s
   }
 
   return (
-    <div className="capitals-game-page">
+    <div className={`capitals-game-page${isInputFocused ? ' capitals-game-page--input-active' : ''}`}>
       {isAscension && (
         <PhaseIndicator
           currentPhase={currentPhase}
@@ -133,6 +134,11 @@ function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, s
             value={inputValue}
             onChange={e => setInputValue(e.target.value)}
             onKeyDown={onKeyDown}
+            onFocus={() => {
+              setIsInputFocused(true)
+              window.setTimeout(() => inputRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' }), 120)
+            }}
+            onBlur={() => setIsInputFocused(false)}
             disabled={!!revealedName || isGameOver}
           />
           <button

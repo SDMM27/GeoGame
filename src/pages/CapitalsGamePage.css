@@ -3,11 +3,13 @@
   position: relative;
   width: 100%;
   min-height: 100vh;
+  min-height: 100dvh;
   background: var(--bg-primary);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
 }
 
 .capitals-game-main {
@@ -17,7 +19,7 @@
   justify-content: center;
   flex: 1;
   gap: 1.5rem;
-  padding: 2rem 1rem;
+  padding: 2rem 1rem 1.5rem;
   width: 100%;
   max-width: 600px;
 }
@@ -47,4 +49,22 @@
   opacity: 0.35;
   cursor: not-allowed;
   pointer-events: none;
+}
+
+@media (max-width: 760px) {
+  .capitals-game-main {
+    justify-content: flex-start;
+    gap: 1rem;
+    padding: 1rem 0.75rem 0.75rem;
+  }
+
+  .capitals-country-value {
+    font-size: 1.25rem;
+    text-align: center;
+  }
+
+  .capitals-game-page--input-active .hud-container,
+  .capitals-game-page--input-active .hud-actions {
+    display: none;
+  }
 }

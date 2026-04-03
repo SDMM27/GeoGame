@@ -3,11 +3,13 @@
   position: relative;
   width: 100%;
   min-height: 100vh;
+  min-height: 100dvh;
   background: var(--bg-primary);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
 }
 
 /* Reuse the same HUD classes from GamePage.css — no duplication needed */
@@ -19,7 +21,7 @@
   justify-content: center;
   flex: 1;
   gap: 2rem;
-  padding: 2rem 1rem;
+  padding: 2rem 1rem 1.5rem;
   width: 100%;
   max-width: 600px;
 }
@@ -106,4 +108,46 @@
   opacity: 0.35;
   cursor: not-allowed;
   pointer-events: none;
+}
+
+@media (max-width: 760px) {
+  .flag-game-main {
+    justify-content: flex-start;
+    gap: 1rem;
+    padding: 1rem 0.75rem 0.75rem;
+  }
+
+  .flag-display,
+  .flag-placeholder {
+    width: min(100%, 340px);
+  }
+
+  .flag-placeholder {
+    height: auto;
+    aspect-ratio: 3 / 2;
+  }
+
+  .flag-input-row {
+    position: sticky;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    padding: 0.75rem;
+    border-radius: 18px;
+    background: rgba(15, 15, 26, 0.94);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  }
+
+  .flag-game-page--input-active .hud-container,
+  .flag-game-page--input-active .hud-actions {
+    display: none;
+  }
+
+  .flag-game-page--input-active .flag-game-main {
+    padding-top: 0.75rem;
+  }
+
+  .flag-game-page--input-active .flag-display,
+  .flag-game-page--input-active .flag-placeholder {
+    max-height: 34vh;
+  }
 }

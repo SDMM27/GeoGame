@@ -81,6 +81,14 @@ const GAMES = [
     active: true,
   },
   {
+    id: GAME_TYPES.COUNTRY_CLUE,
+    icon: "\u{1F50E}",
+    title: "Country Clue",
+    description: "Retrouve le pays avec des indices de distance, direction et surface.",
+    route: "/country-clue",
+    active: true,
+  },
+  {
     id: "placement",
     icon: "\u{1F4CD}",
     title: "Placement Pays",
@@ -126,6 +134,45 @@ function BorderGuessCard({ game }) {
           {mode === "daily"
             ? "Un seul pays par jour, avec progression sauvegardée localement."
             : "Enchaîne des silhouettes sans limite, avec un nouveau pays à chaque manche."}
+        </div>
+        <div className="game-card-buttons">
+          <button className="btn-play" onClick={() => navigate(game.route, { state: { mode } })}>
+            Jouer
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CountryClueCard({ game }) {
+  const navigate = useNavigate();
+  const [mode, setMode] = useState("daily");
+
+  return (
+    <div className="game-card game-card--active">
+      <div className="game-card-icon">{game.icon}</div>
+      <h2 className="game-card-title">{game.title}</h2>
+      <p className="game-card-desc">{game.description}</p>
+      <div className="game-card-controls">
+        <div className="game-mode-tabs">
+          <button
+            className={`game-mode-tab${mode === "daily" ? " game-mode-tab--active" : ""}`}
+            onClick={() => setMode("daily")}
+          >
+            Journalier
+          </button>
+          <button
+            className={`game-mode-tab${mode === "infinite" ? " game-mode-tab--active" : ""}`}
+            onClick={() => setMode("infinite")}
+          >
+            Infini
+          </button>
+        </div>
+        <div className="border-guess-card-note">
+          {mode === "daily"
+            ? "Un pays mystère par jour avec progression mémorisée sur cet appareil."
+            : "Enchaîne des énigmes de pays sans attendre le lendemain."}
         </div>
         <div className="game-card-buttons">
           <button className="btn-play" onClick={() => navigate(game.route, { state: { mode } })}>
@@ -291,18 +338,13 @@ export default function HomePage() {
           <p className="home-subtitle">Explore - Découvre - Compète</p>
         </div>
         <div className="games-grid">
-          {GAMES.map((game) =>
-            game.active && game.id === GAME_TYPES.BORDER_GUESS ? (
+          {GAMES.filter((game) => game.active).map((game) =>
+            game.id === GAME_TYPES.BORDER_GUESS ? (
               <BorderGuessCard key={game.id} game={game} />
-            ) : game.active ? (
-              <ActiveGameCard key={game.id} game={game} />
+            ) : game.id === GAME_TYPES.COUNTRY_CLUE ? (
+              <CountryClueCard key={game.id} game={game} />
             ) : (
-              <div key={game.id} className="game-card game-card--soon">
-                <div className="game-card-icon game-card-icon--dim">{game.icon}</div>
-                <h2 className="game-card-title game-card-title--dim">{game.title}</h2>
-                <p className="game-card-desc game-card-desc--dim">{game.description}</p>
-                <span className="badge-soon">BIENTÔT</span>
-              </div>
+              <ActiveGameCard key={game.id} game={game} />
             )
           )}
         </div>

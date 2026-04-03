@@ -3,4 +3,5 @@ export const GAME_TYPES = {
     FLAGS: 'FLAGS',
     CAPITALS: 'CAPITALS',
     BORDER_GUESS: 'BORDER_GUESS',
+    COUNTRY_CLUE: 'COUNTRY_CLUE',
 };

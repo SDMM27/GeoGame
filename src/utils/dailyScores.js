@@ -7,6 +7,10 @@ export function sortDailyScores(scores) {
 
 export function isBetterDailyScore(newScore, existing) {
   if (newScore.attempts < existing.attempts) return true
-  if (newScore.attempts === existing.attempts && newScore.elapsedTime < existing.elapsedTime) return true
+  if (newScore.attempts === existing.attempts) {
+    const newTime = newScore.elapsedTime ?? Infinity
+    const existingTime = existing.elapsedTime ?? Infinity
+    return newTime < existingTime
+  }
   return false
 }

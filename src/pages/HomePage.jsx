@@ -195,7 +195,7 @@ function ActiveGameCard({ game }) {
   const detectedPreset = ASCENSION_PRESETS.find((preset) => preset.name === detectedPresetName) ?? null;
   const totalAscensionCountries = Object.values(ascensionPhases).reduce((sum, count) => sum + count, 0);
 
-  const handlePlay = (isTraining = false) => {
+  const handlePlay = (isTraining = false, difficultyOverride = null) => {
     if (mode === "ascension") {
       navigate(game.route, {
         state: {
@@ -208,7 +208,7 @@ function ActiveGameCard({ game }) {
       return;
     }
 
-    navigate(game.route, { state: { difficulty, isTraining } });
+    navigate(game.route, { state: { difficulty: difficultyOverride ?? difficulty, isTraining } });
   };
 
   const handlePresetClick = (preset) => {
@@ -253,6 +253,7 @@ function ActiveGameCard({ game }) {
                 key={difficultyOption.name}
                 className={`difficulty-btn${difficultyOption.name === "Hardcore" ? " difficulty-btn--wide" : ""}${difficulty === difficultyOption.name ? " difficulty-btn--active" : ""}`}
                 onClick={() => setDifficulty(difficultyOption.name)}
+                onDoubleClick={() => handlePlay(false, difficultyOption.name)}
               >
                 <span className="difficulty-btn-name" style={{ color: difficultyOption.color }}>
                   {difficultyOption.name === "Hardcore" ? "\uD83D\uDC80 Hardcore - Tous les pays" : difficultyOption.name}

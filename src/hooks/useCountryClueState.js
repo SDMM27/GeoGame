@@ -8,7 +8,7 @@ const DAILY_TIME_ZONE = 'Europe/Paris'
 const DAILY_STORAGE_PREFIX = 'country-clue-daily'
 const EARTH_RADIUS_KM = 6371
 
-const COUNTRY_CLUE_COUNTRIES = countries.features.filter(
+export const COUNTRY_CLUE_COUNTRIES = countries.features.filter(
   (country) => country?.properties?.ADMIN && country?.geometry?.coordinates?.length
 )
 

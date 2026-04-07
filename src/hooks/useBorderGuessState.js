@@ -26,7 +26,7 @@ const BORDER_GUESS_EXCLUDED = new Set([
   'Curaçao', 'Tonga'
 ])
 
-const BORDER_GUESS_COUNTRIES = countries.features.filter(
+export const BORDER_GUESS_COUNTRIES = countries.features.filter(
   (country) =>
     country?.properties?.ADMIN &&
     country?.geometry?.coordinates?.length &&

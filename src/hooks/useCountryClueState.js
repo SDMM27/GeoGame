@@ -345,7 +345,8 @@ function buildGuessRecord(guessInput, targetName) {
   }
 }
 
-export default function useCountryClueState(mode) {
+export default function useCountryClueState(mode, options = {}) {
+  const { overrideCountry = null } = options
   const navigate = useNavigate()
   const [currentCountry, setCurrentCountry] = useState(null)
   const [inputValue, setInputValue] = useState('')
@@ -357,12 +358,25 @@ export default function useCountryClueState(mode) {
   const [elapsedTime, setElapsedTime] = useState(null)
 
   useEffect(() => {
+    if (overrideCountry) return
     if (mode !== 'daily' && mode !== 'infinite') {
       navigate('/')
     }
-  }, [mode, navigate])
+  }, [mode, navigate, overrideCountry])
 
   useEffect(() => {
+    if (!overrideCountry) return
+    setCurrentCountry(overrideCountry)
+    setGuesses([])
+    setStatus('playing')
+    setInputValue('')
+    setHasStarted(true)
+    setStartedAt(Date.now())
+    setElapsedTime(null)
+  }, [overrideCountry])
+
+  useEffect(() => {
+    if (overrideCountry) return
     if (mode !== 'daily' && mode !== 'infinite') return
 
     if (mode === 'daily') {
@@ -401,6 +415,7 @@ export default function useCountryClueState(mode) {
   }, [mode])
 
   useEffect(() => {
+    if (overrideCountry) return  // pas de localStorage en multijoueur
     if (mode !== 'daily' || !dailyKey || !currentCountry) return
 
     writeDailyProgress(dailyKey, {

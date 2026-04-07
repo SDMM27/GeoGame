@@ -9,6 +9,8 @@ import { BORDER_GUESS_COUNTRY_COUNT } from '../../hooks/useBorderGuessState'
 import { COUNTRY_CLUE_COUNTRY_COUNT } from '../../hooks/useCountryClueState'
 import './RoomConfig.css'
 
+const DEFAULT_ASCENSION_PRESET = ASCENSION_PRESETS.find(p => p.name === 'Progressif') ?? ASCENSION_PRESETS[1]
+
 const GAME_META = {
   [GAME_TYPES.PLACEMENT]:    { label: 'Trouve le Pays',    icon: '🌍', hasMode: true },
   [GAME_TYPES.FLAGS]:        { label: 'Trouve le Drapeau', icon: '🚩', hasMode: true },
@@ -43,7 +45,7 @@ function defaultGame(type) {
     type,
     mode: 'standard',
     difficulty: 'Moyen',
-    phases: { Facile: 15, Moyen: 10, Difficile: 5, Impossible: 1 },
+    phases: { ...DEFAULT_ASCENSION_PRESET.phases },
   }
 }
 
@@ -82,7 +84,7 @@ function GameSettings({ game, onChange }) {
   }
 
   const handleSlider = (d, val) => {
-    onChange({ ...game, phases: { ...game.phases, [d]: Number(val) } })
+    onChange({ ...game, phases: { ...game.phases, [d]: Math.min(Number(val), caps[d]) } })
   }
 
   return (

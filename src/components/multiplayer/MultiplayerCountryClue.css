@@ -1,0 +1,25 @@
+.mp-country-clue { display: flex; flex-direction: column; height: calc(100vh - 56px); background: var(--bg-dark, #0f172a); color: #f1f5f9; }
+.mp-cc-header { display: flex; justify-content: space-between; padding: 0.75rem 1.5rem; background: #1e293b; border-bottom: 1px solid #334155; }
+.mp-cc-round { font-weight: 700; color: #00d4ff; }
+.mp-cc-attempts { color: #94a3b8; }
+.mp-cc-layout { display: flex; flex: 1; overflow: hidden; }
+.mp-cc-play { width: 380px; display: flex; flex-direction: column; gap: 1rem; padding: 1rem; overflow-y: auto; background: #1e293b; border-right: 1px solid #334155; }
+.mp-cc-map { flex: 1; }
+.mp-cc-label { font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+.mp-cc-input-block { display: flex; flex-direction: column; gap: 0.5rem; }
+.mp-cc-input-overlay { position: relative; }
+.mp-cc-input { width: 100%; padding: 0.6rem 0.9rem; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #f1f5f9; font-size: 1rem; box-sizing: border-box; }
+.mp-cc-suggestions { position: absolute; top: 100%; left: 0; right: 0; background: #1e293b; border: 1px solid #334155; border-radius: 0 0 8px 8px; z-index: 10; }
+.mp-cc-suggestions button { display: block; width: 100%; padding: 0.5rem 0.9rem; background: none; border: none; color: #f1f5f9; text-align: left; cursor: pointer; }
+.mp-cc-suggestions button:hover { background: #334155; }
+.mp-cc-submit { padding: 0.6rem; border-radius: 8px; background: #00d4ff; color: #0f172a; font-weight: 700; border: none; cursor: pointer; }
+.mp-cc-guess-list { display: flex; flex-direction: column; gap: 0.4rem; }
+.mp-cc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem 0.5rem; padding: 0.6rem 0.75rem; background: #0f172a; border: 1px solid #334155; border-radius: 6px; font-size: 0.85rem; }
+.mp-cc-row strong { grid-column: 1 / -1; color: #f1f5f9; }
+.mp-cc-row span { color: #94a3b8; }
+.mp-cc-row--correct { border-color: #4ade80; }
+.mp-cc-row--correct strong { color: #4ade80; }
+.mp-cc-result { padding: 1rem; border-radius: 8px; background: #0f172a; text-align: center; }
+.mp-cc-solved { color: #4ade80; font-weight: 700; font-size: 1.1rem; }
+.mp-cc-lost { color: #f87171; font-weight: 700; font-size: 1.1rem; }
+.mp-cc-capital, .mp-cc-next { color: #94a3b8; font-size: 0.85rem; margin-top: 0.4rem; }

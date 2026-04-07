@@ -17,9 +17,12 @@ export default function LobbyScreen({ room, playerId, onPseudoSet }) {
     const trimmed = pseudo.trim()
     if (!trimmed) return
     setJoining(true)
-    await joinRoom({ roomId: room.id, playerId, pseudo: trimmed })
-    onPseudoSet(trimmed)
-    setJoining(false)
+    try {
+      await joinRoom({ roomId: room.id, playerId, pseudo: trimmed })
+      onPseudoSet(trimmed)
+    } finally {
+      setJoining(false)
+    }
   }
 
   const handleLaunch = () => launchRoom(room.id)

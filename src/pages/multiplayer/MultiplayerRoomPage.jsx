@@ -52,6 +52,9 @@ export default function MultiplayerRoomPage() {
         <LobbyScreen
           room={room}
           playerId={playerId}
+          // No-op: the Firestore onSnapshot subscription automatically updates
+          // room.players when joinRoom() resolves, re-rendering LobbyScreen with
+          // the player now in the room (isInRoom becomes true).
           onPseudoSet={() => {}}
         />
       )}

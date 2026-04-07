@@ -2,6 +2,7 @@
 import {
   doc,
   setDoc,
+  getDoc,
   updateDoc,
   collection,
   serverTimestamp,
@@ -34,7 +35,11 @@ export function getOrCreatePlayerId() {
  * @param {{ hostId: string, hostPseudo: string, config: object }} params
  */
 export async function createRoom({ hostId, hostPseudo, config }) {
-  const roomId = generateRoomId()
+  let roomId = generateRoomId()
+  // Retry on collision (extremely rare at ~1 billion possible IDs)
+  while ((await getDoc(doc(firestore, 'rooms', roomId))).exists()) {
+    roomId = generateRoomId()
+  }
   const seed = Math.floor(Math.random() * 2 ** 31)
   await setDoc(doc(firestore, 'rooms', roomId), {
     hostId,

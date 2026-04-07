@@ -32,6 +32,8 @@ export default function MultiplayerRoomPage() {
     )
   }
 
+  if (!room) return null
+
   const showCountdown = room.status === 'playing' && room.startAt && !gameStarted
   const showLobby = room.status === 'lobby'
 

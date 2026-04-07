@@ -227,7 +227,7 @@ export default function BorderGuessPage() {
               <button className="border-guess-secondary" onClick={goHome}>
                 Retour à l'accueil
               </button>
-              {!isComplete && (
+              {!isComplete && (mode !== 'daily' || hasStarted) && (
                 <button className="border-guess-secondary border-guess-secondary--warning" onClick={revealCountry}>
                   Révéler le pays
                 </button>

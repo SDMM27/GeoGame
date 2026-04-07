@@ -132,7 +132,7 @@ export function getFocusCountry(country) {
 
   const spreadRatio = fullSpan / primarySpan
   const dominanceRatio = totalArea > 0 ? largestArea / totalArea : 1
-  const hasDominantMainland = dominanceRatio >= 0.72
+  const hasDominantMainland = dominanceRatio >= 0.60
   const isWidelyDispersed = spreadRatio > 1.35
   const shouldFocusPrimaryPolygon =
     hasDominantMainland &&

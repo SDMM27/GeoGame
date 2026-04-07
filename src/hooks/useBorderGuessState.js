@@ -9,8 +9,29 @@ const MAX_ATTEMPTS = 6
 const DAILY_TIME_ZONE = 'Europe/Paris'
 const DAILY_STORAGE_PREFIX = 'border-guess-daily'
 
+const BORDER_GUESS_EXCLUDED = new Set([
+  'Glacier de Siachen',
+  'Banc Serranilla',
+  'Bajo Nuevo Bank (îles Petrel)',
+  'Zone non gouvernée de Chypre',
+  'Vatican',
+  'Base navale américaine de la baie de Guantánamo',
+  'Montserrat',
+  'Monaco',
+  'Saint-Martin',
+  'Nauru',
+  'Gibraltar',
+  'Wallis-et-Futuna',
+  'Îles de la mer de Corail',
+  'Îles Cook',
+  'Curaçao', 'Tonga'
+])
+
 const BORDER_GUESS_COUNTRIES = countries.features.filter(
-  (country) => country?.properties?.ADMIN && country?.geometry?.coordinates?.length
+  (country) =>
+    country?.properties?.ADMIN &&
+    country?.geometry?.coordinates?.length &&
+    !BORDER_GUESS_EXCLUDED.has(country.properties.ADMIN)
 )
 
 function normalizeLongitudeDelta(deltaLng) {

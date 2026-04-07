@@ -17,17 +17,20 @@ function isBetter(newScore, newTimeMs, existingScore, existingTimeMs) {
 export default function AscensionForm({ score, timer, stats, phaseStats, gameType, presetName, isTraining }) {
   const nameRef = useRef()
   const [saved, setSaved] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
   const [blockedByBetter, setBlockedByBetter] = useState(null)
 
   const canSave = !isTraining && presetName !== null
 
   const handleSave = async (e) => {
     e.preventDefault()
+    if (submitting || saved) return
     const name = nameRef.current.value.trim()
     if (!name) {
       toast.error('Veuillez rentrer un pseudo', { containerId: 'topRightToast' })
       return
     }
+    setSubmitting(true)
 
     try {
       const ref = collection(firestore, 'ascension_scores')
@@ -39,6 +42,7 @@ export default function AscensionForm({ score, timer, stats, phaseStats, gameTyp
         const prev = existing.docs[0].data()
         if (!isBetter(score, timer, prev.globalScore, prev.globalTimeMs)) {
           setBlockedByBetter({ timeMs: prev.globalTimeMs, score: prev.globalScore })
+          setSubmitting(false)
           return
         }
         await deleteDoc(existing.docs[0].ref)
@@ -55,7 +59,6 @@ export default function AscensionForm({ score, timer, stats, phaseStats, gameTyp
         phaseStats,
         date: serverTimestamp(),
       })
-      toast.success('Score Ascension sauvegardé !', { containerId: 'topRightToast' })
       const wasReplaced = !existing.empty
       toast.success(
         wasReplaced ? 'Score Ascension mis à jour !' : 'Score Ascension sauvegardé !',
@@ -66,6 +69,7 @@ export default function AscensionForm({ score, timer, stats, phaseStats, gameTyp
     } catch (err) {
       toast.error('Erreur lors de la sauvegarde', { containerId: 'topRightToast' })
       console.error(err)
+      setSubmitting(false)
     }
   }
 
@@ -144,7 +148,9 @@ export default function AscensionForm({ score, timer, stats, phaseStats, gameTyp
               maxLength={20}
               onChange={() => setBlockedByBetter(null)}
             />
-            <button type="submit" className="form-submit" disabled={saved}>Sauvegarder le score</button>
+            <button type="submit" className="form-submit" disabled={saved || submitting}>
+              {submitting ? 'Sauvegarde...' : 'Sauvegarder le score'}
+            </button>
           </form>
         </>
       )}

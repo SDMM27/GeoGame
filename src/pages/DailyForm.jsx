@@ -8,17 +8,21 @@ import './DailyLeaderboard.css'
 
 export default function DailyForm({ attempts, elapsedTime, guesses, gameType, dailyKey }) {
   const nameRef = useRef()
-  const [saved, setSaved] = useState(false)
+  const savedKey = `daily-saved:${gameType}:${dailyKey}`
+  const [saved, setSaved] = useState(() => !!localStorage.getItem(savedKey))
+  const [submitting, setSubmitting] = useState(false)
   const [blockedByBetter, setBlockedByBetter] = useState(null)
   const ref = collection(firestore, 'daily_scores')
 
   const handleSave = async (e) => {
     e.preventDefault()
+    if (submitting || saved) return
     const name = nameRef.current.value.trim()
     if (!name) {
       toast.error('Veuillez rentrer un pseudo', { containerId: 'topRightToast' })
       return
     }
+    setSubmitting(true)
 
     const newScore = { name, gameType, dailyKey, attempts, elapsedTime, guesses }
 
@@ -30,6 +34,7 @@ export default function DailyForm({ attempts, elapsedTime, guesses, gameType, da
       const existing = existingSnapshot.docs[0].data()
       if (!isBetterDailyScore(newScore, existing)) {
         setBlockedByBetter({ attempts: existing.attempts, elapsedTime: existing.elapsedTime })
+        setSubmitting(false)
         return
       }
       await deleteDoc(existingSnapshot.docs[0].ref)
@@ -39,10 +44,12 @@ export default function DailyForm({ attempts, elapsedTime, guesses, gameType, da
       await addDoc(ref, newScore)
       const wasReplaced = !existingSnapshot.empty
       toast.success(wasReplaced ? 'Score mis à jour !' : `Score de ${name} sauvegardé !`, { containerId: 'topRightToast' })
+      localStorage.setItem(savedKey, '1')
       setSaved(true)
     } catch (err) {
       toast.error('Erreur lors de la sauvegarde', { containerId: 'topRightToast' })
       console.error(err)
+      setSubmitting(false)
     }
   }
 
@@ -70,8 +77,8 @@ export default function DailyForm({ attempts, elapsedTime, guesses, gameType, da
           disabled={saved}
           onChange={() => { if (blockedByBetter) setBlockedByBetter(null) }}
         />
-        <button type="submit" className="daily-form__submit" disabled={saved}>
-          {saved ? 'Score sauvegardé ✓' : 'Sauvegarder le score'}
+        <button type="submit" className="daily-form__submit" disabled={saved || submitting}>
+          {saved ? 'Score sauvegardé ✓' : submitting ? 'Sauvegarde...' : 'Sauvegarder le score'}
         </button>
       </form>
     </div>

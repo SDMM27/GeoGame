@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import NavBar from '../components/NavBar'
 import useCountryClueState from '../hooks/useCountryClueState'
+import CountryClueMap from './CountryClueMap'
 import 'react-toastify/dist/ReactToastify.css'
 import './CountryCluePage.css'
 
@@ -145,6 +146,10 @@ export default function CountryCluePage() {
                 Valider
               </button>
             </div>
+
+            {isComplete && (
+              <CountryClueMap guesses={guesses} answerName={answerName} isLost={isLost} />
+            )}
 
             <div className="country-clue-history">
               {guesses.length === 0 ? (

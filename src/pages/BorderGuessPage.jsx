@@ -69,8 +69,6 @@ export default function BorderGuessPage() {
     isSolved,
     isLost,
     isComplete,
-    attemptsRemaining,
-    maxAttempts,
     answerName,
     filteredCountrySuggestions,
     dailyKey,
@@ -113,14 +111,6 @@ export default function BorderGuessPage() {
             <div className="border-guess-stat">
               <span className="border-guess-stat-value">{guesses.length}</span>
               <span className="border-guess-stat-label">Tentatives</span>
-            </div>
-            <div className="border-guess-stat">
-              <span className="border-guess-stat-value">{attemptsRemaining}</span>
-              <span className="border-guess-stat-label">Restantes</span>
-            </div>
-            <div className="border-guess-stat">
-              <span className="border-guess-stat-value">{maxAttempts}</span>
-              <span className="border-guess-stat-label">Maximum</span>
             </div>
           </div>
         </section>
@@ -201,11 +191,6 @@ export default function BorderGuessPage() {
                 <p>
                   La bonne réponse était <strong>{answerName}</strong>.
                   {mode === 'daily' ? ' Reviens demain pour un nouveau pays.' : ' Lance un nouveau pays pour continuer.'}
-                </p>
-              )}
-              {!isComplete && (
-                <p>
-                  Il te reste <strong>{attemptsRemaining}</strong> tentative{attemptsRemaining > 1 ? 's' : ''}.
                 </p>
               )}
             </div>

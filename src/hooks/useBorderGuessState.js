@@ -5,7 +5,6 @@ import L from 'leaflet'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { checkAnswer, normalize } from '../utils/normalizeAnswer'
 
-const MAX_ATTEMPTS = 6
 const DAILY_TIME_ZONE = 'Europe/Paris'
 const DAILY_STORAGE_PREFIX = 'border-guess-daily'
 
@@ -293,7 +292,6 @@ export default function useBorderGuessState(mode) {
   const isSolved = status === 'won'
   const isLost = status === 'lost'
   const isComplete = isSolved || isLost
-  const attemptsRemaining = Math.max(0, MAX_ATTEMPTS - guesses.length)
   const answerName = currentCountry?.properties?.ADMIN ?? ''
 
   const handleSubmit = () => {
@@ -336,11 +334,6 @@ export default function useBorderGuessState(mode) {
       return
     }
 
-    if (nextGuesses.length >= MAX_ATTEMPTS) {
-      setStatus('lost')
-      toast.error(`Raté... la réponse était ${answerName}.`, { containerId: 'topRightToast' })
-      return
-    }
 
     toast.error("Ce n'est pas le bon pays.", { containerId: 'topRightToast' })
   }
@@ -373,8 +366,6 @@ export default function useBorderGuessState(mode) {
     isSolved,
     isLost,
     isComplete,
-    attemptsRemaining,
-    maxAttempts: MAX_ATTEMPTS,
     answerName,
     availableCountrySuggestions,
     filteredCountrySuggestions,

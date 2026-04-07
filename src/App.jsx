@@ -9,6 +9,7 @@ import CountryCluePage from "./pages/CountryCluePage";
 import ScoresPage from "./pages/ScoresPage";
 import MultiplayerHomePage from "./pages/multiplayer/MultiplayerHomePage";
 import MultiplayerCreatePage from "./pages/multiplayer/MultiplayerCreatePage";
+import MultiplayerRoomPage from "./pages/multiplayer/MultiplayerRoomPage";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function App() {
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="/scores" element={<ScoresPage />} />
         <Route path="/multiplayer" element={<MultiplayerHomePage />} />
         <Route path="/multiplayer/create" element={<MultiplayerCreatePage />} />
+        <Route path="/multiplayer/room/:roomId" element={<MultiplayerRoomPage />} />
       </Routes>
     </Router>
   );

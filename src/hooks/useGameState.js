@@ -35,7 +35,7 @@ export function getTotalCountries(difficulty) {
 
 let alreadyChosenCountries = []
 
-export default function useGameState(difficulty, isTraining) {
+export default function useGameState(difficulty, isTraining, overrideCountries = null) {
   const navigate = useNavigate()
 
   const [targetCountry, setTargetCountry] = useState(null)
@@ -59,8 +59,8 @@ export default function useGameState(difficulty, isTraining) {
 
   // Redirect if no difficulty
   useEffect(() => {
-    if (!difficulty) navigate('/')
-  }, [difficulty, navigate])
+    if (!difficulty && !overrideCountries) navigate('/')
+  }, [difficulty, overrideCountries, navigate])
 
   const getRandomCountry = useCallback((diff) => {
     const available = getAvailableDifficulties(diff)
@@ -88,13 +88,18 @@ export default function useGameState(difficulty, isTraining) {
     }
   }, [mapRef])
 
+  const orderedIndexRef = useRef(0)
+
   // Start game on mount
   useEffect(() => {
-    if (!difficulty) return
+    if (!difficulty && !overrideCountries) return
     alreadyChosenCountries = []
-    const total = getTotalCountries(difficulty)
+    orderedIndexRef.current = 0
+    const total = overrideCountries ? overrideCountries.length : getTotalCountries(difficulty)
     setStats({ found: 0, skipped: 0, total })
-    const firstCountry = getRandomCountry(difficulty)
+    const firstCountry = overrideCountries
+      ? overrideCountries[orderedIndexRef.current++]
+      : getRandomCountry(difficulty)
     if (firstCountry) {
       alreadyChosenCountries.push(firstCountry)
       setTargetCountry(firstCountry)
@@ -169,12 +174,14 @@ export default function useGameState(difficulty, isTraining) {
   }
 
   const changeCountry = useCallback(() => {
-    const next = getRandomCountry(difficulty)
+    const next = overrideCountries
+      ? (overrideCountries[orderedIndexRef.current++] ?? null)
+      : getRandomCountry(difficulty)
     if (next) {
       alreadyChosenCountries.push(next)
       setTargetCountry(next)
     }
-  }, [difficulty, getRandomCountry])
+  }, [difficulty, getRandomCountry, overrideCountries])
 
   const onCountryMouseOver = (event) => {
     const layer = event.target

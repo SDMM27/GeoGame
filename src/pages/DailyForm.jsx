@@ -53,7 +53,7 @@ export default function DailyForm({ attempts, elapsedTime, guesses, gameType, da
 
       {blockedByBetter && (
         <div className="daily-form__blocked">
-          <p>Ce pseudo a déjà un meilleur score pour ce puzzle : <strong>{blockedByBetter.attempts} essais — {formatTime(blockedByBetter.elapsedTime)}</strong>.</p>
+          <p>Ce pseudo a déjà un meilleur score pour ce puzzle : <strong>{blockedByBetter.attempts} essai{blockedByBetter.attempts > 1 ? 's' : ''} — {formatTime(blockedByBetter.elapsedTime)}</strong>.</p>
           <p className="daily-form__blocked-hint">Enregistrez sous un autre nom.</p>
         </div>
       )}
@@ -68,6 +68,7 @@ export default function DailyForm({ attempts, elapsedTime, guesses, gameType, da
           placeholder="Ton pseudo..."
           maxLength={20}
           disabled={saved}
+          onChange={() => { if (blockedByBetter) setBlockedByBetter(null) }}
         />
         <button type="submit" className="daily-form__submit" disabled={saved}>
           {saved ? 'Score sauvegardé ✓' : 'Sauvegarder le score'}

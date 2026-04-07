@@ -7,6 +7,7 @@ import {
   collection,
   serverTimestamp,
   Timestamp,
+  increment,
 } from 'firebase/firestore'
 import { firestore } from '../Firebase'
 
@@ -107,4 +108,17 @@ export async function markDisconnected(roomId, playerId) {
 /** Transfère le rôle de host à un autre joueur. */
 export async function transferHost(roomId, newHostId) {
   await updateDoc(doc(firestore, 'rooms', roomId), { hostId: newHostId })
+}
+
+/**
+ * Incrémente les points de plusieurs joueurs en un seul updateDoc.
+ * @param {string} roomId
+ * @param {{ playerId: string, points: number }[]} playerPoints
+ */
+export async function updateTotalPoints(roomId, playerPoints) {
+  const updates = {}
+  playerPoints.forEach(({ playerId, points }) => {
+    updates[`players.${playerId}.totalPoints`] = increment(points)
+  })
+  await updateDoc(doc(firestore, 'rooms', roomId), updates)
 }

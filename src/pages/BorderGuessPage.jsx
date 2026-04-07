@@ -30,7 +30,7 @@ function GuessHistory({ guesses }) {
 
   return (
     <div className="border-guess-history">
-      {guesses.map((guess, index) => (
+      {[...guesses].reverse().map((guess, index) => (
         <div
           key={`${guess.value}-${index}`}
           className={`border-guess-chip ${guess.isCorrect ? 'border-guess-chip--correct' : 'border-guess-chip--wrong'}`}

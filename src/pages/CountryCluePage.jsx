@@ -150,7 +150,7 @@ export default function CountryCluePage() {
               {guesses.length === 0 ? (
                 <p className="country-clue-empty">Aucune tentative pour l’instant.</p>
               ) : (
-                guesses.map((guess, index) => <GuessRow key={`${guess.value}-${index}`} guess={guess} />)
+                [...guesses].reverse().map((guess, index) => <GuessRow key={`${guess.value}-${index}`} guess={guess} />)
               )}
             </div>
           </div>

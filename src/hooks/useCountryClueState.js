@@ -99,7 +99,7 @@ function getCountryAreaKm2(country) {
   }, 0)
 }
 
-const COUNTRY_CENTER_MAP = new Map(
+export const COUNTRY_CENTER_MAP = new Map(
   COUNTRY_CLUE_COUNTRIES.map((country) => [country.properties.ADMIN, getGeographicCenter(country)])
 )
 
@@ -124,7 +124,7 @@ const COUNTRY_LOOKUP = (() => {
   return entries
 })()
 
-function getCountryByName(name) {
+export function getCountryByName(name) {
   return COUNTRY_CLUE_COUNTRIES.find((country) => country.properties.ADMIN === name) ?? null
 }
 

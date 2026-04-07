@@ -350,6 +350,9 @@ export default function useCountryClueState(mode) {
   const [guesses, setGuesses] = useState([])
   const [status, setStatus] = useState('playing')
   const [dailyKey, setDailyKey] = useState(null)
+  const [hasStarted, setHasStarted] = useState(false)
+  const [startedAt, setStartedAt] = useState(null)
+  const [elapsedTime, setElapsedTime] = useState(null)
 
   useEffect(() => {
     if (mode !== 'daily' && mode !== 'infinite') {
@@ -375,6 +378,13 @@ export default function useCountryClueState(mode) {
       setGuesses(hydratedGuesses)
       setStatus(savedProgress?.status ?? 'playing')
       setInputValue('')
+      const alreadyPlaying =
+        savedProgress?.startedAt != null ||
+        (savedProgress?.status != null && savedProgress.status !== 'playing') ||
+        (Array.isArray(savedProgress?.guesses) && savedProgress.guesses.length > 0)
+      setHasStarted(alreadyPlaying)
+      setStartedAt(savedProgress?.startedAt ?? null)
+      setElapsedTime(savedProgress?.elapsedTime ?? null)
       return
     }
 
@@ -383,6 +393,9 @@ export default function useCountryClueState(mode) {
     setGuesses([])
     setStatus('playing')
     setInputValue('')
+    setHasStarted(false)
+    setStartedAt(null)
+    setElapsedTime(null)
   }, [mode])
 
   useEffect(() => {
@@ -392,8 +405,10 @@ export default function useCountryClueState(mode) {
       targetName: currentCountry.properties.ADMIN,
       guesses,
       status,
+      startedAt,
+      elapsedTime,
     })
-  }, [currentCountry, dailyKey, guesses, mode, status])
+  }, [currentCountry, dailyKey, guesses, mode, status, startedAt, elapsedTime])
 
   const availableCountrySuggestions = useMemo(() => {
     const suggestions = new Set()
@@ -414,6 +429,13 @@ export default function useCountryClueState(mode) {
       .filter((suggestion) => normalize(suggestion).includes(normalizedInput))
       .slice(0, 8)
   }, [availableCountrySuggestions, inputValue])
+
+  const startGame = () => {
+    if (hasStarted) return
+    const now = Date.now()
+    setStartedAt(now)
+    setHasStarted(true)
+  }
 
   const isSolved = status === 'won'
   const isLost = status === 'lost'
@@ -457,6 +479,8 @@ export default function useCountryClueState(mode) {
     setInputValue('')
 
     if (isCorrect) {
+      const finalElapsed = startedAt != null ? Date.now() - startedAt : null
+      setElapsedTime(finalElapsed)
       setStatus('won')
       toast.success(`Bravo ! C'était ${answerName}.`, { containerId: 'topRightToast' })
       return
@@ -496,6 +520,9 @@ export default function useCountryClueState(mode) {
     answerCapital,
     filteredCountrySuggestions,
     dailyKey,
+    hasStarted,
+    startGame,
+    elapsedTime,
     handleSubmit,
     startNextInfiniteRound,
     revealCountry,

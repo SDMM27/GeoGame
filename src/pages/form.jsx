@@ -15,15 +15,19 @@ function isBetter(newScore, newTime, existingScore, existingTime) {
 export default function Form({ finalScore, difficulty, elapsedTime, gameType }) {
   const nameRef = useRef();
   const ref = collection(firestore, "scores");
+  const [saved, setSaved] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [blockedByBetterScore, setBlockedByBetterScore] = useState(null);
 
   const handleSave = async (e) => {
     e.preventDefault();
+    if (submitting || saved) return;
     const name = nameRef.current.value.trim();
     if (!name) {
       toast.error("Veuillez rentrer un pseudo", { containerId: "topRightToast" });
       return;
     }
+    setSubmitting(true);
 
     const data = {
       name,
@@ -46,6 +50,7 @@ export default function Form({ finalScore, difficulty, elapsedTime, gameType }) 
       const existing = existingSnapshot.docs[0].data();
       if (!isBetter(finalScore, elapsedTime, existing.score, existing.elapsedTime)) {
         setBlockedByBetterScore({ score: existing.score, elapsedTime: existing.elapsedTime });
+        setSubmitting(false);
         return;
       }
       await deleteDoc(existingSnapshot.docs[0].ref);
@@ -58,14 +63,11 @@ export default function Form({ finalScore, difficulty, elapsedTime, gameType }) 
         wasReplaced ? "Score mis à jour !" : `Score de ${name} sauvegardé !`,
         { containerId: "topRightToast" }
       );
-      const submitBtn = document.getElementById("submitBtn");
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.textContent = "Score sauvegardé ✓";
-      }
+      setSaved(true);
     } catch (err) {
       toast.error("Erreur lors de la sauvegarde", { containerId: "topRightToast" });
       console.error(err);
+      setSubmitting(false);
     }
   };
 
@@ -100,8 +102,8 @@ export default function Form({ finalScore, difficulty, elapsedTime, gameType }) 
           placeholder="Ton pseudo..."
           maxLength={20}
         />
-        <button id="submitBtn" type="submit" className="form-submit">
-          Sauvegarder le score
+        <button type="submit" className="form-submit" disabled={saved || submitting}>
+          {saved ? 'Score sauvegardé ✓' : submitting ? 'Sauvegarde...' : 'Sauvegarder le score'}
         </button>
       </form>
     </div>

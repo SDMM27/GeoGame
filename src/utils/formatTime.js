@@ -6,7 +6,6 @@ export function formatTime(ms) {
   const seconds = Math.floor(totalSeconds % 60);
   const milliseconds = Math.floor(ms % 1000);
 
-  // PadStart rajoute les 0 nécessaires : 1ms devient 001, 10ms devient 010
   const mDisplay = String(minutes).padStart(2, '0');
   const sDisplay = String(seconds).padStart(2, '0');
   const msDisplay = String(milliseconds).padStart(3, '0');

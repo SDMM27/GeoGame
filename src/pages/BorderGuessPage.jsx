@@ -5,6 +5,9 @@ import { ToastContainer } from 'react-toastify'
 import NavBar from '../components/NavBar'
 import useBorderGuessState from '../hooks/useBorderGuessState'
 import { getCountryStyle, getFocusCountry, getViewportSettings } from '../utils/borderGuessMap'
+import DailyForm from './DailyForm'
+import DailyLeaderboard from './DailyLeaderboard'
+import { GAME_TYPES } from '../utils/gameTypes'
 import 'leaflet/dist/leaflet.css'
 import 'react-toastify/dist/ReactToastify.css'
 import './BorderGuessPage.css'
@@ -76,6 +79,9 @@ export default function BorderGuessPage() {
     startNextInfiniteRound,
     revealCountry,
     goHome,
+    hasStarted,
+    startGame,
+    elapsedTime,
   } = useBorderGuessState(mode)
 
   const title = mode === 'daily' ? 'BorderGuess Journalier' : 'BorderGuess Infini'
@@ -118,7 +124,11 @@ export default function BorderGuessPage() {
         <section className="border-guess-layout">
           <div className="border-guess-panel border-guess-panel--map">
             <div className="border-guess-map-frame">
-              {currentCountry && (
+              {mode === 'daily' && !hasStarted ? (
+                <div className="daily-map-placeholder">
+                  Lance le chrono pour révéler les frontières.
+                </div>
+              ) : currentCountry ? (
                 <MapContainer
                   key={currentCountry.properties.ADMIN}
                   className="border-guess-map"
@@ -136,7 +146,7 @@ export default function BorderGuessPage() {
                   <GeoJSON data={displayCountry} style={() => getCountryStyle(currentCountry)} />
                   <FitCountryBounds country={currentCountry} />
                 </MapContainer>
-              )}
+              ) : null}
             </div>
             <p className="border-guess-map-caption">
               Observe uniquement les frontières du pays, puis propose ta réponse.
@@ -145,6 +155,11 @@ export default function BorderGuessPage() {
 
           <div className="border-guess-panel border-guess-panel--side">
             <div className="border-guess-input-wrap">
+              {mode === 'daily' && !hasStarted && !isComplete && (
+                <button className="daily-start-btn" onClick={startGame}>
+                  Démarrer le chrono
+                </button>
+              )}
               <label htmlFor="border-guess-input" className="border-guess-label">
                 Ton pays
               </label>
@@ -157,7 +172,7 @@ export default function BorderGuessPage() {
                   value={inputValue}
                   onChange={(event) => setInputValue(event.target.value)}
                   onKeyDown={onKeyDown}
-                  disabled={isComplete}
+                  disabled={isComplete || (mode === 'daily' && !hasStarted)}
                 />
                 {shouldShowSuggestions && (
                   <div className="border-guess-suggestions">
@@ -177,7 +192,7 @@ export default function BorderGuessPage() {
               <button
                 className="border-guess-submit"
                 onClick={handleSubmit}
-                disabled={!inputValue.trim() || isComplete}
+                disabled={!inputValue.trim() || isComplete || (mode === 'daily' && !hasStarted)}
               >
                 Valider
               </button>
@@ -194,6 +209,19 @@ export default function BorderGuessPage() {
                 </p>
               )}
             </div>
+
+            {isSolved && mode === 'daily' && (
+              <>
+                <DailyForm
+                  attempts={guesses.length}
+                  elapsedTime={elapsedTime}
+                  guesses={guesses.map((g) => g.value)}
+                  gameType={GAME_TYPES.BORDER_GUESS}
+                  dailyKey={dailyKey}
+                />
+                <DailyLeaderboard gameType={GAME_TYPES.BORDER_GUESS} />
+              </>
+            )}
 
             <div className="border-guess-actions">
               <button className="border-guess-secondary" onClick={goHome}>

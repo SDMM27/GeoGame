@@ -13,7 +13,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import './GamePage.css'
 import './FlagGamePage.css'
 
-function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state }) {
+function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state, onGameFinished = null }) {
   const {
     targetCountry, score, timer, stats,
     isGameOver, displayTimer,
@@ -126,7 +126,12 @@ function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state
       {isGameOver && targetCountry && (
         <div className="game-over-overlay">
           <div className="game-over-content">
-            {isAscension ? (
+            {onGameFinished ? (
+              <div className="mp-game-waiting">
+                <p style={{ color: '#4ade80', fontSize: '1.5rem' }}>✓ Terminé !</p>
+                <p style={{ color: '#94a3b8' }}>En attente des autres joueurs...</p>
+              </div>
+            ) : isAscension ? (
               <AscensionForm
                 score={score} timer={timer} stats={stats} phaseStats={phaseStats}
                 gameType={GAME_TYPES.FLAGS} presetName={presetName ?? null} isTraining={isTraining}
@@ -134,10 +139,12 @@ function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state
             ) : (
               <Form finalScore={score} difficulty={difficulty} elapsedTime={timer} gameType="FLAGS" />
             )}
-            <div className="game-over-actions">
-              <button className="hud-btn hud-btn--restart" onClick={restartGame}>↺ Recommencer</button>
-              <button className="hud-btn hud-btn--home" onClick={goHome}>← Accueil</button>
-            </div>
+            {!onGameFinished && (
+              <div className="game-over-actions">
+                <button className="hud-btn hud-btn--restart" onClick={restartGame}>↺ Recommencer</button>
+                <button className="hud-btn hud-btn--home" onClick={goHome}>← Accueil</button>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -170,6 +177,83 @@ function AscensionFlagGame({ phases, isTraining, presetName }) {
       isAscension
       presetName={presetName}
       state={state}
+    />
+  )
+}
+
+export function MultiplayerFlagsGame({ gameConfig, overrideCountries, overridesByDifficulty, onCountryFound, onGameFinished }) {
+  if (gameConfig.mode === 'ascension') {
+    return (
+      <MultiplayerAscensionFlagsGame
+        gameConfig={gameConfig}
+        overridesByDifficulty={overridesByDifficulty}
+        onCountryFound={onCountryFound}
+        onGameFinished={onGameFinished}
+      />
+    )
+  }
+  return (
+    <MultiplayerStandardFlagsGame
+      gameConfig={gameConfig}
+      overrideCountries={overrideCountries}
+      onCountryFound={onCountryFound}
+      onGameFinished={onGameFinished}
+    />
+  )
+}
+
+function MultiplayerStandardFlagsGame({ gameConfig, overrideCountries, onCountryFound, onGameFinished }) {
+  const state = useFlagGameState(gameConfig.difficulty, false, overrideCountries)
+  const prevFoundRef = useRef(0)
+
+  useEffect(() => {
+    if (state.stats.found > prevFoundRef.current) {
+      onCountryFound()
+      prevFoundRef.current = state.stats.found
+    }
+  }, [state.stats.found, onCountryFound])
+
+  useEffect(() => {
+    if (!state.isGameOver) return
+    onGameFinished({ attempts: state.stats.found + state.stats.skipped, elapsedTime: state.timer })
+  }, [state.isGameOver, onGameFinished, state.stats.found, state.stats.skipped, state.timer])
+
+  return (
+    <FlagGameLayout
+      difficulty={gameConfig.difficulty}
+      isTraining={false}
+      isAscension={false}
+      presetName={null}
+      state={state}
+      onGameFinished={onGameFinished}
+    />
+  )
+}
+
+function MultiplayerAscensionFlagsGame({ gameConfig, overridesByDifficulty, onCountryFound, onGameFinished }) {
+  const state = useAscensionState(GAME_TYPES.FLAGS, gameConfig.phases, false, true, overridesByDifficulty)
+  const prevFoundRef = useRef(0)
+
+  useEffect(() => {
+    if (state.stats.found > prevFoundRef.current) {
+      onCountryFound()
+      prevFoundRef.current = state.stats.found
+    }
+  }, [state.stats.found, onCountryFound])
+
+  useEffect(() => {
+    if (!state.isGameOver) return
+    onGameFinished({ attempts: state.stats.found + state.stats.skipped, elapsedTime: state.timer })
+  }, [state.isGameOver, onGameFinished, state.stats.found, state.stats.skipped, state.timer])
+
+  return (
+    <FlagGameLayout
+      difficulty={null}
+      isTraining={false}
+      isAscension
+      presetName={gameConfig.presetName ?? null}
+      state={state}
+      onGameFinished={onGameFinished}
     />
   )
 }

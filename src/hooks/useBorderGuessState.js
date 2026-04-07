@@ -33,6 +33,8 @@ const BORDER_GUESS_COUNTRIES = countries.features.filter(
     !BORDER_GUESS_EXCLUDED.has(country.properties.ADMIN)
 )
 
+export const BORDER_GUESS_COUNTRY_COUNT = BORDER_GUESS_COUNTRIES.length
+
 function normalizeLongitudeDelta(deltaLng) {
   let normalized = deltaLng
 

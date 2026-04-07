@@ -12,6 +12,8 @@ const COUNTRY_CLUE_COUNTRIES = countries.features.filter(
   (country) => country?.properties?.ADMIN && country?.geometry?.coordinates?.length
 )
 
+export const COUNTRY_CLUE_COUNTRY_COUNT = COUNTRY_CLUE_COUNTRIES.length
+
 function normalizeLongitudeDelta(deltaLng) {
   let normalized = deltaLng
 

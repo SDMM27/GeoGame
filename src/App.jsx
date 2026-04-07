@@ -8,6 +8,7 @@ import BorderGuessPage from "./pages/BorderGuessPage";
 import CountryCluePage from "./pages/CountryCluePage";
 import ScoresPage from "./pages/ScoresPage";
 import MultiplayerHomePage from "./pages/multiplayer/MultiplayerHomePage";
+import MultiplayerCreatePage from "./pages/multiplayer/MultiplayerCreatePage";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function App() {
@@ -22,6 +23,7 @@ export default function App() {
         <Route path="/country-clue" element={<CountryCluePage />} />
         <Route path="/scores" element={<ScoresPage />} />
         <Route path="/multiplayer" element={<MultiplayerHomePage />} />
+        <Route path="/multiplayer/create" element={<MultiplayerCreatePage />} />
       </Routes>
     </Router>
   );

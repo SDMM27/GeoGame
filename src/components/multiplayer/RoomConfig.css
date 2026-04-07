@@ -1,0 +1,34 @@
+/* src/components/multiplayer/RoomConfig.css */
+.room-config { max-width: 640px; margin: 0 auto; padding: 2rem 1rem; color: #f1f5f9; }
+.rc-title { font-size: 1.75rem; font-weight: 700; margin-bottom: 1.5rem; }
+.rc-pseudo { margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.4rem; }
+.rc-pseudo label { font-weight: 600; color: #94a3b8; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.rc-pseudo input { padding: 0.6rem 0.9rem; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #f1f5f9; font-size: 1rem; }
+.rc-games-title { font-size: 1rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem; }
+.rc-game { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem; }
+.rc-game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+.rc-game-label { font-weight: 600; font-size: 1rem; }
+.rc-game-actions { display: flex; gap: 0.4rem; }
+.rc-game-actions button { padding: 0.25rem 0.5rem; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: #94a3b8; cursor: pointer; font-size: 0.85rem; }
+.rc-game-actions button:disabled { opacity: 0.3; cursor: not-allowed; }
+.rc-mode-tabs { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
+.rc-mode-tab { padding: 0.35rem 0.75rem; border-radius: 20px; border: 1px solid #475569; background: transparent; color: #94a3b8; cursor: pointer; font-size: 0.85rem; }
+.rc-mode-tab.active { background: #00d4ff22; border-color: #00d4ff; color: #00d4ff; }
+.rc-difficulties { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.rc-diff-btn { padding: 0.4rem 0.75rem; border-radius: 8px; border: 1px solid #334155; background: #0f172a; cursor: pointer; display: flex; flex-direction: column; align-items: center; min-width: 80px; }
+.rc-diff-btn.active { border-color: currentColor; background: #ffffff11; }
+.rc-diff-count { font-size: 0.75rem; color: #64748b; }
+.rc-ascension { display: flex; flex-direction: column; gap: 0.5rem; }
+.rc-presets { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.5rem; }
+.rc-preset { padding: 0.3rem 0.6rem; border-radius: 6px; border: 1px solid #334155; background: transparent; color: #94a3b8; cursor: pointer; font-size: 0.8rem; }
+.rc-preset.active { border-color: #00d4ff; color: #00d4ff; background: #00d4ff11; }
+.rc-asc-row { display: grid; grid-template-columns: 100px 60px 1fr; align-items: center; gap: 0.5rem; font-size: 0.9rem; }
+.rc-asc-val { text-align: right; color: #64748b; font-size: 0.8rem; }
+.rc-slider-label { display: flex; flex-direction: column; gap: 0.4rem; }
+.rc-game-settings { margin-top: 0.5rem; }
+.rc-add-games { margin-top: 0.75rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.rc-add-label { font-size: 0.85rem; color: #64748b; }
+.rc-add-btn { padding: 0.35rem 0.65rem; border-radius: 8px; border: 1px dashed #475569; background: transparent; color: #94a3b8; cursor: pointer; font-size: 0.85rem; }
+.rc-add-btn:hover { border-color: #00d4ff; color: #00d4ff; }
+.rc-submit { width: 100%; padding: 0.85rem; margin-top: 1.5rem; border-radius: 10px; border: none; background: #00d4ff; color: #0f172a; font-size: 1rem; font-weight: 700; cursor: pointer; }
+.rc-submit:disabled { opacity: 0.5; cursor: not-allowed; }

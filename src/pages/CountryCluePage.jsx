@@ -4,6 +4,9 @@ import { ToastContainer } from 'react-toastify'
 import NavBar from '../components/NavBar'
 import useCountryClueState from '../hooks/useCountryClueState'
 import CountryClueMap from './CountryClueMap'
+import DailyForm from './DailyForm'
+import DailyLeaderboard from './DailyLeaderboard'
+import { GAME_TYPES } from '../utils/gameTypes'
 import 'react-toastify/dist/ReactToastify.css'
 import './CountryCluePage.css'
 
@@ -63,6 +66,9 @@ export default function CountryCluePage() {
     startNextInfiniteRound,
     revealCountry,
     goHome,
+    hasStarted,
+    startGame,
+    elapsedTime,
   } = useCountryClueState(mode)
 
   const title = mode === 'daily' ? 'Country Clue Journalier' : 'Country Clue Infini'
@@ -111,6 +117,11 @@ export default function CountryCluePage() {
             </div>
 
             <div className="country-clue-input-block">
+              {mode === 'daily' && !hasStarted && !isComplete && (
+                <button className="daily-start-btn" onClick={startGame}>
+                  Démarrer le chrono
+                </button>
+              )}
               <label htmlFor="country-clue-input">Ta proposition</label>
               <div className="country-clue-input-overlay">
                 <input
@@ -121,7 +132,7 @@ export default function CountryCluePage() {
                   value={inputValue}
                   onChange={(event) => setInputValue(event.target.value)}
                   onKeyDown={onKeyDown}
-                  disabled={isComplete}
+                  disabled={isComplete || (mode === 'daily' && !hasStarted)}
                 />
                 {shouldShowSuggestions && (
                   <div className="country-clue-suggestions">
@@ -141,7 +152,7 @@ export default function CountryCluePage() {
               <button
                 className="country-clue-submit"
                 onClick={handleSubmit}
-                disabled={!inputValue.trim() || isComplete}
+                disabled={!inputValue.trim() || isComplete || (mode === 'daily' && !hasStarted)}
               >
                 Valider
               </button>
@@ -184,11 +195,24 @@ export default function CountryCluePage() {
               )}
             </div>
 
+            {isSolved && mode === 'daily' && (
+              <>
+                <DailyForm
+                  attempts={guesses.length}
+                  elapsedTime={elapsedTime}
+                  guesses={guesses.map((g) => g.value)}
+                  gameType={GAME_TYPES.COUNTRY_CLUE}
+                  dailyKey={dailyKey}
+                />
+                <DailyLeaderboard gameType={GAME_TYPES.COUNTRY_CLUE} />
+              </>
+            )}
+
             <div className="country-clue-actions">
               <button className="country-clue-secondary" onClick={goHome}>
                 Retour à l'accueil
               </button>
-              {!isComplete && (
+              {!isComplete && (mode !== 'daily' || hasStarted) && (
                 <button className="country-clue-secondary country-clue-secondary--warning" onClick={revealCountry}>
                   Révéler le pays
                 </button>

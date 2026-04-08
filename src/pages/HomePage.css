@@ -387,3 +387,28 @@
   color: var(--text-muted);
   margin-top: 2px;
 }
+
+.home-multiplayer-banner {
+  display: flex;
+  justify-content: center;
+  margin: 0 0 2rem;
+}
+
+.home-multiplayer-btn {
+  background: linear-gradient(135deg, #1e3a5f, #1a4a7a);
+  color: #e0f0ff;
+  border: 1px solid #2563eb;
+  border-radius: 10px;
+  padding: 0.75rem 2rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+}
+
+.home-multiplayer-btn:hover {
+  background: linear-gradient(135deg, #1e4a7a, #1a5aa0);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+}

@@ -330,6 +330,7 @@ function ActiveGameCard({ game }) {
 }
 
 export default function HomePage() {
+  const navigate = useNavigate();
   return (
     <div className="home-page">
       <NavBar />
@@ -337,6 +338,11 @@ export default function HomePage() {
         <div className="home-hero">
           <h1 className="home-title">Choisissez votre jeu</h1>
           <p className="home-subtitle">Explore - Découvre - Compète</p>
+        </div>
+        <div className="home-multiplayer-banner">
+          <button className="home-multiplayer-btn" onClick={() => navigate('/multiplayer')}>
+            🎮 Jouer en multijoueur →
+          </button>
         </div>
         <div className="games-grid">
           {GAMES.filter((game) => game.active).map((game) =>

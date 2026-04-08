@@ -18,13 +18,6 @@ import MultiplayerCountryClue from './MultiplayerCountryClue'
 import LiveSidebar from './LiveSidebar'
 import './MultiplayerGame.css'
 
-/**
- * Props:
- *   room       : document Firestore room (status === 'playing')
- *   progress   : { [playerId]: progressData }
- *   playerId   : UUID du joueur local
- *   roomId     : string
- */
 export default function MultiplayerGame({ room, progress, playerId, roomId }) {
   const gameIndex = room.currentGameIndex
   const gameConfig = room.config.games[gameIndex]
@@ -63,12 +56,13 @@ export default function MultiplayerGame({ room, progress, playerId, roomId }) {
     })
   }, [roomId, playerId, gameIndex, progress])
 
-  const handleGameFinished = useCallback(({ attempts, elapsedTime }) => {
+  const handleGameFinished = useCallback(({ attempts, elapsedTime, countriesSolved }) => {
     updatePlayerProgress(roomId, playerId, {
       gameIndex,
       countriesFound: totalCountries,
       attempts,
       elapsedTime,
+      countriesSolved: countriesSolved ?? null,
       finished: true,
       lastSeen: serverTimestamp(),
     })
@@ -88,12 +82,16 @@ export default function MultiplayerGame({ room, progress, playerId, roomId }) {
     if (!allFinished) return
     transitioningRef.current = true
 
+    const isBorderGuess = gameConfig.type === GAME_TYPES.BORDER_GUESS
+    const scoringMode = isBorderGuess ? 'solved' : 'attempts'
+
     const results = activePlayers.map(pid => ({
       playerId: pid,
       attempts: progress[pid].attempts ?? 0,
       elapsedTime: progress[pid].elapsedTime ?? Infinity,
+      countriesSolved: progress[pid].countriesSolved ?? null,
     }))
-    const ranked = rankResults(results, activePlayers.length)
+    const ranked = rankResults(results, activePlayers.length, scoringMode)
 
     Promise.all(
       ranked.map(r =>
@@ -102,6 +100,7 @@ export default function MultiplayerGame({ room, progress, playerId, roomId }) {
           gameIndex,
           attempts: r.attempts,
           elapsedTime: r.elapsedTime,
+          countriesSolved: r.countriesSolved,
           rank: r.rank,
           points: r.points,
         })
@@ -136,7 +135,7 @@ export default function MultiplayerGame({ room, progress, playerId, roomId }) {
     if (type === GAME_TYPES.BORDER_GUESS)
       return <MultiplayerBorderGuess countries={seededData} {...commonProps} />
     if (type === GAME_TYPES.COUNTRY_CLUE)
-      return <MultiplayerCountryClue countries={seededData} {...commonProps} />
+      return <MultiplayerCountryClue countries={seededData} showGlobe={gameConfig.showGlobe ?? true} {...commonProps} />
     return <p>Type de jeu inconnu : {type}</p>
   }
 

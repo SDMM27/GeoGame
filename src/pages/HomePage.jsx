@@ -195,7 +195,7 @@ function ActiveGameCard({ game }) {
   const detectedPreset = ASCENSION_PRESETS.find((preset) => preset.name === detectedPresetName) ?? null;
   const totalAscensionCountries = Object.values(ascensionPhases).reduce((sum, count) => sum + count, 0);
 
-  const handlePlay = (isTraining = false) => {
+  const handlePlay = (isTraining = false, difficultyOverride = null) => {
     if (mode === "ascension") {
       navigate(game.route, {
         state: {
@@ -208,7 +208,7 @@ function ActiveGameCard({ game }) {
       return;
     }
 
-    navigate(game.route, { state: { difficulty, isTraining } });
+    navigate(game.route, { state: { difficulty: difficultyOverride ?? difficulty, isTraining } });
   };
 
   const handlePresetClick = (preset) => {
@@ -253,6 +253,7 @@ function ActiveGameCard({ game }) {
                 key={difficultyOption.name}
                 className={`difficulty-btn${difficultyOption.name === "Hardcore" ? " difficulty-btn--wide" : ""}${difficulty === difficultyOption.name ? " difficulty-btn--active" : ""}`}
                 onClick={() => setDifficulty(difficultyOption.name)}
+                onDoubleClick={() => handlePlay(false, difficultyOption.name)}
               >
                 <span className="difficulty-btn-name" style={{ color: difficultyOption.color }}>
                   {difficultyOption.name === "Hardcore" ? "\uD83D\uDC80 Hardcore - Tous les pays" : difficultyOption.name}
@@ -329,6 +330,7 @@ function ActiveGameCard({ game }) {
 }
 
 export default function HomePage() {
+  const navigate = useNavigate();
   return (
     <div className="home-page">
       <NavBar />
@@ -336,6 +338,11 @@ export default function HomePage() {
         <div className="home-hero">
           <h1 className="home-title">Choisissez votre jeu</h1>
           <p className="home-subtitle">Explore - Découvre - Compète</p>
+        </div>
+        <div className="home-multiplayer-banner">
+          <button className="home-multiplayer-btn" onClick={() => navigate('/multiplayer')}>
+            🎮 Jouer en multijoueur →
+          </button>
         </div>
         <div className="games-grid">
           {GAMES.filter((game) => game.active).map((game) =>

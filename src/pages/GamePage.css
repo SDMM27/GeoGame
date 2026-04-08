@@ -237,6 +237,12 @@
   letter-spacing: 0.5px;
 }
 
+@media (max-width: 1024px) {
+  .controls-hint {
+    display: none;
+  }
+}
+
 /* ── Game over overlay ── */
 .game-over-overlay {
   position: absolute;

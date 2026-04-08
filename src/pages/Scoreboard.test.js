@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { sortScores, filterByGame } from './Scoreboard'
+import { GAME_TYPES } from '../utils/gameTypes'
 
 const DIFFICULTY_ORDER = ["Facile", "Moyen", "Difficile", "Impossible", "Hardcore"];
 
@@ -65,18 +66,18 @@ describe('filterByGame', () => {
     expect(filterByGame(scores, 'AllGames')).toHaveLength(2)
   })
 
-  it('treats missing gameId as country', () => {
+  it('treats missing gameId as country (legacy → PLACEMENT)', () => {
     const scores = [
       { name: 'A' },
       { name: 'B', gameId: 'country' },
       { name: 'C', gameId: 'flags' },
     ]
-    expect(filterByGame(scores, 'country')).toHaveLength(2)
+    expect(filterByGame(scores, GAME_TYPES.PLACEMENT)).toHaveLength(2)
   })
 
   it('filters by gameId when specified', () => {
     const scores = [{ gameId: 'country' }, { gameId: 'flags' }, { gameId: 'country' }]
-    expect(filterByGame(scores, 'flags')).toHaveLength(1)
+    expect(filterByGame(scores, GAME_TYPES.FLAGS)).toHaveLength(1)
   })
 
   it('returns all scores when game is falsy', () => {
@@ -93,13 +94,13 @@ describe('filterByGame — flags', () => {
   ]
 
   it('filters to flags only', () => {
-    const result = filterByGame(scores, 'flags')
+    const result = filterByGame(scores, GAME_TYPES.FLAGS)
     expect(result).toHaveLength(1)
     expect(result[0].name).toBe('Bob')
   })
 
   it('country filter excludes flags', () => {
-    const result = filterByGame(scores, 'country')
+    const result = filterByGame(scores, GAME_TYPES.PLACEMENT)
     expect(result).toHaveLength(2)
     expect(result.map(s => s.name)).toContain('Alice')
     expect(result.map(s => s.name)).toContain('Carol')

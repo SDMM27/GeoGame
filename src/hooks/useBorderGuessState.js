@@ -26,12 +26,14 @@ const BORDER_GUESS_EXCLUDED = new Set([
   'Curaçao', 'Tonga'
 ])
 
-const BORDER_GUESS_COUNTRIES = countries.features.filter(
+export const BORDER_GUESS_COUNTRIES = countries.features.filter(
   (country) =>
     country?.properties?.ADMIN &&
     country?.geometry?.coordinates?.length &&
     !BORDER_GUESS_EXCLUDED.has(country.properties.ADMIN)
 )
+
+export const BORDER_GUESS_COUNTRY_COUNT = BORDER_GUESS_COUNTRIES.length
 
 function normalizeLongitudeDelta(deltaLng) {
   let normalized = deltaLng
@@ -219,7 +221,8 @@ function getDirectionArrow(direction) {
   return arrows[direction] ?? null
 }
 
-export default function useBorderGuessState(mode) {
+export default function useBorderGuessState(mode, options = {}) {
+  const { overrideCountry = null } = options
   const navigate = useNavigate()
   const [currentCountry, setCurrentCountry] = useState(null)
   const [inputValue, setInputValue] = useState('')
@@ -231,12 +234,25 @@ export default function useBorderGuessState(mode) {
   const [elapsedTime, setElapsedTime] = useState(null)
 
   useEffect(() => {
+    if (overrideCountry) return  // pas de redirect en mode multijoueur
     if (mode !== 'daily' && mode !== 'infinite') {
       navigate('/')
     }
-  }, [mode, navigate])
+  }, [mode, navigate, overrideCountry])
 
   useEffect(() => {
+    if (!overrideCountry) return
+    setCurrentCountry(overrideCountry)
+    setGuesses([])
+    setStatus('playing')
+    setInputValue('')
+    setHasStarted(true)
+    setStartedAt(Date.now())
+    setElapsedTime(null)
+  }, [overrideCountry])
+
+  useEffect(() => {
+    if (overrideCountry) return  // géré par l'effet overrideCountry
     if (mode !== 'daily' && mode !== 'infinite') return
 
     if (mode === 'daily') {
@@ -270,6 +286,7 @@ export default function useBorderGuessState(mode) {
   }, [mode])
 
   useEffect(() => {
+    if (overrideCountry) return  // pas de localStorage en multijoueur
     if (mode !== 'daily' || !dailyKey || !currentCountry) return
 
     writeDailyProgress(dailyKey, {

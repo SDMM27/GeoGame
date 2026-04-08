@@ -44,7 +44,7 @@ function getPool(difficulty, gameType, alreadyChosen) {
   )
 }
 
-export default function useAscensionState(gameType, phases, isTraining, isAscensionMode = true) {
+export default function useAscensionState(gameType, phases, isTraining, isAscensionMode = true, overridesByDifficulty = null) {
   const navigate = useNavigate()
   // Static: computed once from props — do not recompute during game
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -104,10 +104,16 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
   }, [gameType])
 
   const getRandomCountry = useCallback((difficulty) => {
+    if (overridesByDifficulty?.[difficulty]) {
+      const remaining = overridesByDifficulty[difficulty].filter(
+        c => !alreadyChosenCountries.includes(c.properties.ADMIN)
+      )
+      return remaining[0] ?? null  // ordre déterministe : prend le premier non utilisé
+    }
     const pool = getPool(difficulty, gameType, alreadyChosenCountries)
     if (!pool.length) return null
     return pool[Math.floor(Math.random() * pool.length)]
-  }, [gameType])
+  }, [gameType, overridesByDifficulty])
 
   const incrementScore = useCallback((difficulty, errorCount) => {
     const row = SCORE_TABLE[difficulty]

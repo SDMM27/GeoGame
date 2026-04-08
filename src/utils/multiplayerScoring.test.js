@@ -51,6 +51,45 @@ describe('rankResults', () => {
   })
 })
 
+describe('rankResults with scoringMode solved', () => {
+  it('ranks by countriesSolved descending', () => {
+    const results = [
+      { playerId: 'a', attempts: 10, elapsedTime: 5000, countriesSolved: 3 },
+      { playerId: 'b', attempts: 2,  elapsedTime: 3000, countriesSolved: 7 },
+    ]
+    const ranked = rankResults(results, 2, 'solved')
+    expect(ranked[0].playerId).toBe('b')
+    expect(ranked[0].rank).toBe(1)
+    expect(ranked[0].points).toBe(2)
+  })
+
+  it('breaks ties on countriesSolved by attempts ascending', () => {
+    const results = [
+      { playerId: 'a', attempts: 5, elapsedTime: 5000, countriesSolved: 4 },
+      { playerId: 'b', attempts: 2, elapsedTime: 9000, countriesSolved: 4 },
+    ]
+    const ranked = rankResults(results, 2, 'solved')
+    expect(ranked[0].playerId).toBe('b')
+  })
+
+  it('breaks ties on countriesSolved+attempts by elapsedTime ascending', () => {
+    const results = [
+      { playerId: 'a', attempts: 3, elapsedTime: 9000, countriesSolved: 4 },
+      { playerId: 'b', attempts: 3, elapsedTime: 2000, countriesSolved: 4 },
+    ]
+    const ranked = rankResults(results, 2, 'solved')
+    expect(ranked[0].playerId).toBe('b')
+  })
+
+  it('falls back to attempts mode when scoringMode is omitted', () => {
+    const results = [
+      { playerId: 'a', attempts: 1, elapsedTime: 1000 },
+      { playerId: 'b', attempts: 5, elapsedTime: 1000 },
+    ]
+    expect(rankResults(results, 2)[0].playerId).toBe('a')
+  })
+})
+
 describe('aggregatePoints', () => {
   it('sums points across games per player', () => {
     const gameResults = [

@@ -11,7 +11,7 @@ import './RoomConfig.css'
 
 const DEFAULT_ASCENSION_PRESET = ASCENSION_PRESETS.find(p => p.name === 'Progressif') ?? ASCENSION_PRESETS[1]
 
-const GAME_META = {
+export const GAME_META = {
   [GAME_TYPES.PLACEMENT]:    { label: 'Trouve le Pays',    icon: '🌍', hasMode: true },
   [GAME_TYPES.FLAGS]:        { label: 'Trouve le Drapeau', icon: '🚩', hasMode: true },
   [GAME_TYPES.CAPITALS]:     { label: 'Trouve la Capitale',icon: '🏛️', hasMode: true },
@@ -37,9 +37,12 @@ function getCaps(type) {
   return Object.fromEntries(ASCENSION_DIFFS.map(d => [d, fn(d)]))
 }
 
-function defaultGame(type) {
-  if (type === GAME_TYPES.BORDER_GUESS || type === GAME_TYPES.COUNTRY_CLUE) {
+export function defaultGame(type) {
+  if (type === GAME_TYPES.BORDER_GUESS) {
     return { type, countryCount: 10 }
+  }
+  if (type === GAME_TYPES.COUNTRY_CLUE) {
+    return { type, countryCount: 10, showGlobe: true }
   }
   return {
     type,
@@ -49,7 +52,7 @@ function defaultGame(type) {
   }
 }
 
-function GameSettings({ game, onChange }) {
+export function GameSettings({ game, onChange }) {
   const meta = GAME_META[game.type]
 
   if (!meta.hasMode) {
@@ -68,6 +71,16 @@ function GameSettings({ game, onChange }) {
             onChange={e => onChange({ ...game, countryCount: Number(e.target.value) })}
           />
         </label>
+        {game.type === GAME_TYPES.COUNTRY_CLUE && (
+          <label className="rc-checkbox-label">
+            <input
+              type="checkbox"
+              checked={game.showGlobe ?? true}
+              onChange={e => onChange({ ...game, showGlobe: e.target.checked })}
+            />
+            Afficher le globe pendant la partie
+          </label>
+        )}
       </div>
     )
   }

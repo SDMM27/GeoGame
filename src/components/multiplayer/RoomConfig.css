@@ -32,3 +32,20 @@
 .rc-add-btn:hover { border-color: #00d4ff; color: #00d4ff; }
 .rc-submit { width: 100%; padding: 0.85rem; margin-top: 1.5rem; border-radius: 10px; border: none; background: #00d4ff; color: #0f172a; font-size: 1rem; font-weight: 700; cursor: pointer; }
 .rc-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.rc-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  color: #d1d5db;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.rc-checkbox-label input[type="checkbox"] {
+  accent-color: #00d4ff;
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+}

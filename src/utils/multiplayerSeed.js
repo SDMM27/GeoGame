@@ -49,23 +49,29 @@ export function getSeededCapitalCountries(difficulty, seed, gameIndex) {
 export function getSeededAscensionOverrides(phases, gameType, seed, gameIndex) {
   const DIFFICULTY_PROP = {
     [GAME_TYPES.PLACEMENT]: 'Difficulty',
-    [GAME_TYPES.FLAGS]:     'DifficultyFlag',
-    [GAME_TYPES.CAPITALS]:  'DifficultyCapitals',
+    [GAME_TYPES.FLAGS]: 'DifficultyFlag',
+    [GAME_TYPES.CAPITALS]: 'DifficultyCapitals',
   }
   const diffProp = DIFFICULTY_PROP[gameType] ?? 'Difficulty'
   const extraFilter =
     gameType === GAME_TYPES.PLACEMENT ? () => true :
-    gameType === GAME_TYPES.CAPITALS  ? c => c.properties.ISO_A2 && c.properties.capital :
-    c => !!c.properties.ISO_A2
+      gameType === GAME_TYPES.CAPITALS ? c => c.properties.ISO_A2 && c.properties.capital :
+        c => !!c.properties.ISO_A2
 
   const result = {}
   let derivedSeed = gameSeed(seed, gameIndex)
 
-  Object.entries(phases).forEach(([difficulty, count]) => {
-    if (!count) return
+  // FIX : Ordre déterministe absolu et incontestable
+  const DIFFICULTIES_ORDER = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore'];
+
+  DIFFICULTIES_ORDER.forEach(difficulty => {
+    const count = phases[difficulty];
+    if (!count) return;
+
     const pool = countries.features.filter(c =>
       c.properties[diffProp] === difficulty && extraFilter(c)
     )
+    // La seed est maintenant mutée de façon strictement identique pour tous
     derivedSeed = ((derivedSeed * 6271 + 1009) >>> 0)
     result[difficulty] = seededShuffle(pool, derivedSeed)
   })

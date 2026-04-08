@@ -5,6 +5,8 @@ import {
   getDoc,
   updateDoc,
   collection,
+  getDocs,
+  writeBatch,
   serverTimestamp,
   Timestamp,
   increment,
@@ -121,4 +123,16 @@ export async function updateTotalPoints(roomId, playerPoints) {
     updates[`players.${playerId}.totalPoints`] = increment(points)
   })
   await updateDoc(doc(firestore, 'rooms', roomId), updates)
+}
+
+/**
+ * Supprime tous les documents de la sous-collection gameResults pour une room.
+ * Doit être appelé avant tout reset (revanche ou reconfig).
+ */
+export async function clearGameResults(roomId) {
+  const snapshot = await getDocs(collection(firestore, 'rooms', roomId, 'gameResults'))
+  if (snapshot.empty) return
+  const batch = writeBatch(firestore)
+  snapshot.docs.forEach(d => batch.delete(d.ref))
+  await batch.commit()
 }

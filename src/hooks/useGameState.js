@@ -9,9 +9,9 @@ const DIFFICULTIES = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
 
 const COUNTRY_STYLE = {
   fillColor: 'transparent',
-  color: '#334155',
+  color: '#94a3b8',
   fillOpacity: 1,
-  weight: 0.85,
+  weight: 1,
 }
 
 const SCORE_TABLE = {
@@ -210,9 +210,8 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
     layer.setStyle(COUNTRY_STYLE)
   }
 
-  const onCountryClick = (event) => {
+  const handleCountrySelected = useCallback((clickedName) => {
     if (!gameStartedRef.current) return
-    const clickedName = event.target.feature.properties.ADMIN
     const targetDiff = countries.features.find(
       c => c.properties.ADMIN === targetCountryRef.current
     )?.properties.Difficulty
@@ -242,7 +241,15 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
       toast.error('Dommage !', { containerId: 'topRightToast' })
       setConsecutiveErrors(prev => prev + 1)
     }
-  }
+  }, [changeCountry, setStyleForCountry])
+
+  const onCountryClick = useCallback((event) => {
+    handleCountrySelected(event.target.feature.properties.ADMIN)
+  }, [handleCountrySelected])
+
+  const onCountryNameClick = useCallback((name) => {
+    handleCountrySelected(name)
+  }, [handleCountrySelected])
 
   const seeCountry = () => {
     setClickOnSeeCountry(true)
@@ -313,8 +320,11 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
     mapRef,
     setMapRef,
     onCountryClick,
+    onCountryNameClick,
     onCountryMouseOver,
     onCountryMouseOut,
+    foundCountriesRef,
+    shownCountriesRef,
     seeCountry,
     restartGame,
     goHome,

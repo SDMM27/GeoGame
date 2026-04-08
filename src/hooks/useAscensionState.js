@@ -29,7 +29,7 @@ const SCORE_TABLE = {
   Impossible: [9, 7, 5],
 }
 
-const COUNTRY_STYLE = { fillColor: 'transparent', color: '#334155', fillOpacity: 1, weight: 0.85 }
+const COUNTRY_STYLE = { fillColor: 'transparent', color: '#64748b', fillOpacity: 1, weight: 0.75 }
 
 // Module-level pool avoids stale closures (same pattern as existing hooks)
 let alreadyChosenCountries = []
@@ -288,9 +288,8 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
     layer.setStyle(COUNTRY_STYLE)
   }, [])
 
-  const onCountryClick = useCallback((event) => {
+  const handleCountrySelected = useCallback((clickedName) => {
     if (!gameStartedRef.current) return
-    const clickedName = event.target.feature.properties.ADMIN
     const feat = countries.features.find(c => c.properties.ADMIN === targetCountryRef.current)
     const diff = feat?.properties.Difficulty
 
@@ -298,7 +297,6 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
       const wasSkipped = consecutiveErrorsRef.current >= 3 || clickOnSeeCountryRef.current
       if (!wasSkipped) {
         toast.success('Bravo ! ' + targetCountryRef.current + ' !', { containerId: 'topRightToast' })
-        // PLACEMENT scoring: each error reduces score (matches useGameState.js)
         incrementScore(diff, consecutiveErrorsRef.current)
       }
       setStyleForCountry(clickedName, { fillColor: '#4ade80', weight: 2, fillOpacity: 0.5 })
@@ -310,6 +308,14 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
       setConsecutiveErrors(prev => prev + 1)
     }
   }, [advanceGame, incrementScore, setStyleForCountry])
+
+  const onCountryClick = useCallback((event) => {
+    handleCountrySelected(event.target.feature.properties.ADMIN)
+  }, [handleCountrySelected])
+
+  const onCountryNameClick = useCallback((name) => {
+    handleCountrySelected(name)
+  }, [handleCountrySelected])
 
   const seeCountry = useCallback(() => {
     if (gameType !== GAME_TYPES.PLACEMENT) {
@@ -460,8 +466,11 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
     mapRef,
     setMapRef,
     onCountryClick,
+    onCountryNameClick,
     onCountryMouseOver,
     onCountryMouseOut,
+    foundCountriesRef,
+    shownCountriesRef,
     // FLAGS / CAPITALS-specific
     inputValue,
     setInputValue,

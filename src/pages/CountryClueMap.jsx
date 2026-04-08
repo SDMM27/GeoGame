@@ -4,12 +4,12 @@ import { COUNTRY_CENTER_MAP, getCountryByName } from '../hooks/useCountryClueSta
 import { getCountryMetrics } from '../utils/borderGuessMap'
 import 'leaflet/dist/leaflet.css'
 
-const SMALL_COUNTRY_THRESHOLD = 1.0
+const SMALL_COUNTRY_THRESHOLD = 1.5
 
-const STYLE_WRONG = { fillColor: '#ef4444', color: '#334155', fillOpacity: 0.5, weight: 0.85 }
-const STYLE_CORRECT = { fillColor: '#22c55e', color: '#334155', fillOpacity: 0.6, weight: 0.85 }
-const CIRCLE_WRONG = { color: '#ef4444', fillColor: '#ef4444', fillOpacity: 0.9, weight: 2, radius: 7 }
-const CIRCLE_CORRECT = { color: '#22c55e', fillColor: '#22c55e', fillOpacity: 0.9, weight: 2, radius: 9 }
+const STYLE_WRONG = { fillColor: '#ef4444', color: '#fca5a5', fillOpacity: 0.65, weight: 2 }
+const STYLE_CORRECT = { fillColor: '#22c55e', color: '#86efac', fillOpacity: 0.72, weight: 2 }
+const CIRCLE_WRONG = { color: '#fca5a5', fillColor: '#ef4444', fillOpacity: 0.95, weight: 3, radius: 11 }
+const CIRCLE_CORRECT = { color: '#86efac', fillColor: '#22c55e', fillOpacity: 0.95, weight: 3, radius: 13 }
 
 // zoom minimum pour qu'un pays de maxSpan degrés soit visible (~10px sur l'écran)
 function switchZoomForSpan(maxSpan) {
@@ -73,7 +73,8 @@ export default function CountryClueMap({ guesses, answerName, isLost }) {
         style={{ height: '100%', width: '100%' }}
       >
         <TileLayer
-          url="https://tiles.stadiamaps.com/tiles/stamen_toner_background/{z}/{x}/{y}{r}.png"
+          url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
           minZoom={2}
         />
         <ZoomTracker onZoom={setZoom} />

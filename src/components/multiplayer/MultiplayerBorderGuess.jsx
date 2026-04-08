@@ -21,6 +21,7 @@ function FitCountryBounds({ country }) {
 export default function MultiplayerBorderGuess({ countries, onCountryFound, onGameFinished }) {
   const [roundIndex, setRoundIndex] = useState(0)
   const [totalAttempts, setTotalAttempts] = useState(0)
+  const [countriesSolved, setCountriesSolved] = useState(0)
   const startTimeRef = useRef(performance.now())
   const completedRef = useRef(false)
 
@@ -28,21 +29,24 @@ export default function MultiplayerBorderGuess({ countries, onCountryFound, onGa
   const {
     inputValue, setInputValue,
     guesses, isSolved, isLost, isComplete, answerName,
-    filteredCountrySuggestions, handleSubmit,
+    filteredCountrySuggestions, handleSubmit, revealCountry,
   } = useBorderGuessState('daily', { overrideCountry: currentCountry })
 
   useEffect(() => {
     if (!isComplete || completedRef.current) return
     const roundAttempts = guesses.length
     const newTotal = totalAttempts + roundAttempts
-    onCountryFound()
+    const newSolved = isSolved ? countriesSolved + 1 : countriesSolved
+
+    if (isSolved) onCountryFound()
 
     if (roundIndex + 1 >= countries.length) {
       completedRef.current = true
       const elapsedTime = performance.now() - startTimeRef.current
-      onGameFinished({ attempts: newTotal, elapsedTime })
+      onGameFinished({ attempts: newTotal, elapsedTime, countriesSolved: newSolved })
     } else {
       setTotalAttempts(newTotal)
+      setCountriesSolved(newSolved)
       setTimeout(() => setRoundIndex(i => i + 1), 1500)
     }
   }, [isComplete]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -109,7 +113,10 @@ export default function MultiplayerBorderGuess({ countries, onCountryFound, onGa
                   </div>
                 )}
               </div>
-              <button className="mp-border-guess-submit" onClick={handleSubmit}>Proposer</button>
+              <div className="mp-border-guess-actions">
+                <button className="mp-border-guess-submit" onClick={handleSubmit}>Proposer</button>
+                <button className="mp-border-guess-reveal" onClick={revealCountry}>Révéler</button>
+              </div>
             </div>
           )}
 

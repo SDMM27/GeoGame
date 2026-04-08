@@ -7,6 +7,7 @@ import CountdownOverlay from '../../components/multiplayer/CountdownOverlay'
 import MultiplayerGame from '../../components/multiplayer/MultiplayerGame'
 import BetweenGamesScreen from '../../components/multiplayer/BetweenGamesScreen'
 import FinalLeaderboard from '../../components/multiplayer/FinalLeaderboard'
+import ReconfigureScreen from '../../components/multiplayer/ReconfigureScreen'
 import useMultiplayerRoom from '../../hooks/useMultiplayerRoom'
 import { getOrCreatePlayerId } from '../../utils/multiplayerRoom'
 import './MultiplayerRoomPage.css'
@@ -17,11 +18,10 @@ export default function MultiplayerRoomPage() {
   const [gameStarted, setGameStarted] = useState(false)
   const { room, progress, gameResults, loading, error } = useMultiplayerRoom(roomId)
 
-  // Réinitialiser gameStarted quand un nouveau jeu démarre (nouveau gameIndex)
   const [lastGameIndex, setLastGameIndex] = useState(null)
   if (room && room.status === 'playing' && room.currentGameIndex !== lastGameIndex) {
     setLastGameIndex(room.currentGameIndex)
-    if (lastGameIndex !== null) setGameStarted(false)  // nouveau jeu → remettre le countdown
+    if (lastGameIndex !== null) setGameStarted(false)
   }
 
   if (loading) {
@@ -44,70 +44,53 @@ export default function MultiplayerRoomPage() {
 
   if (!room) return null
 
-  // ── Lobby ────────────────────────────────────────────────────
   if (room.status === 'lobby') {
     return (
       <div className="mp-room">
         <NavBar />
-        <LobbyScreen
-          room={room}
-          playerId={playerId}
-          onPseudoSet={() => {}}
-        />
+        <LobbyScreen room={room} playerId={playerId} onPseudoSet={() => {}} />
       </div>
     )
   }
 
-  // ── Jeu en cours ─────────────────────────────────────────────
   if (room.status === 'playing') {
     const showCountdown = room.startAt && !gameStarted
     return (
       <div className="mp-room mp-room--playing">
         <NavBar />
         {showCountdown && (
-          <CountdownOverlay
-            startAt={room.startAt}
-            onStart={() => setGameStarted(true)}
-          />
+          <CountdownOverlay startAt={room.startAt} onStart={() => setGameStarted(true)} />
         )}
         {gameStarted && (
-          <MultiplayerGame
-            room={room}
-            progress={progress}
-            playerId={playerId}
-            roomId={roomId}
-          />
+          <MultiplayerGame room={room} progress={progress} playerId={playerId} roomId={roomId} />
         )}
       </div>
     )
   }
 
-  // ── Entre deux jeux ──────────────────────────────────────────
   if (room.status === 'between_games') {
     return (
       <div className="mp-room">
         <NavBar />
-        <BetweenGamesScreen
-          room={room}
-          gameResults={gameResults}
-          playerId={playerId}
-          roomId={roomId}
-        />
+        <BetweenGamesScreen room={room} gameResults={gameResults} playerId={playerId} roomId={roomId} />
       </div>
     )
   }
 
-  // ── Classement final ─────────────────────────────────────────
   if (room.status === 'finished') {
     return (
       <div className="mp-room">
         <NavBar />
-        <FinalLeaderboard
-          room={room}
-          gameResults={gameResults}
-          playerId={playerId}
-          roomId={roomId}
-        />
+        <FinalLeaderboard room={room} gameResults={gameResults} playerId={playerId} roomId={roomId} />
+      </div>
+    )
+  }
+
+  if (room.status === 'reconfiguring') {
+    return (
+      <div className="mp-room">
+        <NavBar />
+        <ReconfigureScreen room={room} playerId={playerId} roomId={roomId} />
       </div>
     )
   }

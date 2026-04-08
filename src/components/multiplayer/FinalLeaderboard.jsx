@@ -1,5 +1,5 @@
 // src/components/multiplayer/FinalLeaderboard.jsx
-import React from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { doc, updateDoc } from 'firebase/firestore'
 import { firestore } from '../../Firebase'
@@ -9,6 +9,7 @@ import './FinalLeaderboard.css'
 export default function FinalLeaderboard({ room, gameResults, playerId, roomId }) {
   const navigate = useNavigate()
   const isHost = room.hostId === playerId
+  const [rematchSubmitting, setRematchSubmitting] = useState(false)
 
   const sortedPlayers = Object.entries(room.players)
     .filter(([, p]) => !p.disconnected)
@@ -24,20 +25,25 @@ export default function FinalLeaderboard({ room, gameResults, playerId, roomId }
   })
 
   const handleRematch = async () => {
-    if (!isHost) return
-    const newSeed = Math.floor(Math.random() * 2 ** 31)
-    const playerUpdates = {}
-    Object.keys(room.players).forEach(pid => {
-      playerUpdates[`players.${pid}.totalPoints`] = 0
-    })
-    await clearGameResults(roomId)
-    await updateDoc(doc(firestore, 'rooms', roomId), {
-      ...playerUpdates,
-      status: 'lobby',
-      currentGameIndex: 0,
-      seed: newSeed,
-      startAt: null,
-    })
+    if (!isHost || rematchSubmitting) return
+    setRematchSubmitting(true)
+    try {
+      const newSeed = Math.floor(Math.random() * 2 ** 31)
+      const playerUpdates = {}
+      Object.keys(room.players).forEach(pid => {
+        playerUpdates[`players.${pid}.totalPoints`] = 0
+      })
+      await clearGameResults(roomId)
+      await updateDoc(doc(firestore, 'rooms', roomId), {
+        ...playerUpdates,
+        status: 'lobby',
+        currentGameIndex: 0,
+        seed: newSeed,
+        startAt: null,
+      })
+    } finally {
+      setRematchSubmitting(false)
+    }
   }
 
   const handleReconfigure = async () => {
@@ -95,7 +101,7 @@ export default function FinalLeaderboard({ room, gameResults, playerId, roomId }
 
       {isHost ? (
         <div className="final-lb-actions">
-          <button className="final-lb-btn final-lb-btn--rematch" onClick={handleRematch}>
+          <button className="final-lb-btn final-lb-btn--rematch" onClick={handleRematch} disabled={rematchSubmitting}>
             🔄 Revanche
           </button>
           <button className="final-lb-btn final-lb-btn--reconfig" onClick={handleReconfigure}>

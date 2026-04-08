@@ -76,7 +76,7 @@ export default function ReconfigureScreen({ room, playerId, roomId }) {
         {games.map((game, i) => {
           const meta = GAME_META[game.type]
           return (
-            <div key={game.type} className="rc-game">
+            <div key={i} className="rc-game">
               <div className="rc-game-header">
                 <span className="rc-game-label">{meta.icon} {meta.label}</span>
                 <div className="rc-game-actions">

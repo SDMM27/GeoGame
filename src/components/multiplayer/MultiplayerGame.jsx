@@ -88,7 +88,7 @@ export default function MultiplayerGame({ room, progress, playerId, roomId }) {
     const results = activePlayers.map(pid => ({
       playerId: pid,
       attempts: progress[pid].attempts ?? 0,
-      elapsedTime: progress[pid].elapsedTime ?? Infinity,
+      elapsedTime: progress[pid].elapsedTime ?? null,
       countriesSolved: progress[pid].countriesSolved ?? null,
     }))
     const ranked = rankResults(results, activePlayers.length, scoringMode)

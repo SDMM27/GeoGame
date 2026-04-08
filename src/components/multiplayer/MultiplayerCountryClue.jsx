@@ -6,7 +6,7 @@ import CountryClueMap from '../../pages/CountryClueMap'
 import 'react-toastify/dist/ReactToastify.css'
 import './MultiplayerCountryClue.css'
 
-export default function MultiplayerCountryClue({ countries, onCountryFound, onGameFinished }) {
+export default function MultiplayerCountryClue({ countries, showGlobe = true, onCountryFound, onGameFinished }) {
   const [roundIndex, setRoundIndex] = useState(0)
   const [totalAttempts, setTotalAttempts] = useState(0)
   const startTimeRef = useRef(performance.now())
@@ -86,21 +86,27 @@ export default function MultiplayerCountryClue({ countries, onCountryFound, onGa
           <div className="mp-cc-guess-list">
             {[...guesses].reverse().map((guess, i) => (
               <article key={i} className={`mp-cc-row ${guess.isCorrect ? 'mp-cc-row--correct' : ''}`}>
-                <strong>{guess.value}</strong>
-                <span>{guess.directionArrow} {guess.distanceKm?.toLocaleString('fr-FR')} km</span>
-                <span>{guess.hemisphereHint.arrow} {guess.hemisphereHint.label}</span>
-                <span>{guess.areaHint.arrow} {guess.areaHint.label}</span>
-                <span>{guess.populationHint.arrow} {guess.populationHint.label}</span>
+                <strong className="mp-cc-col-name">{guess.value}</strong>
+                <span className="mp-cc-col">{guess.directionArrow} {guess.distanceKm?.toLocaleString('fr-FR')} km</span>
+                <span className="mp-cc-col">{guess.hemisphereHint.arrow} {guess.hemisphereHint.label}</span>
+                <span className="mp-cc-col">
+                  {guess.areaHint.arrow} {guess.areaLabel}
+                </span>
+                <span className="mp-cc-col">
+                  {guess.populationHint.arrow} {guess.populationLabel}
+                </span>
               </article>
             ))}
           </div>
         </div>
 
-        <div className="mp-cc-map">
-          {currentCountry && (
-            <CountryClueMap key={currentCountry.properties.ADMIN} targetCountry={currentCountry} guesses={guesses} />
-          )}
-        </div>
+        {showGlobe && (
+          <div className="mp-cc-map">
+            {currentCountry && (
+              <CountryClueMap key={currentCountry.properties.ADMIN} targetCountry={currentCountry} guesses={guesses} />
+            )}
+          </div>
+        )}
       </div>
 
       <ToastContainer enableMultiContainer containerId="topRightToast" position="top-right" autoClose={1500} theme="dark" hideProgressBar />

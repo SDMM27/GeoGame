@@ -100,7 +100,7 @@ function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, s
         <button className="hud-btn hud-btn--see" onClick={seeCountry} disabled={!!revealedName}>
           👁 Voir
         </button>
-        <button className="hud-btn hud-btn--restart" onClick={restartGame}>↺ Recommencer</button>
+        {!onGameFinished && <button className="hud-btn hud-btn--restart" onClick={restartGame}>↺ Recommencer</button>}
       </div>
 
       {/* Contenu principal */}

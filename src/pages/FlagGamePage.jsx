@@ -88,7 +88,7 @@ function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state
       <div className="hud-actions">
         <button className="hud-btn hud-btn--home" onClick={goHome}>← Accueil</button>
         <button className="hud-btn hud-btn--see" onClick={seeCountry} disabled={!!revealedName}>👁 Voir</button>
-        <button className="hud-btn hud-btn--restart" onClick={restartGame}>↺ Recommencer</button>
+        {!onGameFinished && <button className="hud-btn hud-btn--restart" onClick={restartGame}>↺ Recommencer</button>}
       </div>
 
       <div className="flag-game-main">

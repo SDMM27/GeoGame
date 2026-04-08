@@ -17,14 +17,14 @@ export default function MultiplayerCountryClue({ countries, showGlobe = true, on
     inputValue, setInputValue,
     guesses, isSolved, isLost, isComplete,
     answerName, answerFlag, answerCapital,
-    filteredCountrySuggestions, handleSubmit,
+    filteredCountrySuggestions, handleSubmit, revealCountry,
   } = useCountryClueState('daily', { overrideCountry: currentCountry })
 
   useEffect(() => {
     if (!isComplete || completedRef.current) return
     const roundAttempts = guesses.length
     const newTotal = totalAttempts + roundAttempts
-    onCountryFound()
+    if (isSolved) onCountryFound()
 
     if (roundIndex + 1 >= countries.length) {
       completedRef.current = true
@@ -47,8 +47,9 @@ export default function MultiplayerCountryClue({ countries, showGlobe = true, on
         <span className="mp-cc-attempts">{guesses.length} tentative{guesses.length !== 1 ? 's' : ''}</span>
       </div>
 
-      <div className="mp-cc-layout">
-        <div className="mp-cc-play">
+      <div className="mp-cc-body">
+        {/* Colonne gauche : saisie */}
+        <aside className="mp-cc-controls">
           {isComplete ? (
             <div className="mp-cc-result">
               <p className={isSolved ? 'mp-cc-solved' : 'mp-cc-lost'}>
@@ -79,34 +80,46 @@ export default function MultiplayerCountryClue({ countries, showGlobe = true, on
                   </div>
                 )}
               </div>
-              <button className="mp-cc-submit" onClick={handleSubmit}>Proposer</button>
+              <div className="mp-cc-actions">
+                <button className="mp-cc-submit" onClick={handleSubmit}>Proposer</button>
+                <button className="mp-cc-reveal" onClick={revealCountry}>Révéler</button>
+              </div>
+            </div>
+          )}
+        </aside>
+
+        {/* Colonne droite : globe + indices */}
+        <div className="mp-cc-right">
+          {showGlobe && currentCountry && (
+            <div className="mp-cc-map">
+              <CountryClueMap key={currentCountry.properties.ADMIN} targetCountry={currentCountry} guesses={guesses} />
             </div>
           )}
 
           <div className="mp-cc-guess-list">
-            {[...guesses].reverse().map((guess, i) => (
-              <article key={i} className={`mp-cc-row ${guess.isCorrect ? 'mp-cc-row--correct' : ''}`}>
-                <strong className="mp-cc-col-name">{guess.value}</strong>
-                <span className="mp-cc-col">{guess.directionArrow} {guess.distanceKm?.toLocaleString('fr-FR')} km</span>
-                <span className="mp-cc-col">{guess.hemisphereHint.arrow} {guess.hemisphereHint.label}</span>
-                <span className="mp-cc-col">
-                  {guess.areaHint.arrow} {guess.areaLabel}
-                </span>
-                <span className="mp-cc-col">
-                  {guess.populationHint.arrow} {guess.populationLabel}
-                </span>
-              </article>
-            ))}
-          </div>
-        </div>
-
-        {showGlobe && (
-          <div className="mp-cc-map">
-            {currentCountry && (
-              <CountryClueMap key={currentCountry.properties.ADMIN} targetCountry={currentCountry} guesses={guesses} />
+            {guesses.length === 0 ? (
+              <p className="mp-cc-empty">Aucune tentative pour l'instant.</p>
+            ) : (
+              [...guesses].reverse().map((guess, i) => (
+                <article key={i} className={`mp-cc-row ${guess.isCorrect ? 'mp-cc-row--correct' : ''}`}>
+                  <strong className="mp-cc-col-name">{guess.value}</strong>
+                  <span className="mp-cc-col mp-cc-col--neutral">
+                    {guess.directionArrow} {guess.distanceKm?.toLocaleString('fr-FR')} km
+                  </span>
+                  <span className={`mp-cc-col mp-cc-col--${guess.hemisphereHint.tone}`}>
+                    {guess.hemisphereHint.arrow} {guess.hemisphereHint.label}
+                  </span>
+                  <span className={`mp-cc-col mp-cc-col--${guess.areaHint.tone}`}>
+                    {guess.areaHint.arrow} {guess.areaLabel}
+                  </span>
+                  <span className={`mp-cc-col mp-cc-col--${guess.populationHint.tone}`}>
+                    {guess.populationHint.arrow} {guess.populationLabel}
+                  </span>
+                </article>
+              ))
             )}
           </div>
-        )}
+        </div>
       </div>
 
       <ToastContainer enableMultiContainer containerId="topRightToast" position="top-right" autoClose={1500} theme="dark" hideProgressBar />

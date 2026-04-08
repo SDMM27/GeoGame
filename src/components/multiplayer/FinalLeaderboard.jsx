@@ -3,6 +3,7 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { doc, updateDoc } from 'firebase/firestore'
 import { firestore } from '../../Firebase'
+import { clearGameResults, updateRoomStatus } from '../../utils/multiplayerRoom'
 import './FinalLeaderboard.css'
 
 export default function FinalLeaderboard({ room, gameResults, playerId, roomId }) {
@@ -29,6 +30,7 @@ export default function FinalLeaderboard({ room, gameResults, playerId, roomId }
     Object.keys(room.players).forEach(pid => {
       playerUpdates[`players.${pid}.totalPoints`] = 0
     })
+    await clearGameResults(roomId)
     await updateDoc(doc(firestore, 'rooms', roomId), {
       ...playerUpdates,
       status: 'lobby',
@@ -36,6 +38,11 @@ export default function FinalLeaderboard({ room, gameResults, playerId, roomId }
       seed: newSeed,
       startAt: null,
     })
+  }
+
+  const handleReconfigure = async () => {
+    if (!isHost) return
+    await updateRoomStatus(roomId, 'reconfiguring')
   }
 
   const handleHome = () => navigate('/')
@@ -86,17 +93,19 @@ export default function FinalLeaderboard({ room, gameResults, playerId, roomId }
         </div>
       )}
 
-      {isHost && (
+      {isHost ? (
         <div className="final-lb-actions">
           <button className="final-lb-btn final-lb-btn--rematch" onClick={handleRematch}>
             🔄 Revanche
+          </button>
+          <button className="final-lb-btn final-lb-btn--reconfig" onClick={handleReconfigure}>
+            ⚙️ Reconfigurer
           </button>
           <button className="final-lb-btn final-lb-btn--home" onClick={handleHome}>
             ← Accueil
           </button>
         </div>
-      )}
-      {!isHost && (
+      ) : (
         <div className="final-lb-actions">
           <button className="final-lb-btn final-lb-btn--home" onClick={handleHome}>← Accueil</button>
         </div>

@@ -18,3 +18,14 @@
 .final-lb-btn { padding: 0.85rem 2rem; border-radius: 10px; font-weight: 700; font-size: 1rem; border: none; cursor: pointer; }
 .final-lb-btn--rematch { background: #4ade80; color: #052e16; }
 .final-lb-btn--home { background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+
+.final-lb-btn--reconfig {
+  background: #374151;
+  color: #d1d5db;
+  border: 1px solid #4b5563;
+}
+
+.final-lb-btn--reconfig:hover {
+  background: #4b5563;
+  color: #f9fafb;
+}

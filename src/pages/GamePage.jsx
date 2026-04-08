@@ -1,13 +1,14 @@
 // src/pages/GamePage.jsx
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, GeoJSON, CircleMarker, Tooltip, useMap, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import { ToastContainer } from 'react-toastify'
 import useGameState from '../hooks/useGameState'
 import useAscensionState from '../hooks/useAscensionState'
 import { GAME_TYPES } from '../utils/gameTypes'
 import PhaseIndicator from '../components/PhaseIndicator'
+import { getCountryMetrics } from '../utils/borderGuessMap'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import Form from './form'
 import AscensionForm from './AscensionForm'
@@ -15,7 +16,64 @@ import 'leaflet/dist/leaflet.css'
 import 'react-toastify/dist/ReactToastify.css'
 import './GamePage.css'
 
-const GEO_STYLE = { fillColor: 'transparent', color: '#334155', fillOpacity: 1, weight: 0.85 }
+const GEO_STYLE = { fillColor: 'transparent', color: '#94a3b8', fillOpacity: 1, weight: 1 }
+
+const SMALL_THRESHOLD = 0.5
+
+function zoomThresholdForSpan(maxSpan) {
+  return Math.ceil(Math.log2(14 / Math.max(maxSpan, 0.01)))
+}
+
+const smallCountries = (() => {
+  const result = []
+  for (const f of countries.features) {
+    try {
+      const { maxSpan } = getCountryMetrics(f)
+      if (maxSpan >= SMALL_THRESHOLD) continue
+      const center = L.geoJSON(f).getBounds().getCenter()
+      result.push({ name: f.properties.ADMIN, lat: center.lat, lng: center.lng, zoomThreshold: zoomThresholdForSpan(maxSpan) })
+    } catch (_) { /* skip */ }
+  }
+  return result
+})()
+
+const CIRCLE_DEFAULT = { fillColor: '#ffffff', fillOpacity: 0.15, color: '#94a3b8', weight: 2 }
+const CIRCLE_HOVER   = { fillColor: '#7b2ff7', fillOpacity: 0.5,  color: '#7b2ff7', weight: 2 }
+
+function SmallCountryCircles({ onCountryNameClick, foundCountriesRef, shownCountriesRef, stats }) {
+  const [zoom, setZoom] = useState(3)
+  useMapEvents({ zoomend: (e) => setZoom(e.target.getZoom()) })
+
+  return smallCountries
+    .filter(c => zoom < c.zoomThreshold)
+    .filter(c => !foundCountriesRef.current.has(c.name) && !shownCountriesRef.current.has(c.name))
+    .map(c => (
+      <CircleMarker
+        key={c.name}
+        center={[c.lat, c.lng]}
+        radius={8}
+        pathOptions={CIRCLE_DEFAULT}
+        eventHandlers={{
+          click: () => onCountryNameClick(c.name),
+          mouseover: (e) => e.target.setStyle(CIRCLE_HOVER),
+          mouseout:  (e) => e.target.setStyle(CIRCLE_DEFAULT),
+        }}
+      />
+    ))
+}
+
+function shiftLng(coords, offset) {
+  if (typeof coords[0] === 'number') return [coords[0] + offset, coords[1]]
+  return coords.map(c => shiftLng(c, offset))
+}
+function offsetFeatures(features, lngOffset) {
+  return features.map(f => ({
+    ...f,
+    geometry: { ...f.geometry, coordinates: shiftLng(f.geometry.coordinates, lngOffset) }
+  }))
+}
+const featuresLeft = offsetFeatures(countries.features, -360)
+const featuresRight = offsetFeatures(countries.features, 360)
 
 function RightClickDrag() {
   const map = useMap()
@@ -44,11 +102,20 @@ function PlacementGameLayout({ difficulty, isTraining, isAscension, presetName, 
   const {
     targetCountry, score, timer, stats,
     isGameOver, displayTimer,
-    geoJsonRef, setMapRef,
-    onCountryClick, onCountryMouseOver, onCountryMouseOut,
+    geoJsonRef, extraGeoJsonRefs, setMapRef,
+    onCountryClick, onCountryNameClick, onCountryMouseOver, onCountryMouseOut,
+    foundCountriesRef, shownCountriesRef,
     seeCountry, restartGame, goHome,
     currentPhase, phaseCountRemaining, totalPhaseCount, phaseStats,
   } = state
+
+  const geoJsonRefLeft = useRef(null)
+  const geoJsonRefRight = useRef(null)
+  extraGeoJsonRefs.current = [geoJsonRefLeft, geoJsonRefRight]
+
+  const onEachOffsetFeature = useMemo(() => (feature, layer) => {
+    layer.on({ click: onCountryClick, mouseover: onCountryMouseOver, mouseout: onCountryMouseOut })
+  }, [onCountryClick, onCountryMouseOver, onCountryMouseOut])
 
   const progressPct = stats.total ? (stats.found / stats.total) * 100 : 0
 
@@ -150,9 +217,8 @@ function PlacementGameLayout({ difficulty, isTraining, isAscension, presetName, 
       <ToastContainer enableMultiContainer containerId="topRightToast" position="top-right" autoClose={1500} theme="dark" hideProgressBar />
 
       <MapContainer
-        center={[20, 0]} zoom={2} scrollWheelZoom zoomControl={false}
+        center={[20, 0]} zoom={3} zoomSnap={0.25} scrollWheelZoom zoomControl={false}
         dragging={false} doubleClickZoom={false}
-        maxBounds={[[90, -180], [-90, 180]]}
         style={{ width: '100%', height: '100vh' }}
         whenReady={({ target }) => {
           setMapRef(target)
@@ -161,9 +227,16 @@ function PlacementGameLayout({ difficulty, isTraining, isAscension, presetName, 
         }}
       >
         <TileLayer
-          attribution="Stamen Toner"
-          url="https://tiles.stadiamaps.com/tiles/stamen_toner_background/{z}/{x}/{y}{r}.png"
-          noWrap minZoom={2} maxZoom={20}
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
+          minZoom={2} maxZoom={20}
+        />
+        <GeoJSON
+          key="geojson-left"
+          ref={geoJsonRefLeft}
+          style={GEO_STYLE}
+          data={featuresLeft}
+          onEachFeature={onEachOffsetFeature}
         />
         <GeoJSON
           ref={geoJsonRef}
@@ -173,6 +246,21 @@ function PlacementGameLayout({ difficulty, isTraining, isAscension, presetName, 
             layer.on({ click: onCountryClick, mouseover: onCountryMouseOver, mouseout: onCountryMouseOut })
           }}
         />
+        <GeoJSON
+          key="geojson-right"
+          ref={geoJsonRefRight}
+          style={GEO_STYLE}
+          data={featuresRight}
+          onEachFeature={onEachOffsetFeature}
+        />
+        {onCountryNameClick && foundCountriesRef && shownCountriesRef && (
+          <SmallCountryCircles
+            onCountryNameClick={onCountryNameClick}
+            foundCountriesRef={foundCountriesRef}
+            shownCountriesRef={shownCountriesRef}
+            stats={stats}
+          />
+        )}
         <RightClickDrag />
       </MapContainer>
     </div>

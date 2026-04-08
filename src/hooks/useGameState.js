@@ -9,9 +9,9 @@ const DIFFICULTIES = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
 
 const COUNTRY_STYLE = {
   fillColor: 'transparent',
-  color: '#334155',
+  color: '#94a3b8',
   fillOpacity: 1,
-  weight: 0.85,
+  weight: 1,
 }
 
 const SCORE_TABLE = {
@@ -46,6 +46,7 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
   const [consecutiveErrors, setConsecutiveErrors] = useState(0)
   const consecutiveErrorsRef = useRef(0)
   const geoJsonRef = useRef(null)
+  const extraGeoJsonRefs = useRef([])
   const [mapRef, setMapRef] = useState(null)
   const [timer, setTimer] = useState(0)
   const timerRef = useRef(0)
@@ -112,24 +113,34 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
   useEffect(() => { consecutiveErrorsRef.current = consecutiveErrors }, [consecutiveErrors])
   useEffect(() => { clickOnSeeCountryRef.current = clickOnSeeCountry }, [clickOnSeeCountry])
 
+  const setStyleForCountry = useCallback((name, style) => {
+    const allRefs = [geoJsonRef, ...extraGeoJsonRefs.current]
+    for (const ref of allRefs) {
+      if (!ref.current) continue
+      const layer = ref.current.getLayers().find(l => l.feature.properties.ADMIN === name)
+      if (layer) layer.setStyle(style)
+    }
+  }, [])
+
   // 3 consecutive errors: highlight country
   useEffect(() => {
     if (consecutiveErrors < 3) return
     toast.error('Dommage ! C\'est ici que se trouvait ' + targetCountryRef.current, {
       containerId: 'topRightToast',
     })
+    const name = targetCountryRef.current
+    setStyleForCountry(name, { fillColor: '#ff4d4d', weight: 2, fillOpacity: 0.5 })
+    shownCountriesRef.current.add(name)
     if (geoJsonRef.current) {
       const layer = geoJsonRef.current.getLayers().find(
-        l => l.feature.properties.ADMIN === targetCountryRef.current
+        l => l.feature.properties.ADMIN === name
       )
       if (layer) {
-        layer.setStyle({ fillColor: '#ff4d4d', weight: 2, fillOpacity: 0.5 })
-        shownCountriesRef.current.add(targetCountryRef.current)
         const center = layer.getBounds().getCenter()
         zoomCountryMap(center.lat, center.lng)
       }
     }
-  }, [consecutiveErrors, zoomCountryMap]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [consecutiveErrors, zoomCountryMap, setStyleForCountry]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Timer counts UP; stops when all processed
   const allProcessed = stats.total > 0 && (stats.found + stats.skipped >= stats.total)
@@ -199,9 +210,8 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
     layer.setStyle(COUNTRY_STYLE)
   }
 
-  const onCountryClick = (event) => {
+  const handleCountrySelected = useCallback((clickedName) => {
     if (!gameStartedRef.current) return
-    const clickedName = event.target.feature.properties.ADMIN
     const targetDiff = countries.features.find(
       c => c.properties.ADMIN === targetCountryRef.current
     )?.properties.Difficulty
@@ -215,7 +225,7 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
         })
         incrementScore(targetDiff, consecutiveErrorsRef.current)
       }
-      event.target.setStyle({ fillColor: '#4ade80', weight: 2, fillOpacity: 0.5 })
+      setStyleForCountry(clickedName, { fillColor: '#4ade80', weight: 2, fillOpacity: 0.5 })
       shownCountriesRef.current.delete(clickedName)
       foundCountriesRef.current.add(clickedName)
       setStats(prev =>
@@ -231,18 +241,27 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
       toast.error('Dommage !', { containerId: 'topRightToast' })
       setConsecutiveErrors(prev => prev + 1)
     }
-  }
+  }, [changeCountry, setStyleForCountry])
+
+  const onCountryClick = useCallback((event) => {
+    handleCountrySelected(event.target.feature.properties.ADMIN)
+  }, [handleCountrySelected])
+
+  const onCountryNameClick = useCallback((name) => {
+    handleCountrySelected(name)
+  }, [handleCountrySelected])
 
   const seeCountry = () => {
     setClickOnSeeCountry(true)
     clickOnSeeCountryRef.current = true
+    const name = targetCountryRef.current
+    setStyleForCountry(name, { fillColor: '#ff4d4d', weight: 2, fillOpacity: 0.5 })
+    shownCountriesRef.current.add(name)
     if (!geoJsonRef.current) return
     const layer = geoJsonRef.current.getLayers().find(
-      l => l.feature.properties.ADMIN === targetCountryRef.current
+      l => l.feature.properties.ADMIN === name
     )
     if (!layer) return
-    layer.setStyle({ fillColor: '#ff4d4d', weight: 2, fillOpacity: 0.5 })
-    shownCountriesRef.current.add(targetCountryRef.current)
     const center = layer.getBounds().getCenter()
     zoomCountryMap(center.lat, center.lng)
   }
@@ -260,8 +279,8 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
     gameOverToastShownRef.current = false
     foundCountriesRef.current.clear()
     shownCountriesRef.current.clear()
-    if (geoJsonRef.current) {
-      geoJsonRef.current.getLayers().forEach(l => l.setStyle(COUNTRY_STYLE))
+    for (const ref of [geoJsonRef, ...extraGeoJsonRefs.current]) {
+      if (ref.current) ref.current.getLayers().forEach(l => l.setStyle(COUNTRY_STYLE))
     }
     startTimeRef.current = null;
     timerRef.current = 0;
@@ -297,11 +316,15 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
     isGameOver,
     displayTimer,
     geoJsonRef,
+    extraGeoJsonRefs,
     mapRef,
     setMapRef,
     onCountryClick,
+    onCountryNameClick,
     onCountryMouseOver,
     onCountryMouseOut,
+    foundCountriesRef,
+    shownCountriesRef,
     seeCountry,
     restartGame,
     goHome,

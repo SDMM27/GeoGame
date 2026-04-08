@@ -1,5 +1,5 @@
 // src/pages/GamePage.jsx
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet'
 import L from 'leaflet'
@@ -16,6 +16,19 @@ import 'react-toastify/dist/ReactToastify.css'
 import './GamePage.css'
 
 const GEO_STYLE = { fillColor: 'transparent', color: '#334155', fillOpacity: 1, weight: 0.85 }
+
+function shiftLng(coords, offset) {
+  if (typeof coords[0] === 'number') return [coords[0] + offset, coords[1]]
+  return coords.map(c => shiftLng(c, offset))
+}
+function offsetFeatures(features, lngOffset) {
+  return features.map(f => ({
+    ...f,
+    geometry: { ...f.geometry, coordinates: shiftLng(f.geometry.coordinates, lngOffset) }
+  }))
+}
+const featuresLeft = offsetFeatures(countries.features, -360)
+const featuresRight = offsetFeatures(countries.features, 360)
 
 function RightClickDrag() {
   const map = useMap()
@@ -44,11 +57,19 @@ function PlacementGameLayout({ difficulty, isTraining, isAscension, presetName, 
   const {
     targetCountry, score, timer, stats,
     isGameOver, displayTimer,
-    geoJsonRef, setMapRef,
+    geoJsonRef, extraGeoJsonRefs, setMapRef,
     onCountryClick, onCountryMouseOver, onCountryMouseOut,
     seeCountry, restartGame, goHome,
     currentPhase, phaseCountRemaining, totalPhaseCount, phaseStats,
   } = state
+
+  const geoJsonRefLeft = useRef(null)
+  const geoJsonRefRight = useRef(null)
+  extraGeoJsonRefs.current = [geoJsonRefLeft, geoJsonRefRight]
+
+  const onEachOffsetFeature = useMemo(() => (feature, layer) => {
+    layer.on({ click: onCountryClick, mouseover: onCountryMouseOver, mouseout: onCountryMouseOut })
+  }, [onCountryClick, onCountryMouseOver, onCountryMouseOut])
 
   const progressPct = stats.total ? (stats.found / stats.total) * 100 : 0
 
@@ -150,9 +171,8 @@ function PlacementGameLayout({ difficulty, isTraining, isAscension, presetName, 
       <ToastContainer enableMultiContainer containerId="topRightToast" position="top-right" autoClose={1500} theme="dark" hideProgressBar />
 
       <MapContainer
-        center={[20, 0]} zoom={2} scrollWheelZoom zoomControl={false}
+        center={[20, 0]} zoom={3} zoomSnap={0.25} scrollWheelZoom zoomControl={false}
         dragging={false} doubleClickZoom={false}
-        maxBounds={[[90, -180], [-90, 180]]}
         style={{ width: '100%', height: '100vh' }}
         whenReady={({ target }) => {
           setMapRef(target)
@@ -163,7 +183,14 @@ function PlacementGameLayout({ difficulty, isTraining, isAscension, presetName, 
         <TileLayer
           attribution="Stamen Toner"
           url="https://tiles.stadiamaps.com/tiles/stamen_toner_background/{z}/{x}/{y}{r}.png"
-          noWrap minZoom={2} maxZoom={20}
+          minZoom={2} maxZoom={20}
+        />
+        <GeoJSON
+          key="geojson-left"
+          ref={geoJsonRefLeft}
+          style={GEO_STYLE}
+          data={featuresLeft}
+          onEachFeature={onEachOffsetFeature}
         />
         <GeoJSON
           ref={geoJsonRef}
@@ -172,6 +199,13 @@ function PlacementGameLayout({ difficulty, isTraining, isAscension, presetName, 
           onEachFeature={(feature, layer) => {
             layer.on({ click: onCountryClick, mouseover: onCountryMouseOver, mouseout: onCountryMouseOut })
           }}
+        />
+        <GeoJSON
+          key="geojson-right"
+          ref={geoJsonRefRight}
+          style={GEO_STYLE}
+          data={featuresRight}
+          onEachFeature={onEachOffsetFeature}
         />
         <RightClickDrag />
       </MapContainer>

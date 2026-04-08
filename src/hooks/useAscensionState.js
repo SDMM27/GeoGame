@@ -79,6 +79,7 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
 
   // ── PLACEMENT-only state ─────────────────────────────────────
   const geoJsonRef = useRef(null)
+  const extraGeoJsonRefs = useRef([])
   const [mapRef, setMapRef] = useState(null)
   const mapRefRef = useRef(null)
   const [clickOnSeeCountry, setClickOnSeeCountry] = useState(false)
@@ -247,21 +248,31 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
     else map.setView([lat, lng], 4)
   }, [])
 
+  const setStyleForCountry = useCallback((name, style) => {
+    const allRefs = [geoJsonRef, ...extraGeoJsonRefs.current]
+    for (const ref of allRefs) {
+      if (!ref.current) continue
+      const layer = ref.current.getLayers().find(l => l.feature.properties.ADMIN === name)
+      if (layer) layer.setStyle(style)
+    }
+  }, [])
+
   // 3 consecutive errors → show country on map
   useEffect(() => {
     if (gameType !== GAME_TYPES.PLACEMENT || consecutiveErrors < 3) return
     toast.error('Dommage ! C\'est ici : ' + targetCountryRef.current, { containerId: 'topRightToast' })
-    if (!geoJsonRef.current) return
-    const layer = geoJsonRef.current.getLayers().find(
-      l => l.feature.properties.ADMIN === targetCountryRef.current
-    )
-    if (!layer) return
-    layer.setStyle({ fillColor: '#ff4d4d', weight: 2, fillOpacity: 0.5 })
-    shownCountriesRef.current.add(targetCountryRef.current)
-    const center = layer.getBounds().getCenter()
-    const feat = countries.features.find(c => c.properties.ADMIN === targetCountryRef.current)
-    zoomCountryMap(center.lat, center.lng, feat?.properties.Difficulty)
-  }, [consecutiveErrors, gameType, zoomCountryMap])
+    const name = targetCountryRef.current
+    setStyleForCountry(name, { fillColor: '#ff4d4d', weight: 2, fillOpacity: 0.5 })
+    shownCountriesRef.current.add(name)
+    if (geoJsonRef.current) {
+      const layer = geoJsonRef.current.getLayers().find(l => l.feature.properties.ADMIN === name)
+      if (layer) {
+        const center = layer.getBounds().getCenter()
+        const feat = countries.features.find(c => c.properties.ADMIN === name)
+        zoomCountryMap(center.lat, center.lng, feat?.properties.Difficulty)
+      }
+    }
+  }, [consecutiveErrors, gameType, zoomCountryMap, setStyleForCountry])
 
   const onCountryMouseOver = useCallback((event) => {
     const layer = event.target
@@ -290,7 +301,7 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
         // PLACEMENT scoring: each error reduces score (matches useGameState.js)
         incrementScore(diff, consecutiveErrorsRef.current)
       }
-      event.target.setStyle({ fillColor: '#4ade80', weight: 2, fillOpacity: 0.5 })
+      setStyleForCountry(clickedName, { fillColor: '#4ade80', weight: 2, fillOpacity: 0.5 })
       shownCountriesRef.current.delete(clickedName)
       foundCountriesRef.current.add(clickedName)
       advanceGame(!wasSkipped)
@@ -298,7 +309,7 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
       toast.error('Dommage !', { containerId: 'topRightToast' })
       setConsecutiveErrors(prev => prev + 1)
     }
-  }, [advanceGame, incrementScore])
+  }, [advanceGame, incrementScore, setStyleForCountry])
 
   const seeCountry = useCallback(() => {
     if (gameType !== GAME_TYPES.PLACEMENT) {
@@ -313,17 +324,18 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
     // PLACEMENT
     setClickOnSeeCountry(true)
     clickOnSeeCountryRef.current = true
-    if (!geoJsonRef.current) return
-    const layer = geoJsonRef.current.getLayers().find(
-      l => l.feature.properties.ADMIN === targetCountryRef.current
-    )
-    if (!layer) return
-    layer.setStyle({ fillColor: '#ff4d4d', weight: 2, fillOpacity: 0.5 })
-    shownCountriesRef.current.add(targetCountryRef.current)
-    const center = layer.getBounds().getCenter()
-    const feat = countries.features.find(c => c.properties.ADMIN === targetCountryRef.current)
-    zoomCountryMap(center.lat, center.lng, feat?.properties.Difficulty)
-  }, [gameType, revealedName, zoomCountryMap])
+    const name = targetCountryRef.current
+    setStyleForCountry(name, { fillColor: '#ff4d4d', weight: 2, fillOpacity: 0.5 })
+    shownCountriesRef.current.add(name)
+    if (geoJsonRef.current) {
+      const layer = geoJsonRef.current.getLayers().find(l => l.feature.properties.ADMIN === name)
+      if (layer) {
+        const center = layer.getBounds().getCenter()
+        const feat = countries.features.find(c => c.properties.ADMIN === name)
+        zoomCountryMap(center.lat, center.lng, feat?.properties.Difficulty)
+      }
+    }
+  }, [gameType, revealedName, zoomCountryMap, setStyleForCountry])
 
   // ─────────────────────────────────────────────────────────────
   // FLAGS / CAPITALS: auto-advance after reveal + submit handler
@@ -386,8 +398,8 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
     setRevealedName(null)
     foundCountriesRef.current.clear()
     shownCountriesRef.current.clear()
-    if (geoJsonRef.current) {
-      geoJsonRef.current.getLayers().forEach(l => l.setStyle(COUNTRY_STYLE))
+    for (const ref of [geoJsonRef, ...extraGeoJsonRefs.current]) {
+      if (ref.current) ref.current.getLayers().forEach(l => l.setStyle(COUNTRY_STYLE))
     }
     startTimeRef.current = null
     timerRef.current = 0
@@ -444,6 +456,7 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
     phaseStats: phaseStatsRef.current,
     // PLACEMENT-specific
     geoJsonRef,
+    extraGeoJsonRefs,
     mapRef,
     setMapRef,
     onCountryClick,

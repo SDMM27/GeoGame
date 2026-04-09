@@ -3,9 +3,9 @@
 /**
  * Classe les résultats d'un jeu et attribue les points.
  *
- * scoringMode 'attempts' (défaut) :
- *   1. attempts        ASC
- *   2. elapsedTime     ASC
+ * scoringMode 'weighted' (défaut — Placement, Flags, Capitals) :
+ *   1. weightedScore DESC
+ *   2. elapsedTime   ASC
  *
  * scoringMode 'solved' (Border Guess, Country Clue) :
  *   1. countriesSolved DESC
@@ -23,10 +23,10 @@
  *   failures?: number,
  * }>} results
  * @param {number} totalPlayers
- * @param {'attempts'|'solved'} [scoringMode='attempts']
+ * @param {'weighted'|'solved'} [scoringMode='weighted']
  * @returns {Array<{...result, rank: number, points: number}>}
  */
-export function rankResults(results, totalPlayers, scoringMode = 'attempts') {
+export function rankResults(results, totalPlayers, scoringMode = 'weighted') {
   const sorted = [...results].sort((a, b) => {
     if (scoringMode === 'solved') {
       // 1. Pays trouvés (plus = mieux)
@@ -41,9 +41,9 @@ export function rankResults(results, totalPlayers, scoringMode = 'attempts') {
       return (a.elapsedTime ?? Infinity) - (b.elapsedTime ?? Infinity)
     }
 
-    // Mode 'attempts' (défaut)
-    const attemptsDiff = (a.attempts ?? 0) - (b.attempts ?? 0)
-    if (attemptsDiff !== 0) return attemptsDiff
+    // Mode 'weighted' (défaut)
+    const scoreDiff = (b.weightedScore ?? 0) - (a.weightedScore ?? 0)
+    if (scoreDiff !== 0) return scoreDiff
     return (a.elapsedTime ?? Infinity) - (b.elapsedTime ?? Infinity)
   })
 

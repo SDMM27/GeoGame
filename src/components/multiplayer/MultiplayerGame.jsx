@@ -56,13 +56,17 @@ export default function MultiplayerGame({ room, progress, playerId, roomId }) {
     })
   }, [roomId, playerId, gameIndex, progress])
 
-  const handleGameFinished = useCallback(({ attempts, elapsedTime, countriesSolved }) => {
+  const handleGameFinished = useCallback(({ attempts, elapsedTime, countriesSolved, weightedScore, perfects, stumbles, failures }) => {
     updatePlayerProgress(roomId, playerId, {
       gameIndex,
       countriesFound: totalCountries,
-      attempts,
-      elapsedTime,
-      countriesSolved: countriesSolved ?? null,
+      attempts: attempts ?? 0,
+      elapsedTime: elapsedTime ?? null,
+      countriesSolved: countriesSolved ?? 0,
+      weightedScore: weightedScore ?? 0,
+      perfects: perfects ?? 0,
+      stumbles: stumbles ?? 0,
+      failures: failures ?? 0,
       finished: true,
       lastSeen: serverTimestamp(),
     })
@@ -87,6 +91,10 @@ export default function MultiplayerGame({ room, progress, playerId, roomId }) {
       attempts: progress[pid].attempts ?? 0,
       elapsedTime: progress[pid].elapsedTime ?? null,
       countriesSolved: progress[pid].countriesSolved ?? 0,
+      weightedScore: progress[pid].weightedScore ?? 0,
+      perfects: progress[pid].perfects ?? 0,
+      stumbles: progress[pid].stumbles ?? 0,
+      failures: progress[pid].failures ?? 0,
     }))
     const ranked = rankResults(results, activePlayers.length)
 
@@ -98,6 +106,10 @@ export default function MultiplayerGame({ room, progress, playerId, roomId }) {
           attempts: r.attempts,
           elapsedTime: r.elapsedTime,
           countriesSolved: r.countriesSolved,
+          weightedScore: r.weightedScore,
+          perfects: r.perfects,
+          stumbles: r.stumbles,
+          failures: r.failures,
           rank: r.rank,
           points: r.points,
         })

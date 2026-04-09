@@ -11,20 +11,23 @@ export default function FinalLeaderboard({ room, gameResults, playerId, roomId }
   const isHost = room.hostId === playerId
   const [rematchSubmitting, setRematchSubmitting] = useState(false)
 
+  // Le tri ici dépend de totalPoints, qui doit refléter ton nouveau système de scoring pondéré
   const sortedPlayers = Object.entries(room.players)
     .filter(([, p]) => !p.disconnected)
     .sort(([, a], [, b]) => b.totalPoints - a.totalPoints)
 
   const medals = ['🥇', '🥈', '🥉']
-
   const gameCount = room.config.games.length
 
+  // Extraction chirurgicale des nouvelles statistiques détaillées
   const statsByPlayerAndGame = {}
   Object.values(gameResults).forEach(r => {
     if (!statsByPlayerAndGame[r.playerId]) statsByPlayerAndGame[r.playerId] = {}
     statsByPlayerAndGame[r.playerId][r.gameIndex] = {
       points: r.points,
-      countriesSolved: r.countriesSolved ?? 0,
+      perfects: r.perfects ?? 0,   // Trouvés du 1er coup
+      stumbles: r.stumbles ?? 0,   // Trouvés en plusieurs coups
+      failures: r.failures ?? 0,   // Temps écoulé ou essais épuisés
       rank: r.rank,
     }
   })
@@ -85,7 +88,7 @@ export default function FinalLeaderboard({ room, gameResults, playerId, roomId }
 
       {gameCount > 1 && (
         <div className="final-lb-detail">
-          <h2 className="final-lb-detail-title">Détail par jeu</h2>
+          <h2 className="final-lb-detail-title">Analyse des performances par jeu</h2>
           <table className="final-lb-table">
             <thead>
               <tr>
@@ -104,9 +107,17 @@ export default function FinalLeaderboard({ room, gameResults, playerId, roomId }
                     const stats = statsByPlayerAndGame[pid]?.[gi]
                     const rankIdx = rankByPlayerAndGame[pid]?.[gi]
                     if (stats == null) return <td key={gi} className="final-lb-cell">—</td>
+
                     return (
                       <td key={gi} className="final-lb-cell">
-                        {medals[rankIdx] ?? `${rankIdx + 1}`} {stats.countriesSolved} pays · {stats.points}pt
+                        <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
+                          {medals[rankIdx] ?? `${rankIdx + 1}`} · {stats.points} pt{stats.points > 1 ? 's' : ''}
+                        </div>
+                        <div style={{ fontSize: '0.85em', display: 'flex', justifyContent: 'center', gap: '8px', opacity: 0.8 }}>
+                          <span title="One-shots">🎯 {stats.perfects}</span>
+                          <span title="Repêchages">🔄 {stats.stumbles}</span>
+                          <span title="Échecs">❌ {stats.failures}</span>
+                        </div>
                       </td>
                     )
                   })}

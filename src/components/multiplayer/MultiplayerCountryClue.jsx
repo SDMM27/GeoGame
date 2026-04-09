@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { ToastContainer } from 'react-toastify'
 import useCountryClueState from '../../hooks/useCountryClueState'
 import CountryClueMap from '../../pages/CountryClueMap'
+import { getGuessGamePoints } from '../../utils/scoringRules'
 import 'react-toastify/dist/ReactToastify.css'
 import './MultiplayerCountryClue.css'
 
@@ -10,6 +11,10 @@ export default function MultiplayerCountryClue({ countries, showGlobe = true, on
   const [roundIndex, setRoundIndex] = useState(0)
   const [totalAttempts, setTotalAttempts] = useState(0)
   const [totalSolved, setTotalSolved] = useState(0)
+  const [totalWeightedScore, setTotalWeightedScore] = useState(0)
+  const [totalPerfects, setTotalPerfects] = useState(0)
+  const [totalStumbles, setTotalStumbles] = useState(0)
+  const [totalFailures, setTotalFailures] = useState(0)
   const startTimeRef = useRef(performance.now())
   const completedRef = useRef(false)
 
@@ -23,17 +28,37 @@ export default function MultiplayerCountryClue({ countries, showGlobe = true, on
 
   useEffect(() => {
     if (!isComplete || completedRef.current) return
-    const roundAttempts = guesses.filter(g => !g.isCorrect).length
-    const newTotal = totalAttempts + roundAttempts
+
+    const wrongGuesses = guesses.filter(g => !g.isCorrect).length
+    const newTotal = totalAttempts + wrongGuesses
     const newSolved = isSolved ? totalSolved + 1 : totalSolved
+    const roundScore = isSolved ? getGuessGamePoints(wrongGuesses) : 0
+    const newWeightedScore = totalWeightedScore + roundScore
+    const isPerfect = isSolved && wrongGuesses === 0
+    const newPerfects = totalPerfects + (isPerfect ? 1 : 0)
+    const newStumbles = totalStumbles + (isSolved && !isPerfect ? 1 : 0)
+    const newFailures = totalFailures + (isSolved ? 0 : 1)
+
     if (isSolved) onCountryFound()
 
     if (roundIndex + 1 >= countries.length) {
       completedRef.current = true
-      onGameFinished({ attempts: newTotal, elapsedTime: performance.now() - startTimeRef.current, countriesSolved: newSolved })
+      onGameFinished({
+        attempts: newTotal,
+        elapsedTime: performance.now() - startTimeRef.current,
+        countriesSolved: newSolved,
+        weightedScore: newWeightedScore,
+        perfects: newPerfects,
+        stumbles: newStumbles,
+        failures: newFailures,
+      })
     } else {
       setTotalAttempts(newTotal)
       setTotalSolved(newSolved)
+      setTotalWeightedScore(newWeightedScore)
+      setTotalPerfects(newPerfects)
+      setTotalStumbles(newStumbles)
+      setTotalFailures(newFailures)
       setTimeout(() => setRoundIndex(i => i + 1), 1500)
     }
   }, [isComplete]) // eslint-disable-line react-hooks/exhaustive-deps

@@ -3,35 +3,47 @@
 /**
  * Classe les résultats d'un jeu et attribue les points.
  *
- * Priorité stricte :
- *   1. weightedScore  DESC — récompense l'expertise (first-try + difficulté)
- *   2. countriesSolved DESC — départage en cas d'égalité aux points
- *   3. elapsedTime    ASC  — tie-breaker final : le plus rapide gagne
+ * scoringMode 'attempts' (défaut) :
+ *   1. attempts        ASC
+ *   2. elapsedTime     ASC
+ *
+ * scoringMode 'solved' (Border Guess, Country Clue) :
+ *   1. countriesSolved DESC
+ *   2. attempts        ASC
+ *   3. elapsedTime     ASC
  *
  * @param {Array<{
  *   playerId: string,
- *   weightedScore: number,
- *   countriesSolved: number,
- *   elapsedTime: number|null,
- *   attempts: number,
- *   perfects: number,
- *   stumbles: number,
- *   failures: number,
+ *   weightedScore?: number,
+ *   countriesSolved?: number,
+ *   attempts?: number,
+ *   elapsedTime?: number|null,
+ *   perfects?: number,
+ *   stumbles?: number,
+ *   failures?: number,
  * }>} results
  * @param {number} totalPlayers
+ * @param {'attempts'|'solved'} [scoringMode='attempts']
  * @returns {Array<{...result, rank: number, points: number}>}
  */
-export function rankResults(results, totalPlayers) {
+export function rankResults(results, totalPlayers, scoringMode = 'attempts') {
   const sorted = [...results].sort((a, b) => {
-    // 1. Score pondéré (reflète la qualité des réponses)
-    const scoreDiff = (b.weightedScore ?? 0) - (a.weightedScore ?? 0)
-    if (scoreDiff !== 0) return scoreDiff
+    if (scoringMode === 'solved') {
+      // 1. Pays trouvés (plus = mieux)
+      const solvedDiff = (b.countriesSolved ?? 0) - (a.countriesSolved ?? 0)
+      if (solvedDiff !== 0) return solvedDiff
 
-    // 2. Nombre de pays résolus (même en tâtonnant)
-    const solvedDiff = (b.countriesSolved ?? 0) - (a.countriesSolved ?? 0)
-    if (solvedDiff !== 0) return solvedDiff
+      // 2. Tentatives totales (moins = mieux)
+      const attemptsDiff = (a.attempts ?? 0) - (b.attempts ?? 0)
+      if (attemptsDiff !== 0) return attemptsDiff
 
-    // 3. Temps total
+      // 3. Temps (moins = mieux)
+      return (a.elapsedTime ?? Infinity) - (b.elapsedTime ?? Infinity)
+    }
+
+    // Mode 'attempts' (défaut)
+    const attemptsDiff = (a.attempts ?? 0) - (b.attempts ?? 0)
+    if (attemptsDiff !== 0) return attemptsDiff
     return (a.elapsedTime ?? Infinity) - (b.elapsedTime ?? Infinity)
   })
 

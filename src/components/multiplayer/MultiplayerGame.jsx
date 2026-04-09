@@ -96,7 +96,10 @@ export default function MultiplayerGame({ room, progress, playerId, roomId }) {
       stumbles: progress[pid].stumbles ?? 0,
       failures: progress[pid].failures ?? 0,
     }))
-    const ranked = rankResults(results, activePlayers.length)
+    const isGuessGame =
+      gameConfig.type === GAME_TYPES.BORDER_GUESS ||
+      gameConfig.type === GAME_TYPES.COUNTRY_CLUE
+    const ranked = rankResults(results, activePlayers.length, isGuessGame ? 'solved' : 'weighted')
 
     Promise.all(
       ranked.map(r =>

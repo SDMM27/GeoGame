@@ -53,7 +53,7 @@ export default function BetweenGamesScreen({ room, gameResults, playerId, roomId
               <th>Rang</th>
               <th>Joueur</th>
               <th>Pays trouvés</th>
-              <th>Tentatives</th>
+              <th>Tentatives Ratées</th>
               <th>❌ Non trouvés</th>
               <th>Temps</th>
               <th>Points</th>

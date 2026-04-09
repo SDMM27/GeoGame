@@ -3,23 +3,50 @@
 /**
  * Classe les résultats d'un jeu et attribue les points.
  *
- * scoringMode 'attempts' (défaut) : tri attempts ASC, elapsedTime ASC.
- * scoringMode 'solved'            : tri countriesSolved DESC, attempts ASC, elapsedTime ASC.
+ * scoringMode 'weighted' (défaut — Placement, Flags, Capitals) :
+ *   1. weightedScore DESC
+ *   2. elapsedTime   ASC
  *
- * @param {Array<{playerId: string, attempts: number, elapsedTime: number, countriesSolved?: number}>} results
+ * scoringMode 'solved' (Border Guess, Country Clue) :
+ *   1. countriesSolved DESC
+ *   2. attempts        ASC
+ *   3. elapsedTime     ASC
+ *
+ * @param {Array<{
+ *   playerId: string,
+ *   weightedScore?: number,
+ *   countriesSolved?: number,
+ *   attempts?: number,
+ *   elapsedTime?: number|null,
+ *   perfects?: number,
+ *   stumbles?: number,
+ *   failures?: number,
+ * }>} results
  * @param {number} totalPlayers
- * @param {'attempts'|'solved'} [scoringMode='attempts']
- * @returns {Array<{playerId, attempts, elapsedTime, rank, points}>}
+ * @param {'weighted'|'solved'} [scoringMode='weighted']
+ * @returns {Array<{...result, rank: number, points: number}>}
  */
-export function rankResults(results, totalPlayers, scoringMode = 'attempts') {
+export function rankResults(results, totalPlayers, scoringMode = 'weighted') {
   const sorted = [...results].sort((a, b) => {
     if (scoringMode === 'solved') {
+      // 1. Pays trouvés (plus = mieux)
       const solvedDiff = (b.countriesSolved ?? 0) - (a.countriesSolved ?? 0)
       if (solvedDiff !== 0) return solvedDiff
+
+      // 2. Tentatives totales (moins = mieux)
+      const attemptsDiff = (a.attempts ?? 0) - (b.attempts ?? 0)
+      if (attemptsDiff !== 0) return attemptsDiff
+
+      // 3. Temps (moins = mieux)
+      return (a.elapsedTime ?? Infinity) - (b.elapsedTime ?? Infinity)
     }
-    if (a.attempts !== b.attempts) return a.attempts - b.attempts
+
+    // Mode 'weighted' (défaut)
+    const scoreDiff = (b.weightedScore ?? 0) - (a.weightedScore ?? 0)
+    if (scoreDiff !== 0) return scoreDiff
     return (a.elapsedTime ?? Infinity) - (b.elapsedTime ?? Infinity)
   })
+
   return sorted.map((result, index) => ({
     ...result,
     rank: index + 1,

@@ -11,18 +11,37 @@ export default function FinalLeaderboard({ room, gameResults, playerId, roomId }
   const isHost = room.hostId === playerId
   const [rematchSubmitting, setRematchSubmitting] = useState(false)
 
+  // Le tri ici dépend de totalPoints, qui doit refléter ton nouveau système de scoring pondéré
   const sortedPlayers = Object.entries(room.players)
     .filter(([, p]) => !p.disconnected)
     .sort(([, a], [, b]) => b.totalPoints - a.totalPoints)
 
   const medals = ['🥇', '🥈', '🥉']
-
   const gameCount = room.config.games.length
-  const pointsByPlayerAndGame = {}
+
+  // Extraction chirurgicale des nouvelles statistiques détaillées
+  const statsByPlayerAndGame = {}
   Object.values(gameResults).forEach(r => {
-    if (!pointsByPlayerAndGame[r.playerId]) pointsByPlayerAndGame[r.playerId] = {}
-    pointsByPlayerAndGame[r.playerId][r.gameIndex] = r.points
+    if (!statsByPlayerAndGame[r.playerId]) statsByPlayerAndGame[r.playerId] = {}
+    statsByPlayerAndGame[r.playerId][r.gameIndex] = {
+      points: r.points,
+      perfects: r.perfects ?? 0,   // Trouvés du 1er coup
+      stumbles: r.stumbles ?? 0,   // Trouvés en plusieurs coups
+      failures: r.failures ?? 0,   // Temps écoulé ou essais épuisés
+      rank: r.rank,
+    }
   })
+
+  const rankByPlayerAndGame = {}
+  for (let gi = 0; gi < gameCount; gi++) {
+    const sorted = Object.values(gameResults)
+      .filter(r => r.gameIndex === gi)
+      .sort((a, b) => a.rank - b.rank)
+    sorted.forEach((r, idx) => {
+      if (!rankByPlayerAndGame[r.playerId]) rankByPlayerAndGame[r.playerId] = {}
+      rankByPlayerAndGame[r.playerId][gi] = idx
+    })
+  }
 
   const handleRematch = async () => {
     if (!isHost || rematchSubmitting) return
@@ -69,7 +88,7 @@ export default function FinalLeaderboard({ room, gameResults, playerId, roomId }
 
       {gameCount > 1 && (
         <div className="final-lb-detail">
-          <h2 className="final-lb-detail-title">Détail par jeu</h2>
+          <h2 className="final-lb-detail-title">Analyse des performances par jeu</h2>
           <table className="final-lb-table">
             <thead>
               <tr>
@@ -84,13 +103,24 @@ export default function FinalLeaderboard({ room, gameResults, playerId, roomId }
               {sortedPlayers.map(([pid, player]) => (
                 <tr key={pid} className={pid === playerId ? 'final-lb-row-detail--me' : ''}>
                   <td>{player.pseudo}</td>
-                  {Array.from({ length: gameCount }, (_, gi) => (
-                    <td key={gi} className="final-lb-cell">
-                      {pointsByPlayerAndGame[pid]?.[gi] != null
-                        ? `${medals[Object.values(gameResults).filter(r => r.gameIndex === gi).sort((a,b) => a.rank - b.rank).findIndex(r => r.playerId === pid)]} ${pointsByPlayerAndGame[pid][gi]}pt`
-                        : '—'}
-                    </td>
-                  ))}
+                  {Array.from({ length: gameCount }, (_, gi) => {
+                    const stats = statsByPlayerAndGame[pid]?.[gi]
+                    const rankIdx = rankByPlayerAndGame[pid]?.[gi]
+                    if (stats == null) return <td key={gi} className="final-lb-cell">—</td>
+
+                    return (
+                      <td key={gi} className="final-lb-cell">
+                        <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
+                          {medals[rankIdx] ?? `${rankIdx + 1}`} · {stats.points} pt{stats.points > 1 ? 's' : ''}
+                        </div>
+                        <div style={{ fontSize: '0.85em', display: 'flex', justifyContent: 'center', gap: '8px', opacity: 0.8 }}>
+                          <span title="One-shots">🎯 {stats.perfects}</span>
+                          <span title="Repêchages">🔄 {stats.stumbles}</span>
+                          <span title="Échecs">❌ {stats.failures}</span>
+                        </div>
+                      </td>
+                    )
+                  })}
                   <td className="final-lb-total">{player.totalPoints} pts</td>
                 </tr>
               ))}

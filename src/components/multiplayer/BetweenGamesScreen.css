@@ -11,3 +11,4 @@
 .between-games-next-btn { padding: 0.85rem 2rem; border-radius: 10px; background: #00d4ff; color: #0f172a; font-weight: 700; font-size: 1rem; border: none; cursor: pointer; }
 .between-games-auto { color: #64748b; font-size: 0.85rem; }
 .between-games-waiting { text-align: center; color: #64748b; font-style: italic; }
+.between-games-stumbles-note { font-size: 0.82rem; color: #94a3b8; background: #1e293b; border-left: 3px solid #f59e0b; padding: 0.5rem 0.75rem; border-radius: 4px; margin-bottom: 1rem; }

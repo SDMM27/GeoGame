@@ -205,6 +205,10 @@ export function MultiplayerFlagsGame({ gameConfig, overrideCountries, overridesB
 function MultiplayerStandardFlagsGame({ gameConfig, overrideCountries, onCountryFound, onGameFinished }) {
   const state = useFlagGameState(gameConfig.difficulty, false, overrideCountries)
   const prevFoundRef = useRef(0)
+  const totalErrorsRef = useRef(0)
+  const scoreRef = useRef(0)
+  totalErrorsRef.current = state.stats.totalErrors ?? 0
+  scoreRef.current = state.score
 
   useEffect(() => {
     if (state.stats.found > prevFoundRef.current) {
@@ -215,7 +219,16 @@ function MultiplayerStandardFlagsGame({ gameConfig, overrideCountries, onCountry
 
   useEffect(() => {
     if (!state.isGameOver) return
-    onGameFinished({ attempts: state.stats.found + state.stats.skipped, elapsedTime: state.timer })
+    const perfects = state.stats.foundFirstTry ?? 0
+    onGameFinished({
+      attempts: totalErrorsRef.current,
+      elapsedTime: state.timer,
+      countriesSolved: state.stats.found,
+      weightedScore: scoreRef.current,
+      perfects,
+      stumbles: state.stats.found - perfects,
+      failures: state.stats.skipped,
+    })
   }, [state.isGameOver, onGameFinished, state.stats.found, state.stats.skipped, state.timer])
 
   return (
@@ -233,6 +246,10 @@ function MultiplayerStandardFlagsGame({ gameConfig, overrideCountries, onCountry
 function MultiplayerAscensionFlagsGame({ gameConfig, overridesByDifficulty, onCountryFound, onGameFinished }) {
   const state = useAscensionState(GAME_TYPES.FLAGS, gameConfig.phases, false, true, overridesByDifficulty)
   const prevFoundRef = useRef(0)
+  const totalErrorsRef = useRef(0)
+  const scoreRef = useRef(0)
+  totalErrorsRef.current = state.stats.totalErrors ?? 0
+  scoreRef.current = state.score
 
   useEffect(() => {
     if (state.stats.found > prevFoundRef.current) {
@@ -243,7 +260,16 @@ function MultiplayerAscensionFlagsGame({ gameConfig, overridesByDifficulty, onCo
 
   useEffect(() => {
     if (!state.isGameOver) return
-    onGameFinished({ attempts: state.stats.found + state.stats.skipped, elapsedTime: state.timer })
+    const perfects = state.stats.foundFirstTry ?? 0
+    onGameFinished({
+      attempts: totalErrorsRef.current,
+      elapsedTime: state.timer,
+      countriesSolved: state.stats.found,
+      weightedScore: scoreRef.current,
+      perfects,
+      stumbles: state.stats.found - perfects,
+      failures: state.stats.skipped,
+    })
   }, [state.isGameOver, onGameFinished, state.stats.found, state.stats.skipped, state.timer])
 
   return (

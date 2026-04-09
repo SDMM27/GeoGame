@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import { rankResults, aggregatePoints } from './multiplayerScoring'
 
-describe('rankResults', () => {
-  it('ranks by attempts ascending', () => {
+describe('rankResults (weighted mode — default)', () => {
+  it('ranks by weightedScore descending', () => {
     const results = [
-      { playerId: 'b', attempts: 5, elapsedTime: 10000 },
-      { playerId: 'a', attempts: 3, elapsedTime: 20000 },
+      { playerId: 'b', weightedScore: 3, elapsedTime: 10000 },
+      { playerId: 'a', weightedScore: 7, elapsedTime: 20000 },
     ]
     const ranked = rankResults(results, 2)
     expect(ranked[0].playerId).toBe('a')
@@ -18,40 +18,40 @@ describe('rankResults', () => {
 
   it('breaks ties by elapsedTime ascending', () => {
     const results = [
-      { playerId: 'b', attempts: 3, elapsedTime: 15000 },
-      { playerId: 'a', attempts: 3, elapsedTime: 10000 },
+      { playerId: 'b', weightedScore: 5, elapsedTime: 15000 },
+      { playerId: 'a', weightedScore: 5, elapsedTime: 10000 },
     ]
     expect(rankResults(results, 2)[0].playerId).toBe('a')
   })
 
   it('treats missing elapsedTime as Infinity (last)', () => {
     const results = [
-      { playerId: 'b', attempts: 3, elapsedTime: undefined },
-      { playerId: 'a', attempts: 3, elapsedTime: 5000 },
+      { playerId: 'b', weightedScore: 5, elapsedTime: undefined },
+      { playerId: 'a', weightedScore: 5, elapsedTime: 5000 },
     ]
     expect(rankResults(results, 2)[0].playerId).toBe('a')
   })
 
   it('assigns N points to 1st for N players', () => {
     const results = [
-      { playerId: 'a', attempts: 1, elapsedTime: 1000 },
-      { playerId: 'b', attempts: 2, elapsedTime: 2000 },
-      { playerId: 'c', attempts: 3, elapsedTime: 3000 },
+      { playerId: 'a', weightedScore: 9, elapsedTime: 1000 },
+      { playerId: 'b', weightedScore: 5, elapsedTime: 2000 },
+      { playerId: 'c', weightedScore: 2, elapsedTime: 3000 },
     ]
     expect(rankResults(results, 3).map(r => r.points)).toEqual([3, 2, 1])
   })
 
   it('does not mutate the input array', () => {
     const results = [
-      { playerId: 'b', attempts: 5, elapsedTime: 10000 },
-      { playerId: 'a', attempts: 3, elapsedTime: 5000 },
+      { playerId: 'b', weightedScore: 3, elapsedTime: 10000 },
+      { playerId: 'a', weightedScore: 7, elapsedTime: 5000 },
     ]
     rankResults(results, 2)
     expect(results[0].playerId).toBe('b')
   })
 })
 
-describe('rankResults with scoringMode solved', () => {
+describe('rankResults (solved mode)', () => {
   it('ranks by countriesSolved descending', () => {
     const results = [
       { playerId: 'a', attempts: 10, elapsedTime: 5000, countriesSolved: 3 },
@@ -81,10 +81,10 @@ describe('rankResults with scoringMode solved', () => {
     expect(ranked[0].playerId).toBe('b')
   })
 
-  it('falls back to attempts mode when scoringMode is omitted', () => {
+  it('falls back to weighted mode when scoringMode is omitted', () => {
     const results = [
-      { playerId: 'a', attempts: 1, elapsedTime: 1000 },
-      { playerId: 'b', attempts: 5, elapsedTime: 1000 },
+      { playerId: 'a', weightedScore: 9, elapsedTime: 1000 },
+      { playerId: 'b', weightedScore: 3, elapsedTime: 1000 },
     ]
     expect(rankResults(results, 2)[0].playerId).toBe('a')
   })

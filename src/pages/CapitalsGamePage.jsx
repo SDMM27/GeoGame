@@ -253,12 +253,25 @@ export function MultiplayerCapitalsGame({ gameConfig, overrideCountries, overrid
 function MultiplayerStandardCapitalsGame({ gameConfig, overrideCountries, onCountryFound, onGameFinished }) {
   const state = useCapitalsGameState(gameConfig.difficulty, false, overrideCountries)
   const prevFoundRef = useRef(0)
+  const totalErrorsRef = useRef(0)
+  const scoreRef = useRef(0)
+  totalErrorsRef.current = state.stats.totalErrors ?? 0
+  scoreRef.current = state.score
   useEffect(() => {
     if (state.stats.found > prevFoundRef.current) { onCountryFound(); prevFoundRef.current = state.stats.found }
   }, [state.stats.found, onCountryFound])
   useEffect(() => {
     if (!state.isGameOver) return
-    onGameFinished({ attempts: state.stats.found + state.stats.skipped, elapsedTime: state.timer })
+    const perfects = state.stats.foundFirstTry ?? 0
+    onGameFinished({
+      attempts: totalErrorsRef.current,
+      elapsedTime: state.timer,
+      countriesSolved: state.stats.found,
+      weightedScore: scoreRef.current,
+      perfects,
+      stumbles: state.stats.found - perfects,
+      failures: state.stats.skipped,
+    })
   }, [state.isGameOver, onGameFinished, state.stats.found, state.stats.skipped, state.timer])
   return <CapitalsGameLayout difficulty={gameConfig.difficulty} isTraining={false} isAscension={false} presetName={null} state={state} onGameFinished={onGameFinished} />
 }
@@ -266,12 +279,25 @@ function MultiplayerStandardCapitalsGame({ gameConfig, overrideCountries, onCoun
 function MultiplayerAscensionCapitalsGame({ gameConfig, overridesByDifficulty, onCountryFound, onGameFinished }) {
   const state = useAscensionState(GAME_TYPES.CAPITALS, gameConfig.phases, false, true, overridesByDifficulty)
   const prevFoundRef = useRef(0)
+  const totalErrorsRef = useRef(0)
+  const scoreRef = useRef(0)
+  totalErrorsRef.current = state.stats.totalErrors ?? 0
+  scoreRef.current = state.score
   useEffect(() => {
     if (state.stats.found > prevFoundRef.current) { onCountryFound(); prevFoundRef.current = state.stats.found }
   }, [state.stats.found, onCountryFound])
   useEffect(() => {
     if (!state.isGameOver) return
-    onGameFinished({ attempts: state.stats.found + state.stats.skipped, elapsedTime: state.timer })
+    const perfects = state.stats.foundFirstTry ?? 0
+    onGameFinished({
+      attempts: totalErrorsRef.current,
+      elapsedTime: state.timer,
+      countriesSolved: state.stats.found,
+      weightedScore: scoreRef.current,
+      perfects,
+      stumbles: state.stats.found - perfects,
+      failures: state.stats.skipped,
+    })
   }, [state.isGameOver, onGameFinished, state.stats.found, state.stats.skipped, state.timer])
   return <CapitalsGameLayout difficulty={null} isTraining={false} isAscension presetName={gameConfig.presetName ?? null} state={state} onGameFinished={onGameFinished} />
 }

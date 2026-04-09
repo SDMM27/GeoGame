@@ -132,7 +132,7 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
     phaseFoundRef.current = 0
     phaseSkippedRef.current = 0
     const total = phaseSequence.reduce((s, p) => s + p.count, 0)
-    const initialStats = { found: 0, skipped: 0, total }
+    const initialStats = { found: 0, skipped: 0, total, foundFirstTry: 0 }
     setStats(initialStats)
     statsRef.current = initialStats
     phaseStartTimeRef.current = performance.now()
@@ -167,10 +167,14 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
   // ─────────────────────────────────────────────────────────────
   // Core: advance game after a country is resolved
   // ─────────────────────────────────────────────────────────────
-  const advanceGame = useCallback((wasFound) => {
+  const advanceGame = useCallback((wasFound, errorsAtTime = 0) => {
     // Update global stats
     const newStats = wasFound
-      ? { ...statsRef.current, found: statsRef.current.found + 1 }
+      ? {
+          ...statsRef.current,
+          found: statsRef.current.found + 1,
+          foundFirstTry: (statsRef.current.foundFirstTry ?? 0) + (errorsAtTime === 0 ? 1 : 0),
+        }
       : { ...statsRef.current, skipped: statsRef.current.skipped + 1 }
     setStats(newStats)
     statsRef.current = newStats
@@ -302,7 +306,7 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
       setStyleForCountry(clickedName, { fillColor: '#4ade80', weight: 2, fillOpacity: 0.5 })
       shownCountriesRef.current.delete(clickedName)
       foundCountriesRef.current.add(clickedName)
-      advanceGame(!wasSkipped)
+      advanceGame(!wasSkipped, consecutiveErrorsRef.current)
     } else {
       toast.error('Dommage !', { containerId: 'topRightToast' })
       setConsecutiveErrors(prev => prev + 1)
@@ -369,7 +373,7 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
         const adjustedErrors = Math.max(0, consecutiveErrorsRef.current - 1)
         incrementScore(diffProp, adjustedErrors)
       }
-      advanceGame(!wasSkipped)
+      advanceGame(!wasSkipped, consecutiveErrorsRef.current)
     } else {
       const n = consecutiveErrorsRef.current + 1
       setConsecutiveErrors(n)
@@ -417,7 +421,7 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
 
     setTimeout(() => {
       const total = phaseSequence.reduce((s, p) => s + p.count, 0)
-      const initialStats = { found: 0, skipped: 0, total }
+      const initialStats = { found: 0, skipped: 0, total, foundFirstTry: 0 }
       setStats(initialStats)
       statsRef.current = initialStats
       phaseStartTimeRef.current = performance.now()

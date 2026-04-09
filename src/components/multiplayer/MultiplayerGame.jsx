@@ -82,16 +82,13 @@ export default function MultiplayerGame({ room, progress, playerId, roomId }) {
     if (!allFinished) return
     transitioningRef.current = true
 
-    const isBorderGuess = gameConfig.type === GAME_TYPES.BORDER_GUESS
-    const scoringMode = isBorderGuess ? 'solved' : 'attempts'
-
     const results = activePlayers.map(pid => ({
       playerId: pid,
       attempts: progress[pid].attempts ?? 0,
       elapsedTime: progress[pid].elapsedTime ?? null,
-      countriesSolved: progress[pid].countriesSolved ?? null,
+      countriesSolved: progress[pid].countriesSolved ?? 0,
     }))
-    const ranked = rankResults(results, activePlayers.length, scoringMode)
+    const ranked = rankResults(results, activePlayers.length)
 
     Promise.all(
       ranked.map(r =>

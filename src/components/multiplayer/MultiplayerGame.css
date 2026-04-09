@@ -1,3 +1,9 @@
 /* src/components/multiplayer/MultiplayerGame.css */
 .mp-game-view { display: flex; height: calc(100vh - 56px); overflow: hidden; }
-.mp-game-content { flex: 1; overflow: hidden; }
+.mp-game-content { flex: 1; overflow: hidden; position: relative; }
+
+/* Le game-page doit s'adapter au conteneur multi, pas à 100vh */
+.mp-game-content .game-page { min-height: 100%; height: 100%; }
+
+/* Le bouton Révéler remonte légèrement pour ne pas être coupé */
+.mp-game-content .hud-actions { bottom: 40px; }

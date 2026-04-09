@@ -70,7 +70,7 @@ export default function useFlagGameState(difficulty, isTraining, overrideCountri
     alreadyChosenCountries = []
     orderedIndexRef.current = 0
     const total = overrideCountries ? overrideCountries.length : getTotalFlagCountries(difficulty)
-    setStats({ found: 0, skipped: 0, total })
+    setStats({ found: 0, skipped: 0, total, totalErrors: 0 })
     const first = overrideCountries
       ? overrideCountries[orderedIndexRef.current++]
       : getRandomCountry(difficulty)
@@ -164,13 +164,16 @@ export default function useFlagGameState(difficulty, isTraining, overrideCountri
       setStats(prev =>
         wasSkipped
           ? { ...prev, skipped: prev.skipped + 1 }
-          : { ...prev, found: prev.found + 1 }
+          : consecutiveErrorsRef.current === 0
+            ? { ...prev, found: prev.found + 1, foundFirstTry: (prev.foundFirstTry ?? 0) + 1 }
+            : { ...prev, found: prev.found + 1 }
       )
       changeCountry()
     } else {
       const newErrors = consecutiveErrorsRef.current + 1
       setConsecutiveErrors(newErrors)
       consecutiveErrorsRef.current = newErrors
+      setStats(prev => ({ ...prev, totalErrors: (prev.totalErrors ?? 0) + 1 }))
       if (newErrors >= 3) {
         toast.error('Dommage ! C\'est ' + props.ADMIN, { containerId: 'topRightToast' })
         setRevealedName(props.ADMIN)
@@ -204,7 +207,7 @@ export default function useFlagGameState(difficulty, isTraining, overrideCountri
     setTimer(0)
     setTimeout(() => {
       const total = getTotalFlagCountries(difficulty)
-      setStats({ found: 0, skipped: 0, total })
+      setStats({ found: 0, skipped: 0, total, totalErrors: 0 })
       const next = getRandomCountry(difficulty)
       if (next) {
         alreadyChosenCountries.push(next.properties.ADMIN)

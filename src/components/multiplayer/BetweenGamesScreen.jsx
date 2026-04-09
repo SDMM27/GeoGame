@@ -1,15 +1,12 @@
 // src/components/multiplayer/BetweenGamesScreen.jsx
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useRef } from 'react'
 import { updateRoomStatus } from '../../utils/multiplayerRoom'
 import './BetweenGamesScreen.css'
-
-const AUTO_ADVANCE_SECONDS = 10
 
 export default function BetweenGamesScreen({ room, gameResults, playerId, roomId }) {
   const gameIndex = room.currentGameIndex
   const isHost = room.hostId === playerId
   const isLastGame = gameIndex >= room.config.games.length - 1
-  const [countdown, setCountdown] = useState(AUTO_ADVANCE_SECONDS)
   const advancedRef = useRef(false)
 
   const advance = () => {
@@ -21,21 +18,6 @@ export default function BetweenGamesScreen({ room, gameResults, playerId, roomId
       updateRoomStatus(roomId, 'playing', { currentGameIndex: gameIndex + 1 })
     }
   }
-
-  useEffect(() => {
-    if (!isHost) return
-    const interval = setInterval(() => {
-      setCountdown(prev => {
-        if (prev <= 1) {
-          clearInterval(interval)
-          advance()
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-    return () => clearInterval(interval)
-  }, [isHost]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const currentResults = Object.values(gameResults)
     .filter(r => r.gameIndex === gameIndex)
@@ -63,7 +45,8 @@ export default function BetweenGamesScreen({ room, gameResults, playerId, roomId
           <tr>
             <th>Rang</th>
             <th>Joueur</th>
-            <th>Tentatives</th>
+            <th>Pays trouvés</th>
+            <th>Erreurs</th>
             <th>Temps</th>
             <th>Points</th>
             <th>Total</th>
@@ -77,6 +60,7 @@ export default function BetweenGamesScreen({ room, gameResults, playerId, roomId
               <tr key={result.playerId} className={isMe ? 'between-games-row--me' : ''}>
                 <td>{medals[result.rank - 1] ?? result.rank}</td>
                 <td>{playerData?.pseudo ?? '?'}{isMe ? ' (Toi)' : ''}</td>
+                <td>{result.countriesSolved ?? 0}</td>
                 <td>{result.attempts}</td>
                 <td>{formatTime(result.elapsedTime)}</td>
                 <td className="between-games-pts">+{result.points} pt{result.points > 1 ? 's' : ''}</td>
@@ -90,11 +74,8 @@ export default function BetweenGamesScreen({ room, gameResults, playerId, roomId
       {isHost ? (
         <div className="between-games-actions">
           <button className="between-games-next-btn" onClick={advance}>
-            {isLastGame ? 'Voir le classement final' : `Jeu suivant →`}
+            {isLastGame ? 'Voir le classement final' : 'Jeu suivant →'}
           </button>
-          <p className="between-games-auto">
-            {countdown > 0 ? `Avancement automatique dans ${countdown}s` : 'Avancement...'}
-          </p>
         </div>
       ) : (
         <p className="between-games-waiting">En attente du host...</p>

@@ -177,8 +177,8 @@ function PlacementGameLayout({ difficulty, isTraining, isAscension, presetName, 
       </div>
 
       <div className="hud-actions">
-        <button className="hud-btn hud-btn--home" onClick={goHome}>← Accueil</button>
-        <button className="hud-btn hud-btn--see" onClick={seeCountry}>👁 Voir</button>
+        {!onGameFinished && <button className="hud-btn hud-btn--home" onClick={goHome}>← Accueil</button>}
+        <button className="hud-btn hud-btn--reveal" onClick={seeCountry}>👁 Révéler</button>
         {!onGameFinished && <button className="hud-btn hud-btn--restart" onClick={restartGame}>↺ Recommencer</button>}
       </div>
 
@@ -317,6 +317,10 @@ export function MultiplayerPlacementGame({ gameConfig, overrideCountries, overri
 function MultiplayerStandardPlacementGame({ gameConfig, overrideCountries, onCountryFound, onGameFinished }) {
   const state = useGameState(gameConfig.difficulty, false, overrideCountries)
   const prevFoundRef = useRef(0)
+  const totalErrorsRef = useRef(0)
+  const foundFirstTryRef = useRef(0)
+  totalErrorsRef.current = state.stats.totalErrors ?? 0
+  foundFirstTryRef.current = state.stats.foundFirstTry ?? 0
 
   useEffect(() => {
     if (state.stats.found > prevFoundRef.current) {
@@ -327,7 +331,7 @@ function MultiplayerStandardPlacementGame({ gameConfig, overrideCountries, onCou
 
   useEffect(() => {
     if (!state.isGameOver) return
-    onGameFinished({ attempts: state.stats.found + state.stats.skipped, elapsedTime: state.timer })
+    onGameFinished({ attempts: totalErrorsRef.current, elapsedTime: state.timer, countriesSolved: state.stats.found, foundFirstTry: foundFirstTryRef.current })
   }, [state.isGameOver, onGameFinished, state.stats.found, state.stats.skipped, state.timer])
 
   return (
@@ -345,6 +349,10 @@ function MultiplayerStandardPlacementGame({ gameConfig, overrideCountries, onCou
 function MultiplayerAscensionPlacementGame({ gameConfig, overridesByDifficulty, onCountryFound, onGameFinished }) {
   const state = useAscensionState(GAME_TYPES.PLACEMENT, gameConfig.phases, false, true, overridesByDifficulty)
   const prevFoundRef = useRef(0)
+  const totalErrorsRef = useRef(0)
+  const foundFirstTryRef = useRef(0)
+  totalErrorsRef.current = state.stats.totalErrors ?? 0
+  foundFirstTryRef.current = state.stats.foundFirstTry ?? 0
 
   useEffect(() => {
     if (state.stats.found > prevFoundRef.current) {
@@ -355,7 +363,7 @@ function MultiplayerAscensionPlacementGame({ gameConfig, overridesByDifficulty, 
 
   useEffect(() => {
     if (!state.isGameOver) return
-    onGameFinished({ attempts: state.stats.found + state.stats.skipped, elapsedTime: state.timer })
+    onGameFinished({ attempts: totalErrorsRef.current, elapsedTime: state.timer, countriesSolved: state.stats.found, foundFirstTry: foundFirstTryRef.current })
   }, [state.isGameOver, onGameFinished, state.stats.found, state.stats.skipped, state.timer])
 
   return (

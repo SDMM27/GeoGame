@@ -187,9 +187,19 @@
   border-color: var(--accent-cyan-border);
 }
 
-.hud-btn--see {
-  color: var(--warning);
-  border-color: rgba(251, 191, 36, 0.3);
+.hud-btn--reveal {
+  color: #fff;
+  background: rgba(251, 191, 36, 0.18);
+  border-color: rgba(251, 191, 36, 0.6);
+  font-size: 0.95rem;
+  padding: 12px 24px;
+  letter-spacing: 0.03em;
+}
+
+.hud-btn--reveal:hover {
+  background: rgba(251, 191, 36, 0.32);
+  border-color: rgba(251, 191, 36, 0.9);
+  transform: translateY(-2px);
 }
 
 .hud-btn--restart {

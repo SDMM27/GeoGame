@@ -34,7 +34,7 @@ export default function MultiplayerBorderGuess({ countries, onCountryFound, onGa
 
   useEffect(() => {
     if (!isComplete || completedRef.current) return
-    const roundAttempts = guesses.length
+    const roundAttempts = guesses.filter(g => !g.isCorrect).length
     const newTotal = totalAttempts + roundAttempts
     const newSolved = isSolved ? countriesSolved + 1 : countriesSolved
 

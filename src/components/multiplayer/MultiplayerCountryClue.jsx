@@ -9,6 +9,7 @@ import './MultiplayerCountryClue.css'
 export default function MultiplayerCountryClue({ countries, showGlobe = true, onCountryFound, onGameFinished }) {
   const [roundIndex, setRoundIndex] = useState(0)
   const [totalAttempts, setTotalAttempts] = useState(0)
+  const [totalSolved, setTotalSolved] = useState(0)
   const startTimeRef = useRef(performance.now())
   const completedRef = useRef(false)
 
@@ -22,15 +23,17 @@ export default function MultiplayerCountryClue({ countries, showGlobe = true, on
 
   useEffect(() => {
     if (!isComplete || completedRef.current) return
-    const roundAttempts = guesses.length
+    const roundAttempts = guesses.filter(g => !g.isCorrect).length
     const newTotal = totalAttempts + roundAttempts
+    const newSolved = isSolved ? totalSolved + 1 : totalSolved
     if (isSolved) onCountryFound()
 
     if (roundIndex + 1 >= countries.length) {
       completedRef.current = true
-      onGameFinished({ attempts: newTotal, elapsedTime: performance.now() - startTimeRef.current })
+      onGameFinished({ attempts: newTotal, elapsedTime: performance.now() - startTimeRef.current, countriesSolved: newSolved })
     } else {
       setTotalAttempts(newTotal)
+      setTotalSolved(newSolved)
       setTimeout(() => setRoundIndex(i => i + 1), 1500)
     }
   }, [isComplete]) // eslint-disable-line react-hooks/exhaustive-deps

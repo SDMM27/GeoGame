@@ -18,11 +18,27 @@ export default function FinalLeaderboard({ room, gameResults, playerId, roomId }
   const medals = ['🥇', '🥈', '🥉']
 
   const gameCount = room.config.games.length
-  const pointsByPlayerAndGame = {}
+
+  const statsByPlayerAndGame = {}
   Object.values(gameResults).forEach(r => {
-    if (!pointsByPlayerAndGame[r.playerId]) pointsByPlayerAndGame[r.playerId] = {}
-    pointsByPlayerAndGame[r.playerId][r.gameIndex] = r.points
+    if (!statsByPlayerAndGame[r.playerId]) statsByPlayerAndGame[r.playerId] = {}
+    statsByPlayerAndGame[r.playerId][r.gameIndex] = {
+      points: r.points,
+      countriesSolved: r.countriesSolved ?? 0,
+      rank: r.rank,
+    }
   })
+
+  const rankByPlayerAndGame = {}
+  for (let gi = 0; gi < gameCount; gi++) {
+    const sorted = Object.values(gameResults)
+      .filter(r => r.gameIndex === gi)
+      .sort((a, b) => a.rank - b.rank)
+    sorted.forEach((r, idx) => {
+      if (!rankByPlayerAndGame[r.playerId]) rankByPlayerAndGame[r.playerId] = {}
+      rankByPlayerAndGame[r.playerId][gi] = idx
+    })
+  }
 
   const handleRematch = async () => {
     if (!isHost || rematchSubmitting) return
@@ -84,13 +100,16 @@ export default function FinalLeaderboard({ room, gameResults, playerId, roomId }
               {sortedPlayers.map(([pid, player]) => (
                 <tr key={pid} className={pid === playerId ? 'final-lb-row-detail--me' : ''}>
                   <td>{player.pseudo}</td>
-                  {Array.from({ length: gameCount }, (_, gi) => (
-                    <td key={gi} className="final-lb-cell">
-                      {pointsByPlayerAndGame[pid]?.[gi] != null
-                        ? `${medals[Object.values(gameResults).filter(r => r.gameIndex === gi).sort((a,b) => a.rank - b.rank).findIndex(r => r.playerId === pid)]} ${pointsByPlayerAndGame[pid][gi]}pt`
-                        : '—'}
-                    </td>
-                  ))}
+                  {Array.from({ length: gameCount }, (_, gi) => {
+                    const stats = statsByPlayerAndGame[pid]?.[gi]
+                    const rankIdx = rankByPlayerAndGame[pid]?.[gi]
+                    if (stats == null) return <td key={gi} className="final-lb-cell">—</td>
+                    return (
+                      <td key={gi} className="final-lb-cell">
+                        {medals[rankIdx] ?? `${rankIdx + 1}`} {stats.countriesSolved} pays · {stats.points}pt
+                      </td>
+                    )
+                  })}
                   <td className="final-lb-total">{player.totalPoints} pts</td>
                 </tr>
               ))}

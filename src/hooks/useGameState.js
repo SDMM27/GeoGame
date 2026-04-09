@@ -97,7 +97,7 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
     alreadyChosenCountries = []
     orderedIndexRef.current = 0
     const total = overrideCountries ? overrideCountries.length : getTotalCountries(difficulty)
-    setStats({ found: 0, skipped: 0, total })
+    setStats({ found: 0, skipped: 0, total, totalErrors: 0 })
     const firstCountry = overrideCountries
       ? overrideCountries[orderedIndexRef.current++]
       : getRandomCountry(difficulty)
@@ -231,15 +231,21 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
       setStats(prev =>
         wasSkipped
           ? { ...prev, skipped: prev.skipped + 1 }
-          : { ...prev, found: prev.found + 1 }
+          : consecutiveErrorsRef.current === 0
+            ? { ...prev, found: prev.found + 1, foundFirstTry: (prev.foundFirstTry ?? 0) + 1 }
+            : { ...prev, found: prev.found + 1 }
       )
       changeCountry()
       setConsecutiveErrors(0)
+      consecutiveErrorsRef.current = 0
       setClickOnSeeCountry(false)
       clickOnSeeCountryRef.current = false
     } else {
       toast.error('Dommage !', { containerId: 'topRightToast' })
-      setConsecutiveErrors(prev => prev + 1)
+      const newErrors = consecutiveErrorsRef.current + 1
+      setConsecutiveErrors(newErrors)
+      consecutiveErrorsRef.current = newErrors
+      setStats(prev => ({ ...prev, totalErrors: (prev.totalErrors ?? 0) + 1 }))
     }
   }, [changeCountry, setStyleForCountry])
 
@@ -287,7 +293,7 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
     setTimer(0);
     setTimeout(() => {
       const total = getTotalCountries(difficulty);
-      setStats({ found: 0, skipped: 0, total });
+      setStats({ found: 0, skipped: 0, total, totalErrors: 0 });
       const next = getRandomCountry(difficulty);
       if (next) {
         alreadyChosenCountries.push(next);

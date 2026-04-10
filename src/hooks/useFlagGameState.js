@@ -4,6 +4,7 @@ import { toast } from 'react-toastify'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { formatTime } from '../utils/formatTime'
 import { checkAnswer } from '../utils/normalizeAnswer'
+import { saveSnapshot } from '../utils/multiplayerSnapshot'
 
 const DIFFICULTIES = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
 
@@ -28,12 +29,12 @@ export function getTotalFlagCountries(difficulty) {
 
 let alreadyChosenCountries = []
 
-export default function useFlagGameState(difficulty, isTraining, overrideCountries = null) {
+export default function useFlagGameState(difficulty, isTraining, overrideCountries = null, mpSnapshot = null, mpSnapshotKey = null) {
   const navigate = useNavigate()
 
   const [targetCountry, setTargetCountry] = useState(null)
   const targetCountryRef = useRef(null)
-  const [score, setScore] = useState(0)
+  const [score, setScore] = useState(mpSnapshot?.score ?? 0)
   const [gameStarted, setGameStarted] = useState(false)
   const gameStartedRef = useRef(false)
   const [consecutiveErrors, setConsecutiveErrors] = useState(0)
@@ -41,12 +42,16 @@ export default function useFlagGameState(difficulty, isTraining, overrideCountri
   const [inputValue, setInputValue] = useState('')
   const [revealedName, setRevealedName] = useState(null)
   const [stats, setStats] = useState({ found: 0, skipped: 0, total: 0 })
-  const [timer, setTimer] = useState(0)
-  const timerRef = useRef(0)
+  const [timer, setTimer] = useState(mpSnapshot?.elapsedMs ?? 0)
+  const timerRef = useRef(mpSnapshot?.elapsedMs ?? 0)
   const startTimeRef = useRef(null)
   const [clickOnSeeCountry, setClickOnSeeCountry] = useState(false)
   const clickOnSeeCountryRef = useRef(false)
   const gameOverToastShownRef = useRef(false)
+
+  // Refs for snapshot saves (always current, avoids stale closures in intervals)
+  const statsForSnapRef = useRef({ found: 0, skipped: 0, total: 0, totalErrors: 0 })
+  const scoreForSnapRef = useRef(mpSnapshot?.score ?? 0)
 
   useEffect(() => {
     if (!difficulty && !overrideCountries) navigate('/')
@@ -70,6 +75,33 @@ export default function useFlagGameState(difficulty, isTraining, overrideCountri
     alreadyChosenCountries = []
     orderedIndexRef.current = 0
     const total = overrideCountries ? overrideCountries.length : getTotalFlagCountries(difficulty)
+
+    if (mpSnapshot && overrideCountries && mpSnapshot.countryIndex > 0) {
+      // Restore state — player refreshed mid-game
+      const idx = mpSnapshot.countryIndex
+      orderedIndexRef.current = idx
+      for (let i = 0; i < idx; i++) alreadyChosenCountries.push(overrideCountries[i].properties.ADMIN)
+      const restoredStats = {
+        found: mpSnapshot.found,
+        skipped: mpSnapshot.skipped,
+        total,
+        totalErrors: mpSnapshot.totalErrors ?? 0,
+        foundFirstTry: mpSnapshot.foundFirstTry ?? 0,
+      }
+      setStats(restoredStats)
+      statsForSnapRef.current = restoredStats
+      scoreForSnapRef.current = mpSnapshot.score ?? 0
+      setConsecutiveErrors(mpSnapshot.consecutiveErrors ?? 0)
+      consecutiveErrorsRef.current = mpSnapshot.consecutiveErrors ?? 0
+      const currentCountry = overrideCountries[idx - 1] ?? null
+      if (currentCountry) {
+        setTargetCountry(currentCountry)
+        gameStartedRef.current = true
+        setGameStarted(true)
+      }
+      return
+    }
+
     setStats({ found: 0, skipped: 0, total, totalErrors: 0 })
     const first = overrideCountries
       ? overrideCountries[orderedIndexRef.current++]
@@ -190,6 +222,45 @@ export default function useFlagGameState(difficulty, isTraining, overrideCountri
     clickOnSeeCountryRef.current = true
     setRevealedName(targetCountryRef.current?.properties?.ADMIN ?? null)
   }
+
+  // Keep snapshot refs in sync
+  useEffect(() => { statsForSnapRef.current = stats }, [stats])
+  useEffect(() => { scoreForSnapRef.current = score }, [score])
+
+  // Save state immediately on action (country found/skipped/error)
+  useEffect(() => {
+    if (!mpSnapshotKey || !gameStarted || allProcessed) return
+    saveSnapshot(mpSnapshotKey, {
+      savedAt: Date.now(),
+      elapsedMs: timerRef.current,
+      countryIndex: orderedIndexRef.current,
+      found: stats.found,
+      skipped: stats.skipped,
+      totalErrors: stats.totalErrors ?? 0,
+      foundFirstTry: stats.foundFirstTry ?? 0,
+      score,
+      consecutiveErrors,
+    })
+  }, [stats, score, consecutiveErrors]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Also save timer every 5s so elapsed time stays accurate
+  useEffect(() => {
+    if (!mpSnapshotKey || !gameStarted || allProcessed) return
+    const id = setInterval(() => {
+      saveSnapshot(mpSnapshotKey, {
+        savedAt: Date.now(),
+        elapsedMs: timerRef.current,
+        countryIndex: orderedIndexRef.current,
+        found: statsForSnapRef.current.found,
+        skipped: statsForSnapRef.current.skipped,
+        totalErrors: statsForSnapRef.current.totalErrors ?? 0,
+        foundFirstTry: statsForSnapRef.current.foundFirstTry ?? 0,
+        score: scoreForSnapRef.current,
+        consecutiveErrors: consecutiveErrorsRef.current,
+      })
+    }, 5000)
+    return () => clearInterval(id)
+  }, [gameStarted, allProcessed, mpSnapshotKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const restartGame = () => {
     setGameStarted(false)

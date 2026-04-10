@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import countries from '../data/countriesWithDifficulty_FR.json'
@@ -346,7 +346,7 @@ function buildGuessRecord(guessInput, targetName) {
 }
 
 export default function useCountryClueState(mode, options = {}) {
-  const { overrideCountry = null } = options
+  const { overrideCountry = null, initialGuesses = null } = options
   const navigate = useNavigate()
   const [currentCountry, setCurrentCountry] = useState(null)
   const [inputValue, setInputValue] = useState('')
@@ -356,6 +356,7 @@ export default function useCountryClueState(mode, options = {}) {
   const [hasStarted, setHasStarted] = useState(false)
   const [startedAt, setStartedAt] = useState(null)
   const [elapsedTime, setElapsedTime] = useState(null)
+  const initialGuessesUsedRef = useRef(false)
 
   useEffect(() => {
     if (overrideCountry) return
@@ -367,13 +368,18 @@ export default function useCountryClueState(mode, options = {}) {
   useEffect(() => {
     if (!overrideCountry) return
     setCurrentCountry(overrideCountry)
-    setGuesses([])
+    if (!initialGuessesUsedRef.current && initialGuesses?.length) {
+      setGuesses(initialGuesses)
+      initialGuessesUsedRef.current = true
+    } else {
+      setGuesses([])
+    }
     setStatus('playing')
     setInputValue('')
     setHasStarted(true)
     setStartedAt(Date.now())
     setElapsedTime(null)
-  }, [overrideCountry])
+  }, [overrideCountry]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (overrideCountry) return

@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom'
 import * as Flags from 'country-flag-icons/react/3x2'
 import { ToastContainer } from 'react-toastify'
 import useCapitalsGameState from '../hooks/useCapitalsGameState'
+import { snapshotKey, loadSnapshot } from '../utils/multiplayerSnapshot'
 import useAscensionState from '../hooks/useAscensionState'
 import { GAME_TYPES } from '../utils/gameTypes'
 import PhaseIndicator from '../components/PhaseIndicator'
@@ -229,7 +230,7 @@ function AscensionCapitalsGame({ phases, isTraining, presetName }) {
   )
 }
 
-export function MultiplayerCapitalsGame({ gameConfig, overrideCountries, overridesByDifficulty, onCountryFound, onGameFinished }) {
+export function MultiplayerCapitalsGame({ gameConfig, overrideCountries, overridesByDifficulty, onCountryFound, onGameFinished, roomId, playerId, gameIndex }) {
   if (gameConfig.mode === 'ascension') {
     return (
       <MultiplayerAscensionCapitalsGame
@@ -237,6 +238,9 @@ export function MultiplayerCapitalsGame({ gameConfig, overrideCountries, overrid
         overridesByDifficulty={overridesByDifficulty}
         onCountryFound={onCountryFound}
         onGameFinished={onGameFinished}
+        roomId={roomId}
+        playerId={playerId}
+        gameIndex={gameIndex}
       />
     )
   }
@@ -246,13 +250,20 @@ export function MultiplayerCapitalsGame({ gameConfig, overrideCountries, overrid
       overrideCountries={overrideCountries}
       onCountryFound={onCountryFound}
       onGameFinished={onGameFinished}
+      roomId={roomId}
+      playerId={playerId}
+      gameIndex={gameIndex}
     />
   )
 }
 
-function MultiplayerStandardCapitalsGame({ gameConfig, overrideCountries, onCountryFound, onGameFinished }) {
-  const state = useCapitalsGameState(gameConfig.difficulty, false, overrideCountries)
-  const prevFoundRef = useRef(0)
+function MultiplayerStandardCapitalsGame({ gameConfig, overrideCountries, onCountryFound, onGameFinished, roomId, playerId, gameIndex }) {
+  const mpSnapKey = roomId && playerId != null && gameIndex != null
+    ? snapshotKey(roomId, playerId, gameIndex)
+    : null
+  const [mpSnapshot] = useState(() => mpSnapKey ? loadSnapshot(mpSnapKey) : null)
+  const state = useCapitalsGameState(gameConfig.difficulty, false, overrideCountries, mpSnapshot, mpSnapKey)
+  const prevFoundRef = useRef(mpSnapshot?.found ?? 0)
   const totalErrorsRef = useRef(0)
   const scoreRef = useRef(0)
   totalErrorsRef.current = state.stats.totalErrors ?? 0
@@ -276,9 +287,13 @@ function MultiplayerStandardCapitalsGame({ gameConfig, overrideCountries, onCoun
   return <CapitalsGameLayout difficulty={gameConfig.difficulty} isTraining={false} isAscension={false} presetName={null} state={state} onGameFinished={onGameFinished} />
 }
 
-function MultiplayerAscensionCapitalsGame({ gameConfig, overridesByDifficulty, onCountryFound, onGameFinished }) {
-  const state = useAscensionState(GAME_TYPES.CAPITALS, gameConfig.phases, false, true, overridesByDifficulty)
-  const prevFoundRef = useRef(0)
+function MultiplayerAscensionCapitalsGame({ gameConfig, overridesByDifficulty, onCountryFound, onGameFinished, roomId, playerId, gameIndex }) {
+  const mpSnapKey = roomId && playerId != null && gameIndex != null
+    ? snapshotKey(roomId, playerId, gameIndex)
+    : null
+  const [mpSnapshot] = useState(() => mpSnapKey ? loadSnapshot(mpSnapKey) : null)
+  const state = useAscensionState(GAME_TYPES.CAPITALS, gameConfig.phases, false, true, overridesByDifficulty, mpSnapshot, mpSnapKey)
+  const prevFoundRef = useRef(mpSnapshot?.found ?? 0)
   const totalErrorsRef = useRef(0)
   const scoreRef = useRef(0)
   totalErrorsRef.current = state.stats.totalErrors ?? 0

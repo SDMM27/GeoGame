@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom'
 import * as Flags from 'country-flag-icons/react/3x2'
 import { ToastContainer } from 'react-toastify'
 import useFlagGameState from '../hooks/useFlagGameState'
+import { snapshotKey, loadSnapshot } from '../utils/multiplayerSnapshot'
 import useAscensionState from '../hooks/useAscensionState'
 import { GAME_TYPES } from '../utils/gameTypes'
 import PhaseIndicator from '../components/PhaseIndicator'
@@ -181,7 +182,7 @@ function AscensionFlagGame({ phases, isTraining, presetName }) {
   )
 }
 
-export function MultiplayerFlagsGame({ gameConfig, overrideCountries, overridesByDifficulty, onCountryFound, onGameFinished }) {
+export function MultiplayerFlagsGame({ gameConfig, overrideCountries, overridesByDifficulty, onCountryFound, onGameFinished, roomId, playerId, gameIndex }) {
   if (gameConfig.mode === 'ascension') {
     return (
       <MultiplayerAscensionFlagsGame
@@ -189,6 +190,9 @@ export function MultiplayerFlagsGame({ gameConfig, overrideCountries, overridesB
         overridesByDifficulty={overridesByDifficulty}
         onCountryFound={onCountryFound}
         onGameFinished={onGameFinished}
+        roomId={roomId}
+        playerId={playerId}
+        gameIndex={gameIndex}
       />
     )
   }
@@ -198,13 +202,20 @@ export function MultiplayerFlagsGame({ gameConfig, overrideCountries, overridesB
       overrideCountries={overrideCountries}
       onCountryFound={onCountryFound}
       onGameFinished={onGameFinished}
+      roomId={roomId}
+      playerId={playerId}
+      gameIndex={gameIndex}
     />
   )
 }
 
-function MultiplayerStandardFlagsGame({ gameConfig, overrideCountries, onCountryFound, onGameFinished }) {
-  const state = useFlagGameState(gameConfig.difficulty, false, overrideCountries)
-  const prevFoundRef = useRef(0)
+function MultiplayerStandardFlagsGame({ gameConfig, overrideCountries, onCountryFound, onGameFinished, roomId, playerId, gameIndex }) {
+  const mpSnapKey = roomId && playerId != null && gameIndex != null
+    ? snapshotKey(roomId, playerId, gameIndex)
+    : null
+  const [mpSnapshot] = useState(() => mpSnapKey ? loadSnapshot(mpSnapKey) : null)
+  const state = useFlagGameState(gameConfig.difficulty, false, overrideCountries, mpSnapshot, mpSnapKey)
+  const prevFoundRef = useRef(mpSnapshot?.found ?? 0)
   const totalErrorsRef = useRef(0)
   const scoreRef = useRef(0)
   totalErrorsRef.current = state.stats.totalErrors ?? 0
@@ -243,9 +254,13 @@ function MultiplayerStandardFlagsGame({ gameConfig, overrideCountries, onCountry
   )
 }
 
-function MultiplayerAscensionFlagsGame({ gameConfig, overridesByDifficulty, onCountryFound, onGameFinished }) {
-  const state = useAscensionState(GAME_TYPES.FLAGS, gameConfig.phases, false, true, overridesByDifficulty)
-  const prevFoundRef = useRef(0)
+function MultiplayerAscensionFlagsGame({ gameConfig, overridesByDifficulty, onCountryFound, onGameFinished, roomId, playerId, gameIndex }) {
+  const mpSnapKey = roomId && playerId != null && gameIndex != null
+    ? snapshotKey(roomId, playerId, gameIndex)
+    : null
+  const [mpSnapshot] = useState(() => mpSnapKey ? loadSnapshot(mpSnapKey) : null)
+  const state = useAscensionState(GAME_TYPES.FLAGS, gameConfig.phases, false, true, overridesByDifficulty, mpSnapshot, mpSnapKey)
+  const prevFoundRef = useRef(mpSnapshot?.found ?? 0)
   const totalErrorsRef = useRef(0)
   const scoreRef = useRef(0)
   totalErrorsRef.current = state.stats.totalErrors ?? 0

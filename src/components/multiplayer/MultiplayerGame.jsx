@@ -10,6 +10,7 @@ import {
   updateRoomStatus,
   updateTotalPoints,
 } from '../../utils/multiplayerRoom'
+import { snapshotKey, loadSnapshot, saveSnapshot, clearSnapshot } from '../../utils/multiplayerSnapshot'
 import { MultiplayerPlacementGame } from '../../pages/GamePage'
 import { MultiplayerFlagsGame } from '../../pages/FlagGamePage'
 import { MultiplayerCapitalsGame } from '../../pages/CapitalsGamePage'
@@ -23,6 +24,11 @@ export default function MultiplayerGame({ room, progress, playerId, roomId }) {
   const gameConfig = room.config.games[gameIndex]
   const isHost = room.hostId === playerId
   const transitioningRef = useRef(false)
+
+  const [alreadyCompleted] = React.useState(() => {
+    const snap = loadSnapshot(snapshotKey(roomId, playerId, gameIndex))
+    return snap?.completed === true
+  })
 
   const seededData = useMemo(
     () => getSeededCountriesForGame(gameConfig, room.seed, gameIndex),
@@ -38,9 +44,29 @@ export default function MultiplayerGame({ room, progress, playerId, roomId }) {
   }, [gameConfig, seededData])
 
   useEffect(() => {
+    const key = snapshotKey(roomId, playerId, gameIndex)
+    const snap = loadSnapshot(key)
+    if (snap?.completed) {
+      // Game was already finished before refresh — re-establish finished: true in Firestore
+      updatePlayerProgress(roomId, playerId, {
+        gameIndex,
+        countriesFound: totalCountries,
+        attempts: snap.attempts ?? 0,
+        elapsedTime: snap.elapsedTime ?? null,
+        countriesSolved: snap.totalSolved ?? 0,
+        weightedScore: snap.totalWeightedScore ?? 0,
+        perfects: snap.totalPerfects ?? 0,
+        stumbles: snap.totalStumbles ?? 0,
+        failures: snap.totalFailures ?? 0,
+        finished: true,
+        lastSeen: serverTimestamp(),
+      })
+      return
+    }
+    const countriesFound = snap?.found ?? snap?.totalSolved ?? 0
     updatePlayerProgress(roomId, playerId, {
       gameIndex,
-      countriesFound: 0,
+      countriesFound,
       finished: false,
       lastSeen: serverTimestamp(),
     })
@@ -57,6 +83,7 @@ export default function MultiplayerGame({ room, progress, playerId, roomId }) {
   }, [roomId, playerId, gameIndex, progress])
 
   const handleGameFinished = useCallback(({ attempts, elapsedTime, countriesSolved, weightedScore, perfects, stumbles, failures }) => {
+    clearSnapshot(snapshotKey(roomId, playerId, gameIndex))
     updatePlayerProgress(roomId, playerId, {
       gameIndex,
       countriesFound: totalCountries,
@@ -130,6 +157,9 @@ export default function MultiplayerGame({ room, progress, playerId, roomId }) {
   const commonProps = {
     onCountryFound: handleCountryFound,
     onGameFinished: handleGameFinished,
+    roomId,
+    playerId,
+    gameIndex,
   }
 
   const renderGame = () => {
@@ -137,6 +167,7 @@ export default function MultiplayerGame({ room, progress, playerId, roomId }) {
     const isAscension = mode === 'ascension'
     const overrides = isAscension ? null : seededData
     const overridesByDiff = isAscension ? seededData : null
+    const mpSnapKey = snapshotKey(roomId, playerId, gameIndex)
 
     if (type === GAME_TYPES.PLACEMENT)
       return <MultiplayerPlacementGame gameConfig={gameConfig} overrideCountries={overrides} overridesByDifficulty={overridesByDiff} {...commonProps} />
@@ -145,9 +176,9 @@ export default function MultiplayerGame({ room, progress, playerId, roomId }) {
     if (type === GAME_TYPES.CAPITALS)
       return <MultiplayerCapitalsGame gameConfig={gameConfig} overrideCountries={overrides} overridesByDifficulty={overridesByDiff} {...commonProps} />
     if (type === GAME_TYPES.BORDER_GUESS)
-      return <MultiplayerBorderGuess countries={seededData} {...commonProps} />
+      return <MultiplayerBorderGuess countries={seededData} snapshotKey={mpSnapKey} onCountryFound={handleCountryFound} onGameFinished={handleGameFinished} />
     if (type === GAME_TYPES.COUNTRY_CLUE)
-      return <MultiplayerCountryClue countries={seededData} showGlobe={gameConfig.showGlobe ?? true} {...commonProps} />
+      return <MultiplayerCountryClue countries={seededData} showGlobe={gameConfig.showGlobe ?? true} snapshotKey={mpSnapKey} onCountryFound={handleCountryFound} onGameFinished={handleGameFinished} />
     return <p>Type de jeu inconnu : {type}</p>
   }
 

@@ -23,12 +23,12 @@ export function generateRoomId() {
   return id
 }
 
-/** UUID stable par onglet, persisté en sessionStorage. */
+/** UUID stable par navigateur, persisté en localStorage (cross-onglets). */
 export function getOrCreatePlayerId() {
-  let id = sessionStorage.getItem('mp_player_id')
+  let id = localStorage.getItem('mp_player_id')
   if (!id) {
     id = crypto.randomUUID()
-    sessionStorage.setItem('mp_player_id', id)
+    localStorage.setItem('mp_player_id', id)
   }
   return id
 }

@@ -1,5 +1,5 @@
 // src/components/multiplayer/MultiplayerGame.jsx
-import React, { useCallback, useEffect, useMemo, useRef } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { serverTimestamp } from 'firebase/firestore'
 import { GAME_TYPES } from '../../utils/gameTypes'
 import { getSeededCountriesForGame } from '../../utils/multiplayerSeed'
@@ -10,7 +10,7 @@ import {
   updateRoomStatus,
   updateTotalPoints,
 } from '../../utils/multiplayerRoom'
-import { snapshotKey, loadSnapshot, saveSnapshot, clearSnapshot } from '../../utils/multiplayerSnapshot'
+import { snapshotKey, loadSnapshot, saveSnapshot } from '../../utils/multiplayerSnapshot'
 import { MultiplayerPlacementGame } from '../../pages/GamePage'
 import { MultiplayerFlagsGame } from '../../pages/FlagGamePage'
 import { MultiplayerCapitalsGame } from '../../pages/CapitalsGamePage'
@@ -25,10 +25,9 @@ export default function MultiplayerGame({ room, progress, playerId, roomId }) {
   const isHost = room.hostId === playerId
   const transitioningRef = useRef(false)
 
-  const [alreadyCompleted] = React.useState(() => {
-    const snap = loadSnapshot(snapshotKey(roomId, playerId, gameIndex))
-    return snap?.completed === true
-  })
+  const [isFinished, setIsFinished] = useState(
+    () => loadSnapshot(snapshotKey(roomId, playerId, gameIndex))?.completed === true
+  )
 
   const seededData = useMemo(
     () => getSeededCountriesForGame(gameConfig, room.seed, gameIndex),
@@ -59,6 +58,7 @@ export default function MultiplayerGame({ room, progress, playerId, roomId }) {
         stumbles: snap.totalStumbles ?? 0,
         failures: snap.totalFailures ?? 0,
         finished: true,
+        cheated: snap?.revealed || false,
         lastSeen: serverTimestamp(),
       })
       return
@@ -83,7 +83,17 @@ export default function MultiplayerGame({ room, progress, playerId, roomId }) {
   }, [roomId, playerId, gameIndex, progress])
 
   const handleGameFinished = useCallback(({ attempts, elapsedTime, countriesSolved, weightedScore, perfects, stumbles, failures }) => {
-    clearSnapshot(snapshotKey(roomId, playerId, gameIndex))
+    saveSnapshot(snapshotKey(roomId, playerId, gameIndex), {
+      savedAt: Date.now(),
+      completed: true,
+      attempts: attempts ?? 0,
+      elapsedTime: elapsedTime ?? null,
+      totalSolved: countriesSolved ?? 0,
+      totalWeightedScore: weightedScore ?? 0,
+      totalPerfects: perfects ?? 0,
+      totalStumbles: stumbles ?? 0,
+      totalFailures: failures ?? 0,
+    })
     updatePlayerProgress(roomId, playerId, {
       gameIndex,
       countriesFound: totalCountries,
@@ -154,6 +164,12 @@ export default function MultiplayerGame({ room, progress, playerId, roomId }) {
     })
   }, [progress, isHost, room.players, gameIndex, roomId]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  useEffect(() => {
+    if (progress[playerId]?.gameIndex === gameIndex && progress[playerId]?.finished === true) {
+      setIsFinished(true)
+    }
+  }, [progress, playerId, gameIndex]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const commonProps = {
     onCountryFound: handleCountryFound,
     onGameFinished: handleGameFinished,
@@ -176,16 +192,22 @@ export default function MultiplayerGame({ room, progress, playerId, roomId }) {
     if (type === GAME_TYPES.CAPITALS)
       return <MultiplayerCapitalsGame gameConfig={gameConfig} overrideCountries={overrides} overridesByDifficulty={overridesByDiff} {...commonProps} />
     if (type === GAME_TYPES.BORDER_GUESS)
-      return <MultiplayerBorderGuess countries={seededData} snapshotKey={mpSnapKey} onCountryFound={handleCountryFound} onGameFinished={handleGameFinished} />
+      return <MultiplayerBorderGuess countries={seededData} snapshotKey={mpSnapKey} onCountryFound={handleCountryFound} onGameFinished={handleGameFinished} room={room} />
     if (type === GAME_TYPES.COUNTRY_CLUE)
-      return <MultiplayerCountryClue countries={seededData} showGlobe={gameConfig.showGlobe ?? true} snapshotKey={mpSnapKey} onCountryFound={handleCountryFound} onGameFinished={handleGameFinished} />
+      return <MultiplayerCountryClue countries={seededData} showGlobe={gameConfig.showGlobe ?? true} snapshotKey={mpSnapKey} onCountryFound={handleCountryFound} onGameFinished={handleGameFinished} room={room} />
     return <p>Type de jeu inconnu : {type}</p>
   }
 
   return (
     <div className="mp-game-view">
       <div className="mp-game-content">
-        {renderGame()}
+        {isFinished ? (
+          <div className="mp-game-finished-wait">
+            <span className="mp-game-finished-icon">✓</span>
+            <h2>Tu as terminé !</h2>
+            <p>En attente des autres joueurs...</p>
+          </div>
+        ) : renderGame()}
       </div>
       <LiveSidebar
         room={room}

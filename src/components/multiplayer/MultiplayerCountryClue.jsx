@@ -4,19 +4,36 @@ import { ToastContainer } from 'react-toastify'
 import useCountryClueState from '../../hooks/useCountryClueState'
 import CountryClueMap from '../../pages/CountryClueMap'
 import { getGuessGamePoints } from '../../utils/scoringRules'
+import { loadSnapshot, saveSnapshot } from '../../utils/multiplayerSnapshot'
 import 'react-toastify/dist/ReactToastify.css'
 import './MultiplayerCountryClue.css'
 
-export default function MultiplayerCountryClue({ countries, showGlobe = true, onCountryFound, onGameFinished }) {
-  const [roundIndex, setRoundIndex] = useState(0)
-  const [totalAttempts, setTotalAttempts] = useState(0)
-  const [totalSolved, setTotalSolved] = useState(0)
-  const [totalWeightedScore, setTotalWeightedScore] = useState(0)
-  const [totalPerfects, setTotalPerfects] = useState(0)
-  const [totalStumbles, setTotalStumbles] = useState(0)
-  const [totalFailures, setTotalFailures] = useState(0)
-  const startTimeRef = useRef(performance.now())
+export default function MultiplayerCountryClue({ countries, showGlobe = true, onCountryFound, onGameFinished, snapshotKey, room }) {
+  const [snap] = useState(() => snapshotKey ? loadSnapshot(snapshotKey) : null)
+  const startTime = room.startAt?.seconds ? room.startAt.seconds * 1000 : Date.now()
+  const startTimeRef = useRef(performance.now() - (snap?.elapsedMs ?? 0))
   const completedRef = useRef(false)
+  const roundTransitionRef = useRef(false)
+
+  const [roundIndex, setRoundIndex] = useState(snap?.roundIndex ?? 0)
+  const [totalAttempts, setTotalAttempts] = useState(snap?.totalAttempts ?? 0)
+  const [totalSolved, setTotalSolved] = useState(snap?.totalSolved ?? 0)
+  const [totalWeightedScore, setTotalWeightedScore] = useState(snap?.totalWeightedScore ?? 0)
+  const [totalPerfects, setTotalPerfects] = useState(snap?.totalPerfects ?? 0)
+  const [totalStumbles, setTotalStumbles] = useState(snap?.totalStumbles ?? 0)
+  const [totalFailures, setTotalFailures] = useState(snap?.totalFailures ?? 0)
+
+  // Refs always reflect latest state for use in intervals
+  const accRef = useRef({
+    roundIndex: snap?.roundIndex ?? 0,
+    totalAttempts: snap?.totalAttempts ?? 0,
+    totalSolved: snap?.totalSolved ?? 0,
+    totalWeightedScore: snap?.totalWeightedScore ?? 0,
+    totalPerfects: snap?.totalPerfects ?? 0,
+    totalStumbles: snap?.totalStumbles ?? 0,
+    totalFailures: snap?.totalFailures ?? 0,
+  })
+  accRef.current = { roundIndex, totalAttempts, totalSolved, totalWeightedScore, totalPerfects, totalStumbles, totalFailures }
 
   const currentCountry = countries[roundIndex] ?? null
   const {
@@ -24,10 +41,50 @@ export default function MultiplayerCountryClue({ countries, showGlobe = true, on
     guesses, isSolved, isLost, isComplete,
     answerName, answerFlag, answerCapital,
     filteredCountrySuggestions, handleSubmit, revealCountry,
-  } = useCountryClueState('daily', { overrideCountry: currentCountry })
+  } = useCountryClueState('daily', { overrideCountry: currentCountry, initialGuesses: snap?.currentGuesses ?? null })
+
+  const guessesRef = useRef(snap?.currentGuesses ?? [])
+  guessesRef.current = guesses
+
+  const handleReveal = () => {
+    revealCountry()
+    const acc = accRef.current
+    const wrongGuesses = guessesRef.current.filter(g => !g.isCorrect).length
+    const newTotal = acc.totalAttempts + wrongGuesses
+    const newFailures = acc.totalFailures + 1
+
+    if (acc.roundIndex + 1 >= countries.length) {
+      saveSnapshot(snapshotKey, {
+        savedAt: Date.now(),
+        completed: true,
+        attempts: newTotal,
+        elapsedTime: performance.now() - startTimeRef.current,
+        totalSolved: acc.totalSolved,
+        totalWeightedScore: acc.totalWeightedScore,
+        totalPerfects: acc.totalPerfects,
+        totalStumbles: acc.totalStumbles,
+        totalFailures: newFailures,
+      })
+    } else {
+      saveSnapshot(snapshotKey, {
+        savedAt: Date.now(),
+        elapsedMs: performance.now() - startTimeRef.current,
+        roundIndex: acc.roundIndex + 1,
+        totalAttempts: newTotal,
+        totalSolved: acc.totalSolved,
+        totalWeightedScore: acc.totalWeightedScore,
+        totalPerfects: acc.totalPerfects,
+        totalStumbles: acc.totalStumbles,
+        totalFailures: newFailures,
+        currentGuesses: [],
+      })
+    }
+  }
 
   useEffect(() => {
     if (!isComplete || completedRef.current) return
+
+    roundTransitionRef.current = true
 
     const wrongGuesses = guesses.filter(g => !g.isCorrect).length
     const newTotal = totalAttempts + wrongGuesses
@@ -59,9 +116,48 @@ export default function MultiplayerCountryClue({ countries, showGlobe = true, on
       setTotalPerfects(newPerfects)
       setTotalStumbles(newStumbles)
       setTotalFailures(newFailures)
-      setTimeout(() => setRoundIndex(i => i + 1), 1500)
+      if (snapshotKey) {
+        saveSnapshot(snapshotKey, {
+          savedAt: Date.now(),
+          elapsedMs: performance.now() - startTimeRef.current,
+          roundIndex: roundIndex + 1,
+          totalAttempts: newTotal,
+          totalSolved: newSolved,
+          totalWeightedScore: newWeightedScore,
+          totalPerfects: newPerfects,
+          totalStumbles: newStumbles,
+          totalFailures: newFailures,
+          currentGuesses: [],
+        })
+      }
+      setTimeout(() => {
+        roundTransitionRef.current = false
+        setRoundIndex(i => i + 1)
+      }, 1500)
     }
   }, [isComplete]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Save every 5s with current partial guesses
+  useEffect(() => {
+    if (!snapshotKey) return
+    const id = setInterval(() => {
+      if (roundTransitionRef.current) return
+      const acc = accRef.current
+      saveSnapshot(snapshotKey, {
+        savedAt: Date.now(),
+        elapsedMs: performance.now() - startTimeRef.current,
+        roundIndex: acc.roundIndex,
+        totalAttempts: acc.totalAttempts,
+        totalSolved: acc.totalSolved,
+        totalWeightedScore: acc.totalWeightedScore,
+        totalPerfects: acc.totalPerfects,
+        totalStumbles: acc.totalStumbles,
+        totalFailures: acc.totalFailures,
+        currentGuesses: guessesRef.current,
+      })
+    }, 5000)
+    return () => clearInterval(id)
+  }, [snapshotKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const trimmedInput = inputValue.trim()
   const showSuggestions = !isComplete &&
@@ -110,7 +206,7 @@ export default function MultiplayerCountryClue({ countries, showGlobe = true, on
               </div>
               <div className="mp-cc-actions">
                 <button className="mp-cc-submit" onClick={handleSubmit}>Proposer</button>
-                <button className="mp-cc-reveal" onClick={revealCountry}>Révéler</button>
+                <button className="mp-cc-reveal" onClick={handleReveal}>Révéler</button>
               </div>
             </div>
           )}

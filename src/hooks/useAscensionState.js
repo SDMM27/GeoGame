@@ -7,6 +7,7 @@ import { formatTime } from '../utils/formatTime'
 import { GAME_TYPES } from '../utils/gameTypes'
 import { checkAnswer } from '../utils/normalizeAnswer'
 import { buildPhaseSequence } from '../utils/ascensionPresets'
+import { saveSnapshot } from '../utils/multiplayerSnapshot'
 
 // Which country property name holds the difficulty for each game type
 const DIFFICULTY_PROP = {
@@ -44,7 +45,7 @@ function getPool(difficulty, gameType, alreadyChosen) {
   )
 }
 
-export default function useAscensionState(gameType, phases, isTraining, isAscensionMode = true, overridesByDifficulty = null) {
+export default function useAscensionState(gameType, phases, isTraining, isAscensionMode = true, overridesByDifficulty = null, mpSnapshot = null, mpSnapshotKey = null) {
   const navigate = useNavigate()
   // Static: computed once from props — do not recompute during game
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -63,7 +64,7 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
   // ── Common game state ────────────────────────────────────────
   const [targetCountry, setTargetCountry] = useState(null)
   const targetCountryRef = useRef(null)
-  const [score, setScore] = useState(0)
+  const [score, setScore] = useState(mpSnapshot?.score ?? 0)
   const [gameStarted, setGameStarted] = useState(false)
   const gameStartedRef = useRef(false)
   const [consecutiveErrors, setConsecutiveErrors] = useState(0)
@@ -73,8 +74,8 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
   const [isGameOver, setIsGameOver] = useState(false)
 
   // ── Timer ────────────────────────────────────────────────────
-  const [timer, setTimer] = useState(0)
-  const timerRef = useRef(0)
+  const [timer, setTimer] = useState(mpSnapshot?.elapsedMs ?? 0)
+  const timerRef = useRef(mpSnapshot?.elapsedMs ?? 0)
   const startTimeRef = useRef(null)
 
   // ── PLACEMENT-only state ─────────────────────────────────────
@@ -90,6 +91,10 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
   // ── FLAGS / CAPITALS state ───────────────────────────────────
   const [inputValue, setInputValue] = useState('')
   const [revealedName, setRevealedName] = useState(null)
+
+  // ── Snapshot refs (always current, avoids stale closures) ────
+  const statsForSnapRef = useRef({ found: 0, skipped: 0, total: 0, foundFirstTry: 0 })
+  const scoreForSnapRef = useRef(mpSnapshot?.score ?? 0)
 
   // ─────────────────────────────────────────────────────────────
   // Helpers
@@ -132,6 +137,62 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
     phaseFoundRef.current = 0
     phaseSkippedRef.current = 0
     const total = phaseSequence.reduce((s, p) => s + p.count, 0)
+
+    if (mpSnapshot && (mpSnapshot.found + mpSnapshot.skipped) > 0) {
+      // Restore from snapshot — player refreshed mid-game
+      const processed = mpSnapshot.found + mpSnapshot.skipped
+      // Compute which phase and position within that phase
+      let phaseIdx = 0
+      let processedInPhase = processed
+      for (let i = 0; i < phaseSequence.length && processedInPhase >= phaseSequence[i].count; i++) {
+        processedInPhase -= phaseSequence[i].count
+        phaseIdx = i + 1
+      }
+      if (phaseIdx >= phaseSequence.length) {
+        phaseIdx = phaseSequence.length - 1
+        processedInPhase = phaseSequence[phaseIdx].count
+      }
+      const countRemaining = Math.max(0, phaseSequence[phaseIdx].count - processedInPhase)
+      currentPhaseIndexRef.current = phaseIdx
+      setCurrentPhaseIndex(phaseIdx)
+      phaseCountRemainingRef.current = countRemaining
+      setPhaseCountRemaining(countRemaining)
+      const restoredStats = {
+        found: mpSnapshot.found,
+        skipped: mpSnapshot.skipped,
+        total,
+        foundFirstTry: mpSnapshot.foundFirstTry ?? 0,
+      }
+      setStats(restoredStats)
+      statsRef.current = restoredStats
+      statsForSnapRef.current = restoredStats
+      scoreForSnapRef.current = mpSnapshot.score ?? 0
+      setConsecutiveErrors(mpSnapshot.consecutiveErrors ?? 0)
+      consecutiveErrorsRef.current = mpSnapshot.consecutiveErrors ?? 0
+      phaseStartTimeRef.current = performance.now()
+      // Repopulate alreadyChosenCountries by simulating the processed picks in order,
+      // so getRandomCountry skips already-played countries and returns the correct next one.
+      let toSkip = processed
+      let simPhaseIdx = 0
+      while (toSkip > 0 && simPhaseIdx < phaseSequence.length) {
+        const countInPhase = Math.min(toSkip, phaseSequence[simPhaseIdx].count)
+        for (let j = 0; j < countInPhase; j++) {
+          const c = getRandomCountry(phaseSequence[simPhaseIdx].difficulty)
+          if (c) alreadyChosenCountries.push(c.properties.ADMIN)
+        }
+        toSkip -= countInPhase
+        simPhaseIdx++
+      }
+      const first = getRandomCountry(phaseSequence[phaseIdx].difficulty)
+      if (first) {
+        alreadyChosenCountries.push(first.properties.ADMIN)
+        setTargetFromFeature(first)
+        gameStartedRef.current = true
+        setGameStarted(true)
+      }
+      return
+    }
+
     const initialStats = { found: 0, skipped: 0, total, foundFirstTry: 0 }
     setStats(initialStats)
     statsRef.current = initialStats
@@ -387,6 +448,47 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
       setInputValue('')
     }
   }, [gameType, inputValue, revealedName, advanceGame, incrementScore])
+
+  // ─────────────────────────────────────────────────────────────
+  // Snapshot persistence
+  // ─────────────────────────────────────────────────────────────
+  useEffect(() => { statsForSnapRef.current = stats }, [stats])
+  useEffect(() => { scoreForSnapRef.current = score }, [score])
+
+  // Save on action (country found/skipped/error)
+  useEffect(() => {
+    if (!mpSnapshotKey || !gameStarted || isGameOver) return
+    saveSnapshot(mpSnapshotKey, {
+      savedAt: Date.now(),
+      elapsedMs: timerRef.current,
+      countryIndex: stats.found + stats.skipped,
+      found: stats.found,
+      skipped: stats.skipped,
+      totalErrors: 0,
+      foundFirstTry: stats.foundFirstTry ?? 0,
+      score,
+      consecutiveErrors,
+    })
+  }, [stats, score, consecutiveErrors]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Also save timer every 5s so elapsed time stays accurate
+  useEffect(() => {
+    if (!mpSnapshotKey || !gameStarted || isGameOver) return
+    const id = setInterval(() => {
+      saveSnapshot(mpSnapshotKey, {
+        savedAt: Date.now(),
+        elapsedMs: timerRef.current,
+        countryIndex: statsForSnapRef.current.found + statsForSnapRef.current.skipped,
+        found: statsForSnapRef.current.found,
+        skipped: statsForSnapRef.current.skipped,
+        totalErrors: 0,
+        foundFirstTry: statsForSnapRef.current.foundFirstTry ?? 0,
+        score: scoreForSnapRef.current,
+        consecutiveErrors: consecutiveErrorsRef.current,
+      })
+    }, 5000)
+    return () => clearInterval(id)
+  }, [gameStarted, isGameOver, mpSnapshotKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ─────────────────────────────────────────────────────────────
   // Restart / Go home

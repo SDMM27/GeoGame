@@ -23,12 +23,12 @@ export function generateRoomId() {
   return id
 }
 
-/** UUID stable par onglet, persisté en sessionStorage. */
+/** UUID stable par navigateur, persisté en localStorage (cross-onglets). */
 export function getOrCreatePlayerId() {
-  let id = sessionStorage.getItem('mp_player_id')
+  let id = localStorage.getItem('mp_player_id')
   if (!id) {
     id = crypto.randomUUID()
-    sessionStorage.setItem('mp_player_id', id)
+    localStorage.setItem('mp_player_id', id)
   }
   return id
 }
@@ -82,6 +82,11 @@ export async function updateRoomStatus(roomId, status, extra = {}) {
 
 /** Met à jour la progression d'un joueur pour le jeu en cours. */
 export async function updatePlayerProgress(roomId, playerId, progressData) {
+  // Sécurité : si le temps arrive du client et qu'il est < 0, on le redresse
+  if (progressData.elapsedTime && progressData.elapsedTime < 0) {
+    progressData.elapsedTime = 0;
+  }
+
   await setDoc(
     doc(firestore, 'rooms', roomId, 'progress', playerId),
     progressData,
@@ -135,4 +140,12 @@ export async function clearGameResults(roomId) {
   const batch = writeBatch(firestore)
   snapshot.docs.forEach(d => batch.delete(d.ref))
   await batch.commit()
+}
+
+export async function updatePlayerGameFlags(roomId, playerId, flags) {
+  await setDoc(
+    doc(firestore, 'rooms', roomId, 'progress', playerId),
+    flags,
+    { merge: true }
+  )
 }

@@ -82,6 +82,11 @@ export async function updateRoomStatus(roomId, status, extra = {}) {
 
 /** Met à jour la progression d'un joueur pour le jeu en cours. */
 export async function updatePlayerProgress(roomId, playerId, progressData) {
+  // Sécurité : si le temps arrive du client et qu'il est < 0, on le redresse
+  if (progressData.elapsedTime && progressData.elapsedTime < 0) {
+    progressData.elapsedTime = 0;
+  }
+
   await setDoc(
     doc(firestore, 'rooms', roomId, 'progress', playerId),
     progressData,
@@ -135,4 +140,12 @@ export async function clearGameResults(roomId) {
   const batch = writeBatch(firestore)
   snapshot.docs.forEach(d => batch.delete(d.ref))
   await batch.commit()
+}
+
+export async function updatePlayerGameFlags(roomId, playerId, flags) {
+  await setDoc(
+    doc(firestore, 'rooms', roomId, 'progress', playerId),
+    flags,
+    { merge: true }
+  )
 }

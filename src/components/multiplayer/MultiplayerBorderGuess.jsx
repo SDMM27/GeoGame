@@ -20,8 +20,9 @@ function FitCountryBounds({ country }) {
   return null
 }
 
-export default function MultiplayerBorderGuess({ countries, onCountryFound, onGameFinished, snapshotKey }) {
+export default function MultiplayerBorderGuess({ countries, onCountryFound, onGameFinished, snapshotKey, room }) {
   const [snap] = useState(() => snapshotKey ? loadSnapshot(snapshotKey) : null)
+  const startTime = room.startAt?.seconds ? room.startAt.seconds * 1000 : Date.now()
   const startTimeRef = useRef(performance.now() - (snap?.elapsedMs ?? 0))
   const completedRef = useRef(false)
   const roundTransitionRef = useRef(false)
@@ -55,6 +56,41 @@ export default function MultiplayerBorderGuess({ countries, onCountryFound, onGa
 
   const guessesRef = useRef(snap?.currentGuesses ?? [])
   guessesRef.current = guesses
+
+  const handleReveal = () => {
+    revealCountry()
+    const acc = accRef.current
+    const wrongGuesses = guessesRef.current.filter(g => !g.isCorrect).length
+    const newTotal = acc.totalAttempts + wrongGuesses
+    const newFailures = acc.totalFailures + 1
+
+    if (acc.roundIndex + 1 >= countries.length) {
+      saveSnapshot(snapshotKey, {
+        savedAt: Date.now(),
+        completed: true,
+        attempts: newTotal,
+        elapsedTime: performance.now() - startTimeRef.current,
+        totalSolved: acc.totalSolved,
+        totalWeightedScore: acc.totalWeightedScore,
+        totalPerfects: acc.totalPerfects,
+        totalStumbles: acc.totalStumbles,
+        totalFailures: newFailures,
+      })
+    } else {
+      saveSnapshot(snapshotKey, {
+        savedAt: Date.now(),
+        elapsedMs: performance.now() - startTimeRef.current,
+        roundIndex: acc.roundIndex + 1,
+        totalAttempts: newTotal,
+        totalSolved: acc.totalSolved,
+        totalWeightedScore: acc.totalWeightedScore,
+        totalPerfects: acc.totalPerfects,
+        totalStumbles: acc.totalStumbles,
+        totalFailures: newFailures,
+        currentGuesses: [],
+      })
+    }
+  }
 
   useEffect(() => {
     if (!isComplete || completedRef.current) return
@@ -94,7 +130,7 @@ export default function MultiplayerBorderGuess({ countries, onCountryFound, onGa
       if (snapshotKey) {
         saveSnapshot(snapshotKey, {
           savedAt: Date.now(),
-          elapsedMs: performance.now() - startTimeRef.current,
+          elapsedMs: Date.now() - startTime,
           roundIndex: roundIndex + 1,
           totalAttempts: newTotal,
           totalSolved: newSolved,
@@ -198,7 +234,7 @@ export default function MultiplayerBorderGuess({ countries, onCountryFound, onGa
               </div>
               <div className="mp-border-guess-actions">
                 <button className="mp-border-guess-submit" onClick={handleSubmit}>Proposer</button>
-                <button className="mp-border-guess-reveal" onClick={revealCountry}>Révéler</button>
+                <button className="mp-border-guess-reveal" onClick={handleReveal}>Révéler</button>
               </div>
             </div>
           )}

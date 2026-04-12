@@ -107,3 +107,64 @@ describe('aggregatePoints', () => {
     expect(aggregatePoints([])).toEqual({})
   })
 })
+
+describe('rankResults — joueurs abandonnés', () => {
+  it('place un joueur abandonné après les joueurs actifs (mode weighted)', () => {
+    const results = [
+      { playerId: 'a', weightedScore: 5, elapsedTime: 10000, abandoned: false },
+      { playerId: 'b', weightedScore: 2, elapsedTime: 10000, abandoned: false },
+      { playerId: 'c', weightedScore: 0, elapsedTime: 0,     abandoned: true  },
+    ]
+    const ranked = rankResults(results, 3)
+    expect(ranked[0].playerId).toBe('a')
+    expect(ranked[1].playerId).toBe('b')
+    expect(ranked[2].playerId).toBe('c')
+    expect(ranked[2].rank).toBe(3)
+    expect(ranked[2].points).toBe(1)
+  })
+
+  it('place un joueur abandonné après les joueurs actifs (mode solved)', () => {
+    const results = [
+      { playerId: 'a', countriesSolved: 5, attempts: 2, elapsedTime: 8000, abandoned: false },
+      { playerId: 'b', countriesSolved: 0, attempts: 0, elapsedTime: 0,    abandoned: true  },
+    ]
+    const ranked = rankResults(results, 2, 'solved')
+    expect(ranked[0].playerId).toBe('a')
+    expect(ranked[1].playerId).toBe('b')
+    expect(ranked[1].rank).toBe(2)
+    expect(ranked[1].points).toBe(1)
+  })
+
+  it('deux joueurs abandonnés partagent le même rang et les mêmes points', () => {
+    const results = [
+      { playerId: 'a', weightedScore: 8, elapsedTime: 5000, abandoned: false },
+      { playerId: 'b', weightedScore: 0, elapsedTime: 0,    abandoned: true  },
+      { playerId: 'c', weightedScore: 0, elapsedTime: 0,    abandoned: true  },
+    ]
+    const ranked = rankResults(results, 3)
+    const abandoned = ranked.filter(r => r.abandoned)
+    expect(abandoned).toHaveLength(2)
+    expect(abandoned[0].rank).toBe(abandoned[1].rank)
+    expect(abandoned[0].points).toBe(abandoned[1].points)
+  })
+
+  it('quand tous les joueurs abandonnent, chacun reçoit 1 point', () => {
+    const results = [
+      { playerId: 'a', weightedScore: 0, elapsedTime: 0, abandoned: true },
+      { playerId: 'b', weightedScore: 0, elapsedTime: 0, abandoned: true },
+      { playerId: 'c', weightedScore: 0, elapsedTime: 0, abandoned: true },
+    ]
+    const ranked = rankResults(results, 3)
+    ranked.forEach(r => expect(r.points).toBe(1))
+  })
+
+  it('joueurs non abandonnés sans champ abandoned ne sont pas affectés', () => {
+    const results = [
+      { playerId: 'a', weightedScore: 9, elapsedTime: 1000 },
+      { playerId: 'b', weightedScore: 3, elapsedTime: 2000 },
+    ]
+    const ranked = rankResults(results, 2)
+    expect(ranked[0].playerId).toBe('a')
+    expect(ranked[0].points).toBe(2)
+  })
+})

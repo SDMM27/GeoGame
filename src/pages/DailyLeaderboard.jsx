@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { collection, getDocs, query, where } from 'firebase/firestore'
 import { firestore } from '../Firebase'
 import { sortDailyScores } from '../utils/dailyScores'
@@ -53,12 +53,14 @@ function AccordionRow({ score, index }) {
 }
 
 export default function DailyLeaderboard({ gameType, dailyKey }) {
+  if (!dailyKey) return null
+
   const [selectedDate, setSelectedDate] = useState(dailyKey)
   const [scores, setScores] = useState([])
   const [loading, setLoading] = useState(true)
   const [showPicker, setShowPicker] = useState(false)
 
-  const days = getLast7Days(dailyKey)
+  const days = useMemo(() => getLast7Days(dailyKey), [dailyKey])
 
   useEffect(() => {
     const fetchScores = async () => {

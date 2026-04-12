@@ -53,14 +53,14 @@ function AccordionRow({ score, index }) {
 }
 
 export default function DailyLeaderboard({ gameType, dailyKey }) {
-  if (!dailyKey) return null
-
-  const [selectedDate, setSelectedDate] = useState(dailyKey)
+  const [selectedDate, setSelectedDate] = useState(dailyKey ?? '')
   const [scores, setScores] = useState([])
   const [loading, setLoading] = useState(true)
   const [showPicker, setShowPicker] = useState(false)
 
-  const days = useMemo(() => getLast7Days(dailyKey), [dailyKey])
+  const days = useMemo(() => (dailyKey ? getLast7Days(dailyKey) : []), [dailyKey])
+
+  if (!dailyKey) return null
 
   useEffect(() => {
     const fetchScores = async () => {

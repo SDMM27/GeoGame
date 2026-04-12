@@ -210,16 +210,18 @@ export default function BorderGuessPage() {
               )}
             </div>
 
-            {isSolved && mode === 'daily' && (
+            {isComplete && mode === 'daily' && (
               <>
-                <DailyForm
-                  attempts={guesses.length}
-                  elapsedTime={elapsedTime}
-                  guesses={guesses.map((g) => g.value)}
-                  gameType={GAME_TYPES.BORDER_GUESS}
-                  dailyKey={dailyKey}
-                />
-                <DailyLeaderboard gameType={GAME_TYPES.BORDER_GUESS} />
+                {isSolved && (
+                  <DailyForm
+                    attempts={guesses.length}
+                    elapsedTime={elapsedTime}
+                    guesses={guesses.map((g) => g.value)}
+                    gameType={GAME_TYPES.BORDER_GUESS}
+                    dailyKey={dailyKey}
+                  />
+                )}
+                <DailyLeaderboard gameType={GAME_TYPES.BORDER_GUESS} dailyKey={dailyKey} />
               </>
             )}
 

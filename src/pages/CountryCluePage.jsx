@@ -195,16 +195,18 @@ export default function CountryCluePage() {
               )}
             </div>
 
-            {isSolved && mode === 'daily' && (
+            {isComplete && mode === 'daily' && (
               <>
-                <DailyForm
-                  attempts={guesses.length}
-                  elapsedTime={elapsedTime}
-                  guesses={guesses.map((g) => g.value)}
-                  gameType={GAME_TYPES.COUNTRY_CLUE}
-                  dailyKey={dailyKey}
-                />
-                <DailyLeaderboard gameType={GAME_TYPES.COUNTRY_CLUE} />
+                {isSolved && (
+                  <DailyForm
+                    attempts={guesses.length}
+                    elapsedTime={elapsedTime}
+                    guesses={guesses.map((g) => g.value)}
+                    gameType={GAME_TYPES.COUNTRY_CLUE}
+                    dailyKey={dailyKey}
+                  />
+                )}
+                <DailyLeaderboard gameType={GAME_TYPES.COUNTRY_CLUE} dailyKey={dailyKey} />
               </>
             )}
 

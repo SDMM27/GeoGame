@@ -220,3 +220,67 @@
   color: var(--text-muted);
   font-size: 0.95rem;
 }
+
+/* ── Date navigation ── */
+.daily-lb__date-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.daily-lb__day-btn {
+  padding: 5px 12px;
+  background: var(--bg-secondary, #0d1b2a);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.daily-lb__day-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary);
+}
+
+.daily-lb__day-btn--active {
+  background: rgba(0, 212, 255, 0.12);
+  border-color: rgba(0, 212, 255, 0.4);
+  color: var(--accent-cyan, #00d4ff);
+}
+
+.daily-lb__history-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.daily-lb__history-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s;
+}
+
+.daily-lb__history-link:hover {
+  color: var(--text-primary);
+}
+
+.daily-lb__date-picker {
+  padding: 5px 10px;
+  background: var(--bg-secondary, #0d1b2a);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  cursor: pointer;
+}

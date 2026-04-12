@@ -27,7 +27,10 @@
  * @returns {Array<{...result, rank: number, points: number}>}
  */
 export function rankResults(results, totalPlayers, scoringMode = 'weighted') {
-  const sorted = [...results].sort((a, b) => {
+  const active   = results.filter(r => !r.abandoned)
+  const abandoned = results.filter(r => r.abandoned)
+
+  const sorted = [...active].sort((a, b) => {
     if (scoringMode === 'solved') {
       // 1. Pays trouvés (plus = mieux)
       const solvedDiff = (b.countriesSolved ?? 0) - (a.countriesSolved ?? 0)
@@ -47,11 +50,23 @@ export function rankResults(results, totalPlayers, scoringMode = 'weighted') {
     return (a.elapsedTime ?? Infinity) - (b.elapsedTime ?? Infinity)
   })
 
-  return sorted.map((result, index) => ({
+  const abandonedRank   = active.length + 1
+  // Si tous abandonnent → 1 pt ; sinon, dernier rang actif + 1
+  const abandonedPoints = active.length === 0 ? 1 : totalPlayers - active.length
+
+  const rankedActive = sorted.map((result, index) => ({
     ...result,
-    rank: index + 1,
+    rank:   index + 1,
     points: totalPlayers - index,
   }))
+
+  const rankedAbandoned = abandoned.map(result => ({
+    ...result,
+    rank:   abandonedRank,
+    points: abandonedPoints,
+  }))
+
+  return [...rankedActive, ...rankedAbandoned]
 }
 
 /**

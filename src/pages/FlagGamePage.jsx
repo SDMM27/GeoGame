@@ -7,6 +7,7 @@ import useFlagGameState from '../hooks/useFlagGameState'
 import { snapshotKey, loadSnapshot } from '../utils/multiplayerSnapshot'
 import useAscensionState from '../hooks/useAscensionState'
 import { GAME_TYPES } from '../utils/gameTypes'
+import { checkAnswer } from '../utils/normalizeAnswer'
 import PhaseIndicator from '../components/PhaseIndicator'
 import Form from './form'
 import AscensionForm from './AscensionForm'
@@ -34,6 +35,17 @@ function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state
   const isoA2 = targetCountry?.properties?.ISO_A2?.toUpperCase()
   const FlagComponent = isoA2 ? Flags[isoA2] : null
   const onKeyDown = (e) => { if (e.key === 'Enter') handleSubmit() }
+  const shouldAutoSubmit = Boolean(
+    inputValue.trim() &&
+    targetCountry &&
+    !revealedName &&
+    !isGameOver &&
+    checkAnswer(inputValue, targetCountry.properties.ADMIN, targetCountry.properties.aliases ?? [])
+  )
+
+  useEffect(() => {
+    if (shouldAutoSubmit) handleSubmit()
+  }, [shouldAutoSubmit, handleSubmit])
 
   return (
     <div className={`flag-game-page${isInputFocused ? ' flag-game-page--input-active' : ''}`}>

@@ -7,6 +7,7 @@ import useCapitalsGameState from '../hooks/useCapitalsGameState'
 import { snapshotKey, loadSnapshot } from '../utils/multiplayerSnapshot'
 import useAscensionState from '../hooks/useAscensionState'
 import { GAME_TYPES } from '../utils/gameTypes'
+import { checkAnswer } from '../utils/normalizeAnswer'
 import PhaseIndicator from '../components/PhaseIndicator'
 import Form from './form'
 import AscensionForm from './AscensionForm'
@@ -43,6 +44,17 @@ function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, s
   const onKeyDown = (e) => {
     if (e.key === 'Enter') handleSubmit()
   }
+  const shouldAutoSubmit = Boolean(
+    inputValue.trim() &&
+    targetCountry &&
+    !revealedName &&
+    !isGameOver &&
+    checkAnswer(inputValue, targetCountry.properties.capital, targetCountry.properties.capitalAliases ?? [])
+  )
+
+  useEffect(() => {
+    if (shouldAutoSubmit) handleSubmit()
+  }, [shouldAutoSubmit, handleSubmit])
 
   return (
     <div className={`capitals-game-page${isInputFocused ? ' capitals-game-page--input-active' : ''}`}>

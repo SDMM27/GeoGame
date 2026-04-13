@@ -17266,7 +17266,7 @@
                 "ISO_A2": "AD",
                 "aliases": [],
                 "capital": "Andorra la Vella",
-                "capitalAliases": [],
+                "capitalAliases": ["Andorre la Vieille"],
                 "DifficultyFlag": "Difficile",
                 "DifficultyCapitals": "Difficile",
                 "population": 88406
@@ -199902,7 +199902,7 @@
                 "ISO_A2": "AZ",
                 "aliases": [],
                 "capital": "Baku",
-                "capitalAliases": [],
+                "capitalAliases": ["Bakou"],
                 "DifficultyFlag": "Difficile",
                 "DifficultyCapitals": "Difficile",
                 "population": 10241722
@@ -227654,7 +227654,7 @@
                 "ISO_A3": "BHS",
                 "Difficulty": "Difficile",
                 "ISO_A2": "BS",
-                "aliases": [],
+                "aliases": ["Bahamas"],
                 "capital": "Nassau",
                 "capitalAliases": [],
                 "DifficultyFlag": "Difficile",
@@ -973403,7 +973403,7 @@
                 "ISO_A2": "GD",
                 "aliases": [],
                 "capital": "St. George's",
-                "capitalAliases": [],
+                "capitalAliases": ["St George", "St Georges"],
                 "DifficultyFlag": "Impossible",
                 "DifficultyCapitals": "Impossible",
                 "population": 109021
@@ -1340965,7 +1340965,7 @@
                 "ISO_A2": "LK",
                 "aliases": [],
                 "capital": "Colombo",
-                "capitalAliases": [],
+                "capitalAliases": ["Sri Jayawardenapura Kotte"],
                 "DifficultyFlag": "Moyen",
                 "DifficultyCapitals": "Moyen",
                 "population": 21763170
@@ -1411505,7 +1411505,7 @@
                 "ISO_A2": "MT",
                 "aliases": [],
                 "capital": "Valletta",
-                "capitalAliases": [],
+                "capitalAliases": ["La Valette","Valette"],
                 "DifficultyFlag": "Difficile",
                 "DifficultyCapitals": "Difficile",
                 "population": 574250
@@ -1611836,7 +1611836,7 @@
                 "ISO_A2": "PH",
                 "aliases": [],
                 "capital": "Manila",
-                "capitalAliases": [],
+                "capitalAliases": ["Manille"],
                 "DifficultyFlag": "Moyen",
                 "DifficultyCapitals": "Moyen",
                 "population": 114123600
@@ -1869926,7 +1869926,7 @@
                 "ISO_A2": "SG",
                 "aliases": [],
                 "capital": "Singapore",
-                "capitalAliases": [],
+                "capitalAliases": ["Singapour"],
                 "DifficultyFlag": "Difficile",
                 "DifficultyCapitals": "Difficile",
                 "population": 6110200
@@ -1886165,7 +1886165,7 @@
                 "Difficulty": "Difficile",
                 "ISO_A2": "SM",
                 "aliases": [],
-                "capital": "City of San Marino",
+                "capital": "Saint-Marin",
                 "capitalAliases": [],
                 "DifficultyFlag": "Difficile",
                 "DifficultyCapitals": "Difficile",
@@ -1921044,11 +1921044,11 @@
         {
             "type": "Feature",
             "properties": {
-                "ADMIN": "Swaziland",
+                "ADMIN": "Eswatini",
                 "ISO_A3": "SWZ",
                 "Difficulty": "Difficile",
                 "ISO_A2": "SZ",
-                "aliases": [],
+                "aliases": ["Swaziland"],
                 "capital": "Mbabane",
                 "capitalAliases": [],
                 "DifficultyFlag": "Difficile",
@@ -2194454,7 +2194454,7 @@
                 "ISO_A2": "YE",
                 "aliases": [],
                 "capital": "Sana'a",
-                "capitalAliases": [],
+                "capitalAliases": ["Sanaa"],
                 "DifficultyFlag": "Difficile",
                 "DifficultyCapitals": "Difficile",
                 "population": 32684503

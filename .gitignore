@@ -28,6 +28,9 @@ yarn-error.log*
 .claude
 .superpowers
 .worktrees
+graphify-out/
+.graphify_python/
+.graphify*
 
 putAllScoresToPlacementGameType.js
 archiveScoresToV1.js

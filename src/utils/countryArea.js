@@ -1,7 +1,7 @@
 // src/utils/countryArea.js
 // Shared area computation extracted from useCountryClueState.js
 
-const EARTH_RADIUS_KM = 6371
+export const EARTH_RADIUS_KM = 6371
 
 export function collectCoordinates(geometry) {
   if (!geometry) return []
@@ -21,7 +21,11 @@ export function getRingAreaKm2(ring) {
   for (let index = 0; index < ring.length; index += 1) {
     const [lng1, lat1] = ring[index]
     const [lng2, lat2] = ring[(index + 1) % ring.length]
-    area += lng1 * lngScale * lat2 * latScale - lng2 * lngScale * lat1 * latScale
+    const x1 = lng1 * lngScale
+    const y1 = lat1 * latScale
+    const x2 = lng2 * lngScale
+    const y2 = lat2 * latScale
+    area += x1 * y2 - x2 * y1
   }
 
   return Math.abs(area / 2)

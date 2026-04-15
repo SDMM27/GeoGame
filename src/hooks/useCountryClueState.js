@@ -3,11 +3,10 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { checkAnswer, normalize } from '../utils/normalizeAnswer'
-import { collectCoordinates, getRingAreaKm2, getCountryAreaKm2 } from '../utils/countryArea'
+import { collectCoordinates, getRingAreaKm2, getCountryAreaKm2, EARTH_RADIUS_KM } from '../utils/countryArea'
 
 const DAILY_TIME_ZONE = 'Europe/Paris'
 const DAILY_STORAGE_PREFIX = 'country-clue-daily'
-const EARTH_RADIUS_KM = 6371
 
 export const COUNTRY_CLUE_COUNTRIES = countries.features.filter(
   (country) => country?.properties?.ADMIN && country?.geometry?.coordinates?.length

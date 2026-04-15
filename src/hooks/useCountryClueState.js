@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { checkAnswer, normalize } from '../utils/normalizeAnswer'
+import { collectCoordinates, getRingAreaKm2, getCountryAreaKm2 } from '../utils/countryArea'
 
 const DAILY_TIME_ZONE = 'Europe/Paris'
 const DAILY_STORAGE_PREFIX = 'country-clue-daily'
@@ -21,20 +22,6 @@ function normalizeLongitudeDelta(deltaLng) {
   while (normalized < -180) normalized += 360
 
   return normalized
-}
-
-function collectCoordinates(geometry) {
-  if (!geometry) return []
-
-  if (geometry.type === 'Polygon') {
-    return [geometry.coordinates]
-  }
-
-  if (geometry.type === 'MultiPolygon') {
-    return geometry.coordinates
-  }
-
-  return []
 }
 
 function getGeographicCenter(country) {
@@ -68,37 +55,6 @@ function getGeographicCenter(country) {
   const lat = Math.atan2(z, hyp) * (180 / Math.PI)
 
   return { lat, lng }
-}
-
-function getRingAreaKm2(ring) {
-  if (!Array.isArray(ring) || ring.length < 3) return 0
-
-  const referenceLat = ring.reduce((sum, [, lat]) => sum + lat, 0) / ring.length
-  const latScale = (Math.PI / 180) * EARTH_RADIUS_KM
-  const lngScale = latScale * Math.cos((referenceLat * Math.PI) / 180)
-
-  let area = 0
-
-  for (let index = 0; index < ring.length; index += 1) {
-    const [lng1, lat1] = ring[index]
-    const [lng2, lat2] = ring[(index + 1) % ring.length]
-    const x1 = lng1 * lngScale
-    const y1 = lat1 * latScale
-    const x2 = lng2 * lngScale
-    const y2 = lat2 * latScale
-    area += x1 * y2 - x2 * y1
-  }
-
-  return Math.abs(area / 2)
-}
-
-function getCountryAreaKm2(country) {
-  return collectCoordinates(country.geometry).reduce((totalArea, polygon) => {
-    const [outerRing, ...holes] = polygon
-    const outerArea = getRingAreaKm2(outerRing)
-    const holesArea = holes.reduce((holeTotal, ring) => holeTotal + getRingAreaKm2(ring), 0)
-    return totalArea + Math.max(outerArea - holesArea, 0)
-  }, 0)
 }
 
 export const COUNTRY_CENTER_MAP = new Map(

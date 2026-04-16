@@ -4,10 +4,9 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import { addDoc, collection, getDocs, query, where, deleteDoc } from 'firebase/firestore'
 import { toast } from 'react-toastify'
 import NavBar from '../components/NavBar'
-import DailyLeaderboard from './DailyLeaderboard'
+import RankingLeaderboard from './RankingLeaderboard'
 import useRankingGameState from '../hooks/useRankingGameState'
 import { GAME_TYPES } from '../utils/gameTypes'
-import { formatTime } from '../utils/formatTime'
 import { firestore } from '../Firebase'
 import './RankingGamePage.css'
 
@@ -51,9 +50,6 @@ export default function RankingGamePage() {
     score,
     totalError,
     correctOrder,
-    elapsedTime,
-    hasStarted,
-    startGame,
     handleSubmit,
     startNextRound,
     startInfiniteRound,
@@ -89,7 +85,7 @@ export default function RankingGamePage() {
 
       if (!existing.empty) {
         const prev = existing.docs[0].data()
-        if (score > prev.score || (score === prev.score && elapsedTime < prev.elapsedTime)) {
+        if (score > prev.score) {
           await deleteDoc(existing.docs[0].ref)
         } else {
           toast.info('Tu as déjà un meilleur score enregistré.', { containerId: 'topRightToast' })
@@ -104,7 +100,6 @@ export default function RankingGamePage() {
         dailyKey,
         score,
         totalError,
-        elapsedTime,
       })
 
       setLeaderboardSubmitted(true)
@@ -168,77 +163,59 @@ export default function RankingGamePage() {
           </div>
         )}
 
-        {/* Timer — daily only, after start */}
-        {mode === 'daily' && hasStarted && status !== 'idle' && (
-          <div className="ranking-timer">⏱ {formatTime(elapsedTime)}</div>
-        )}
-
         {/* Criterion banner */}
         <CriterionBanner criterion={criterion} />
 
         {/* === PLAYING === */}
         {status === 'playing' && (
           <>
-            {mode === 'daily' && !hasStarted ? (
-              <>
-                <div className="daily-map-placeholder">
-                  Lance le chrono pour révéler les pays à classer.
-                </div>
-                <button className="daily-start-btn" onClick={startGame}>
-                  Démarrer le chrono
-                </button>
-              </>
-            ) : (
-              <>
-                <div className="ranking-drag-hint">Glisse pour réordonner</div>
+            <div className="ranking-drag-hint">Glisse pour réordonner</div>
 
-                <DragDropContext onDragEnd={onDragEnd}>
-                  <Droppable droppableId="ranking-countries">
-                    {(provided) => (
-                      <div ref={provided.innerRef} {...provided.droppableProps}>
-                        {countries.map((country, index) => (
-                          <Draggable
-                            key={country.properties.ISO_A3}
-                            draggableId={country.properties.ISO_A3}
-                            index={index}
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable droppableId="ranking-countries">
+                {(provided) => (
+                  <div ref={provided.innerRef} {...provided.droppableProps}>
+                    {countries.map((country, index) => (
+                      <Draggable
+                        key={country.properties.ISO_A3}
+                        draggableId={country.properties.ISO_A3}
+                        index={index}
+                      >
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            style={provided.draggableProps.style}
+                            className={`ranking-country-item${snapshot.isDragging ? ' ranking-country-item--dragging' : ''}`}
                           >
-                            {(provided, snapshot) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                                style={provided.draggableProps.style}
-                                className={`ranking-country-item${snapshot.isDragging ? ' ranking-country-item--dragging' : ''}`}
-                              >
-                                <span className="ranking-drag-handle">⠿</span>
-                                <span className="ranking-country-index">{index + 1}</span>
-                                {FLAG_URL(country.properties.ISO_A2) && (
-                                  <img
-                                    src={FLAG_URL(country.properties.ISO_A2)}
-                                    alt=""
-                                    className="ranking-country-flag"
-                                    onError={(e) => { e.target.style.display = 'none' }}
-                                  />
-                                )}
-                                <span className="ranking-country-name">{country.properties.ADMIN}</span>
-                              </div>
+                            <span className="ranking-drag-handle">⠿</span>
+                            <span className="ranking-country-index">{index + 1}</span>
+                            {FLAG_URL(country.properties.ISO_A2) && (
+                              <img
+                                src={FLAG_URL(country.properties.ISO_A2)}
+                                alt=""
+                                className="ranking-country-flag"
+                                onError={(e) => { e.target.style.display = 'none' }}
+                              />
                             )}
-                          </Draggable>
-                        ))}
-                        {provided.placeholder}
-                      </div>
-                    )}
-                  </Droppable>
-                </DragDropContext>
+                            <span className="ranking-country-name">{country.properties.ADMIN}</span>
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
 
-                <button
-                  className="ranking-submit-btn"
-                  onClick={handleSubmit}
-                >
-                  ✓ Soumettre mon classement
-                </button>
-              </>
-            )}
+            <button
+              className="ranking-submit-btn"
+              onClick={handleSubmit}
+            >
+              ✓ Soumettre mon classement
+            </button>
           </>
         )}
 
@@ -256,7 +233,6 @@ export default function RankingGamePage() {
               <div className="ranking-score-sub">
                 Erreur totale : {totalError} position{totalError !== 1 ? 's' : ''}
               </div>
-              <div className="ranking-score-time">{formatTime(elapsedTime)}</div>
             </div>
 
             {/* Correct ranking revealed */}
@@ -313,7 +289,7 @@ export default function RankingGamePage() {
             )}
 
             {mode === 'daily' && (
-              <DailyLeaderboard gameType={GAME_TYPES.RANKING} dailyKey={dailyKey} />
+              <RankingLeaderboard dailyKey={dailyKey} />
             )}
 
             {mode === 'infinite' && (

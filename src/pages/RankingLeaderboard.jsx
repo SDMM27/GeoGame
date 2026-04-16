@@ -32,8 +32,6 @@ export default function RankingLeaderboard({ dailyKey }) {
 
   const days = useMemo(() => (dailyKey ? getLast7Days(dailyKey) : []), [dailyKey])
 
-  if (!dailyKey) return null
-
   useEffect(() => {
     const fetchScores = async () => {
       setLoading(true)
@@ -52,6 +50,8 @@ export default function RankingLeaderboard({ dailyKey }) {
     }
     fetchScores()
   }, [selectedDate])
+
+  if (!dailyKey) return null
 
   return (
     <div className="daily-lb ranking-lb">

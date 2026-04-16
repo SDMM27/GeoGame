@@ -146,7 +146,16 @@ export default function useRankingGameState(mode, options = {}) {
     if (mode === 'daily') {
       initDailyRound()
     } else {
-      initInfiniteRound()
+      setCriterion(null)
+      setCountries([])
+      setStatus('choosing-category')
+      setScore(null)
+      setTotalError(null)
+      setCorrectOrder([])
+      setCountryValues(new Map())
+      setElapsedTime(0)
+      setIsTimerRunning(false)
+      setHasStarted(false)
     }
     return () => clearInterval(timerRef.current)
   }, [mode, difficulty])
@@ -209,10 +218,10 @@ export default function useRankingGameState(mode, options = {}) {
     }
   }
 
-  function initInfiniteRound() {
+  function initInfiniteRound(criterionKey = null) {
     const n = COUNTRY_COUNT[difficulty] ?? 5
-    const criterionKey = pickCriterionKey(null)
-    const crit = CRITERIA[criterionKey]
+    const key = pickCriterionKey(criterionKey)
+    const crit = CRITERIA[key]
     const pool = buildCountryPool(RANKING_COUNTRIES, crit, areaMap)
     const selected = pickN(pool, n, Math.random.bind(Math))
     const shuffled = selected.sort(() => Math.random() - 0.5)
@@ -289,7 +298,13 @@ export default function useRankingGameState(mode, options = {}) {
 
   function startNextRound() {
     if (mode !== 'infinite') return
-    initInfiniteRound()
+    setCriterion(null)
+    setStatus('choosing-category')
+  }
+
+  function startInfiniteRound(criterionKey) {
+    if (mode !== 'infinite' || status !== 'choosing-category') return
+    initInfiniteRound(criterionKey)
   }
 
   return {
@@ -306,6 +321,7 @@ export default function useRankingGameState(mode, options = {}) {
     startGame,
     handleSubmit,
     startNextRound,
+    startInfiniteRound,
     dailyKey: mode === 'daily' ? getTodayKey() : null,
   }
 }

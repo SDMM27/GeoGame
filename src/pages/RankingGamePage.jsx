@@ -36,7 +36,7 @@ export default function RankingGamePage() {
   const location = useLocation()
   const initialMode = location.state?.mode ?? 'daily'
   const [mode, setMode] = useState(initialMode)
-  const [difficulty, setDifficulty] = useState('Facile')
+  const [countryCount, setCountryCount] = useState(5)
   const [submitName, setSubmitName] = useState('')
   const [leaderboardSubmitted, setLeaderboardSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -54,7 +54,7 @@ export default function RankingGamePage() {
     startNextRound,
     startInfiniteRound,
     dailyKey,
-  } = useRankingGameState(mode, { difficulty })
+  } = useRankingGameState(mode, { countryCount })
 
   function onDragEnd(result) {
     if (!result.destination) return
@@ -153,18 +153,29 @@ export default function RankingGamePage() {
           ))}
         </div>
 
-        {/* Difficulty selector — infinite mode only, before submission */}
-        {mode === 'infinite' && !isSubmitted && (
-          <div className="ranking-difficulty-row">
-            {['Facile', 'Moyen', 'Difficile'].map((d) => (
-              <button
-                key={d}
-                className={`ranking-difficulty-btn${difficulty === d ? ' ranking-difficulty-btn--active' : ''}`}
-                onClick={() => setDifficulty(d)}
-              >
-                {d}
-              </button>
-            ))}
+        {/* Country count slider — infinite mode only, before choosing category */}
+        {mode === 'infinite' && status === 'choosing-category' && (
+          <div className="ranking-slider-wrap">
+            <div className="ranking-slider-value">{countryCount} pays</div>
+            <input
+              type="range"
+              min={3}
+              max={20}
+              value={countryCount}
+              onChange={(e) => setCountryCount(Number(e.target.value))}
+              className="ranking-slider"
+            />
+            <div className="ranking-slider-labels">
+              <span className={`ranking-slider-label ranking-slider-label--easy${countryCount <= 5 ? ' ranking-slider-label--active' : ''}`}>
+                Facile<br />3–5
+              </span>
+              <span className={`ranking-slider-label ranking-slider-label--medium${countryCount >= 6 && countryCount <= 12 ? ' ranking-slider-label--active' : ''}`}>
+                Moyen<br />6–12
+              </span>
+              <span className={`ranking-slider-label ranking-slider-label--hard${countryCount >= 13 ? ' ranking-slider-label--active' : ''}`}>
+                Difficile<br />13–20
+              </span>
+            </div>
           </div>
         )}
 
@@ -244,9 +255,6 @@ export default function RankingGamePage() {
         {/* === SUBMITTED === */}
         {isSubmitted && (
           <>
-            {/* Criterion reminder */}
-            <CriterionBanner criterion={criterion} />
-
             {/* Score */}
             <div className="ranking-score">
               <div className="ranking-score-value">

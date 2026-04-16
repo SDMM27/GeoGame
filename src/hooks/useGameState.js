@@ -42,7 +42,7 @@ export function getTotalCountriesByContinent(continent) {
 
 let alreadyChosenCountries = []
 
-export default function useGameState(difficulty, isTraining, overrideCountries = null, mpSnapshot = null, mpSnapshotKey = null) {
+export default function useGameState(difficulty, isTraining, overrideCountries = null, mpSnapshot = null, mpSnapshotKey = null, continent = null) {
   const navigate = useNavigate()
 
   const [targetCountry, setTargetCountry] = useState(null)
@@ -67,15 +67,19 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
 
   // Redirect if no difficulty
   useEffect(() => {
-    if (!difficulty && !overrideCountries) navigate('/')
-  }, [difficulty, overrideCountries, navigate])
+    if (!difficulty && !overrideCountries && !continent) navigate('/')
+  }, [difficulty, overrideCountries, continent, navigate])
 
-  const getRandomCountry = useCallback((diff) => {
-    const available = getAvailableDifficulties(diff)
-    const filtered = countries.features.filter(c =>
-      available.includes(c.properties.Difficulty) &&
-      !alreadyChosenCountries.includes(c.properties.ADMIN)
-    )
+  const getRandomCountry = useCallback((diff, cont) => {
+    const filtered = cont
+      ? countries.features.filter(c =>
+          c.properties.continent === cont &&
+          !alreadyChosenCountries.includes(c.properties.ADMIN)
+        )
+      : countries.features.filter(c =>
+          getAvailableDifficulties(diff).includes(c.properties.Difficulty) &&
+          !alreadyChosenCountries.includes(c.properties.ADMIN)
+        )
     if (filtered.length === 0) return null
     return filtered[Math.floor(Math.random() * filtered.length)].properties.ADMIN
   }, [])
@@ -104,10 +108,14 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
 
   // Start game on mount
   useEffect(() => {
-    if (!difficulty && !overrideCountries) return
+    if (!difficulty && !overrideCountries && !continent) return
     alreadyChosenCountries = []
     orderedIndexRef.current = 0
-    const total = overrideCountries ? overrideCountries.length : getTotalCountries(difficulty)
+    const total = overrideCountries
+      ? overrideCountries.length
+      : continent
+        ? getTotalCountriesByContinent(continent)
+        : getTotalCountries(difficulty)
 
     if (mpSnapshot && overrideCountries && mpSnapshot.countryIndex > 0) {
       // Restore state — player refreshed mid-game
@@ -138,7 +146,7 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
     setStats({ found: 0, skipped: 0, total, totalErrors: 0 })
     const firstCountry = overrideCountries
       ? overrideCountries[orderedIndexRef.current++]
-      : getRandomCountry(difficulty)
+      : getRandomCountry(difficulty, continent)
     if (firstCountry) {
       alreadyChosenCountries.push(firstCountry)
       setTargetCountry(firstCountry)
@@ -225,12 +233,12 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
   const changeCountry = useCallback(() => {
     const next = overrideCountries
       ? (overrideCountries[orderedIndexRef.current++] ?? null)
-      : getRandomCountry(difficulty)
+      : getRandomCountry(difficulty, continent)
     if (next) {
       alreadyChosenCountries.push(next)
       setTargetCountry(next)
     }
-  }, [difficulty, getRandomCountry, overrideCountries])
+  }, [difficulty, continent, getRandomCountry, overrideCountries])
 
   const onCountryMouseOver = (event) => {
     const layer = event.target
@@ -330,9 +338,9 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
     timerRef.current = 0;
     setTimer(0);
     setTimeout(() => {
-      const total = getTotalCountries(difficulty);
+      const total = continent ? getTotalCountriesByContinent(continent) : getTotalCountries(difficulty);
       setStats({ found: 0, skipped: 0, total, totalErrors: 0 });
-      const next = getRandomCountry(difficulty);
+      const next = getRandomCountry(difficulty, continent);
       if (next) {
         alreadyChosenCountries.push(next);
         setTargetCountry(next);

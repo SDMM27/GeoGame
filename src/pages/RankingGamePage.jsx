@@ -112,6 +112,28 @@ export default function RankingGamePage() {
 
   const isSubmitted = status === 'submitted'
 
+  const errorChips = isSubmitted
+    ? correctOrder
+        .map((country, correctIdx) => {
+          const playerIdx = countries.findIndex(
+            (c) => c.properties.ISO_A3 === country.properties.ISO_A3
+          )
+          return {
+            iso: country.properties.ISO_A3,
+            name: country.properties.ADMIN,
+            error: Math.abs(playerIdx - correctIdx),
+          }
+        })
+        .sort((a, b) => b.error - a.error)
+    : []
+
+  function chipClass(error) {
+    if (error === 0) return 'ranking-error-chip--zero'
+    if (error === 1) return 'ranking-error-chip--low'
+    if (error <= 3) return 'ranking-error-chip--mid'
+    return 'ranking-error-chip--high'
+  }
+
   return (
     <div className="ranking-game-page">
       <NavBar />
@@ -232,6 +254,13 @@ export default function RankingGamePage() {
               </div>
               <div className="ranking-score-sub">
                 Erreur totale : {totalError} position{totalError !== 1 ? 's' : ''}
+              </div>
+              <div className="ranking-error-chips">
+                {errorChips.map(({ iso, name, error }) => (
+                  <span key={iso} className={`ranking-error-chip ${chipClass(error)}`}>
+                    {name} {error === 0 ? '0' : `−${error}`}
+                  </span>
+                ))}
               </div>
             </div>
 

@@ -91,7 +91,7 @@ const GAMES = [
   {
     id: "ranking",
     icon: "🏆",
-    title: "Classement",
+    title: "Country Ranking",
     description: "Classe des pays du plus grand au plus petit selon un critère : population, superficie, PIB ou densité.",
     route: "/ranking",
     cardType: "ranking",

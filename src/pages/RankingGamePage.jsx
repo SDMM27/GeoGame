@@ -143,7 +143,7 @@ export default function RankingGamePage() {
     <div className="ranking-game-page">
       <NavBar />
       <div className="ranking-game-main">
-        <h1 className="ranking-game-title">Classement</h1>
+        <h1 className="ranking-game-title">Country Ranking</h1>
 
         {/* Mode tabs */}
         <div className="ranking-mode-tabs">

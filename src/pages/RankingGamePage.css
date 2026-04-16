@@ -400,6 +400,40 @@
   transform: translateY(-1px);
 }
 
+/* ── Daily start (owned here, referenced by RankingGamePage) ── */
+.daily-map-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 280px;
+  background: rgba(0,0,0,0.25);
+  border-radius: var(--radius-lg);
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.daily-start-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 16px;
+  margin-top: 8px;
+  background: var(--accent-cyan, #00d4ff);
+  color: #000;
+  border: none;
+  border-radius: var(--radius-lg);
+  font-family: var(--font-main);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.daily-start-btn:hover {
+  opacity: 0.88;
+}
+
 /* ── Category selection ── */
 .ranking-category-selection {
   display: flex;

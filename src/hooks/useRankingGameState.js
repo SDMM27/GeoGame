@@ -305,6 +305,8 @@ export default function useRankingGameState(mode, options = {}) {
     setCorrectOrder([])
     setCountryValues(new Map())
     setElapsedTime(0)
+    setIsTimerRunning(false)
+    setHasStarted(false)
     setStatus('choosing-category')
   }
 

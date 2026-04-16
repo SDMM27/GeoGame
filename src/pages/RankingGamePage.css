@@ -77,16 +77,6 @@
   background: rgba(0, 212, 255, 0.12);
 }
 
-/* ── Timer ── */
-.ranking-timer {
-  text-align: right;
-  font-weight: 700;
-  color: var(--warning);
-  font-size: 0.9rem;
-  margin-bottom: 12px;
-  letter-spacing: 0.5px;
-}
-
 /* ── Criterion banner ── */
 .ranking-criterion {
   background: var(--bg-card);
@@ -117,26 +107,6 @@
   font-size: 0.8rem;
 }
 
-/* ── Start button ── */
-.ranking-start-btn {
-  width: 100%;
-  padding: 13px 16px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-family: var(--font-main);
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  margin-bottom: 16px;
-  transition: background 0.15s, border-color 0.15s;
-}
-
-.ranking-start-btn:hover {
-  background: rgba(0, 212, 255, 0.08);
-  border-color: var(--accent-cyan-border);
-}
 
 /* ── Drag hint ── */
 .ranking-drag-hint {
@@ -245,6 +215,50 @@
   color: var(--text-dim);
   font-size: 0.78rem;
   margin-top: 4px;
+}
+
+/* ── Error chips ── */
+.ranking-error-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.ranking-error-chip {
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ranking-error-chip--zero {
+  background: rgba(0, 200, 120, 0.15);
+  color: var(--success);
+  border: 1px solid rgba(0, 200, 120, 0.35);
+}
+
+.ranking-error-chip--low {
+  background: rgba(220, 80, 80, 0.10);
+  color: #e07070;
+  border: 1px solid rgba(220, 80, 80, 0.25);
+}
+
+.ranking-error-chip--mid {
+  background: rgba(220, 60, 60, 0.18);
+  color: #e05050;
+  border: 1px solid rgba(220, 60, 60, 0.40);
+}
+
+.ranking-error-chip--high {
+  background: rgba(210, 30, 30, 0.25);
+  color: var(--danger);
+  border: 1px solid rgba(210, 30, 30, 0.55);
 }
 
 /* ── Results list ── */
@@ -398,40 +412,6 @@
   background: rgba(0, 212, 255, 0.08);
   border-color: var(--accent-cyan-border);
   transform: translateY(-1px);
-}
-
-/* ── Daily start (owned here, referenced by RankingGamePage) ── */
-.daily-map-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  min-height: 280px;
-  background: rgba(0,0,0,0.25);
-  border-radius: var(--radius-lg);
-  color: var(--text-muted);
-  font-size: 0.95rem;
-}
-
-.daily-start-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding: 16px;
-  margin-top: 8px;
-  background: var(--accent-cyan, #00d4ff);
-  color: #000;
-  border: none;
-  border-radius: var(--radius-lg);
-  font-family: var(--font-main);
-  font-size: 1rem;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.daily-start-btn:hover {
-  opacity: 0.88;
 }
 
 /* ── Category selection ── */

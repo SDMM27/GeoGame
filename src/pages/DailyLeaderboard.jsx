@@ -6,6 +6,8 @@ import { formatTime } from '../utils/formatTime'
 import { getLast7Days } from '../utils/dateUtils'
 import './DailyLeaderboard.css'
 
+const MEDAL = ['🥇', '🥈', '🥉']
+
 function AccordionRow({ score, index }) {
   const [open, setOpen] = useState(false)
 

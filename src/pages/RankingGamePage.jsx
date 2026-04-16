@@ -9,27 +9,26 @@ import useRankingGameState from '../hooks/useRankingGameState'
 import { GAME_TYPES } from '../utils/gameTypes'
 import { formatTime } from '../utils/formatTime'
 import { firestore } from '../Firebase'
+import './RankingGamePage.css'
 
 const FLAG_URL = (iso2) =>
   iso2 ? `https://flagcdn.com/w40/${iso2.toLowerCase()}.png` : null
 
+const CATEGORY_OPTIONS = [
+  { key: null,         emoji: '🎲', label: 'Aléatoire' },
+  { key: 'population', emoji: '👥', label: 'Population' },
+  { key: 'area',       emoji: '🗺️', label: 'Superficie' },
+  { key: 'gdp',        emoji: '💰', label: 'PIB' },
+  { key: 'density',    emoji: '📍', label: 'Densité' },
+]
+
 function CriterionBanner({ criterion }) {
   if (!criterion) return null
   return (
-    <div
-      style={{
-        background: '#1a2a3a',
-        borderLeft: '3px solid #4a8aff',
-        borderRadius: 4,
-        padding: '10px 16px',
-        marginBottom: 16,
-      }}
-    >
-      <div style={{ color: '#888', fontSize: 11, textTransform: 'uppercase', marginBottom: 2 }}>
-        Critère
-      </div>
-      <div style={{ fontSize: 16, fontWeight: 'bold' }}>{criterion.label}</div>
-      <div style={{ color: '#aaa', fontSize: 12, marginTop: 2 }}>{criterion.consigne}</div>
+    <div className="ranking-criterion">
+      <div className="ranking-criterion-label">Critère</div>
+      <div className="ranking-criterion-name">{criterion.label}</div>
+      <div className="ranking-criterion-hint">{criterion.consigne}</div>
     </div>
   )
 }
@@ -53,10 +52,11 @@ export default function RankingGamePage() {
     totalError,
     correctOrder,
     elapsedTime,
-    isTimerRunning,
-    startTimer,
+    hasStarted,
+    startGame,
     handleSubmit,
     startNextRound,
+    startInfiniteRound,
     dailyKey,
   } = useRankingGameState(mode, { difficulty })
 
@@ -118,17 +118,17 @@ export default function RankingGamePage() {
   const isSubmitted = status === 'submitted'
 
   return (
-    <>
+    <div className="ranking-game-page">
       <NavBar />
-      <div className="container py-4" style={{ maxWidth: 600 }}>
-        <h1 className="game-title">Classement</h1>
+      <div className="ranking-game-main">
+        <h1 className="ranking-game-title">Classement</h1>
 
         {/* Mode tabs */}
-        <div className="game-mode-tabs mb-3">
+        <div className="ranking-mode-tabs">
           {['daily', 'infinite'].map((m) => (
             <button
               key={m}
-              className={`game-mode-tab${mode === m ? ' game-mode-tab--active' : ''}`}
+              className={`ranking-mode-tab${mode === m ? ' ranking-mode-tab--active' : ''}`}
               onClick={() => setMode(m)}
             >
               {m === 'daily' ? 'Journalier' : 'Infini'}
@@ -138,11 +138,11 @@ export default function RankingGamePage() {
 
         {/* Difficulty selector — infinite mode only, before submission */}
         {mode === 'infinite' && !isSubmitted && (
-          <div className="d-flex gap-2 mb-3">
+          <div className="ranking-difficulty-row">
             {['Facile', 'Moyen', 'Difficile'].map((d) => (
               <button
                 key={d}
-                className={`btn btn-sm${difficulty === d ? ' btn-primary' : ' btn-outline-secondary'}`}
+                className={`ranking-difficulty-btn${difficulty === d ? ' ranking-difficulty-btn--active' : ''}`}
                 onClick={() => setDifficulty(d)}
               >
                 {d}
@@ -151,11 +151,26 @@ export default function RankingGamePage() {
           </div>
         )}
 
-        {/* Timer */}
-        {status !== 'idle' && (
-          <div className="text-end mb-2 fw-bold" style={{ color: '#f0c040' }}>
-            ⏱ {formatTime(elapsedTime)}
+        {/* Category selection — infinite mode only */}
+        {mode === 'infinite' && status === 'choosing-category' && (
+          <div className="ranking-category-selection">
+            <div className="ranking-category-title">Choisir une catégorie</div>
+            {CATEGORY_OPTIONS.map(({ key, emoji, label }) => (
+              <button
+                key={key ?? '__random__'}
+                className="ranking-category-btn"
+                onClick={() => startInfiniteRound(key)}
+              >
+                <span className="ranking-category-emoji">{emoji}</span>
+                {label}
+              </button>
+            ))}
           </div>
+        )}
+
+        {/* Timer — daily only, after start */}
+        {mode === 'daily' && hasStarted && status !== 'idle' && (
+          <div className="ranking-timer">⏱ {formatTime(elapsedTime)}</div>
         )}
 
         {/* Criterion banner */}
@@ -164,91 +179,66 @@ export default function RankingGamePage() {
         {/* === PLAYING === */}
         {status === 'playing' && (
           <>
-            {!isTimerRunning && (
-              <button className="btn btn-outline-light w-100 mb-3" onClick={startTimer}>
-                ▶ Démarrer le chrono
-              </button>
-            )}
+            {mode === 'daily' && !hasStarted ? (
+              <>
+                <div className="daily-map-placeholder">
+                  Lance le chrono pour révéler les pays à classer.
+                </div>
+                <button className="daily-start-btn" onClick={startGame}>
+                  Démarrer le chrono
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="ranking-drag-hint">Glisse pour réordonner</div>
 
-            <div className="text-muted small mb-2">Glisse pour réordonner</div>
-
-            <DragDropContext onDragEnd={onDragEnd}>
-              <Droppable droppableId="ranking-countries">
-                {(provided) => (
-                  <div ref={provided.innerRef} {...provided.droppableProps}>
-                    {countries.map((country, index) => (
-                      <Draggable
-                        key={country.properties.ISO_A3}
-                        draggableId={country.properties.ISO_A3}
-                        index={index}
-                      >
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            style={{
-                              ...provided.draggableProps.style,
-                              background: snapshot.isDragging ? '#1a3a2e' : '#1e1e3e',
-                              border: snapshot.isDragging
-                                ? '2px solid #3a8a5e'
-                                : '1px solid #3a3a6e',
-                              borderRadius: 8,
-                              padding: '10px 14px',
-                              marginBottom: 6,
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 12,
-                              cursor: 'grab',
-                              userSelect: 'none',
-                            }}
+                <DragDropContext onDragEnd={onDragEnd}>
+                  <Droppable droppableId="ranking-countries">
+                    {(provided) => (
+                      <div ref={provided.innerRef} {...provided.droppableProps}>
+                        {countries.map((country, index) => (
+                          <Draggable
+                            key={country.properties.ISO_A3}
+                            draggableId={country.properties.ISO_A3}
+                            index={index}
                           >
-                            <span style={{ color: '#555', fontSize: 18 }}>⠿</span>
-                            <span
-                              style={{
-                                background: '#2a2a4e',
-                                color: '#aaa',
-                                borderRadius: '50%',
-                                width: 24,
-                                height: 24,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                fontSize: 12,
-                                fontWeight: 'bold',
-                                flexShrink: 0,
-                              }}
-                            >
-                              {index + 1}
-                            </span>
-                            {FLAG_URL(country.properties.ISO_A2) && (
-                              <img
-                                src={FLAG_URL(country.properties.ISO_A2)}
-                                alt=""
-                                style={{ width: 28, height: 'auto', borderRadius: 2 }}
-                                onError={(e) => {
-                                  e.target.style.display = 'none'
-                                }}
-                              />
+                            {(provided, snapshot) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                style={provided.draggableProps.style}
+                                className={`ranking-country-item${snapshot.isDragging ? ' ranking-country-item--dragging' : ''}`}
+                              >
+                                <span className="ranking-drag-handle">⠿</span>
+                                <span className="ranking-country-index">{index + 1}</span>
+                                {FLAG_URL(country.properties.ISO_A2) && (
+                                  <img
+                                    src={FLAG_URL(country.properties.ISO_A2)}
+                                    alt=""
+                                    className="ranking-country-flag"
+                                    onError={(e) => { e.target.style.display = 'none' }}
+                                  />
+                                )}
+                                <span className="ranking-country-name">{country.properties.ADMIN}</span>
+                              </div>
                             )}
-                            <span style={{ fontWeight: 500 }}>{country.properties.ADMIN}</span>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
+                </DragDropContext>
 
-            <button
-              className="btn btn-primary w-100 mt-3"
-              onClick={handleSubmit}
-              disabled={!isTimerRunning}
-            >
-              ✓ Soumettre mon classement
-            </button>
+                <button
+                  className="ranking-submit-btn"
+                  onClick={handleSubmit}
+                >
+                  ✓ Soumettre mon classement
+                </button>
+              </>
+            )}
           </>
         )}
 
@@ -259,18 +249,18 @@ export default function RankingGamePage() {
             <CriterionBanner criterion={criterion} />
 
             {/* Score */}
-            <div className="text-center my-3">
-              <div className="display-4 fw-bold" style={{ color: '#f0c040' }}>
+            <div className="ranking-score">
+              <div className="ranking-score-value">
                 {score} pt{score !== 1 ? 's' : ''}
               </div>
-              <div className="text-muted">
+              <div className="ranking-score-sub">
                 Erreur totale : {totalError} position{totalError !== 1 ? 's' : ''}
               </div>
-              <div className="text-muted small">{formatTime(elapsedTime)}</div>
+              <div className="ranking-score-time">{formatTime(elapsedTime)}</div>
             </div>
 
             {/* Correct ranking revealed */}
-            <h5 className="mb-2">Classement correct</h5>
+            <div className="ranking-results-title">Classement correct</div>
             {correctOrder.map((country, index) => {
               const playerIdx = countries.findIndex(
                 (c) => c.properties.ISO_A3 === country.properties.ISO_A3
@@ -281,57 +271,26 @@ export default function RankingGamePage() {
               return (
                 <div
                   key={country.properties.ISO_A3}
-                  style={{
-                    background: isCorrect ? '#1e3a1e' : '#1e1e3e',
-                    border: `1px solid ${isCorrect ? '#3a7a3a' : '#8a3a3a'}`,
-                    borderRadius: 8,
-                    padding: '8px 14px',
-                    marginBottom: 5,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 10,
-                  }}
+                  className={`ranking-result-row${isCorrect ? ' ranking-result-row--correct' : ' ranking-result-row--wrong'}`}
                 >
-                  <span
-                    style={{
-                      background: isCorrect ? '#3a7a3a' : '#3a3a6e',
-                      color: '#fff',
-                      borderRadius: '50%',
-                      width: 22,
-                      height: 22,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: 11,
-                      fontWeight: 'bold',
-                      flexShrink: 0,
-                    }}
-                  >
+                  <span className={`ranking-result-index${isCorrect ? ' ranking-result-index--correct' : ' ranking-result-index--wrong'}`}>
                     {index + 1}
                   </span>
                   {FLAG_URL(country.properties.ISO_A2) && (
                     <img
                       src={FLAG_URL(country.properties.ISO_A2)}
                       alt=""
-                      style={{ width: 24, height: 'auto', borderRadius: 2 }}
-                      onError={(e) => {
-                        e.target.style.display = 'none'
-                      }}
+                      className="ranking-result-flag"
+                      onError={(e) => { e.target.style.display = 'none' }}
                     />
                   )}
-                  <span style={{ flexGrow: 1 }}>{country.properties.ADMIN}</span>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ color: '#5fa', fontSize: 12, fontWeight: 'bold' }}>
-                      {formattedVal}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 11,
-                        color: isCorrect ? '#3a7a3a' : '#e06060',
-                      }}
-                    >
-                      {isCorrect ? '✓ correct' : `✗ tu avais mis #${playerIdx + 1}`}
-                    </div>
+                  <span className="ranking-result-country">{country.properties.ADMIN}</span>
+                  <div className="ranking-result-meta">
+                    <div className="ranking-result-value">{formattedVal}</div>
+                    {isCorrect
+                      ? <span className="ranking-result-status--correct">✓ correct</span>
+                      : <span className="ranking-result-status--wrong">✗ tu avais mis #{playerIdx + 1}</span>
+                    }
                   </div>
                 </div>
               )
@@ -339,15 +298,15 @@ export default function RankingGamePage() {
 
             {/* Daily leaderboard submission */}
             {mode === 'daily' && !leaderboardSubmitted && (
-              <form onSubmit={submitToLeaderboard} className="mt-3 d-flex gap-2">
+              <form onSubmit={submitToLeaderboard} className="ranking-leaderboard-form">
                 <input
-                  className="form-control"
+                  className="ranking-leaderboard-input"
                   placeholder="Ton pseudo"
                   value={submitName}
                   onChange={(e) => setSubmitName(e.target.value)}
                   maxLength={30}
                 />
-                <button className="btn btn-outline-primary" type="submit" disabled={submitting}>
+                <button className="ranking-leaderboard-submit" type="submit" disabled={submitting}>
                   {submitting ? '...' : '📤'}
                 </button>
               </form>
@@ -358,13 +317,13 @@ export default function RankingGamePage() {
             )}
 
             {mode === 'infinite' && (
-              <button className="btn btn-outline-primary w-100 mt-3" onClick={startNextRound}>
+              <button className="ranking-next-btn" onClick={startNextRound}>
                 ▶ Round suivant
               </button>
             )}
           </>
         )}
       </div>
-    </>
+    </div>
   )
 }

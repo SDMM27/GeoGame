@@ -326,7 +326,10 @@ export default function RankingGamePage() {
             )}
 
             {mode === 'daily' && (
-              <RankingLeaderboard dailyKey={dailyKey} />
+              <RankingLeaderboard
+                dailyKey={dailyKey}
+                playerName={leaderboardSubmitted ? submitName : null}
+              />
             )}
 
             {mode === 'infinite' && (

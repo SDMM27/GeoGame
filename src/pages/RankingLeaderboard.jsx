@@ -10,7 +10,7 @@ import './RankingLeaderboard.css'
 
 const MEDAL = ['🥇', '🥈', '🥉']
 
-export default function RankingLeaderboard({ dailyKey }) {
+export default function RankingLeaderboard({ dailyKey, playerName = null }) {
   const [selectedDate, setSelectedDate] = useState(dailyKey ?? '')
   const [scores, setScores] = useState([])
   const [loading, setLoading] = useState(true)
@@ -88,13 +88,18 @@ export default function RankingLeaderboard({ dailyKey }) {
           {scores.map((score, index) => (
             <div
               key={`${score.name}-${score.dailyKey}-${index}`}
-              className={`daily-lb__row${index < 3 ? ' daily-lb__row--top' : ''}`}
+              className={`daily-lb__row${index < 3 ? ' daily-lb__row--top' : ''}${score.name === playerName ? ' ranking-lb__row--self' : ''}`}
             >
               <div className="daily-lb__row-main">
                 <span className="daily-lb__rank">
                   {index < 3 ? MEDAL[index] : `#${index + 1}`}
                 </span>
-                <span className="daily-lb__name">{score.name}</span>
+                <span className="daily-lb__name">
+                  {score.name}
+                  {score.name === playerName && (
+                    <span className="ranking-lb__self-badge">vous</span>
+                  )}
+                </span>
                 <span className="ranking-lb__score">{score.score} pts</span>
                 <span className="ranking-lb__error">{score.totalError} pos.</span>
               </div>

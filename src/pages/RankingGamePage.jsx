@@ -104,6 +104,7 @@ export default function RankingGamePage() {
         dailyKey,
         score,
         totalError,
+        playerOrder: countries.map((c) => c.properties.ADMIN),
       })
 
       if (rankingSavedKey) localStorage.setItem(rankingSavedKey, '1')

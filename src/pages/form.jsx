@@ -12,7 +12,7 @@ function isBetter(newScore, newTime, existingScore, existingTime) {
   return false;
 }
 
-export default function Form({ finalScore, difficulty, elapsedTime, gameType }) {
+export default function Form({ finalScore, difficulty, elapsedTime, gameType, continent }) {
   const nameRef = useRef();
   const ref = collection(firestore, "scores");
   const [saved, setSaved] = useState(false);
@@ -35,6 +35,7 @@ export default function Form({ finalScore, difficulty, elapsedTime, gameType }) 
       difficulty,
       elapsedTime,
       gameType,
+      ...(continent != null && { continent }),
     };
 
     const existingSnapshot = await getDocs(

@@ -99,7 +99,7 @@ function RightClickDrag() {
   return null
 }
 
-function PlacementGameLayout({ difficulty, isTraining, isAscension, presetName, state, onGameFinished = null }) {
+function PlacementGameLayout({ difficulty, isTraining, isAscension, presetName, state, onGameFinished = null, continent }) {
   const {
     targetCountry, score, timer, stats,
     isGameOver, displayTimer,
@@ -202,7 +202,7 @@ function PlacementGameLayout({ difficulty, isTraining, isAscension, presetName, 
                 isTraining={isTraining}
               />
             ) : (
-              <Form finalScore={score} difficulty={difficulty} elapsedTime={timer} gameType="PLACEMENT" />
+              <Form finalScore={score} difficulty={difficulty} elapsedTime={timer} gameType="PLACEMENT" continent={continent} />
             )}
             {!onGameFinished && (
               <div className="game-over-actions">
@@ -277,6 +277,7 @@ function StandardPlacementGame({ difficulty, isTraining, continent }) {
       isAscension={false}
       presetName={null}
       state={state}
+      continent={continent}
     />
   )
 }

@@ -16,7 +16,7 @@ import './GamePage.css'
 import './FlagGamePage.css'
 import './CapitalsGamePage.css'
 
-function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, state, onGameFinished = null }) {
+function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, state, onGameFinished = null, continent }) {
   const {
     targetCountry, score, timer, stats,
     isGameOver, displayTimer,
@@ -184,7 +184,7 @@ function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, s
                 isTraining={isTraining}
               />
             ) : (
-              <Form finalScore={score} difficulty={difficulty} elapsedTime={timer} gameType="CAPITALS" />
+              <Form finalScore={score} difficulty={difficulty} elapsedTime={timer} gameType="CAPITALS" continent={continent} />
             )}
             {!onGameFinished && (
               <div className="game-over-actions">
@@ -225,6 +225,7 @@ function StandardCapitalsGame({ difficulty, isTraining, continent }) {
       isAscension={false}
       presetName={null}
       state={state}
+      continent={continent}
     />
   )
 }

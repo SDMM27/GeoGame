@@ -258,7 +258,7 @@ function ActiveGameCard({ game }) {
   const detectedPreset = ASCENSION_PRESETS.find((preset) => preset.name === detectedPresetName) ?? null;
   const totalAscensionCountries = Object.values(ascensionPhases).reduce((sum, count) => sum + count, 0);
 
-  const handlePlay = (isTraining = false, difficultyOverride = null) => {
+  const handlePlay = (isTraining = false, difficultyOverride = null, continentOverride = null) => {
     if (mode === "ascension") {
       navigate(game.route, {
         state: {
@@ -272,7 +272,7 @@ function ActiveGameCard({ game }) {
     }
 
     if (selectionMode === "continent") {
-      navigate(game.route, { state: { continent: selectedContinent, isTraining } });
+      navigate(game.route, { state: { continent: continentOverride ?? selectedContinent, isTraining } });
       return;
     }
 
@@ -353,6 +353,7 @@ function ActiveGameCard({ game }) {
                     key={cont.name}
                     className={`difficulty-btn${selectedContinent === cont.name ? " difficulty-btn--active" : ""}`}
                     onClick={() => setSelectedContinent(cont.name)}
+                    onDoubleClick={() => handlePlay(false, null, cont.name)}
                   >
                     <span className="difficulty-btn-name" style={{ color: cont.color }}>{cont.name}</span>
                     <span className="difficulty-btn-count">{cont.count} pays</span>

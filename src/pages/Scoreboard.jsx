@@ -4,9 +4,11 @@ import { collection, getDocs } from 'firebase/firestore'
 import { firestore } from '../Firebase'
 import { formatTime } from '../utils/formatTime'
 import { GAME_TYPES } from '../utils/gameTypes'
+import { CONTINENTS } from '../utils/continents'
 import './scoreboard.css'
 
 const DIFFICULTY_ORDER = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
+const CONTINENT_NAMES = new Set(['Europe', 'Asie', 'Afrique', 'Amériques', 'Océanie'])
 const MEDAL = ['\uD83E\uDD47', '\uD83E\uDD48', '\uD83E\uDD49']
 const LEGACY_GAME_ID_MAP = { country: GAME_TYPES.PLACEMENT, flags: GAME_TYPES.FLAGS }
 const ACTIVE_GAMES = [
@@ -31,12 +33,12 @@ export const filterByGame = (scores, game) => {
   })
 }
 
-export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT }) {
+export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT, continentMode = false }) {
   const [allScores, setAllScores] = useState([])
   const [selectedGame, setSelectedGame] = useState(defaultGame)
   const [selectedDifficulty, setSelectedDifficulty] = useState('AllScores')
+  const [selectedContinent, setSelectedContinent] = useState('AllContinents')
   const [loading, setLoading] = useState(true)
-  const [isLegacy, setIsLegacy] = useState(false)
 
   useEffect(() => {
     setSelectedGame(defaultGame)
@@ -46,8 +48,7 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT }) {
     const fetchScores = async () => {
       setLoading(true)
       try {
-        const collectionName = isLegacy ? 'scores_v1' : 'scores'
-        const snapshot = await getDocs(collection(firestore, collectionName))
+        const snapshot = await getDocs(collection(firestore, 'scores'))
         setAllScores(snapshot.docs.map((doc) => doc.data()))
       } finally {
         setLoading(false)
@@ -55,32 +56,27 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT }) {
     }
 
     fetchScores()
-  }, [isLegacy])
+  }, [])
+
+  const isContinentScore = (score) =>
+    score.continent != null || CONTINENT_NAMES.has(score.difficulty)
 
   const scores = sortScores(
-    filterByGame(allScores, selectedGame).filter(
-      (score) => selectedDifficulty === 'AllScores' || score.difficulty === selectedDifficulty
-    )
+    filterByGame(allScores, selectedGame).filter((score) => {
+      if (continentMode) {
+        if (!isContinentScore(score)) return false
+        if (selectedContinent !== 'AllContinents' && score.continent !== selectedContinent && score.difficulty !== selectedContinent) return false
+      } else {
+        if (isContinentScore(score)) return false
+        if (selectedDifficulty !== 'AllScores' && score.difficulty !== selectedDifficulty) return false
+      }
+      return true
+    })
   )
 
   return (
     <div className="scoreboard">
       <h1 className="scoreboard-title">Tableau des scores</h1>
-
-      <div className="scoreboard-era-tabs">
-        <button
-          className={`scoreboard-era-tab ${!isLegacy ? 'scoreboard-era-tab--active' : ''}`}
-          onClick={() => setIsLegacy(false)}
-        >
-          Classement actuel <br />(nouvelles difficultés)
-        </button>
-        <button
-          className={`scoreboard-era-tab ${isLegacy ? 'scoreboard-era-tab--active' : ''}`}
-          onClick={() => setIsLegacy(true)}
-        >
-          Ancien classement
-        </button>
-      </div>
 
       <div className="scoreboard-filters">
         <select
@@ -94,22 +90,35 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT }) {
           <option value="AllGames">Tous les jeux</option>
         </select>
 
-        <select
-          className="scoreboard-select"
-          value={selectedDifficulty}
-          onChange={(event) => setSelectedDifficulty(event.target.value)}
-        >
-          {DIFFICULTY_ORDER.map((difficulty) => (
-            <option key={difficulty} value={difficulty}>{difficulty}</option>
-          ))}
-          <option value="AllScores">Toutes les difficultés</option>
-        </select>
+        {continentMode ? (
+          <select
+            className="scoreboard-select"
+            value={selectedContinent}
+            onChange={(event) => setSelectedContinent(event.target.value)}
+          >
+            {CONTINENTS.map(({ name }) => (
+              <option key={name} value={name}>{name}</option>
+            ))}
+            <option value="AllContinents">Tous les continents</option>
+          </select>
+        ) : (
+          <select
+            className="scoreboard-select"
+            value={selectedDifficulty}
+            onChange={(event) => setSelectedDifficulty(event.target.value)}
+          >
+            {DIFFICULTY_ORDER.map((difficulty) => (
+              <option key={difficulty} value={difficulty}>{difficulty}</option>
+            ))}
+            <option value="AllScores">Toutes les difficultés</option>
+          </select>
+        )}
       </div>
 
       {loading ? (
         <p className="scoreboard-loading">Chargement...</p>
       ) : scores.length === 0 ? (
-        <p className="scoreboard-empty">Aucun score pour cette difficulté.</p>
+        <p className="scoreboard-empty">Aucun score pour ces filtres.</p>
       ) : (
         <div className="scoreboard-table">
           <div className="scoreboard-header">
@@ -132,7 +141,9 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT }) {
               <span className="scoreboard-time">
                 {score.elapsedTime != null ? formatTime(score.elapsedTime) : '—'}
               </span>
-              <span className="scoreboard-difficulty">{score.difficulty}</span>
+              <span className="scoreboard-difficulty">
+                {score.continent ? `${score.difficulty} · ${score.continent}` : score.difficulty}
+              </span>
             </div>
           ))}
         </div>

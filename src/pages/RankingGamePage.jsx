@@ -38,7 +38,6 @@ export default function RankingGamePage() {
   const [mode, setMode] = useState(initialMode)
   const [countryCount, setCountryCount] = useState(5)
   const [submitName, setSubmitName] = useState('')
-  const [leaderboardSubmitted, setLeaderboardSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
 
   const {
@@ -55,6 +54,11 @@ export default function RankingGamePage() {
     startInfiniteRound,
     dailyKey,
   } = useRankingGameState(mode, { countryCount })
+
+  const rankingSavedKey = dailyKey ? `ranking-saved:${dailyKey}` : null
+  const [leaderboardSubmitted, setLeaderboardSubmitted] = useState(() =>
+    rankingSavedKey ? !!localStorage.getItem(rankingSavedKey) : false
+  )
 
   function onDragEnd(result) {
     if (!result.destination) return
@@ -102,6 +106,7 @@ export default function RankingGamePage() {
         totalError,
       })
 
+      if (rankingSavedKey) localStorage.setItem(rankingSavedKey, '1')
       setLeaderboardSubmitted(true)
       toast.success('Score enregistré !', { containerId: 'topRightToast' })
     } catch {

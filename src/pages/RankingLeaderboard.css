@@ -1,0 +1,24 @@
+/* src/pages/RankingLeaderboard.css */
+
+/* Override grid pour 4 colonnes : rang / joueur / score / erreur */
+.ranking-lb .daily-lb__header,
+.ranking-lb .daily-lb__row-main {
+  grid-template-columns: 40px 1fr 80px 80px;
+}
+
+.ranking-lb__score,
+.ranking-lb__error {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  text-align: right;
+}
+
+/* Non-clickable rows — reset pointer cursor and hover inherited from daily-lb */
+.ranking-lb .daily-lb__row-main {
+  cursor: default;
+  user-select: auto;
+}
+
+.ranking-lb .daily-lb__row-main:hover {
+  background: var(--bg-secondary, #0d1b2a);
+}

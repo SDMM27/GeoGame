@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@hello-pangea/dnd": "^18.0.1",
     "bootstrap": "^5.3.0",
     "country-flag-icons": "^1.6.15",
     "firebase": "^9.22.2",

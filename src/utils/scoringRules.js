@@ -42,3 +42,15 @@ export function getGuessGamePoints(wrongGuesses) {
   if (wrongGuesses <= 2) return 2
   return 0
 }
+
+/**
+ * Ranking Game — based on sum of absolute position errors across all N countries.
+ * totalError = Σ |player_position[i] - correct_position[i]|
+ * 0 (perfect) → 3 pts, ≤ n → 2 pts, ≤ 2n → 1 pt, > 2n → 0 pt.
+ */
+export function getRankingGamePoints(totalError, n) {
+  if (totalError === 0) return 3
+  if (totalError <= n) return 2
+  if (totalError <= 2 * n) return 1
+  return 0
+}

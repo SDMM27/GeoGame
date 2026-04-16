@@ -4,25 +4,11 @@ import { collection, getDocs, query, where } from 'firebase/firestore'
 import { firestore } from '../Firebase'
 import { GAME_TYPES } from '../utils/gameTypes'
 import { sortRankingScores } from '../utils/rankingScores'
+import { getLast7Days } from '../utils/dateUtils'
 import './DailyLeaderboard.css'
 import './RankingLeaderboard.css'
 
 const MEDAL = ['🥇', '🥈', '🥉']
-
-function getLast7Days(todayKey) {
-  const [y, m, d] = todayKey.split('-').map(Number)
-  const baseDate = new Date(y, m - 1, d)
-  return Array.from({ length: 7 }, (_, i) => {
-    const date = new Date(baseDate)
-    date.setDate(baseDate.getDate() - i)
-    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
-    const label =
-      i === 0 ? "Aujourd'hui" :
-      i === 1 ? 'Hier' :
-      date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
-    return { key, label }
-  })
-}
 
 export default function RankingLeaderboard({ dailyKey }) {
   const [selectedDate, setSelectedDate] = useState(dailyKey ?? '')
@@ -96,8 +82,8 @@ export default function RankingLeaderboard({ dailyKey }) {
           <div className="daily-lb__header">
             <span>#</span>
             <span>Joueur</span>
-            <span style={{ textAlign: 'right' }}>Score</span>
-            <span style={{ textAlign: 'right' }}>Erreur</span>
+            <span className="ranking-lb__score">Score</span>
+            <span className="ranking-lb__error">Erreur</span>
           </div>
           {scores.map((score, index) => (
             <div

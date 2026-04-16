@@ -12,3 +12,13 @@
   color: var(--text-primary);
   text-align: right;
 }
+
+/* Non-clickable rows — reset pointer cursor and hover inherited from daily-lb */
+.ranking-lb .daily-lb__row-main {
+  cursor: default;
+  user-select: auto;
+}
+
+.ranking-lb .daily-lb__row-main:hover {
+  background: var(--bg-secondary, #0d1b2a);
+}

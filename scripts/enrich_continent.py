@@ -17,9 +17,18 @@ FALLBACK = {
     'TW': 'Asie',      # Taiwan
     'PS': 'Asie',      # Palestine
     'SJ': 'Europe',    # Svalbard
+    'VA': 'Europe',    # Vatican
+    'TL': 'Asie',      # Timor-Leste
+    'SX': 'Amériques', # Sint Maarten
+    'PN': 'Océanie',   # Pitcairn
     'AQ': None,        # Antarctica — no continent tag
     '-99': None,
     '': None,
+}
+
+# Fallback by ADMIN name for countries with null ISO_A2 (e.g. Kosovo)
+FALLBACK_BY_ADMIN = {
+    'Kosovo': 'Europe',
 }
 
 def get_continent(iso2):
@@ -39,6 +48,8 @@ missing = []
 for feature in data['features']:
     iso2 = feature['properties'].get('ISO_A2', '') or ''
     continent = get_continent(iso2)
+    if continent is None:
+        continent = FALLBACK_BY_ADMIN.get(feature['properties'].get('ADMIN', ''))
     feature['properties']['continent'] = continent
     if continent is None:
         missing.append(f"{feature['properties'].get('ADMIN')} ({iso2})")

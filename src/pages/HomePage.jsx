@@ -2,13 +2,10 @@
 import { useNavigate } from "react-router-dom";
 import NavBar from "../components/NavBar";
 import { GAME_TYPES } from "../utils/gameTypes";
-import { getTotalCountries } from "../hooks/useGameState";
-import { getTotalFlagCountries } from "../hooks/useFlagGameState";
-import { getTotalCapitalCountries } from "../hooks/useCapitalsGameState";
+import { getTotalCountries, getTotalCountriesByContinent } from "../hooks/useGameState";
+import { getTotalFlagCountries, getTotalFlagCountriesByContinent } from "../hooks/useFlagGameState";
+import { getTotalCapitalCountries, getTotalCapitalCountriesByContinent } from "../hooks/useCapitalsGameState";
 import { CONTINENTS } from "../utils/continents";
-import { getTotalCountriesByContinent } from "../hooks/useGameState";
-import { getTotalFlagCountriesByContinent } from "../hooks/useFlagGameState";
-import { getTotalCapitalCountriesByContinent } from "../hooks/useCapitalsGameState";
 import { ASCENSION_PRESETS, matchPreset } from "../utils/ascensionPresets";
 import "./HomePage.css";
 
@@ -429,7 +426,11 @@ function ActiveGameCard({ game }) {
           >
             Jouer
           </button>
-          <button className="btn-training" onClick={() => handlePlay(true)}>
+          <button
+            className="btn-training"
+            onClick={() => handlePlay(true)}
+            disabled={mode === "standard" && selectionMode === "continent" && !selectedContinent}
+          >
             Entraînement
           </button>
         </div>

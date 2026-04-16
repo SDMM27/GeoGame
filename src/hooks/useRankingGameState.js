@@ -26,6 +26,11 @@ export function computeTotalError(playerOrder, correctOrder) {
   }, 0)
 }
 
+export function pickCriterionKey(key) {
+  if (key && CRITERIA_KEYS.includes(key)) return key
+  return CRITERIA_KEYS[Math.floor(Math.random() * CRITERIA_KEYS.length)]
+}
+
 // --- Private helpers ---
 
 function hashString(value) {
@@ -119,6 +124,7 @@ export default function useRankingGameState(mode, options = {}) {
   const [countryValues, setCountryValues] = useState(new Map())
   const [elapsedTime, setElapsedTime] = useState(0)
   const [isTimerRunning, setIsTimerRunning] = useState(false)
+  const [hasStarted, setHasStarted] = useState(false)
   const timerRef = useRef(null)
   const startTimeRef = useRef(null)
 
@@ -155,10 +161,17 @@ export default function useRankingGameState(mode, options = {}) {
         .map((iso) => RANKING_COUNTRIES.find((c) => c.properties.ISO_A3 === iso))
         .filter(Boolean)
 
+      const alreadyStarted = saved.hasStarted === true || (saved.elapsedTime ?? 0) > 0 || saved.status === 'submitted'
+
       setCriterion(savedCriterion)
       setCountries(restoredCountries)
       setStatus(saved.status)
       setElapsedTime(saved.elapsedTime ?? 0)
+      setHasStarted(alreadyStarted)
+
+      if (alreadyStarted && saved.status === 'playing') {
+        setIsTimerRunning(true)
+      }
 
       if (saved.status === 'submitted') {
         const correct = computeCorrectOrder(restoredCountries, savedCriterion, areaMap)
@@ -181,12 +194,14 @@ export default function useRankingGameState(mode, options = {}) {
       setStatus('playing')
       setElapsedTime(0)
       setIsTimerRunning(false)
+      setHasStarted(false)
 
       saveDailyProgress(dateKey, {
         criterion: criterionKey,
         initialOrder: shuffled.map((c) => c.properties.ISO_A3),
         playerOrder: shuffled.map((c) => c.properties.ISO_A3),
         status: 'playing',
+        hasStarted: false,
         elapsedTime: 0,
         score: null,
         totalError: null,
@@ -196,7 +211,7 @@ export default function useRankingGameState(mode, options = {}) {
 
   function initInfiniteRound() {
     const n = COUNTRY_COUNT[difficulty] ?? 5
-    const criterionKey = CRITERIA_KEYS[Math.floor(Math.random() * CRITERIA_KEYS.length)]
+    const criterionKey = pickCriterionKey(null)
     const crit = CRITERIA[criterionKey]
     const pool = buildCountryPool(RANKING_COUNTRIES, crit, areaMap)
     const selected = pickN(pool, n, Math.random.bind(Math))
@@ -211,11 +226,19 @@ export default function useRankingGameState(mode, options = {}) {
     setCountryValues(new Map())
     setElapsedTime(0)
     setIsTimerRunning(false)
+    setHasStarted(true)
   }
 
-  function startTimer() {
-    if (status === 'playing' && !isTimerRunning) {
-      setIsTimerRunning(true)
+  function startGame() {
+    if (hasStarted || status !== 'playing') return
+    setHasStarted(true)
+    setIsTimerRunning(true)
+    if (mode === 'daily') {
+      const dateKey = getTodayKey()
+      const saved = readDailyProgress(dateKey)
+      if (saved) {
+        saveDailyProgress(dateKey, { ...saved, hasStarted: true })
+      }
     }
   }
 
@@ -279,8 +302,8 @@ export default function useRankingGameState(mode, options = {}) {
     totalError,
     correctOrder,
     elapsedTime,
-    isTimerRunning,
-    startTimer,
+    hasStarted,
+    startGame,
     handleSubmit,
     startNextRound,
     dailyKey: mode === 'daily' ? getTodayKey() : null,

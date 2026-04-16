@@ -299,6 +299,12 @@ export default function useRankingGameState(mode, options = {}) {
   function startNextRound() {
     if (mode !== 'infinite') return
     setCriterion(null)
+    setCountries([])
+    setScore(null)
+    setTotalError(null)
+    setCorrectOrder([])
+    setCountryValues(new Map())
+    setElapsedTime(0)
     setStatus('choosing-category')
   }
 

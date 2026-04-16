@@ -1,5 +1,5 @@
 // src/hooks/useRankingGameState.js
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { getCountryAreaKm2 } from '../utils/countryArea'
 import { CRITERIA, CRITERIA_KEYS, buildCountryPool } from '../utils/rankingCriteria'
@@ -122,24 +122,6 @@ export default function useRankingGameState(mode, options = {}) {
   const [totalError, setTotalError] = useState(null)
   const [correctOrder, setCorrectOrder] = useState([])
   const [countryValues, setCountryValues] = useState(new Map())
-  const [elapsedTime, setElapsedTime] = useState(0)
-  const [isTimerRunning, setIsTimerRunning] = useState(false)
-  const [hasStarted, setHasStarted] = useState(false)
-  const timerRef = useRef(null)
-  const startTimeRef = useRef(null)
-
-  // Timer management
-  useEffect(() => {
-    if (isTimerRunning) {
-      startTimeRef.current = Date.now() - elapsedTime
-      timerRef.current = setInterval(() => {
-        setElapsedTime(Date.now() - startTimeRef.current)
-      }, 100)
-    } else {
-      clearInterval(timerRef.current)
-    }
-    return () => clearInterval(timerRef.current)
-  }, [isTimerRunning])
 
   // Initialize on mode/difficulty change
   useEffect(() => {
@@ -153,11 +135,7 @@ export default function useRankingGameState(mode, options = {}) {
       setTotalError(null)
       setCorrectOrder([])
       setCountryValues(new Map())
-      setElapsedTime(0)
-      setIsTimerRunning(false)
-      setHasStarted(false)
     }
-    return () => clearInterval(timerRef.current)
   }, [mode, difficulty])
 
   function initDailyRound() {
@@ -170,17 +148,9 @@ export default function useRankingGameState(mode, options = {}) {
         .map((iso) => RANKING_COUNTRIES.find((c) => c.properties.ISO_A3 === iso))
         .filter(Boolean)
 
-      const alreadyStarted = saved.hasStarted === true || (saved.elapsedTime ?? 0) > 0 || saved.status === 'submitted'
-
       setCriterion(savedCriterion)
       setCountries(restoredCountries)
       setStatus(saved.status)
-      setElapsedTime(saved.elapsedTime ?? 0)
-      setHasStarted(alreadyStarted)
-
-      if (alreadyStarted && saved.status === 'playing') {
-        setIsTimerRunning(true)
-      }
 
       if (saved.status === 'submitted') {
         const correct = computeCorrectOrder(restoredCountries, savedCriterion, areaMap)
@@ -201,17 +171,12 @@ export default function useRankingGameState(mode, options = {}) {
       setCriterion(crit)
       setCountries(shuffled)
       setStatus('playing')
-      setElapsedTime(0)
-      setIsTimerRunning(false)
-      setHasStarted(false)
 
       saveDailyProgress(dateKey, {
         criterion: criterionKey,
         initialOrder: shuffled.map((c) => c.properties.ISO_A3),
         playerOrder: shuffled.map((c) => c.properties.ISO_A3),
         status: 'playing',
-        hasStarted: false,
-        elapsedTime: 0,
         score: null,
         totalError: null,
       })
@@ -233,22 +198,6 @@ export default function useRankingGameState(mode, options = {}) {
     setTotalError(null)
     setCorrectOrder([])
     setCountryValues(new Map())
-    setElapsedTime(0)
-    setIsTimerRunning(false)
-    setHasStarted(true)
-  }
-
-  function startGame() {
-    if (hasStarted || status !== 'playing') return
-    setHasStarted(true)
-    setIsTimerRunning(true)
-    if (mode === 'daily') {
-      const dateKey = getTodayKey()
-      const saved = readDailyProgress(dateKey)
-      if (saved) {
-        saveDailyProgress(dateKey, { ...saved, hasStarted: true })
-      }
-    }
   }
 
   function reorderCountries(newOrder) {
@@ -267,9 +216,6 @@ export default function useRankingGameState(mode, options = {}) {
 
   function handleSubmit() {
     if (status !== 'playing' || !criterion) return
-
-    setIsTimerRunning(false)
-    const finalTime = elapsedTime
 
     const correct = computeCorrectOrder(countries, criterion, areaMap)
     const error = computeTotalError(countries, correct)
@@ -291,7 +237,6 @@ export default function useRankingGameState(mode, options = {}) {
         status: 'submitted',
         score: pts,
         totalError: error,
-        elapsedTime: finalTime,
       })
     }
   }
@@ -304,9 +249,6 @@ export default function useRankingGameState(mode, options = {}) {
     setTotalError(null)
     setCorrectOrder([])
     setCountryValues(new Map())
-    setElapsedTime(0)
-    setIsTimerRunning(false)
-    setHasStarted(false)
     setStatus('choosing-category')
   }
 
@@ -324,9 +266,6 @@ export default function useRankingGameState(mode, options = {}) {
     score,
     totalError,
     correctOrder,
-    elapsedTime,
-    hasStarted,
-    startGame,
     handleSubmit,
     startNextRound,
     startInfiniteRound,

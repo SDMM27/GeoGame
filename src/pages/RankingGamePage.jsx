@@ -255,13 +255,6 @@ export default function RankingGamePage() {
               <div className="ranking-score-sub">
                 Erreur totale : {totalError} position{totalError !== 1 ? 's' : ''}
               </div>
-              <div className="ranking-error-chips">
-                {errorChips.map(({ iso, name, error }) => (
-                  <span key={iso} className={`ranking-error-chip ${chipClass(error)}`}>
-                    {name} {error === 0 ? '0' : `−${error}`}
-                  </span>
-                ))}
-              </div>
             </div>
 
             {/* Correct ranking revealed */}
@@ -295,7 +288,7 @@ export default function RankingGamePage() {
                     {isCorrect
                       ? <span className="ranking-result-status--correct">✓ correct</span>
                       : <span className="ranking-result-status--wrong">
-                          ✗ mis #{playerIdx + 1} (−{Math.abs(playerIdx - index)} pos.)
+                          mis #{playerIdx + 1} (écart de {Math.abs(playerIdx - index)})
                         </span>
                     }
                   </div>

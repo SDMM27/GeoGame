@@ -9,9 +9,6 @@ export default function NavBar() {
       <Link to="/" className="navbar-logo">
         GEO<span className="navbar-logo-accent">GAME</span>
       </Link>
-      <Link to="/multiplayer" className="navbar-mp-link">
-        Multijoueur
-      </Link>
     </nav>
   )
 }

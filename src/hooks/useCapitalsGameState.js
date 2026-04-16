@@ -38,7 +38,7 @@ export function getTotalCapitalCountriesByContinent(continent) {
 
 let alreadyChosenCountries = []
 
-export default function useCapitalsGameState(difficulty, isTraining, overrideCountries = null, mpSnapshot = null, mpSnapshotKey = null) {
+export default function useCapitalsGameState(difficulty, isTraining, overrideCountries = null, mpSnapshot = null, mpSnapshotKey = null, continent = null) {
   const navigate = useNavigate()
 
   const [targetCountry, setTargetCountry] = useState(null)
@@ -63,17 +63,23 @@ export default function useCapitalsGameState(difficulty, isTraining, overrideCou
   const scoreForSnapRef = useRef(mpSnapshot?.score ?? 0)
 
   useEffect(() => {
-    if (!difficulty && !overrideCountries) navigate('/')
-  }, [difficulty, overrideCountries, navigate])
+    if (!difficulty && !overrideCountries && !continent) navigate('/')
+  }, [difficulty, overrideCountries, continent, navigate])
 
-  const getRandomCountry = useCallback((diff) => {
-    const available = getAvailableDifficulties(diff)
-    const filtered = countries.features.filter(c =>
-      available.includes(c.properties.DifficultyCapitals) &&
-      c.properties.ISO_A2 &&
-      c.properties.capital &&
-      !alreadyChosenCountries.includes(c.properties.ADMIN)
-    )
+  const getRandomCountry = useCallback((diff, cont) => {
+    const filtered = cont
+      ? countries.features.filter(c =>
+          c.properties.continent === cont &&
+          c.properties.ISO_A2 &&
+          c.properties.capital &&
+          !alreadyChosenCountries.includes(c.properties.ADMIN)
+        )
+      : countries.features.filter(c =>
+          getAvailableDifficulties(diff).includes(c.properties.DifficultyCapitals) &&
+          c.properties.ISO_A2 &&
+          c.properties.capital &&
+          !alreadyChosenCountries.includes(c.properties.ADMIN)
+        )
     if (filtered.length === 0) return null
     return filtered[Math.floor(Math.random() * filtered.length)]
   }, [])
@@ -81,10 +87,14 @@ export default function useCapitalsGameState(difficulty, isTraining, overrideCou
   const orderedIndexRef = useRef(0)
 
   useEffect(() => {
-    if (!difficulty && !overrideCountries) return
+    if (!difficulty && !overrideCountries && !continent) return
     alreadyChosenCountries = []
     orderedIndexRef.current = 0
-    const total = overrideCountries ? overrideCountries.length : getTotalCapitalCountries(difficulty)
+    const total = overrideCountries
+      ? overrideCountries.length
+      : continent
+        ? getTotalCapitalCountriesByContinent(continent)
+        : getTotalCapitalCountries(difficulty)
 
     if (mpSnapshot && overrideCountries && mpSnapshot.countryIndex > 0) {
       // Restore state — player refreshed mid-game
@@ -115,14 +125,14 @@ export default function useCapitalsGameState(difficulty, isTraining, overrideCou
     setStats({ found: 0, skipped: 0, total, totalErrors: 0 })
     const first = overrideCountries
       ? overrideCountries[orderedIndexRef.current++]
-      : getRandomCountry(difficulty)
+      : getRandomCountry(difficulty, continent)
     if (first) {
       alreadyChosenCountries.push(first.properties.ADMIN)
       setTargetCountry(first)
       gameStartedRef.current = true
       setGameStarted(true)
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [difficulty, continent, getRandomCountry, overrideCountries]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { targetCountryRef.current = targetCountry }, [targetCountry])
   useEffect(() => { consecutiveErrorsRef.current = consecutiveErrors }, [consecutiveErrors])
@@ -167,7 +177,7 @@ export default function useCapitalsGameState(difficulty, isTraining, overrideCou
   const changeCountry = useCallback(() => {
     const next = overrideCountries
       ? (overrideCountries[orderedIndexRef.current++] ?? null)
-      : getRandomCountry(difficulty)
+      : getRandomCountry(difficulty, continent)
     if (next) {
       alreadyChosenCountries.push(next.properties.ADMIN)
       setTargetCountry(next)
@@ -178,7 +188,7 @@ export default function useCapitalsGameState(difficulty, isTraining, overrideCou
     consecutiveErrorsRef.current = 0
     setClickOnSeeCountry(false)
     clickOnSeeCountryRef.current = false
-  }, [difficulty, getRandomCountry, overrideCountries])
+  }, [difficulty, continent, getRandomCountry, overrideCountries])
 
   // Auto-avance après révélation (3 erreurs ou bouton "Voir")
   useEffect(() => {
@@ -289,7 +299,7 @@ export default function useCapitalsGameState(difficulty, isTraining, overrideCou
     setTimeout(() => {
       const total = getTotalCapitalCountries(difficulty)
       setStats({ found: 0, skipped: 0, total, totalErrors: 0 })
-      const next = getRandomCountry(difficulty)
+      const next = getRandomCountry(difficulty, continent)
       if (next) {
         alreadyChosenCountries.push(next.properties.ADMIN)
         setTargetCountry(next)

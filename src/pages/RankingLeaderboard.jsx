@@ -10,7 +10,40 @@ import './RankingLeaderboard.css'
 
 const MEDAL = ['🥇', '🥈', '🥉']
 
-export default function RankingLeaderboard({ dailyKey }) {
+function AccordionRow({ score, index, playerName }) {
+  const [open, setOpen] = useState(false)
+  const isSelf = score.name === playerName
+
+  return (
+    <div className={`daily-lb__row${index < 3 ? ' daily-lb__row--top' : ''}${isSelf ? ' ranking-lb__row--self' : ''}`}>
+      <div className="daily-lb__row-main" onClick={() => setOpen((prev) => !prev)}>
+        <span className="daily-lb__rank">
+          {index < 3 ? MEDAL[index] : `#${index + 1}`}
+        </span>
+        <span className="daily-lb__name">
+          {score.name}
+          {isSelf && <span className="ranking-lb__self-badge">vous</span>}
+        </span>
+        <span className="ranking-lb__score">{score.score} pts</span>
+        <span className="ranking-lb__error">{score.totalError} pos.</span>
+      </div>
+      {open && Array.isArray(score.playerOrder) && score.playerOrder.length > 0 && (
+        <div className="daily-lb__accordion">
+          <p className="daily-lb__accordion-title">Classement joué</p>
+          <ol className="daily-lb__guess-list">
+            {score.playerOrder.map((country, i) => (
+              <li key={`${country}-${i}`} className="daily-lb__guess-item">
+                {i + 1}. {country}
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default function RankingLeaderboard({ dailyKey, playerName = null }) {
   const [selectedDate, setSelectedDate] = useState(dailyKey ?? '')
   const [scores, setScores] = useState([])
   const [loading, setLoading] = useState(true)
@@ -86,19 +119,12 @@ export default function RankingLeaderboard({ dailyKey }) {
             <span className="ranking-lb__error">Erreur</span>
           </div>
           {scores.map((score, index) => (
-            <div
+            <AccordionRow
               key={`${score.name}-${score.dailyKey}-${index}`}
-              className={`daily-lb__row${index < 3 ? ' daily-lb__row--top' : ''}`}
-            >
-              <div className="daily-lb__row-main">
-                <span className="daily-lb__rank">
-                  {index < 3 ? MEDAL[index] : `#${index + 1}`}
-                </span>
-                <span className="daily-lb__name">{score.name}</span>
-                <span className="ranking-lb__score">{score.score} pts</span>
-                <span className="ranking-lb__error">{score.totalError} pos.</span>
-              </div>
-            </div>
+              score={score}
+              index={index}
+              playerName={playerName}
+            />
           ))}
         </>
       )}

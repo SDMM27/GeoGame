@@ -104,6 +104,7 @@ export default function RankingGamePage() {
         dailyKey,
         score,
         totalError,
+        playerOrder: countries.map((c) => c.properties.ADMIN),
       })
 
       if (rankingSavedKey) localStorage.setItem(rankingSavedKey, '1')
@@ -326,7 +327,10 @@ export default function RankingGamePage() {
             )}
 
             {mode === 'daily' && (
-              <RankingLeaderboard dailyKey={dailyKey} />
+              <RankingLeaderboard
+                dailyKey={dailyKey}
+                playerName={leaderboardSubmitted ? submitName : null}
+              />
             )}
 
             {mode === 'infinite' && (

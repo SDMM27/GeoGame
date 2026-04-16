@@ -168,11 +168,11 @@ function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state
   )
 }
 
-function StandardFlagGame({ difficulty, isTraining }) {
-  const state = useFlagGameState(difficulty, isTraining)
+function StandardFlagGame({ difficulty, isTraining, continent }) {
+  const state = useFlagGameState(difficulty, isTraining, null, null, null, continent)
   return (
     <FlagGameLayout
-      difficulty={difficulty}
+      difficulty={difficulty ?? continent}
       isTraining={isTraining}
       isAscension={false}
       presetName={null}
@@ -312,7 +312,7 @@ function MultiplayerAscensionFlagsGame({ gameConfig, overridesByDifficulty, onCo
 }
 
 export default function FlagGamePage() {
-  const { difficulty, isTraining, isAscension, phases, presetName } = useLocation().state || {}
+  const { difficulty, isTraining, isAscension, phases, presetName, continent } = useLocation().state || {}
 
   if (isAscension) {
     return (
@@ -324,5 +324,5 @@ export default function FlagGamePage() {
     )
   }
 
-  return <StandardFlagGame difficulty={difficulty} isTraining={isTraining} />
+  return <StandardFlagGame difficulty={difficulty} isTraining={isTraining} continent={continent} />
 }

@@ -216,11 +216,11 @@ function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, s
   )
 }
 
-function StandardCapitalsGame({ difficulty, isTraining }) {
-  const state = useCapitalsGameState(difficulty, isTraining)
+function StandardCapitalsGame({ difficulty, isTraining, continent }) {
+  const state = useCapitalsGameState(difficulty, isTraining, null, null, null, continent)
   return (
     <CapitalsGameLayout
-      difficulty={difficulty}
+      difficulty={difficulty ?? continent}
       isTraining={isTraining}
       isAscension={false}
       presetName={null}
@@ -330,7 +330,7 @@ function MultiplayerAscensionCapitalsGame({ gameConfig, overridesByDifficulty, o
 }
 
 export default function CapitalsGamePage() {
-  const { difficulty, isTraining, isAscension, phases, presetName } = useLocation().state || {}
+  const { difficulty, isTraining, isAscension, phases, presetName, continent } = useLocation().state || {}
 
   if (isAscension) {
     return (
@@ -342,5 +342,5 @@ export default function CapitalsGamePage() {
     )
   }
 
-  return <StandardCapitalsGame difficulty={difficulty} isTraining={isTraining} />
+  return <StandardCapitalsGame difficulty={difficulty} isTraining={isTraining} continent={continent} />
 }

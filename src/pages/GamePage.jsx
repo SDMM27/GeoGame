@@ -268,11 +268,11 @@ function PlacementGameLayout({ difficulty, isTraining, isAscension, presetName, 
   )
 }
 
-function StandardPlacementGame({ difficulty, isTraining }) {
-  const state = useGameState(difficulty, isTraining)
+function StandardPlacementGame({ difficulty, isTraining, continent }) {
+  const state = useGameState(difficulty, isTraining, null, null, null, continent)
   return (
     <PlacementGameLayout
-      difficulty={difficulty}
+      difficulty={difficulty ?? continent}
       isTraining={isTraining}
       isAscension={false}
       presetName={null}
@@ -412,7 +412,7 @@ function MultiplayerAscensionPlacementGame({ gameConfig, overridesByDifficulty, 
 }
 
 export default function GamePage() {
-  const { difficulty, isTraining, isAscension, phases, presetName } = useLocation().state || {}
+  const { difficulty, isTraining, isAscension, phases, presetName, continent } = useLocation().state || {}
 
   if (isAscension) {
     return (
@@ -424,5 +424,5 @@ export default function GamePage() {
     )
   }
 
-  return <StandardPlacementGame difficulty={difficulty} isTraining={isTraining} />
+  return <StandardPlacementGame difficulty={difficulty} isTraining={isTraining} continent={continent} />
 }

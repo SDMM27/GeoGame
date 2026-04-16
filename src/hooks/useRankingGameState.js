@@ -7,8 +7,7 @@ import { getRankingGamePoints } from '../utils/scoringRules'
 
 const DAILY_TIME_ZONE = 'Europe/Paris'
 const DAILY_STORAGE_PREFIX = 'ranking-daily'
-const COUNTRY_COUNT = { Facile: 5, Moyen: 8, Difficile: 10 }
-const DAILY_COUNT = 6
+const DAILY_COUNT = 5
 
 const RANKING_COUNTRIES = countries.features.filter(
   (country) => country?.properties?.ADMIN && country?.geometry?.coordinates?.length
@@ -108,7 +107,7 @@ function saveDailyProgress(dateKey, data) {
 // --- Hook ---
 
 export default function useRankingGameState(mode, options = {}) {
-  const { difficulty = 'Facile' } = options
+  const { countryCount = 5 } = options
 
   const areaMap = useMemo(
     () => new Map(RANKING_COUNTRIES.map((c) => [c.properties.ADMIN, getCountryAreaKm2(c)])),
@@ -123,7 +122,7 @@ export default function useRankingGameState(mode, options = {}) {
   const [correctOrder, setCorrectOrder] = useState([])
   const [countryValues, setCountryValues] = useState(new Map())
 
-  // Initialize on mode/difficulty change
+  // Initialize on mode/countryCount change
   useEffect(() => {
     if (mode === 'daily') {
       initDailyRound()
@@ -136,7 +135,7 @@ export default function useRankingGameState(mode, options = {}) {
       setCorrectOrder([])
       setCountryValues(new Map())
     }
-  }, [mode, difficulty])
+  }, [mode, countryCount])
 
   function initDailyRound() {
     const dateKey = getTodayKey()
@@ -184,7 +183,7 @@ export default function useRankingGameState(mode, options = {}) {
   }
 
   function initInfiniteRound(criterionKey = null) {
-    const n = COUNTRY_COUNT[difficulty] ?? 5
+    const n = countryCount
     const key = pickCriterionKey(criterionKey)
     const crit = CRITERIA[key]
     const pool = buildCountryPool(RANKING_COUNTRIES, crit, areaMap)

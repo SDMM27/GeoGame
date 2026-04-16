@@ -27,6 +27,12 @@ export function getTotalFlagCountries(difficulty) {
   ).length
 }
 
+export function getTotalFlagCountriesByContinent(continent) {
+  return countries.features.filter(c =>
+    c.properties.continent === continent && c.properties.ISO_A2
+  ).length
+}
+
 let alreadyChosenCountries = []
 
 export default function useFlagGameState(difficulty, isTraining, overrideCountries = null, mpSnapshot = null, mpSnapshotKey = null) {

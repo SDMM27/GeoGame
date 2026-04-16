@@ -28,6 +28,14 @@ export function getTotalCapitalCountries(difficulty) {
   ).length
 }
 
+export function getTotalCapitalCountriesByContinent(continent) {
+  return countries.features.filter(c =>
+    c.properties.continent === continent &&
+    c.properties.ISO_A2 &&
+    c.properties.capital
+  ).length
+}
+
 let alreadyChosenCountries = []
 
 export default function useCapitalsGameState(difficulty, isTraining, overrideCountries = null, mpSnapshot = null, mpSnapshotKey = null) {

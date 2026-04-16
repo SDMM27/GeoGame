@@ -34,6 +34,12 @@ export function getTotalCountries(difficulty) {
   ).length
 }
 
+export function getTotalCountriesByContinent(continent) {
+  return countries.features.filter(c =>
+    c.properties.continent === continent
+  ).length
+}
+
 let alreadyChosenCountries = []
 
 export default function useGameState(difficulty, isTraining, overrideCountries = null, mpSnapshot = null, mpSnapshotKey = null) {

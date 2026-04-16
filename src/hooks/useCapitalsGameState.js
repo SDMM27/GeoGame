@@ -132,7 +132,7 @@ export default function useCapitalsGameState(difficulty, isTraining, overrideCou
       gameStartedRef.current = true
       setGameStarted(true)
     }
-  }, [difficulty, continent, getRandomCountry, overrideCountries]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { targetCountryRef.current = targetCountry }, [targetCountry])
   useEffect(() => { consecutiveErrorsRef.current = consecutiveErrors }, [consecutiveErrors])
@@ -297,7 +297,9 @@ export default function useCapitalsGameState(difficulty, isTraining, overrideCou
     timerRef.current = 0
     setTimer(0)
     setTimeout(() => {
-      const total = getTotalCapitalCountries(difficulty)
+      const total = continent
+        ? getTotalCapitalCountriesByContinent(continent)
+        : getTotalCapitalCountries(difficulty)
       setStats({ found: 0, skipped: 0, total, totalErrors: 0 })
       const next = getRandomCountry(difficulty, continent)
       if (next) {

@@ -294,7 +294,9 @@ export default function RankingGamePage() {
                     <div className="ranking-result-value">{formattedVal}</div>
                     {isCorrect
                       ? <span className="ranking-result-status--correct">✓ correct</span>
-                      : <span className="ranking-result-status--wrong">✗ tu avais mis #{playerIdx + 1}</span>
+                      : <span className="ranking-result-status--wrong">
+                          ✗ mis #{playerIdx + 1} (−{Math.abs(playerIdx - index)} pos.)
+                        </span>
                     }
                   </div>
                 </div>

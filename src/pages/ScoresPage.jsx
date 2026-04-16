@@ -27,10 +27,16 @@ export default function ScoresPage() {
         >
           🚀 Ascension
         </button>
+        <button
+          className={`scoreboard-mode-tab ${mode === 'continent' ? 'scoreboard-mode-tab--active' : ''}`}
+          onClick={() => setMode('continent')}
+        >
+          🌍 Continent
+        </button>
       </div>
       {mode === 'ascension'
         ? <AscensionScoreboard defaultGame={game} />
-        : <Scoreboard defaultGame={game} />
+        : <Scoreboard defaultGame={game} continentMode={mode === 'continent'} />
       }
     </div>
   )

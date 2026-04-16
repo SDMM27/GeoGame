@@ -2,9 +2,10 @@
 import { useNavigate } from "react-router-dom";
 import NavBar from "../components/NavBar";
 import { GAME_TYPES } from "../utils/gameTypes";
-import { getTotalCountries } from "../hooks/useGameState";
-import { getTotalFlagCountries } from "../hooks/useFlagGameState";
-import { getTotalCapitalCountries } from "../hooks/useCapitalsGameState";
+import { getTotalCountries, getTotalCountriesByContinent } from "../hooks/useGameState";
+import { getTotalFlagCountries, getTotalFlagCountriesByContinent } from "../hooks/useFlagGameState";
+import { getTotalCapitalCountries, getTotalCapitalCountriesByContinent } from "../hooks/useCapitalsGameState";
+import { CONTINENTS } from "../utils/continents";
 import { ASCENSION_PRESETS, matchPreset } from "../utils/ascensionPresets";
 import "./HomePage.css";
 
@@ -40,6 +41,17 @@ function getDifficultyCaps(gameId) {
       acc[difficulty.name] = difficulty.count;
       return acc;
     }, {});
+}
+
+function getContinentsForGame(gameId) {
+  const countFn =
+    gameId === GAME_TYPES.FLAGS
+      ? getTotalFlagCountriesByContinent
+      : gameId === GAME_TYPES.CAPITALS
+        ? getTotalCapitalCountriesByContinent
+        : getTotalCountriesByContinent;
+
+  return CONTINENTS.map(c => ({ ...c, count: countFn(c.name) }));
 }
 
 function buildPresetPhases(name) {
@@ -237,13 +249,16 @@ function ActiveGameCard({ game }) {
   const [mode, setMode] = useState("standard");
   const [difficulty, setDifficulty] = useState("Moyen");
   const [ascensionPhases, setAscensionPhases] = useState(() => buildPresetPhases("Progressif"));
+  const [selectionMode, setSelectionMode] = useState("difficulty");
+  const [selectedContinent, setSelectedContinent] = useState(null);
+  const continents = useMemo(() => getContinentsForGame(game.id), [game.id]);
   const difficulties = getDifficultiesForGame(game.id);
   const ascensionCaps = useMemo(() => getDifficultyCaps(game.id), [game.id]);
   const detectedPresetName = matchPreset(ascensionPhases);
   const detectedPreset = ASCENSION_PRESETS.find((preset) => preset.name === detectedPresetName) ?? null;
   const totalAscensionCountries = Object.values(ascensionPhases).reduce((sum, count) => sum + count, 0);
 
-  const handlePlay = (isTraining = false, difficultyOverride = null) => {
+  const handlePlay = (isTraining = false, difficultyOverride = null, continentOverride = null) => {
     if (mode === "ascension") {
       navigate(game.route, {
         state: {
@@ -253,6 +268,11 @@ function ActiveGameCard({ game }) {
           isTraining,
         },
       });
+      return;
+    }
+
+    if (selectionMode === "continent") {
+      navigate(game.route, { state: { continent: continentOverride ?? selectedContinent, isTraining } });
       return;
     }
 
@@ -295,21 +315,53 @@ function ActiveGameCard({ game }) {
           </button>
         </div>
         {mode === "standard" ? (
-          <div className="difficulty-grid">
-            {difficulties.map((difficultyOption) => (
+          <>
+            <div className="game-mode-tabs">
               <button
-                key={difficultyOption.name}
-                className={`difficulty-btn${difficultyOption.name === "Hardcore" ? " difficulty-btn--wide" : ""}${difficulty === difficultyOption.name ? " difficulty-btn--active" : ""}`}
-                onClick={() => setDifficulty(difficultyOption.name)}
-                onDoubleClick={() => handlePlay(false, difficultyOption.name)}
+                className={`game-mode-tab${selectionMode === "difficulty" ? " game-mode-tab--active" : ""}`}
+                onClick={() => setSelectionMode("difficulty")}
               >
-                <span className="difficulty-btn-name" style={{ color: difficultyOption.color }}>
-                  {difficultyOption.name === "Hardcore" ? "\uD83D\uDC80 Hardcore - Tous les pays" : difficultyOption.name}
-                </span>
-                <span className="difficulty-btn-count">{difficultyOption.count} pays</span>
+                Par difficulté
               </button>
-            ))}
-          </div>
+              <button
+                className={`game-mode-tab${selectionMode === "continent" ? " game-mode-tab--active" : ""}`}
+                onClick={() => setSelectionMode("continent")}
+              >
+                Par continent
+              </button>
+            </div>
+            {selectionMode === "difficulty" ? (
+              <div className="difficulty-grid">
+                {difficulties.map((difficultyOption) => (
+                  <button
+                    key={difficultyOption.name}
+                    className={`difficulty-btn${difficultyOption.name === "Hardcore" ? " difficulty-btn--wide" : ""}${difficulty === difficultyOption.name ? " difficulty-btn--active" : ""}`}
+                    onClick={() => setDifficulty(difficultyOption.name)}
+                    onDoubleClick={() => handlePlay(false, difficultyOption.name)}
+                  >
+                    <span className="difficulty-btn-name" style={{ color: difficultyOption.color }}>
+                      {difficultyOption.name === "Hardcore" ? "\uD83D\uDC80 Hardcore - Tous les pays" : difficultyOption.name}
+                    </span>
+                    <span className="difficulty-btn-count">{difficultyOption.count} pays</span>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="difficulty-grid">
+                {continents.map((cont) => (
+                  <button
+                    key={cont.name}
+                    className={`difficulty-btn${selectedContinent === cont.name ? " difficulty-btn--active" : ""}`}
+                    onClick={() => setSelectedContinent(cont.name)}
+                    onDoubleClick={() => handlePlay(false, null, cont.name)}
+                  >
+                    <span className="difficulty-btn-name" style={{ color: cont.color }}>{cont.name}</span>
+                    <span className="difficulty-btn-count">{cont.count} pays</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
         ) : (
           <div className="ascension-panel">
             <div className="ascension-presets">
@@ -365,10 +417,21 @@ function ActiveGameCard({ game }) {
           {"\uD83C\uDFC6"} Scores
         </button>
         <div className="game-card-buttons">
-          <button className="btn-play" onClick={() => handlePlay(false)} disabled={mode === "ascension" && totalAscensionCountries === 0}>
+          <button
+            className="btn-play"
+            onClick={() => handlePlay(false)}
+            disabled={
+              (mode === "ascension" && totalAscensionCountries === 0) ||
+              (mode === "standard" && selectionMode === "continent" && !selectedContinent)
+            }
+          >
             Jouer
           </button>
-          <button className="btn-training" onClick={() => handlePlay(true)}>
+          <button
+            className="btn-training"
+            onClick={() => handlePlay(true)}
+            disabled={mode === "standard" && selectionMode === "continent" && !selectedContinent}
+          >
             Entraînement
           </button>
         </div>

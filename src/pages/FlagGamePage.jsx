@@ -15,7 +15,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import './GamePage.css'
 import './FlagGamePage.css'
 
-function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state, onGameFinished = null }) {
+function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state, onGameFinished = null, continent }) {
   const {
     targetCountry, score, timer, stats,
     isGameOver, displayTimer,
@@ -150,7 +150,7 @@ function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state
                 gameType={GAME_TYPES.FLAGS} presetName={presetName ?? null} isTraining={isTraining}
               />
             ) : (
-              <Form finalScore={score} difficulty={difficulty} elapsedTime={timer} gameType="FLAGS" />
+              <Form finalScore={score} difficulty={difficulty} elapsedTime={timer} gameType="FLAGS" continent={continent} />
             )}
             {!onGameFinished && (
               <div className="game-over-actions">
@@ -168,15 +168,16 @@ function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state
   )
 }
 
-function StandardFlagGame({ difficulty, isTraining }) {
-  const state = useFlagGameState(difficulty, isTraining)
+function StandardFlagGame({ difficulty, isTraining, continent }) {
+  const state = useFlagGameState(difficulty, isTraining, null, null, null, continent)
   return (
     <FlagGameLayout
-      difficulty={difficulty}
+      difficulty={difficulty ?? continent}
       isTraining={isTraining}
       isAscension={false}
       presetName={null}
       state={state}
+      continent={continent}
     />
   )
 }
@@ -312,7 +313,7 @@ function MultiplayerAscensionFlagsGame({ gameConfig, overridesByDifficulty, onCo
 }
 
 export default function FlagGamePage() {
-  const { difficulty, isTraining, isAscension, phases, presetName } = useLocation().state || {}
+  const { difficulty, isTraining, isAscension, phases, presetName, continent } = useLocation().state || {}
 
   if (isAscension) {
     return (
@@ -324,5 +325,5 @@ export default function FlagGamePage() {
     )
   }
 
-  return <StandardFlagGame difficulty={difficulty} isTraining={isTraining} />
+  return <StandardFlagGame difficulty={difficulty} isTraining={isTraining} continent={continent} />
 }

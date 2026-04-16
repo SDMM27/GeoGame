@@ -16,7 +16,7 @@ import './GamePage.css'
 import './FlagGamePage.css'
 import './CapitalsGamePage.css'
 
-function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, state, onGameFinished = null }) {
+function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, state, onGameFinished = null, continent }) {
   const {
     targetCountry, score, timer, stats,
     isGameOver, displayTimer,
@@ -184,7 +184,7 @@ function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, s
                 isTraining={isTraining}
               />
             ) : (
-              <Form finalScore={score} difficulty={difficulty} elapsedTime={timer} gameType="CAPITALS" />
+              <Form finalScore={score} difficulty={difficulty} elapsedTime={timer} gameType="CAPITALS" continent={continent} />
             )}
             {!onGameFinished && (
               <div className="game-over-actions">
@@ -216,15 +216,16 @@ function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, s
   )
 }
 
-function StandardCapitalsGame({ difficulty, isTraining }) {
-  const state = useCapitalsGameState(difficulty, isTraining)
+function StandardCapitalsGame({ difficulty, isTraining, continent }) {
+  const state = useCapitalsGameState(difficulty, isTraining, null, null, null, continent)
   return (
     <CapitalsGameLayout
-      difficulty={difficulty}
+      difficulty={difficulty ?? continent}
       isTraining={isTraining}
       isAscension={false}
       presetName={null}
       state={state}
+      continent={continent}
     />
   )
 }
@@ -330,7 +331,7 @@ function MultiplayerAscensionCapitalsGame({ gameConfig, overridesByDifficulty, o
 }
 
 export default function CapitalsGamePage() {
-  const { difficulty, isTraining, isAscension, phases, presetName } = useLocation().state || {}
+  const { difficulty, isTraining, isAscension, phases, presetName, continent } = useLocation().state || {}
 
   if (isAscension) {
     return (
@@ -342,5 +343,5 @@ export default function CapitalsGamePage() {
     )
   }
 
-  return <StandardCapitalsGame difficulty={difficulty} isTraining={isTraining} />
+  return <StandardCapitalsGame difficulty={difficulty} isTraining={isTraining} continent={continent} />
 }

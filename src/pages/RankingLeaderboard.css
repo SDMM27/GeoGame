@@ -22,3 +22,26 @@
 .ranking-lb .daily-lb__row-main:hover {
   background: var(--bg-secondary, #0d1b2a);
 }
+
+/* Ligne du joueur courant */
+.ranking-lb__row--self .daily-lb__row-main {
+  background: rgba(0, 212, 255, 0.13);
+  border: 1px solid rgba(0, 212, 255, 0.35);
+}
+
+.ranking-lb__row--self .daily-lb__row-main:hover {
+  background: rgba(0, 212, 255, 0.18);
+}
+
+.ranking-lb__self-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: rgba(0, 212, 255, 0.2);
+  color: #00d4ff;
+  vertical-align: middle;
+  letter-spacing: 0.03em;
+}

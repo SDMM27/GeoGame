@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { getCountryAreaKm2 } from '../utils/countryArea'
 import { CRITERIA, CRITERIA_KEYS, buildCountryPool } from '../utils/rankingCriteria'
-import { getRankingGamePoints } from '../utils/scoringRules'
+import { getRankingAttemptScore, getRankingGamePoints } from '../utils/scoringRules'
 
 const DAILY_TIME_ZONE = 'Europe/Paris'
 const DAILY_STORAGE_PREFIX = 'ranking-daily'
@@ -127,6 +127,9 @@ export default function useRankingGameState(mode, options = {}) {
   const [totalError, setTotalError] = useState(null)
   const [correctOrder, setCorrectOrder] = useState([])
   const [countryValues, setCountryValues] = useState(new Map())
+  const [attemptNumber, setAttemptNumber] = useState(1)
+  const [positionFeedback, setPositionFeedback] = useState(null)
+  const [bestTotalError, setBestTotalError] = useState(null)
 
   // Initialize on mode/countryCount change
   useEffect(() => {
@@ -140,6 +143,9 @@ export default function useRankingGameState(mode, options = {}) {
       setTotalError(null)
       setCorrectOrder([])
       setCountryValues(new Map())
+      setAttemptNumber(1)
+      setPositionFeedback(null)
+      setBestTotalError(null)
     }
   }, [mode, countryCount])
 
@@ -203,6 +209,9 @@ export default function useRankingGameState(mode, options = {}) {
     setTotalError(null)
     setCorrectOrder([])
     setCountryValues(new Map())
+    setAttemptNumber(1)
+    setPositionFeedback(null)
+    setBestTotalError(null)
   }
 
   function reorderCountries(newOrder) {
@@ -254,7 +263,15 @@ export default function useRankingGameState(mode, options = {}) {
     setTotalError(null)
     setCorrectOrder([])
     setCountryValues(new Map())
+    setAttemptNumber(1)
+    setPositionFeedback(null)
+    setBestTotalError(null)
     setStatus('choosing-category')
+  }
+
+  function retryAttempt() {
+    setAttemptNumber((prev) => prev + 1)
+    setPositionFeedback(null)
   }
 
   function startInfiniteRound(criterionKey) {
@@ -274,6 +291,9 @@ export default function useRankingGameState(mode, options = {}) {
     handleSubmit,
     startNextRound,
     startInfiniteRound,
+    attemptNumber,
+    positionFeedback,
+    retryAttempt,
     dailyKey: mode === 'daily' ? getTodayKey() : null,
   }
 }

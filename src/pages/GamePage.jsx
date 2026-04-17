@@ -39,7 +39,7 @@ const smallCountries = (() => {
 })()
 
 const CIRCLE_DEFAULT = { fillColor: '#ffffff', fillOpacity: 0.15, color: '#94a3b8', weight: 2 }
-const CIRCLE_HOVER   = { fillColor: '#7b2ff7', fillOpacity: 0.5,  color: '#7b2ff7', weight: 2 }
+const CIRCLE_HOVER = { fillColor: '#7b2ff7', fillOpacity: 0.5, color: '#7b2ff7', weight: 2 }
 
 function SmallCountryCircles({ onCountryNameClick, foundCountriesRef, shownCountriesRef, stats }) {
   const [zoom, setZoom] = useState(3)
@@ -57,7 +57,7 @@ function SmallCountryCircles({ onCountryNameClick, foundCountriesRef, shownCount
         eventHandlers={{
           click: () => onCountryNameClick(c.name),
           mouseover: (e) => e.target.setStyle(CIRCLE_HOVER),
-          mouseout:  (e) => e.target.setStyle(CIRCLE_DEFAULT),
+          mouseout: (e) => e.target.setStyle(CIRCLE_DEFAULT),
         }}
       />
     ))
@@ -103,7 +103,7 @@ function PlacementGameLayout({ difficulty, isTraining, isAscension, presetName, 
   const {
     targetCountry, score, timer, stats,
     isGameOver, displayTimer,
-    geoJsonRef, extraGeoJsonRefs, setMapRef,
+    geoJsonRef, extraGeoJsonRefs, mapRef, setMapRef,
     onCountryClick, onCountryNameClick, onCountryMouseOver, onCountryMouseOut,
     foundCountriesRef, shownCountriesRef,
     seeCountry, restartGame, goHome,
@@ -113,6 +113,25 @@ function PlacementGameLayout({ difficulty, isTraining, isAscension, presetName, 
   const geoJsonRefLeft = useRef(null)
   const geoJsonRefRight = useRef(null)
   extraGeoJsonRefs.current = [geoJsonRefLeft, geoJsonRefRight]
+
+  const CONTINENT_ZOOM = {
+    'Amériques': { center: [10, -80], zoom: 3 },
+    'Afrique': { center: [10, 20], zoom: 3.6 },
+    'Europe': { center: [50, 20], zoom: 4 },
+    'Océanie': { center: [-10, 170], zoom: 3.5 }
+  }
+
+  useEffect(() => {
+    if (!mapRef || !continent) return
+    const override = CONTINENT_ZOOM[continent]
+    if (override) {
+      mapRef.setView(override.center, override.zoom, { animate: false })
+      return
+    }
+    const features = countries.features.filter(f => f.properties.continent === continent)
+    if (features.length === 0) return
+    mapRef.fitBounds(L.geoJSON(features).getBounds(), { padding: [20, 20], animate: false })
+  }, [mapRef, continent])
 
   const onEachOffsetFeature = useMemo(() => (feature, layer) => {
     layer.on({ click: onCountryClick, mouseover: onCountryMouseOver, mouseout: onCountryMouseOut })

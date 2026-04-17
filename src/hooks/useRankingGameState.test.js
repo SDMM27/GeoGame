@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { computeTotalError, pickCriterionKey } from './useRankingGameState'
+import { computeTotalError, computePositionFeedback, pickCriterionKey } from './useRankingGameState'
 import { CRITERIA_KEYS } from '../utils/rankingCriteria'
 
 const c = (iso) => ({ properties: { ISO_A3: iso } })
@@ -42,5 +42,24 @@ describe('pickCriterionKey', () => {
   it('returns a valid CRITERIA_KEYS entry when undefined is passed', () => {
     const key = pickCriterionKey(undefined)
     expect(CRITERIA_KEYS).toContain(key)
+  })
+})
+
+describe('computePositionFeedback', () => {
+  it('returns all true for a perfect order', () => {
+    const order = [c('FRA'), c('DEU'), c('ESP')]
+    expect(computePositionFeedback(order, order)).toEqual([true, true, true])
+  })
+
+  it('returns false for swapped adjacent countries', () => {
+    const correct = [c('FRA'), c('DEU'), c('ESP')]
+    const player  = [c('DEU'), c('FRA'), c('ESP')]
+    expect(computePositionFeedback(player, correct)).toEqual([false, false, true])
+  })
+
+  it('returns false for all positions when completely reversed', () => {
+    const correct = [c('A'), c('B'), c('C')]
+    const player  = [c('C'), c('B'), c('A')]
+    expect(computePositionFeedback(player, correct)).toEqual([false, true, false])
   })
 })

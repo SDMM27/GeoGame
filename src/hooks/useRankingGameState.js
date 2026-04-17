@@ -25,6 +25,12 @@ export function computeTotalError(playerOrder, correctOrder) {
   }, 0)
 }
 
+export function computePositionFeedback(playerOrder, correctOrder) {
+  return playerOrder.map(
+    (country, i) => country.properties.ISO_A3 === correctOrder[i].properties.ISO_A3
+  )
+}
+
 export function pickCriterionKey(key) {
   if (key && CRITERIA_KEYS.includes(key)) return key
   return CRITERIA_KEYS[Math.floor(Math.random() * CRITERIA_KEYS.length)]

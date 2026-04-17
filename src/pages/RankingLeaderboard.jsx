@@ -26,6 +26,11 @@ function AccordionRow({ score, index, playerName }) {
         </span>
         <span className="ranking-lb__score">{score.score} pts</span>
         <span className="ranking-lb__error">{score.totalError} pos.</span>
+        <span className="ranking-lb__attempts">
+          {score.attemptsUsed != null
+            ? `${score.attemptsUsed} essai${score.attemptsUsed !== 1 ? 's' : ''}`
+            : '—'}
+        </span>
       </div>
       {open && Array.isArray(score.playerOrder) && score.playerOrder.length > 0 && (
         <div className="daily-lb__accordion">
@@ -117,6 +122,7 @@ export default function RankingLeaderboard({ dailyKey, playerName = null }) {
             <span>Joueur</span>
             <span className="ranking-lb__score">Score</span>
             <span className="ranking-lb__error">Erreur</span>
+            <span className="ranking-lb__attempts">Essais</span>
           </div>
           {scores.map((score, index) => (
             <AccordionRow

@@ -509,6 +509,25 @@
   text-align: center;
 }
 
+/* ── Attempt counter ── */
+.ranking-attempt-counter {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+/* ── Position feedback colors ── */
+.ranking-country-item--correct {
+  border-left: 4px solid #22c55e;
+}
+
+.ranking-country-item--wrong {
+  border-left: 4px solid #ef4444;
+}
+
 @media (max-width: 640px) {
   .ranking-game-main {
     padding: 20px 14px 28px;

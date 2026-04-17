@@ -53,6 +53,9 @@ export default function RankingGamePage() {
     startNextRound,
     startInfiniteRound,
     dailyKey,
+    attemptNumber,
+    positionFeedback,
+    retryAttempt,
   } = useRankingGameState(mode, { countryCount })
 
   const rankingSavedKey = dailyKey ? `ranking-saved:${dailyKey}` : null
@@ -89,7 +92,10 @@ export default function RankingGamePage() {
 
       if (!existing.empty) {
         const prev = existing.docs[0].data()
-        if (score > prev.score) {
+        const better =
+          score > prev.score ||
+          (score === prev.score && totalError < (prev.totalError ?? Infinity))
+        if (better) {
           await deleteDoc(existing.docs[0].ref)
         } else {
           toast.info('Tu as déjà un meilleur score enregistré.', { containerId: 'topRightToast' })
@@ -104,6 +110,7 @@ export default function RankingGamePage() {
         dailyKey,
         score,
         totalError,
+        attemptsUsed: attemptNumber,
         playerOrder: countries.map((c) => c.properties.ADMIN),
       })
 
@@ -209,52 +216,82 @@ export default function RankingGamePage() {
         {status === 'playing' && (
           <>
             <div className="ranking-drag-hint">Glisse pour réordonner</div>
+            <div className="ranking-attempt-counter">
+              Essai {attemptNumber} / 3
+            </div>
 
-            <DragDropContext onDragEnd={onDragEnd}>
-              <Droppable droppableId="ranking-countries">
-                {(provided) => (
-                  <div ref={provided.innerRef} {...provided.droppableProps}>
-                    {countries.map((country, index) => (
-                      <Draggable
-                        key={country.properties.ISO_A3}
-                        draggableId={country.properties.ISO_A3}
-                        index={index}
-                      >
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            style={provided.draggableProps.style}
-                            className={`ranking-country-item${snapshot.isDragging ? ' ranking-country-item--dragging' : ''}`}
+            {!positionFeedback ? (
+              <>
+                <DragDropContext onDragEnd={onDragEnd}>
+                  <Droppable droppableId="ranking-countries">
+                    {(provided) => (
+                      <div ref={provided.innerRef} {...provided.droppableProps}>
+                        {countries.map((country, index) => (
+                          <Draggable
+                            key={country.properties.ISO_A3}
+                            draggableId={country.properties.ISO_A3}
+                            index={index}
                           >
-                            <span className="ranking-drag-handle">⠿</span>
-                            <span className="ranking-country-index">{index + 1}</span>
-                            {FLAG_URL(country.properties.ISO_A2) && (
-                              <img
-                                src={FLAG_URL(country.properties.ISO_A2)}
-                                alt=""
-                                className="ranking-country-flag"
-                                onError={(e) => { e.target.style.display = 'none' }}
-                              />
+                            {(provided, snapshot) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                style={provided.draggableProps.style}
+                                className={`ranking-country-item${snapshot.isDragging ? ' ranking-country-item--dragging' : ''}`}
+                              >
+                                <span className="ranking-drag-handle">⠿</span>
+                                <span className="ranking-country-index">{index + 1}</span>
+                                {FLAG_URL(country.properties.ISO_A2) && (
+                                  <img
+                                    src={FLAG_URL(country.properties.ISO_A2)}
+                                    alt=""
+                                    className="ranking-country-flag"
+                                    onError={(e) => { e.target.style.display = 'none' }}
+                                  />
+                                )}
+                                <span className="ranking-country-name">{country.properties.ADMIN}</span>
+                              </div>
                             )}
-                            <span className="ranking-country-name">{country.properties.ADMIN}</span>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
+                </DragDropContext>
 
-            <button
-              className="ranking-submit-btn"
-              onClick={handleSubmit}
-            >
-              ✓ Soumettre mon classement
-            </button>
+                <button className="ranking-submit-btn" onClick={handleSubmit}>
+                  ✓ Soumettre mon classement
+                </button>
+              </>
+            ) : (
+              <>
+                <div>
+                  {countries.map((country, index) => (
+                    <div
+                      key={country.properties.ISO_A3}
+                      className={`ranking-country-item${positionFeedback[index] ? ' ranking-country-item--correct' : ' ranking-country-item--wrong'}`}
+                    >
+                      <span className="ranking-country-index">{index + 1}</span>
+                      {FLAG_URL(country.properties.ISO_A2) && (
+                        <img
+                          src={FLAG_URL(country.properties.ISO_A2)}
+                          alt=""
+                          className="ranking-country-flag"
+                          onError={(e) => { e.target.style.display = 'none' }}
+                        />
+                      )}
+                      <span className="ranking-country-name">{country.properties.ADMIN}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <button className="ranking-submit-btn" onClick={retryAttempt}>
+                  ↺ Réessayer — Essai {attemptNumber + 1} / 3
+                </button>
+              </>
+            )}
           </>
         )}
 

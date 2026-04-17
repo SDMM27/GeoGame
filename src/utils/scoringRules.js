@@ -54,3 +54,11 @@ export function getRankingGamePoints(totalError, n) {
   if (totalError <= 2 * n) return 1
   return 0
 }
+
+/**
+ * Ranking Attempt Scoring — bonus points based on attempt number.
+ * Attempt 1 (first try) → 3 pts, attempt 2 → 2 pts, attempt 3 → 1 pt.
+ */
+export function getRankingAttemptScore(attemptNumber) {
+  return 4 - attemptNumber
+}

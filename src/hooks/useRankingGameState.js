@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { getCountryAreaKm2 } from '../utils/countryArea'
 import { CRITERIA, CRITERIA_KEYS, buildCountryPool } from '../utils/rankingCriteria'
-import { getRankingAttemptScore, getRankingGamePoints } from '../utils/scoringRules'
+import { getRankingAttemptScore } from '../utils/scoringRules'
 
 const DAILY_TIME_ZONE = 'Europe/Paris'
 const DAILY_STORAGE_PREFIX = 'ranking-daily'
@@ -162,6 +162,9 @@ export default function useRankingGameState(mode, options = {}) {
       setCriterion(savedCriterion)
       setCountries(restoredCountries)
       setStatus(saved.status)
+      setAttemptNumber(saved.attemptNumber ?? 1)
+      setPositionFeedback(saved.positionFeedback ?? null)
+      setBestTotalError(saved.bestTotalError ?? null)
 
       if (saved.status === 'submitted') {
         const correct = computeCorrectOrder(restoredCountries, savedCriterion, areaMap)
@@ -190,6 +193,9 @@ export default function useRankingGameState(mode, options = {}) {
         status: 'playing',
         score: null,
         totalError: null,
+        attemptNumber: 1,
+        positionFeedback: null,
+        bestTotalError: null,
       })
     }
   }
@@ -229,29 +235,74 @@ export default function useRankingGameState(mode, options = {}) {
   }
 
   function handleSubmit() {
-    if (status !== 'playing' || !criterion) return
+    if (status !== 'playing' || !criterion || positionFeedback !== null) return
 
     const correct = computeCorrectOrder(countries, criterion, areaMap)
     const error = computeTotalError(countries, correct)
-    const pts = getRankingGamePoints(error, countries.length)
-    const valuesMap = buildValuesMap(countries, criterion, areaMap)
+    const feedback = computePositionFeedback(countries, correct)
+    const newBestError = bestTotalError === null ? error : Math.min(bestTotalError, error)
 
-    setCorrectOrder(correct)
-    setTotalError(error)
-    setScore(pts)
-    setCountryValues(valuesMap)
-    setStatus('submitted')
+    setPositionFeedback(feedback)
+    setBestTotalError(newBestError)
 
-    if (mode === 'daily') {
-      const dateKey = getTodayKey()
-      const saved = readDailyProgress(dateKey)
-      saveDailyProgress(dateKey, {
-        ...(saved ?? {}),
-        playerOrder: countries.map((c) => c.properties.ISO_A3),
-        status: 'submitted',
-        score: pts,
-        totalError: error,
-      })
+    if (error === 0) {
+      const pts = getRankingAttemptScore(attemptNumber)
+      setCorrectOrder(correct)
+      setCountryValues(buildValuesMap(countries, criterion, areaMap))
+      setScore(pts)
+      setTotalError(0)
+      setStatus('submitted')
+
+      if (mode === 'daily') {
+        const dateKey = getTodayKey()
+        const saved = readDailyProgress(dateKey)
+        saveDailyProgress(dateKey, {
+          ...(saved ?? {}),
+          playerOrder: countries.map((c) => c.properties.ISO_A3),
+          status: 'submitted',
+          score: pts,
+          totalError: 0,
+          attemptNumber,
+          bestTotalError: 0,
+          positionFeedback: feedback,
+        })
+      }
+    } else if (attemptNumber >= 3) {
+      setCorrectOrder(correct)
+      setCountryValues(buildValuesMap(countries, criterion, areaMap))
+      setScore(0)
+      setTotalError(newBestError)
+      setStatus('submitted')
+
+      if (mode === 'daily') {
+        const dateKey = getTodayKey()
+        const saved = readDailyProgress(dateKey)
+        saveDailyProgress(dateKey, {
+          ...(saved ?? {}),
+          playerOrder: countries.map((c) => c.properties.ISO_A3),
+          status: 'submitted',
+          score: 0,
+          totalError: newBestError,
+          attemptNumber,
+          bestTotalError: newBestError,
+          positionFeedback: feedback,
+        })
+      }
+    } else {
+      if (mode === 'daily') {
+        const dateKey = getTodayKey()
+        const saved = readDailyProgress(dateKey)
+        saveDailyProgress(dateKey, {
+          ...(saved ?? {}),
+          playerOrder: countries.map((c) => c.properties.ISO_A3),
+          status: 'playing',
+          score: null,
+          totalError: null,
+          attemptNumber,
+          bestTotalError: newBestError,
+          positionFeedback: feedback,
+        })
+      }
     }
   }
 

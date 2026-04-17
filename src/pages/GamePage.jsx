@@ -114,14 +114,21 @@ function PlacementGameLayout({ difficulty, isTraining, isAscension, presetName, 
   const geoJsonRefRight = useRef(null)
   extraGeoJsonRefs.current = [geoJsonRefLeft, geoJsonRefRight]
 
+  const CONTINENT_ZOOM = {
+    // 'Amériques': { center: [10, -80], zoom: 3 },
+    // 'Océanie':   { center: [-25, 145], zoom: 4 },
+  }
+
   useEffect(() => {
     if (!mapRef || !continent) return
-    const features = countries.features.filter(
-      f => f.properties.continent === continent
-    )
+    const override = CONTINENT_ZOOM[continent]
+    if (override) {
+      mapRef.setView(override.center, override.zoom, { animate: false })
+      return
+    }
+    const features = countries.features.filter(f => f.properties.continent === continent)
     if (features.length === 0) return
-    const bounds = L.geoJSON(features).getBounds()
-    mapRef.fitBounds(bounds, { padding: [20, 20], animate: false })
+    mapRef.fitBounds(L.geoJSON(features).getBounds(), { padding: [20, 20], animate: false })
   }, [mapRef, continent])
 
   const onEachOffsetFeature = useMemo(() => (feature, layer) => {

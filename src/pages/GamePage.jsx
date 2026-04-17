@@ -103,7 +103,7 @@ function PlacementGameLayout({ difficulty, isTraining, isAscension, presetName, 
   const {
     targetCountry, score, timer, stats,
     isGameOver, displayTimer,
-    geoJsonRef, extraGeoJsonRefs, setMapRef,
+    geoJsonRef, extraGeoJsonRefs, mapRef, setMapRef,
     onCountryClick, onCountryNameClick, onCountryMouseOver, onCountryMouseOut,
     foundCountriesRef, shownCountriesRef,
     seeCountry, restartGame, goHome,
@@ -113,6 +113,16 @@ function PlacementGameLayout({ difficulty, isTraining, isAscension, presetName, 
   const geoJsonRefLeft = useRef(null)
   const geoJsonRefRight = useRef(null)
   extraGeoJsonRefs.current = [geoJsonRefLeft, geoJsonRefRight]
+
+  useEffect(() => {
+    if (!mapRef || !continent) return
+    const features = countries.features.filter(
+      f => f.properties.continent === continent
+    )
+    if (features.length === 0) return
+    const bounds = L.geoJSON(features).getBounds()
+    mapRef.fitBounds(bounds, { padding: [20, 20], animate: false })
+  }, [mapRef, continent])
 
   const onEachOffsetFeature = useMemo(() => (feature, layer) => {
     layer.on({ click: onCountryClick, mouseover: onCountryMouseOver, mouseout: onCountryMouseOut })

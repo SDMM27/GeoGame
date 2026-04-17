@@ -1,13 +1,14 @@
 /* src/pages/RankingLeaderboard.css */
 
-/* Override grid pour 4 colonnes : rang / joueur / score / erreur */
+/* Override grid pour 5 colonnes : rang / joueur / score / erreur / essais */
 .ranking-lb .daily-lb__header,
 .ranking-lb .daily-lb__row-main {
-  grid-template-columns: 40px 1fr 80px 80px;
+  grid-template-columns: 40px 1fr 80px 80px 70px;
 }
 
 .ranking-lb__score,
-.ranking-lb__error {
+.ranking-lb__error,
+.ranking-lb__attempts {
   font-size: 0.9rem;
   color: var(--text-primary);
   text-align: right;

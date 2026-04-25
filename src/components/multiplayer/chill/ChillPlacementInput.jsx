@@ -1,5 +1,5 @@
 // src/components/multiplayer/chill/ChillPlacementInput.jsx
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useCallback } from 'react'
 import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -39,8 +39,10 @@ function RightClickDrag() {
       map._rawPanBy(L.point(dx, dy))
     }
     const onMouseUp = (e) => {
-      if (e.button !== 2) return
-      isDragging = false; container.style.cursor = ''; map.fire('moveend')
+      if (!isDragging) return
+      isDragging = false
+      container.style.cursor = ''
+      if (e.button === 2) map.fire('moveend')
     }
     const onContextMenu = (e) => e.preventDefault()
     container.addEventListener('mousedown', onMouseDown)
@@ -156,13 +158,9 @@ export default function ChillPlacementInput({ targetName, onSubmit, countdownEnd
     layer.setStyle(GEO_STYLE)
   }
 
-  const onEachFeature = (feature, layer) => {
-    layer.on({
-      click: handleCountryClick,
-      mouseover: handleMouseOver,
-      mouseout: handleMouseOut,
-    })
-  }
+  const onEachFeature = useCallback((feature, layer) => {
+    layer.on({ click: handleCountryClick, mouseover: handleMouseOver, mouseout: handleMouseOut })
+  }, []) // safe: all handler logic reads refs, not closure state
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
@@ -215,6 +213,7 @@ export default function ChillPlacementInput({ targetName, onSubmit, countdownEnd
           onEachFeature={onEachFeature}
         />
         <GeoJSON
+          key="geojson-center"
           ref={geoJsonRef}
           style={GEO_STYLE}
           data={countries.features}

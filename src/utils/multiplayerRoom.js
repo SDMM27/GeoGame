@@ -149,3 +149,64 @@ export async function updatePlayerGameFlags(roomId, playerId, flags) {
     { merge: true }
   )
 }
+
+// ─── Chill Mode ─────────────────────────────────────────────────────────────
+
+/**
+ * Initialise chillState au démarrage d'un jeu chill.
+ * Appelé par le host uniquement.
+ */
+export async function initChillState(roomId, countdownMs) {
+  const countdownEnd = Timestamp.fromDate(new Date(Date.now() + countdownMs))
+  await updateDoc(doc(firestore, 'rooms', roomId), {
+    chillState: {
+      phase: 'playing',
+      currentCountryIndex: 0,
+      countdownEnd,
+      mancheStartIndex: 0,
+      reviewStep: 0,
+      playerAnswers: {},
+    },
+  })
+}
+
+/**
+ * Host : passe au pays suivant ou déclenche la review.
+ * @param {string} phase        - 'playing' | 'review'
+ * @param {number} nextIndex    - nouveau currentCountryIndex
+ * @param {number} mancheStart  - mancheStartIndex inchangé ou mis à jour
+ * @param {number|null} countdownMs - si phase='playing', durée du nouveau countdown
+ */
+export async function advanceChillTurn(roomId, phase, nextIndex, mancheStart, countdownMs) {
+  const update = {
+    'chillState.phase': phase,
+    'chillState.currentCountryIndex': nextIndex,
+    'chillState.mancheStartIndex': mancheStart,
+    'chillState.reviewStep': 0,
+  }
+  if (phase === 'playing' && countdownMs != null) {
+    update['chillState.countdownEnd'] = Timestamp.fromDate(
+      new Date(Date.now() + countdownMs)
+    )
+  }
+  await updateDoc(doc(firestore, 'rooms', roomId), update)
+}
+
+/**
+ * Un joueur soumet sa réponse pour le pays courant.
+ * Chaque joueur écrit sur son propre chemin — pas de conflit.
+ */
+export async function submitChillAnswer(roomId, playerId, countryIndex, answerData) {
+  await updateDoc(doc(firestore, 'rooms', roomId), {
+    [`chillState.playerAnswers.${playerId}.${countryIndex}`]: answerData,
+  })
+}
+
+/**
+ * Host : avance d'un pas dans la review (ou déclenche onContinue côté client).
+ */
+export async function setChillReviewStep(roomId, step) {
+  await updateDoc(doc(firestore, 'rooms', roomId), {
+    'chillState.reviewStep': step,
+  })
+}

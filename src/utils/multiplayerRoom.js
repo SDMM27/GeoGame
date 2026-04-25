@@ -155,8 +155,6 @@ export async function updatePlayerGameFlags(roomId, playerId, flags) {
 /**
  * Initialise chillState au démarrage d'un jeu chill.
  * Appelé par le host uniquement.
- * @param {string} roomId
- * @param {number} countdownMs - durée du premier countdown en ms
  */
 export async function initChillState(roomId, countdownMs) {
   const countdownEnd = Timestamp.fromDate(new Date(Date.now() + countdownMs))
@@ -174,10 +172,9 @@ export async function initChillState(roomId, countdownMs) {
 
 /**
  * Host : passe au pays suivant ou déclenche la review.
- * @param {string} roomId
- * @param {'playing'|'review'} phase
- * @param {number} nextIndex - nouveau currentCountryIndex
- * @param {number} mancheStart - mancheStartIndex (inchangé ou mis à jour)
+ * @param {string} phase        - 'playing' | 'review'
+ * @param {number} nextIndex    - nouveau currentCountryIndex
+ * @param {number} mancheStart  - mancheStartIndex inchangé ou mis à jour
  * @param {number|null} countdownMs - si phase='playing', durée du nouveau countdown
  */
 export async function advanceChillTurn(roomId, phase, nextIndex, mancheStart, countdownMs) {
@@ -197,11 +194,7 @@ export async function advanceChillTurn(roomId, phase, nextIndex, mancheStart, co
 
 /**
  * Un joueur soumet sa réponse pour le pays courant.
- * Chaque joueur écrit sur son propre chemin — pas de conflit concurrent.
- * @param {string} roomId
- * @param {string} playerId
- * @param {number} countryIndex
- * @param {{ answer?: string, clickedAdmin?: string, correct: boolean, score: number }} answerData
+ * Chaque joueur écrit sur son propre chemin — pas de conflit.
  */
 export async function submitChillAnswer(roomId, playerId, countryIndex, answerData) {
   await updateDoc(doc(firestore, 'rooms', roomId), {
@@ -210,9 +203,7 @@ export async function submitChillAnswer(roomId, playerId, countryIndex, answerDa
 }
 
 /**
- * Host : avance d'un pas dans la review.
- * @param {string} roomId
- * @param {number} step - nouveau reviewStep
+ * Host : avance d'un pas dans la review (ou déclenche onContinue côté client).
  */
 export async function setChillReviewStep(roomId, step) {
   await updateDoc(doc(firestore, 'rooms', roomId), {

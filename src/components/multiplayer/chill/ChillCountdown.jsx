@@ -3,12 +3,7 @@ import { useState, useEffect } from 'react'
 
 /**
  * Barre de progression synchronisée sur countdownEnd (Firestore Timestamp).
- * Se met à jour toutes les 100ms. Change de couleur : vert > orange > rouge.
- *
- * @param {{
- *   countdownEnd: import('firebase/firestore').Timestamp | number,
- *   totalMs: number,
- * }} props
+ * @param {{ countdownEnd: import('firebase/firestore').Timestamp, totalMs: number }} props
  */
 export default function ChillCountdown({ countdownEnd, totalMs }) {
   const [remaining, setRemaining] = useState(totalMs)

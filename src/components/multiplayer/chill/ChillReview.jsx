@@ -2,9 +2,19 @@
 
 /**
  * Revue de fin de manche.
- * Step 0 : tous les résultats ensemble (bons en vert, totaux).
- * Step 1..N : mauvaises réponses une par une.
- * Step > N : bouton "Continuer" visible.
+ * Affiche d'abord tous les bons résultats, puis les mauvais un par un.
+ *
+ * @param {{
+ *   mancheCountries: Array<string|object>,  // pays de la manche (string pour placement, feature pour les autres)
+ *   mancheStartIndex: number,
+ *   playerAnswers: object,                   // chillState.playerAnswers
+ *   reviewStep: number,                      // chillState.reviewStep
+ *   isHost: boolean,
+ *   players: object,                         // room.players { [playerId]: { pseudo } }
+ *   gameType: string,
+ *   onNext: () => void,                      // host avance d'un pas
+ *   onContinue: () => void,                  // host termine la review
+ * }} props
  */
 export default function ChillReview({
   mancheCountries,
@@ -17,7 +27,7 @@ export default function ChillReview({
   onNext,
   onContinue,
 }) {
-  // Liste de toutes les mauvaises réponses de la manche
+  // Construire la liste de toutes les mauvaises réponses de la manche
   const wrongAnswers = mancheCountries.flatMap((country, i) => {
     const idx = mancheStartIndex + i
     const countryName = typeof country === 'string' ? country : country.ADMIN
@@ -35,7 +45,7 @@ export default function ChillReview({
       }))
   })
 
-  // Synthèse des résultats par joueur (step 0)
+  // Construire la synthèse des bons résultats (step 0)
   const correctSummary = Object.entries(players).map(([pid, p]) => {
     const correctCount = mancheCountries.filter((_, i) => {
       const idx = mancheStartIndex + i
@@ -88,7 +98,9 @@ export default function ChillReview({
         if (!current) return null
         const correctName = typeof current.country === 'string'
           ? current.country
-          : (current.country.capital ?? current.country.ADMIN)
+          : gameType === 'CAPITALS'
+            ? (current.country.capital ?? current.country.ADMIN)
+            : current.country.ADMIN
         const givenAnswer = current.answer.answer ?? current.answer.clickedAdmin ?? '—'
 
         return (
@@ -133,6 +145,9 @@ export default function ChillReview({
         <button onClick={onContinue} style={btnStyle('#166534')}>
           Continuer →
         </button>
+      )}
+      {isAllDone && !isHost && (
+        <p style={{ color: '#64748b', marginTop: 12 }}>En attente de l'hôte…</p>
       )}
     </div>
   )

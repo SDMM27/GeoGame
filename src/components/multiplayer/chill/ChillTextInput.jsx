@@ -3,22 +3,22 @@ import { useState, useEffect, useRef } from 'react'
 
 /**
  * Input texte sans validation temps réel.
- * Stocke la valeur localement et auto-soumet quand countdownEnd est atteint.
- * Utilise un ref pour éviter les closures périmées dans le setTimeout.
+ * Auto-soumet la valeur courante quand countdownEnd est atteint.
  *
  * @param {{
  *   onSubmit: (value: string) => void,
- *   countdownEnd: import('firebase/firestore').Timestamp | number,
+ *   countdownEnd: import('firebase/firestore').Timestamp,
  *   locked: boolean,
  *   placeholder?: string,
  * }} props
  */
 export default function ChillTextInput({ onSubmit, countdownEnd, locked, placeholder = 'Écris ta réponse…' }) {
   const [value, setValue] = useState('')
+  // Ref pour capturer la valeur la plus récente dans le setTimeout
   const valueRef = useRef('')
   const submitted = useRef(false)
 
-  // Réinitialiser à chaque nouveau pays (nouveau countdownEnd)
+  // Réinitialiser quand countdownEnd change (nouveau pays)
   useEffect(() => {
     setValue('')
     valueRef.current = ''

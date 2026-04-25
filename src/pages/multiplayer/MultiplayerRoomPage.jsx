@@ -5,6 +5,7 @@ import NavBar from '../../components/NavBar'
 import LobbyScreen from '../../components/multiplayer/LobbyScreen'
 import CountdownOverlay from '../../components/multiplayer/CountdownOverlay'
 import MultiplayerGame from '../../components/multiplayer/MultiplayerGame'
+import ChillGame from '../../components/multiplayer/chill/ChillGame'
 import BetweenGamesScreen from '../../components/multiplayer/BetweenGamesScreen'
 import FinalLeaderboard from '../../components/multiplayer/FinalLeaderboard'
 import ReconfigureScreen from '../../components/multiplayer/ReconfigureScreen'
@@ -54,6 +55,7 @@ export default function MultiplayerRoomPage() {
   }
 
   if (room.status === 'playing') {
+    const isChill = !!room.config?.chillConfig
     const showCountdown = room.startAt && !gameStarted
     return (
       <div className="mp-room mp-room--playing">
@@ -61,7 +63,10 @@ export default function MultiplayerRoomPage() {
         {showCountdown && (
           <CountdownOverlay startAt={room.startAt} onStart={() => setGameStarted(true)} />
         )}
-        {gameStarted && (
+        {gameStarted && isChill && (
+          <ChillGame room={room} playerId={playerId} roomId={roomId} />
+        )}
+        {gameStarted && !isChill && (
           <MultiplayerGame room={room} progress={progress} playerId={playerId} roomId={roomId} />
         )}
       </div>

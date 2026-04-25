@@ -24,13 +24,14 @@ import ChillTextInput from './ChillTextInput'
 import ChillPlacementInput from './ChillPlacementInput'
 import ChillReview from './ChillReview'
 
+const endedGames = new Set()
+
 export default function ChillGame({ room, playerId, roomId }) {
   const chillState = room.chillState
   const gameIndex = room.currentGameIndex
   const gameConfig = room.config.games[gameIndex]
   const mancheSize = room.config.chillConfig?.mancheSize ?? 10
   const isHost = room.hostId === playerId
-  const transitioningRef = useRef(false)
 
   // ─── Liste de pays avec difficulté ─────────────────────────────────────────
   const countriesWithDiff = useMemo(() => {
@@ -42,6 +43,8 @@ export default function ChillGame({ room, playerId, roomId }) {
   }, [gameConfig, room.seed, gameIndex])
 
   const totalCountries = countriesWithDiff.length
+  const countriesWithDiffRef = useRef(countriesWithDiff)
+  useEffect(() => { countriesWithDiffRef.current = countriesWithDiff }, [countriesWithDiff])
 
   // ─── Init chillState (host, une seule fois) ────────────────────────────────
   useEffect(() => {
@@ -53,8 +56,9 @@ export default function ChillGame({ room, playerId, roomId }) {
 
   // ─── Fin de partie (host) ──────────────────────────────────────────────────
   const handleGameEnd = useCallback(async () => {
-    if (!isHost || transitioningRef.current) return
-    transitioningRef.current = true
+    const gameKey = `${roomId}-${gameIndex}`
+    if (!isHost || endedGames.has(gameKey)) return
+    endedGames.add(gameKey)
 
     const activePlayers = Object.entries(room.players).filter(([, p]) => !p.disconnected)
     const results = activePlayers.map(([pid]) => {
@@ -69,7 +73,6 @@ export default function ChillGame({ room, playerId, roomId }) {
         playerId: pid,
         weightedScore,
         countriesSolved,
-        failures,
         attempts: failures,
         perfects: countriesSolved,
         stumbles: 0,
@@ -77,7 +80,10 @@ export default function ChillGame({ room, playerId, roomId }) {
       }
     })
 
-    const scored = rankResults(results, activePlayers.length, 'weighted')
+    const scoringMode = (gameConfig.type === GAME_TYPES.BORDER_GUESS || gameConfig.type === GAME_TYPES.COUNTRY_CLUE)
+      ? 'solved'
+      : 'weighted'
+    const scored = rankResults(results, activePlayers.length, scoringMode)
     await Promise.all(scored.map(r =>
       writeGameResult(roomId, gameIndex, r.playerId, r)
     ))
@@ -98,12 +104,12 @@ export default function ChillGame({ room, playerId, roomId }) {
     const id = setTimeout(async () => {
       const next = chillState.currentCountryIndex + 1
       const mancheStart = chillState.mancheStartIndex
-      const isEndOfManche = (next - mancheStart) >= mancheSize || next >= totalCountries
+      const isEndOfManche = (next - mancheStart) >= mancheSize || next >= countriesWithDiffRef.current.length
 
       if (isEndOfManche) {
         await advanceChillTurn(roomId, 'review', next, mancheStart, null)
       } else {
-        const { difficulty } = countriesWithDiff[next]
+        const { difficulty } = countriesWithDiffRef.current[next]
         const countdownMs = getCountdownMs(difficulty)
         await advanceChillTurn(roomId, 'playing', next, mancheStart, countdownMs)
       }
@@ -123,10 +129,12 @@ export default function ChillGame({ room, playerId, roomId }) {
 
   // ─── Callbacks review ──────────────────────────────────────────────────────
   const handleReviewNext = useCallback(() => {
+    if (!isHost) return
     setChillReviewStep(roomId, (chillState?.reviewStep ?? 0) + 1)
-  }, [roomId, chillState?.reviewStep])
+  }, [isHost, roomId, chillState?.reviewStep])
 
   const handleReviewContinue = useCallback(() => {
+    if (!isHost) return
     const next = chillState.currentCountryIndex
     if (next >= totalCountries) {
       handleGameEnd()
@@ -135,7 +143,7 @@ export default function ChillGame({ room, playerId, roomId }) {
       const countdownMs = getCountdownMs(difficulty)
       advanceChillTurn(roomId, 'playing', next, next, countdownMs)
     }
-  }, [chillState, totalCountries, countriesWithDiff, roomId, handleGameEnd])
+  }, [isHost, chillState, totalCountries, countriesWithDiff, roomId, handleGameEnd])
 
   // ─── Render ────────────────────────────────────────────────────────────────
   if (!chillState) {

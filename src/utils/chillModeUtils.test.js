@@ -53,6 +53,11 @@ describe('evaluateGuessAnswer', () => {
     expect(r.correct).toBe(true)
     expect(r.score).toBe(3)
   })
+  test('correct sur alias', () => {
+    const r = evaluateGuessAnswer('Francia', 'France', ['Francia'])
+    expect(r.correct).toBe(true)
+    expect(r.score).toBe(3)
+  })
   test('incorrect donne 0 pt', () => {
     const r = evaluateGuessAnswer('Belgique', 'France', [])
     expect(r.correct).toBe(false)

@@ -8,10 +8,19 @@ export const CHILL_COUNTDOWN_MS = {
   Impossible: 15000,
 }
 
+/** Retourne la durée du countdown en ms pour une difficulté donnée. Défaut : 10000ms. */
 export function getCountdownMs(difficulty) {
   return CHILL_COUNTDOWN_MS[difficulty] ?? 10000
 }
 
+/**
+ * Évalue une réponse textuelle (FLAGS, CAPITALS).
+ * @param {string|null} submitted - réponse du joueur
+ * @param {string} target - nom attendu (ADMIN ou capital)
+ * @param {string[]} aliases - noms alternatifs acceptés
+ * @param {string} difficulty - difficulté pour le scoring
+ * @returns {{ correct: boolean, score: number }}
+ */
 export function evaluateTextAnswer(submitted, target, aliases, difficulty) {
   if (!submitted || !submitted.trim()) return { correct: false, score: 0 }
   const correct = checkAnswer(submitted.trim(), target, aliases)
@@ -19,6 +28,13 @@ export function evaluateTextAnswer(submitted, target, aliases, difficulty) {
   return { correct, score }
 }
 
+/**
+ * Évalue une réponse textuelle pour les jeux sans difficulté (BORDER_GUESS, COUNTRY_CLUE).
+ * @param {string|null} submitted
+ * @param {string} target
+ * @param {string[]} aliases
+ * @returns {{ correct: boolean, score: number }}
+ */
 export function evaluateGuessAnswer(submitted, target, aliases) {
   if (!submitted || !submitted.trim()) return { correct: false, score: 0 }
   const correct = checkAnswer(submitted.trim(), target, aliases)
@@ -26,6 +42,13 @@ export function evaluateGuessAnswer(submitted, target, aliases) {
   return { correct, score }
 }
 
+/**
+ * Évalue un placement sur la carte.
+ * @param {string|null} clickedAdmin - ADMIN du pays cliqué (null si pas de clic)
+ * @param {string} targetName - nom attendu (string depuis getSeededPlacementCountries)
+ * @param {string} difficulty
+ * @returns {{ correct: boolean, score: number }}
+ */
 export function evaluatePlacement(clickedAdmin, targetName, difficulty) {
   if (!clickedAdmin) return { correct: false, score: 0 }
   const correct = normalize(clickedAdmin) === normalize(targetName)
@@ -33,8 +56,14 @@ export function evaluatePlacement(clickedAdmin, targetName, difficulty) {
   return { correct, score }
 }
 
+/**
+ * Aplatit getSeededAscensionOverrides en tableau séquentiel avec difficulty par pays.
+ * Ordre : Facile → Moyen → Difficile → Impossible.
+ * @param {{ [difficulty: string]: object[] }} overrides
+ * @returns {{ country: object, difficulty: string }[]}
+ */
 export function flattenAscensionCountries(overrides) {
-  const ORDER = ['Facile', 'Moyen', 'Difficile', 'Impossible']
+  const ORDER = Object.keys(CHILL_COUNTDOWN_MS)
   return ORDER.flatMap(diff =>
     (overrides[diff] ?? []).map(country => ({ country, difficulty: diff }))
   )

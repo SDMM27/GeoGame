@@ -168,6 +168,8 @@ export function GameSettings({ game, onChange }) {
 export default function RoomConfig({ onSubmit, submitting }) {
   const [pseudo, setPseudo] = useState('')
   const [games, setGames] = useState([defaultGame(GAME_TYPES.PLACEMENT)])
+  const [chillMode, setChillMode] = useState(false)
+  const [chillTimers, setChillTimers] = useState({ Facile: 6, Moyen: 8, Difficile: 10, Impossible: 15 })
 
   const usedTypes = new Set(games.map(g => g.type))
   const availableToAdd = Object.keys(GAME_META).filter(t => !usedTypes.has(t))
@@ -195,7 +197,13 @@ export default function RoomConfig({ onSubmit, submitting }) {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!pseudo.trim() || games.length === 0) return
-    onSubmit({ pseudo: pseudo.trim(), config: { games } })
+    onSubmit({
+      pseudo: pseudo.trim(),
+      config: {
+        games,
+        ...(chillMode ? { chillConfig: { timers: chillTimers } } : {}),
+      },
+    })
   }
 
   return (
@@ -244,6 +252,42 @@ export default function RoomConfig({ onSubmit, submitting }) {
                 </button>
               )
             })}
+          </div>
+        )}
+      </div>
+
+      <div className="rc-chill-section">
+        <label className="rc-checkbox-label">
+          <input
+            type="checkbox"
+            checked={chillMode}
+            onChange={e => setChillMode(e.target.checked)}
+          />
+          <span>🛋️ Mode Chill</span>
+          <span className="rc-chill-hint" style={{ color: '#94a3b8', fontSize: '0.85em', marginLeft: 8 }}>
+            Compte à rebours commun · Revue après chaque manche
+          </span>
+        </label>
+
+        {chillMode && (
+          <div className="rc-chill-options" style={{ marginTop: 12, paddingLeft: 24 }}>
+            <span style={{ color: '#94a3b8', fontSize: '0.85em', display: 'block', marginBottom: 8 }}>
+              Secondes par difficulté :
+            </span>
+            {['Facile', 'Moyen', 'Difficile', 'Impossible'].map(d => (
+              <label key={d} className="rc-asc-row" style={{ marginBottom: 6 }}>
+                <span style={{ color: DIFFICULTY_COLORS[d], minWidth: 80 }}>{d}</span>
+                <span className="rc-asc-val">{chillTimers[d]}s</span>
+                <input
+                  type="range"
+                  min={2}
+                  max={30}
+                  step={1}
+                  value={chillTimers[d]}
+                  onChange={e => setChillTimers(prev => ({ ...prev, [d]: Number(e.target.value) }))}
+                />
+              </label>
+            ))}
           </div>
         )}
       </div>

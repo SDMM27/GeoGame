@@ -18,7 +18,6 @@ const CATEGORY_OPTIONS = [
   { key: 'population', emoji: '👥', label: 'Population' },
   { key: 'area',       emoji: '🗺️', label: 'Superficie' },
   { key: 'gdp',        emoji: '💰', label: 'PIB' },
-  { key: 'density',    emoji: '📍', label: 'Densité' },
 ]
 
 function CriterionBanner({ criterion }) {

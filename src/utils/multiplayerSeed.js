@@ -73,7 +73,7 @@ export function getSeededAscensionOverrides(phases, gameType, seed, gameIndex) {
     )
     // La seed est maintenant mutée de façon strictement identique pour tous
     derivedSeed = ((derivedSeed * 6271 + 1009) >>> 0)
-    result[difficulty] = seededShuffle(pool, derivedSeed)
+    result[difficulty] = seededShuffle(pool, derivedSeed).slice(0, count)
   })
 
   return result

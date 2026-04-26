@@ -4,7 +4,7 @@ import { updateRoomStatus } from '../../utils/multiplayerRoom'
 import { GAME_TYPES } from '../../utils/gameTypes'
 import './BetweenGamesScreen.css'
 
-export default function BetweenGamesScreen({ room, gameResults, playerId, roomId }) {
+export default function BetweenGamesScreen({ room, gameResults, playerId, roomId, isChill = false }) {
   const gameIndex = room.currentGameIndex
   const isHost = room.hostId === playerId
   const isLastGame = gameIndex >= room.config.games.length - 1
@@ -46,7 +46,40 @@ export default function BetweenGamesScreen({ room, gameResults, playerId, roomId
         {gameConfig.type} — {gameConfig.mode === 'ascension' ? 'Ascension' : gameConfig.difficulty ?? `${gameConfig.countryCount} pays`}
       </p>
 
-      {isGuessGame ? (
+      {isChill ? (
+        // ─── Affichage Chill : score brut cumulatif ──────────────────────────
+        <table className="between-games-table">
+          <thead>
+            <tr>
+              <th>Rang</th>
+              <th>Joueur</th>
+              <th>Score</th>
+              <th>Pays trouvés</th>
+              <th>❌ Non trouvés</th>
+              <th>Points gagnés</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentResults.map(result => {
+              const playerData = room.players[result.playerId]
+              const isMe = result.playerId === playerId
+              return (
+                <tr key={result.playerId} className={isMe ? 'between-games-row--me' : ''}>
+                  <td>{medals[result.rank - 1] ?? result.rank}</td>
+                  <td>{playerData?.pseudo ?? '?'}{isMe ? ' (Toi)' : ''}</td>
+                  <td><strong>{result.weightedScore ?? 0}</strong></td>
+                  <td>{result.countriesSolved ?? 0}</td>
+                  <td>{result.attempts ?? 0}</td>
+                  <td className="between-games-pts">+{result.points} pt{result.points > 1 ? 's' : ''}</td>
+                  <td className="between-games-total">{playerData?.totalPoints ?? 0} pts</td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      ) : isGuessGame ? (
+        // ─── Affichage Normal Guess ──────────────────────────────────────────
         <table className="between-games-table">
           <thead>
             <tr>
@@ -80,6 +113,7 @@ export default function BetweenGamesScreen({ room, gameResults, playerId, roomId
           </tbody>
         </table>
       ) : (
+        // ─── Affichage Normal Placement/Flags/Capitals ───────────────────────
         <table className="between-games-table">
           <thead>
             <tr>

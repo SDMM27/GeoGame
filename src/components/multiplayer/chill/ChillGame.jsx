@@ -20,7 +20,6 @@ import {
 import {
   getCountdownMs,
   evaluateTextAnswer,
-  evaluateGuessAnswer,
   evaluatePlacement,
   flattenAscensionCountries,
 } from '../../../utils/chillModeUtils'

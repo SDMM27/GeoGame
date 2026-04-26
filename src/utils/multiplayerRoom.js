@@ -156,18 +156,19 @@ export async function updatePlayerGameFlags(roomId, playerId, flags) {
  * Initialise chillState au démarrage d'un jeu chill.
  * Appelé par le host uniquement.
  */
-export async function initChillState(roomId, countdownMs) {
-  const countdownEnd = Timestamp.fromDate(new Date(Date.now() + countdownMs))
-  await updateDoc(doc(firestore, 'rooms', roomId), {
-    chillState: {
-      phase: 'playing',
-      currentCountryIndex: 0,
-      countdownEnd,
-      mancheStartIndex: 0,
-      reviewStep: 0,
-      playerAnswers: {},
-    },
-  })
+export async function initChillState(roomId, gameIndex, countdownMs) {
+  const state = {
+    gameIndex,
+    phase: 'playing',
+    currentCountryIndex: 0,
+    mancheStartIndex: 0,
+    reviewStep: 0,
+    playerAnswers: {},
+  }
+  if (countdownMs != null) {
+    state.countdownEnd = Timestamp.fromDate(new Date(Date.now() + countdownMs))
+  }
+  await updateDoc(doc(firestore, 'rooms', roomId), { chillState: state })
 }
 
 /**

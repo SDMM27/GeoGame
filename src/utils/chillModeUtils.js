@@ -8,8 +8,13 @@ export const CHILL_COUNTDOWN_MS = {
   Impossible: 15000,
 }
 
-/** Retourne la durée du countdown en ms pour une difficulté donnée. Défaut : 10000ms. */
-export function getCountdownMs(difficulty) {
+/**
+ * Retourne la durée du countdown en ms pour une difficulté donnée.
+ * @param {string} difficulty
+ * @param {{ Facile?: number, Moyen?: number, Difficile?: number, Impossible?: number }} [timers] - secondes custom (depuis chillConfig)
+ */
+export function getCountdownMs(difficulty, timers) {
+  if (timers?.[difficulty] != null) return timers[difficulty] * 1000
   return CHILL_COUNTDOWN_MS[difficulty] ?? 10000
 }
 

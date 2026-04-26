@@ -2,7 +2,6 @@
 import { useEffect, useRef } from 'react'
 import { ToastContainer } from 'react-toastify'
 import useBorderGuessState from '../../../hooks/useBorderGuessState'
-import { getGuessGamePoints } from '../../../utils/scoringRules'
 import 'react-toastify/dist/ReactToastify.css'
 
 export default function ChillGuessInput({ country, locked, onSubmit }) {
@@ -19,10 +18,9 @@ export default function ChillGuessInput({ country, locked, onSubmit }) {
   useEffect(() => {
     if (!isComplete || lockedAtMount.current || submittedRef.current) return
     submittedRef.current = true
-    const wrongGuesses = guesses.filter(g => !g.isCorrect).length
     onSubmit({
       correct: isSolved,
-      score: isSolved ? getGuessGamePoints(wrongGuesses) : 0,
+      score: isSolved ? 3 : 0,
       guesses: guesses.map(g => g.value),
     })
   }, [isComplete]) // eslint-disable-line react-hooks/exhaustive-deps

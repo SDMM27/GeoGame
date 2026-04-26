@@ -1,5 +1,5 @@
 // src/components/multiplayer/chill/ChillPlacementReview.jsx
-import { useEffect, useRef, useCallback } from 'react'
+import { useCallback } from 'react'
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import countries from '../../../data/countriesWithDifficulty_FR.json'
@@ -31,13 +31,10 @@ export default function ChillPlacementReview({
   onNext,
   onContinue,
 }) {
-  const geoJsonRef = useRef(null)
-  const geoJsonRefLeft = useRef(null)
-  const geoJsonRefRight = useRef(null)
-
   // Construire la liste des mauvaises réponses
   const wrongAnswers = mancheCountries.flatMap((country, i) => {
     const idx = mancheStartIndex + i
+    const countryName = typeof country === 'string' ? country : country.properties?.ADMIN ?? country.ADMIN
     return Object.entries(players)
       .filter(([pid]) => {
         const ans = playerAnswers?.[pid]?.[String(idx)]
@@ -47,7 +44,7 @@ export default function ChillPlacementReview({
         pid,
         pseudo: players[pid].pseudo,
         country,
-        countryName: country,
+        countryName,
         answer: playerAnswers[pid][String(idx)],
       }))
   })
@@ -63,25 +60,16 @@ export default function ChillPlacementReview({
 
   const isAllDone = reviewStep > wrongAnswers.length
 
-  // Appliquer les highlights quand reviewStep ou refs changent
-  useEffect(() => {
-    if (reviewStep < 1) return
-    const current = wrongAnswers[reviewStep - 1]
-    if (!current) return
-    const correctName = current.countryName
-    const wrongName = current.answer?.clickedAdmin ?? null
+  const current = reviewStep >= 1 ? wrongAnswers[reviewStep - 1] : null
+  const correctName = current?.countryName ?? ''
+  const wrongName = current?.answer?.clickedAdmin ?? null
 
-    const refs = [geoJsonRef, geoJsonRefLeft, geoJsonRefRight]
-    for (const ref of refs) {
-      if (!ref.current) continue
-      ref.current.getLayers().forEach(layer => {
-        const admin = layer.feature?.properties?.ADMIN
-        if (admin === correctName) layer.setStyle(CORRECT_STYLE)
-        else if (wrongName && admin === wrongName) layer.setStyle(WRONG_STYLE)
-        else layer.setStyle(BASE_STYLE)
-      })
-    }
-  }, [reviewStep, wrongAnswers])
+  const getStyle = useCallback((feature) => {
+    const admin = feature?.properties?.ADMIN
+    if (admin === correctName) return CORRECT_STYLE
+    if (wrongName && admin === wrongName) return WRONG_STYLE
+    return BASE_STYLE
+  }, [correctName, wrongName])
 
   // ─── Step 0 : résumé texte ───────────────────────────────────────────────
   if (reviewStep === 0) {
@@ -117,14 +105,12 @@ export default function ChillPlacementReview({
   }
 
   // ─── Step ≥ 1 : carte plein écran + barre bas ────────────────────────────
-  const current = wrongAnswers[reviewStep - 1]
   if (!current && !isAllDone) return null
 
   const clickedAdmin = current?.answer?.clickedAdmin ?? null
-  const correctName = current?.countryName ?? ''
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100vh', overflow: 'hidden', background: '#0f172a' }}>
+    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 500, overflow: 'hidden', background: '#0f172a' }}>
       <MapContainer
         center={[20, 0]}
         zoom={2}
@@ -133,7 +119,7 @@ export default function ChillPlacementReview({
         zoomControl={false}
         dragging={false}
         doubleClickZoom={false}
-        style={{ width: '100%', height: '100vh' }}
+        style={{ width: '100%', height: '100%' }}
         whenReady={({ target }) => {
           target.getContainer().style.background = '#0f172a'
           setTimeout(() => target.invalidateSize(), 100)
@@ -145,9 +131,9 @@ export default function ChillPlacementReview({
           minZoom={2}
           maxZoom={20}
         />
-        <GeoJSON key={`left-${reviewStep}`} ref={geoJsonRefLeft} style={BASE_STYLE} data={featuresLeft} />
-        <GeoJSON key={`center-${reviewStep}`} ref={geoJsonRef} style={BASE_STYLE} data={countries.features} />
-        <GeoJSON key={`right-${reviewStep}`} ref={geoJsonRefRight} style={BASE_STYLE} data={featuresRight} />
+        <GeoJSON key={`left-${reviewStep}`} style={getStyle} data={featuresLeft} />
+        <GeoJSON key={`center-${reviewStep}`} style={getStyle} data={countries.features} />
+        <GeoJSON key={`right-${reviewStep}`} style={getStyle} data={featuresRight} />
       </MapContainer>
 
       {/* Barre overlay en bas */}

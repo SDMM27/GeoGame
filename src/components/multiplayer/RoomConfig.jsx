@@ -169,7 +169,7 @@ export default function RoomConfig({ onSubmit, submitting }) {
   const [pseudo, setPseudo] = useState('')
   const [games, setGames] = useState([defaultGame(GAME_TYPES.PLACEMENT)])
   const [chillMode, setChillMode] = useState(false)
-  const [mancheSize, setMancheSize] = useState(10)
+  const [chillTimers, setChillTimers] = useState({ Facile: 6, Moyen: 8, Difficile: 10, Impossible: 15 })
 
   const usedTypes = new Set(games.map(g => g.type))
   const availableToAdd = Object.keys(GAME_META).filter(t => !usedTypes.has(t))
@@ -201,7 +201,7 @@ export default function RoomConfig({ onSubmit, submitting }) {
       pseudo: pseudo.trim(),
       config: {
         games,
-        ...(chillMode ? { chillConfig: { mancheSize } } : {}),
+        ...(chillMode ? { chillConfig: { timers: chillTimers } } : {}),
       },
     })
   }
@@ -271,22 +271,23 @@ export default function RoomConfig({ onSubmit, submitting }) {
 
         {chillMode && (
           <div className="rc-chill-options" style={{ marginTop: 12, paddingLeft: 24 }}>
-            <label className="rc-slider-label">
-              <span>
-                Pays par manche : <strong>{mancheSize}</strong>
-              </span>
-              <input
-                type="range"
-                min={5}
-                max={20}
-                step={5}
-                value={mancheSize}
-                onChange={e => setMancheSize(Number(e.target.value))}
-              />
-              <span style={{ color: '#64748b', fontSize: '0.8em' }}>
-                Chrono : Facile 6s · Moyen 8s · Difficile 10s · Impossible 15s
-              </span>
-            </label>
+            <span style={{ color: '#94a3b8', fontSize: '0.85em', display: 'block', marginBottom: 8 }}>
+              Secondes par difficulté :
+            </span>
+            {['Facile', 'Moyen', 'Difficile', 'Impossible'].map(d => (
+              <label key={d} className="rc-asc-row" style={{ marginBottom: 6 }}>
+                <span style={{ color: DIFFICULTY_COLORS[d], minWidth: 80 }}>{d}</span>
+                <span className="rc-asc-val">{chillTimers[d]}s</span>
+                <input
+                  type="range"
+                  min={2}
+                  max={30}
+                  step={1}
+                  value={chillTimers[d]}
+                  onChange={e => setChillTimers(prev => ({ ...prev, [d]: Number(e.target.value) }))}
+                />
+              </label>
+            ))}
           </div>
         )}
       </div>

@@ -52,10 +52,9 @@ export default function BetweenGamesScreen({ room, gameResults, playerId, roomId
             <tr>
               <th>Rang</th>
               <th>Joueur</th>
+              <th>Score</th>
               <th>Pays trouvés</th>
-              <th>Tentatives Ratées</th>
               <th>❌ Non trouvés</th>
-              <th>Temps</th>
               <th>Points</th>
               <th>Total</th>
             </tr>
@@ -64,14 +63,14 @@ export default function BetweenGamesScreen({ room, gameResults, playerId, roomId
             {currentResults.map(result => {
               const playerData = room.players[result.playerId]
               const isMe = result.playerId === playerId
+              const notFound = (result.attempts ?? 0)
               return (
                 <tr key={result.playerId} className={isMe ? 'between-games-row--me' : ''}>
                   <td>{medals[result.rank - 1] ?? result.rank}</td>
                   <td>{playerData?.pseudo ?? '?'}{isMe ? ' (Toi)' : ''}</td>
+                  <td><strong>{result.weightedScore ?? 0}</strong></td>
                   <td>{result.countriesSolved ?? 0}</td>
-                  <td>{result.attempts ?? 0}</td>
-                  <td>{result.failures ?? 0}</td>
-                  <td>{formatTime(result.elapsedTime)}</td>
+                  <td>{notFound}</td>
                   <td className="between-games-pts">+{result.points} pt{result.points > 1 ? 's' : ''}</td>
                   <td className="between-games-total">{playerData?.totalPoints ?? 0} pts</td>
                 </tr>

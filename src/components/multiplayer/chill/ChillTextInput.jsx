@@ -1,28 +1,23 @@
 // src/components/multiplayer/chill/ChillTextInput.jsx
 import { useState, useEffect, useRef } from 'react'
 
-/**
- * Input texte sans validation temps réel.
- * Auto-soumet la valeur courante quand countdownEnd est atteint.
- *
- * @param {{
- *   onSubmit: (value: string) => void,
- *   countdownEnd: import('firebase/firestore').Timestamp,
- *   locked: boolean,
- *   placeholder?: string,
- * }} props
- */
 export default function ChillTextInput({ onSubmit, countdownEnd, locked, placeholder = 'Écris ta réponse…' }) {
   const [value, setValue] = useState('')
-  // Ref pour capturer la valeur la plus récente dans le setTimeout
+  const [submitted, setSubmitted] = useState(false)
   const valueRef = useRef('')
-  const submitted = useRef(false)
+  const onSubmitRef = useRef(onSubmit)
+  const hasTimer = !!countdownEnd
+
+  // Garder onSubmitRef synchronisé sans invalider les effets du timer
+  useEffect(() => {
+    onSubmitRef.current = onSubmit
+  })
 
   // Réinitialiser quand countdownEnd change (nouveau pays)
   useEffect(() => {
     setValue('')
     valueRef.current = ''
-    submitted.current = false
+    setSubmitted(false)
   }, [countdownEnd])
 
   // Auto-soumettre à countdownEnd
@@ -33,39 +28,72 @@ export default function ChillTextInput({ onSubmit, countdownEnd, locked, placeho
       : Number(countdownEnd)
     const ms = Math.max(0, endMs - Date.now())
     const id = setTimeout(() => {
-      if (!submitted.current) {
-        submitted.current = true
-        onSubmit(valueRef.current)
-      }
+      let shouldSubmit = false
+      setSubmitted(prev => {
+        if (prev) return prev
+        shouldSubmit = true
+        return true
+      })
+      if (shouldSubmit) onSubmitRef.current(valueRef.current)
     }, ms)
     return () => clearTimeout(id)
-  }, [countdownEnd, onSubmit])
+  }, [countdownEnd])
+
+  const doSubmit = () => {
+    if (submitted || locked) return
+    setSubmitted(true)
+    onSubmit(valueRef.current)
+  }
 
   const handleChange = (e) => {
-    if (locked || submitted.current) return
+    if (locked || submitted) return
     setValue(e.target.value)
     valueRef.current = e.target.value
   }
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') doSubmit()
+  }
+
+  const isDisabled = locked || submitted
   return (
-    <input
-      type="text"
-      value={value}
-      onChange={handleChange}
-      disabled={locked || submitted.current}
-      placeholder={locked ? '⏳ En attente…' : placeholder}
-      autoFocus
-      style={{
-        width: '100%',
-        padding: '10px 14px',
-        fontSize: '1rem',
-        borderRadius: 8,
-        border: `2px solid ${locked ? '#334155' : '#3b82f6'}`,
-        background: '#0f172a',
-        color: locked ? '#64748b' : '#f1f5f9',
-        outline: 'none',
-        transition: 'border-color 0.2s',
-      }}
-    />
+    <div style={{ display: 'flex', gap: 8 }}>
+      <input
+        type="text"
+        value={value}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+        disabled={isDisabled}
+        placeholder={locked ? '⏳ En attente…' : placeholder}
+        autoFocus
+        style={{
+          flex: 1,
+          padding: '10px 14px',
+          fontSize: '1rem',
+          borderRadius: 8,
+          border: `2px solid ${isDisabled ? '#334155' : '#3b82f6'}`,
+          background: '#0f172a',
+          color: isDisabled ? '#64748b' : '#f1f5f9',
+          outline: 'none',
+          transition: 'border-color 0.2s',
+        }}
+      />
+      {!hasTimer && (
+        <button
+          onClick={doSubmit}
+          disabled={isDisabled}
+          style={{
+            padding: '10px 18px',
+            borderRadius: 8,
+            border: 'none',
+            background: isDisabled ? '#1e293b' : '#3b82f6',
+            color: isDisabled ? '#64748b' : '#fff',
+            fontSize: '1rem',
+            cursor: isDisabled ? 'default' : 'pointer',
+            transition: 'background 0.2s',
+          }}
+        >→</button>
+      )}
+    </div>
   )
 }

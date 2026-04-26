@@ -42,20 +42,6 @@ export const CRITERIA = {
     },
     format: (value) => `${value.toLocaleString('fr-FR')} Mrd $`,
   },
-
-  density: {
-    key: 'density',
-    label: 'Densité',
-    consigne: 'Classe du plus dense au moins dense',
-    unit: 'hab/km²',
-    compute: (country, areaMap) => {
-      const area = areaMap?.get(country.properties.ADMIN)
-      const pop = country.properties.population
-      if (!area || !pop) return null
-      return pop / area
-    },
-    format: (value) => `${Math.round(value).toLocaleString('fr-FR')} hab/km²`,
-  },
 }
 
 export const CRITERIA_KEYS = Object.keys(CRITERIA)

@@ -59,16 +59,7 @@ function RightClickDrag() {
   return null
 }
 
-/**
- * Carte Leaflet mode chill — un joueur clique un pays pour le sélectionner.
- *
- * Props:
- *   targetName    {string}          - nom du pays à trouver (affiché en haut)
- *   onSubmit      {function}        - appelé avec le nom ADMIN sélectionné (ou null)
- *   countdownEnd  {number|object}   - timestamp de fin (ms ou objet Firestore Timestamp)
- *   locked        {boolean}         - si true, carte non interactive
- */
-export default function ChillPlacementInput({ targetName, onSubmit, countdownEnd, locked }) {
+export default function ChillPlacementInput({ onSubmit, countdownEnd, locked }) {
   const geoJsonRef = useRef(null)
   const geoJsonRefLeft = useRef(null)
   const geoJsonRefRight = useRef(null)
@@ -163,28 +154,7 @@ export default function ChillPlacementInput({ targetName, onSubmit, countdownEnd
   }, []) // safe: all handler logic reads refs, not closure state
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-      {/* Target country label — outside the map */}
-      <div style={{
-        position: 'absolute',
-        top: 12,
-        left: '50%',
-        transform: 'translateX(-50%)',
-        zIndex: 1000,
-        background: 'rgba(15,23,42,0.85)',
-        border: '1px solid #334155',
-        borderRadius: 8,
-        padding: '6px 18px',
-        color: '#f1f5f9',
-        fontSize: '1rem',
-        fontWeight: 600,
-        letterSpacing: '0.03em',
-        pointerEvents: 'none',
-        whiteSpace: 'nowrap',
-      }}>
-        {targetName}
-      </div>
-
+    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
       <MapContainer
         center={[20, 0]}
         zoom={3}
@@ -193,7 +163,7 @@ export default function ChillPlacementInput({ targetName, onSubmit, countdownEnd
         zoomControl={false}
         dragging={false}
         doubleClickZoom={false}
-        style={{ width: '100%', height: '100%' }}
+        style={{ width: '100%', height: '100vh' }}
         whenReady={({ target }) => {
           target.getContainer().style.background = '#0f172a'
           setTimeout(() => target.invalidateSize(), 100)

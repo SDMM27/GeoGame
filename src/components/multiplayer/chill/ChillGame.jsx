@@ -7,7 +7,6 @@ import { getCountryAreaKm2 } from '../../../utils/countryArea'
 import { getCountryStyle, getFocusCountry } from '../../../utils/borderGuessMap'
 import { GAME_TYPES } from '../../../utils/gameTypes'
 import { getSeededCountriesForGame } from '../../../utils/multiplayerSeed'
-import { rankResults } from '../../../utils/multiplayerScoring'
 import {
   initChillState,
   advanceChillTurn,
@@ -23,6 +22,7 @@ import {
   evaluatePlacement,
   flattenAscensionCountries,
 } from '../../../utils/chillModeUtils'
+
 import ChillCountdown from './ChillCountdown'
 import ChillTextInput from './ChillTextInput'
 import ChillPlacementInput from './ChillPlacementInput'
@@ -145,10 +145,8 @@ export default function ChillGame({ room, playerId, roomId }) {
       }
     })
 
-    const scoringMode = (gameConfig.type === GAME_TYPES.BORDER_GUESS || gameConfig.type === GAME_TYPES.COUNTRY_CLUE)
-      ? 'solved'
-      : 'weighted'
-    const scored = rankResults(results, activePlayers.length, scoringMode)
+    const sorted = [...results].sort((a, b) => (b.weightedScore ?? 0) - (a.weightedScore ?? 0))
+    const scored = sorted.map((r, i) => ({ ...r, rank: i + 1, points: r.weightedScore ?? 0 }))
     await Promise.all(scored.map(r =>
       writeGameResult(roomId, gameIndex, r.playerId, r)
     ))

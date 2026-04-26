@@ -14,9 +14,9 @@ const makeCountry = (overrides = {}) => ({
 })
 
 describe('CRITERIA_KEYS', () => {
-  it('contains exactly population, area, gdp, density', () => {
-    expect(CRITERIA_KEYS).toEqual(expect.arrayContaining(['population', 'area', 'gdp', 'density']))
-    expect(CRITERIA_KEYS).toHaveLength(4)
+  it('contains exactly population, area, gdp', () => {
+    expect(CRITERIA_KEYS).toEqual(expect.arrayContaining(['population', 'area', 'gdp']))
+    expect(CRITERIA_KEYS).toHaveLength(3)
   })
 })
 
@@ -57,25 +57,6 @@ describe('CRITERIA.area.compute', () => {
   })
 })
 
-describe('CRITERIA.density.compute', () => {
-  it('returns population / area', () => {
-    const country = makeCountry({ ADMIN: 'France', population: 68_000_000 })
-    const areaMap = new Map([['France', 551695]])
-    const density = CRITERIA.density.compute(country, areaMap)
-    expect(density).toBeCloseTo(68_000_000 / 551695, 2)
-  })
-
-  it('returns null when area is missing', () => {
-    const country = makeCountry({ population: 1_000_000 })
-    expect(CRITERIA.density.compute(country, new Map())).toBeNull()
-  })
-
-  it('returns null when population is missing', () => {
-    const country = makeCountry({ ADMIN: 'Test', population: undefined })
-    const areaMap = new Map([['Test', 100000]])
-    expect(CRITERIA.density.compute(country, areaMap)).toBeNull()
-  })
-})
 
 describe('buildCountryPool', () => {
   it('excludes countries where compute returns null', () => {

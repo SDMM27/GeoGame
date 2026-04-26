@@ -1,5 +1,10 @@
 // src/components/multiplayer/chill/ChillGame.jsx
 import { useMemo, useEffect, useRef, useCallback } from 'react'
+import * as Flags from 'country-flag-icons/react/3x2'
+import { MapContainer, GeoJSON, useMap } from 'react-leaflet'
+import L from 'leaflet'
+import { getCountryAreaKm2 } from '../../../utils/countryArea'
+import { getCountryStyle, getFocusCountry } from '../../../utils/borderGuessMap'
 import { GAME_TYPES } from '../../../utils/gameTypes'
 import { getSeededCountriesForGame } from '../../../utils/multiplayerSeed'
 import { rankResults } from '../../../utils/multiplayerScoring'
@@ -24,6 +29,62 @@ import ChillTextInput from './ChillTextInput'
 import ChillPlacementInput from './ChillPlacementInput'
 import ChillReview from './ChillReview'
 import ChillPlacementReview from './ChillPlacementReview'
+import ChillGuessInput from './ChillGuessInput'
+
+
+function FitCountry({ country }) {
+  const map = useMap()
+  useEffect(() => {
+    try { map.fitBounds(L.geoJSON(country).getBounds(), { padding: [20, 20] }) } catch (e) {}
+  }, [map, country])
+  return null
+}
+
+function BorderGuessDisplay({ country }) {
+  const displayCountry = getFocusCountry(country)
+  return (
+    <div style={{ height: 220, borderRadius: 8, overflow: 'hidden', marginBottom: 16, border: '1px solid #1e293b', background: '#0f172a' }}>
+      <MapContainer
+        key={country.properties?.ADMIN}
+        center={[20, 0]} zoom={3} zoomControl={false} attributionControl={false}
+        scrollWheelZoom={false} dragging={false} doubleClickZoom={false}
+        boxZoom={false} keyboard={false} touchZoom={false}
+        style={{ height: '100%', width: '100%', background: '#0f172a' }}
+      >
+        <GeoJSON data={displayCountry} style={() => getCountryStyle(country)} />
+        <FitCountry country={country} />
+      </MapContainer>
+    </div>
+  )
+}
+
+function CountryClueDisplay({ country }) {
+  const pop = country.properties?.population
+  const area = Math.round(getCountryAreaKm2(country))
+  const fmt = (n) => {
+    if (n >= 1e9) return `${(n / 1e9).toFixed(1)} Mrd`
+    if (n >= 1e6) return `${Math.round(n / 1e6)} M`
+    if (n >= 1e3) return `${Math.round(n / 1e3)} k`
+    return String(n)
+  }
+  const fmtArea = (n) => {
+    if (n >= 1e6) return `${(n / 1e6).toFixed(1)} M km²`
+    if (n >= 1e3) return `${Math.round(n / 1e3)} k km²`
+    return `${n} km²`
+  }
+  const cell = (label, value) => (
+    <div style={{ background: '#1e293b', borderRadius: 8, padding: '10px 20px', textAlign: 'center' }}>
+      <div style={{ color: '#94a3b8', fontSize: '0.65rem', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: 4 }}>{label}</div>
+      <div style={{ color: '#f1f5f9', fontWeight: 700, fontSize: '1.1rem' }}>{value}</div>
+    </div>
+  )
+  return (
+    <div style={{ display: 'flex', gap: 12, marginBottom: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
+      {cell('Population', pop ? fmt(pop) : '?')}
+      {cell('Superficie', area ? fmtArea(area) : '?')}
+    </div>
+  )
+}
 
 const endedGames = new Set()
 
@@ -47,13 +108,17 @@ export default function ChillGame({ room, playerId, roomId }) {
   const countriesWithDiffRef = useRef(countriesWithDiff)
   useEffect(() => { countriesWithDiffRef.current = countriesWithDiff }, [countriesWithDiff])
 
-  // ─── Init chillState (host, une seule fois) ────────────────────────────────
+  const isNoTimerGame = gameConfig.type === GAME_TYPES.BORDER_GUESS || gameConfig.type === GAME_TYPES.COUNTRY_CLUE
+  const noTimerAdvancedRef = useRef(null)
+
+  // ─── Init chillState (host) — réinitialise si gameIndex change ───────────────
   useEffect(() => {
-    if (!isHost || chillState) return
+    if (!isHost) return
+    if (chillState && chillState.gameIndex === gameIndex) return
     if (!countriesWithDiff.length) return
-    const countdownMs = getCountdownMs(countriesWithDiff[0].difficulty, chillTimers)
-    initChillState(roomId, countdownMs)
-  }, [isHost, chillState, roomId, countriesWithDiff])
+    const countdownMs = isNoTimerGame ? null : getCountdownMs(countriesWithDiff[0].difficulty, chillTimers)
+    initChillState(roomId, gameIndex, countdownMs)
+  }, [isHost, chillState?.gameIndex, gameIndex, roomId, countriesWithDiff])
 
   // ─── Fin de partie (host) ──────────────────────────────────────────────────
   const handleGameEnd = useCallback(async () => {
@@ -120,6 +185,31 @@ export default function ChillGame({ room, playerId, roomId }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isHost, chillState?.countdownEnd, chillState?.currentCountryIndex, chillState?.phase])
 
+  // ─── Host : avancer sans timer quand tous les joueurs ont répondu ────────────
+  useEffect(() => {
+    if (!isHost || !chillState || chillState.phase !== 'playing' || !isNoTimerGame) return
+    const idx = chillState.currentCountryIndex
+    const advKey = `${gameIndex}-${idx}`
+    if (noTimerAdvancedRef.current === advKey) return
+    const activePlayers = Object.entries(room.players)
+      .filter(([, p]) => !p.disconnected)
+      .map(([id]) => id)
+    if (!activePlayers.length) return
+    const allAnswered = activePlayers.every(pid =>
+      chillState.playerAnswers?.[pid]?.[String(idx)] != null
+    )
+    if (!allAnswered) return
+    noTimerAdvancedRef.current = advKey
+    const next = idx + 1
+    const mancheStart = chillState.mancheStartIndex
+    if (next >= countriesWithDiffRef.current.length) {
+      advanceChillTurn(roomId, 'review', next, mancheStart, null)
+    } else {
+      advanceChillTurn(roomId, 'playing', next, mancheStart, null)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isHost, chillState?.playerAnswers, chillState?.currentCountryIndex, chillState?.phase])
+
   // ─── Soumission de la réponse locale ───────────────────────────────────────
   const handleSubmitAnswer = useCallback((answerData) => {
     const idx = chillState?.currentCountryIndex
@@ -140,11 +230,10 @@ export default function ChillGame({ room, playerId, roomId }) {
     if (next >= totalCountries) {
       handleGameEnd()
     } else {
-      const { difficulty } = countriesWithDiff[next]
-      const countdownMs = getCountdownMs(difficulty, chillTimers)
+      const countdownMs = isNoTimerGame ? null : getCountdownMs(countriesWithDiff[next].difficulty, chillTimers)
       advanceChillTurn(roomId, 'playing', next, next, countdownMs)
     }
-  }, [isHost, chillState, totalCountries, countriesWithDiff, roomId, handleGameEnd])
+  }, [isHost, chillState, totalCountries, countriesWithDiff, roomId, handleGameEnd, isNoTimerGame])
 
   // ─── Render ────────────────────────────────────────────────────────────────
   if (!chillState) {
@@ -227,50 +316,73 @@ export default function ChillGame({ room, playerId, roomId }) {
   // ─── Layout centré pour les jeux texte ────────────────────────────────────
   const renderTextInput = () => {
     if (gameConfig.type === GAME_TYPES.FLAGS) {
-      const target = currentCountry.ADMIN
-      const aliases = currentCountry.aliases ?? []
+      const isoA2 = currentCountry.properties?.ISO_A2?.toUpperCase()
+      const FlagComponent = isoA2 ? Flags[isoA2] : null
+      const target = currentCountry.properties?.ADMIN
+      const aliases = currentCountry.properties?.aliases ?? []
       return (
-        <ChillTextInput
-          countdownEnd={chillState.countdownEnd}
-          locked={alreadyAnswered}
-          placeholder="Nom du pays…"
-          onSubmit={(answer) => {
-            const evalResult = evaluateTextAnswer(answer, target, aliases, difficulty)
-            handleSubmitAnswer({ answer, ...evalResult })
-          }}
-        />
+        <>
+          {FlagComponent
+            ? <FlagComponent style={{ display: 'block', margin: '0 auto 16px', maxWidth: 200, borderRadius: 4 }} />
+            : <div style={{ height: 80, marginBottom: 16 }} />
+          }
+          <ChillTextInput
+            countdownEnd={chillState.countdownEnd}
+            locked={alreadyAnswered}
+            placeholder="Nom du pays…"
+            onSubmit={(answer) => {
+              const evalResult = evaluateTextAnswer(answer, target, aliases, difficulty)
+              handleSubmitAnswer({ answer, ...evalResult })
+            }}
+          />
+        </>
       )
     }
 
     if (gameConfig.type === GAME_TYPES.CAPITALS) {
-      const target = currentCountry.capital ?? ''
-      const aliases = currentCountry.capitalAliases ?? []
+      const isoA2 = currentCountry.properties?.ISO_A2?.toUpperCase()
+      const FlagComponent = isoA2 ? Flags[isoA2] : null
+      const countryName = currentCountry.properties?.ADMIN
+      const target = currentCountry.properties?.capital ?? ''
+      const aliases = currentCountry.properties?.capitalAliases ?? []
       return (
-        <ChillTextInput
-          countdownEnd={chillState.countdownEnd}
-          locked={alreadyAnswered}
-          placeholder="Nom de la capitale…"
-          onSubmit={(answer) => {
-            const evalResult = evaluateTextAnswer(answer, target, aliases, difficulty)
-            handleSubmitAnswer({ answer, ...evalResult })
-          }}
-        />
+        <>
+          {FlagComponent
+            ? <FlagComponent style={{ display: 'block', margin: '0 auto 8px', maxWidth: 200, borderRadius: 4 }} />
+            : <div style={{ height: 80, marginBottom: 8 }} />
+          }
+          {countryName && (
+            <p style={{ textAlign: 'center', color: '#f1f5f9', fontWeight: 600, fontSize: '1.1rem', marginBottom: 16 }}>
+              {countryName}
+            </p>
+          )}
+          <ChillTextInput
+            countdownEnd={chillState.countdownEnd}
+            locked={alreadyAnswered}
+            placeholder="Nom de la capitale…"
+            onSubmit={(answer) => {
+              const evalResult = evaluateTextAnswer(answer, target, aliases, difficulty)
+              handleSubmitAnswer({ answer, ...evalResult })
+            }}
+          />
+        </>
       )
     }
 
     if (gameConfig.type === GAME_TYPES.BORDER_GUESS || gameConfig.type === GAME_TYPES.COUNTRY_CLUE) {
-      const target = currentCountry.ADMIN
-      const aliases = currentCountry.aliases ?? []
       return (
-        <ChillTextInput
-          countdownEnd={chillState.countdownEnd}
-          locked={alreadyAnswered}
-          placeholder="Nom du pays…"
-          onSubmit={(answer) => {
-            const evalResult = evaluateGuessAnswer(answer, target, aliases)
-            handleSubmitAnswer({ answer, ...evalResult })
-          }}
-        />
+        <>
+          {gameConfig.type === GAME_TYPES.BORDER_GUESS
+            ? <BorderGuessDisplay country={currentCountry} />
+            : <CountryClueDisplay country={currentCountry} />
+          }
+          <ChillGuessInput
+            key={chillState.currentCountryIndex}
+            country={currentCountry}
+            locked={alreadyAnswered}
+            onSubmit={(result) => handleSubmitAnswer(result)}
+          />
+        </>
       )
     }
 
@@ -282,7 +394,7 @@ export default function ChillGame({ room, playerId, roomId }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', color: '#94a3b8', marginBottom: 8, fontSize: '0.85em' }}>
         <span>Pays {chillState.currentCountryIndex + 1} / {totalCountries}</span>
       </div>
-      <ChillCountdown countdownEnd={chillState.countdownEnd} totalMs={countdownMs} />
+      {!isNoTimerGame && <ChillCountdown countdownEnd={chillState.countdownEnd} totalMs={countdownMs} />}
       <div style={{ marginTop: 16 }}>
         {renderTextInput()}
       </div>

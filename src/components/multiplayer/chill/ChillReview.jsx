@@ -30,7 +30,7 @@ export default function ChillReview({
   // Construire la liste de toutes les mauvaises réponses de la manche
   const wrongAnswers = mancheCountries.flatMap((country, i) => {
     const idx = mancheStartIndex + i
-    const countryName = typeof country === 'string' ? country : country.ADMIN
+    const countryName = typeof country === 'string' ? country : country.properties?.ADMIN
     return Object.entries(players)
       .filter(([pid]) => {
         const ans = playerAnswers?.[pid]?.[String(idx)]
@@ -99,9 +99,10 @@ export default function ChillReview({
         const correctName = typeof current.country === 'string'
           ? current.country
           : gameType === 'CAPITALS'
-            ? (current.country.capital ?? current.country.ADMIN)
-            : current.country.ADMIN
-        const givenAnswer = current.answer.answer ?? current.answer.clickedAdmin ?? '—'
+            ? (current.country.properties?.capital ?? current.country.properties?.ADMIN)
+            : current.country.properties?.ADMIN
+        const guessesArr = current.answer.guesses
+        const givenAnswer = current.answer.answer ?? current.answer.clickedAdmin ?? null
 
         return (
           <div>
@@ -117,7 +118,15 @@ export default function ChillReview({
               </div>
               <div style={{ marginBottom: 8 }}>
                 <span style={{ color: '#94a3b8', fontSize: '0.85em' }}>Réponse donnée</span>
-                <div style={{ color: '#fca5a5' }}>{givenAnswer || '(rien)'}</div>
+                {guessesArr?.length > 0
+                  ? <>
+                      <div style={{ color: '#94a3b8', fontSize: '0.85em', marginTop: 2 }}>
+                        {guessesArr.length} tentative{guessesArr.length > 1 ? 's' : ''}
+                      </div>
+                      <div style={{ color: '#fca5a5' }}>{guessesArr.join(' → ')}</div>
+                    </>
+                  : <div style={{ color: '#fca5a5' }}>{givenAnswer || '(rien)'}</div>
+                }
               </div>
               <div>
                 <span style={{ color: '#94a3b8', fontSize: '0.85em' }}>Réponse correcte</span>

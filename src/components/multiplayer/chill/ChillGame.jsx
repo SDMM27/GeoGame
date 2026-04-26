@@ -23,6 +23,7 @@ import ChillCountdown from './ChillCountdown'
 import ChillTextInput from './ChillTextInput'
 import ChillPlacementInput from './ChillPlacementInput'
 import ChillReview from './ChillReview'
+import ChillPlacementReview from './ChillPlacementReview'
 
 const endedGames = new Set()
 
@@ -30,7 +31,7 @@ export default function ChillGame({ room, playerId, roomId }) {
   const chillState = room.chillState
   const gameIndex = room.currentGameIndex
   const gameConfig = room.config.games[gameIndex]
-  const mancheSize = room.config.chillConfig?.mancheSize ?? 10
+  const chillTimers = room.config.chillConfig?.timers ?? null
   const isHost = room.hostId === playerId
 
   // ─── Liste de pays avec difficulté ─────────────────────────────────────────
@@ -50,7 +51,7 @@ export default function ChillGame({ room, playerId, roomId }) {
   useEffect(() => {
     if (!isHost || chillState) return
     if (!countriesWithDiff.length) return
-    const countdownMs = getCountdownMs(countriesWithDiff[0].difficulty)
+    const countdownMs = getCountdownMs(countriesWithDiff[0].difficulty, chillTimers)
     initChillState(roomId, countdownMs)
   }, [isHost, chillState, roomId, countriesWithDiff])
 
@@ -104,13 +105,13 @@ export default function ChillGame({ room, playerId, roomId }) {
     const id = setTimeout(async () => {
       const next = chillState.currentCountryIndex + 1
       const mancheStart = chillState.mancheStartIndex
-      const isEndOfManche = (next - mancheStart) >= mancheSize || next >= countriesWithDiffRef.current.length
+      const isEndOfManche = next >= countriesWithDiffRef.current.length
 
       if (isEndOfManche) {
         await advanceChillTurn(roomId, 'review', next, mancheStart, null)
       } else {
         const { difficulty } = countriesWithDiffRef.current[next]
-        const countdownMs = getCountdownMs(difficulty)
+        const countdownMs = getCountdownMs(difficulty, chillTimers)
         await advanceChillTurn(roomId, 'playing', next, mancheStart, countdownMs)
       }
     }, ms + 300)
@@ -140,7 +141,7 @@ export default function ChillGame({ room, playerId, roomId }) {
       handleGameEnd()
     } else {
       const { difficulty } = countriesWithDiff[next]
-      const countdownMs = getCountdownMs(difficulty)
+      const countdownMs = getCountdownMs(difficulty, chillTimers)
       advanceChillTurn(roomId, 'playing', next, next, countdownMs)
     }
   }, [isHost, chillState, totalCountries, countriesWithDiff, roomId, handleGameEnd])
@@ -158,19 +159,20 @@ export default function ChillGame({ room, playerId, roomId }) {
       .slice(mancheStart, mancheEnd)
       .map(({ country }) => country)
 
-    return (
-      <ChillReview
-        mancheCountries={mancheCountries}
-        mancheStartIndex={mancheStart}
-        playerAnswers={chillState.playerAnswers ?? {}}
-        reviewStep={chillState.reviewStep ?? 0}
-        isHost={isHost}
-        players={room.players}
-        gameType={gameConfig.type}
-        onNext={handleReviewNext}
-        onContinue={handleReviewContinue}
-      />
-    )
+    const reviewProps = {
+      mancheCountries,
+      mancheStartIndex: mancheStart,
+      playerAnswers: chillState.playerAnswers ?? {},
+      reviewStep: chillState.reviewStep ?? 0,
+      isHost,
+      players: room.players,
+      gameType: gameConfig.type,
+      onNext: handleReviewNext,
+      onContinue: handleReviewContinue,
+    }
+    return gameConfig.type === GAME_TYPES.PLACEMENT
+      ? <ChillPlacementReview {...reviewProps} />
+      : <ChillReview {...reviewProps} />
   }
 
   // Phase playing
@@ -178,14 +180,29 @@ export default function ChillGame({ room, playerId, roomId }) {
   if (!currentCountry) return null
 
   const alreadyAnswered = room.chillState?.playerAnswers?.[playerId]?.[String(chillState.currentCountryIndex)] != null
-  const countdownMs = getCountdownMs(difficulty)
+  const countdownMs = getCountdownMs(difficulty, chillTimers)
 
-  const renderInput = () => {
-    if (gameConfig.type === GAME_TYPES.PLACEMENT) {
-      const targetName = typeof currentCountry === 'string' ? currentCountry : currentCountry.ADMIN
-      return (
+  // ─── Layout plein écran pour PLACEMENT ────────────────────────────────────
+  if (gameConfig.type === GAME_TYPES.PLACEMENT) {
+    const targetName = typeof currentCountry === 'string' ? currentCountry : currentCountry.properties?.ADMIN
+    return (
+      <div style={{ position: 'relative', width: '100%', minHeight: '100vh', overflow: 'hidden', background: '#0f172a' }}>
+        <div style={{
+          position: 'absolute', top: 16, left: '50%', transform: 'translateX(-50%)',
+          zIndex: 1000, minWidth: 340,
+          background: 'rgba(15,23,42,0.88)', backdropFilter: 'blur(10px)',
+          border: '1px solid #1e293b', borderRadius: 12, padding: '10px 20px',
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
+            <span style={{ color: '#94a3b8', fontSize: '0.65rem', letterSpacing: '1px', textTransform: 'uppercase' }}>Pays à trouver</span>
+            <span style={{ color: '#94a3b8', fontSize: '0.7rem' }}>{chillState.currentCountryIndex + 1} / {totalCountries}</span>
+          </div>
+          <div style={{ textAlign: 'center', color: '#f1f5f9', fontWeight: 700, fontSize: '1.1rem', marginBottom: 4 }}>
+            {targetName}
+          </div>
+          <ChillCountdown countdownEnd={chillState.countdownEnd} totalMs={countdownMs} />
+        </div>
         <ChillPlacementInput
-          targetName={targetName}
           countdownEnd={chillState.countdownEnd}
           locked={alreadyAnswered}
           onSubmit={(clickedAdmin) => {
@@ -193,9 +210,22 @@ export default function ChillGame({ room, playerId, roomId }) {
             handleSubmitAnswer({ clickedAdmin, ...evalResult })
           }}
         />
-      )
-    }
+        {alreadyAnswered && (
+          <div style={{
+            position: 'absolute', bottom: 24, left: '50%', transform: 'translateX(-50%)',
+            zIndex: 1000, background: 'rgba(15,23,42,0.88)', backdropFilter: 'blur(10px)',
+            border: '1px solid #1e293b', borderRadius: 10, padding: '10px 24px',
+            color: '#64748b', fontSize: '0.9rem', whiteSpace: 'nowrap',
+          }}>
+            ✓ Réponse envoyée — en attente des autres joueurs…
+          </div>
+        )}
+      </div>
+    )
+  }
 
+  // ─── Layout centré pour les jeux texte ────────────────────────────────────
+  const renderTextInput = () => {
     if (gameConfig.type === GAME_TYPES.FLAGS) {
       const target = currentCountry.ADMIN
       const aliases = currentCountry.aliases ?? []
@@ -247,17 +277,14 @@ export default function ChillGame({ room, playerId, roomId }) {
     return <div style={{ color: '#ef4444' }}>Type de jeu non supporté en mode chill.</div>
   }
 
-  const progress = `${chillState.currentCountryIndex + 1} / ${totalCountries}`
-
   return (
     <div style={{ padding: '16px 24px', maxWidth: 640, margin: '0 auto' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', color: '#94a3b8', marginBottom: 8, fontSize: '0.85em' }}>
-        <span>Pays {progress}</span>
-        <span>Manche : {chillState.currentCountryIndex - chillState.mancheStartIndex + 1} / {mancheSize}</span>
+        <span>Pays {chillState.currentCountryIndex + 1} / {totalCountries}</span>
       </div>
       <ChillCountdown countdownEnd={chillState.countdownEnd} totalMs={countdownMs} />
       <div style={{ marginTop: 16 }}>
-        {renderInput()}
+        {renderTextInput()}
       </div>
       {alreadyAnswered && (
         <p style={{ color: '#64748b', textAlign: 'center', marginTop: 12, fontSize: '0.9em' }}>

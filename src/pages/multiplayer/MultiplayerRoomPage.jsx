@@ -77,7 +77,7 @@ export default function MultiplayerRoomPage() {
     return (
       <div className="mp-room">
         <NavBar />
-        <BetweenGamesScreen room={room} gameResults={gameResults} playerId={playerId} roomId={roomId} />
+        <BetweenGamesScreen room={room} gameResults={gameResults} playerId={playerId} roomId={roomId} isChill={!!room.config.chillConfig} />
       </div>
     )
   }

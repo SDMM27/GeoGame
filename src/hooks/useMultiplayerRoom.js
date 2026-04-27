@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { doc, collection, onSnapshot } from 'firebase/firestore'
 import { firestore } from '../Firebase'
+import { calibrateServerTime } from '../utils/serverTime'
 
 /**
  * S'abonne à la room et à la subcollection progress via onSnapshot.
@@ -23,6 +24,7 @@ export default function useMultiplayerRoom(roomId) {
 
     setLoading(true)
     setError(null)
+    calibrateServerTime()
 
     const unsubRoom = onSnapshot(
       doc(firestore, 'rooms', roomId),

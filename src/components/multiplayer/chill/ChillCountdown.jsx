@@ -1,5 +1,6 @@
 // src/components/multiplayer/chill/ChillCountdown.jsx
 import { useState, useEffect } from 'react'
+import { serverNow } from '../../../utils/serverTime'
 
 /**
  * Barre de progression synchronisée sur countdownEnd (Firestore Timestamp ou objet {toMillis}).
@@ -15,7 +16,7 @@ export default function ChillCountdown({ countdownEnd, totalMs }) {
       ? countdownEnd.toMillis()
       : Number(countdownEnd)
 
-    const tick = () => setRemaining(Math.max(0, endMs - Date.now()))
+    const tick = () => setRemaining(Math.max(0, endMs - serverNow()))
     tick()
     const id = setInterval(tick, 100)
     return () => clearInterval(id)

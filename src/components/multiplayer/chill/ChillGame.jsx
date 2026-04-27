@@ -23,6 +23,7 @@ import {
   flattenAscensionCountries,
 } from '../../../utils/chillModeUtils'
 
+import { serverNow } from '../../../utils/serverTime'
 import ChillCountdown from './ChillCountdown'
 import ChillTextInput from './ChillTextInput'
 import ChillPlacementInput from './ChillPlacementInput'
@@ -176,7 +177,7 @@ export default function ChillGame({ room, playerId, roomId }) {
     if (!isHost || !chillState || chillState.phase !== 'playing') return
     if (!countdownEndMs) return
 
-    const ms = Math.max(0, countdownEndMs - Date.now())
+    const ms = Math.max(0, countdownEndMs - serverNow())
 
     const id = setTimeout(async () => {
       const next = chillState.currentCountryIndex + 1
@@ -337,6 +338,7 @@ export default function ChillGame({ room, playerId, roomId }) {
             : <div style={{ height: 80, marginBottom: 16 }} />
           }
           <ChillTextInput
+            key={chillState.currentCountryIndex}
             countdownEnd={countdownEndTs}
             locked={alreadyAnswered}
             placeholder="Nom du pays…"
@@ -366,6 +368,7 @@ export default function ChillGame({ room, playerId, roomId }) {
             </p>
           )}
           <ChillTextInput
+            key={chillState.currentCountryIndex}
             countdownEnd={countdownEndTs}
             locked={alreadyAnswered}
             placeholder="Nom de la capitale…"

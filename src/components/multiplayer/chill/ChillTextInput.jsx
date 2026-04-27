@@ -1,5 +1,6 @@
 // src/components/multiplayer/chill/ChillTextInput.jsx
 import { useState, useEffect, useRef } from 'react'
+import { serverNow } from '../../../utils/serverTime'
 
 export default function ChillTextInput({ onSubmit, countdownEnd, locked, placeholder = 'Écris ta réponse…' }) {
   const [value, setValue] = useState('')
@@ -31,7 +32,7 @@ export default function ChillTextInput({ onSubmit, countdownEnd, locked, placeho
   // Auto-soumettre à countdownEnd
   useEffect(() => {
     if (!countdownEndMs) return
-    const ms = Math.max(0, countdownEndMs - Date.now())
+    const ms = Math.max(0, countdownEndMs - serverNow())
     const id = setTimeout(() => {
       let shouldSubmit = false
       setSubmitted(prev => {

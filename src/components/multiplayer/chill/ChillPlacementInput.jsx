@@ -1,5 +1,6 @@
 // src/components/multiplayer/chill/ChillPlacementInput.jsx
 import React, { useEffect, useRef, useCallback, useState } from 'react'
+import { serverNow } from '../../../utils/serverTime'
 import { MapContainer, TileLayer, GeoJSON, CircleMarker, useMap, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -143,7 +144,7 @@ export default function ChillPlacementInput({ onSubmit, countdownEnd, locked }) 
   // Auto-submit at countdownEnd
   useEffect(() => {
     if (!countdownEndMs) return
-    const ms = Math.max(0, countdownEndMs - Date.now())
+    const ms = Math.max(0, countdownEndMs - serverNow())
     const id = setTimeout(() => {
       if (!submittedRef.current) {
         submittedRef.current = true

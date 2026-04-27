@@ -25,7 +25,7 @@ export default function ChillTextInput({ onSubmit, countdownEnd, locked, placeho
     setValue('')
     valueRef.current = ''
     setSubmitted(false)
-    inputRef.current?.focus()
+    setTimeout(() => inputRef.current?.focus(), 50)
   }, [countdownEndMs])
 
   // Auto-soumettre à countdownEnd

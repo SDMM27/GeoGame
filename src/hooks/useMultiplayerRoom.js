@@ -28,7 +28,7 @@ export default function useMultiplayerRoom(roomId) {
       doc(firestore, 'rooms', roomId),
       (snap) => {
         if (snap.exists()) {
-          setRoom({ id: snap.id, ...snap.data() })
+          setRoom({ id: snap.id, ...snap.data({ serverTimestamps: 'estimate' }) })
         } else {
           setError('Room introuvable.')
         }

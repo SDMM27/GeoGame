@@ -166,9 +166,8 @@ export async function initChillState(roomId, gameIndex, countdownMs) {
     playerAnswers: {},
   }
   if (countdownMs != null) {
-    const now = Date.now()
-    state.countdownStart = Timestamp.fromDate(new Date(now))
-    state.countdownEnd = Timestamp.fromDate(new Date(now + countdownMs))
+    state.countdownStart = serverTimestamp()
+    state.countdownDurationMs = countdownMs
   }
   await updateDoc(doc(firestore, 'rooms', roomId), { chillState: state })
 }
@@ -188,9 +187,8 @@ export async function advanceChillTurn(roomId, phase, nextIndex, mancheStart, co
     'chillState.reviewStep': 0,
   }
   if (phase === 'playing' && countdownMs != null) {
-    const now = Date.now()
-    update['chillState.countdownStart'] = Timestamp.fromDate(new Date(now))
-    update['chillState.countdownEnd'] = Timestamp.fromDate(new Date(now + countdownMs))
+    update['chillState.countdownStart'] = serverTimestamp()
+    update['chillState.countdownDurationMs'] = countdownMs
   }
   await updateDoc(doc(firestore, 'rooms', roomId), update)
 }

@@ -2,12 +2,12 @@
 import { useState, useEffect } from 'react'
 
 /**
- * Barre de progression synchronisée sur countdownStart/countdownEnd (Firestore Timestamps).
- * totalMs est utilisé comme fallback si countdownStart est absent.
+ * Barre de progression synchronisée sur countdownEnd (Firestore Timestamp ou objet {toMillis}).
+ * totalMs = durée configurée (countdownDurationMs depuis Firestore).
+ * Le pourcentage est plafonné à 100% pour absorber le délai réseau à la réception.
  */
-export default function ChillCountdown({ countdownStart, countdownEnd, totalMs }) {
+export default function ChillCountdown({ countdownEnd, totalMs }) {
   const [remaining, setRemaining] = useState(totalMs)
-  const [effectiveTotalMs, setEffectiveTotalMs] = useState(totalMs)
 
   useEffect(() => {
     if (!countdownEnd) return
@@ -15,21 +15,14 @@ export default function ChillCountdown({ countdownStart, countdownEnd, totalMs }
       ? countdownEnd.toMillis()
       : Number(countdownEnd)
 
-    const startMs = countdownStart
-      ? (typeof countdownStart.toMillis === 'function' ? countdownStart.toMillis() : Number(countdownStart))
-      : null
-
-    const total = startMs != null ? endMs - startMs : totalMs
-    setEffectiveTotalMs(total)
-
     const tick = () => setRemaining(Math.max(0, endMs - Date.now()))
     tick()
     const id = setInterval(tick, 100)
     return () => clearInterval(id)
-  }, [countdownStart, countdownEnd, totalMs])
+  }, [countdownEnd])
 
-  const pct = effectiveTotalMs > 0 ? (remaining / effectiveTotalMs) * 100 : 0
-  const seconds = Math.ceil(remaining / 1000)
+  const pct = totalMs > 0 ? Math.min(100, (remaining / totalMs) * 100) : 0
+  const displaySeconds = Math.ceil(Math.min(remaining, totalMs) / 1000)
   const color = pct > 40 ? '#22c55e' : pct > 15 ? '#f59e0b' : '#ef4444'
 
   return (
@@ -52,7 +45,7 @@ export default function ChillCountdown({ countdownStart, countdownEnd, totalMs }
         color: '#94a3b8',
         marginTop: 2,
       }}>
-        {seconds}s
+        {displaySeconds}s
       </div>
     </div>
   )

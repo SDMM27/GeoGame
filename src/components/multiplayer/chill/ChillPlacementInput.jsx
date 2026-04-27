@@ -1,13 +1,58 @@
 // src/components/multiplayer/chill/ChillPlacementInput.jsx
-import React, { useEffect, useRef, useCallback } from 'react'
-import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet'
+import React, { useEffect, useRef, useCallback, useState } from 'react'
+import { MapContainer, TileLayer, GeoJSON, CircleMarker, useMap, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import countries from '../../../data/countriesWithDifficulty_FR.json'
+import { getCountryMetrics } from '../../../utils/borderGuessMap'
 
 const GEO_STYLE = { fillColor: 'transparent', color: '#94a3b8', fillOpacity: 1, weight: 1 }
 const HOVER_STYLE = { fillColor: '#7b2ff7', fillOpacity: 0.4, color: '#94a3b8', weight: 1 }
 const SELECTED_STYLE = { fillColor: '#3b82f6', fillOpacity: 0.6, color: '#60a5fa', weight: 2 }
+
+const CIRCLE_DEFAULT = { fillColor: '#ffffff', fillOpacity: 0.15, color: '#94a3b8', weight: 2 }
+const CIRCLE_HOVER = { fillColor: '#7b2ff7', fillOpacity: 0.5, color: '#7b2ff7', weight: 2 }
+const CIRCLE_SELECTED = { fillColor: '#3b82f6', fillOpacity: 0.8, color: '#60a5fa', weight: 2 }
+
+const SMALL_THRESHOLD = 0.5
+const LNG_OFFSETS = [-360, 0, 360]
+
+const smallCountriesData = (() => {
+  const result = []
+  for (const f of countries.features) {
+    try {
+      const { maxSpan } = getCountryMetrics(f)
+      if (maxSpan >= SMALL_THRESHOLD) continue
+      const center = L.geoJSON(f).getBounds().getCenter()
+      const zoomThreshold = Math.ceil(Math.log2(14 / Math.max(maxSpan, 0.01)))
+      result.push({ name: f.properties.ADMIN, lat: center.lat, lng: center.lng, zoomThreshold })
+    } catch (_) {}
+  }
+  return result
+})()
+
+function SmallCountryCircles({ selectedName, locked, onSelect }) {
+  const [zoom, setZoom] = useState(3)
+  useMapEvents({ zoomend: (e) => setZoom(e.target.getZoom()) })
+
+  return smallCountriesData
+    .filter(c => zoom < c.zoomThreshold)
+    .flatMap(c =>
+      LNG_OFFSETS.map(offset => (
+        <CircleMarker
+          key={`${c.name}-${offset}`}
+          center={[c.lat, c.lng + offset]}
+          radius={8}
+          pathOptions={selectedName === c.name ? CIRCLE_SELECTED : CIRCLE_DEFAULT}
+          eventHandlers={locked ? {} : {
+            click: () => onSelect(c.name),
+            mouseover: (e) => { if (selectedName !== c.name) e.target.setStyle(CIRCLE_HOVER) },
+            mouseout: (e) => { if (selectedName !== c.name) e.target.setStyle(CIRCLE_DEFAULT) },
+          }}
+        />
+      ))
+    )
+}
 
 function shiftLng(coords, offset) {
   if (typeof coords[0] === 'number') return [coords[0] + offset, coords[1]]
@@ -71,11 +116,21 @@ export default function ChillPlacementInput({ onSubmit, countdownEnd, locked }) 
   // Ref to the previously highlighted layer, to reset style on new selection
   const prevLayerRef = useRef(null)
 
-  // Re-initialize on new question (countdownEnd changes with each round)
+  // State copy of selected for CircleMarker re-renders
+  const [selectedName, setSelectedName] = useState(null)
+
+  // Use a primitive ms value so Firebase re-creating the Timestamp object
+  // on every room update doesn't falsely trigger re-init/timer effects
+  const countdownEndMs = countdownEnd
+    ? (typeof countdownEnd.toMillis === 'function' ? countdownEnd.toMillis() : Number(countdownEnd))
+    : null
+
+  // Re-initialize on new question (countdownEndMs changes with each round)
   useEffect(() => {
     selectedRef.current = null
     submittedRef.current = false
     prevLayerRef.current = null
+    setSelectedName(null)
 
     // Reset all layers to base style
     for (const ref of [geoJsonRef, geoJsonRefLeft, geoJsonRefRight]) {
@@ -83,15 +138,12 @@ export default function ChillPlacementInput({ onSubmit, countdownEnd, locked }) 
         ref.current.getLayers().forEach(l => l.setStyle(GEO_STYLE))
       }
     }
-  }, [countdownEnd])
+  }, [countdownEndMs])
 
   // Auto-submit at countdownEnd
   useEffect(() => {
-    if (!countdownEnd) return
-    const endMs = typeof countdownEnd.toMillis === 'function'
-      ? countdownEnd.toMillis()
-      : Number(countdownEnd)
-    const ms = Math.max(0, endMs - Date.now())
+    if (!countdownEndMs) return
+    const ms = Math.max(0, countdownEndMs - Date.now())
     const id = setTimeout(() => {
       if (!submittedRef.current) {
         submittedRef.current = true
@@ -99,7 +151,7 @@ export default function ChillPlacementInput({ onSubmit, countdownEnd, locked }) 
       }
     }, ms)
     return () => clearTimeout(id)
-  }, [countdownEnd, onSubmit])
+  }, [countdownEndMs, onSubmit])
 
   // Helper: find the canonical ADMIN layer from any of the 3 GeoJSON layers
   function findLayersByAdmin(adminName) {
@@ -115,20 +167,19 @@ export default function ChillPlacementInput({ onSubmit, countdownEnd, locked }) 
     return found
   }
 
-  const handleCountryClick = (event) => {
+  const selectCountry = useCallback((adminName) => {
     if (locked || submittedRef.current) return
-    const layer = event.target
-    const adminName = layer.feature.properties.ADMIN
-
-    // Deselect previous country (all copies: left, center, right)
     if (prevLayerRef.current && prevLayerRef.current !== adminName) {
       findLayersByAdmin(prevLayerRef.current).forEach(l => l.setStyle(GEO_STYLE))
     }
-
-    // Highlight all copies of newly selected country
     findLayersByAdmin(adminName).forEach(l => l.setStyle(SELECTED_STYLE))
     prevLayerRef.current = adminName
     selectedRef.current = adminName
+    setSelectedName(adminName)
+  }, [locked]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleCountryClick = (event) => {
+    selectCountry(event.target.feature.properties.ADMIN)
   }
 
   const handleMouseOver = (event) => {
@@ -196,6 +247,7 @@ export default function ChillPlacementInput({ onSubmit, countdownEnd, locked }) 
           data={featuresRight}
           onEachFeature={onEachFeature}
         />
+        <SmallCountryCircles selectedName={selectedName} locked={locked} onSelect={selectCountry} />
         <RightClickDrag />
       </MapContainer>
     </div>

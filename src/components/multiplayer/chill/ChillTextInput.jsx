@@ -6,27 +6,32 @@ export default function ChillTextInput({ onSubmit, countdownEnd, locked, placeho
   const [submitted, setSubmitted] = useState(false)
   const valueRef = useRef('')
   const onSubmitRef = useRef(onSubmit)
+  const inputRef = useRef(null)
   const hasTimer = !!countdownEnd
+
+  // Use a primitive ms value so Firebase re-creating the Timestamp object
+  // on every room update doesn't falsely trigger re-init/timer effects
+  const countdownEndMs = countdownEnd
+    ? (typeof countdownEnd.toMillis === 'function' ? countdownEnd.toMillis() : Number(countdownEnd))
+    : null
 
   // Garder onSubmitRef synchronisé sans invalider les effets du timer
   useEffect(() => {
     onSubmitRef.current = onSubmit
   })
 
-  // Réinitialiser quand countdownEnd change (nouveau pays)
+  // Réinitialiser quand countdownEndMs change (nouveau pays)
   useEffect(() => {
     setValue('')
     valueRef.current = ''
     setSubmitted(false)
-  }, [countdownEnd])
+    inputRef.current?.focus()
+  }, [countdownEndMs])
 
   // Auto-soumettre à countdownEnd
   useEffect(() => {
-    if (!countdownEnd) return
-    const endMs = typeof countdownEnd.toMillis === 'function'
-      ? countdownEnd.toMillis()
-      : Number(countdownEnd)
-    const ms = Math.max(0, endMs - Date.now())
+    if (!countdownEndMs) return
+    const ms = Math.max(0, countdownEndMs - Date.now())
     const id = setTimeout(() => {
       let shouldSubmit = false
       setSubmitted(prev => {
@@ -37,7 +42,7 @@ export default function ChillTextInput({ onSubmit, countdownEnd, locked, placeho
       if (shouldSubmit) onSubmitRef.current(valueRef.current)
     }, ms)
     return () => clearTimeout(id)
-  }, [countdownEnd])
+  }, [countdownEndMs])
 
   const doSubmit = () => {
     if (submitted || locked) return
@@ -59,6 +64,7 @@ export default function ChillTextInput({ onSubmit, countdownEnd, locked, placeho
   return (
     <div style={{ display: 'flex', gap: 8 }}>
       <input
+        ref={inputRef}
         type="text"
         value={value}
         onChange={handleChange}

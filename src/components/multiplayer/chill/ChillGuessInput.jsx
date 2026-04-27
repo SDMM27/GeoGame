@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css'
 export default function ChillGuessInput({ country, locked, onSubmit }) {
   const lockedAtMount = useRef(locked)
   const submittedRef = useRef(false)
+  const inputRef = useRef(null)
 
   const {
     inputValue, setInputValue,
@@ -24,6 +25,10 @@ export default function ChillGuessInput({ country, locked, onSubmit }) {
       guesses: guesses.map(g => g.value),
     })
   }, [isComplete]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!lockedAtMount.current) inputRef.current?.focus()
+  }, [country])
 
   if (lockedAtMount.current) {
     return (
@@ -53,6 +58,7 @@ export default function ChillGuessInput({ country, locked, onSubmit }) {
         <div style={{ marginBottom: 12 }}>
           <div style={{ position: 'relative' }}>
             <input
+              ref={inputRef}
               placeholder="Nom du pays…"
               value={inputValue}
               onChange={e => setInputValue(e.target.value)}

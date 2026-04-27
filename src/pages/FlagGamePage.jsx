@@ -1,7 +1,6 @@
 // src/pages/FlagGamePage.jsx
 import React, { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import * as Flags from 'country-flag-icons/react/3x2'
 import { ToastContainer } from 'react-toastify'
 import useFlagGameState from '../hooks/useFlagGameState'
 import { snapshotKey, loadSnapshot } from '../utils/multiplayerSnapshot'
@@ -32,8 +31,7 @@ function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state
   }, [targetCountry, revealedName])
 
   const progressPct = stats.total ? (stats.found / stats.total) * 100 : 0
-  const isoA2 = targetCountry?.properties?.ISO_A2?.toUpperCase()
-  const FlagComponent = isoA2 ? Flags[isoA2] : null
+  const isoA2 = targetCountry?.properties?.ISO_A2?.toLowerCase()
   const onKeyDown = (e) => { if (e.key === 'Enter') handleSubmit() }
   const shouldAutoSubmit = Boolean(
     inputValue.trim() &&
@@ -105,8 +103,8 @@ function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state
       </div>
 
       <div className="flag-game-main">
-        {FlagComponent
-          ? <FlagComponent className="flag-display" title={revealedName ?? '?'} />
+        {isoA2
+          ? <img src={`/flags/${isoA2}.png`} alt={revealedName ?? '?'} className="flag-display" />
           : <div className="flag-placeholder" />
         }
         {revealedName && <div className="flag-revealed-name">{revealedName}</div>}

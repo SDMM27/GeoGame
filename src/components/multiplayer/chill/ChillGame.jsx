@@ -1,6 +1,6 @@
 // src/components/multiplayer/chill/ChillGame.jsx
 import { useMemo, useEffect, useRef, useCallback } from 'react'
-import * as Flags from 'country-flag-icons/react/3x2'
+
 import { MapContainer, GeoJSON, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import { getCountryAreaKm2 } from '../../../utils/countryArea'
@@ -313,14 +313,13 @@ export default function ChillGame({ room, playerId, roomId }) {
   // ─── Layout centré pour les jeux texte ────────────────────────────────────
   const renderTextInput = () => {
     if (gameConfig.type === GAME_TYPES.FLAGS) {
-      const isoA2 = currentCountry.properties?.ISO_A2?.toUpperCase()
-      const FlagComponent = isoA2 ? Flags[isoA2] : null
+      const isoA2 = currentCountry.properties?.ISO_A2?.toLowerCase()
       const target = currentCountry.properties?.ADMIN
       const aliases = currentCountry.properties?.aliases ?? []
       return (
         <>
-          {FlagComponent
-            ? <FlagComponent style={{ display: 'block', margin: '0 auto 16px', maxWidth: 200, borderRadius: 4 }} />
+          {isoA2
+            ? <img src={`/flags/${isoA2}.png`} alt={target ?? '?'} style={{ display: 'block', margin: '0 auto 16px', maxWidth: 200, borderRadius: 4 }} />
             : <div style={{ height: 80, marginBottom: 16 }} />
           }
           <ChillTextInput
@@ -337,15 +336,14 @@ export default function ChillGame({ room, playerId, roomId }) {
     }
 
     if (gameConfig.type === GAME_TYPES.CAPITALS) {
-      const isoA2 = currentCountry.properties?.ISO_A2?.toUpperCase()
-      const FlagComponent = isoA2 ? Flags[isoA2] : null
+      const isoA2 = currentCountry.properties?.ISO_A2?.toLowerCase()
       const countryName = currentCountry.properties?.ADMIN
       const target = currentCountry.properties?.capital ?? ''
       const aliases = currentCountry.properties?.capitalAliases ?? []
       return (
         <>
-          {FlagComponent
-            ? <FlagComponent style={{ display: 'block', margin: '0 auto 8px', maxWidth: 200, borderRadius: 4 }} />
+          {isoA2
+            ? <img src={`/flags/${isoA2}.png`} alt={countryName ?? '?'} style={{ display: 'block', margin: '0 auto 8px', maxWidth: 200, borderRadius: 4 }} />
             : <div style={{ height: 80, marginBottom: 8 }} />
           }
           {countryName && (

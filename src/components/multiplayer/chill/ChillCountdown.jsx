@@ -2,11 +2,12 @@
 import { useState, useEffect } from 'react'
 
 /**
- * Barre de progression synchronisée sur countdownEnd (Firestore Timestamp).
- * @param {{ countdownEnd: import('firebase/firestore').Timestamp, totalMs: number }} props
+ * Barre de progression synchronisée sur countdownStart/countdownEnd (Firestore Timestamps).
+ * totalMs est utilisé comme fallback si countdownStart est absent.
  */
-export default function ChillCountdown({ countdownEnd, totalMs }) {
+export default function ChillCountdown({ countdownStart, countdownEnd, totalMs }) {
   const [remaining, setRemaining] = useState(totalMs)
+  const [effectiveTotalMs, setEffectiveTotalMs] = useState(totalMs)
 
   useEffect(() => {
     if (!countdownEnd) return
@@ -14,13 +15,20 @@ export default function ChillCountdown({ countdownEnd, totalMs }) {
       ? countdownEnd.toMillis()
       : Number(countdownEnd)
 
+    const startMs = countdownStart
+      ? (typeof countdownStart.toMillis === 'function' ? countdownStart.toMillis() : Number(countdownStart))
+      : null
+
+    const total = startMs != null ? endMs - startMs : totalMs
+    setEffectiveTotalMs(total)
+
     const tick = () => setRemaining(Math.max(0, endMs - Date.now()))
     tick()
     const id = setInterval(tick, 100)
     return () => clearInterval(id)
-  }, [countdownEnd])
+  }, [countdownStart, countdownEnd, totalMs])
 
-  const pct = totalMs > 0 ? (remaining / totalMs) * 100 : 0
+  const pct = effectiveTotalMs > 0 ? (remaining / effectiveTotalMs) * 100 : 0
   const seconds = Math.ceil(remaining / 1000)
   const color = pct > 40 ? '#22c55e' : pct > 15 ? '#f59e0b' : '#ef4444'
 

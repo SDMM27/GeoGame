@@ -286,7 +286,7 @@ export default function ChillGame({ room, playerId, roomId }) {
           <div style={{ textAlign: 'center', color: '#f1f5f9', fontWeight: 700, fontSize: '1.1rem', marginBottom: 4 }}>
             {targetName}
           </div>
-          <ChillCountdown countdownEnd={chillState.countdownEnd} totalMs={countdownMs} />
+          <ChillCountdown countdownStart={chillState.countdownStart} countdownEnd={chillState.countdownEnd} totalMs={countdownMs} />
         </div>
         <ChillPlacementInput
           countdownEnd={chillState.countdownEnd}
@@ -389,7 +389,7 @@ export default function ChillGame({ room, playerId, roomId }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', color: '#94a3b8', marginBottom: 8, fontSize: '0.85em' }}>
         <span>Pays {chillState.currentCountryIndex + 1} / {totalCountries}</span>
       </div>
-      {!isNoTimerGame && <ChillCountdown countdownEnd={chillState.countdownEnd} totalMs={countdownMs} />}
+      {!isNoTimerGame && <ChillCountdown countdownStart={chillState.countdownStart} countdownEnd={chillState.countdownEnd} totalMs={countdownMs} />}
       <div style={{ marginTop: 16 }}>
         {renderTextInput()}
       </div>

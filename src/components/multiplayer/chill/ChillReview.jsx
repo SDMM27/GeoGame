@@ -34,14 +34,14 @@ export default function ChillReview({
     return Object.entries(players)
       .filter(([pid]) => {
         const ans = playerAnswers?.[pid]?.[String(idx)]
-        return ans !== undefined && ans !== null && !ans.correct
+        return !ans?.correct
       })
       .map(([pid]) => ({
         pid,
         pseudo: players[pid].pseudo,
         country,
         countryName,
-        answer: playerAnswers[pid][String(idx)],
+        answer: playerAnswers?.[pid]?.[String(idx)] ?? null,
       }))
   })
 
@@ -101,8 +101,8 @@ export default function ChillReview({
           : gameType === 'CAPITALS'
             ? (current.country.properties?.capital ?? current.country.properties?.ADMIN)
             : current.country.properties?.ADMIN
-        const guessesArr = current.answer.guesses
-        const givenAnswer = current.answer.answer ?? current.answer.clickedAdmin ?? null
+        const guessesArr = current.answer?.guesses
+        const givenAnswer = current.answer?.answer ?? current.answer?.clickedAdmin ?? null
 
         return (
           <div>

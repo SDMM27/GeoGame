@@ -23,6 +23,7 @@ import {
   flattenAscensionCountries,
 } from '../../../utils/chillModeUtils'
 
+import { serverNow } from '../../../utils/serverTime'
 import ChillCountdown from './ChillCountdown'
 import ChillTextInput from './ChillTextInput'
 import ChillPlacementInput from './ChillPlacementInput'
@@ -110,6 +111,23 @@ export default function ChillGame({ room, playerId, roomId }) {
   const isNoTimerGame = gameConfig.type === GAME_TYPES.BORDER_GUESS || gameConfig.type === GAME_TYPES.COUNTRY_CLUE
   const noTimerAdvancedRef = useRef(null)
 
+  // Dérive countdownEnd depuis le timestamp serveur pour corriger la dérive d'horloge.
+  // countdownStart est un serverTimestamp() Firestore → même valeur absolue pour tous.
+  // Chaque client calcule endMs = serverStart + duration, donc ms = endMs - Date.now()
+  // s'annule avec le décalage d'horloge, et le timer se déclenche au bon moment réel.
+  const countdownStartMs = chillState?.countdownStart
+    ? (typeof chillState.countdownStart.toMillis === 'function'
+        ? chillState.countdownStart.toMillis()
+        : Number(chillState.countdownStart))
+    : null
+  const countdownEndTs = useMemo(() => {
+    const duration = chillState?.countdownDurationMs
+    if (!countdownStartMs || !duration) return null
+    const endMs = countdownStartMs + duration
+    return { toMillis: () => endMs }
+  }, [countdownStartMs, chillState?.countdownDurationMs])
+  const countdownEndMs = countdownEndTs?.toMillis() ?? null
+
   // ─── Init chillState (host) — réinitialise si gameIndex change ───────────────
   useEffect(() => {
     if (!isHost) return
@@ -157,12 +175,9 @@ export default function ChillGame({ room, playerId, roomId }) {
   // ─── Host : avancer le tour quand le countdown se termine ─────────────────
   useEffect(() => {
     if (!isHost || !chillState || chillState.phase !== 'playing') return
-    if (!chillState.countdownEnd) return
+    if (!countdownEndMs) return
 
-    const endMs = typeof chillState.countdownEnd.toMillis === 'function'
-      ? chillState.countdownEnd.toMillis()
-      : Number(chillState.countdownEnd)
-    const ms = Math.max(0, endMs - Date.now())
+    const ms = Math.max(0, countdownEndMs - serverNow())
 
     const id = setTimeout(async () => {
       const next = chillState.currentCountryIndex + 1
@@ -173,14 +188,14 @@ export default function ChillGame({ room, playerId, roomId }) {
         await advanceChillTurn(roomId, 'review', next, mancheStart, null)
       } else {
         const { difficulty } = countriesWithDiffRef.current[next]
-        const countdownMs = getCountdownMs(difficulty, chillTimers)
-        await advanceChillTurn(roomId, 'playing', next, mancheStart, countdownMs)
+        const nextCountdownMs = getCountdownMs(difficulty, chillTimers)
+        await advanceChillTurn(roomId, 'playing', next, mancheStart, nextCountdownMs)
       }
     }, ms + 300)
 
     return () => clearTimeout(id)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isHost, chillState?.countdownEnd, chillState?.currentCountryIndex, chillState?.phase])
+  }, [isHost, countdownEndMs, chillState?.currentCountryIndex, chillState?.phase])
 
   // ─── Host : avancer sans timer quand tous les joueurs ont répondu ────────────
   useEffect(() => {
@@ -266,7 +281,7 @@ export default function ChillGame({ room, playerId, roomId }) {
   if (!currentCountry) return null
 
   const alreadyAnswered = room.chillState?.playerAnswers?.[playerId]?.[String(chillState.currentCountryIndex)] != null
-  const countdownMs = getCountdownMs(difficulty, chillTimers)
+  const displayDurationMs = chillState.countdownDurationMs ?? getCountdownMs(difficulty, chillTimers)
 
   // ─── Layout plein écran pour PLACEMENT ────────────────────────────────────
   if (gameConfig.type === GAME_TYPES.PLACEMENT) {
@@ -286,10 +301,10 @@ export default function ChillGame({ room, playerId, roomId }) {
           <div style={{ textAlign: 'center', color: '#f1f5f9', fontWeight: 700, fontSize: '1.1rem', marginBottom: 4 }}>
             {targetName}
           </div>
-          <ChillCountdown countdownStart={chillState.countdownStart} countdownEnd={chillState.countdownEnd} totalMs={countdownMs} />
+          <ChillCountdown countdownEnd={countdownEndTs} totalMs={displayDurationMs} />
         </div>
         <ChillPlacementInput
-          countdownEnd={chillState.countdownEnd}
+          countdownEnd={countdownEndTs}
           locked={alreadyAnswered}
           onSubmit={(clickedAdmin) => {
             const evalResult = evaluatePlacement(clickedAdmin, targetName, difficulty)
@@ -323,7 +338,8 @@ export default function ChillGame({ room, playerId, roomId }) {
             : <div style={{ height: 80, marginBottom: 16 }} />
           }
           <ChillTextInput
-            countdownEnd={chillState.countdownEnd}
+            key={chillState.currentCountryIndex}
+            countdownEnd={countdownEndTs}
             locked={alreadyAnswered}
             placeholder="Nom du pays…"
             onSubmit={(answer) => {
@@ -352,7 +368,8 @@ export default function ChillGame({ room, playerId, roomId }) {
             </p>
           )}
           <ChillTextInput
-            countdownEnd={chillState.countdownEnd}
+            key={chillState.currentCountryIndex}
+            countdownEnd={countdownEndTs}
             locked={alreadyAnswered}
             placeholder="Nom de la capitale…"
             onSubmit={(answer) => {
@@ -389,7 +406,7 @@ export default function ChillGame({ room, playerId, roomId }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', color: '#94a3b8', marginBottom: 8, fontSize: '0.85em' }}>
         <span>Pays {chillState.currentCountryIndex + 1} / {totalCountries}</span>
       </div>
-      {!isNoTimerGame && <ChillCountdown countdownStart={chillState.countdownStart} countdownEnd={chillState.countdownEnd} totalMs={countdownMs} />}
+      {!isNoTimerGame && <ChillCountdown countdownEnd={countdownEndTs} totalMs={displayDurationMs} />}
       <div style={{ marginTop: 16 }}>
         {renderTextInput()}
       </div>

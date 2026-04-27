@@ -27,7 +27,7 @@ export default function ChillGuessInput({ country, locked, onSubmit }) {
   }, [isComplete]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!lockedAtMount.current) inputRef.current?.focus()
+    if (!lockedAtMount.current) setTimeout(() => inputRef.current?.focus(), 50)
   }, [country])
 
   if (lockedAtMount.current) {

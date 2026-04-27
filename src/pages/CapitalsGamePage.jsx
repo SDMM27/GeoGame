@@ -1,7 +1,7 @@
 // src/pages/CapitalsGamePage.jsx
 import React, { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import * as Flags from 'country-flag-icons/react/3x2'
+
 import { ToastContainer } from 'react-toastify'
 import useCapitalsGameState from '../hooks/useCapitalsGameState'
 import { snapshotKey, loadSnapshot } from '../utils/multiplayerSnapshot'
@@ -38,8 +38,7 @@ function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, s
 
   const progressPct = stats.total ? (stats.found / stats.total) * 100 : 0
 
-  const isoA2 = targetCountry?.properties?.ISO_A2?.toUpperCase()
-  const FlagComponent = isoA2 ? Flags[isoA2] : null
+  const isoA2 = targetCountry?.properties?.ISO_A2?.toLowerCase()
 
   const onKeyDown = (e) => {
     if (e.key === 'Enter') handleSubmit()
@@ -119,8 +118,8 @@ function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, s
       {/* Contenu principal */}
       <div className="capitals-game-main">
         {/* Indice 1 : Drapeau */}
-        {FlagComponent
-          ? <FlagComponent className="flag-display" title={targetCountry?.properties?.ADMIN ?? '?'} />
+        {isoA2
+          ? <img src={`/flags/${isoA2}.png`} alt={targetCountry?.properties?.ADMIN ?? '?'} className="flag-display" />
           : <div className="flag-placeholder" />
         }
 

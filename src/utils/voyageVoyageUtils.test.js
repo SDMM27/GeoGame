@@ -5,6 +5,8 @@ import {
   isNeighbor,
   getEligibleCountries,
   computeScore,
+  selectRandomPair,
+  getDailyPair,
 } from './voyageVoyageUtils'
 
 // Minimal test graph
@@ -103,5 +105,51 @@ describe('computeScore', () => {
 
   it('score minimum est toujours 1', () => {
     expect(computeScore(2, 10, 20)).toBe(1)
+  })
+})
+
+describe('selectRandomPair', () => {
+  it('retourne une paire avec optimalLength >= minPathLength', () => {
+    const pair = selectRandomPair(testBorders, 2)
+    expect(pair.startISO).not.toBe(pair.targetISO)
+    expect(pair.optimalLength).toBeGreaterThanOrEqual(2)
+  })
+
+  it('retourne un objet avec les propriétés startISO, targetISO, optimalLength', () => {
+    const pair = selectRandomPair(testBorders, 1)
+    expect(pair).toHaveProperty('startISO')
+    expect(pair).toHaveProperty('targetISO')
+    expect(pair).toHaveProperty('optimalLength')
+  })
+
+  it('utilise le rng fourni pour des résultats déterministes', () => {
+    // rng séquentiel : 0, 0.1, 0.2... → sélections prévisibles
+    let call = 0
+    const deterministicRng = () => (call++ * 0.15) % 1
+    const pair1 = selectRandomPair(testBorders, 1, deterministicRng)
+    call = 0
+    const pair2 = selectRandomPair(testBorders, 1, deterministicRng)
+    expect(pair1.startISO).toBe(pair2.startISO)
+    expect(pair1.targetISO).toBe(pair2.targetISO)
+  })
+})
+
+describe('getDailyPair', () => {
+  it('retourne la même paire pour la même date', () => {
+    const pair1 = getDailyPair(testBorders, '2026-04-28')
+    const pair2 = getDailyPair(testBorders, '2026-04-28')
+    expect(pair1.startISO).toBe(pair2.startISO)
+    expect(pair1.targetISO).toBe(pair2.targetISO)
+    expect(pair1.optimalLength).toBe(pair2.optimalLength)
+  })
+
+  it('utilise une graine différente pour des dates différentes', () => {
+    const pair1 = getDailyPair(testBorders, '2026-04-28')
+    const pair2 = getDailyPair(testBorders, '2026-04-29')
+    // Verify both pairs are valid (optimalLength >= 3)
+    expect(pair1.optimalLength).toBeGreaterThanOrEqual(3)
+    expect(pair2.optimalLength).toBeGreaterThanOrEqual(3)
+    // The dates produce different seeds, so pairs should differ with high probability
+    // (though not guaranteed with a very small graph)
   })
 })

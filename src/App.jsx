@@ -7,6 +7,7 @@ import CapitalsGamePage from "./pages/CapitalsGamePage";
 import BorderGuessPage from "./pages/BorderGuessPage";
 import CountryCluePage from "./pages/CountryCluePage";
 import RankingGamePage from "./pages/RankingGamePage";
+import VoyageVoyagePage from "./pages/VoyageVoyagePage";
 import ScoresPage from "./pages/ScoresPage";
 import MultiplayerHomePage from "./pages/multiplayer/MultiplayerHomePage";
 import MultiplayerCreatePage from "./pages/multiplayer/MultiplayerCreatePage";
@@ -23,6 +24,7 @@ export default function App() {
         <Route path="/capitals-game" element={<CapitalsGamePage />} />
         <Route path="/border-guess" element={<BorderGuessPage />} />
         <Route path="/country-clue" element={<CountryCluePage />} />
+        <Route path="/voyage-voyage" element={<VoyageVoyagePage />} />
         <Route path="/ranking" element={<RankingGamePage />} />
         <Route path="/scores" element={<ScoresPage />} />
         <Route path="/multiplayer" element={<MultiplayerHomePage />} />

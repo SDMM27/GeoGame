@@ -1,3 +1,5 @@
+import { mulberry32 } from './prng'
+
 /**
  * Trouve le chemin le plus court entre deux pays (BFS).
  * @param {string} startISO - Code ISO A2 du pays de départ
@@ -78,15 +80,10 @@ export function selectRandomPair(borders, minPathLength = 3, rng = Math.random) 
 }
 
 /**
- * PRNG déterministe basé sur une chaîne (seed).
- * Utilisé pour le mode quotidien.
+ * Converts a date string (YYYY-MM-DD) to a numeric seed.
  */
-function makeSeededRng(seed) {
-  let s = seed.split('').reduce((acc, c) => (acc * 31 + c.charCodeAt(0)) | 0, 0)
-  return () => {
-    s = (Math.imul(1664525, s) + 1013904223) | 0
-    return (s >>> 0) / 0x100000000
-  }
+function dateToSeed(dateString) {
+  return dateString.split('').reduce((acc, c) => (acc * 31 + c.charCodeAt(0)) | 0, 0) >>> 0
 }
 
 /**
@@ -95,6 +92,6 @@ function makeSeededRng(seed) {
  * @param {string} dateString - Format YYYY-MM-DD
  */
 export function getDailyPair(borders, dateString) {
-  const rng = makeSeededRng(dateString)
+  const rng = mulberry32(dateToSeed(dateString))
   return selectRandomPair(borders, 3, rng)
 }

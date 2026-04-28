@@ -132,6 +132,11 @@ describe('selectRandomPair', () => {
     expect(pair1.startISO).toBe(pair2.startISO)
     expect(pair1.targetISO).toBe(pair2.targetISO)
   })
+
+  it('throws when no valid pair can be found', () => {
+    const isolated = { A: ['B'], B: ['A'] } // max path length is 1, can never meet minPathLength=3
+    expect(() => selectRandomPair(isolated, 3)).toThrow()
+  })
 })
 
 describe('getDailyPair', () => {

@@ -30,7 +30,8 @@ export default function useVoyageVoyageState(mode = 'infinite') {
   const [isGameOver, setIsGameOver] = useState(false)
   const [score, setScore] = useState(null)
   const [elapsedTime, setElapsedTime] = useState(0)
-  const timerRef = useRef(null)
+  const [gameKey, setGameKey] = useState(0)
+  const intervalRef = useRef(null)
 
   const initGame = useCallback(() => {
     const dateStr = new Date().toISOString().slice(0, 10)
@@ -51,6 +52,7 @@ export default function useVoyageVoyageState(mode = 'infinite') {
     setIsGameOver(false)
     setScore(null)
     setElapsedTime(0)
+    setGameKey(k => k + 1)
   }, [mode])
 
   // Initialize on mount and when mode changes
@@ -58,13 +60,13 @@ export default function useVoyageVoyageState(mode = 'infinite') {
 
   // Timer — stops when game is over
   useEffect(() => {
-    clearInterval(timerRef.current)
+    clearInterval(intervalRef.current)
     if (isGameOver) return
-    timerRef.current = setInterval(() => {
+    intervalRef.current = setInterval(() => {
       setElapsedTime(t => t + 100)
     }, 100)
-    return () => clearInterval(timerRef.current)
-  }, [isGameOver])
+    return () => clearInterval(intervalRef.current)
+  }, [isGameOver, gameKey])
 
   const submitGuess = useCallback((input) => {
     if (isGameOver || !input.trim()) return

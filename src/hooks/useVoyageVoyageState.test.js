@@ -38,12 +38,17 @@ describe('computeScore — formule de score', () => {
   })
 
   it('chemin parfait mais 2 erreurs : score = 1', () => {
-    // optimal=2, steps=2, wrongs=2 → 4 - 2 - 1 = 1
+    // optimal=2, steps=2, wrongs=2 → 4 - 2 - (2 × 0.5) = 1
     expect(computeScore(2, 2, 2)).toBe(1)
   })
 
+  it('1 erreur donne une pénalité de 0.5 (poids × 0.5)', () => {
+    // optimal=2, steps=2, wrongs=1 → 4 - 2 - 0.5 = 1.5
+    expect(computeScore(2, 2, 1)).toBe(1.5)
+  })
+
   it('chemin non optimal (3 étapes au lieu de 2) sans erreur : score = 1', () => {
-    // optimal=2, steps=3, wrongs=0 → 4 - 3 - 0 = 1
+    // optimal=2, steps=3, wrongs=0 → 2×2 - 3 - 0 = 1
     expect(computeScore(2, 3, 0)).toBe(1)
   })
 

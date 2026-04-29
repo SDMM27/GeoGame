@@ -6,7 +6,7 @@ import { isBetterDailyScore } from '../utils/dailyScores'
 import { formatTime } from '../utils/formatTime'
 import './DailyLeaderboard.css'
 
-export default function DailyForm({ attempts, elapsedTime, guesses, gameType, dailyKey }) {
+export default function DailyForm({ attempts, elapsedTime, guesses, gameType, dailyKey, statText, hints }) {
   const nameRef = useRef()
   const savedKey = `daily-saved:${gameType}:${dailyKey}`
   const [saved, setSaved] = useState(() => !!localStorage.getItem(savedKey))
@@ -24,7 +24,7 @@ export default function DailyForm({ attempts, elapsedTime, guesses, gameType, da
     }
     setSubmitting(true)
 
-    const newScore = { name, gameType, dailyKey, attempts, elapsedTime, guesses }
+    const newScore = { name, gameType, dailyKey, attempts, elapsedTime, guesses, ...(hints != null && { hints }) }
 
     const existingSnapshot = await getDocs(
       query(ref, where('name', '==', name), where('gameType', '==', gameType), where('dailyKey', '==', dailyKey))
@@ -56,7 +56,7 @@ export default function DailyForm({ attempts, elapsedTime, guesses, gameType, da
   return (
     <div className="daily-form">
       <h2 className="daily-form__title">Partie terminée !</h2>
-      <p className="daily-form__stat">{attempts} essai{attempts > 1 ? 's' : ''} — {elapsedTime != null ? formatTime(elapsedTime) : '—'}</p>
+      <p className="daily-form__stat">{statText ?? `${attempts} essai${attempts > 1 ? 's' : ''} — ${elapsedTime != null ? formatTime(elapsedTime) : '—'}`}</p>
 
       {blockedByBetter && (
         <div className="daily-form__blocked">

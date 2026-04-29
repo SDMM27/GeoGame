@@ -42,6 +42,46 @@ export function isNeighbor(isoA, isoB, borders) {
 }
 
 /**
+ * BFS depuis un pays — retourne un objet { iso: distance }.
+ */
+export function bfsDistances(startISO, borders) {
+  const dist = { [startISO]: 0 }
+  const queue = [startISO]
+  while (queue.length) {
+    const cur = queue.shift()
+    for (const nb of (borders[cur] ?? [])) {
+      if (!(nb in dist)) {
+        dist[nb] = dist[cur] + 1
+        queue.push(nb)
+      }
+    }
+  }
+  return dist
+}
+
+/**
+ * Vérifie si la liste d'ISOs forme un chemin connecté de start à target
+ * (chaque pays adjacent au suivant dans la chaîne).
+ */
+export function isPathComplete(chainISOs, startISO, targetISO, borders) {
+  if (!chainISOs.includes(targetISO)) return false
+  const chainSet = new Set(chainISOs)
+  const visited = new Set([startISO])
+  const queue = [startISO]
+  while (queue.length) {
+    const cur = queue.shift()
+    if (cur === targetISO) return true
+    for (const nb of (borders[cur] ?? [])) {
+      if (chainSet.has(nb) && !visited.has(nb)) {
+        visited.add(nb)
+        queue.push(nb)
+      }
+    }
+  }
+  return false
+}
+
+/**
  * Retourne la liste des pays éligibles (au moins une frontière).
  */
 export function getEligibleCountries(borders) {

@@ -144,6 +144,12 @@
   text-align: right;
 }
 
+.daily-lb__attempts-detail {
+  font-size: 0.75em;
+  color: #64748b;
+  margin-left: 3px;
+}
+
 .daily-lb__accordion {
   padding: 10px 12px 12px 52px;
   background: rgba(0,0,0,0.2);

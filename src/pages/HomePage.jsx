@@ -101,6 +101,15 @@ const GAMES = [
     active: true,
   },
   {
+    id: GAME_TYPES.VOYAGE_VOYAGE,
+    icon: "✈️",
+    title: "Voyage Voyage",
+    description: "Relie deux pays en passant par leurs frontières communes. Trouve le chemin le plus court !",
+    route: "/voyage-voyage",
+    cardType: "voyage",
+    active: true,
+  },
+  {
     id: "ranking",
     icon: "🏆",
     title: "Country Ranking",
@@ -158,6 +167,48 @@ function BorderGuessCard({ game }) {
         </div>
         <div className="game-card-buttons">
           <button className="btn-play" onClick={() => navigate(game.route, { state: { mode } })}>
+            Jouer
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function VoyageVoyageCard({ game }) {
+  const navigate = useNavigate();
+  const [mode, setMode] = useState("daily");
+
+  return (
+    <div className="game-card game-card--active">
+      <div className="game-card-icon">{game.icon}</div>
+      <h2 className="game-card-title">{game.title}</h2>
+      <p className="game-card-desc">{game.description}</p>
+      <div className="game-card-controls">
+        <div className="game-mode-tabs">
+          <button
+            className={`game-mode-tab${mode === "daily" ? " game-mode-tab--active" : ""}`}
+            onClick={() => setMode("daily")}
+          >
+            Journalier
+          </button>
+          <button
+            className={`game-mode-tab${mode === "infinite" ? " game-mode-tab--active" : ""}`}
+            onClick={() => setMode("infinite")}
+          >
+            Infini
+          </button>
+        </div>
+        <div className="border-guess-card-note">
+          {mode === "daily"
+            ? "Une seule route par jour, identique pour tous les joueurs."
+            : "Une nouvelle route à chaque partie, sans limite."}
+        </div>
+        <div className="game-card-buttons">
+          <button
+            className="btn-play"
+            onClick={() => navigate(game.route, { state: { mode } })}
+          >
             Jouer
           </button>
         </div>
@@ -463,6 +514,8 @@ export default function HomePage() {
               <CountryClueCard key={game.id} game={game} />
             ) : game.cardType === "ranking" ? (
               <RankingCard key={game.id} game={game} />
+            ) : game.cardType === "voyage" ? (
+              <VoyageVoyageCard key={game.id} game={game} />
             ) : (
               <ActiveGameCard key={game.id} game={game} />
             )

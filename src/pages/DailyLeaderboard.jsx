@@ -8,7 +8,7 @@ import './DailyLeaderboard.css'
 
 const MEDAL = ['🥇', '🥈', '🥉']
 
-function AccordionRow({ score, index }) {
+function AccordionRow({ score, index, secondaryFormatter }) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -16,29 +16,43 @@ function AccordionRow({ score, index }) {
       <div className="daily-lb__row-main" onClick={() => setOpen((prev) => !prev)}>
         <span className="daily-lb__rank">{index < 3 ? MEDAL[index] : `#${index + 1}`}</span>
         <span className="daily-lb__name">{score.name}</span>
-        <span className="daily-lb__attempts">{score.attempts} essai{score.attempts > 1 ? 's' : ''}</span>
-        <span className="daily-lb__time">{score.elapsedTime != null ? formatTime(score.elapsedTime) : '—'}</span>
+        <span className="daily-lb__attempts">
+          {score.hints > 0
+            ? <>{score.attempts + score.hints} <span className="daily-lb__attempts-detail">({score.attempts}+{score.hints})</span></>
+            : score.attempts
+          }
+        </span>
+        <span className="daily-lb__time">{score.elapsedTime != null ? (secondaryFormatter ?? formatTime)(score.elapsedTime) : '—'}</span>
       </div>
-      {open && Array.isArray(score.guesses) && score.guesses.length > 0 && (
+      {open && (
         <div className="daily-lb__accordion">
-          <p className="daily-lb__accordion-title">Pays tentés</p>
-          <ol className="daily-lb__guess-list">
-            {score.guesses.map((country, i) => (
-              <li
-                key={`${country}-${i}`}
-                className={`daily-lb__guess-item${i === score.guesses.length - 1 ? ' daily-lb__guess-item--correct' : ''}`}
-              >
-                {i + 1}. {country}
-              </li>
-            ))}
-          </ol>
+          {score.hints != null && (
+            <p className="daily-lb__accordion-hints">
+              Indices utilisés : <strong>{score.hints === 0 ? 'aucun' : `${score.hints}`}</strong>
+            </p>
+          )}
+          {Array.isArray(score.guesses) && score.guesses.length > 0 && (
+            <>
+              <p className="daily-lb__accordion-title">Pays tentés</p>
+              <ol className="daily-lb__guess-list">
+                {score.guesses.map((country, i) => (
+                  <li
+                    key={`${country}-${i}`}
+                    className={`daily-lb__guess-item${i === score.guesses.length - 1 ? ' daily-lb__guess-item--correct' : ''}`}
+                  >
+                    {i + 1}. {country}
+                  </li>
+                ))}
+              </ol>
+            </>
+          )}
         </div>
       )}
     </div>
   )
 }
 
-export default function DailyLeaderboard({ gameType, dailyKey }) {
+export default function DailyLeaderboard({ gameType, dailyKey, columnLabels, secondaryFormatter }) {
   const [selectedDate, setSelectedDate] = useState(dailyKey ?? '')
   const [scores, setScores] = useState([])
   const [loading, setLoading] = useState(true)
@@ -110,11 +124,11 @@ export default function DailyLeaderboard({ gameType, dailyKey }) {
           <div className="daily-lb__header">
             <span>#</span>
             <span>Joueur</span>
-            <span>Essais</span>
-            <span>Temps</span>
+            <span>{columnLabels?.attempts ?? 'Essais'}</span>
+            <span>{columnLabels?.secondary ?? 'Temps'}</span>
           </div>
           {scores.map((score, index) => (
-            <AccordionRow key={`${score.name}-${score.dailyKey}-${index}`} score={score} index={index} />
+            <AccordionRow key={`${score.name}-${score.dailyKey}-${index}`} score={score} index={index} secondaryFormatter={secondaryFormatter} />
           ))}
         </>
       )}

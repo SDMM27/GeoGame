@@ -1,16 +1,21 @@
+function effectiveAttempts(score) {
+  return score.attempts + (score.hints ?? 0)
+}
+
 export function sortDailyScores(scores) {
   return [...scores].sort((a, b) => {
-    if (a.attempts !== b.attempts) return a.attempts - b.attempts
+    const effDiff = effectiveAttempts(a) - effectiveAttempts(b)
+    if (effDiff !== 0) return effDiff
     return (a.elapsedTime ?? Infinity) - (b.elapsedTime ?? Infinity)
   })
 }
 
 export function isBetterDailyScore(newScore, existing) {
-  if (newScore.attempts < existing.attempts) return true
-  if (newScore.attempts === existing.attempts) {
-    const newTime = newScore.elapsedTime ?? Infinity
-    const existingTime = existing.elapsedTime ?? Infinity
-    return newTime < existingTime
+  const newEff = effectiveAttempts(newScore)
+  const existingEff = effectiveAttempts(existing)
+  if (newEff < existingEff) return true
+  if (newEff === existingEff) {
+    return (newScore.elapsedTime ?? Infinity) < (existing.elapsedTime ?? Infinity)
   }
   return false
 }

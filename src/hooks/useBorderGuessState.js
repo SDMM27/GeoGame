@@ -23,7 +23,7 @@ const BORDER_GUESS_EXCLUDED = new Set([
   'Wallis-et-Futuna',
   'Îles de la mer de Corail',
   'Îles Cook',
-  'Curaçao', 'Tonga'
+  'Curaçao', 'Tonga', 'Îles Pitcairn', 'Antarctique'
 ])
 
 export const BORDER_GUESS_COUNTRIES = countries.features.filter(

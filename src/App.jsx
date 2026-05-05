@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react"
 import HomePage from "./pages/HomePage";
 import GamePage from "./pages/GamePage";
 import FlagGamePage from "./pages/FlagGamePage";
@@ -30,6 +31,7 @@ export default function App() {
         <Route path="/multiplayer" element={<MultiplayerHomePage />} />
         <Route path="/multiplayer/create" element={<MultiplayerCreatePage />} />
         <Route path="/multiplayer/room/:roomId" element={<MultiplayerRoomPage />} />
+        <Analytics />
       </Routes>
     </Router>
   );

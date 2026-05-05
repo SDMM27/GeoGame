@@ -31,8 +31,8 @@ export default function App() {
         <Route path="/multiplayer" element={<MultiplayerHomePage />} />
         <Route path="/multiplayer/create" element={<MultiplayerCreatePage />} />
         <Route path="/multiplayer/room/:roomId" element={<MultiplayerRoomPage />} />
-        <Analytics />
       </Routes>
+      <Analytics />
     </Router>
   );
 }

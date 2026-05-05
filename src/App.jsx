@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Analytics } from "@vercel/analytics/next"
+import { Analytics } from "@vercel/analytics/react"
 import HomePage from "./pages/HomePage";
 import GamePage from "./pages/GamePage";
 import FlagGamePage from "./pages/FlagGamePage";

@@ -169,6 +169,9 @@ export default function CountryCluePage() {
                 gameType="COUNTRY_CLUE"
                 difficulty={mode === 'daily' ? 'Daily' : 'Infini'}
                 scoreLabel="ESSAIS"
+                details={isSolved
+                  ? `Trouvé en ${guesses.length} devinette${guesses.length > 1 ? 's' : ''}`
+                  : `Non trouvé (${guesses.length} tentative${guesses.length > 1 ? 's' : ''})`}
               />
             )}
 

@@ -207,6 +207,9 @@ export default function BorderGuessPage() {
                 gameType="BORDER_GUESS"
                 difficulty={mode === 'daily' ? 'Daily' : 'Infini'}
                 scoreLabel="ESSAIS"
+                details={isSolved
+                  ? `Trouvé en ${guesses.length} essai${guesses.length > 1 ? 's' : ''}`
+                  : `Non trouvé (${guesses.length} essai${guesses.length > 1 ? 's' : ''})`}
               />
             )}
 

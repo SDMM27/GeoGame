@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
-import { exportShareCard } from '../utils/shareScore'
+import { exportShareCard, copyShareText } from '../utils/shareScore'
 import './ShareScoreButton.css'
 
-export default function ShareScoreButton({ score, gameType, difficulty, scoreLabel = 'POINTS' }) {
+export default function ShareScoreButton({ score, gameType, difficulty, scoreLabel = 'POINTS', details }) {
   const [pseudo, setPseudo] = useState(() => localStorage.getItem('geogame_pseudo') ?? '')
   const [sharing, setSharing] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   const handleShare = async () => {
     localStorage.setItem('geogame_pseudo', pseudo)
@@ -15,6 +16,17 @@ export default function ShareScoreButton({ score, gameType, difficulty, scoreLab
       if (err?.name !== 'AbortError') console.error(err)
     } finally {
       setSharing(false)
+    }
+  }
+
+  const handleCopy = async () => {
+    localStorage.setItem('geogame_pseudo', pseudo)
+    try {
+      await copyShareText({ score, gameType, difficulty, pseudo, scoreLabel, details })
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error(err)
     }
   }
 
@@ -29,15 +41,24 @@ export default function ShareScoreButton({ score, gameType, difficulty, scoreLab
         onChange={e => setPseudo(e.target.value)}
         maxLength={30}
       />
-      <button
-        className="share-score-btn"
-        onClick={handleShare}
-        disabled={sharing}
-        aria-busy={sharing}
-        aria-label={sharing ? 'Partage en cours…' : 'Partager mon score'}
-      >
-        {sharing ? 'Partage en cours…' : '📤 Partager mon score'}
-      </button>
+      <div className="share-score-actions">
+        <button
+          className="share-score-btn"
+          onClick={handleShare}
+          disabled={sharing}
+          aria-busy={sharing}
+          aria-label={sharing ? 'Partage en cours…' : 'Partager mon score'}
+        >
+          {sharing ? 'Partage en cours…' : '📤 Partager mon score'}
+        </button>
+        <button
+          className="share-copy-btn"
+          onClick={handleCopy}
+          aria-label={copied ? 'Résultat copié !' : 'Copier les résultats'}
+        >
+          {copied ? '✓ Copié !' : '📋 Copier'}
+        </button>
+      </div>
     </div>
   )
 }

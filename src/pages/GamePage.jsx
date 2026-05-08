@@ -223,7 +223,12 @@ function PlacementGameLayout({ difficulty, isTraining, isAscension, presetName, 
               />
             ) : (
               <>
-                <ShareScoreButton score={score} gameType="PLACEMENT" difficulty={difficulty} />
+                <ShareScoreButton
+                  score={score}
+                  gameType="PLACEMENT"
+                  difficulty={difficulty}
+                  details={`${stats.found}/${stats.total} pays placés · ${timer ? `${Math.floor(timer/60)}m${String(timer%60).padStart(2,'0')}s` : ''}`}
+                />
                 <Form finalScore={score} difficulty={difficulty} elapsedTime={timer} gameType="PLACEMENT" continent={continent} />
               </>
             )}

@@ -165,3 +165,44 @@ export async function exportShareCard(data) {
     setTimeout(() => URL.revokeObjectURL(url), 150)
   }
 }
+
+function formatTime(seconds) {
+  if (!seconds) return ''
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  return m > 0 ? `${m}m${s.toString().padStart(2, '0')}s` : `${s}s`
+}
+
+export function generateShareText({ score, gameType, difficulty, pseudo, scoreLabel = 'POINTS', details }) {
+  const label = GAME_LABELS[gameType] ?? gameType
+  const displayPseudo = pseudo?.trim() || 'Anonyme'
+  const site = typeof window !== 'undefined' ? window.location.hostname : 'geogame.vercel.app'
+
+  const lines = [
+    `🌍 GeoGame — ${label}`,
+    `🏆 ${Math.round(score ?? 0)} ${scoreLabel} | ${difficulty ?? ''}`.trimEnd().replace(/\|$/, '').trim(),
+  ]
+  if (details) lines.push(`📊 ${details}`)
+  lines.push(`joué par ${displayPseudo}`)
+  lines.push('')
+  lines.push(`Peux-tu faire mieux ? ${site}`)
+
+  return lines.join('\n')
+}
+
+export async function copyShareText(data) {
+  const text = generateShareText(data)
+  try {
+    await navigator.clipboard.writeText(text)
+  } catch {
+    // fallback for environments without clipboard API
+    const ta = document.createElement('textarea')
+    ta.value = text
+    ta.style.position = 'fixed'
+    ta.style.opacity = '0'
+    document.body.appendChild(ta)
+    ta.select()
+    document.execCommand('copy')
+    document.body.removeChild(ta)
+  }
+}

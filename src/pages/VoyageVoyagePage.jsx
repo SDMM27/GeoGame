@@ -322,6 +322,7 @@ export default function VoyageVoyagePage() {
               gameType="VOYAGE_VOYAGE"
               difficulty={mode === 'daily' ? 'Daily' : 'Infini'}
               scoreLabel="PTS"
+              details={`${stepsUsed} étape${stepsUsed > 1 ? 's' : ''} · optimal : ${optimalLength}`}
             />
 
             {mode === 'daily' && (

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { generateShareCard, exportShareCard, GAME_LABELS } from './shareScore'
+import { generateShareCard, exportShareCard, GAME_LABELS, generateShareText } from './shareScore'
 
 const makeMockCtx = () => ({
   createLinearGradient: vi.fn(() => ({ addColorStop: vi.fn() })),
@@ -117,5 +117,35 @@ describe('exportShareCard', () => {
     })
     await exportShareCard({ score: 42, gameType: 'FLAGS', difficulty: 'Difficile', pseudo: '' })
     expect(createObj).toHaveBeenCalled()
+  })
+})
+
+describe('generateShareText', () => {
+  it('includes game label, score, difficulty, pseudo', () => {
+    const text = generateShareText({ score: 42, gameType: 'FLAGS', difficulty: 'Difficile', pseudo: 'Pierre', details: '35/50 pays trouvés' })
+    expect(text).toContain('Jeu des Drapeaux')
+    expect(text).toContain('42')
+    expect(text).toContain('Difficile')
+    expect(text).toContain('Pierre')
+  })
+
+  it('uses Anonyme when pseudo is empty', () => {
+    const text = generateShareText({ score: 10, gameType: 'FLAGS', difficulty: 'Facile', pseudo: '', details: '' })
+    expect(text).toContain('Anonyme')
+  })
+
+  it('includes details line when provided', () => {
+    const text = generateShareText({ score: 5, gameType: 'BORDER_GUESS', difficulty: 'Daily', pseudo: 'X', details: 'Trouvé en 2 essais' })
+    expect(text).toContain('📊 Trouvé en 2 essais')
+  })
+
+  it('omits details line when not provided', () => {
+    const text = generateShareText({ score: 5, gameType: 'RANKING', difficulty: 'Daily', pseudo: 'X' })
+    expect(text).not.toContain('📊')
+  })
+
+  it('rounds fractional score', () => {
+    const text = generateShareText({ score: 7.6, gameType: 'VOYAGE_VOYAGE', difficulty: 'Daily', pseudo: 'X', scoreLabel: 'PTS' })
+    expect(text).toContain('8 PTS')
   })
 })

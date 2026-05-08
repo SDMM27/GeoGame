@@ -311,6 +311,7 @@ export default function RankingGamePage() {
               score={score}
               gameType="RANKING"
               difficulty={mode === 'daily' ? 'Daily' : 'Infini'}
+              details={`Erreur totale : ${totalError} position${totalError !== 1 ? 's' : ''}`}
             />
 
             {/* Correct ranking revealed */}

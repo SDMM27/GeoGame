@@ -46,3 +46,26 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.share-score-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.share-copy-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 16px;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+}
+
+.share-copy-btn:hover {
+  opacity: 0.85;
+}

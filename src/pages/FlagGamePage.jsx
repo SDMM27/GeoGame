@@ -150,7 +150,12 @@ function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state
               />
             ) : (
               <>
-                <ShareScoreButton score={score} gameType="FLAGS" difficulty={difficulty} />
+                <ShareScoreButton
+                  score={score}
+                  gameType="FLAGS"
+                  difficulty={difficulty}
+                  details={`${stats.found}/${stats.total} pays trouvés · ${timer ? `${Math.floor(timer/60)}m${String(timer%60).padStart(2,'0')}s` : ''}`}
+                />
                 <Form finalScore={score} difficulty={difficulty} elapsedTime={timer} gameType="FLAGS" continent={continent} />
               </>
             )}

@@ -5,6 +5,7 @@ import { addDoc, collection, getDocs, query, where, deleteDoc } from 'firebase/f
 import { toast } from 'react-toastify'
 import NavBar from '../components/NavBar'
 import RankingLeaderboard from './RankingLeaderboard'
+import ShareScoreButton from '../components/ShareScoreButton'
 import useRankingGameState from '../hooks/useRankingGameState'
 import { GAME_TYPES } from '../utils/gameTypes'
 import { firestore } from '../Firebase'
@@ -298,6 +299,11 @@ export default function RankingGamePage() {
         {isSubmitted && (
           <>
             {/* Score */}
+            <ShareScoreButton
+              score={score}
+              gameType="RANKING"
+              difficulty={mode === 'daily' ? 'Daily' : 'Infini'}
+            />
             <div className="ranking-score">
               <div className="ranking-score-value">
                 {score} pt{score !== 1 ? 's' : ''}

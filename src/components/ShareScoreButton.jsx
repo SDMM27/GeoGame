@@ -21,6 +21,7 @@ export default function ShareScoreButton({ score, gameType, difficulty, scoreLab
   return (
     <div className="share-score-block">
       <input
+        aria-label="Ton pseudo (optionnel)"
         className="share-pseudo-input"
         type="text"
         placeholder="Ton pseudo (optionnel)"
@@ -32,8 +33,10 @@ export default function ShareScoreButton({ score, gameType, difficulty, scoreLab
         className="share-score-btn"
         onClick={handleShare}
         disabled={sharing}
+        aria-busy={sharing}
+        aria-label={sharing ? 'Partage en cours…' : 'Partager mon score'}
       >
-        {sharing ? '...' : '📤 Partager mon score'}
+        {sharing ? 'Partage en cours…' : '📤 Partager mon score'}
       </button>
     </div>
   )

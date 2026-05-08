@@ -10,6 +10,7 @@ import { checkAnswer } from '../utils/normalizeAnswer'
 import PhaseIndicator from '../components/PhaseIndicator'
 import Form from './form'
 import AscensionForm from './AscensionForm'
+import ShareScoreButton from '../components/ShareScoreButton'
 import 'react-toastify/dist/ReactToastify.css'
 import './GamePage.css'
 import './FlagGamePage.css'
@@ -148,7 +149,15 @@ function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state
                 gameType={GAME_TYPES.FLAGS} presetName={presetName ?? null} isTraining={isTraining}
               />
             ) : (
-              <Form finalScore={score} difficulty={difficulty} elapsedTime={timer} gameType="FLAGS" continent={continent} />
+              <>
+                <ShareScoreButton
+                  score={score}
+                  gameType="FLAGS"
+                  difficulty={difficulty}
+                  details={`${stats.found}/${stats.total} pays trouvés · ${timer ? `${Math.floor(timer/60)}m${String(timer%60).padStart(2,'0')}s` : ''}`}
+                />
+                <Form finalScore={score} difficulty={difficulty} elapsedTime={timer} gameType="FLAGS" continent={continent} />
+              </>
             )}
             {!onGameFinished && (
               <div className="game-over-actions">

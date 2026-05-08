@@ -13,6 +13,7 @@ import { getCountryMetrics } from '../utils/borderGuessMap'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import Form from './form'
 import AscensionForm from './AscensionForm'
+import ShareScoreButton from '../components/ShareScoreButton'
 import 'leaflet/dist/leaflet.css'
 import 'react-toastify/dist/ReactToastify.css'
 import './GamePage.css'
@@ -221,7 +222,15 @@ function PlacementGameLayout({ difficulty, isTraining, isAscension, presetName, 
                 isTraining={isTraining}
               />
             ) : (
-              <Form finalScore={score} difficulty={difficulty} elapsedTime={timer} gameType="PLACEMENT" continent={continent} />
+              <>
+                <ShareScoreButton
+                  score={score}
+                  gameType="PLACEMENT"
+                  difficulty={difficulty}
+                  details={`${stats.found}/${stats.total} pays placés · ${timer ? `${Math.floor(timer/60)}m${String(timer%60).padStart(2,'0')}s` : ''}`}
+                />
+                <Form finalScore={score} difficulty={difficulty} elapsedTime={timer} gameType="PLACEMENT" continent={continent} />
+              </>
             )}
             {!onGameFinished && (
               <div className="game-over-actions">

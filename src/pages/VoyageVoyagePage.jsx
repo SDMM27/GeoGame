@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import NavBar from '../components/NavBar'
 import VoyageVoyageMap from '../components/VoyageVoyageMap'
+import ShareScoreButton from '../components/ShareScoreButton'
 import useVoyageVoyageState from '../hooks/useVoyageVoyageState'
 import DailyForm from './DailyForm'
 import DailyLeaderboard from './DailyLeaderboard'
@@ -315,6 +316,14 @@ export default function VoyageVoyagePage() {
                 </div>
               </div>
             )}
+
+            <ShareScoreButton
+              score={score ?? 0}
+              gameType="VOYAGE_VOYAGE"
+              difficulty={mode === 'daily' ? 'Daily' : 'Infini'}
+              scoreLabel="PTS"
+              details={`${stepsUsed} étape${stepsUsed > 1 ? 's' : ''} · optimal : ${optimalLength}`}
+            />
 
             {mode === 'daily' && (
               <>

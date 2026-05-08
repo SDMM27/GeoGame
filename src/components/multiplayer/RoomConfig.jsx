@@ -256,7 +256,8 @@ export default function RoomConfig({ onSubmit, submitting }) {
         )}
       </div>
 
-      <div className="rc-chill-section">
+      {/* Mode Chill temporairement désactivé - en cours de correction */}
+      {false && <div className="rc-chill-section">
         <label className="rc-checkbox-label">
           <input
             type="checkbox"
@@ -290,7 +291,7 @@ export default function RoomConfig({ onSubmit, submitting }) {
             ))}
           </div>
         )}
-      </div>
+      </div>}
 
       <button
         type="submit"

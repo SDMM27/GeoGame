@@ -2,9 +2,9 @@ export const GAME_LABELS = {
   PLACEMENT: 'Placement',
   FLAGS: 'Jeu des Drapeaux',
   CAPITALS: 'Capitales',
-  BORDER_GUESS: 'BorderGuess',
-  COUNTRY_CLUE: 'Country Clue',
-  RANKING: 'Ranking',
+  BORDER_GUESS: 'Deviner la Frontière',
+  COUNTRY_CLUE: 'Pays Mystère',
+  RANKING: 'Classement',
   VOYAGE_VOYAGE: 'Voyage Voyage',
 }
 
@@ -61,7 +61,21 @@ export function generateShareCard({ score, gameType, difficulty, pseudo, scoreLa
         const bY = padY - 4
         ctx.fillStyle = 'rgba(255,255,255,0.10)'
         ctx.beginPath()
-        ctx.roundRect(bX, bY, bW, 28, 14)
+        if (ctx.roundRect) {
+          ctx.roundRect(bX, bY, bW, 28, 14)
+        } else {
+          const r = 14, x = bX, y = bY, w = bW, h = 28
+          ctx.moveTo(x + r, y)
+          ctx.lineTo(x + w - r, y)
+          ctx.quadraticCurveTo(x + w, y, x + w, y + r)
+          ctx.lineTo(x + w, y + h - r)
+          ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h)
+          ctx.lineTo(x + r, y + h)
+          ctx.quadraticCurveTo(x, y + h, x, y + h - r)
+          ctx.lineTo(x, y + r)
+          ctx.quadraticCurveTo(x, y, x + r, y)
+          ctx.closePath()
+        }
         ctx.fill()
         ctx.strokeStyle = 'rgba(255,255,255,0.15)'
         ctx.lineWidth = 1
@@ -148,6 +162,6 @@ export async function exportShareCard(data) {
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
-    URL.revokeObjectURL(url)
+    setTimeout(() => URL.revokeObjectURL(url), 150)
   }
 }

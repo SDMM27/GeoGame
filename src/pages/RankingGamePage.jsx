@@ -299,11 +299,6 @@ export default function RankingGamePage() {
         {isSubmitted && (
           <>
             {/* Score */}
-            <ShareScoreButton
-              score={score}
-              gameType="RANKING"
-              difficulty={mode === 'daily' ? 'Daily' : 'Infini'}
-            />
             <div className="ranking-score">
               <div className="ranking-score-value">
                 {score} pt{score !== 1 ? 's' : ''}
@@ -312,6 +307,11 @@ export default function RankingGamePage() {
                 Erreur totale : {totalError} position{totalError !== 1 ? 's' : ''}
               </div>
             </div>
+            <ShareScoreButton
+              score={score}
+              gameType="RANKING"
+              difficulty={mode === 'daily' ? 'Daily' : 'Infini'}
+            />
 
             {/* Correct ranking revealed */}
             <div className="ranking-results-title">Classement correct</div>

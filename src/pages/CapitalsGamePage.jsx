@@ -11,6 +11,7 @@ import { checkAnswer } from '../utils/normalizeAnswer'
 import PhaseIndicator from '../components/PhaseIndicator'
 import Form from './form'
 import AscensionForm from './AscensionForm'
+import ShareScoreButton from '../components/ShareScoreButton'
 import 'react-toastify/dist/ReactToastify.css'
 import './GamePage.css'
 import './FlagGamePage.css'
@@ -183,7 +184,10 @@ function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, s
                 isTraining={isTraining}
               />
             ) : (
-              <Form finalScore={score} difficulty={difficulty} elapsedTime={timer} gameType="CAPITALS" continent={continent} />
+              <>
+                <ShareScoreButton score={score} gameType="CAPITALS" difficulty={difficulty} />
+                <Form finalScore={score} difficulty={difficulty} elapsedTime={timer} gameType="CAPITALS" continent={continent} />
+              </>
             )}
             {!onGameFinished && (
               <div className="game-over-actions">

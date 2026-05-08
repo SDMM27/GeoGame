@@ -16,6 +16,7 @@ export function generateShareCard({ score, gameType, difficulty, pseudo, scoreLa
       canvas.width = W
       canvas.height = H
       const ctx = canvas.getContext('2d')
+      if (!ctx) throw new Error('Canvas 2D context unavailable')
 
       // Background gradient
       const grad = ctx.createLinearGradient(0, 0, W, H)
@@ -124,7 +125,10 @@ export function generateShareCard({ score, gameType, difficulty, pseudo, scoreLa
       ctx.fillText('peux-tu faire mieux ?', W - padX, bottomY)
       ctx.restore()
 
-      canvas.toBlob(resolve, 'image/png')
+      canvas.toBlob(blob => {
+        if (blob) resolve(blob)
+        else reject(new Error('Canvas toBlob returned null'))
+      }, 'image/png')
     } catch (err) {
       reject(err)
     }

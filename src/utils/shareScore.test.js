@@ -75,6 +75,13 @@ describe('generateShareCard', () => {
     const texts = mockCtx.fillText.mock.calls.map(c => String(c[0]))
     expect(texts.some(t => t.includes('ESSAIS'))).toBe(true)
   })
+
+  it('rejects when toBlob returns null', async () => {
+    vi.spyOn(HTMLCanvasElement.prototype, 'toBlob').mockImplementation(cb => cb(null))
+    await expect(
+      generateShareCard({ score: 0, gameType: 'FLAGS', difficulty: '', pseudo: '' })
+    ).rejects.toThrow('Canvas toBlob returned null')
+  })
 })
 
 describe('exportShareCard', () => {

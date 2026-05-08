@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { GeoJSON, MapContainer, useMap } from 'react-leaflet'
 import { ToastContainer } from 'react-toastify'
 import NavBar from '../components/NavBar'
+import ShareScoreButton from '../components/ShareScoreButton'
 import useBorderGuessState from '../hooks/useBorderGuessState'
 import { getCountryStyle, getFocusCountry, getViewportSettings } from '../utils/borderGuessMap'
 import DailyForm from './DailyForm'
@@ -199,6 +200,15 @@ export default function BorderGuessPage() {
             </div>
 
             <GuessHistory guesses={guesses} />
+
+            {isComplete && (
+              <ShareScoreButton
+                score={guesses.length}
+                gameType="BORDER_GUESS"
+                difficulty={mode === 'daily' ? 'Daily' : 'Infini'}
+                scoreLabel="ESSAIS"
+              />
+            )}
 
             <div className={`border-guess-result${isSolved ? ' border-guess-result--win' : isLost ? ' border-guess-result--lose' : ''}`}>
               {isSolved && <p>Bien joué, la bonne réponse était <strong>{answerName}</strong>.</p>}

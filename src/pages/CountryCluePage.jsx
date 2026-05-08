@@ -2,6 +2,7 @@ import React from 'react'
 import { useLocation } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import NavBar from '../components/NavBar'
+import ShareScoreButton from '../components/ShareScoreButton'
 import useCountryClueState from '../hooks/useCountryClueState'
 import CountryClueMap from './CountryClueMap'
 import DailyForm from './DailyForm'
@@ -160,6 +161,15 @@ export default function CountryCluePage() {
 
             {isComplete && (
               <CountryClueMap guesses={guesses} answerName={answerName} isLost={isLost} />
+            )}
+
+            {isComplete && (
+              <ShareScoreButton
+                score={guesses.length}
+                gameType="COUNTRY_CLUE"
+                difficulty={mode === 'daily' ? 'Daily' : 'Infini'}
+                scoreLabel="ESSAIS"
+              />
             )}
 
             <div className="country-clue-history">

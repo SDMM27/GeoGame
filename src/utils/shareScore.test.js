@@ -1,0 +1,114 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { generateShareCard, exportShareCard, GAME_LABELS } from './shareScore'
+
+const makeMockCtx = () => ({
+  createLinearGradient: vi.fn(() => ({ addColorStop: vi.fn() })),
+  fillRect: vi.fn(),
+  fillText: vi.fn(),
+  beginPath: vi.fn(),
+  arc: vi.fn(),
+  fill: vi.fn(),
+  stroke: vi.fn(),
+  roundRect: vi.fn(),
+  measureText: vi.fn(() => ({ width: 50 })),
+  save: vi.fn(),
+  restore: vi.fn(),
+  fillStyle: '',
+  strokeStyle: '',
+  font: '',
+  textAlign: '',
+  globalAlpha: 1,
+  lineWidth: 1,
+})
+
+describe('GAME_LABELS', () => {
+  it('maps all 7 game types', () => {
+    expect(GAME_LABELS.FLAGS).toBe('Jeu des Drapeaux')
+    expect(GAME_LABELS.PLACEMENT).toBe('Placement')
+    expect(GAME_LABELS.CAPITALS).toBe('Capitales')
+    expect(GAME_LABELS.BORDER_GUESS).toBe('BorderGuess')
+    expect(GAME_LABELS.COUNTRY_CLUE).toBe('Country Clue')
+    expect(GAME_LABELS.RANKING).toBe('Ranking')
+    expect(GAME_LABELS.VOYAGE_VOYAGE).toBe('Voyage Voyage')
+  })
+})
+
+describe('generateShareCard', () => {
+  let mockCtx
+
+  beforeEach(() => {
+    mockCtx = makeMockCtx()
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(mockCtx)
+    vi.spyOn(HTMLCanvasElement.prototype, 'toBlob').mockImplementation(cb =>
+      cb(new Blob(['png'], { type: 'image/png' }))
+    )
+  })
+
+  afterEach(() => vi.restoreAllMocks())
+
+  it('returns an image/png Blob', async () => {
+    const blob = await generateShareCard({ score: 42, gameType: 'FLAGS', difficulty: 'Difficile', pseudo: 'Pierre' })
+    expect(blob).toBeInstanceOf(Blob)
+    expect(blob.type).toBe('image/png')
+  })
+
+  it('draws the score as text', async () => {
+    await generateShareCard({ score: 42, gameType: 'FLAGS', difficulty: 'Difficile', pseudo: 'Pierre' })
+    const texts = mockCtx.fillText.mock.calls.map(c => c[0])
+    expect(texts).toContain('42')
+  })
+
+  it('rounds fractional scores', async () => {
+    await generateShareCard({ score: 7.6, gameType: 'VOYAGE_VOYAGE', difficulty: 'Daily', pseudo: 'X' })
+    const texts = mockCtx.fillText.mock.calls.map(c => c[0])
+    expect(texts).toContain('8')
+  })
+
+  it('displays Anonyme when pseudo is empty', async () => {
+    await generateShareCard({ score: 10, gameType: 'FLAGS', difficulty: 'Facile', pseudo: '' })
+    const texts = mockCtx.fillText.mock.calls.map(c => String(c[0]))
+    expect(texts.some(t => t.includes('Anonyme'))).toBe(true)
+  })
+
+  it('uses custom scoreLabel when provided', async () => {
+    await generateShareCard({ score: 5, gameType: 'BORDER_GUESS', difficulty: 'Daily', pseudo: '', scoreLabel: 'ESSAIS' })
+    const texts = mockCtx.fillText.mock.calls.map(c => String(c[0]))
+    expect(texts.some(t => t.includes('ESSAIS'))).toBe(true)
+  })
+})
+
+describe('exportShareCard', () => {
+  beforeEach(() => {
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(makeMockCtx())
+    vi.spyOn(HTMLCanvasElement.prototype, 'toBlob').mockImplementation(cb =>
+      cb(new Blob(['png'], { type: 'image/png' }))
+    )
+  })
+
+  afterEach(() => vi.restoreAllMocks())
+
+  it('calls navigator.share when canShare is supported', async () => {
+    const mockShare = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'canShare', { value: vi.fn().mockReturnValue(true), configurable: true })
+    Object.defineProperty(navigator, 'share', { value: mockShare, configurable: true })
+    await exportShareCard({ score: 42, gameType: 'FLAGS', difficulty: 'Difficile', pseudo: 'P' })
+    expect(mockShare).toHaveBeenCalledOnce()
+  })
+
+  it('falls back to URL.createObjectURL when canShare is unsupported', async () => {
+    Object.defineProperty(navigator, 'canShare', { value: undefined, configurable: true })
+    const createObj = vi.fn(() => 'blob:fake')
+    URL.createObjectURL = createObj
+    URL.revokeObjectURL = vi.fn()
+    const a = { href: '', download: '', click: vi.fn(), style: {} }
+    vi.spyOn(document.body, 'appendChild').mockImplementation(() => {})
+    vi.spyOn(document.body, 'removeChild').mockImplementation(() => {})
+    const originalCreateElement = document.createElement.bind(document)
+    vi.spyOn(document, 'createElement').mockImplementation(tag => {
+      if (tag === 'a') return a
+      return originalCreateElement(tag)
+    })
+    await exportShareCard({ score: 42, gameType: 'FLAGS', difficulty: 'Difficile', pseudo: '' })
+    expect(createObj).toHaveBeenCalled()
+  })
+})

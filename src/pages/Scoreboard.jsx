@@ -1,5 +1,6 @@
 ﻿// src/pages/Scoreboard.jsx
 import React, { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { collection, getDocs } from 'firebase/firestore'
 import { firestore } from '../Firebase'
 import { formatTime } from '../utils/formatTime'
@@ -34,6 +35,7 @@ export const filterByGame = (scores, game) => {
 }
 
 export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT, continentMode = false }) {
+  const { t } = useTranslation()
   const [allScores, setAllScores] = useState([])
   const [selectedGame, setSelectedGame] = useState(defaultGame)
   const [selectedDifficulty, setSelectedDifficulty] = useState('AllScores')
@@ -76,7 +78,7 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT, contine
 
   return (
     <div className="scoreboard">
-      <h1 className="scoreboard-title">Tableau des scores</h1>
+      <h1 className="scoreboard-title">{t('scoreboard.title')}</h1>
 
       <div className="scoreboard-filters">
         <select
@@ -87,7 +89,7 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT, contine
           {ACTIVE_GAMES.map((game) => (
             <option key={game.id} value={game.id}>{game.label}</option>
           ))}
-          <option value="AllGames">Tous les jeux</option>
+          <option value="AllGames">{t('options.all_games')}</option>
         </select>
 
         {continentMode ? (
@@ -99,7 +101,7 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT, contine
             {CONTINENTS.map(({ name }) => (
               <option key={name} value={name}>{name}</option>
             ))}
-            <option value="AllContinents">Tous les continents</option>
+            <option value="AllContinents">{t('options.all_continents')}</option>
           </select>
         ) : (
           <select
@@ -110,15 +112,15 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT, contine
             {DIFFICULTY_ORDER.map((difficulty) => (
               <option key={difficulty} value={difficulty}>{difficulty}</option>
             ))}
-            <option value="AllScores">Toutes les difficultés</option>
+            <option value="AllScores">{t('options.all_scores')}</option>
           </select>
         )}
       </div>
 
       {loading ? (
-        <p className="scoreboard-loading">Chargement...</p>
+        <p className="scoreboard-loading">{t('messages.loading')}</p>
       ) : scores.length === 0 ? (
-        <p className="scoreboard-empty">Aucun score pour ces filtres.</p>
+        <p className="scoreboard-empty">{t('scoreboard.no_ascension_scores')}</p>
       ) : (
         <div className="scoreboard-table">
           <div className="scoreboard-header">

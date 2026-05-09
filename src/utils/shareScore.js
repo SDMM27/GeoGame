@@ -1,11 +1,52 @@
+import i18n from '../i18n'
+
+// Static fallback labels (used when i18n is not initialised, e.g. in tests)
 export const GAME_LABELS = {
   PLACEMENT: 'Placement',
   FLAGS: 'Jeu des Drapeaux',
   CAPITALS: 'Capitales',
-  BORDER_GUESS: 'Deviner la Frontière',
-  COUNTRY_CLUE: 'Pays Mystère',
-  RANKING: 'Classement',
+  BORDER_GUESS: 'Border Guess',
+  COUNTRY_CLUE: 'Country Clue',
+  RANKING: 'Country Ranking',
   VOYAGE_VOYAGE: 'Voyage Voyage',
+}
+
+// Maps game type keys → i18n locale paths
+const GAME_TYPE_LOCALE_KEYS = {
+  FLAGS: 'games.flags.title',
+  PLACEMENT: 'games.placement.title',
+  CAPITALS: 'games.capitals.title',
+  BORDER_GUESS: 'games.border_guess.title',
+  COUNTRY_CLUE: 'games.country_clue.title',
+  RANKING: 'games.ranking.title',
+  VOYAGE_VOYAGE: 'games.voyage_voyage.title',
+}
+
+function getGameLabel(gameType) {
+  const key = GAME_TYPE_LOCALE_KEYS[gameType]
+  if (key && i18n.isInitialized) return i18n.t(key)
+  return GAME_LABELS[gameType] ?? gameType
+}
+
+function translateDifficulty(diff) {
+  if (!diff) return ''
+  if (!i18n.isInitialized) return diff
+  if (i18n.exists(`difficulties.${diff}`)) return i18n.t(`difficulties.${diff}`)
+  const modeMap = {
+    'Daily': 'modes.daily',
+    'Infini': 'modes.infinite',
+    'Infinite': 'modes.infinite',
+    'Journalier': 'modes.daily',
+    'daily': 'modes.daily',
+    'infinite': 'modes.infinite',
+  }
+  if (modeMap[diff]) return i18n.t(modeMap[diff])
+  return diff
+}
+
+function t(key, fallback) {
+  if (i18n.isInitialized) return i18n.t(key)
+  return fallback
 }
 
 export function generateShareCard({ score, gameType, difficulty, pseudo, scoreLabel = 'POINTS' }) {
@@ -88,7 +129,7 @@ export function generateShareCard({ score, gameType, difficulty, pseudo, scoreLa
       }
 
       // Game mode label (center, above score)
-      const label = GAME_LABELS[gameType] ?? gameType
+      const label = getGameLabel(gameType)
       const centerY = H / 2
       ctx.save()
       ctx.globalAlpha = 0.5
@@ -117,26 +158,28 @@ export function generateShareCard({ score, gameType, difficulty, pseudo, scoreLa
 
       // Pseudo (bottom-left)
       const bottomY = H - padY
-      const displayPseudo = pseudo?.trim() || 'Anonyme'
+      const displayPseudo = pseudo?.trim() || t('share.anonymous', 'Anonyme')
+      const playedBy = t('share.played_by', 'joué par')
       ctx.save()
       ctx.font = '13px "Segoe UI", sans-serif'
       ctx.textAlign = 'left'
       ctx.globalAlpha = 0.45
       ctx.fillStyle = '#ffffff'
-      const prefixW = ctx.measureText('joué par ').width
-      ctx.fillText('joué par ', padX, bottomY)
+      const prefixW = ctx.measureText(`${playedBy} `).width
+      ctx.fillText(`${playedBy} `, padX, bottomY)
       ctx.globalAlpha = 1
       ctx.font = '600 13px "Segoe UI", sans-serif'
       ctx.fillText(displayPseudo, padX + prefixW, bottomY)
       ctx.restore()
 
       // CTA (bottom-right)
+      const canYouBeat = t('share.can_you_beat', 'peux-tu faire mieux ?')
       ctx.save()
       ctx.globalAlpha = 0.3
       ctx.fillStyle = '#ffffff'
       ctx.font = 'italic 12px "Segoe UI", sans-serif'
       ctx.textAlign = 'right'
-      ctx.fillText('peux-tu faire mieux ?', W - padX, bottomY)
+      ctx.fillText(canYouBeat, W - padX, bottomY)
       ctx.restore()
 
       canvas.toBlob(blob => {
@@ -166,26 +209,22 @@ export async function exportShareCard(data) {
   }
 }
 
-function formatTime(seconds) {
-  if (!seconds) return ''
-  const m = Math.floor(seconds / 60)
-  const s = seconds % 60
-  return m > 0 ? `${m}m${s.toString().padStart(2, '0')}s` : `${s}s`
-}
-
 export function generateShareText({ score, gameType, difficulty, pseudo, scoreLabel = 'POINTS', details }) {
-  const label = GAME_LABELS[gameType] ?? gameType
-  const displayPseudo = pseudo?.trim() || 'Anonyme'
+  const label = getGameLabel(gameType)
+  const displayPseudo = pseudo?.trim() || t('share.anonymous', 'Anonyme')
+  const playedBy = t('share.played_by', 'joué par')
+  const canYouBeat = t('share.can_you_beat', 'Peux-tu faire mieux ?')
+  const translatedDiff = translateDifficulty(difficulty)
   const site = typeof window !== 'undefined' ? window.location.hostname : 'geogame.vercel.app'
 
   const lines = [
     `🌍 GeoGame — ${label}`,
-    `🏆 ${Math.round(score ?? 0)} ${scoreLabel} | ${difficulty ?? ''}`.trimEnd().replace(/\|$/, '').trim(),
+    `🏆 ${Math.round(score ?? 0)} ${scoreLabel} | ${translatedDiff ?? ''}`.trimEnd().replace(/\|$/, '').trim(),
   ]
   if (details) lines.push(`📊 ${details}`)
-  lines.push(`joué par ${displayPseudo}`)
+  lines.push(`${playedBy} ${displayPseudo}`)
   lines.push('')
-  lines.push(`Peux-tu faire mieux ? ${site}`)
+  lines.push(`${canYouBeat} ${site}`)
 
   return lines.join('\n')
 }

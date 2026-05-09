@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { firestore } from '../Firebase'
 import { addDoc, collection, getDocs, query, where, deleteDoc, serverTimestamp } from 'firebase/firestore'
 import { toast } from 'react-toastify'
@@ -15,6 +16,7 @@ function isBetter(newScore, newTimeMs, existingScore, existingTimeMs) {
  * Only saves to Firestore if presetName is not null and isTraining is false.
  */
 export default function AscensionForm({ score, timer, stats, phaseStats, gameType, presetName, isTraining }) {
+  const { t } = useTranslation()
   const nameRef = useRef()
   const [saved, setSaved] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -27,7 +29,7 @@ export default function AscensionForm({ score, timer, stats, phaseStats, gameTyp
     if (submitting || saved) return
     const name = nameRef.current.value.trim()
     if (!name) {
-      toast.error('Veuillez rentrer un pseudo', { containerId: 'topRightToast' })
+      toast.error(t('messages.please_enter_username'), { containerId: 'topRightToast' })
       return
     }
     setSubmitting(true)
@@ -79,25 +81,25 @@ export default function AscensionForm({ score, timer, stats, phaseStats, gameTyp
 
   return (
     <div className="form-container">
-      <h2 className="form-title">🚀 Ascension terminée !</h2>
-      {presetName && <p className="form-score-display">Preset : <strong>{presetName}</strong></p>}
+      <h2 className="form-title">{t('form.ascension_title')}</h2>
+      {presetName && <p className="form-score-display">{t('labels.preset')} <strong>{presetName}</strong></p>}
 
       <div style={{ display: 'flex', justifyContent: 'space-around', margin: '12px 0' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ color: 'var(--accent-purple)', fontSize: '1.4em', fontWeight: 'bold' }}>
             {formatTime(timer)}
           </div>
-          <div style={{ color: 'var(--text-muted)', fontSize: '0.8em' }}>Temps total</div>
+          <div style={{ color: 'var(--text-muted)', fontSize: '0.8em' }}>{t('labels.total_time')}</div>
         </div>
         <div style={{ textAlign: 'center' }}>
           <div style={{ color: '#fbbf24', fontSize: '1.4em', fontWeight: 'bold' }}>{score}</div>
-          <div style={{ color: 'var(--text-muted)', fontSize: '0.8em' }}>Score</div>
+          <div style={{ color: 'var(--text-muted)', fontSize: '0.8em' }}>{t('labels.score')}</div>
         </div>
         <div style={{ textAlign: 'center' }}>
           <div style={{ color: '#4ade80', fontSize: '1.4em', fontWeight: 'bold' }}>
             {stats.found}/{stats.total}
           </div>
-          <div style={{ color: 'var(--text-muted)', fontSize: '0.8em' }}>Trouvés</div>
+          <div style={{ color: 'var(--text-muted)', fontSize: '0.8em' }}>{t('labels.found')}</div>
         </div>
       </div>
 
@@ -105,9 +107,9 @@ export default function AscensionForm({ score, timer, stats, phaseStats, gameTyp
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82em', marginBottom: '12px' }}>
           <thead>
             <tr style={{ color: 'var(--text-muted)', borderBottom: '1px solid var(--border)' }}>
-              <th style={{ textAlign: 'left', padding: '3px 0' }}>Phase</th>
-              <th style={{ textAlign: 'center' }}>Trouvés</th>
-              <th style={{ textAlign: 'center' }}>Passés</th>
+              <th style={{ textAlign: 'left', padding: '3px 0' }}>{t('labels.phase')}</th>
+              <th style={{ textAlign: 'center' }}>{t('labels.found')}</th>
+              <th style={{ textAlign: 'center' }}>{t('game_hud.skipped')}</th>
               <th style={{ textAlign: 'right' }}>Temps</th>
             </tr>
           </thead>
@@ -130,34 +132,34 @@ export default function AscensionForm({ score, timer, stats, phaseStats, gameTyp
         <>
           {blockedByBetter && (
             <div className="form-blocked">
-              <p className="form-blocked-message">⚠️ Ce pseudo a déjà un meilleur temps :</p>
+              <p className="form-blocked-message">⚠️ {t('form.better_ascension_time')}</p>
               <p className="form-blocked-score">
-                <strong>{formatTime(blockedByBetter.timeMs)}</strong> — {blockedByBetter.score} pts
+                <strong>{formatTime(blockedByBetter.timeMs)}</strong> — {blockedByBetter.score} {t('units.pts')}
               </p>
-              <p className="form-blocked-hint">Enregistrez sous un autre nom.</p>
+              <p className="form-blocked-hint">{t('form.use_different_name')}</p>
             </div>
           )}
           <form onSubmit={handleSave}>
-            <label htmlFor="ascension-name" className="form-label">Pseudo</label>
+            <label htmlFor="ascension-name" className="form-label">{t('labels.username')}</label>
             <input
               type="text"
               id="ascension-name"
               ref={nameRef}
               className="form-input"
-              placeholder="Ton pseudo..."
+              placeholder={t('placeholders.username')}
               maxLength={20}
               onChange={() => setBlockedByBetter(null)}
             />
             <button type="submit" className="form-submit" disabled={saved || submitting}>
-              {submitting ? 'Sauvegarde...' : 'Sauvegarder le score'}
+              {submitting ? t('form.saving') : t('buttons.save_score')}
             </button>
           </form>
         </>
       )}
-      {saved && <p style={{ color: '#4ade80', textAlign: 'center' }}>Score sauvegardé ✓</p>}
+      {saved && <p style={{ color: '#4ade80', textAlign: 'center' }}>{t('form.score_saved')}</p>}
       {!canSave && (
         <p style={{ color: 'var(--text-muted)', fontSize: '0.85em', textAlign: 'center' }}>
-          {isTraining ? 'Mode entraînement — score non enregistré' : 'Config custom — score non enregistré'}
+          {isTraining ? t('form.training_mode_not_saved') : t('form.custom_config_not_saved')}
         </p>
       )}
     </div>

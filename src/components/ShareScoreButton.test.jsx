@@ -2,6 +2,17 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import ShareScoreButton from './ShareScoreButton'
 
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key) => ({
+      'share.copy_button': '📋 Copier les résultats',
+      'share.copied': '✓ Résultat copié !',
+      'share.pseudo_placeholder': 'Ton pseudo (optionnel)',
+      'share.anonymous': 'Anonyme',
+    }[key] ?? key),
+  }),
+}))
+
 vi.mock('../utils/shareScore', () => ({
   copyShareText: vi.fn().mockResolvedValue(undefined),
 }))

@@ -1,9 +1,12 @@
 ﻿import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
 import L from 'leaflet'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { checkAnswer, normalize } from '../utils/normalizeAnswer'
+import { getAllCountryNames, getCountryName } from '../utils/getCountryName'
+import countryAliases from '../data/countryAliases.json'
 
 const DAILY_TIME_ZONE = 'Europe/Paris'
 const DAILY_STORAGE_PREFIX = 'border-guess-daily'
@@ -102,6 +105,29 @@ const COUNTRY_LOOKUP = (() => {
       entries.set(normalize(name), country)
     })
   })
+
+  // Extend with EN and RU names so users can type in those languages
+  for (const feature of BORDER_GUESS_COUNTRIES) {
+    const iso = feature.properties.ISO_A2
+    for (const lang of ['en', 'ru']) {
+      const name = getCountryName(iso, lang)
+      if (name) {
+        const key = normalize(name)
+        if (!entries.has(key)) entries.set(key, feature)
+      }
+    }
+  }
+
+  // Extend with abbreviations and colloquial names (USA, UK, РФ, etc.)
+  for (const feature of BORDER_GUESS_COUNTRIES) {
+    const iso = feature.properties.ISO_A2?.toUpperCase()
+    if (!iso) continue
+    const extraAliases = countryAliases[iso] ?? []
+    for (const alias of extraAliases) {
+      const key = normalize(alias)
+      if (!entries.has(key)) entries.set(key, feature)
+    }
+  }
 
   return entries
 })()
@@ -224,6 +250,7 @@ function getDirectionArrow(direction) {
 export default function useBorderGuessState(mode, options = {}) {
   const { overrideCountry = null, initialGuesses = null } = options
   const navigate = useNavigate()
+  const { t, i18n } = useTranslation()
   const [currentCountry, setCurrentCountry] = useState(null)
   const [inputValue, setInputValue] = useState('')
   const [guesses, setGuesses] = useState([])
@@ -305,18 +332,15 @@ export default function useBorderGuessState(mode, options = {}) {
   }, [currentCountry, dailyKey, guesses, mode, status, startedAt, elapsedTime])
 
   const availableCountrySuggestions = useMemo(() => {
+    const lang = i18n.language
     const suggestions = new Set()
-
     BORDER_GUESS_COUNTRIES.forEach((country) => {
-      const names = [country.properties.ADMIN, ...(country.properties.aliases ?? [])]
-
-      names.forEach((name) => {
-        suggestions.add(name)
-      })
+      const localizedName = getCountryName(country.properties.ISO_A2, lang) || country.properties.ADMIN
+      suggestions.add(localizedName)
     })
-
-    return [...suggestions].sort((a, b) => a.localeCompare(b, 'fr'))
-  }, [])
+    const sortLocale = lang === 'ru' ? 'ru' : lang === 'en' ? 'en' : 'fr'
+    return [...suggestions].sort((a, b) => a.localeCompare(b, sortLocale))
+  }, [i18n.language])
 
   const filteredCountrySuggestions = useMemo(() => {
     const normalizedInput = normalize(inputValue)
@@ -346,7 +370,7 @@ export default function useBorderGuessState(mode, options = {}) {
     const normalizedGuess = normalize(nextGuess)
     const alreadyTried = guesses.some((guess) => guess.normalizedInput === normalizedGuess)
     if (alreadyTried) {
-      toast.info('Tu as déjà proposé ce pays.', { containerId: 'topRightToast' })
+      toast.info(t('toasts.already_proposed'), { containerId: 'topRightToast' })
       return
     }
 
@@ -357,11 +381,18 @@ export default function useBorderGuessState(mode, options = {}) {
     }
 
     const guessedName = guessedCountry.properties.ADMIN
-    const isCorrect = checkAnswer(guessedName, answerName, currentCountry.properties.aliases ?? [])
+    const guessedISO = guessedCountry.properties.ISO_A2 ?? null
+    const extraNames = getAllCountryNames(
+      currentCountry.properties.ISO_A2,
+      answerName,
+      currentCountry.properties.aliases ?? []
+    )
+    const isCorrect = checkAnswer(guessedName, answerName, currentCountry.properties.aliases ?? [], extraNames)
     const nextGuesses = [
       ...guesses,
       {
         value: guessedName,
+        iso: guessedISO,
         normalizedInput: normalizedGuess,
         isCorrect,
         distanceKm: isCorrect ? 0 : getDistanceKm(guessedName, answerName),
@@ -377,12 +408,12 @@ export default function useBorderGuessState(mode, options = {}) {
       const finalElapsed = startedAt != null ? Date.now() - startedAt : null
       setElapsedTime(finalElapsed)
       setStatus('won')
-      toast.success(`Bravo ! C'était ${answerName}.`, { containerId: 'topRightToast' })
+      toast.success(t('toasts.country_was', { name: getCountryName(currentCountry.properties.ISO_A2, i18n.language) || answerName }), { containerId: 'topRightToast' })
       return
     }
 
 
-    toast.error("Ce n'est pas le bon pays.", { containerId: 'topRightToast' })
+    toast.error(t('toasts.wrong'), { containerId: 'topRightToast' })
   }
 
   const startNextInfiniteRound = () => {
@@ -392,20 +423,21 @@ export default function useBorderGuessState(mode, options = {}) {
     setGuesses([])
     setStatus('playing')
     setInputValue('')
-    toast.info('Nouveau pays chargé.', { containerId: 'topRightToast' })
+    toast.info(t('toasts.found_country', { name: getCountryName(nextCountry.properties.ISO_A2, i18n.language) || nextCountry.properties.ADMIN }), { containerId: 'topRightToast' })
   }
 
   const revealCountry = () => {
     if (!currentCountry || isComplete) return
     setStatus('lost')
     setInputValue('')
-    toast.info(`Le pays était ${answerName}.`, { containerId: 'topRightToast' })
+    toast.info(t('toasts.country_was', { name: getCountryName(currentCountry.properties.ISO_A2, i18n.language) || answerName }), { containerId: 'topRightToast' })
   }
 
   const goHome = () => navigate('/')
 
   return {
     currentCountry,
+    currentCountryISO: currentCountry?.properties?.ISO_A2 ?? null,
     inputValue,
     setInputValue,
     guesses,

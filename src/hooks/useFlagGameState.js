@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { formatTime } from '../utils/formatTime'
 import { checkAnswer } from '../utils/normalizeAnswer'
+import { getAllCountryNames, getCountryName } from '../utils/getCountryName'
 import { saveSnapshot } from '../utils/multiplayerSnapshot'
 
 const DIFFICULTIES = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
@@ -37,6 +39,7 @@ let alreadyChosenCountries = []
 
 export default function useFlagGameState(difficulty, isTraining, overrideCountries = null, mpSnapshot = null, mpSnapshotKey = null, continent = null) {
   const navigate = useNavigate()
+  const { t, i18n } = useTranslation()
 
   const [targetCountry, setTargetCountry] = useState(null)
   const targetCountryRef = useRef(null)
@@ -155,7 +158,7 @@ export default function useFlagGameState(difficulty, isTraining, overrideCountri
     if (!allProcessed || !gameStarted || gameOverToastShownRef.current) return
     gameOverToastShownRef.current = true
     if (isTraining) {
-      toast.success('Bravo ! Vous avez trouvé tous les drapeaux !', {
+      toast.success(t('toasts.all_flags_found'), {
         containerId: 'centerToast',
       })
     }
@@ -200,12 +203,15 @@ export default function useFlagGameState(difficulty, isTraining, overrideCountri
     // consecutiveErrors is read from ref because it may be incremented in the same call.
     if (!gameStartedRef.current || !targetCountryRef.current || revealedName) return
     const props = targetCountryRef.current.properties
-    const isCorrect = checkAnswer(inputValue, props.ADMIN, props.aliases ?? [])
+    const iso = props.ISO_A2
+    const aliases = props.aliases ?? []
+    const extraNames = getAllCountryNames(iso, props.ADMIN, aliases)
+    const isCorrect = checkAnswer(inputValue, props.ADMIN, aliases, extraNames)
 
     if (isCorrect) {
       const wasSkipped = clickOnSeeCountryRef.current
       if (!wasSkipped) {
-        toast.success('Bravo ! ' + props.ADMIN + ' !', { containerId: 'topRightToast' })
+        toast.success(t('toasts.found_country', { name: getCountryName(props.ISO_A2, i18n.language) || props.ADMIN }), { containerId: 'topRightToast' })
         incrementScore(props.DifficultyFlag, consecutiveErrorsRef.current)
       }
       setStats(prev =>
@@ -222,10 +228,10 @@ export default function useFlagGameState(difficulty, isTraining, overrideCountri
       consecutiveErrorsRef.current = newErrors
       setStats(prev => ({ ...prev, totalErrors: (prev.totalErrors ?? 0) + 1 }))
       if (newErrors >= 3) {
-        toast.error('Dommage ! C\'est ' + props.ADMIN, { containerId: 'topRightToast' })
+        toast.error(t('toasts.location_reveal', { name: getCountryName(props.ISO_A2, i18n.language) || props.ADMIN }), { containerId: 'topRightToast' })
         setRevealedName(props.ADMIN)
       } else {
-        toast.error('Dommage !', { containerId: 'topRightToast' })
+        toast.error(t('toasts.wrong'), { containerId: 'topRightToast' })
       }
       setInputValue('')
     }
@@ -316,6 +322,7 @@ export default function useFlagGameState(difficulty, isTraining, overrideCountri
 
   return {
     targetCountry,
+    targetCountryISO: targetCountry?.properties?.ISO_A2 ?? null,
     score,
     timer,
     stats,

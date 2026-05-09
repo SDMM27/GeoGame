@@ -1,5 +1,6 @@
 import React from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import NavBar from '../components/NavBar'
 import Scoreboard from './Scoreboard'
 import AscensionScoreboard from './AscensionScoreboard'
@@ -7,6 +8,7 @@ import { GAME_TYPES } from '../utils/gameTypes'
 import './scoreboard.css'
 
 export default function ScoresPage() {
+  const { t } = useTranslation()
   const [searchParams] = useSearchParams()
   const game = searchParams.get('game') ?? GAME_TYPES.PLACEMENT
   const initialMode = searchParams.get('mode') === 'ascension' ? 'ascension' : 'standard'
@@ -19,19 +21,19 @@ export default function ScoresPage() {
           className={`scoreboard-mode-tab ${mode === 'standard' ? 'scoreboard-mode-tab--active' : ''}`}
           onClick={() => setMode('standard')}
         >
-          Standard
+          {t('modes.standard')}
         </button>
         <button
           className={`scoreboard-mode-tab ${mode === 'ascension' ? 'scoreboard-mode-tab--active' : ''}`}
           onClick={() => setMode('ascension')}
         >
-          🚀 Ascension
+          {t('modes.ascension')}
         </button>
         <button
           className={`scoreboard-mode-tab ${mode === 'continent' ? 'scoreboard-mode-tab--active' : ''}`}
           onClick={() => setMode('continent')}
         >
-          🌍 Continent
+          {t('modes.continent')}
         </button>
       </div>
       {mode === 'ascension'

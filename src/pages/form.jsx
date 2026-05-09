@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { useTranslation } from 'react-i18next';
 import "./form.css";
 import "react-toastify/dist/ReactToastify.css";
 import { firestore } from "../Firebase";
@@ -13,6 +14,7 @@ function isBetter(newScore, newTime, existingScore, existingTime) {
 }
 
 export default function Form({ finalScore, difficulty, elapsedTime, gameType, continent }) {
+  const { t } = useTranslation();
   const nameRef = useRef();
   const ref = collection(firestore, "scores");
   const [saved, setSaved] = useState(false);
@@ -24,7 +26,7 @@ export default function Form({ finalScore, difficulty, elapsedTime, gameType, co
     if (submitting || saved) return;
     const name = nameRef.current.value.trim();
     if (!name) {
-      toast.error("Veuillez rentrer un pseudo", { containerId: "topRightToast" });
+      toast.error(t('messages.please_enter_username'), { containerId: "topRightToast" });
       return;
     }
     setSubmitting(true);
@@ -74,37 +76,37 @@ export default function Form({ finalScore, difficulty, elapsedTime, gameType, co
 
   return (
     <div className="form-container">
-      <h2 className="form-title">Partie terminée !</h2>
+      <h2 className="form-title">{t('form.title')}</h2>
       <p className="form-score-display">
-        Score : <strong>{finalScore} pts</strong> — {difficulty}
+        {t('labels.score')} <strong>{finalScore} {t('units.pts')}</strong> — {difficulty}
       </p>
       <p className="form-score-display">
-        Temps : <strong>{formatTime(elapsedTime)}</strong>
+        {t('labels.time')} <strong>{formatTime(elapsedTime)}</strong>
       </p>
 
       {blockedByBetterScore && (
         <div className="form-blocked">
           <p className="form-blocked-message">
-            ⚠️ Ce pseudo a déjà un meilleur score dans cette difficulté&nbsp;:
+            ⚠️ {t('form.better_score_exists')}
           </p>
           <p className="form-blocked-score">
-            <strong>{blockedByBetterScore.score} pts</strong> — {formatTime(blockedByBetterScore.elapsedTime)}
+            <strong>{blockedByBetterScore.score} {t('units.pts')}</strong> — {formatTime(blockedByBetterScore.elapsedTime)}
           </p>
-          <p className="form-blocked-hint">Veuillez enregistrer votre score sous un autre nom.</p>
+          <p className="form-blocked-hint">{t('form.use_different_name')}</p>
         </div>
       )}
       <form onSubmit={handleSave}>
-        <label htmlFor="name" className="form-label">Pseudo</label>
+        <label htmlFor="name" className="form-label">{t('labels.username')}</label>
         <input
           type="text"
           id="name"
           ref={nameRef}
           className="form-input"
-          placeholder="Ton pseudo..."
+          placeholder={t('placeholders.username')}
           maxLength={20}
         />
         <button type="submit" className="form-submit" disabled={saved || submitting}>
-          {saved ? 'Score sauvegardé ✓' : submitting ? 'Sauvegarde...' : 'Sauvegarder le score'}
+          {saved ? t('form.score_saved') : submitting ? t('form.saving') : t('buttons.save_score')}
         </button>
       </form>
     </div>

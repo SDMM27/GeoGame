@@ -1,5 +1,9 @@
 // src/utils/dateUtils.js
-export function getLast7Days(todayKey) {
+export function getLast7Days(todayKey, lang = 'fr') {
+  const locale = lang === 'ru' ? 'ru-RU' : lang === 'en' ? 'en-US' : 'fr-FR'
+  const todayLabel = lang === 'ru' ? 'Сегодня' : lang === 'en' ? 'Today' : "Aujourd'hui"
+  const yesterdayLabel = lang === 'ru' ? 'Вчера' : lang === 'en' ? 'Yesterday' : 'Hier'
+
   const [y, m, d] = todayKey.split('-').map(Number)
   const baseDate = new Date(y, m - 1, d)
   return Array.from({ length: 7 }, (_, i) => {
@@ -7,9 +11,9 @@ export function getLast7Days(todayKey) {
     date.setDate(baseDate.getDate() - i)
     const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
     const label =
-      i === 0 ? "Aujourd'hui" :
-      i === 1 ? 'Hier' :
-      date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+      i === 0 ? todayLabel :
+      i === 1 ? yesterdayLabel :
+      date.toLocaleDateString(locale, { day: 'numeric', month: 'short' })
     return { key, label }
   })
 }

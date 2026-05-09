@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { addDoc, collection, getDocs, query, where, deleteDoc } from 'firebase/firestore'
 import { toast } from 'react-toastify'
 import { firestore } from '../Firebase'
@@ -7,6 +8,7 @@ import { formatTime } from '../utils/formatTime'
 import './DailyLeaderboard.css'
 
 export default function DailyForm({ attempts, elapsedTime, guesses, gameType, dailyKey, statText, hints }) {
+  const { t } = useTranslation()
   const nameRef = useRef()
   const savedKey = `daily-saved:${gameType}:${dailyKey}`
   const [saved, setSaved] = useState(() => !!localStorage.getItem(savedKey))
@@ -19,7 +21,7 @@ export default function DailyForm({ attempts, elapsedTime, guesses, gameType, da
     if (submitting || saved) return
     const name = nameRef.current.value.trim()
     if (!name) {
-      toast.error('Veuillez rentrer un pseudo', { containerId: 'topRightToast' })
+      toast.error(t('messages.please_enter_username'), { containerId: 'topRightToast' })
       return
     }
     setSubmitting(true)
@@ -55,30 +57,30 @@ export default function DailyForm({ attempts, elapsedTime, guesses, gameType, da
 
   return (
     <div className="daily-form">
-      <h2 className="daily-form__title">Partie terminée !</h2>
-      <p className="daily-form__stat">{statText ?? `${attempts} essai${attempts > 1 ? 's' : ''} — ${elapsedTime != null ? formatTime(elapsedTime) : '—'}`}</p>
+      <h2 className="daily-form__title">{t('form.title')}</h2>
+      <p className="daily-form__stat">{statText ?? `${attempts} ${attempts === 1 ? t('units.attempt_one') : t('units.attempt_other')} — ${elapsedTime != null ? formatTime(elapsedTime) : '—'}`}</p>
 
       {blockedByBetter && (
         <div className="daily-form__blocked">
-          <p>Ce pseudo a déjà un meilleur score pour ce puzzle : <strong>{blockedByBetter.attempts} essai{blockedByBetter.attempts > 1 ? 's' : ''} — {formatTime(blockedByBetter.elapsedTime)}</strong>.</p>
-          <p className="daily-form__blocked-hint">Enregistrez sous un autre nom.</p>
+          <p>{t('form.better_daily_score')} <strong>{blockedByBetter.attempts} {blockedByBetter.attempts === 1 ? t('units.attempt_one') : t('units.attempt_other')} — {formatTime(blockedByBetter.elapsedTime)}</strong>.</p>
+          <p className="daily-form__blocked-hint">{t('form.use_different_name_daily')}</p>
         </div>
       )}
 
       <form onSubmit={handleSave}>
-        <label htmlFor="daily-pseudo" className="daily-form__label">Pseudo</label>
+        <label htmlFor="daily-pseudo" className="daily-form__label">{t('labels.username')}</label>
         <input
           id="daily-pseudo"
           ref={nameRef}
           className="daily-form__input"
           type="text"
-          placeholder="Ton pseudo..."
+          placeholder={t('placeholders.username')}
           maxLength={20}
           disabled={saved}
           onChange={() => { if (blockedByBetter) setBlockedByBetter(null) }}
         />
         <button type="submit" className="daily-form__submit" disabled={saved || submitting}>
-          {saved ? 'Score sauvegardé ✓' : submitting ? 'Sauvegarde...' : 'Sauvegarder le score'}
+          {saved ? t('form.score_saved') : submitting ? t('form.saving') : t('buttons.save_score')}
         </button>
       </form>
     </div>

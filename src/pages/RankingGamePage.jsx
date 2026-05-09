@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import { addDoc, collection, getDocs, query, where, deleteDoc } from 'firebase/firestore'
 import { toast } from 'react-toastify'
@@ -9,23 +10,17 @@ import ShareScoreButton from '../components/ShareScoreButton'
 import useRankingGameState from '../hooks/useRankingGameState'
 import { GAME_TYPES } from '../utils/gameTypes'
 import { firestore } from '../Firebase'
+import { getCountryName } from '../utils/getCountryName'
 import './RankingGamePage.css'
 
 const FLAG_URL = (iso2) =>
   iso2 ? `https://flagcdn.com/w40/${iso2.toLowerCase()}.png` : null
 
-const CATEGORY_OPTIONS = [
-  { key: null,         emoji: '🎲', label: 'Aléatoire' },
-  { key: 'population', emoji: '👥', label: 'Population' },
-  { key: 'area',       emoji: '🗺️', label: 'Superficie' },
-  { key: 'gdp',        emoji: '💰', label: 'PIB' },
-]
-
-function CriterionBanner({ criterion }) {
+function CriterionBanner({ criterion, t }) {
   if (!criterion) return null
   return (
     <div className="ranking-criterion">
-      <div className="ranking-criterion-label">Critère</div>
+      <div className="ranking-criterion-label">{t('labels.criterion')}</div>
       <div className="ranking-criterion-name">{criterion.label}</div>
       <div className="ranking-criterion-hint">{criterion.consigne}</div>
     </div>
@@ -33,12 +28,20 @@ function CriterionBanner({ criterion }) {
 }
 
 export default function RankingGamePage() {
+  const { t, i18n } = useTranslation()
   const location = useLocation()
   const initialMode = location.state?.mode ?? 'daily'
   const [mode, setMode] = useState(initialMode)
   const [countryCount, setCountryCount] = useState(5)
   const [submitName, setSubmitName] = useState('')
   const [submitting, setSubmitting] = useState(false)
+
+  const CATEGORY_OPTIONS = [
+    { key: null,         emoji: '🎲', label: t('ranking.random') },
+    { key: 'population', emoji: '👥', label: t('ranking.population') },
+    { key: 'area',       emoji: '🗺️', label: t('ranking.area') },
+    { key: 'gdp',        emoji: '💰', label: t('ranking.gdp') },
+  ]
 
   const {
     criterion,
@@ -75,7 +78,7 @@ export default function RankingGamePage() {
     e.preventDefault()
     const name = submitName.trim()
     if (!name) {
-      toast.error('Veuillez entrer un pseudo', { containerId: 'topRightToast' })
+      toast.error(t('messages.please_enter_username'), { containerId: 'topRightToast' })
       return
     }
     setSubmitting(true)
@@ -98,7 +101,7 @@ export default function RankingGamePage() {
         if (better) {
           await deleteDoc(existing.docs[0].ref)
         } else {
-          toast.info('Tu as déjà un meilleur score enregistré.', { containerId: 'topRightToast' })
+          toast.info(t('ranking.better_score_exists'), { containerId: 'topRightToast' })
           setSubmitting(false)
           return
         }
@@ -116,9 +119,9 @@ export default function RankingGamePage() {
 
       if (rankingSavedKey) localStorage.setItem(rankingSavedKey, '1')
       setLeaderboardSubmitted(true)
-      toast.success('Score enregistré !', { containerId: 'topRightToast' })
+      toast.success(t('messages.score_saved'), { containerId: 'topRightToast' })
     } catch {
-      toast.error('Erreur lors de la sauvegarde.', { containerId: 'topRightToast' })
+      toast.error(t('messages.save_error'), { containerId: 'topRightToast' })
     }
     setSubmitting(false)
   }
@@ -151,7 +154,7 @@ export default function RankingGamePage() {
     <div className="ranking-game-page">
       <NavBar />
       <div className="ranking-game-main">
-        <h1 className="ranking-game-title">Country Ranking</h1>
+        <h1 className="ranking-game-title">{t('ranking.title')}</h1>
 
         {/* Mode tabs */}
         <div className="ranking-mode-tabs">
@@ -161,7 +164,7 @@ export default function RankingGamePage() {
               className={`ranking-mode-tab${mode === m ? ' ranking-mode-tab--active' : ''}`}
               onClick={() => setMode(m)}
             >
-              {m === 'daily' ? 'Journalier' : 'Infini'}
+              {m === 'daily' ? t('modes.daily') : t('modes.infinite')}
             </button>
           ))}
         </div>
@@ -180,13 +183,13 @@ export default function RankingGamePage() {
             />
             <div className="ranking-slider-labels">
               <span className={`ranking-slider-label ranking-slider-label--easy${countryCount <= 5 ? ' ranking-slider-label--active' : ''}`}>
-                Facile<br />3–5
+                {t('difficulties.easy_range')}
               </span>
               <span className={`ranking-slider-label ranking-slider-label--medium${countryCount >= 6 && countryCount <= 12 ? ' ranking-slider-label--active' : ''}`}>
-                Moyen<br />6–12
+                {t('difficulties.medium_range')}
               </span>
               <span className={`ranking-slider-label ranking-slider-label--hard${countryCount >= 13 ? ' ranking-slider-label--active' : ''}`}>
-                Difficile<br />13–20
+                {t('difficulties.hard_range')}
               </span>
             </div>
           </div>
@@ -195,7 +198,7 @@ export default function RankingGamePage() {
         {/* Category selection — infinite mode only */}
         {mode === 'infinite' && status === 'choosing-category' && (
           <div className="ranking-category-selection">
-            <div className="ranking-category-title">Choisir une catégorie</div>
+            <div className="ranking-category-title">{t('ranking.choose_category')}</div>
             {CATEGORY_OPTIONS.map(({ key, emoji, label }) => (
               <button
                 key={key ?? '__random__'}
@@ -210,12 +213,12 @@ export default function RankingGamePage() {
         )}
 
         {/* Criterion banner */}
-        <CriterionBanner criterion={criterion} />
+        <CriterionBanner criterion={criterion} t={t} />
 
         {/* === PLAYING === */}
         {status === 'playing' && (
           <>
-            <div className="ranking-drag-hint">Glisse pour réordonner</div>
+            <div className="ranking-drag-hint">{t('ranking.drag_hint')}</div>
             <div className="ranking-attempt-counter">
               Essai {attemptNumber} / 3
             </div>
@@ -250,7 +253,7 @@ export default function RankingGamePage() {
                                     onError={(e) => { e.target.style.display = 'none' }}
                                   />
                                 )}
-                                <span className="ranking-country-name">{country.properties.ADMIN}</span>
+                                <span className="ranking-country-name">{getCountryName(country.properties.ISO_A2, i18n.language) || country.properties.ADMIN}</span>
                               </div>
                             )}
                           </Draggable>
@@ -262,7 +265,7 @@ export default function RankingGamePage() {
                 </DragDropContext>
 
                 <button className="ranking-submit-btn" onClick={handleSubmit}>
-                  ✓ Soumettre mon classement
+                  {t('buttons.submit_ranking')}
                 </button>
               </>
             ) : (
@@ -282,7 +285,7 @@ export default function RankingGamePage() {
                           onError={(e) => { e.target.style.display = 'none' }}
                         />
                       )}
-                      <span className="ranking-country-name">{country.properties.ADMIN}</span>
+                      <span className="ranking-country-name">{getCountryName(country.properties.ISO_A2, i18n.language) || country.properties.ADMIN}</span>
                     </div>
                   ))}
                 </div>
@@ -304,18 +307,18 @@ export default function RankingGamePage() {
                 {score} pt{score !== 1 ? 's' : ''}
               </div>
               <div className="ranking-score-sub">
-                Erreur totale : {totalError} position{totalError !== 1 ? 's' : ''}
+                {t('ranking.total_error')} {totalError} position{totalError !== 1 ? 's' : ''}
               </div>
             </div>
             <ShareScoreButton
               score={score}
               gameType="RANKING"
               difficulty={mode === 'daily' ? 'Daily' : 'Infini'}
-              details={`Erreur totale : ${totalError} position${totalError !== 1 ? 's' : ''}`}
+              details={t('share.details_ranking_error', { count: totalError })}
             />
 
             {/* Correct ranking revealed */}
-            <div className="ranking-results-title">Classement correct</div>
+            <div className="ranking-results-title">{t('ranking.correct_ranking')}</div>
             {correctOrder.map((country, index) => {
               const playerIdx = countries.findIndex(
                 (c) => c.properties.ISO_A3 === country.properties.ISO_A3
@@ -339,13 +342,13 @@ export default function RankingGamePage() {
                       onError={(e) => { e.target.style.display = 'none' }}
                     />
                   )}
-                  <span className="ranking-result-country">{country.properties.ADMIN}</span>
+                  <span className="ranking-result-country">{getCountryName(country.properties.ISO_A2, i18n.language) || country.properties.ADMIN}</span>
                   <div className="ranking-result-meta">
                     <div className="ranking-result-value">{formattedVal}</div>
                     {isCorrect
                       ? <span className="ranking-result-status--correct">✓ correct</span>
                       : <span className="ranking-result-status--wrong">
-                          mis #{playerIdx + 1} (écart de {Math.abs(playerIdx - index)})
+                          {t('ranking.placed_at')}{playerIdx + 1} ({t('ranking.difference_of')} {Math.abs(playerIdx - index)})
                         </span>
                     }
                   </div>
@@ -358,7 +361,7 @@ export default function RankingGamePage() {
               <form onSubmit={submitToLeaderboard} className="ranking-leaderboard-form">
                 <input
                   className="ranking-leaderboard-input"
-                  placeholder="Ton pseudo"
+                  placeholder={t('labels.your_username')}
                   value={submitName}
                   onChange={(e) => setSubmitName(e.target.value)}
                   maxLength={30}
@@ -378,7 +381,7 @@ export default function RankingGamePage() {
 
             {mode === 'infinite' && (
               <button className="ranking-next-btn" onClick={startNextRound}>
-                ▶ Round suivant
+                {t('buttons.next_round')}
               </button>
             )}
           </>

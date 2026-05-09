@@ -1,9 +1,11 @@
 // src/components/multiplayer/LobbyScreen.jsx
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { joinRoom, launchRoom } from '../../utils/multiplayerRoom'
 import './LobbyScreen.css'
 
 export default function LobbyScreen({ room, playerId, onPseudoSet }) {
+  const { t } = useTranslation()
   const [pseudo, setPseudo] = useState('')
   const [joining, setJoining] = useState(false)
 
@@ -32,19 +34,19 @@ export default function LobbyScreen({ room, playerId, onPseudoSet }) {
   if (!isInRoom) {
     return (
       <div className="lobby-join">
-        <h2 className="lobby-join-title">Rejoindre la partie</h2>
-        <p className="lobby-join-code">Code : <strong>{room.id}</strong></p>
+        <h2 className="lobby-join-title">{t('lobby.join_title')}</h2>
+        <p className="lobby-join-code">{t('labels.code')} <strong>{room.id}</strong></p>
         <form onSubmit={handleJoin} className="lobby-join-form">
           <input
             className="lobby-pseudo-input"
-            placeholder="Ton pseudo"
+            placeholder={t('placeholders.username')}
             value={pseudo}
             onChange={e => setPseudo(e.target.value)}
             maxLength={20}
             autoFocus
           />
           <button type="submit" className="lobby-join-btn" disabled={!pseudo.trim() || joining}>
-            {joining ? 'Connexion...' : 'Rejoindre'}
+            {joining ? t('lobby.connecting') : t('buttons.join')}
           </button>
         </form>
       </div>
@@ -53,14 +55,14 @@ export default function LobbyScreen({ room, playerId, onPseudoSet }) {
 
   return (
     <div className="lobby">
-      <h2 className="lobby-title">Salle d'attente</h2>
+      <h2 className="lobby-title">{t('lobby.waiting_room')}</h2>
 
       <div className="lobby-invite">
-        <span className="lobby-invite-label">Lien d'invitation</span>
+        <span className="lobby-invite-label">{t('lobby.invite_link')}</span>
         <div className="lobby-invite-row">
           <code className="lobby-invite-code">{room.id}</code>
           <button className="lobby-copy-btn" type="button" onClick={handleCopyLink}>
-            Copier le lien
+            {t('buttons.copy_link')}
           </button>
         </div>
       </div>
@@ -72,8 +74,8 @@ export default function LobbyScreen({ room, playerId, onPseudoSet }) {
             className={`lobby-player${player.disconnected ? ' lobby-player--disconnected' : ''}${pid === room.hostId ? ' lobby-player--host' : ''}`}
           >
             <span className="lobby-player-pseudo">{player.pseudo}</span>
-            {pid === room.hostId && <span className="lobby-host-badge">Host</span>}
-            {player.disconnected && <span className="lobby-dc-badge">Déconnecté</span>}
+            {pid === room.hostId && <span className="lobby-host-badge">{t('labels.host')}</span>}
+            {player.disconnected && <span className="lobby-dc-badge">{t('labels.disconnected')}</span>}
           </li>
         ))}
       </ul>
@@ -85,10 +87,10 @@ export default function LobbyScreen({ room, playerId, onPseudoSet }) {
           onClick={handleLaunch}
           disabled={!canLaunch}
         >
-          {canLaunch ? 'Lancer la partie' : 'En attente de joueurs... (min. 2)'}
+          {canLaunch ? t('buttons.launch_game') : t('lobby.waiting_for_players')}
         </button>
       ) : (
-        <p className="lobby-waiting">En attente du lancement par le host...</p>
+        <p className="lobby-waiting">{t('lobby.waiting_for_host')}</p>
       )}
     </div>
   )

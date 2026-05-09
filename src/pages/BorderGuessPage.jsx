@@ -1,7 +1,9 @@
 ﻿import React, { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import { GeoJSON, MapContainer, useMap } from 'react-leaflet'
 import { ToastContainer } from 'react-toastify'
+import { getCountryName } from '../utils/getCountryName'
 import NavBar from '../components/NavBar'
 import ShareScoreButton from '../components/ShareScoreButton'
 import useBorderGuessState from '../hooks/useBorderGuessState'
@@ -27,9 +29,9 @@ function FitCountryBounds({ country }) {
   return null
 }
 
-function GuessHistory({ guesses }) {
+function GuessHistory({ guesses, t, i18n }) {
   if (guesses.length === 0) {
-    return <p className="border-guess-empty">Aucune tentative pour l'instant.</p>
+    return <p className="border-guess-empty">{t('labels.no_attempts')}</p>
   }
 
   return (
@@ -40,7 +42,7 @@ function GuessHistory({ guesses }) {
           className={`border-guess-chip ${guess.isCorrect ? 'border-guess-chip--correct' : 'border-guess-chip--wrong'}`}
         >
           <div className="border-guess-chip-main">
-            <span>{guess.value}</span>
+            <span>{(guess.iso && getCountryName(guess.iso, i18n.language)) || guess.value}</span>
             {!guess.isCorrect && guess.distanceKm != null && (
               <div className="border-guess-hint">
                 {guess.direction && guess.directionArrow && (
@@ -55,7 +57,7 @@ function GuessHistory({ guesses }) {
               </div>
             )}
           </div>
-          <strong>{guess.isCorrect ? 'Trouvé' : 'Raté'}</strong>
+          <strong>{guess.isCorrect ? t('labels.found') : t('labels.missed')}</strong>
         </div>
       ))}
     </div>
@@ -63,10 +65,12 @@ function GuessHistory({ guesses }) {
 }
 
 export default function BorderGuessPage() {
+  const { t, i18n } = useTranslation()
   const location = useLocation()
   const mode = location.state?.mode ?? 'daily'
   const {
     currentCountry,
+    currentCountryISO,
     inputValue,
     setInputValue,
     guesses,
@@ -85,11 +89,13 @@ export default function BorderGuessPage() {
     elapsedTime,
   } = useBorderGuessState(mode)
 
-  const title = mode === 'daily' ? 'BorderGuess Journalier' : 'BorderGuess Infini'
+  const localizedAnswerName = getCountryName(currentCountryISO, i18n.language) || answerName
+
+  const title = mode === 'daily' ? t('borderguess.daily_title') : t('borderguess.infinite_title')
   const subtitle =
     mode === 'daily'
-      ? `Un seul pays par jour, partagé pour tout le monde. Puzzle du ${dailyKey ?? 'jour'}.`
-      : 'Enchaîne autant de silhouettes que tu veux, sans attendre demain.'
+      ? t('borderguess.daily_subtitle')
+      : t('borderguess.infinite_subtitle')
   const trimmedInputValue = inputValue.trim()
   const shouldShowSuggestions =
     !isComplete &&
@@ -110,14 +116,14 @@ export default function BorderGuessPage() {
       <main className="border-guess-main">
         <section className="border-guess-panel border-guess-panel--hero">
           <div>
-            <p className="border-guess-eyebrow">Nouveau jeu</p>
+            <p className="border-guess-eyebrow">{t('labels.new_game')}</p>
             <h1>{title}</h1>
             <p className="border-guess-subtitle">{subtitle}</p>
           </div>
           <div className="border-guess-stats">
             <div className="border-guess-stat">
               <span className="border-guess-stat-value">{guesses.length}</span>
-              <span className="border-guess-stat-label">Tentatives</span>
+              <span className="border-guess-stat-label">{t('labels.attempts')}</span>
             </div>
           </div>
         </section>
@@ -127,7 +133,7 @@ export default function BorderGuessPage() {
             <div className="border-guess-map-frame">
               {mode === 'daily' && !hasStarted ? (
                 <div className="daily-map-placeholder">
-                  Lance le chrono pour révéler les frontières.
+                  {t('borderguess.start_timer_hint')}
                 </div>
               ) : currentCountry ? (
                 <MapContainer
@@ -150,7 +156,7 @@ export default function BorderGuessPage() {
               ) : null}
             </div>
             <p className="border-guess-map-caption">
-              Observe uniquement les frontières du pays, puis propose ta réponse.
+              {t('borderguess.map_caption')}
             </p>
           </div>
 
@@ -158,18 +164,18 @@ export default function BorderGuessPage() {
             <div className="border-guess-input-wrap">
               {mode === 'daily' && !hasStarted && !isComplete && (
                 <button className="daily-start-btn" onClick={startGame}>
-                  Démarrer le chrono
+                  {t('buttons.start_timer')}
                 </button>
               )}
               <label htmlFor="border-guess-input" className="border-guess-label">
-                Ton pays
+                {t('labels.your_country')}
               </label>
               <div className="border-guess-input-overlay">
                 <input
                   id="border-guess-input"
                   className="border-guess-input"
                   type="text"
-                  placeholder="Ex : Japon, Brésil, Maroc..."
+                  placeholder={t('placeholders.country_examples')}
                   value={inputValue}
                   onChange={(event) => setInputValue(event.target.value)}
                   onKeyDown={onKeyDown}
@@ -195,30 +201,30 @@ export default function BorderGuessPage() {
                 onClick={handleSubmit}
                 disabled={!inputValue.trim() || isComplete || (mode === 'daily' && !hasStarted)}
               >
-                Valider
+                {t('buttons.validate')}
               </button>
             </div>
 
-            <GuessHistory guesses={guesses} />
+            <GuessHistory guesses={guesses} t={t} i18n={i18n} />
 
             {isComplete && (
               <ShareScoreButton
                 score={guesses.length}
                 gameType="BORDER_GUESS"
                 difficulty={mode === 'daily' ? 'Daily' : 'Infini'}
-                scoreLabel="ESSAIS"
+                scoreLabel={t('share.score_attempts')}
                 details={isSolved
-                  ? `Trouvé en ${guesses.length} essai${guesses.length > 1 ? 's' : ''}`
-                  : `Non trouvé (${guesses.length} essai${guesses.length > 1 ? 's' : ''})`}
+                  ? t('share.details_found_attempts', { count: guesses.length })
+                  : t('share.details_not_found_attempts', { count: guesses.length })}
               />
             )}
 
             <div className={`border-guess-result${isSolved ? ' border-guess-result--win' : isLost ? ' border-guess-result--lose' : ''}`}>
-              {isSolved && <p>Bien joué, la bonne réponse était <strong>{answerName}</strong>.</p>}
+              {isSolved && <p>{t('borderguess.success_message')} <strong>{localizedAnswerName}</strong>.</p>}
               {isLost && (
                 <p>
-                  La bonne réponse était <strong>{answerName}</strong>.
-                  {mode === 'daily' ? ' Reviens demain pour un nouveau pays.' : ' Lance un nouveau pays pour continuer.'}
+                  {t('borderguess.answer_was')} <strong>{localizedAnswerName}</strong>.
+                  {mode === 'daily' ? ` ${t('borderguess.see_tomorrow')}` : ` ${t('borderguess.start_new_game')}`}
                 </p>
               )}
             </div>
@@ -240,16 +246,16 @@ export default function BorderGuessPage() {
 
             <div className="border-guess-actions">
               <button className="border-guess-secondary" onClick={goHome}>
-                Retour à l'accueil
+                {t('buttons.return_home')}
               </button>
               {!isComplete && (mode !== 'daily' || hasStarted) && (
                 <button className="border-guess-secondary border-guess-secondary--warning" onClick={revealCountry}>
-                  Révéler le pays
+                  {t('buttons.reveal_country')}
                 </button>
               )}
               {mode === 'infinite' && (
                 <button className="border-guess-primary border-guess-action-button" onClick={startNextInfiniteRound}>
-                  Nouveau pays
+                  {t('buttons.new_country')}
                 </button>
               )}
             </div>

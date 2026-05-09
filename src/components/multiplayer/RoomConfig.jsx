@@ -1,5 +1,6 @@
 // src/components/multiplayer/RoomConfig.jsx
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { GAME_TYPES } from '../../utils/gameTypes'
 import { ASCENSION_PRESETS, matchPreset } from '../../utils/ascensionPresets'
 import { getTotalCountries } from '../../hooks/useGameState'
@@ -12,11 +13,11 @@ import './RoomConfig.css'
 const DEFAULT_ASCENSION_PRESET = ASCENSION_PRESETS.find(p => p.name === 'Progressif') ?? ASCENSION_PRESETS[1]
 
 export const GAME_META = {
-  [GAME_TYPES.PLACEMENT]:    { label: 'Trouve le Pays',    icon: '🌍', hasMode: true },
-  [GAME_TYPES.FLAGS]:        { label: 'Trouve le Drapeau', icon: '🚩', hasMode: true },
-  [GAME_TYPES.CAPITALS]:     { label: 'Trouve la Capitale',icon: '🏛️', hasMode: true },
-  [GAME_TYPES.BORDER_GUESS]: { label: 'BorderGuess',       icon: '🧭', hasMode: false },
-  [GAME_TYPES.COUNTRY_CLUE]: { label: 'Country Clue',      icon: '🔎', hasMode: false },
+  [GAME_TYPES.PLACEMENT]:    { labelKey: 'games.placement.title',  icon: '🌍', hasMode: true },
+  [GAME_TYPES.FLAGS]:        { labelKey: 'games.flags.title',      icon: '🚩', hasMode: true },
+  [GAME_TYPES.CAPITALS]:     { labelKey: 'games.capitals.title',   icon: '🏛️', hasMode: true },
+  [GAME_TYPES.BORDER_GUESS]: { label: 'BorderGuess',               icon: '🧭', hasMode: false },
+  [GAME_TYPES.COUNTRY_CLUE]: { label: 'Country Clue',              icon: '🔎', hasMode: false },
 }
 
 const DIFFICULTIES = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
@@ -53,6 +54,7 @@ export function defaultGame(type) {
 }
 
 export function GameSettings({ game, onChange }) {
+  const { t } = useTranslation()
   const meta = GAME_META[game.type]
 
   if (!meta.hasMode) {
@@ -107,12 +109,12 @@ export function GameSettings({ game, onChange }) {
           type="button"
           className={`rc-mode-tab${game.mode === 'standard' ? ' active' : ''}`}
           onClick={() => onChange({ ...game, mode: 'standard' })}
-        >Standard</button>
+        >{t('modes.standard')}</button>
         <button
           type="button"
           className={`rc-mode-tab${game.mode === 'ascension' ? ' active' : ''}`}
           onClick={() => onChange({ ...game, mode: 'ascension' })}
-        >🚀 Ascension</button>
+        >{t('modes.ascension')}</button>
       </div>
 
       {game.mode === 'standard' ? (
@@ -129,7 +131,7 @@ export function GameSettings({ game, onChange }) {
                 {d === 'Hardcore' ? '💀 Hardcore' : d}
               </span>
               <span className="rc-diff-count">
-                {d === 'Hardcore' ? 'Tous' : countFn(d)}
+                {d === 'Hardcore' ? t('labels.all_countries') : countFn(d)}
               </span>
             </button>
           ))}
@@ -166,6 +168,7 @@ export function GameSettings({ game, onChange }) {
 }
 
 export default function RoomConfig({ onSubmit, submitting }) {
+  const { t } = useTranslation()
   const [pseudo, setPseudo] = useState('')
   const [games, setGames] = useState([defaultGame(GAME_TYPES.PLACEMENT)])
   const [chillMode, setChillMode] = useState(false)
@@ -208,15 +211,15 @@ export default function RoomConfig({ onSubmit, submitting }) {
 
   return (
     <form className="room-config" onSubmit={handleSubmit}>
-      <h2 className="rc-title">Configurer la partie</h2>
+      <h2 className="rc-title">{t('config.title')}</h2>
 
       <div className="rc-pseudo">
-        <label htmlFor="rc-pseudo-input">Ton pseudo</label>
+        <label htmlFor="rc-pseudo-input">{t('labels.your_username')}</label>
         <input
           id="rc-pseudo-input"
           value={pseudo}
           onChange={e => setPseudo(e.target.value)}
-          placeholder="Pseudo"
+          placeholder={t('placeholders.username')}
           maxLength={20}
           required
         />
@@ -229,11 +232,11 @@ export default function RoomConfig({ onSubmit, submitting }) {
           return (
             <div key={game.type} className="rc-game">
               <div className="rc-game-header">
-                <span className="rc-game-label">{meta.icon} {meta.label}</span>
+                <span className="rc-game-label">{meta.icon} {meta.labelKey ? t(meta.labelKey) : meta.label}</span>
                 <div className="rc-game-actions">
-                  <button type="button" onClick={() => moveUp(i)} disabled={i === 0} aria-label="Monter">↑</button>
-                  <button type="button" onClick={() => moveDown(i)} disabled={i === games.length - 1} aria-label="Descendre">↓</button>
-                  <button type="button" onClick={() => removeGame(i)} disabled={games.length === 1} aria-label="Supprimer">✕</button>
+                  <button type="button" onClick={() => moveUp(i)} disabled={i === 0} aria-label={t('buttons.move_up')}>↑</button>
+                  <button type="button" onClick={() => moveDown(i)} disabled={i === games.length - 1} aria-label={t('buttons.move_down')}>↓</button>
+                  <button type="button" onClick={() => removeGame(i)} disabled={games.length === 1} aria-label={t('buttons.delete')}>✕</button>
                 </div>
               </div>
               <GameSettings game={game} onChange={updated => updateGame(i, updated)} />
@@ -243,12 +246,12 @@ export default function RoomConfig({ onSubmit, submitting }) {
 
         {availableToAdd.length > 0 && (
           <div className="rc-add-games">
-            <span className="rc-add-label">Ajouter un jeu :</span>
+            <span className="rc-add-label">{t('config.add_game')}</span>
             {availableToAdd.map(type => {
               const meta = GAME_META[type]
               return (
                 <button key={type} type="button" className="rc-add-btn" onClick={() => addGame(type)}>
-                  + {meta.icon} {meta.label}
+                  + {meta.icon} {meta.labelKey ? t(meta.labelKey) : meta.label}
                 </button>
               )
             })}
@@ -264,16 +267,16 @@ export default function RoomConfig({ onSubmit, submitting }) {
             checked={chillMode}
             onChange={e => setChillMode(e.target.checked)}
           />
-          <span>🛋️ Mode Chill</span>
+          <span>{t('modes.chill')}</span>
           <span className="rc-chill-hint" style={{ color: '#94a3b8', fontSize: '0.85em', marginLeft: 8 }}>
-            Compte à rebours commun · Revue après chaque manche
+            {t('config.chill_hint')}
           </span>
         </label>
 
         {chillMode && (
           <div className="rc-chill-options" style={{ marginTop: 12, paddingLeft: 24 }}>
             <span style={{ color: '#94a3b8', fontSize: '0.85em', display: 'block', marginBottom: 8 }}>
-              Secondes par difficulté :
+              {t('config.seconds_by_difficulty')}
             </span>
             {['Facile', 'Moyen', 'Difficile', 'Impossible'].map(d => (
               <label key={d} className="rc-asc-row" style={{ marginBottom: 6 }}>
@@ -298,7 +301,7 @@ export default function RoomConfig({ onSubmit, submitting }) {
         className="rc-submit"
         disabled={!pseudo.trim() || games.length === 0 || submitting}
       >
-        {submitting ? 'Création en cours...' : 'Créer la partie'}
+        {submitting ? t('config.creating') : t('buttons.create_game')}
       </button>
     </form>
   )

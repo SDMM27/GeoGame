@@ -1,0 +1,350 @@
+{
+  "continents": {
+    "Europe": "Европа",
+    "Asie": "Азия",
+    "Afrique": "Африка",
+    "Amériques": "Америки",
+    "Océanie": "Океания"
+  },
+  "home": {
+    "title": "Выберите игру",
+    "subtitle": "Исследуй - Открывай - Соревнуйся",
+    "multiplayer_button": "🎮 Играть вместе →"
+  },
+  "games": {
+    "placement": {
+      "title": "Найди страну",
+      "description": "Найди все страны выбранной сложности."
+    },
+    "flags": {
+      "title": "Найди флаг",
+      "description": "Определи страну по её флагу."
+    },
+    "capitals": {
+      "title": "Найди столицу",
+      "description": "Найди столицу по флагу и названию страны."
+    },
+    "border_guess": {
+      "title": "BorderGuess",
+      "description": "Угадай страну только по её границам."
+    },
+    "country_clue": {
+      "title": "Country Clue",
+      "description": "Найди страну по подсказкам о расстоянии, направлении и площади."
+    },
+    "voyage_voyage": {
+      "title": "Voyage Voyage",
+      "description": "Соедини две страны через общие границы. Найди кратчайший путь!"
+    },
+    "ranking": {
+      "title": "Country Ranking",
+      "description": "Упорядочи страны от большего к меньшему по критерию: население, площадь или ВВП."
+    },
+    "placement_countries": {
+      "title": "Размести страну",
+      "description": "Поставь страну на нужное место на карте."
+    },
+    "lives_mode": {
+      "title": "Режим жизней",
+      "description": "Найди как можно больше стран без ошибок."
+    }
+  },
+  "modes": {
+    "daily": "Ежедневный",
+    "infinite": "Бесконечный",
+    "standard": "Стандарт",
+    "ascension": "🚀 Восхождение",
+    "chill": "🛋️ Спокойный",
+    "continent": "🌍 Континент"
+  },
+  "buttons": {
+    "play": "Играть",
+    "training": "Тренировка",
+    "scores": "🏆 Очки",
+    "home": "← Главная",
+    "reveal": "👁 Показать",
+    "restart": "↺ Заново",
+    "validate": "Подтвердить",
+    "see": "👁 Смотреть",
+    "start_timer": "Запустить таймер",
+    "return_home": "На главную",
+    "reveal_country": "Раскрыть страну",
+    "new_country": "Новая страна",
+    "new_game": "Новая игра",
+    "new_path": "↺ Новый маршрут",
+    "see_results": "Смотреть результаты",
+    "next_country_hint": "👁 Следующая страна",
+    "all_countries_hint": "🗺 Все страны",
+    "initials_hint": "🔤 Инициалы",
+    "next_round": "Следующий раунд",
+    "submit_ranking": "✓ Отправить рейтинг",
+    "save_score": "Сохранить счёт",
+    "copy_link": "Скопировать ссылку",
+    "launch_game": "Запустить игру",
+    "create_game": "Создать игру",
+    "join": "Присоединиться",
+    "move_up": "Вверх",
+    "move_down": "Вниз",
+    "delete": "Удалить",
+    "see_final_ranking": "Итоговый рейтинг",
+    "next_game": "Следующая игра →",
+    "hide_history": "Скрыть историю",
+    "show_full_history": "Показать всю историю"
+  },
+  "difficulties": {
+    "Facile": "Лёгкий",
+    "Moyen": "Средний",
+    "Difficile": "Сложный",
+    "Impossible": "Невозможный",
+    "Hardcore": "Хардкор",
+    "hardcore_all": "💀 Хардкор - Все страны",
+    "easy_range": "Лёгкий (3–5)",
+    "medium_range": "Средний (6–12)",
+    "hard_range": "Сложный (13–20)"
+  },
+  "selection": {
+    "by_difficulty": "По сложности",
+    "by_continent": "По континенту"
+  },
+  "presets": {
+    "progressive": "Прогрессивный",
+    "custom": "Особый"
+  },
+  "labels": {
+    "configuration": "Настройки",
+    "total_countries": "стран всего",
+    "country": "Страна",
+    "your_country": "Твоя страна",
+    "your_guess": "Твой ответ",
+    "how_to_read_hints": "Как читать подсказки",
+    "no_attempts": "Ещё нет попыток.",
+    "attempts": "Попытки",
+    "found": "Найдено",
+    "missed": "Промах",
+    "capital": "Столица:",
+    "new_game": "Новая игра",
+    "score": "Счёт:",
+    "time": "Время:",
+    "username": "Псевдоним",
+    "your_username": "Твой псевдоним",
+    "phase": "Фаза:",
+    "remaining": "осталось",
+    "start": "Начало",
+    "arrival": "Финиш",
+    "optimal": "оптимально:",
+    "hints": "Подсказки:",
+    "criterion": "Критерий",
+    "preset": "Пресет:",
+    "total_time": "Общее время",
+    "all_countries": "Все",
+    "code": "Код:",
+    "host": "Хост",
+    "disconnected": "Отключён",
+    "game": "Игра",
+    "finished": "завершена!",
+    "points_earned": "Заработанные очки",
+    "total": "Итого",
+    "rank": "Место",
+    "player": "Игрок",
+    "countries_found": "Найдено стран",
+    "failed_attempts": "Неудачные попытки",
+    "points": "Очки",
+    "you": "(Ты)",
+    "optimal_path": "Оптимальный путь:",
+    "unknown": "Неизвестна"
+  },
+  "game_hud": {
+    "target_country": "НАЙТИ СТРАНУ",
+    "score": "СЧЁТ",
+    "time": "ВРЕМЯ",
+    "countries": "стран",
+    "found": "✓ НАЙДЕНО",
+    "skipped": "✗ ПРОПУЩЕНО",
+    "remaining": "◎ ОСТАЛОСЬ",
+    "flags": "ФЛАГИ",
+    "capitals": "СТОЛИЦЫ"
+  },
+  "controls": {
+    "left_click": "Левая кнопка",
+    "select_country": "Выбрать страну",
+    "right_click": "Правая кнопка",
+    "move_map": "Переместить карту",
+    "wheel": "Колёсико",
+    "zoom": "Увеличить / Уменьшить"
+  },
+  "game_over": {
+    "completed": "✓ Завершено!",
+    "waiting_players": "Ожидание других игроков..."
+  },
+  "borderguess": {
+    "daily_title": "BorderGuess: Ежедневный",
+    "infinite_title": "BorderGuess: Бесконечный",
+    "daily_subtitle": "Одна страна в день, общая для всех. Головоломка дня.",
+    "infinite_subtitle": "Угадывай силуэты без ограничений, не дожидаясь завтра.",
+    "daily_description": "Одна страна в день с прогрессом, сохранённым локально.",
+    "infinite_description": "Угадывай силуэты без ограничений, новая страна в каждом раунде.",
+    "start_timer_hint": "Запусти таймер, чтобы увидеть границы.",
+    "map_caption": "Смотри только на границы страны, затем дай ответ.",
+    "success_message": "Отлично, правильный ответ был",
+    "answer_was": "Правильный ответ был",
+    "see_tomorrow": "Возвращайся завтра за новой страной.",
+    "start_new_game": "Запусти новую страну, чтобы продолжить."
+  },
+  "country_clue": {
+    "daily_title": "Country Clue: Ежедневный",
+    "infinite_title": "Country Clue: Бесконечный",
+    "daily_subtitle": "Загадочная страна на сегодня. Головоломка дня.",
+    "infinite_subtitle": "Свободная версия, вдохновлённая Countryle, без ограничений.",
+    "daily_description": "Загадочная страна в день с прогрессом на этом устройстве.",
+    "infinite_description": "Угадывай страны одну за другой без ожидания.",
+    "intro_text": "Каждый ответ раскрывает расстояние, направление, полушарие и ориентир по площади, чтобы помочь тебе найти нужную страну.",
+    "hints_explanation": "Направление указывает на целевую страну. Полушарие показывает положение относительно экватора. Площадь и население показывают, больше/меньше или многолюднее/малолюднее искомая страна.",
+    "correct": "Отлично.",
+    "guess_title": "Угадай страну",
+    "metric_distance": "Расстояние",
+    "metric_direction": "Направление",
+    "metric_hemisphere": "Полушарие",
+    "metric_area": "Площадь",
+    "metric_population": "Население"
+  },
+  "voyage_voyage": {
+    "daily_description": "Один маршрут в день, одинаковый для всех игроков.",
+    "infinite_description": "Новый маршрут в каждой игре, без ограничений.",
+    "confirm_new_path": "Отказаться от этого пути и создать новый?",
+    "perfect_path": "Идеально! Найден оптимальный путь",
+    "arrived_in": "Прибыли за"
+  },
+  "ranking": {
+    "title": "Country Ranking",
+    "daily_description": "Упорядочи 6 стран по критерию дня. Только одна попытка в день.",
+    "infinite_description": "Играй раунды ранжирования с выбором сложности.",
+    "random": "Случайный",
+    "population": "Население",
+    "area": "Площадь",
+    "gdp": "ВВП",
+    "drag_hint": "Перетащи для изменения порядка",
+    "choose_category": "Выбрать категорию",
+    "total_error": "Общая ошибка:",
+    "correct_ranking": "Правильный рейтинг",
+    "placed_at": "поставлено #",
+    "difference_of": "разница",
+    "better_score_exists": "У тебя уже есть лучший результат."
+  },
+  "form": {
+    "title": "Игра завершена!",
+    "ascension_title": "🚀 Восхождение завершено!",
+    "better_score_exists": "Этот псевдоним уже имеет лучший счёт в этой сложности:",
+    "use_different_name": "Пожалуйста, сохраните счёт под другим именем.",
+    "better_daily_score": "Этот псевдоним уже имеет лучший счёт для этой головоломки:",
+    "use_different_name_daily": "Сохраните под другим именем.",
+    "score_saved": "Счёт сохранён ✓",
+    "saving": "Сохранение...",
+    "better_ascension_time": "Этот псевдоним уже имеет лучшее время:",
+    "training_mode_not_saved": "Режим тренировки — счёт не сохраняется",
+    "custom_config_not_saved": "Особая конфигурация — счёт не сохраняется"
+  },
+  "messages": {
+    "please_enter_username": "Пожалуйста, введи псевдоним",
+    "score_saved": "Счёт сохранён!",
+    "save_error": "Ошибка при сохранении.",
+    "loading": "Загрузка..."
+  },
+  "units": {
+    "pt": "очко",
+    "pts": "очков",
+    "attempt_one": "попытка",
+    "attempt_other": "попыток",
+    "step_one": "шаг",
+    "step_other": "шагов",
+    "error_one": "ошибка",
+    "error_other": "ошибок",
+    "position_one": "позиция",
+    "position_other": "позиций"
+  },
+  "options": {
+    "all_games": "Все игры",
+    "all_presets": "Все пресеты",
+    "all_continents": "Все континенты",
+    "all_scores": "Все результаты"
+  },
+  "scoreboard": {
+    "title": "Таблица результатов",
+    "no_ascension_scores": "Нет результатов Восхождения для этого фильтра."
+  },
+  "leaderboard": {
+    "title": "Ежедневный рейтинг",
+    "final_title": "🏆 Итоговые результаты",
+    "no_scores_today": "Нет результатов за этот день.",
+    "attempts": "Попытки",
+    "time": "Время",
+    "hints_used": "Использованные подсказки:",
+    "no_hints": "нет",
+    "attempted_countries": "Угаданные страны"
+  },
+  "multiplayer": {
+    "title": "Мультиплеер"
+  },
+  "lobby": {
+    "join_title": "Присоединиться к игре",
+    "connecting": "Подключение...",
+    "waiting_room": "Зал ожидания",
+    "invite_link": "Ссылка для приглашения",
+    "waiting_for_players": "Ожидание игроков... (мин. 2)",
+    "waiting_for_host": "Ожидание хоста..."
+  },
+  "config": {
+    "title": "Настроить игру",
+    "add_game": "Добавить игру:",
+    "chill_hint": "Общий обратный отсчёт · Обзор после каждого раунда",
+    "seconds_by_difficulty": "Секунды по сложности:",
+    "creating": "Создание...",
+    "typing_tolerance_note": "⚠️ Для игр с вводом (флаги, столицы) первая ошибка за страну допускается и не влияет на счёт — опечатки бывают!"
+  },
+  "stats": {
+    "first_try": "🎯 С первого раза",
+    "stumbles": "🔄 Колебания",
+    "not_found": "❌ Не найдено"
+  },
+  "placeholders": {
+    "country_name": "Введи название страны...",
+    "capital_name": "Введи столицу...",
+    "country_examples": "Напр.: Япония, Бразилия, Марокко...",
+    "country_examples_clue": "Напр.: Канада, Япония, Марокко...",
+    "username": "Твой псевдоним...",
+    "room_code": "Код (напр.: AB3K7Z)",
+    "enter_country_on_path": "Введи страну на маршруте…"
+  },
+  "aria": {
+    "progress_phase": "Прогресс фазы"
+  },
+  "toasts": {
+    "correct": "Отлично!",
+    "wrong": "Неверно!",
+    "found_country": "Отлично! {{name}}!",
+    "location_reveal": "Неверно! {{name}} была здесь",
+    "all_countries_found": "Отлично! Вы нашли все страны!",
+    "all_flags_found": "Отлично! Вы нашли все флаги!",
+    "all_capitals_found": "Отлично! Вы нашли все столицы!",
+    "already_proposed": "Ты уже предложил эту страну.",
+    "country_was": "Отлично! Это была {{name}}",
+    "hint_updated": "Подсказка обновлена",
+    "ascension_phase_done": "Фаза завершена! Отлично!",
+    "ascension_failed": "Неверно! Игра окончена."
+  },
+  "share": {
+    "copy_button": "📋 Скопировать результаты",
+    "copied": "✓ Результат скопирован!",
+    "pseudo_placeholder": "Твой псевдоним (необязательно)",
+    "anonymous": "Аноним",
+    "played_by": "сыграл",
+    "can_you_beat": "Сможешь лучше?",
+    "score_attempts": "ПОПЫТОК",
+    "details_found_attempts": "Найдено за {{count}} попытку",
+    "details_not_found_attempts": "Не найдено ({{count}} попыток)",
+    "details_ranking_error": "Общая ошибка: {{count}} позиций",
+    "details_flags_timer": "{{found}}/{{total}} флагов найдено · {{time}}",
+    "details_placement_timer": "{{found}}/{{total}} стран размещено · {{time}}",
+    "details_capitals_timer": "{{found}}/{{total}} столиц найдено · {{time}}",
+    "details_voyage": "{{steps}} шаг(ов) · оптимально: {{optimal}}"
+  }
+}

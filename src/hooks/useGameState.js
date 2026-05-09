@@ -1,10 +1,12 @@
 // src/hooks/useGameState.js
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { formatTime } from '../utils/formatTime'
 import { saveSnapshot } from '../utils/multiplayerSnapshot'
+import { getCountryName } from '../utils/getCountryName'
 
 const DIFFICULTIES = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
 
@@ -44,6 +46,7 @@ let alreadyChosenCountries = []
 
 export default function useGameState(difficulty, isTraining, overrideCountries = null, mpSnapshot = null, mpSnapshotKey = null, continent = null) {
   const navigate = useNavigate()
+  const { t, i18n } = useTranslation()
 
   const [targetCountry, setTargetCountry] = useState(null)
   const targetCountryRef = useRef(null)
@@ -171,7 +174,7 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
   // 3 consecutive errors: highlight country
   useEffect(() => {
     if (consecutiveErrors < 3) return
-    toast.error('Dommage ! C\'est ici que se trouvait ' + targetCountryRef.current, {
+    toast.error(t('toasts.location_reveal', { name: getCountryName(countries.features.find(c => c.properties.ADMIN === targetCountryRef.current)?.properties?.ISO_A2, i18n.language) || targetCountryRef.current }), {
       containerId: 'topRightToast',
     })
     const name = targetCountryRef.current
@@ -217,7 +220,7 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
     if (!allProcessed || !gameStarted || gameOverToastShownRef.current) return
     gameOverToastShownRef.current = true
     if (isTraining) {
-      toast.success('Bravo ! Vous avez trouvé tous les pays !', {
+      toast.success(t('toasts.all_countries_found'), {
         containerId: 'centerToast',
       })
     }
@@ -266,7 +269,7 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
       const wasSkipped =
         consecutiveErrorsRef.current >= 3 || clickOnSeeCountryRef.current
       if (!wasSkipped) {
-        toast.success('Bravo ! ' + targetCountryRef.current + ' !', {
+        toast.success(t('toasts.found_country', { name: getCountryName(targetCountryISO, i18n.language) || targetCountryRef.current }), {
           containerId: 'topRightToast',
         })
         incrementScore(targetDiff, consecutiveErrorsRef.current)
@@ -287,7 +290,7 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
       setClickOnSeeCountry(false)
       clickOnSeeCountryRef.current = false
     } else {
-      toast.error('Dommage !', { containerId: 'topRightToast' })
+      toast.error(t('toasts.wrong'), { containerId: 'topRightToast' })
       const newErrors = consecutiveErrorsRef.current + 1
       setConsecutiveErrors(newErrors)
       consecutiveErrorsRef.current = newErrors
@@ -399,8 +402,14 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
   const isGameOver = allProcessed && !isTraining
   const displayTimer = isTraining ? '∞' : formatTime(timer)
 
+  const targetCountryISO = useMemo(
+    () => countries.features.find(c => c.properties.ADMIN === targetCountry)?.properties?.ISO_A2 ?? null,
+    [targetCountry]
+  )
+
   return {
     targetCountry,
+    targetCountryISO,
     score,
     timer,
     stats,

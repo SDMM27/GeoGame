@@ -2,10 +2,12 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { useTranslation } from 'react-i18next'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { formatTime } from '../utils/formatTime'
 import { checkAnswer } from '../utils/normalizeAnswer'
 import { saveSnapshot } from '../utils/multiplayerSnapshot'
+import { getCountryName, getAllCapitalNames } from '../utils/getCountryName'
 
 const SCORE_TABLE = {
   Facile:     [3, 2, 1],
@@ -40,6 +42,7 @@ let alreadyChosenCountries = []
 
 export default function useCapitalsGameState(difficulty, isTraining, overrideCountries = null, mpSnapshot = null, mpSnapshotKey = null, continent = null) {
   const navigate = useNavigate()
+  const { t, i18n } = useTranslation()
 
   const [targetCountry, setTargetCountry] = useState(null)
   const targetCountryRef = useRef(null)
@@ -160,7 +163,7 @@ export default function useCapitalsGameState(difficulty, isTraining, overrideCou
     if (!allProcessed || !gameStarted || gameOverToastShownRef.current) return
     gameOverToastShownRef.current = true
     if (isTraining) {
-      toast.success('Bravo ! Vous avez trouvé toutes les capitales !', {
+      toast.success(t('toasts.all_capitals_found'), {
         containerId: 'centerToast',
       })
     }
@@ -205,12 +208,16 @@ export default function useCapitalsGameState(difficulty, isTraining, overrideCou
     // consecutiveErrors is read from ref because it may be incremented in the same call.
     if (!gameStartedRef.current || !targetCountryRef.current || revealedName) return
     const props = targetCountryRef.current.properties
-    const isCorrect = checkAnswer(inputValue, props.capital, props.capitalAliases ?? [])
+    const iso = targetCountryRef.current?.properties?.ISO_A2
+    const capital = props.capital
+    const capitalAliases = props.capitalAliases ?? []
+    const extraCapitals = getAllCapitalNames(iso, capital, capitalAliases)
+    const isCorrect = checkAnswer(inputValue, capital, capitalAliases, extraCapitals)
 
     if (isCorrect) {
       const wasSkipped = clickOnSeeCountryRef.current
       if (!wasSkipped) {
-        toast.success('Bravo ! ' + props.capital + ' !', { containerId: 'topRightToast' })
+        toast.success(t('toasts.found_country', { name: getCountryName(iso, i18n.language) || props.ADMIN }), { containerId: 'topRightToast' })
         incrementScore(props.DifficultyCapitals, consecutiveErrorsRef.current)
       }
       setStats(prev =>
@@ -227,10 +234,10 @@ export default function useCapitalsGameState(difficulty, isTraining, overrideCou
       consecutiveErrorsRef.current = newErrors
       setStats(prev => ({ ...prev, totalErrors: (prev.totalErrors ?? 0) + 1 }))
       if (newErrors >= 3) {
-        toast.error('Dommage ! La capitale est ' + props.capital, { containerId: 'topRightToast' })
+        toast.error(t('toasts.wrong'), { containerId: 'topRightToast' })
         setRevealedName(props.capital)
       } else {
-        toast.error('Dommage !', { containerId: 'topRightToast' })
+        toast.error(t('toasts.wrong'), { containerId: 'topRightToast' })
       }
       setInputValue('')
     }
@@ -321,6 +328,7 @@ export default function useCapitalsGameState(difficulty, isTraining, overrideCou
 
   return {
     targetCountry,
+    targetCountryISO: targetCountry?.properties?.ISO_A2 ?? null,
     score,
     timer,
     stats,

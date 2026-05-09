@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { collection, getDocs, query, where } from 'firebase/firestore'
 import { firestore } from '../Firebase'
 import { sortDailyScores } from '../utils/dailyScores'
@@ -9,6 +10,7 @@ import './DailyLeaderboard.css'
 const MEDAL = ['🥇', '🥈', '🥉']
 
 function AccordionRow({ score, index, secondaryFormatter }) {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
 
   return (
@@ -28,12 +30,12 @@ function AccordionRow({ score, index, secondaryFormatter }) {
         <div className="daily-lb__accordion">
           {score.hints != null && (
             <p className="daily-lb__accordion-hints">
-              Indices utilisés : <strong>{score.hints === 0 ? 'aucun' : `${score.hints}`}</strong>
+              {t('leaderboard.hints_used')} <strong>{score.hints === 0 ? t('leaderboard.no_hints') : `${score.hints}`}</strong>
             </p>
           )}
           {Array.isArray(score.guesses) && score.guesses.length > 0 && (
             <>
-              <p className="daily-lb__accordion-title">Pays tentés</p>
+              <p className="daily-lb__accordion-title">{t('leaderboard.attempted_countries')}</p>
               <ol className="daily-lb__guess-list">
                 {score.guesses.map((country, i) => (
                   <li
@@ -53,12 +55,13 @@ function AccordionRow({ score, index, secondaryFormatter }) {
 }
 
 export default function DailyLeaderboard({ gameType, dailyKey, columnLabels, secondaryFormatter }) {
+  const { t, i18n } = useTranslation()
   const [selectedDate, setSelectedDate] = useState(dailyKey ?? '')
   const [scores, setScores] = useState([])
   const [loading, setLoading] = useState(true)
   const [showPicker, setShowPicker] = useState(false)
 
-  const days = useMemo(() => (dailyKey ? getLast7Days(dailyKey) : []), [dailyKey])
+  const days = useMemo(() => (dailyKey ? getLast7Days(dailyKey, i18n.language) : []), [dailyKey, i18n.language])
 
   if (!dailyKey) return null
 
@@ -83,7 +86,7 @@ export default function DailyLeaderboard({ gameType, dailyKey, columnLabels, sec
 
   return (
     <div className="daily-lb">
-      <h2 className="daily-lb__title">Classement journalier</h2>
+      <h2 className="daily-lb__title">{t('leaderboard.title')}</h2>
 
       <div className="daily-lb__date-nav">
         {days.map(({ key, label }) => (
@@ -102,7 +105,7 @@ export default function DailyLeaderboard({ gameType, dailyKey, columnLabels, sec
           className="daily-lb__history-link"
           onClick={() => setShowPicker((prev) => !prev)}
         >
-          {showPicker ? "Masquer l'historique" : "Voir tout l'historique"}
+          {showPicker ? t('buttons.hide_history') : t('buttons.show_full_history')}
         </button>
         {showPicker && (
           <input
@@ -116,16 +119,16 @@ export default function DailyLeaderboard({ gameType, dailyKey, columnLabels, sec
       </div>
 
       {loading ? (
-        <p className="daily-lb__loading">Chargement...</p>
+        <p className="daily-lb__loading">{t('messages.loading')}</p>
       ) : scores.length === 0 ? (
-        <p className="daily-lb__empty">Aucun score pour ce jour.</p>
+        <p className="daily-lb__empty">{t('leaderboard.no_scores_today')}</p>
       ) : (
         <>
           <div className="daily-lb__header">
             <span>#</span>
-            <span>Joueur</span>
-            <span>{columnLabels?.attempts ?? 'Essais'}</span>
-            <span>{columnLabels?.secondary ?? 'Temps'}</span>
+            <span>{t('labels.player')}</span>
+            <span>{columnLabels?.attempts ?? t('leaderboard.attempts')}</span>
+            <span>{columnLabels?.secondary ?? t('leaderboard.time')}</span>
           </div>
           {scores.map((score, index) => (
             <AccordionRow key={`${score.name}-${score.dailyKey}-${index}`} score={score} index={index} secondaryFormatter={secondaryFormatter} />

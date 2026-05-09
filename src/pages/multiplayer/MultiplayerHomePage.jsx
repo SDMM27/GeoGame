@@ -1,11 +1,13 @@
 // src/pages/multiplayer/MultiplayerHomePage.jsx
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import NavBar from '../../components/NavBar'
 import './MultiplayerHomePage.css'
 
 export default function MultiplayerHomePage() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [joinCode, setJoinCode] = useState('')
 
   const handleJoin = (e) => {
@@ -18,22 +20,22 @@ export default function MultiplayerHomePage() {
     <div className="mp-home">
       <NavBar />
       <main className="mp-home-main">
-        <h1 className="mp-home-title">Multijoueur</h1>
+        <h1 className="mp-home-title">{t('multiplayer.title')}</h1>
         <div className="mp-home-cards">
           <button
             className="mp-card mp-card--create"
             onClick={() => navigate('/multiplayer/create')}
           >
             <span className="mp-card-icon">🎮</span>
-            <span className="mp-card-label">Créer une partie</span>
+            <span className="mp-card-label">{t('buttons.create_game')}</span>
           </button>
           <div className="mp-card mp-card--join">
             <span className="mp-card-icon">🔗</span>
-            <span className="mp-card-label">Rejoindre</span>
+            <span className="mp-card-label">{t('buttons.join')}</span>
             <form onSubmit={handleJoin} className="mp-join-form">
               <input
                 className="mp-join-input"
-                placeholder="Code (ex: AB3K7Z)"
+                placeholder={t('placeholders.room_code')}
                 value={joinCode}
                 onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
                 maxLength={6}
@@ -43,7 +45,7 @@ export default function MultiplayerHomePage() {
                 className="mp-join-btn"
                 disabled={joinCode.trim().length !== 6}
               >
-                Rejoindre
+                {t('buttons.join')}
               </button>
             </form>
           </div>

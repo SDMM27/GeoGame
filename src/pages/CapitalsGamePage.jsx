@@ -1,6 +1,7 @@
 // src/pages/CapitalsGamePage.jsx
 import React, { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 import { ToastContainer } from 'react-toastify'
 import useCapitalsGameState from '../hooks/useCapitalsGameState'
@@ -8,6 +9,7 @@ import { snapshotKey, loadSnapshot } from '../utils/multiplayerSnapshot'
 import useAscensionState from '../hooks/useAscensionState'
 import { GAME_TYPES } from '../utils/gameTypes'
 import { checkAnswer } from '../utils/normalizeAnswer'
+import { getCountryName, getCapitalName, getAllCapitalNames } from '../utils/getCountryName'
 import PhaseIndicator from '../components/PhaseIndicator'
 import Form from './form'
 import AscensionForm from './AscensionForm'
@@ -18,8 +20,9 @@ import './FlagGamePage.css'
 import './CapitalsGamePage.css'
 
 function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, state, onGameFinished = null, continent }) {
+  const { t, i18n } = useTranslation()
   const {
-    targetCountry, score, timer, stats,
+    targetCountry, targetCountryISO, score, timer, stats,
     isGameOver, displayTimer,
     inputValue, setInputValue, handleSubmit,
     revealedName,
@@ -49,7 +52,12 @@ function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, s
     targetCountry &&
     !revealedName &&
     !isGameOver &&
-    checkAnswer(inputValue, targetCountry.properties.capital, targetCountry.properties.capitalAliases ?? [])
+    checkAnswer(
+      inputValue,
+      targetCountry.properties.capital,
+      targetCountry.properties.capitalAliases ?? [],
+      getAllCapitalNames(targetCountry.properties.ISO_A2, targetCountry.properties.capital, targetCountry.properties.capitalAliases ?? [])
+    )
   )
 
   useEffect(() => {
@@ -71,47 +79,47 @@ function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, s
           <div className="hud-row">
             <div className="hud-cell">
               <span className="hud-value" style={{ color: 'var(--accent-cyan)' }}>{score}</span>
-              <span className="hud-label">SCORE</span>
+              <span className="hud-label">{t('game_hud.score')}</span>
             </div>
             <div className="hud-cell hud-cell--target">
-              <span className="hud-target-label">CAPITALES</span>
+              <span className="hud-target-label">{t('game_hud.capitals')}</span>
               <span className="hud-target-name">?</span>
             </div>
             <div className="hud-cell">
               <span className="hud-value" style={{ color: 'var(--accent-cyan)' }}>{displayTimer}</span>
-              <span className="hud-label">TEMPS</span>
+              <span className="hud-label">{t('game_hud.time')}</span>
             </div>
           </div>
           <div className="hud-progress-wrap">
             <div className="hud-progress-track">
               <div className="hud-progress-bar" style={{ width: `${progressPct}%` }} />
             </div>
-            <span className="hud-progress-text">{stats.found} / {stats.total} pays</span>
+            <span className="hud-progress-text">{stats.found} / {stats.total} {t('game_hud.countries')}</span>
           </div>
         </div>
         <div className="hud-stats">
           <div className="hud-stat">
             <span className="hud-stat-value hud-stat-value--found">{stats.found}</span>
-            <span className="hud-stat-label">✓ TROUVÉS</span>
+            <span className="hud-stat-label">{t('game_hud.found')}</span>
           </div>
           <div className="hud-stat">
             <span className="hud-stat-value hud-stat-value--skipped">{stats.skipped}</span>
-            <span className="hud-stat-label">✗ PASSÉS</span>
+            <span className="hud-stat-label">{t('game_hud.skipped')}</span>
           </div>
           <div className="hud-stat">
             <span className="hud-stat-value hud-stat-value--remaining">
               {stats.total - stats.found - stats.skipped}
             </span>
-            <span className="hud-stat-label">◎ RESTANTS</span>
+            <span className="hud-stat-label">{t('game_hud.remaining')}</span>
           </div>
         </div>
       </div>
 
       {/* Actions */}
       <div className="hud-actions">
-        <button className="hud-btn hud-btn--home" onClick={goHome}>← Accueil</button>
+        <button className="hud-btn hud-btn--home" onClick={goHome}>{t('buttons.home')}</button>
         <button className="hud-btn hud-btn--see" onClick={seeCountry} disabled={!!revealedName}>
-          👁 Voir
+          {t('buttons.see')}
         </button>
         {!onGameFinished && <button className="hud-btn hud-btn--restart" onClick={restartGame}>↺ Recommencer</button>}
       </div>
@@ -126,15 +134,15 @@ function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, s
 
         {/* Indice 2 : Nom du pays */}
         <div className="capitals-country-name">
-          <span className="capitals-country-label">Pays</span>
+          <span className="capitals-country-label">{t('labels.country')}</span>
           <span className="capitals-country-value">
-            {targetCountry?.properties?.ADMIN ?? ''}
+            {getCountryName(targetCountry?.properties?.ISO_A2, i18n.language) || targetCountry?.properties?.ADMIN}
           </span>
         </div>
 
         {/* Révélation de la capitale */}
         {revealedName && (
-          <div className="flag-revealed-name">{revealedName}</div>
+          <div className="flag-revealed-name">{getCapitalName(targetCountryISO, i18n.language) || targetCountry?.properties?.capital}</div>
         )}
 
         {/* Saisie */}
@@ -143,7 +151,7 @@ function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, s
             ref={inputRef}
             className="flag-input"
             type="text"
-            placeholder="Tape la capitale..."
+            placeholder={t('placeholders.capital_name')}
             value={inputValue}
             onChange={e => setInputValue(e.target.value)}
             onKeyDown={onKeyDown}
@@ -159,7 +167,7 @@ function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, s
             onClick={handleSubmit}
             disabled={!!revealedName || isGameOver || !inputValue.trim()}
           >
-            <span aria-label="Valider">→</span>
+            <span aria-label={t('buttons.validate')}>→</span>
           </button>
         </div>
       </div>
@@ -170,8 +178,8 @@ function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, s
           <div className="game-over-content">
             {onGameFinished ? (
               <div className="mp-game-waiting">
-                <p style={{ color: '#4ade80', fontSize: '1.5rem' }}>✓ Terminé !</p>
-                <p style={{ color: '#94a3b8' }}>En attente des autres joueurs...</p>
+                <p style={{ color: '#4ade80', fontSize: '1.5rem' }}>{t('game_over.completed')}</p>
+                <p style={{ color: '#94a3b8' }}>{t('game_over.waiting_players')}</p>
               </div>
             ) : isAscension ? (
               <AscensionForm
@@ -189,15 +197,15 @@ function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, s
                   score={score}
                   gameType="CAPITALS"
                   difficulty={difficulty}
-                  details={`${stats.found}/${stats.total} capitales trouvées · ${timer ? `${Math.floor(timer/60)}m${String(timer%60).padStart(2,'0')}s` : ''}`}
+                  details={t('share.details_capitals_timer', { found: stats.found, total: stats.total, time: timer ? `${Math.floor(timer/60000)}m${String(Math.floor((timer%60000)/1000)).padStart(2,'0')}s` : '' })}
                 />
                 <Form finalScore={score} difficulty={difficulty} elapsedTime={timer} gameType="CAPITALS" continent={continent} />
               </>
             )}
             {!onGameFinished && (
               <div className="game-over-actions">
-                <button className="hud-btn hud-btn--restart" onClick={restartGame}>↺ Recommencer</button>
-                <button className="hud-btn hud-btn--home" onClick={goHome}>← Accueil</button>
+                <button className="hud-btn hud-btn--restart" onClick={restartGame}>{t('buttons.restart')}</button>
+                <button className="hud-btn hud-btn--home" onClick={goHome}>{t('buttons.home')}</button>
               </div>
             )}
           </div>

@@ -1,15 +1,21 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { checkAnswer, normalize } from '../utils/normalizeAnswer'
 import { collectCoordinates, getRingAreaKm2, getCountryAreaKm2, EARTH_RADIUS_KM } from '../utils/countryArea'
+import { getCountryName, getAllCountryNames } from '../utils/getCountryName'
+import countryAliases from '../data/countryAliases.json'
 
 const DAILY_TIME_ZONE = 'Europe/Paris'
 const DAILY_STORAGE_PREFIX = 'country-clue-daily'
 
 export const COUNTRY_CLUE_COUNTRIES = countries.features.filter(
-  (country) => country?.properties?.ADMIN && country?.geometry?.coordinates?.length
+  (country) =>
+    country?.properties?.ADMIN &&
+    country?.geometry?.coordinates?.length &&
+    country?.properties?.ISO_A2  // exclut les territoires sans code ISO (intraduisibles)
 )
 
 export const COUNTRY_CLUE_COUNTRY_COUNT = COUNTRY_CLUE_COUNTRIES.length
@@ -77,6 +83,29 @@ const COUNTRY_LOOKUP = (() => {
       entries.set(normalize(name), country)
     })
   })
+
+  // Also index EN and RU names so players can type in those languages
+  for (const feature of COUNTRY_CLUE_COUNTRIES) {
+    const iso = feature.properties.ISO_A2
+    for (const lang of ['en', 'ru']) {
+      const name = getCountryName(iso, lang)
+      if (name) {
+        const key = normalize(name)
+        if (!entries.has(key)) entries.set(key, feature)
+      }
+    }
+  }
+
+  // Extend with abbreviations and colloquial names (USA, UK, РФ, etc.)
+  for (const feature of COUNTRY_CLUE_COUNTRIES) {
+    const iso = feature.properties.ISO_A2?.toUpperCase()
+    if (!iso) continue
+    const extraAliases = countryAliases[iso] ?? []
+    for (const alias of extraAliases) {
+      const key = normalize(alias)
+      if (!entries.has(key)) entries.set(key, feature)
+    }
+  }
 
   return entries
 })()
@@ -281,6 +310,7 @@ function buildGuessRecord(guessInput, targetName) {
 
   return {
     value: guessedName,
+    isoA2: guessInput?.isoA2 ?? null,
     normalizedInput,
     isCorrect,
     distanceKm: isCorrect ? 0 : getDistanceKm(guessedName, targetName),
@@ -303,6 +333,7 @@ function buildGuessRecord(guessInput, targetName) {
 export default function useCountryClueState(mode, options = {}) {
   const { overrideCountry = null, initialGuesses = null } = options
   const navigate = useNavigate()
+  const { t, i18n } = useTranslation()
   const [currentCountry, setCurrentCountry] = useState(null)
   const [inputValue, setInputValue] = useState('')
   const [guesses, setGuesses] = useState([])
@@ -389,15 +420,15 @@ export default function useCountryClueState(mode, options = {}) {
   }, [currentCountry, dailyKey, guesses, mode, status, startedAt, elapsedTime])
 
   const availableCountrySuggestions = useMemo(() => {
+    const lang = i18n.language
     const suggestions = new Set()
-
     COUNTRY_CLUE_COUNTRIES.forEach((country) => {
-      const names = [country.properties.ADMIN, ...(country.properties.aliases ?? [])]
-      names.forEach((name) => suggestions.add(name))
+      const localizedName = getCountryName(country.properties.ISO_A2, lang) || country.properties.ADMIN
+      suggestions.add(localizedName)
     })
-
-    return [...suggestions].sort((a, b) => a.localeCompare(b, 'fr'))
-  }, [])
+    const sortLocale = lang === 'ru' ? 'ru' : lang === 'en' ? 'en' : 'fr'
+    return [...suggestions].sort((a, b) => a.localeCompare(b, sortLocale))
+  }, [i18n.language])
 
   const filteredCountrySuggestions = useMemo(() => {
     const normalizedInput = normalize(inputValue)
@@ -429,7 +460,7 @@ export default function useCountryClueState(mode, options = {}) {
     const normalizedGuess = normalize(nextGuess)
     const alreadyTried = guesses.some((guess) => guess.normalizedInput === normalizedGuess)
     if (alreadyTried) {
-      toast.info('Tu as déjà proposé ce pays.', { containerId: 'topRightToast' })
+      toast.info(t('toasts.already_proposed'), { containerId: 'topRightToast' })
       return
     }
 
@@ -440,12 +471,17 @@ export default function useCountryClueState(mode, options = {}) {
     }
 
     const guessedName = guessedCountry.properties.ADMIN
-    const isCorrect = checkAnswer(guessedName, answerName, currentCountry.properties.aliases ?? [])
+    const iso = currentCountry.properties.ISO_A2
+    const adminName = currentCountry.properties.ADMIN
+    const aliases = currentCountry.properties.aliases ?? []
+    const extraNames = getAllCountryNames(iso, adminName, aliases)
+    const isCorrect = checkAnswer(guessedName, adminName, aliases, extraNames)
     const nextGuesses = [
       ...guesses,
       buildGuessRecord(
         {
           value: guessedName,
+          isoA2: guessedCountry.properties.ISO_A2 ?? null,
           normalizedInput: normalizedGuess,
           isCorrect,
         },
@@ -460,11 +496,11 @@ export default function useCountryClueState(mode, options = {}) {
       const finalElapsed = startedAt != null ? Date.now() - startedAt : null
       setElapsedTime(finalElapsed)
       setStatus('won')
-      toast.success(`Bravo ! C'était ${answerName}.`, { containerId: 'topRightToast' })
+      toast.success(t('toasts.country_was', { name: getCountryName(iso, i18n.language) || answerName }), { containerId: 'topRightToast' })
       return
     }
 
-    toast.info('Indice mis à jour. Continue.', { containerId: 'topRightToast' })
+    toast.info(t('toasts.hint_updated'), { containerId: 'topRightToast' })
   }
 
   const startNextInfiniteRound = () => {
@@ -474,14 +510,14 @@ export default function useCountryClueState(mode, options = {}) {
     setGuesses([])
     setStatus('playing')
     setInputValue('')
-    toast.info('Nouveau pays chargé.', { containerId: 'topRightToast' })
+    toast.info(t('toasts.found_country', { name: getCountryName(nextCountry.properties.ISO_A2, i18n.language) || nextCountry.properties.ADMIN }), { containerId: 'topRightToast' })
   }
 
   const revealCountry = () => {
     if (!currentCountry || isComplete) return
     setStatus('lost')
     setInputValue('')
-    toast.info(`Le pays était ${answerName}.`, { containerId: 'topRightToast' })
+    toast.info(t('toasts.country_was', { name: getCountryName(currentCountry.properties.ISO_A2, i18n.language) || answerName }), { containerId: 'topRightToast' })
   }
 
   const goHome = () => navigate('/')
@@ -496,6 +532,7 @@ export default function useCountryClueState(mode, options = {}) {
     answerName,
     answerFlag,
     answerCapital,
+    currentCountryISO: currentCountry?.properties?.ISO_A2 ?? null,
     filteredCountrySuggestions,
     dailyKey,
     hasStarted,

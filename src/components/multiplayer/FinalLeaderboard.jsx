@@ -1,6 +1,7 @@
 // src/components/multiplayer/FinalLeaderboard.jsx
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { doc, updateDoc } from 'firebase/firestore'
 import { firestore } from '../../Firebase'
 import { clearGameResults, updateRoomStatus } from '../../utils/multiplayerRoom'
@@ -8,6 +9,7 @@ import './FinalLeaderboard.css'
 
 export default function FinalLeaderboard({ room, gameResults, playerId, roomId }) {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const isHost = room.hostId === playerId
   const [rematchSubmitting, setRematchSubmitting] = useState(false)
 
@@ -74,13 +76,13 @@ export default function FinalLeaderboard({ room, gameResults, playerId, roomId }
 
   return (
     <div className="final-leaderboard">
-      <h1 className="final-lb-title">🏆 Résultats finaux</h1>
+      <h1 className="final-lb-title">{t('leaderboard.final_title')}</h1>
 
       <div className="final-lb-podium">
         {sortedPlayers.map(([pid, player], index) => (
           <div key={pid} className={`final-lb-row${pid === playerId ? ' final-lb-row--me' : ''}`}>
             <span className="final-lb-medal">{medals[index] ?? `${index + 1}`}</span>
-            <span className="final-lb-pseudo">{player.pseudo}{pid === playerId ? ' (Toi)' : ''}</span>
+            <span className="final-lb-pseudo">{player.pseudo}{pid === playerId ? ` ${t('labels.you')}` : ''}</span>
             <span className="final-lb-pts">{player.totalPoints} pts</span>
           </div>
         ))}
@@ -92,11 +94,11 @@ export default function FinalLeaderboard({ room, gameResults, playerId, roomId }
           <table className="final-lb-table">
             <thead>
               <tr>
-                <th>Joueur</th>
+                <th>{t('labels.player')}</th>
                 {room.config.games.map((g, i) => (
                   <th key={i}>{g.type.charAt(0) + g.type.slice(1).toLowerCase().replace('_', ' ')}</th>
                 ))}
-                <th>Total</th>
+                <th>{t('labels.points')}</th>
               </tr>
             </thead>
             <tbody>

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { ToastContainer } from 'react-toastify'
 import NavBar from '../components/NavBar'
 import VoyageVoyageMap from '../components/VoyageVoyageMap'
@@ -10,6 +11,7 @@ import DailyLeaderboard from './DailyLeaderboard'
 import { GAME_TYPES } from '../utils/gameTypes'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { normalize } from '../utils/normalizeAnswer'
+import { getCountryName } from '../utils/getCountryName'
 import 'react-toastify/dist/ReactToastify.css'
 import './VoyageVoyagePage.css'
 
@@ -29,6 +31,7 @@ function getSuggestions(input) {
 }
 
 export default function VoyageVoyagePage() {
+  const { t, i18n } = useTranslation()
   const location = useLocation()
   const [mode] = useState(location.state?.mode ?? 'infinite')
   const [showModal, setShowModal] = useState(false)
@@ -129,29 +132,29 @@ export default function VoyageVoyagePage() {
         <div className="voyage-country voyage-start">
           {startCountry && (
             <>
-              <img src={flagSrc(startCountry.properties.ISO_A2)} alt={startCountry.properties.ADMIN} />
-              <span>{startCountry.properties.ADMIN}</span>
-              <small>Départ</small>
+              <img src={flagSrc(startCountry.properties.ISO_A2)} alt={getCountryName(startCountry.properties.ISO_A2, i18n.language) || startCountry.properties.ADMIN} />
+              <span>{getCountryName(startCountry.properties.ISO_A2, i18n.language) || startCountry.properties.ADMIN}</span>
+              <small>{t('labels.start')}</small>
             </>
           )}
         </div>
 
         <div className="voyage-stats">
-          <span>{stepsUsed} étape{stepsUsed > 1 ? 's' : ''} · optimal : {optimalLength}</span>
-          <span>{wrongGuesses.length} erreur{wrongGuesses.length > 1 ? 's' : ''}</span>
+          <span>{stepsUsed} {stepsUsed === 1 ? t('units.step_one') : t('units.step_other')} · {t('labels.optimal')} {optimalLength}</span>
+          <span>{wrongGuesses.length} {wrongGuesses.length === 1 ? t('units.error_one') : t('units.error_other')}</span>
           {mode === 'infinite' && !isGameOver && (
             <button
               className="voyage-regen-btn"
               onClick={() => {
-                if (window.confirm('Abandonner ce chemin et en générer un nouveau ?')) resetGame()
+                if (window.confirm(t('voyage_voyage.confirm_new_path'))) resetGame()
               }}
             >
-              ↺ Nouveau chemin
+              {t('buttons.new_path')}
             </button>
           )}
           {isGameOver && !showModal && (
             <button className="voyage-regen-btn voyage-regen-btn--results" onClick={() => setShowModal(true)}>
-              Voir les résultats
+              {t('buttons.see_results')}
             </button>
           )}
         </div>
@@ -159,9 +162,9 @@ export default function VoyageVoyagePage() {
         <div className="voyage-country voyage-target">
           {targetCountry && (
             <>
-              <img src={flagSrc(targetCountry.properties.ISO_A2)} alt={targetCountry.properties.ADMIN} />
-              <span>{targetCountry.properties.ADMIN}</span>
-              <small>Arrivée</small>
+              <img src={flagSrc(targetCountry.properties.ISO_A2)} alt={getCountryName(targetCountry.properties.ISO_A2, i18n.language) || targetCountry.properties.ADMIN} />
+              <span>{getCountryName(targetCountry.properties.ISO_A2, i18n.language) || targetCountry.properties.ADMIN}</span>
+              <small>{t('labels.arrival')}</small>
             </>
           )}
         </div>
@@ -187,7 +190,7 @@ export default function VoyageVoyagePage() {
               {i > 0 && <span className="voyage-chain-sep">›</span>}
               <span className={`voyage-chain-badge voyage-chain-badge--${g.color}`}>
                 <img src={flagSrc(g.feature.properties.ISO_A2)} alt="" />
-                {g.feature.properties.ADMIN}
+                {getCountryName(g.feature.properties.ISO_A2, i18n.language) || g.feature.properties.ADMIN}
               </span>
             </span>
           ))
@@ -215,7 +218,7 @@ export default function VoyageVoyagePage() {
             {wrongGuesses.map(f => (
               <span key={f.properties.ISO_A2} className="voyage-chain-badge voyage-chain-badge--red">
                 <img src={flagSrc(f.properties.ISO_A2)} alt="" />
-                {f.properties.ADMIN}
+                {getCountryName(f.properties.ISO_A2, i18n.language) || f.properties.ADMIN}
               </span>
             ))}
           </span>
@@ -225,27 +228,27 @@ export default function VoyageVoyagePage() {
       {!isGameOver ? (
         <div className="voyage-input-wrapper">
           <div className="voyage-hints-bar">
-            <span className="voyage-hints-label">Indices :</span>
+            <span className="voyage-hints-label">{t('labels.hints')}</span>
             <button
               className={`voyage-hint-btn ${hintsUsed.includes('next') ? 'used' : ''}`}
               disabled={hintsUsed.includes('next') || unguessedOptimalPath.length === 0}
               onClick={() => useHint('next')}
             >
-              <span className="voyage-hint-icon">👁</span> Prochain pays
+              {t('buttons.next_country_hint')}
             </button>
             <button
               className={`voyage-hint-btn ${hintsUsed.includes('all') ? 'used' : ''}`}
               disabled={hintsUsed.includes('all') || !hintsUsed.includes('next') || unguessedOptimalPath.length === 0}
               onClick={() => useHint('all')}
             >
-              <span className="voyage-hint-icon">🗺</span> Tous les pays
+              {t('buttons.all_countries_hint')}
             </button>
             <button
               className={`voyage-hint-btn ${hintsUsed.includes('initials') ? 'used' : ''}`}
               disabled={hintsUsed.includes('initials') || !hintsUsed.includes('all')}
               onClick={() => useHint('initials')}
             >
-              <span className="voyage-hint-icon">🔤</span> Initiales
+              {t('buttons.initials_hint')}
             </button>
           </div>
           <form className="voyage-input-row" onSubmit={handleSubmit}>
@@ -254,7 +257,7 @@ export default function VoyageVoyagePage() {
               value={input}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
-              placeholder="Entrez un pays sur le chemin…"
+              placeholder={t('placeholders.enter_country_on_path')}
               autoFocus
               autoComplete="off"
               spellCheck="false"
@@ -277,7 +280,7 @@ export default function VoyageVoyagePage() {
                   }}
                 >
                   <img src={flagSrc(feature.properties.ISO_A2)} alt="" />
-                  {feature.properties.ADMIN}
+                  {getCountryName(feature.properties.ISO_A2, i18n.language) || feature.properties.ADMIN}
                 </li>
               ))}
             </ul>
@@ -291,14 +294,14 @@ export default function VoyageVoyagePage() {
             <button className="voyage-modal-close" onClick={() => setShowModal(false)}>✕</button>
 
             {isPerfect
-              ? <p className="voyage-result-perfect">Parfait ! Chemin optimal trouvé</p>
-              : <p className="voyage-modal-title">Arrivé en <strong>{stepsUsed}</strong> étape{stepsUsed > 1 ? 's' : ''} (optimal : {optimalLength})</p>
+              ? <p className="voyage-result-perfect">{t('voyage_voyage.perfect_path')}</p>
+              : <p className="voyage-modal-title">{t('voyage_voyage.arrived_in')} <strong>{stepsUsed}</strong> {stepsUsed === 1 ? t('units.step_one') : t('units.step_other')} ({t('labels.optimal')} {optimalLength})</p>
             }
-            <p className="voyage-modal-sub">Score : <strong>{score?.toFixed(1)}</strong> · Erreurs : {wrongGuesses.length}</p>
+            <p className="voyage-modal-sub">{t('labels.score')} <strong>{score?.toFixed(1)}</strong> · {wrongGuesses.length === 1 ? t('units.error_one') : t('units.error_other')} : {wrongGuesses.length}</p>
 
             {!isPerfect && optimalPath.length > 0 && (
               <div className="voyage-optimal">
-                <span className="voyage-optimal-label">Chemin optimal :</span>
+                <span className="voyage-optimal-label">{t('labels.optimal_path')}</span>
                 <div className="voyage-optimal-chain">
                   {optimalPath.map((f, i) => {
                     const iso = f.properties.ISO_A2
@@ -308,7 +311,7 @@ export default function VoyageVoyagePage() {
                         {i > 0 && <span className="voyage-chain-sep">›</span>}
                         <span className={`voyage-chain-badge ${guessed ? 'voyage-chain-badge--green' : 'voyage-chain-badge--missed'}`}>
                           <img src={flagSrc(iso)} alt="" />
-                          {f.properties.ADMIN}
+                          {getCountryName(f.properties.ISO_A2, i18n.language) || f.properties.ADMIN}
                         </span>
                       </span>
                     )
@@ -322,7 +325,7 @@ export default function VoyageVoyagePage() {
               gameType="VOYAGE_VOYAGE"
               difficulty={mode === 'daily' ? 'Daily' : 'Infini'}
               scoreLabel="PTS"
-              details={`${stepsUsed} étape${stepsUsed > 1 ? 's' : ''} · optimal : ${optimalLength}`}
+              details={t('share.details_voyage', { steps: stepsUsed, optimal: optimalLength })}
             />
 
             {mode === 'daily' && (
@@ -333,19 +336,19 @@ export default function VoyageVoyagePage() {
                   guesses={validatedChain.map(f => f.properties.ADMIN)}
                   gameType={GAME_TYPES.VOYAGE_VOYAGE}
                   dailyKey={dailyKey}
-                  statText={`${stepsUsed} étape${stepsUsed > 1 ? 's' : ''} · ${wrongGuesses.length} erreur${wrongGuesses.length > 1 ? 's' : ''} · ${hintsUsed.length} indice${hintsUsed.length > 1 ? 's' : ''}`}
+                  statText={`${stepsUsed} ${stepsUsed === 1 ? t('units.step_one') : t('units.step_other')} · ${wrongGuesses.length} ${wrongGuesses.length === 1 ? t('units.error_one') : t('units.error_other')} · ${hintsUsed.length} indice${hintsUsed.length > 1 ? 's' : ''}`}
                   hints={hintsUsed.length}
                 />
                 <DailyLeaderboard
                   gameType={GAME_TYPES.VOYAGE_VOYAGE}
                   dailyKey={dailyKey}
                   columnLabels={{ attempts: 'Étapes', secondary: 'Erreurs' }}
-                  secondaryFormatter={n => `${n} erreur${n > 1 ? 's' : ''}`}
+                  secondaryFormatter={n => `${n} ${n === 1 ? t('units.error_one') : t('units.error_other')}`}
                 />
               </>
             )}
 
-            <button className="voyage-modal-new-game" onClick={resetGame}>↺ Nouvelle partie</button>
+            <button className="voyage-modal-new-game" onClick={resetGame}>{t('buttons.new_game')}</button>
           </div>
         </div>
       )}

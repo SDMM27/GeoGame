@@ -1,6 +1,33 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { generateShareCard, exportShareCard, GAME_LABELS, generateShareText } from './shareScore'
 
+// Mock i18n so tests are independent of locale files
+vi.mock('../i18n', () => {
+  const translations = {
+    'games.flags.title': 'Jeu des Drapeaux',
+    'games.placement.title': 'Placement',
+    'games.capitals.title': 'Capitales',
+    'games.border_guess.title': 'Border Guess',
+    'games.country_clue.title': 'Country Clue',
+    'games.ranking.title': 'Country Ranking',
+    'games.voyage_voyage.title': 'Voyage Voyage',
+    'share.played_by': 'joué par',
+    'share.can_you_beat': 'Peux-tu faire mieux ?',
+    'share.anonymous': 'Anonyme',
+    'difficulties.Difficile': 'Difficile',
+    'difficulties.Facile': 'Facile',
+    'modes.daily': 'Daily',
+    'modes.infinite': 'Infini',
+  }
+  return {
+    default: {
+      isInitialized: true,
+      t: (key) => translations[key] ?? key,
+      exists: (key) => key in translations,
+    },
+  }
+})
+
 const makeMockCtx = () => ({
   createLinearGradient: vi.fn(() => ({ addColorStop: vi.fn() })),
   fillRect: vi.fn(),
@@ -26,9 +53,9 @@ describe('GAME_LABELS', () => {
     expect(GAME_LABELS.FLAGS).toBe('Jeu des Drapeaux')
     expect(GAME_LABELS.PLACEMENT).toBe('Placement')
     expect(GAME_LABELS.CAPITALS).toBe('Capitales')
-    expect(GAME_LABELS.BORDER_GUESS).toBe('Deviner la Frontière')
-    expect(GAME_LABELS.COUNTRY_CLUE).toBe('Pays Mystère')
-    expect(GAME_LABELS.RANKING).toBe('Classement')
+    expect(GAME_LABELS.BORDER_GUESS).toBe('Border Guess')
+    expect(GAME_LABELS.COUNTRY_CLUE).toBe('Country Clue')
+    expect(GAME_LABELS.RANKING).toBe('Country Ranking')
     expect(GAME_LABELS.VOYAGE_VOYAGE).toBe('Voyage Voyage')
   })
 })
@@ -147,5 +174,15 @@ describe('generateShareText', () => {
   it('rounds fractional score', () => {
     const text = generateShareText({ score: 7.6, gameType: 'VOYAGE_VOYAGE', difficulty: 'Daily', pseudo: 'X', scoreLabel: 'PTS' })
     expect(text).toContain('8 PTS')
+  })
+
+  it('uses translated game label from i18n', () => {
+    const text = generateShareText({ score: 0, gameType: 'BORDER_GUESS', difficulty: 'Daily', pseudo: 'X' })
+    expect(text).toContain('Border Guess')
+  })
+
+  it('translates difficulty from mode key', () => {
+    const text = generateShareText({ score: 0, gameType: 'RANKING', difficulty: 'Infini', pseudo: 'X' })
+    expect(text).toContain('Infini') // maps to modes.infinite → 'Infini' in mock
   })
 })

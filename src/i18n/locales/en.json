@@ -1,0 +1,350 @@
+{
+  "continents": {
+    "Europe": "Europe",
+    "Asie": "Asia",
+    "Afrique": "Africa",
+    "Amériques": "Americas",
+    "Océanie": "Oceania"
+  },
+  "home": {
+    "title": "Choose your game",
+    "subtitle": "Explore - Discover - Compete",
+    "multiplayer_button": "🎮 Play multiplayer →"
+  },
+  "games": {
+    "placement": {
+      "title": "Find the Country",
+      "description": "Find all countries of the chosen difficulty."
+    },
+    "flags": {
+      "title": "Find the Flag",
+      "description": "Identify the country from its flag."
+    },
+    "capitals": {
+      "title": "Find the Capital",
+      "description": "Find the capital from the flag and country name."
+    },
+    "border_guess": {
+      "title": "BorderGuess",
+      "description": "Guess a country only from its borders."
+    },
+    "country_clue": {
+      "title": "Country Clue",
+      "description": "Find the country using distance, direction and area hints."
+    },
+    "voyage_voyage": {
+      "title": "Voyage Voyage",
+      "description": "Connect two countries through shared borders. Find the shortest path!"
+    },
+    "ranking": {
+      "title": "Country Ranking",
+      "description": "Rank countries from largest to smallest by criterion: population, area or GDP."
+    },
+    "placement_countries": {
+      "title": "Country Placement",
+      "description": "Place the country in the right spot on the map."
+    },
+    "lives_mode": {
+      "title": "Lives Mode",
+      "description": "Find as many countries as possible without making mistakes."
+    }
+  },
+  "modes": {
+    "daily": "Daily",
+    "infinite": "Infinite",
+    "standard": "Standard",
+    "ascension": "🚀 Ascension",
+    "chill": "🛋️ Chill Mode",
+    "continent": "🌍 Continent"
+  },
+  "buttons": {
+    "play": "Play",
+    "training": "Training",
+    "scores": "🏆 Scores",
+    "home": "← Home",
+    "reveal": "👁 Reveal",
+    "restart": "↺ Restart",
+    "validate": "Confirm",
+    "see": "👁 View",
+    "start_timer": "Start timer",
+    "return_home": "Back to home",
+    "reveal_country": "Reveal country",
+    "new_country": "New country",
+    "new_game": "New game",
+    "new_path": "↺ New path",
+    "see_results": "See results",
+    "next_country_hint": "👁 Next country",
+    "all_countries_hint": "🗺 All countries",
+    "initials_hint": "🔤 Initials",
+    "next_round": "Next round",
+    "submit_ranking": "✓ Submit my ranking",
+    "save_score": "Save score",
+    "copy_link": "Copy link",
+    "launch_game": "Start game",
+    "create_game": "Create game",
+    "join": "Join",
+    "move_up": "Move up",
+    "move_down": "Move down",
+    "delete": "Delete",
+    "see_final_ranking": "See final ranking",
+    "next_game": "Next game →",
+    "hide_history": "Hide history",
+    "show_full_history": "Show full history"
+  },
+  "difficulties": {
+    "Facile": "Easy",
+    "Moyen": "Medium",
+    "Difficile": "Hard",
+    "Impossible": "Impossible",
+    "Hardcore": "Hardcore",
+    "hardcore_all": "💀 Hardcore - All countries",
+    "easy_range": "Easy (3–5)",
+    "medium_range": "Medium (6–12)",
+    "hard_range": "Hard (13–20)"
+  },
+  "selection": {
+    "by_difficulty": "By difficulty",
+    "by_continent": "By continent"
+  },
+  "presets": {
+    "progressive": "Progressive",
+    "custom": "Custom"
+  },
+  "labels": {
+    "configuration": "Configuration",
+    "total_countries": "countries total",
+    "country": "Country",
+    "your_country": "Your country",
+    "your_guess": "Your guess",
+    "how_to_read_hints": "How to read hints",
+    "no_attempts": "No attempts yet.",
+    "attempts": "Attempts",
+    "found": "Found",
+    "missed": "Missed",
+    "capital": "Capital:",
+    "new_game": "New game",
+    "score": "Score:",
+    "time": "Time:",
+    "username": "Username",
+    "your_username": "Your username",
+    "phase": "Phase:",
+    "remaining": "remaining",
+    "start": "Start",
+    "arrival": "Arrival",
+    "optimal": "optimal:",
+    "hints": "Hints:",
+    "criterion": "Criterion",
+    "preset": "Preset:",
+    "total_time": "Total time",
+    "all_countries": "All",
+    "code": "Code:",
+    "host": "Host",
+    "disconnected": "Disconnected",
+    "game": "Game",
+    "finished": "finished!",
+    "points_earned": "Points earned",
+    "total": "Total",
+    "rank": "Rank",
+    "player": "Player",
+    "countries_found": "Countries found",
+    "failed_attempts": "Failed attempts",
+    "points": "Points",
+    "you": "(You)",
+    "optimal_path": "Optimal path:",
+    "unknown": "Unknown"
+  },
+  "game_hud": {
+    "target_country": "COUNTRY TO FIND",
+    "score": "SCORE",
+    "time": "TIME",
+    "countries": "countries",
+    "found": "✓ FOUND",
+    "skipped": "✗ SKIPPED",
+    "remaining": "◎ REMAINING",
+    "flags": "FLAGS",
+    "capitals": "CAPITALS"
+  },
+  "controls": {
+    "left_click": "Left click",
+    "select_country": "Select a country",
+    "right_click": "Right click",
+    "move_map": "Move the map",
+    "wheel": "Scroll wheel",
+    "zoom": "Zoom in / out"
+  },
+  "game_over": {
+    "completed": "✓ Done!",
+    "waiting_players": "Waiting for other players..."
+  },
+  "borderguess": {
+    "daily_title": "Daily BorderGuess",
+    "infinite_title": "Infinite BorderGuess",
+    "daily_subtitle": "One country per day, shared for everyone. Daily puzzle.",
+    "infinite_subtitle": "Chain as many silhouettes as you want without waiting until tomorrow.",
+    "daily_description": "One country per day, with progress saved locally.",
+    "infinite_description": "Chain silhouettes without limit, with a new country each round.",
+    "start_timer_hint": "Start the timer to reveal the borders.",
+    "map_caption": "Look only at the borders of the country, then give your answer.",
+    "success_message": "Well done, the correct answer was",
+    "answer_was": "The correct answer was",
+    "see_tomorrow": "Come back tomorrow for a new country.",
+    "start_new_game": "Start a new country to continue."
+  },
+  "country_clue": {
+    "daily_title": "Daily Country Clue",
+    "infinite_title": "Infinite Country Clue",
+    "daily_subtitle": "A mystery country to find today. Daily puzzle.",
+    "infinite_subtitle": "A free version inspired by Countryle, chainable without limit.",
+    "daily_description": "A mystery country per day with progress saved on this device.",
+    "infinite_description": "Chain country puzzles without waiting for tomorrow.",
+    "intro_text": "Each guess reveals the distance, direction, hemisphere and an area reference to help you converge toward the right country.",
+    "hints_explanation": "Direction points toward the target country. Hemisphere indicates position relative to the equator. Area and Population indicate whether the target country is larger/smaller or more/less populated.",
+    "correct": "Well done.",
+    "guess_title": "Guess the country",
+    "metric_distance": "Distance",
+    "metric_direction": "Direction",
+    "metric_hemisphere": "Hemisphere",
+    "metric_area": "Area",
+    "metric_population": "Population"
+  },
+  "voyage_voyage": {
+    "daily_description": "One route per day, the same for all players.",
+    "infinite_description": "A new route each game, without limit.",
+    "confirm_new_path": "Abandon this path and generate a new one?",
+    "perfect_path": "Perfect! Optimal path found",
+    "arrived_in": "Arrived in"
+  },
+  "ranking": {
+    "title": "Country Ranking",
+    "daily_description": "Rank 6 countries by today's criterion. One attempt per day.",
+    "infinite_description": "Chain ranking rounds with difficulty of your choice.",
+    "random": "Random",
+    "population": "Population",
+    "area": "Area",
+    "gdp": "GDP",
+    "drag_hint": "Drag to reorder",
+    "choose_category": "Choose a category",
+    "total_error": "Total error:",
+    "correct_ranking": "Correct ranking",
+    "placed_at": "placed #",
+    "difference_of": "difference of",
+    "better_score_exists": "You already have a better score saved."
+  },
+  "form": {
+    "title": "Game over!",
+    "ascension_title": "🚀 Ascension complete!",
+    "better_score_exists": "This username already has a better score in this difficulty:",
+    "use_different_name": "Please save your score under a different name.",
+    "better_daily_score": "This username already has a better score for this puzzle:",
+    "use_different_name_daily": "Save under a different name.",
+    "score_saved": "Score saved ✓",
+    "saving": "Saving...",
+    "better_ascension_time": "This username already has a better time:",
+    "training_mode_not_saved": "Training mode — score not saved",
+    "custom_config_not_saved": "Custom config — score not saved"
+  },
+  "messages": {
+    "please_enter_username": "Please enter a username",
+    "score_saved": "Score saved!",
+    "save_error": "Error while saving.",
+    "loading": "Loading..."
+  },
+  "units": {
+    "pt": "pt",
+    "pts": "pts",
+    "attempt_one": "attempt",
+    "attempt_other": "attempts",
+    "step_one": "step",
+    "step_other": "steps",
+    "error_one": "error",
+    "error_other": "errors",
+    "position_one": "position",
+    "position_other": "positions"
+  },
+  "options": {
+    "all_games": "All games",
+    "all_presets": "All presets",
+    "all_continents": "All continents",
+    "all_scores": "All scores"
+  },
+  "scoreboard": {
+    "title": "Scoreboard",
+    "no_ascension_scores": "No Ascension scores for this filter."
+  },
+  "leaderboard": {
+    "title": "Daily leaderboard",
+    "final_title": "🏆 Final results",
+    "no_scores_today": "No scores for this day.",
+    "attempts": "Attempts",
+    "time": "Time",
+    "hints_used": "Hints used:",
+    "no_hints": "none",
+    "attempted_countries": "Countries attempted"
+  },
+  "multiplayer": {
+    "title": "Multiplayer"
+  },
+  "lobby": {
+    "join_title": "Join the game",
+    "connecting": "Connecting...",
+    "waiting_room": "Waiting room",
+    "invite_link": "Invite link",
+    "waiting_for_players": "Waiting for players... (min. 2)",
+    "waiting_for_host": "Waiting for host..."
+  },
+  "config": {
+    "title": "Configure the game",
+    "add_game": "Add a game:",
+    "chill_hint": "Shared countdown · Review after each round",
+    "seconds_by_difficulty": "Seconds by difficulty:",
+    "creating": "Creating...",
+    "typing_tolerance_note": "⚠️ For typing games (flags, capitals), the first hesitation per country is tolerated and doesn't affect the score — typos happen!"
+  },
+  "stats": {
+    "first_try": "🎯 One tap",
+    "stumbles": "🔄 Stumbles",
+    "not_found": "❌ Not found"
+  },
+  "placeholders": {
+    "country_name": "Type the country name...",
+    "capital_name": "Type the capital...",
+    "country_examples": "e.g. Japan, Brazil, Morocco...",
+    "country_examples_clue": "e.g. Canada, Japan, Morocco...",
+    "username": "Your username...",
+    "room_code": "Code (e.g. AB3K7Z)",
+    "enter_country_on_path": "Enter a country on the path…"
+  },
+  "aria": {
+    "progress_phase": "Phase progress"
+  },
+  "toasts": {
+    "correct": "Well done!",
+    "wrong": "Wrong!",
+    "found_country": "Well done! {{name}}!",
+    "location_reveal": "Wrong! {{name}} was here",
+    "all_countries_found": "Well done! You found all countries!",
+    "all_flags_found": "Well done! You found all flags!",
+    "all_capitals_found": "Well done! You found all capitals!",
+    "already_proposed": "You already proposed this country.",
+    "country_was": "Well done! It was {{name}}",
+    "hint_updated": "Hint updated",
+    "ascension_phase_done": "Phase done! Well done!",
+    "ascension_failed": "Wrong! Game over."
+  },
+  "share": {
+    "copy_button": "📋 Copy results",
+    "copied": "✓ Result copied!",
+    "pseudo_placeholder": "Your username (optional)",
+    "anonymous": "Anonymous",
+    "played_by": "played by",
+    "can_you_beat": "Can you do better?",
+    "score_attempts": "ATTEMPTS",
+    "details_found_attempts": "Found in {{count}} attempt(s)",
+    "details_not_found_attempts": "Not found ({{count}} attempt(s))",
+    "details_ranking_error": "Total error: {{count}} position(s)",
+    "details_flags_timer": "{{found}}/{{total}} flags found · {{time}}",
+    "details_placement_timer": "{{found}}/{{total}} countries placed · {{time}}",
+    "details_capitals_timer": "{{found}}/{{total}} capitals found · {{time}}",
+    "details_voyage": "{{steps}} step(s) · optimal: {{optimal}}"
+  }
+}

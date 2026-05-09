@@ -7,8 +7,8 @@ export function normalize(str) {
     .trim()
 }
 
-export function checkAnswer(input, target, aliases = []) {
+export function checkAnswer(input, target, aliases = [], extraNames = []) {
   const normalizedInput = normalize(input)
-  const candidates = [target, ...aliases].map(normalize)
+  const candidates = [target, ...aliases, ...extraNames].map(normalize)
   return candidates.includes(normalizedInput)
 }

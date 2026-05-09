@@ -2,12 +2,14 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { useTranslation } from 'react-i18next'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { formatTime } from '../utils/formatTime'
 import { GAME_TYPES } from '../utils/gameTypes'
 import { checkAnswer } from '../utils/normalizeAnswer'
 import { buildPhaseSequence } from '../utils/ascensionPresets'
 import { saveSnapshot } from '../utils/multiplayerSnapshot'
+import { getCountryName } from '../utils/getCountryName'
 
 // Which country property name holds the difficulty for each game type
 const DIFFICULTY_PROP = {
@@ -47,6 +49,7 @@ function getPool(difficulty, gameType, alreadyChosen) {
 
 export default function useAscensionState(gameType, phases, isTraining, isAscensionMode = true, overridesByDifficulty = null, mpSnapshot = null, mpSnapshotKey = null) {
   const navigate = useNavigate()
+  const { t, i18n } = useTranslation()
   // Static: computed once from props — do not recompute during game
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const phaseSequence = useRef(buildPhaseSequence(phases)).current
@@ -281,7 +284,7 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
         phaseFoundRef.current = 0
         phaseSkippedRef.current = 0
         phaseStartTimeRef.current = performance.now()
-        toast.info(`🚀 Phase ${nextPhase.difficulty} commencée !`, { containerId: 'topRightToast', autoClose: 2000 })
+        toast.info(t('toasts.ascension_phase_done'), { containerId: 'topRightToast', autoClose: 2000 })
         const next = getRandomCountry(nextPhase.difficulty)
         if (next) {
           alreadyChosenCountries.push(next.properties.ADMIN)
@@ -325,8 +328,10 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
   // 3 consecutive errors → show country on map
   useEffect(() => {
     if (gameType !== GAME_TYPES.PLACEMENT || consecutiveErrors < 3) return
-    toast.error('Dommage ! C\'est ici : ' + targetCountryRef.current, { containerId: 'topRightToast' })
     const name = targetCountryRef.current
+    const feat3err = countries.features.find(c => c.properties.ADMIN === name)
+    const iso3err = feat3err?.properties.ISO_A2
+    toast.error(t('toasts.location_reveal', { name: getCountryName(iso3err, i18n.language) || name }), { containerId: 'topRightToast' })
     setStyleForCountry(name, { fillColor: '#ff4d4d', weight: 2, fillOpacity: 0.5 })
     shownCountriesRef.current.add(name)
     if (geoJsonRef.current) {
@@ -361,7 +366,8 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
     if (clickedName === targetCountryRef.current) {
       const wasSkipped = consecutiveErrorsRef.current >= 3 || clickOnSeeCountryRef.current
       if (!wasSkipped) {
-        toast.success('Bravo ! ' + targetCountryRef.current + ' !', { containerId: 'topRightToast' })
+        const isoPlacement = feat?.properties.ISO_A2
+        toast.success(t('toasts.found_country', { name: getCountryName(isoPlacement, i18n.language) || targetCountryRef.current }), { containerId: 'topRightToast' })
         incrementScore(diff, consecutiveErrorsRef.current)
       }
       setStyleForCountry(clickedName, { fillColor: '#4ade80', weight: 2, fillOpacity: 0.5 })
@@ -369,7 +375,7 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
       foundCountriesRef.current.add(clickedName)
       advanceGame(!wasSkipped, consecutiveErrorsRef.current)
     } else {
-      toast.error('Dommage !', { containerId: 'topRightToast' })
+      toast.error(t('toasts.wrong'), { containerId: 'topRightToast' })
       setConsecutiveErrors(prev => prev + 1)
     }
   }, [advanceGame, incrementScore, setStyleForCountry])

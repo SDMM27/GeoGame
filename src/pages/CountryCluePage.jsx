@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import NavBar from '../components/NavBar'
@@ -8,39 +9,46 @@ import CountryClueMap from './CountryClueMap'
 import DailyForm from './DailyForm'
 import DailyLeaderboard from './DailyLeaderboard'
 import { GAME_TYPES } from '../utils/gameTypes'
+import { getCountryName } from '../utils/getCountryName'
 import 'react-toastify/dist/ReactToastify.css'
 import './CountryCluePage.css'
 
-function GuessRow({ guess }) {
+function GuessRow({ guess, lang }) {
+  const { t } = useTranslation()
+  const displayName =
+    guess.isoA2 && lang
+      ? (getCountryName(guess.isoA2, lang) ?? guess.value)
+      : guess.value
+
   return (
     <article className={`country-clue-row${guess.isCorrect ? ' country-clue-row--correct' : ''}`}>
       <div className="country-clue-row-main">
-        <strong>{guess.value}</strong>
+        <strong>{displayName}</strong>
       </div>
 
       <div className="country-clue-metric">
-        <span className="country-clue-metric-label">Distance</span>
+        <span className="country-clue-metric-label">{t('country_clue.metric_distance')}</span>
         <strong>{guess.distanceKm?.toLocaleString('fr-FR')} km</strong>
       </div>
 
       <div className="country-clue-metric">
-        <span className="country-clue-metric-label">Direction</span>
+        <span className="country-clue-metric-label">{t('country_clue.metric_direction')}</span>
         <strong>{guess.directionArrow} {guess.direction}</strong>
       </div>
 
       <div className={`country-clue-metric country-clue-metric--${guess.hemisphereHint.tone}`}>
-        <span className="country-clue-metric-label">Hémisphère</span>
+        <span className="country-clue-metric-label">{t('country_clue.metric_hemisphere')}</span>
         <strong>{guess.hemisphereHint.arrow} {guess.hemisphereHint.label}</strong>
       </div>
 
       <div className={`country-clue-metric country-clue-metric--${guess.areaHint.tone}`}>
-        <span className="country-clue-metric-label">Surface</span>
+        <span className="country-clue-metric-label">{t('country_clue.metric_area')}</span>
         <strong>{guess.areaHint.arrow} {guess.areaHint.label}</strong>
         <small>{guess.areaLabel}</small>
       </div>
 
       <div className={`country-clue-metric country-clue-metric--${guess.populationHint.tone}`}>
-        <span className="country-clue-metric-label">Population</span>
+        <span className="country-clue-metric-label">{t('country_clue.metric_population')}</span>
         <strong>{guess.populationHint.arrow} {guess.populationHint.label}</strong>
         <small>{guess.populationLabel}</small>
       </div>
@@ -49,6 +57,7 @@ function GuessRow({ guess }) {
 }
 
 export default function CountryCluePage() {
+  const { t, i18n } = useTranslation()
   const location = useLocation()
   const mode = location.state?.mode ?? 'daily'
   const {
@@ -61,6 +70,7 @@ export default function CountryCluePage() {
     answerName,
     answerFlag,
     answerCapital,
+    currentCountryISO,
     filteredCountrySuggestions,
     dailyKey,
     handleSubmit,
@@ -72,11 +82,17 @@ export default function CountryCluePage() {
     elapsedTime,
   } = useCountryClueState(mode)
 
-  const title = mode === 'daily' ? 'Country Clue Journalier' : 'Country Clue Infini'
+  const lang = i18n.language
+  const translatedAnswerName =
+    currentCountryISO
+      ? (getCountryName(currentCountryISO, lang) ?? answerName)
+      : answerName
+
+  const title = mode === 'daily' ? t('country_clue.daily_title') : t('country_clue.infinite_title')
   const subtitle =
     mode === 'daily'
-      ? `Un pays mystère à retrouver aujourd'hui. Puzzle du ${dailyKey ?? 'jour'}.`
-      : 'Une version libre inspirée de Countryle, à enchaîner sans limite.'
+      ? t('country_clue.daily_subtitle')
+      : t('country_clue.infinite_subtitle')
   const trimmedInputValue = inputValue.trim()
   const shouldShowSuggestions =
     !isComplete &&
@@ -95,14 +111,14 @@ export default function CountryCluePage() {
       <main className="country-clue-main">
         <section className="country-clue-hero">
           <div>
-            <p className="country-clue-eyebrow">Nouveau jeu</p>
+            <p className="country-clue-eyebrow">{t('labels.new_game')}</p>
             <h1>{title}</h1>
             <p className="country-clue-subtitle">{subtitle}</p>
           </div>
           <div className="country-clue-stat-strip">
             <div className="country-clue-stat">
               <span>{guesses.length}</span>
-              <small>Tentatives</small>
+              <small>{t('labels.attempts')}</small>
             </div>
           </div>
         </section>
@@ -110,26 +126,25 @@ export default function CountryCluePage() {
         <section className="country-clue-layout">
           <div className="country-clue-panel country-clue-panel--play">
             <div className="country-clue-intro-card">
-              <h2>Devine le pays</h2>
+              <h2>{t('country_clue.guess_title')}</h2>
               <p>
-                Chaque proposition révèle la distance, la direction, l’hémisphère
-                et un repère de surface pour t’aider à converger vers le bon pays.
+                {t('country_clue.intro_text')}
               </p>
             </div>
 
             <div className="country-clue-input-block">
               {mode === 'daily' && !hasStarted && !isComplete && (
                 <button className="daily-start-btn" onClick={startGame}>
-                  Démarrer le chrono
+                  {t('buttons.start_timer')}
                 </button>
               )}
-              <label htmlFor="country-clue-input">Ta proposition</label>
+              <label htmlFor="country-clue-input">{t('labels.your_guess')}</label>
               <div className="country-clue-input-overlay">
                 <input
                   id="country-clue-input"
                   className="country-clue-input"
                   type="text"
-                  placeholder="Ex : Canada, Japon, Maroc..."
+                  placeholder={t('placeholders.country_examples_clue')}
                   value={inputValue}
                   onChange={(event) => setInputValue(event.target.value)}
                   onKeyDown={onKeyDown}
@@ -155,7 +170,7 @@ export default function CountryCluePage() {
                 onClick={handleSubmit}
                 disabled={!inputValue.trim() || isComplete || (mode === 'daily' && !hasStarted)}
               >
-                Valider
+                {t('buttons.validate')}
               </button>
             </div>
 
@@ -168,18 +183,18 @@ export default function CountryCluePage() {
                 score={guesses.length}
                 gameType="COUNTRY_CLUE"
                 difficulty={mode === 'daily' ? 'Daily' : 'Infini'}
-                scoreLabel="ESSAIS"
+                scoreLabel={t('share.score_attempts')}
                 details={isSolved
-                  ? `Trouvé en ${guesses.length} devinette${guesses.length > 1 ? 's' : ''}`
-                  : `Non trouvé (${guesses.length} tentative${guesses.length > 1 ? 's' : ''})`}
+                  ? t('share.details_found_attempts', { count: guesses.length })
+                  : t('share.details_not_found_attempts', { count: guesses.length })}
               />
             )}
 
             <div className="country-clue-history">
               {guesses.length === 0 ? (
-                <p className="country-clue-empty">Aucune tentative pour l’instant.</p>
+                <p className="country-clue-empty">{t('labels.no_attempts')}</p>
               ) : (
-                [...guesses].reverse().map((guess, index) => <GuessRow key={`${guess.value}-${index}`} guess={guess} />)
+                [...guesses].reverse().map((guess, index) => <GuessRow key={`${guess.value}-${index}`} guess={guess} lang={lang} />)
               )}
             </div>
           </div>
@@ -189,21 +204,21 @@ export default function CountryCluePage() {
               {isSolved && (
                 <>
                   <span className="country-clue-flag" aria-hidden="true">{answerFlag}</span>
-                  <h3>{answerName}</h3>
-                  <p>Bien joué. Capitale: <strong>{answerCapital || 'Inconnue'}</strong>.</p>
+                  <h3>{translatedAnswerName}</h3>
+                  <p>{t('country_clue.correct')} {t('labels.capital')} <strong>{answerCapital || t('labels.unknown')}</strong>.</p>
                 </>
               )}
               {isLost && (
                 <>
                   <span className="country-clue-flag" aria-hidden="true">{answerFlag}</span>
-                  <h3>{answerName}</h3>
-                  <p>Capitale: <strong>{answerCapital || 'Inconnue'}</strong>.</p>
+                  <h3>{translatedAnswerName}</h3>
+                  <p>{t('labels.capital')} <strong>{answerCapital || t('labels.unknown')}</strong>.</p>
                 </>
               )}
               {!isComplete && (
                 <>
-                  <h3>Comment lire les indices</h3>
-                  <p>Direction pointe vers le pays cible. Hémisphère indique la position par rapport à l'équateur. Surface et Population indiquent si le pays recherché est plus grand/petit ou plus/moins peuplé.</p>
+                  <h3>{t('labels.how_to_read_hints')}</h3>
+                  <p>{t('country_clue.hints_explanation')}</p>
                 </>
               )}
             </div>
@@ -225,16 +240,16 @@ export default function CountryCluePage() {
 
             <div className="country-clue-actions">
               <button className="country-clue-secondary" onClick={goHome}>
-                Retour à l'accueil
+                {t('buttons.return_home')}
               </button>
               {!isComplete && (mode !== 'daily' || hasStarted) && (
                 <button className="country-clue-secondary country-clue-secondary--warning" onClick={revealCountry}>
-                  Révéler le pays
+                  {t('buttons.reveal_country')}
                 </button>
               )}
               {mode === 'infinite' && (
                 <button className="country-clue-primary" onClick={startNextInfiniteRound}>
-                  Nouveau pays
+                  {t('buttons.new_country')}
                 </button>
               )}
             </div>

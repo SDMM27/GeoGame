@@ -250,7 +250,7 @@ function PlacementGameLayout({ difficulty, isTraining, isAscension, presetName, 
 
       <MapContainer
         center={[20, 0]} zoom={3} zoomSnap={0.25} scrollWheelZoom zoomControl={false}
-        dragging={false} doubleClickZoom={false}
+        dragging={false} doubleClickZoom={false} attributionControl={false}
         style={{ width: '100%', height: '100vh' }}
         whenReady={({ target }) => {
           setMapRef(target)

@@ -113,7 +113,12 @@
 
 .game-tile-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
+}
+
+.game-tile-actions > button {
+  flex: 1 1 auto;
 }
 
 .game-tile-scores {

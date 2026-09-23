@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, GeoJSON, CircleMarker, Tooltip, useMapEvents }
 import { COUNTRY_CENTER_MAP, getCountryByName } from '../hooks/useCountryClueState'
 import { getCountryMetrics } from '../utils/borderGuessMap'
 import 'leaflet/dist/leaflet.css'
+import { DARK_NOLABELS_TILE_URL } from '../mapTiles'
 
 const SMALL_COUNTRY_THRESHOLD = 1.5
 
@@ -73,7 +74,7 @@ export default function CountryClueMap({ guesses, answerName, isLost }) {
         style={{ height: '100%', width: '100%' }}
       >
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
+          url={DARK_NOLABELS_TILE_URL}
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
           minZoom={2}
         />

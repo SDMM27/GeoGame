@@ -3,6 +3,7 @@ import { useCallback } from 'react'
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import countries from '../../../data/countriesWithDifficulty_FR.json'
+import { DARK_NOLABELS_TILE_URL } from '../../../mapTiles'
 
 const BASE_STYLE = { fillColor: 'transparent', color: '#94a3b8', fillOpacity: 1, weight: 1 }
 const CORRECT_STYLE = { fillColor: '#22c55e', fillOpacity: 0.55, color: '#86efac', weight: 2 }
@@ -126,7 +127,7 @@ export default function ChillPlacementReview({
         }}
       >
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
+          url={DARK_NOLABELS_TILE_URL}
           attribution='&copy; OpenStreetMap contributors &copy; CARTO'
           minZoom={2}
           maxZoom={20}

@@ -2158903,7 +2158903,7 @@
                 "ISO_A2": "VA",
                 "aliases": [],
                 "capital": "Vatican City",
-                "capitalAliases": [],
+                "capitalAliases": ["Vatican"],
                 "DifficultyFlag": "Moyen",
                 "population": 882,
                 "gdp": null,

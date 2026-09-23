@@ -10,6 +10,7 @@ import { snapshotKey, loadSnapshot } from '../utils/multiplayerSnapshot'
 import useAscensionState from '../hooks/useAscensionState'
 import { GAME_TYPES } from '../utils/gameTypes'
 import { getCountryName } from '../utils/getCountryName'
+import { DARK_NOLABELS_TILE_URL } from '../mapTiles'
 import PhaseIndicator from '../components/PhaseIndicator'
 import { getCountryMetrics } from '../utils/borderGuessMap'
 import countries from '../data/countriesWithDifficulty_FR.json'
@@ -260,7 +261,7 @@ function PlacementGameLayout({ difficulty, isTraining, isAscension, presetName, 
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
+          url={DARK_NOLABELS_TILE_URL}
           minZoom={2} maxZoom={20}
         />
         <GeoJSON

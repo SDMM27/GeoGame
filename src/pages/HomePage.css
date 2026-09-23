@@ -116,6 +116,11 @@
   gap: 8px;
 }
 
+.game-tile-scores {
+  width: 100%;
+  padding: 6px 16px;
+}
+
 .btn-tile-secondary {
   flex: 1;
   padding: 12px;

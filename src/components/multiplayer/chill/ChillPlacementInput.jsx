@@ -6,6 +6,7 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import countries from '../../../data/countriesWithDifficulty_FR.json'
 import { getCountryMetrics } from '../../../utils/borderGuessMap'
+import { DARK_NOLABELS_TILE_URL } from '../../../mapTiles'
 
 const GEO_STYLE = { fillColor: 'transparent', color: '#94a3b8', fillOpacity: 1, weight: 1 }
 const HOVER_STYLE = { fillColor: '#7b2ff7', fillOpacity: 0.4, color: '#94a3b8', weight: 1 }
@@ -223,7 +224,7 @@ export default function ChillPlacementInput({ onSubmit, countdownEnd, locked }) 
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
+          url={DARK_NOLABELS_TILE_URL}
           minZoom={2}
           maxZoom={20}
         />

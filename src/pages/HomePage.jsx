@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useState } from "react";
+﻿import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import NavBar from "../components/NavBar";
@@ -136,169 +136,6 @@ const GAMES = [
     active: false,
   },
 ];
-
-function BorderGuessCard({ game }) {
-  const navigate = useNavigate();
-  const { t } = useTranslation();
-  const [mode, setMode] = useState("daily");
-
-  return (
-    <div className="game-card game-card--active">
-      <div className="game-card-icon">{game.icon}</div>
-      <h2 className="game-card-title">{t(game.titleKey)}</h2>
-      <p className="game-card-desc">{t(game.descKey)}</p>
-      <div className="game-card-controls">
-        <div className="game-mode-tabs">
-          <button
-            className={`game-mode-tab${mode === "daily" ? " game-mode-tab--active" : ""}`}
-            onClick={() => setMode("daily")}
-          >
-            {t('modes.daily')}
-          </button>
-          <button
-            className={`game-mode-tab${mode === "infinite" ? " game-mode-tab--active" : ""}`}
-            onClick={() => setMode("infinite")}
-          >
-            {t('modes.infinite')}
-          </button>
-        </div>
-        <div className="border-guess-card-note">
-          {mode === "daily"
-            ? "Un seul pays par jour, avec progression sauvegardée localement."
-            : "Enchaîne des silhouettes sans limite, avec un nouveau pays à chaque manche."}
-        </div>
-        <div className="game-card-buttons">
-          <button className="btn-play" onClick={() => navigate(game.route, { state: { mode } })}>
-            {t('buttons.play')}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function VoyageVoyageCard({ game }) {
-  const navigate = useNavigate();
-  const { t } = useTranslation();
-  const [mode, setMode] = useState("daily");
-
-  return (
-    <div className="game-card game-card--active">
-      <div className="game-card-icon">{game.icon}</div>
-      <h2 className="game-card-title">{t(game.titleKey)}</h2>
-      <p className="game-card-desc">{t(game.descKey)}</p>
-      <div className="game-card-controls">
-        <div className="game-mode-tabs">
-          <button
-            className={`game-mode-tab${mode === "daily" ? " game-mode-tab--active" : ""}`}
-            onClick={() => setMode("daily")}
-          >
-            {t('modes.daily')}
-          </button>
-          <button
-            className={`game-mode-tab${mode === "infinite" ? " game-mode-tab--active" : ""}`}
-            onClick={() => setMode("infinite")}
-          >
-            {t('modes.infinite')}
-          </button>
-        </div>
-        <div className="border-guess-card-note">
-          {mode === "daily"
-            ? "Une seule route par jour, identique pour tous les joueurs."
-            : "Une nouvelle route à chaque partie, sans limite."}
-        </div>
-        <div className="game-card-buttons">
-          <button
-            className="btn-play"
-            onClick={() => navigate(game.route, { state: { mode } })}
-          >
-            {t('buttons.play')}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function CountryClueCard({ game }) {
-  const navigate = useNavigate();
-  const { t } = useTranslation();
-  const [mode, setMode] = useState("daily");
-
-  return (
-    <div className="game-card game-card--active">
-      <div className="game-card-icon">{game.icon}</div>
-      <h2 className="game-card-title">{t(game.titleKey)}</h2>
-      <p className="game-card-desc">{t(game.descKey)}</p>
-      <div className="game-card-controls">
-        <div className="game-mode-tabs">
-          <button
-            className={`game-mode-tab${mode === "daily" ? " game-mode-tab--active" : ""}`}
-            onClick={() => setMode("daily")}
-          >
-            {t('modes.daily')}
-          </button>
-          <button
-            className={`game-mode-tab${mode === "infinite" ? " game-mode-tab--active" : ""}`}
-            onClick={() => setMode("infinite")}
-          >
-            {t('modes.infinite')}
-          </button>
-        </div>
-        <div className="border-guess-card-note">
-          {mode === "daily"
-            ? "Un pays mystère par jour avec progression mémorisée sur cet appareil."
-            : "Enchaîne des énigmes de pays sans attendre le lendemain."}
-        </div>
-        <div className="game-card-buttons">
-          <button className="btn-play" onClick={() => navigate(game.route, { state: { mode } })}>
-            {t('buttons.play')}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function RankingCard({ game }) {
-  const navigate = useNavigate();
-  const { t } = useTranslation();
-  const [mode, setMode] = useState("daily");
-
-  return (
-    <div className="game-card game-card--active">
-      <div className="game-card-icon">{game.icon}</div>
-      <h2 className="game-card-title">{t(game.titleKey)}</h2>
-      <p className="game-card-desc">{t(game.descKey)}</p>
-      <div className="game-card-controls">
-        <div className="game-mode-tabs">
-          <button
-            className={`game-mode-tab${mode === "daily" ? " game-mode-tab--active" : ""}`}
-            onClick={() => setMode("daily")}
-          >
-            {t('modes.daily')}
-          </button>
-          <button
-            className={`game-mode-tab${mode === "infinite" ? " game-mode-tab--active" : ""}`}
-            onClick={() => setMode("infinite")}
-          >
-            {t('modes.infinite')}
-          </button>
-        </div>
-        <div className="border-guess-card-note">
-          {mode === "daily"
-            ? "Classe 6 pays selon le critère du jour. Un seul essai par jour."
-            : "Enchaîne des rounds de classement avec difficulté au choix."}
-        </div>
-        <div className="game-card-buttons">
-          <button className="btn-play" onClick={() => navigate(game.route, { state: { mode } })}>
-            {t('buttons.play')}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function ActiveGameCard({ game }) {
   const navigate = useNavigate();
@@ -497,9 +334,77 @@ function ActiveGameCard({ game }) {
   );
 }
 
+// Jeux lancés directement depuis la tuile, avec un bouton par mode
+const DAILY_INFINITE_GAMES = new Set([
+  GAME_TYPES.BORDER_GUESS,
+  GAME_TYPES.COUNTRY_CLUE,
+  GAME_TYPES.VOYAGE_VOYAGE,
+  "ranking",
+]);
+
+function GameTile({ game, onConfigure }) {
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const isDailyInfinite = DAILY_INFINITE_GAMES.has(game.id);
+
+  return (
+    <div className="game-tile">
+      <div className="game-tile-head">
+        <span className="game-tile-icon">{game.icon}</span>
+        <h2 className="game-tile-title">{t(game.titleKey)}</h2>
+      </div>
+      <p className="game-tile-desc">{t(game.descKey)}</p>
+      <div className="game-tile-actions">
+        {isDailyInfinite ? (
+          <>
+            <button className="btn-play" onClick={() => navigate(game.route, { state: { mode: "daily" } })}>
+              {t('modes.daily')}
+            </button>
+            <button className="btn-tile-secondary" onClick={() => navigate(game.route, { state: { mode: "infinite" } })}>
+              {t('modes.infinite')}
+            </button>
+          </>
+        ) : (
+          <button className="btn-play" onClick={() => onConfigure(game.id)}>
+            {t('buttons.play')}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function GameConfigModal({ game, onClose }) {
+  useEffect(() => {
+    const handleKey = (event) => {
+      if (event.key === "Escape") onClose();
+    };
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKey);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKey);
+    };
+  }, [onClose]);
+
+  return (
+    <div className="game-modal-overlay" onClick={onClose}>
+      <div className="game-modal" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
+        <button className="game-modal-close" onClick={onClose} aria-label="Fermer">×</button>
+        <ActiveGameCard game={game} />
+      </div>
+    </div>
+  );
+}
+
 export default function HomePage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [configGameId, setConfigGameId] = useState(null);
+  const configGame = GAMES.find((game) => game.id === configGameId) ?? null;
+  const closeConfig = useCallback(() => setConfigGameId(null), []);
+
   return (
     <div className="home-page">
       <NavBar />
@@ -515,21 +420,12 @@ export default function HomePage() {
           </button>
         </div>
         <div className="games-grid">
-          {GAMES.filter((game) => game.active).map((game) =>
-            game.id === GAME_TYPES.BORDER_GUESS ? (
-              <BorderGuessCard key={game.id} game={game} />
-            ) : game.id === GAME_TYPES.COUNTRY_CLUE ? (
-              <CountryClueCard key={game.id} game={game} />
-            ) : game.cardType === "ranking" ? (
-              <RankingCard key={game.id} game={game} />
-            ) : game.cardType === "voyage" ? (
-              <VoyageVoyageCard key={game.id} game={game} />
-            ) : (
-              <ActiveGameCard key={game.id} game={game} />
-            )
-          )}
+          {GAMES.filter((game) => game.active).map((game) => (
+            <GameTile key={game.id} game={game} onConfigure={setConfigGameId} />
+          ))}
         </div>
       </main>
+      {configGame && <GameConfigModal game={configGame} onClose={closeConfig} />}
     </div>
   );
 }

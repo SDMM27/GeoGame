@@ -370,6 +370,11 @@ function GameTile({ game, onConfigure }) {
           </button>
         )}
       </div>
+      {!isDailyInfinite && (
+        <button className="nav-scores-btn game-tile-scores" onClick={() => navigate(`/scores?game=${game.id}`)}>
+          {t('buttons.scores')}
+        </button>
+      )}
     </div>
   );
 }

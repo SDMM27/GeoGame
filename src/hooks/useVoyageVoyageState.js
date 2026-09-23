@@ -17,6 +17,7 @@ function getFeatureByISO(iso) {
 
 function findFeatureByInput(input) {
   return countries.features.find(f =>
+    f.properties.ISO_A2 &&
     checkAnswer(input, f.properties.ADMIN, f.properties.aliases)
   ) ?? null
 }

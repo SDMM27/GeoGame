@@ -13,7 +13,7 @@ export default function NavBar() {
   return (
     <nav className="navbar">
       <Link to="/" className="navbar-logo">
-        GEO<span className="navbar-logo-accent">GAME</span>
+        <img src="/logo.png" alt="GeoGame" className="navbar-logo-img" />
       </Link>
       <div className="navbar-lang-group">
         {LANGUAGES.map(lang => (

@@ -21,6 +21,29 @@
   color: var(--accent-purple);
 }
 
+.navbar-logo {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-logo-img {
+  height: 76px;
+  width: auto;
+  display: block;
+  filter: drop-shadow(0 0 10px rgba(124, 58, 237, 0.45));
+  transition: transform 0.2s;
+}
+
+.navbar-logo:hover .navbar-logo-img {
+  transform: scale(1.05);
+}
+
+@media (max-width: 600px) {
+  .navbar-logo-img {
+    height: 60px;
+  }
+}
+
 @media (max-width: 600px) {
   .navbar {
     padding: 16px 20px;

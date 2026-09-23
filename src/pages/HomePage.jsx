@@ -506,6 +506,7 @@ export default function HomePage() {
       <main className="home-main">
         <div className="home-hero">
           <h1 className="home-title">{t('home.title')}</h1>
+          <img src="/logo.png" alt="GeoGame" className="home-logo" />
           <p className="home-subtitle">{t('home.subtitle')}</p>
         </div>
         <div className="home-multiplayer-banner">

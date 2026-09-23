@@ -30,6 +30,20 @@
   text-shadow: none;
 }
 
+.home-logo {
+  display: block;
+  height: 120px;
+  width: auto;
+  margin: 8px auto 16px;
+  filter: drop-shadow(0 0 18px rgba(124, 58, 237, 0.35));
+}
+
+@media (max-width: 600px) {
+  .home-logo {
+    height: 95px;
+  }
+}
+
 .home-subtitle {
   font-size: 0.9rem;
   color: var(--text-muted);

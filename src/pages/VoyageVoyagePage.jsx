@@ -17,7 +17,8 @@ import './VoyageVoyagePage.css'
 
 const flagSrc = iso => `/flags/${iso.toLowerCase()}.png`
 
-const ALL_FEATURES = countries.features
+// Territoires sans code ISO (Somaliland, Kosovo…) exclus : pas de drapeau ni de frontières
+const ALL_FEATURES = countries.features.filter(f => f.properties.ISO_A2)
 
 function getSuggestions(input) {
   if (input.length < 2) return []

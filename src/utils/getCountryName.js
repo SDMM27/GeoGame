@@ -3,6 +3,12 @@ import countryAliases from '../data/countryAliases.json'
 
 const cache = {}
 
+// Overrides for names where Intl.DisplayNames uses an unwanted form (e.g. "Congo-Kinshasa")
+const nameOverrides = {
+  CD: { fr: 'République démocratique du Congo', en: 'Democratic Republic of the Congo', ru: 'Демократическая Республика Конго' },
+  CG: { fr: 'Congo', en: 'Congo', ru: 'Конго' },
+}
+
 function displayNames(locale) {
   if (!cache[locale]) {
     try {
@@ -17,6 +23,8 @@ function displayNames(locale) {
 export function getCountryName(isoA2, lang) {
   if (!isoA2 || isoA2 === '-99' || isoA2 === '-1') return null
   const locale = lang === 'ru' ? 'ru' : lang === 'en' ? 'en' : 'fr'
+  const override = nameOverrides[isoA2.toUpperCase()]?.[locale]
+  if (override) return override
   try {
     const dn = displayNames(locale)
     return dn?.of(isoA2.toUpperCase()) || null

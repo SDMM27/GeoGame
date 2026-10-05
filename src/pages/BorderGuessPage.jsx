@@ -6,6 +6,8 @@ import { ToastContainer } from 'react-toastify'
 import { getCountryName } from '../utils/getCountryName'
 import NavBar from '../components/NavBar'
 import ShareScoreButton from '../components/ShareScoreButton'
+import ChallengeBanner from '../components/ChallengeBanner'
+import { resolveMode } from '../utils/challenge'
 import useBorderGuessState from '../hooks/useBorderGuessState'
 import { getCountryStyle, getFocusCountry, getViewportSettings } from '../utils/borderGuessMap'
 import DailyForm from './DailyForm'
@@ -67,7 +69,7 @@ function GuessHistory({ guesses, t, i18n }) {
 export default function BorderGuessPage() {
   const { t, i18n } = useTranslation()
   const location = useLocation()
-  const mode = location.state?.mode ?? 'daily'
+  const mode = resolveMode(location, 'daily')
   const {
     currentCountry,
     currentCountryISO,
@@ -114,6 +116,13 @@ export default function BorderGuessPage() {
     <div className="border-guess-page">
       <NavBar />
       <main className="border-guess-main">
+        {mode === 'daily' && (
+          <ChallengeBanner
+            gameType="BORDER_GUESS"
+            dailyKey={dailyKey}
+            result={isComplete ? { score: guesses.length, solved: isSolved } : null}
+          />
+        )}
         <section className="border-guess-panel border-guess-panel--hero">
           <div>
             <p className="border-guess-eyebrow">{t('labels.new_game')}</p>
@@ -216,6 +225,7 @@ export default function BorderGuessPage() {
                 details={isSolved
                   ? t('share.details_found_attempts', { count: guesses.length })
                   : t('share.details_not_found_attempts', { count: guesses.length })}
+                challenge={mode === 'daily' ? { route: '/border-guess', dailyKey, solved: isSolved } : null}
               />
             )}
 

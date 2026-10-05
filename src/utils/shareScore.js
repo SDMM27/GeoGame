@@ -209,7 +209,7 @@ export async function exportShareCard(data) {
   }
 }
 
-export function generateShareText({ score, gameType, difficulty, pseudo, scoreLabel = 'POINTS', details }) {
+export function generateShareText({ score, gameType, difficulty, pseudo, scoreLabel = 'POINTS', details, challengeUrl }) {
   const label = getGameLabel(gameType)
   const displayPseudo = pseudo?.trim() || t('share.anonymous', 'Anonyme')
   const playedBy = t('share.played_by', 'joué par')
@@ -224,13 +224,37 @@ export function generateShareText({ score, gameType, difficulty, pseudo, scoreLa
   if (details) lines.push(`📊 ${details}`)
   lines.push(`${playedBy} ${displayPseudo}`)
   lines.push('')
-  lines.push(`${canYouBeat} ${site}`)
+  if (challengeUrl) {
+    lines.push(`${t('challenge.share_cta', '🎯 Je te défie ! Bats mon score :')} ${challengeUrl}`)
+  } else {
+    lines.push(`${canYouBeat} ${site}`)
+  }
 
   return lines.join('\n')
 }
 
 export async function copyShareText(data) {
+  await copyText(generateShareText(data))
+}
+
+// Défi : feuille de partage native sur mobile, presse-papier ailleurs.
+// Retourne 'shared' | 'copied' | 'cancelled'.
+export async function shareChallenge(data) {
   const text = generateShareText(data)
+  const isTouch = typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches
+  if (isTouch && navigator.share) {
+    try {
+      await navigator.share({ text })
+      return 'shared'
+    } catch (err) {
+      if (err?.name === 'AbortError') return 'cancelled'
+    }
+  }
+  await copyText(text)
+  return 'copied'
+}
+
+async function copyText(text) {
   try {
     await navigator.clipboard.writeText(text)
   } catch {

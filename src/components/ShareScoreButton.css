@@ -69,3 +69,8 @@
 .share-copy-btn:hover {
   opacity: 0.85;
 }
+
+.share-challenge-btn {
+  background: rgba(34, 211, 238, 0.14);
+  border-color: rgba(34, 211, 238, 0.5);
+}

@@ -346,5 +346,23 @@
     "details_placement_timer": "{{found}}/{{total}} countries placed · {{time}}",
     "details_capitals_timer": "{{found}}/{{total}} capitals found · {{time}}",
     "details_voyage": "{{steps}} step(s) · optimal: {{optimal}}"
+  },
+  "challenge": {
+    "button": "🔗 Challenge a friend",
+    "link_copied": "✓ Challenge link copied!",
+    "share_cta": "🎯 I challenge you! Beat my score:",
+    "a_friend": "A friend",
+    "banner_title": "🎯 {{name}} challenges you on today's game!",
+    "their_score": "{{name}}'s score: {{score}}",
+    "your_score": "Your score: {{score}}",
+    "your_turn": "your turn!",
+    "result_win": "🏆 You beat {{name}}!",
+    "result_lose": "😅 {{name}} stays ahead… Rematch tomorrow?",
+    "result_tie": "🤝 Perfect tie with {{name}}!",
+    "stale": "This challenge is from {{day}}: today's game has changed since, so no comparison is possible.",
+    "attempts_one": "{{count}} attempt",
+    "attempts_other": "{{count}} attempts",
+    "not_found": "country not found",
+    "points": "{{score}} pts"
   }
 }

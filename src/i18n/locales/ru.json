@@ -346,5 +346,25 @@
     "details_placement_timer": "{{found}}/{{total}} стран размещено · {{time}}",
     "details_capitals_timer": "{{found}}/{{total}} столиц найдено · {{time}}",
     "details_voyage": "{{steps}} шаг(ов) · оптимально: {{optimal}}"
+  },
+  "challenge": {
+    "button": "🔗 Бросить вызов другу",
+    "link_copied": "✓ Ссылка на вызов скопирована!",
+    "share_cta": "🎯 Бросаю тебе вызов! Побей мой результат:",
+    "a_friend": "Друг",
+    "banner_title": "🎯 {{name}} бросает тебе вызов в игре дня!",
+    "their_score": "Результат {{name}}: {{score}}",
+    "your_score": "Твой результат: {{score}}",
+    "your_turn": "твой ход!",
+    "result_win": "🏆 Ты победил {{name}}!",
+    "result_lose": "😅 {{name}} впереди… Реванш завтра?",
+    "result_tie": "🤝 Ничья с {{name}}!",
+    "stale": "Этот вызов от {{day}}: игра дня с тех пор изменилась, сравнение невозможно.",
+    "attempts_one": "{{count}} попытка",
+    "attempts_few": "{{count}} попытки",
+    "attempts_many": "{{count}} попыток",
+    "attempts_other": "{{count}} попытки",
+    "not_found": "страна не найдена",
+    "points": "{{score}} очк."
   }
 }

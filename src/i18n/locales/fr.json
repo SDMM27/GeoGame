@@ -321,6 +321,7 @@
     "correct": "Bravo !",
     "wrong": "Dommage !",
     "found_country": "Bravo ! {{name}} !",
+    "typo_accepted": "Accepté ! On écrit « {{name}} »",
     "location_reveal": "Dommage ! C'est ici que se trouvait {{name}}",
     "all_countries_found": "Bravo ! Vous avez trouvé tous les pays !",
     "all_flags_found": "Bravo ! Vous avez trouvé tous les drapeaux !",

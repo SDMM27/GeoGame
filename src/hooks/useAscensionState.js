@@ -6,10 +6,10 @@ import { useTranslation } from 'react-i18next'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { formatTime } from '../utils/formatTime'
 import { GAME_TYPES } from '../utils/gameTypes'
-import { checkAnswer } from '../utils/normalizeAnswer'
+import { matchKnownAnswer } from '../utils/answerLexicon'
 import { buildPhaseSequence } from '../utils/ascensionPresets'
 import { saveSnapshot } from '../utils/multiplayerSnapshot'
-import { getCountryName } from '../utils/getCountryName'
+import { getCountryName, getAllCountryNames, getAllCapitalNames } from '../utils/getCountryName'
 
 // Which country property name holds the difficulty for each game type
 const DIFFICULTY_PROP = {
@@ -432,7 +432,10 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
     const diffProp  = isFlags ? props.DifficultyFlag  : props.DifficultyCapitals
     const revLabel  = answer
 
-    if (checkAnswer(inputValue, answer, aliases)) {
+    const accepted = isFlags
+      ? getAllCountryNames(props.ISO_A2, answer, aliases)
+      : getAllCapitalNames(props.ISO_A2, answer, aliases)
+    if (matchKnownAnswer(inputValue, accepted)) {
       const wasSkipped = clickOnSeeCountryRef.current
       if (!wasSkipped) {
         toast.success('Bravo ! ' + revLabel + ' !', { containerId: 'topRightToast' })

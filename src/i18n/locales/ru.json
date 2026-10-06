@@ -321,6 +321,7 @@
     "correct": "Отлично!",
     "wrong": "Неверно!",
     "found_country": "Отлично! {{name}}!",
+    "typo_accepted": "Принято! Правильно: «{{name}}»",
     "location_reveal": "Неверно! {{name}} была здесь",
     "all_countries_found": "Отлично! Вы нашли все страны!",
     "all_flags_found": "Отлично! Вы нашли все флаги!",

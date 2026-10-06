@@ -133,16 +133,35 @@ function shuffle(arr, random) {
   return sample(arr, arr.length, random)
 }
 
-// Prend `n` éléments de `candidates`, d'abord parmi ceux qui vérifient `preferred` (même continent…),
-// pour que les mauvaises réponses restent plausibles
-function pickPreferring(candidates, n, random, preferred) {
-  const chosen = sample(candidates.filter(preferred), n, random)
-  if (chosen.length < n) {
-    const rest = candidates.filter((c) => !chosen.includes(c))
-    chosen.push(...sample(rest, n - chosen.length, random))
+// Prend `n` éléments de `candidates` en privilégiant le score de proximité le plus élevé
+// (même chaîne, même continent…), au hasard parmi les ex æquo, pour que les mauvaises réponses restent plausibles
+function pickRanked(candidates, n, random, score) {
+  const byScore = new Map()
+  for (const c of candidates) {
+    const s = score(c)
+    if (!byScore.has(s)) byScore.set(s, [])
+    byScore.get(s).push(c)
+  }
+  const chosen = []
+  for (const s of [...byScore.keys()].sort((a, b) => b - a)) {
+    chosen.push(...sample(byScore.get(s), n - chosen.length, random))
+    if (chosen.length === n) break
   }
   return chosen.length === n ? chosen : null
 }
+
+const pickPreferring = (candidates, n, random, preferred) =>
+  pickRanked(candidates, n, random, (c) => (preferred(c) ? 1 : 0))
+
+const difficultyRank = (d) => QUIZ_DIFFICULTIES.indexOf(d)
+
+// Pays d'une liste qui respectent la difficulté autorisée ; à défaut, la liste entière
+function allowedIsos(isos, allowed) {
+  const ok = isos.filter((iso) => allowed.includes(BY_ISO.get(iso)?.Difficulty))
+  return ok.length ? ok : isos
+}
+
+const countryDifficulty = (iso) => BY_ISO.get(iso)?.Difficulty ?? 'Impossible'
 
 const countryChoice = (iso) => ({ id: `country:${iso}`, kind: 'country', value: iso })
 const featureChoice = (f) => ({ id: `feature:${f.id}`, kind: 'feature', value: f.id })
@@ -169,21 +188,22 @@ function featuresAllowed(allowed, filter = () => true) {
 // Distracteurs du même type : d'abord dans les difficultés autorisées, sinon dans toute la base
 function featureDistractors(subject, allowed, n, random, exclude) {
   const ok = (f) => f.type === subject.type && f.id !== subject.id && !exclude(f)
-  const sameContinent = (f) => f.continent === subject.continent
-  return pickPreferring(featuresAllowed(allowed, ok), n, random, sameContinent)
-    ?? pickPreferring(FEATURES.filter(ok), n, random, sameContinent)
+  // Une mauvaise réponse obscure s'élimine trop facilement : on reste d'abord dans la difficulté autorisée
+  const score = (f) => (allowed.includes(f.difficulty) ? 2 : 0) + (f.continent === subject.continent ? 1 : 0)
+  return pickRanked(FEATURES.filter(ok), n, random, score)
 }
 
-function countryDistractors(subjectIsos, continent, n, random) {
+function countryDistractors(subjectIsos, continent, difficulty, n, random) {
   const excluded = new Set(subjectIsos)
-  const candidates = VALID_COUNTRIES.filter((p) => !excluded.has(p.ISO_A2))
   const ref = BY_ISO.get(subjectIsos[0])
   const neighborhood = new Set(subjectIsos.flatMap((iso) => countryBorders[iso] ?? []))
+  // Pas de mauvaise réponse plus obscure que la question elle-même (territoires lointains…)
+  const candidates = VALID_COUNTRIES.filter(
+    (p) => !excluded.has(p.ISO_A2) && difficultyRank(p.Difficulty) <= Math.max(difficultyRank(difficulty), 1)
+  )
   // Voisins d'abord, puis même continent : un intrus lointain rendrait la question triviale
-  const close = (p) => neighborhood.has(p.ISO_A2)
-  const sameContinent = (p) => p.continent === (continent ?? ref?.continent)
-  const near = pickPreferring(candidates.filter((p) => close(p) || sameContinent(p)), n, random, close)
-  return (near ?? pickPreferring(candidates, n, random, sameContinent))?.map((p) => p.ISO_A2) ?? null
+  const score = (p) => (neighborhood.has(p.ISO_A2) ? 2 : 0) + (p.continent === (continent ?? ref?.continent) ? 1 : 0)
+  return pickRanked(candidates, n, random, score)?.map((p) => p.ISO_A2) ?? null
 }
 
 const generators = {
@@ -195,14 +215,15 @@ const generators = {
     const promptKey = many
       ? `${subject.type === 'river' ? 'river' : 'feature'}_country_many${mode === ANSWER_MODES.FREE ? '_free' : ''}`
       : `${subject.type === 'island' ? 'island' : subject.type === 'river' ? 'river' : 'feature'}_country_one`
-    const wrong = mode === ANSWER_MODES.FREE ? null : countryDistractors(subject.countries, subject.continent, 3, random)
+    const wrong = mode === ANSWER_MODES.FREE ? null : countryDistractors(subject.countries, subject.continent, subject.difficulty, 3, random)
     if (mode !== ANSWER_MODES.FREE && !wrong) return null
+    const answerIso = pick(allowedIsos(subject.countries, allowed), random)
     return buildQuestion({
       type: 'feature_country',
       promptKey,
-      difficulty: subject.difficulty,
+      difficulty: mode === ANSWER_MODES.FREE ? subject.difficulty : hardest([subject.difficulty, countryDifficulty(answerIso)]),
       params: { feature: subject.id },
-      correct: countryChoice(pick(subject.countries, random)),
+      correct: countryChoice(answerIso),
       wrong: wrong?.map(countryChoice),
       accepted: subject.countries.map(countryChoice),
       random,
@@ -214,13 +235,13 @@ const generators = {
   country_feature(allowed, random) {
     const subject = pick(featuresAllowed(allowed), random)
     if (!subject) return null
-    const iso = pick(subject.countries, random)
+    const iso = pick(allowedIsos(subject.countries, allowed), random)
     const wrong = featureDistractors(subject, allowed, 3, random, (f) => f.countries.includes(iso))
     if (!wrong) return null
     return buildQuestion({
       type: 'country_feature',
       promptKey: `country_${subject.type}`,
-      difficulty: subject.difficulty,
+      difficulty: hardest([subject.difficulty, countryDifficulty(iso)]),
       params: { country: iso },
       correct: featureChoice(subject),
       wrong: wrong.map(featureChoice),
@@ -304,13 +325,13 @@ const generators = {
   highest_point(allowed, random) {
     const subject = pick(featuresAllowed(allowed, (f) => f.type === 'mountain' && f.highestOf?.length), random)
     if (!subject) return null
-    const iso = pick(subject.highestOf.filter((c) => ALL_BY_ISO.has(c)), random)
+    const iso = pick(allowedIsos(subject.highestOf.filter((c) => ALL_BY_ISO.has(c)), allowed), random)
     if (!iso) return null
     const wrong = featureDistractors(subject, allowed, 3, random, (f) => f.countries.includes(iso))
     if (!wrong) return null
     return buildQuestion({
       type: 'highest_point',
-      difficulty: subject.difficulty,
+      difficulty: hardest([subject.difficulty, countryDifficulty(iso)]),
       params: { country: iso },
       correct: featureChoice(subject),
       wrong: wrong.map(featureChoice),
@@ -340,9 +361,9 @@ const generators = {
     if (!subject) return null
     const top = FEATURE_BY_ID.get(subject.highest)
     // Les autres sommets de la même chaîne font les meilleurs pièges
-    const wrong = pickPreferring(
+    const wrong = pickRanked(
       FEATURES.filter((f) => f.type === 'mountain' && f.id !== top.id),
-      3, random, (f) => f.range === subject.id
+      3, random, (f) => (f.range === subject.id ? 2 : 0) + (f.continent === top.continent ? 1 : 0)
     )
     if (!wrong) return null
     return buildQuestion({

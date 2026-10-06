@@ -1,0 +1,157 @@
+// App-only strings, merged into the shared i18n instance (../src/i18n) under `mobile.*`.
+import i18n from '@shared/i18n'
+
+const fr = {
+  tabs: { play: 'Jouer', multiplayer: 'Multi', leaderboards: 'Classements', profile: 'Profil' },
+  home: {
+    greeting: 'Prêt à voyager ?',
+    daily_title: 'Défis du jour',
+    daily_subtitle: 'Nouveaux chaque jour à minuit',
+    games_title: 'Jeux',
+    games_subtitle: 'Choisis ta difficulté ou ton continent',
+    daily: 'Défi du jour',
+    infinite: 'Infini',
+    done: 'Fait',
+  },
+  setup: {
+    mode: 'Mode',
+    standard: 'Standard',
+    ascension: 'Ascension',
+    countries: '{{count}} pays',
+    play: 'Jouer',
+    training: 'Entraînement',
+    training_hint: 'Sans chrono, sans score',
+    pick_continent: 'Choisis un continent',
+    total: '{{count}} pays au total',
+  },
+  game: {
+    quit_title: 'Quitter la partie ?',
+    quit_message: 'Ta progression sera perdue.',
+    quit: 'Quitter',
+    cancel: 'Annuler',
+    find: 'Trouve sur la carte',
+    reveal: 'Révéler',
+    skip: 'Passer',
+    found: 'trouvés',
+    time: 'Temps',
+    score: 'Score',
+    finished: 'Partie terminée',
+    replay: 'Rejouer',
+    home: 'Accueil',
+    share: 'Partager',
+    new_record: 'Nouveau record',
+    save: 'Enregistrer',
+    save_error: "L'enregistrement a échoué. Réessaie.",
+    phase: 'Phase',
+    remaining: 'restants',
+  },
+  common: { coming_soon: 'Bientôt disponible', back: 'Retour' },
+}
+
+const en: typeof fr = {
+  tabs: { play: 'Play', multiplayer: 'Multi', leaderboards: 'Rankings', profile: 'Profile' },
+  home: {
+    greeting: 'Ready to travel?',
+    daily_title: 'Daily challenges',
+    daily_subtitle: 'New ones every day at midnight',
+    games_title: 'Games',
+    games_subtitle: 'Pick a difficulty or a continent',
+    daily: 'Daily',
+    infinite: 'Infinite',
+    done: 'Done',
+  },
+  setup: {
+    mode: 'Mode',
+    standard: 'Standard',
+    ascension: 'Ascension',
+    countries: '{{count}} countries',
+    play: 'Play',
+    training: 'Training',
+    training_hint: 'No timer, no score',
+    pick_continent: 'Pick a continent',
+    total: '{{count}} countries in total',
+  },
+  game: {
+    quit_title: 'Quit this game?',
+    quit_message: "Your progress won't be saved.",
+    quit: 'Quit',
+    cancel: 'Cancel',
+    find: 'Find on the map',
+    reveal: 'Reveal',
+    skip: 'Skip',
+    found: 'found',
+    time: 'Time',
+    score: 'Score',
+    finished: 'Game over',
+    replay: 'Play again',
+    home: 'Home',
+    share: 'Share',
+    new_record: 'New record',
+    save: 'Save',
+    save_error: "Couldn't save your score. Try again.",
+    phase: 'Phase',
+    remaining: 'left',
+  },
+  common: { coming_soon: 'Coming soon', back: 'Back' },
+}
+
+const ru: typeof fr = {
+  tabs: { play: 'Играть', multiplayer: 'Мульти', leaderboards: 'Рейтинги', profile: 'Профиль' },
+  home: {
+    greeting: 'Готов к путешествию?',
+    daily_title: 'Задания дня',
+    daily_subtitle: 'Новые каждый день в полночь',
+    games_title: 'Игры',
+    games_subtitle: 'Выбери сложность или континент',
+    daily: 'Задание дня',
+    infinite: 'Бесконечно',
+    done: 'Готово',
+  },
+  setup: {
+    mode: 'Режим',
+    standard: 'Стандарт',
+    ascension: 'Восхождение',
+    countries: '{{count}} стран',
+    play: 'Играть',
+    training: 'Тренировка',
+    training_hint: 'Без таймера и очков',
+    pick_continent: 'Выбери континент',
+    total: 'Всего {{count}} стран',
+  },
+  game: {
+    quit_title: 'Выйти из игры?',
+    quit_message: 'Прогресс не сохранится.',
+    quit: 'Выйти',
+    cancel: 'Отмена',
+    find: 'Найди на карте',
+    reveal: 'Показать',
+    skip: 'Пропустить',
+    found: 'найдено',
+    time: 'Время',
+    score: 'Очки',
+    finished: 'Игра окончена',
+    replay: 'Ещё раз',
+    home: 'Главная',
+    share: 'Поделиться',
+    new_record: 'Новый рекорд',
+    save: 'Сохранить',
+    save_error: 'Не удалось сохранить. Попробуй ещё раз.',
+    phase: 'Фаза',
+    remaining: 'осталось',
+  },
+  common: { coming_soon: 'Скоро', back: 'Назад' },
+}
+
+i18n.addResourceBundle('fr', 'translation', { mobile: fr }, true, true)
+i18n.addResourceBundle('en', 'translation', { mobile: en }, true, true)
+i18n.addResourceBundle('ru', 'translation', { mobile: ru }, true, true)
+
+// Website labels carry emoji/arrows ("🏆 Scores", "← Accueil"); strip them for native UI.
+export function clean(label: string) {
+  return label
+    .replace(/^[^\p{L}\p{N}]+/u, '')
+    .replace(/[\s→←↺✓✗◎]+$/u, '')
+    .trim()
+}
+
+export default i18n

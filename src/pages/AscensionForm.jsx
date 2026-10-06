@@ -1,15 +1,8 @@
 import React, { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { firestore } from '../Firebase'
-import { addDoc, collection, getDocs, query, where, deleteDoc, serverTimestamp } from 'firebase/firestore'
+import { saveAscensionScore } from '../utils/saveScore'
 import { toast } from 'react-toastify'
 import { formatTime } from '../utils/formatTime'
-
-function isBetter(newScore, newTimeMs, existingScore, existingTimeMs) {
-  if (newScore > existingScore) return true
-  if (newScore === existingScore && newTimeMs < existingTimeMs) return true
-  return false
-}
 
 /**
  * End-of-game summary and score save for Ascension mode.
@@ -35,35 +28,14 @@ export default function AscensionForm({ score, timer, stats, phaseStats, gameTyp
     setSubmitting(true)
 
     try {
-      const ref = collection(firestore, 'ascension_scores')
-      const existing = await getDocs(
-        query(ref, where('name', '==', name), where('gameType', '==', gameType), where('presetName', '==', presetName))
-      )
-
-      if (!existing.empty) {
-        const prev = existing.docs[0].data()
-        if (!isBetter(score, timer, prev.globalScore, prev.globalTimeMs)) {
-          setBlockedByBetter({ timeMs: prev.globalTimeMs, score: prev.globalScore })
-          setSubmitting(false)
-          return
-        }
-        await deleteDoc(existing.docs[0].ref)
+      const result = await saveAscensionScore({ name, gameType, presetName, timer, score, stats, phaseStats })
+      if (result.status === 'blocked') {
+        setBlockedByBetter(result.existing)
+        setSubmitting(false)
+        return
       }
-
-      await addDoc(ref, {
-        name,
-        gameType,
-        presetName,
-        globalTimeMs: timer,
-        globalScore: score,
-        totalFound: stats.found,
-        totalSkipped: stats.skipped,
-        phaseStats,
-        date: serverTimestamp(),
-      })
-      const wasReplaced = !existing.empty
       toast.success(
-        wasReplaced ? 'Score Ascension mis à jour !' : 'Score Ascension sauvegardé !',
+        result.status === 'updated' ? 'Score Ascension mis à jour !' : 'Score Ascension sauvegardé !',
         { containerId: 'topRightToast' }
       )
       setBlockedByBetter(null)

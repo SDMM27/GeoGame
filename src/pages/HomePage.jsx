@@ -120,6 +120,15 @@ const GAMES = [
     active: true,
   },
   {
+    id: GAME_TYPES.QUIZ,
+    icon: "🧠",
+    titleKey: "games.quiz.title",
+    descKey: "games.quiz.description",
+    route: "/quiz",
+    directLaunch: true,
+    active: true,
+  },
+  {
     id: "placement",
     icon: "\u{1F4CD}",
     titleKey: "games.placement_map.title",
@@ -364,13 +373,17 @@ function GameTile({ game, onConfigure }) {
               {t('modes.infinite')}
             </button>
           </>
+        ) : game.directLaunch ? (
+          <button className="btn-play" onClick={() => navigate(game.route)}>
+            {t('buttons.play')}
+          </button>
         ) : (
           <button className="btn-play" onClick={() => onConfigure(game.id)}>
             {t('buttons.play')}
           </button>
         )}
       </div>
-      {!isDailyInfinite && (
+      {!isDailyInfinite && !game.directLaunch && (
         <button className="nav-scores-btn game-tile-scores" onClick={() => navigate(`/scores?game=${game.id}`)}>
           {t('buttons.scores')}
         </button>

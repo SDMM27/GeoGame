@@ -47,6 +47,10 @@
     "lives_mode": {
       "title": "Режим жизней",
       "description": "Найди как можно больше стран без ошибок."
+    },
+    "quiz": {
+      "title": "Гео-викторина",
+      "description": "Отвечай на вопросы по географии один за другим, пока не решишь остановиться."
     }
   },
   "modes": {
@@ -347,5 +351,65 @@
     "details_placement_timer": "{{found}}/{{total}} стран размещено · {{time}}",
     "details_capitals_timer": "{{found}}/{{total}} столиц найдено · {{time}}",
     "details_voyage": "{{steps}} шаг(ов) · оптимально: {{optimal}}"
+  },
+  "quiz": {
+    "pick_difficulty": "Выбери сложность",
+    "pick_difficulty_hint": "Вопросы будут не сложнее выбранного уровня. Остановиться можно в любой момент.",
+    "points_one": "{{count}} очко",
+    "points_few": "{{count}} очка",
+    "points_many": "{{count}} очков",
+    "points_other": "{{count}} очка",
+    "score": "Счёт",
+    "correct_answers": "Верные ответы",
+    "streak": "Серия",
+    "best_streak": "Лучшая серия",
+    "correct": "✓ Верно!",
+    "wrong": "✗ Неверно",
+    "next": "Следующий вопрос →",
+    "quit": "Остановиться",
+    "summary_title": "Игра окончена",
+    "change_difficulty": "Сменить сложность",
+    "share_label": "ОЧКИ",
+    "share_details": "{{correct}}/{{answered}} верных ответов · лучшая серия {{streak}}",
+    "questions": {
+      "feature_country_one": "{{feature}}: в какой стране?",
+      "island_country_one": "{{feature}}: какой стране принадлежит?",
+      "feature_country_many": "{{feature}}: в какой из этих стран?",
+      "feature_country_many_free": "{{feature}}: назови одну из стран, где это находится",
+      "river_country_one": "{{feature}}: по какой стране протекает эта река?",
+      "river_country_many": "{{feature}}: через какую из этих стран протекает эта река?",
+      "river_country_many_free": "{{feature}}: назови страну, через которую протекает эта река",
+      "country_river": "{{country}}: какая река протекает по этой стране?",
+      "country_mountain": "{{country}}: какая вершина находится в этой стране?",
+      "country_range": "{{country}}: какая горная система находится в этой стране?",
+      "country_lake": "{{country}}: какое озеро или внутреннее море находится в этой стране?",
+      "country_desert": "{{country}}: какая пустыня находится в этой стране?",
+      "country_waterfall": "{{country}}: какой водопад находится в этой стране?",
+      "country_island": "{{country}}: какой остров принадлежит этой стране?",
+      "feature_continent": "{{feature}}: на каком континенте?",
+      "river_mouth": "{{feature}}: куда впадает эта река?",
+      "river_city": "Какая река протекает через город {{city}}?",
+      "mountain_range": "{{feature}}: в какой горной системе находится эта вершина?",
+      "highest_point": "{{country}}: какая вершина — высшая точка этой страны?",
+      "mountain_height": "Какая вершина имеет высоту {{height}} м ({{countries}})?",
+      "range_highest": "{{feature}}: какая вершина здесь самая высокая?",
+      "longest_river": "Какая из этих рек самая длинная?",
+      "highest_mountain": "Какая из этих вершин самая высокая?",
+      "neighbor": "Какая из этих стран граничит по суше со страной {{country}}?",
+      "not_neighbor": "Какая из этих стран НЕ граничит по суше со страной {{country}}?",
+      "neighbor_free": "Назови страну, которая граничит по суше со страной {{country}}"
+    },
+    "pick_mode": "Формат ответов",
+    "modes": {
+      "choices": "Выбор из вариантов",
+      "choices_hint": "4 варианта, верный только один",
+      "free": "Свободный ответ",
+      "free_hint": "Ты сам вписываешь ответ"
+    },
+    "input_placeholder": "Твой ответ…",
+    "dont_know": "Не знаю",
+    "typo_accepted": "Опечатка засчитана: {{name}}",
+    "answer_was": "Ответ: {{answer}}",
+    "accepted_answers": "Возможные ответы: {{answer}}"
   }
 }

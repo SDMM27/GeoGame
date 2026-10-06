@@ -47,6 +47,10 @@
     "lives_mode": {
       "title": "Mode Vies",
       "description": "Trouve un maximum de pays sans te tromper."
+    },
+    "quiz": {
+      "title": "Quiz Géo",
+      "description": "Enchaîne les questions de culture géographique jusqu'à ce que tu décides d'arrêter."
     }
   },
   "modes": {
@@ -347,5 +351,63 @@
     "details_placement_timer": "{{found}}/{{total}} pays placés · {{time}}",
     "details_capitals_timer": "{{found}}/{{total}} capitales trouvées · {{time}}",
     "details_voyage": "{{steps}} étape(s) · optimal : {{optimal}}"
+  },
+  "quiz": {
+    "pick_difficulty": "Choisis ta difficulté",
+    "pick_difficulty_hint": "Les questions iront jusqu'à cette difficulté. Tu peux arrêter quand tu veux.",
+    "points_one": "{{count}} point",
+    "points_other": "{{count}} points",
+    "score": "Score",
+    "correct_answers": "Bonnes réponses",
+    "streak": "Série",
+    "best_streak": "Meilleure série",
+    "correct": "✓ Bonne réponse !",
+    "wrong": "✗ Mauvaise réponse",
+    "next": "Question suivante →",
+    "quit": "Arrêter",
+    "summary_title": "Fin de la partie",
+    "change_difficulty": "Changer de difficulté",
+    "share_label": "POINTS",
+    "share_details": "{{correct}}/{{answered}} bonnes réponses · série max {{streak}}",
+    "questions": {
+      "feature_country_one": "{{feature}} : dans quel pays ?",
+      "island_country_one": "{{feature}} : à quel pays ?",
+      "feature_country_many": "{{feature}} : dans lequel de ces pays ?",
+      "feature_country_many_free": "{{feature}} : cite un des pays concernés",
+      "river_country_one": "Dans quel pays coule {{feature}} ?",
+      "river_country_many": "Lequel de ces pays est traversé par {{feature}} ?",
+      "river_country_many_free": "Cite un pays traversé par {{feature}}",
+      "country_river": "{{country}} : quel cours d'eau traverse ce pays ?",
+      "country_mountain": "{{country}} : quel sommet se trouve dans ce pays ?",
+      "country_range": "{{country}} : quelle chaîne de montagnes se trouve dans ce pays ?",
+      "country_lake": "{{country}} : quel lac ou mer fermée se trouve dans ce pays ?",
+      "country_desert": "{{country}} : quel désert s'étend dans ce pays ?",
+      "country_waterfall": "{{country}} : quelle chute d'eau se trouve dans ce pays ?",
+      "country_island": "{{country}} : quelle île appartient à ce pays ?",
+      "feature_continent": "{{feature}} : sur quel continent ?",
+      "river_mouth": "Où se jette {{feature}} ?",
+      "river_city": "Quel cours d'eau traverse la ville de {{city}} ?",
+      "mountain_range": "Dans quelle chaîne de montagnes se trouve {{feature}} ?",
+      "highest_point": "{{country}} : quel est le point culminant de ce pays ?",
+      "mountain_height": "Quel sommet culmine à {{height}} m ({{countries}}) ?",
+      "range_highest": "{{feature}} : quel est le plus haut sommet ?",
+      "longest_river": "Lequel de ces cours d'eau est le plus long ?",
+      "highest_mountain": "Lequel de ces sommets est le plus haut ?",
+      "neighbor": "Lequel de ces pays a une frontière terrestre avec ce pays : {{country}} ?",
+      "not_neighbor": "Lequel de ces pays n'a PAS de frontière terrestre avec ce pays : {{country}} ?",
+      "neighbor_free": "Cite un pays qui a une frontière terrestre avec ce pays : {{country}}"
+    },
+    "pick_mode": "Format des réponses",
+    "modes": {
+      "choices": "Choix multiples",
+      "choices_hint": "4 propositions, une seule est la bonne",
+      "free": "Réponse libre",
+      "free_hint": "Tu écris toi-même la réponse"
+    },
+    "input_placeholder": "Ta réponse…",
+    "dont_know": "Je ne sais pas",
+    "typo_accepted": "Faute de frappe acceptée : {{name}}",
+    "answer_was": "Réponse : {{answer}}",
+    "accepted_answers": "Réponses possibles : {{answer}}"
   }
 }

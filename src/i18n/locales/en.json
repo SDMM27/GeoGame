@@ -47,6 +47,10 @@
     "lives_mode": {
       "title": "Lives Mode",
       "description": "Find as many countries as possible without making mistakes."
+    },
+    "quiz": {
+      "title": "Geo Quiz",
+      "description": "Answer geography trivia questions one after another until you decide to stop."
     }
   },
   "modes": {
@@ -347,5 +351,63 @@
     "details_placement_timer": "{{found}}/{{total}} countries placed · {{time}}",
     "details_capitals_timer": "{{found}}/{{total}} capitals found · {{time}}",
     "details_voyage": "{{steps}} step(s) · optimal: {{optimal}}"
+  },
+  "quiz": {
+    "pick_difficulty": "Choose your difficulty",
+    "pick_difficulty_hint": "Questions will go up to this difficulty. You can stop whenever you want.",
+    "points_one": "{{count}} point",
+    "points_other": "{{count}} points",
+    "score": "Score",
+    "correct_answers": "Correct answers",
+    "streak": "Streak",
+    "best_streak": "Best streak",
+    "correct": "✓ Correct!",
+    "wrong": "✗ Wrong answer",
+    "next": "Next question →",
+    "quit": "Stop",
+    "summary_title": "Game over",
+    "change_difficulty": "Change difficulty",
+    "share_label": "POINTS",
+    "share_details": "{{correct}}/{{answered}} correct answers · best streak {{streak}}",
+    "questions": {
+      "feature_country_one": "Which country is home to {{feature}}?",
+      "island_country_one": "Which country does {{feature}} belong to?",
+      "feature_country_many": "Which of these countries is home to {{feature}}?",
+      "feature_country_many_free": "Name a country that is home to {{feature}}",
+      "river_country_one": "Which country does {{feature}} flow through?",
+      "river_country_many": "Which of these countries does {{feature}} flow through?",
+      "river_country_many_free": "Name a country that {{feature}} flows through",
+      "country_river": "{{country}}: which river flows through this country?",
+      "country_mountain": "{{country}}: which peak is in this country?",
+      "country_range": "{{country}}: which mountain range is in this country?",
+      "country_lake": "{{country}}: which lake or inland sea is in this country?",
+      "country_desert": "{{country}}: which desert extends into this country?",
+      "country_waterfall": "{{country}}: which waterfall is in this country?",
+      "country_island": "{{country}}: which island belongs to this country?",
+      "feature_continent": "{{feature}}: on which continent?",
+      "river_mouth": "What body of water does {{feature}} flow into?",
+      "river_city": "Which river flows through {{city}}?",
+      "mountain_range": "Which mountain range is {{feature}} part of?",
+      "highest_point": "{{country}}: what is the highest point of this country?",
+      "mountain_height": "Which peak rises to {{height}} m ({{countries}})?",
+      "range_highest": "{{feature}}: what is the highest peak?",
+      "longest_river": "Which of these rivers is the longest?",
+      "highest_mountain": "Which of these peaks is the highest?",
+      "neighbor": "Which of these countries shares a land border with {{country}}?",
+      "not_neighbor": "Which of these countries does NOT share a land border with {{country}}?",
+      "neighbor_free": "Name a country that shares a land border with {{country}}"
+    },
+    "pick_mode": "Answer format",
+    "modes": {
+      "choices": "Multiple choice",
+      "choices_hint": "4 options, only one is right",
+      "free": "Free answer",
+      "free_hint": "You type the answer yourself"
+    },
+    "input_placeholder": "Your answer…",
+    "dont_know": "I don't know",
+    "typo_accepted": "Typo accepted: {{name}}",
+    "answer_was": "Answer: {{answer}}",
+    "accepted_answers": "Possible answers: {{answer}}"
   }
 }

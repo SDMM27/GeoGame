@@ -321,6 +321,7 @@
     "correct": "Well done!",
     "wrong": "Wrong!",
     "found_country": "Well done! {{name}}!",
+    "typo_accepted": "Accepted! It's spelled \"{{name}}\"",
     "location_reveal": "Wrong! {{name}} was here",
     "all_countries_found": "Well done! You found all countries!",
     "all_flags_found": "Well done! You found all flags!",

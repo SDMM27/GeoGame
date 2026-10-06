@@ -5,7 +5,7 @@ import { toast } from 'react-toastify'
 import { useTranslation } from 'react-i18next'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { formatTime } from '../utils/formatTime'
-import { checkAnswer } from '../utils/normalizeAnswer'
+import { matchKnownAnswer } from '../utils/answerLexicon'
 import { saveSnapshot } from '../utils/multiplayerSnapshot'
 import { getCountryName, getAllCapitalNames } from '../utils/getCountryName'
 
@@ -212,12 +212,18 @@ export default function useCapitalsGameState(difficulty, isTraining, overrideCou
     const capital = props.capital
     const capitalAliases = props.capitalAliases ?? []
     const extraCapitals = getAllCapitalNames(iso, capital, capitalAliases)
-    const isCorrect = checkAnswer(inputValue, capital, capitalAliases, extraCapitals)
+    const result = matchKnownAnswer(inputValue, [capital, ...capitalAliases, ...extraCapitals])
+    const isCorrect = Boolean(result)
 
     if (isCorrect) {
       const wasSkipped = clickOnSeeCountryRef.current
       if (!wasSkipped) {
-        toast.success(t('toasts.found_country', { name: getCountryName(iso, i18n.language) || props.ADMIN }), { containerId: 'topRightToast' })
+        toast.success(
+          result.match === 'typo'
+            ? t('toasts.typo_accepted', { name: result.name })
+            : t('toasts.found_country', { name: getCountryName(iso, i18n.language) || props.ADMIN }),
+          { containerId: 'topRightToast' }
+        )
         incrementScore(props.DifficultyCapitals, consecutiveErrorsRef.current)
       }
       setStats(prev =>

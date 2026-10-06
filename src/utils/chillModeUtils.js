@@ -1,4 +1,5 @@
 import { checkAnswer, normalize } from './normalizeAnswer'
+import { matchKnownAnswer } from './answerLexicon'
 import { getPlacementPoints, getWordGamePoints, getGuessGamePoints } from './scoringRules'
 
 export const CHILL_COUNTDOWN_MS = {
@@ -28,7 +29,7 @@ export function getCountdownMs(difficulty, timers) {
  */
 export function evaluateTextAnswer(submitted, target, aliases, difficulty) {
   if (!submitted || !submitted.trim()) return { correct: false, score: 0 }
-  const correct = checkAnswer(submitted.trim(), target, aliases)
+  const correct = Boolean(matchKnownAnswer(submitted.trim(), [target, ...(aliases ?? [])]))
   const score = correct ? getWordGamePoints(difficulty, 0) : 0
   return { correct, score }
 }

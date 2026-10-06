@@ -26,7 +26,36 @@ const BORDER_GUESS_EXCLUDED = new Set([
   'Wallis-et-Futuna',
   'Îles de la mer de Corail',
   'Îles Cook',
-  'Curaçao', 'Tonga', 'Îles Pitcairn', 'Antarctique'
+  'Curaçao', 'Tonga', 'Îles Pitcairn', 'Antarctique',
+  // Archipels réduits à des points épars, sans forme reconnaissable
+  'Îles Marshall',
+  'Tuvalu',
+  'Maldives',
+  'Kiribati',
+  'États fédérés de Micronésie',
+  'Îles Mariannes du Nord',
+  'Palaos',
+  'Îles Spratly',
+  'Îles mineures éloignées des États-Unis',
+  "Territoire britannique de l'océan Indien",
+  'Île Clipperton',
+  'Îles Ashmore et Cartier',
+  'Récif Scarborough',
+  // Territoires minuscules ou trop fragmentés pour être devinés
+  'Seychelles',
+  'Îles Turques-et-Caïques',
+  'Îles Vierges britanniques',
+  'Îles Vierges américaines',
+  'Sainte-Hélène',
+  'Samoa américaines',
+  'Saint-Barthélemy',
+  'Anguilla',
+  'Niue',
+  'Île Norfolk',
+  'Macao R.A.S.',
+  "Zone de souveraineté d'Akrotiri",
+  'Zone de souveraineté de Dhekelia',
+  'Bermudes',
 ])
 
 export const BORDER_GUESS_COUNTRIES = countries.features.filter(

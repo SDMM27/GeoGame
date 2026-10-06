@@ -99,13 +99,13 @@ describe('generateQuestion', () => {
     expect(new Set(questions.map((q) => q.type)).size).toBeGreaterThanOrEqual(12)
   })
 
-  it('avoids repeating questions already seen in the session', () => {
+  it('avoids repeating questions or subjects already seen in the session', () => {
     const random = mulberry32(3)
     const used = new Set()
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 60; i++) {
       const q = generateQuestion('Moyen', used, random)
-      expect(used.has(q.key)).toBe(false)
-      used.add(q.key)
+      for (const k of q.usedKeys) expect(used.has(k), k).toBe(false)
+      q.usedKeys.forEach((k) => used.add(k))
     }
   })
 })

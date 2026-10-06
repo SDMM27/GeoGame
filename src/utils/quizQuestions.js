@@ -169,7 +169,10 @@ const mouthChoice = (key) => ({ id: `mouth:${key}`, kind: 'mouth', value: key })
 const continentChoice = (name) => ({ id: `continent:${name}`, kind: 'continent', value: name })
 
 function buildQuestion({ type, promptKey = type, difficulty, params = {}, correct, wrong, accepted = [correct], random, key }) {
+  // Éléments sur lesquels porte la question : on évite d'en reparler dans la même partie
+  const subjects = [params.feature, correct?.kind === 'feature' ? correct.value : null].filter(Boolean)
   return {
+    usedKeys: [key, ...new Set(subjects.map((id) => `subject:${id}`))],
     type,
     promptKey,
     difficulty,
@@ -468,6 +471,7 @@ function curatedToQuestion(q, random) {
   const wrong = q.wrong.map((w, i) => ({ id: `wrong${i}`, kind: 'text', value: w }))
   return {
     ...buildQuestion({ type: 'curated', difficulty: q.difficulty, correct, wrong, random, key: `curated:${q.id}` }),
+    usedKeys: [`curated:${q.id}`],
     text: q.question,
     fact: q.fact,
     accept: q.accept ?? [],
@@ -494,7 +498,7 @@ export function generateQuestion(maxDifficulty, usedKeys = new Set(), random = M
     const type = pickWeighted(weights, random)
     const question = generators[type](allowed, random, answerMode)
     if (!question || !allowed.includes(question.difficulty)) continue
-    if (!usedKeys.has(question.key)) return question
+    if (!question.usedKeys.some((k) => usedKeys.has(k))) return question
     fallback = fallback ?? question
   }
   if (fallback) return fallback

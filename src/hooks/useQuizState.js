@@ -17,7 +17,7 @@ export default function useQuizState() {
 
   const drawQuestion = useCallback((difficulty, mode) => {
     const next = generateQuestion(difficulty, usedKeysRef.current, Math.random, mode)
-    if (next) usedKeysRef.current.add(next.key)
+    next?.usedKeys.forEach((k) => usedKeysRef.current.add(k))
     setQuestion(next)
     setSelectedId(null)
     setFreeResult(null)

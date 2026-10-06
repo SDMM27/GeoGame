@@ -8,7 +8,7 @@ import useCapitalsGameState from '../hooks/useCapitalsGameState'
 import { snapshotKey, loadSnapshot } from '../utils/multiplayerSnapshot'
 import useAscensionState from '../hooks/useAscensionState'
 import { GAME_TYPES } from '../utils/gameTypes'
-import { checkAnswer } from '../utils/normalizeAnswer'
+import { matchKnownAnswer } from '../utils/answerLexicon'
 import { getCountryName, getCapitalName, getAllCapitalNames } from '../utils/getCountryName'
 import PhaseIndicator from '../components/PhaseIndicator'
 import Form from './form'
@@ -52,11 +52,10 @@ function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, s
     targetCountry &&
     !revealedName &&
     !isGameOver &&
-    checkAnswer(
+    matchKnownAnswer(
       inputValue,
-      targetCountry.properties.capital,
-      targetCountry.properties.capitalAliases ?? [],
-      getAllCapitalNames(targetCountry.properties.ISO_A2, targetCountry.properties.capital, targetCountry.properties.capitalAliases ?? [])
+      getAllCapitalNames(targetCountry.properties.ISO_A2, targetCountry.properties.capital, targetCountry.properties.capitalAliases ?? []),
+      { whileTyping: true }
     )
   )
 

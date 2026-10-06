@@ -7,7 +7,7 @@ import useFlagGameState from '../hooks/useFlagGameState'
 import { snapshotKey, loadSnapshot } from '../utils/multiplayerSnapshot'
 import useAscensionState from '../hooks/useAscensionState'
 import { GAME_TYPES } from '../utils/gameTypes'
-import { checkAnswer } from '../utils/normalizeAnswer'
+import { matchKnownAnswer } from '../utils/answerLexicon'
 import { getCountryName, getAllCountryNames } from '../utils/getCountryName'
 import PhaseIndicator from '../components/PhaseIndicator'
 import Form from './form'
@@ -42,11 +42,10 @@ function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state
     targetCountry &&
     !revealedName &&
     !isGameOver &&
-    checkAnswer(
+    matchKnownAnswer(
       inputValue,
-      targetCountry.properties.ADMIN,
-      targetCountry.properties.aliases ?? [],
-      getAllCountryNames(targetCountry.properties.ISO_A2, targetCountry.properties.ADMIN, targetCountry.properties.aliases ?? [])
+      getAllCountryNames(targetCountry.properties.ISO_A2, targetCountry.properties.ADMIN, targetCountry.properties.aliases ?? []),
+      { whileTyping: true }
     )
   )
 

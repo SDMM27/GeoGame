@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { formatTime } from '../utils/formatTime'
-import { checkAnswer } from '../utils/normalizeAnswer'
+import { matchKnownAnswer } from '../utils/answerLexicon'
 import { getAllCountryNames, getCountryName } from '../utils/getCountryName'
 import { saveSnapshot } from '../utils/multiplayerSnapshot'
 
@@ -206,12 +206,14 @@ export default function useFlagGameState(difficulty, isTraining, overrideCountri
     const iso = props.ISO_A2
     const aliases = props.aliases ?? []
     const extraNames = getAllCountryNames(iso, props.ADMIN, aliases)
-    const isCorrect = checkAnswer(inputValue, props.ADMIN, aliases, extraNames)
+    const result = matchKnownAnswer(inputValue, [props.ADMIN, ...aliases, ...extraNames])
+    const isCorrect = Boolean(result)
 
     if (isCorrect) {
       const wasSkipped = clickOnSeeCountryRef.current
       if (!wasSkipped) {
-        toast.success(t('toasts.found_country', { name: getCountryName(props.ISO_A2, i18n.language) || props.ADMIN }), { containerId: 'topRightToast' })
+        const name = getCountryName(props.ISO_A2, i18n.language) || props.ADMIN
+        toast.success(t(result.match === 'typo' ? 'toasts.typo_accepted' : 'toasts.found_country', { name }), { containerId: 'topRightToast' })
         incrementScore(props.DifficultyFlag, consecutiveErrorsRef.current)
       }
       setStats(prev =>

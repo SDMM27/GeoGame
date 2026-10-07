@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
+import { useKeyboardVisible } from '@/hooks/useKeyboardVisible'
 import { clean } from '@/i18n'
 import { colors, fonts, radius, space } from '@/theme'
 import { Text, Touchable } from '../ui'
@@ -37,6 +38,8 @@ export function GuessInputBar({
 }) {
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
+  // The keyboard covers the home indicator: no bottom inset under the input while typing.
+  const keyboardVisible = useKeyboardVisible()
   const inputRef = useRef<TextInput>(null)
   const trimmed = value.trim()
   const visibleSuggestions = locked || suggestions.includes(trimmed) ? [] : suggestions
@@ -51,7 +54,7 @@ export function GuessInputBar({
   }, [value])
 
   return (
-    <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, space.md) }]}>
+    <View style={[styles.bar, { paddingBottom: keyboardVisible ? space.md : Math.max(insets.bottom, space.md) }]}>
       {visibleSuggestions.length > 0 && (
         <ScrollView
           horizontal

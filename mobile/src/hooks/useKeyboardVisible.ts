@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Keyboard, Platform } from 'react-native'
+import { Keyboard, Platform, useWindowDimensions } from 'react-native'
 
 // Whether the software keyboard is shown (iOS reports it slightly earlier with the "will" events).
 export function useKeyboardVisible() {
@@ -31,4 +31,9 @@ export function useKeyboardHeight() {
     }
   }, [])
   return height
+}
+
+// Window height left above the keyboard.
+export function useVisibleHeight() {
+  return useWindowDimensions().height - useKeyboardHeight()
 }

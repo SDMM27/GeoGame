@@ -4,7 +4,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { Image } from 'expo-image'
 import { useEffect, useEffectEvent, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, View, useWindowDimensions } from 'react-native'
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, View } from 'react-native'
 import Animated, { FadeIn, FadeInDown, ZoomIn } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -15,7 +15,7 @@ import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
 import { ResultsSheet, type SaveConfig } from '@/components/game/ResultsSheet'
 import { Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
-import { useKeyboardHeight } from '@/hooks/useKeyboardVisible'
+import { useKeyboardVisible, useVisibleHeight } from '@/hooks/useKeyboardVisible'
 import { DIFFICULTY_COLORS } from '@/games'
 import { clean } from '@/i18n'
 import { RoomHudPill, Standings, useReportFound, type RoomPlay } from '@/multiplayer/RoomPlay'
@@ -117,12 +117,13 @@ export function TypingGame({
   const locked = !!revealedName || isGameOver
   // While typing, everything must fit between the top bar and the keyboard: tighter spacing,
   // and the flag takes whatever height is left.
-  const keyboardHeight = useKeyboardHeight()
-  const { height: windowHeight } = useWindowDimensions()
-  const typing = keyboardHeight > 0
+  const typing = useKeyboardVisible()
+  const visibleHeight = useVisibleHeight()
   const gap = typing ? space.md : space.xl
   const paddingTop = insets.top + 42 + (typing ? space.sm : space.lg)
-  const inputBarHeight = 52 + space.md + Math.max(insets.bottom, space.md)
+  // The keyboard covers the home indicator: no bottom inset under the input while typing.
+  const inputBarPadding = typing ? space.md : Math.max(insets.bottom, space.md)
+  const inputBarHeight = 52 + space.md + inputBarPadding
   const otherBlocks =
     (currentPhase ? 16 + gap : 0) + // phase row
     30 + gap + // progress
@@ -130,7 +131,7 @@ export function TypingGame({
     (revealedName ? 40 + gap : 0) // revealed answer
   const flagHeight = Math.min(
     280,
-    Math.max(60, windowHeight - keyboardHeight - inputBarHeight - paddingTop - space.md - otherBlocks)
+    Math.max(60, visibleHeight - inputBarHeight - paddingTop - space.md - otherBlocks)
   )
 
   const question = (
@@ -209,7 +210,7 @@ export function TypingGame({
         </ScrollView>
 
         {!isGameOver && (
-          <View style={[styles.inputBar, { paddingBottom: Math.max(insets.bottom, space.md) }]}>
+          <View style={[styles.inputBar, { paddingBottom: inputBarPadding }]}>
             <TextInput
               ref={inputRef}
               value={inputValue}

@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next'
 import { collection, getDocs } from 'firebase/firestore'
 import { firestore } from '../Firebase'
 import { formatTime } from '../utils/formatTime'
+import { useAccount } from '../auth'
+import PlayerName, { mineClass } from '../components/PlayerName'
 import { GAME_TYPES } from '../utils/gameTypes'
 import { CONTINENTS } from '../utils/continents'
 import './scoreboard.css'
@@ -36,6 +38,7 @@ export const filterByGame = (scores, game) => {
 
 export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT, continentMode = false }) {
   const { t } = useTranslation()
+  const { account } = useAccount()
   const [allScores, setAllScores] = useState([])
   const [selectedGame, setSelectedGame] = useState(defaultGame)
   const [selectedDifficulty, setSelectedDifficulty] = useState('AllScores')
@@ -133,12 +136,12 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT, contine
           {scores.map((score, index) => (
             <div
               key={index}
-              className={`scoreboard-row ${index < 3 ? 'scoreboard-row--top' : ''}`}
+              className={`scoreboard-row ${index < 3 ? 'scoreboard-row--top' : ''}${mineClass(score, account)}`}
             >
               <span className="scoreboard-rank">
                 {index < 3 ? MEDAL[index] : `#${index + 1}`}
               </span>
-              <span className="scoreboard-name">{score.name}</span>
+              <span className="scoreboard-name"><PlayerName entry={score} account={account} /></span>
               <span className="scoreboard-score">{score.score} pts</span>
               <span className="scoreboard-time">
                 {score.elapsedTime != null ? formatTime(score.elapsedTime) : '—'}

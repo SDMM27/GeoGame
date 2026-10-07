@@ -3,19 +3,22 @@ import { useTranslation } from 'react-i18next'
 import { fetchDailyScores } from '../utils/saveScore'
 import { formatTime } from '../utils/formatTime'
 import { getLast7Days } from '../utils/dateUtils'
+import { useAccount } from '../auth'
+import { useLeaderboardRefresh } from '../hooks/useLeaderboardRefresh'
+import PlayerName, { mineClass } from '../components/PlayerName'
 import './DailyLeaderboard.css'
 
 const MEDAL = ['🥇', '🥈', '🥉']
 
-function AccordionRow({ score, index, secondaryFormatter, guessesTitle }) {
+function AccordionRow({ score, index, account, secondaryFormatter, guessesTitle }) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
 
   return (
-    <div className={`daily-lb__row${index < 3 ? ' daily-lb__row--top' : ''}`}>
+    <div className={`daily-lb__row${index < 3 ? ' daily-lb__row--top' : ''}${mineClass(score, account)}`}>
       <div className="daily-lb__row-main" onClick={() => setOpen((prev) => !prev)}>
         <span className="daily-lb__rank">{index < 3 ? MEDAL[index] : `#${index + 1}`}</span>
-        <span className="daily-lb__name">{score.name}</span>
+        <span className="daily-lb__name"><PlayerName entry={score} account={account} /></span>
         <span className="daily-lb__attempts">
           {score.hints > 0
             ? <>{score.attempts + score.hints} <span className="daily-lb__attempts-detail">({score.attempts}+{score.hints})</span></>
@@ -54,6 +57,8 @@ function AccordionRow({ score, index, secondaryFormatter, guessesTitle }) {
 
 export default function DailyLeaderboard({ gameType, dailyKey, columnLabels, secondaryFormatter, guessesTitle }) {
   const { t, i18n } = useTranslation()
+  const { account } = useAccount()
+  const refreshKey = useLeaderboardRefresh()
   const [selectedDate, setSelectedDate] = useState(dailyKey ?? '')
   const [scores, setScores] = useState([])
   const [loading, setLoading] = useState(true)
@@ -73,7 +78,7 @@ export default function DailyLeaderboard({ gameType, dailyKey, columnLabels, sec
       }
     }
     fetchScores()
-  }, [gameType, selectedDate])
+  }, [gameType, selectedDate, refreshKey])
 
   return (
     <div className="daily-lb">
@@ -122,7 +127,7 @@ export default function DailyLeaderboard({ gameType, dailyKey, columnLabels, sec
             <span>{columnLabels?.secondary ?? t('leaderboard.time')}</span>
           </div>
           {scores.map((score, index) => (
-            <AccordionRow key={`${score.name}-${score.dailyKey}-${index}`} score={score} index={index} secondaryFormatter={secondaryFormatter} guessesTitle={guessesTitle} />
+            <AccordionRow key={`${score.name}-${score.dailyKey}-${index}`} score={score} index={index} account={account} secondaryFormatter={secondaryFormatter} guessesTitle={guessesTitle} />
           ))}
         </>
       )}

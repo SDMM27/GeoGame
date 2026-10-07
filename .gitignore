@@ -34,3 +34,6 @@ graphify-out/
 
 putAllScoresToPlacementGameType.js
 archiveScoresToV1.js
+
+# Firebase Admin keys (scripts/purgeAnonymousScores.mjs)
+serviceAccount*.json

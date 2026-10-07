@@ -1,9 +1,10 @@
-import React, { useRef, useState } from 'react'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { saveAscensionScore } from '../utils/saveScore'
-import { toast } from 'react-toastify'
 import { formatTime } from '../utils/formatTime'
-import { getSavedPseudo } from '../utils/account'
+import { useAccount } from '../auth'
+import { useScoreSave } from '../hooks/useScoreSave'
+import LeaderboardSave from '../components/LeaderboardSave'
 
 /**
  * End-of-game summary and score save for Ascension mode.
@@ -11,42 +12,12 @@ import { getSavedPseudo } from '../utils/account'
  */
 export default function AscensionForm({ score, timer, stats, phaseStats, gameType, presetName, isTraining }) {
   const { t } = useTranslation()
-  const nameRef = useRef()
-  const [saved, setSaved] = useState(false)
-  const [submitting, setSubmitting] = useState(false)
-  const [blockedByBetter, setBlockedByBetter] = useState(null)
-
   const canSave = !isTraining && presetName !== null
-
-  const handleSave = async (e) => {
-    e.preventDefault()
-    if (submitting || saved) return
-    const name = nameRef.current.value.trim()
-    if (!name) {
-      toast.error(t('messages.please_enter_username'), { containerId: 'topRightToast' })
-      return
-    }
-    setSubmitting(true)
-
-    try {
-      const result = await saveAscensionScore({ name, gameType, presetName, timer, score, stats, phaseStats })
-      if (result.status === 'blocked') {
-        setBlockedByBetter(result.existing)
-        setSubmitting(false)
-        return
-      }
-      toast.success(
-        result.status === 'updated' ? 'Score Ascension mis à jour !' : 'Score Ascension sauvegardé !',
-        { containerId: 'topRightToast' }
-      )
-      setBlockedByBetter(null)
-      setSaved(true)
-    } catch (err) {
-      toast.error('Erreur lors de la sauvegarde', { containerId: 'topRightToast' })
-      console.error(err)
-      setSubmitting(false)
-    }
-  }
+  const saver = useScoreSave(
+    useAccount(),
+    (player) => saveAscensionScore({ ...player, gameType, presetName, timer, score, stats, phaseStats }),
+    { enabled: canSave }
+  )
 
   const DIFFICULTY_COLORS = {
     Facile: '#4ade80', Moyen: '#00d4ff', Difficile: '#fbbf24', Impossible: '#f97316',
@@ -101,36 +72,14 @@ export default function AscensionForm({ score, timer, stats, phaseStats, gameTyp
         </table>
       )}
 
-      {canSave && !saved && (
-        <>
-          {blockedByBetter && (
-            <div className="form-blocked">
-              <p className="form-blocked-message">⚠️ {t('form.better_ascension_time')}</p>
-              <p className="form-blocked-score">
-                <strong>{formatTime(blockedByBetter.timeMs)}</strong> — {blockedByBetter.score} {t('units.pts')}
-              </p>
-              <p className="form-blocked-hint">{t('form.use_different_name')}</p>
-            </div>
-          )}
-          <form onSubmit={handleSave}>
-            <label htmlFor="ascension-name" className="form-label">{t('labels.username')}</label>
-            <input
-              type="text"
-              id="ascension-name"
-              ref={nameRef}
-              defaultValue={getSavedPseudo()}
-              className="form-input"
-              placeholder={t('placeholders.username')}
-              maxLength={20}
-              onChange={() => setBlockedByBetter(null)}
-            />
-            <button type="submit" className="form-submit" disabled={saved || submitting}>
-              {submitting ? t('form.saving') : t('buttons.save_score')}
-            </button>
-          </form>
-        </>
+      {canSave && (
+        <LeaderboardSave
+          saver={saver}
+          existingText={(existing) => `${formatTime(existing.timeMs)} — ${existing.score} ${t('units.pts')}`}
+          blockedLabel={t('form.better_ascension_time')}
+          blockedHint={t('form.use_different_name')}
+        />
       )}
-      {saved && <p style={{ color: '#4ade80', textAlign: 'center' }}>{t('form.score_saved')}</p>}
       {!canSave && (
         <p style={{ color: 'var(--text-muted)', fontSize: '0.85em', textAlign: 'center' }}>
           {isTraining ? t('form.training_mode_not_saved') : t('form.custom_config_not_saved')}

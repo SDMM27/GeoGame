@@ -54,6 +54,7 @@
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
     "build:countries": "node scripts/build-countries.mjs",
+    "build:flags": "node scripts/build-flags.mjs",
     "postinstall": "setup-skia-web public"
   },
   "private": true

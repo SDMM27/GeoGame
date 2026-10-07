@@ -44,6 +44,8 @@ const fr = {
     save_error: "L'enregistrement a échoué. Réessaie.",
     phase: 'Phase',
     remaining: 'restants',
+    which_country: 'Quel est ce pays ?',
+    which_capital: 'Quelle est sa capitale ?',
   },
   common: { coming_soon: 'Bientôt disponible', back: 'Retour' },
 }
@@ -91,6 +93,8 @@ const en: typeof fr = {
     save_error: "Couldn't save your score. Try again.",
     phase: 'Phase',
     remaining: 'left',
+    which_country: 'Which country is this?',
+    which_capital: 'What is its capital?',
   },
   common: { coming_soon: 'Coming soon', back: 'Back' },
 }
@@ -138,6 +142,8 @@ const ru: typeof fr = {
     save_error: 'Не удалось сохранить. Попробуй ещё раз.',
     phase: 'Фаза',
     remaining: 'осталось',
+    which_country: 'Что это за страна?',
+    which_capital: 'Какая у неё столица?',
   },
   common: { coming_soon: 'Скоро', back: 'Назад' },
 }

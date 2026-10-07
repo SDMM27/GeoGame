@@ -64,7 +64,6 @@ function PlacementGame({
   const mapRef = useRef<WorldMapHandle>(null)
   const {
     targetCountry,
-    targetCountryISO,
     score,
     timer,
     stats,
@@ -99,6 +98,9 @@ function PlacementGame({
     return () => clearTimeout(id)
   }, [continent])
 
+  // useAscensionState doesn't expose targetCountryISO: look it up from the country name
+  const targetCountryISO: string | null =
+    state.targetCountryISO ?? allCountries.find((f) => f.properties.ADMIN === targetCountry)?.properties.ISO_A2 ?? null
   const targetName = getCountryName(targetCountryISO, i18n.language) || targetCountry
   const progress = stats.total ? (stats.found + stats.skipped) / stats.total : 0
   const remaining = stats.total - stats.found - stats.skipped
@@ -108,10 +110,12 @@ function PlacementGame({
     <View style={{ flex: 1, backgroundColor: colors.ocean }}>
       <WorldMap ref={mapRef} onCountryPress={(layer) => onCountryClick({ target: layer })} />
 
-      <GameTopBar>
-        <HudPill icon="timer-outline" label={displayTimer} />
-        {!isTraining && <HudPill icon="star-four-points-outline" label={String(score)} color={colors.accent} />}
-      </GameTopBar>
+      {!isGameOver && (
+        <GameTopBar>
+          <HudPill icon="timer-outline" label={displayTimer} />
+          {!isTraining && <HudPill icon="star-four-points-outline" label={String(score)} color={colors.accent} />}
+        </GameTopBar>
+      )}
 
       {!isGameOver && targetCountry && (
         <Animated.View

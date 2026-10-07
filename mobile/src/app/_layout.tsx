@@ -13,6 +13,7 @@ import { StatusBar } from 'expo-status-bar'
 import { useEffect } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
+import { InstallHint } from '@/components/InstallHint'
 import { ToastHost } from '@/components/ToastHost'
 import { colors } from '@/theme'
 
@@ -67,6 +68,7 @@ export default function RootLayout() {
           <Stack.Screen name="multi/[code]" options={{ animation: 'fade_from_bottom' }} />
           <Stack.Screen name="game" options={{ gestureEnabled: false, animation: 'fade_from_bottom' }} />
         </Stack>
+        <InstallHint />
         <ToastHost />
       </ThemeProvider>
     </GestureHandlerRootView>

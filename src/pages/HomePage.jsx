@@ -2,6 +2,7 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import NavBar from "../components/NavBar";
+import AppBanner from "../components/AppBanner";
 import { GAME_TYPES } from "../utils/gameTypes";
 import { getTotalCountries, getTotalCountriesByContinent } from "../hooks/useGameState";
 import { getTotalFlagCountries, getTotalFlagCountriesByContinent } from "../hooks/useFlagGameState";
@@ -427,6 +428,7 @@ export default function HomePage() {
     <div className="home-page">
       <NavBar />
       <main className="home-main">
+        <AppBanner />
         <div className="home-hero">
           <h1 className="home-title">{t('home.title')}</h1>
           <img src="/logo.png" alt="GeoGame" className="home-logo" />

@@ -656,5 +656,13 @@
       "title": "Night owl",
       "desc": "Play between midnight and 5 am"
     }
+  },
+  "app_banner": {
+    "title": "GeoGame as an app",
+    "subtitle": "Full screen with an icon on your home screen. Install it from Safari.",
+    "open": "Open",
+    "close": "Close",
+    "subtitle_android": "Download the APK, then allow the install when Android asks.",
+    "download": "Download"
   }
 }

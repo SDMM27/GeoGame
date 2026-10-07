@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<!-- Web build template (expo export -p web). Makes the app installable from Safari/Chrome
+     ("Add to Home Screen"): full screen, own icon, content under the notch via safe-area insets. -->
+<html lang="%LANG_ISO_CODE%">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+    <title>%WEB_TITLE%</title>
+    <meta name="description" content="GeoGame — Mini-jeux de géographie" />
+    <meta name="theme-color" content="#0B1020" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="GeoGame" />
+    <style id="expo-reset">
+      html,
+      body {
+        height: 100%;
+        background-color: #0B1020;
+      }
+      body {
+        overflow: hidden;
+        overscroll-behavior: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      #root {
+        display: flex;
+        height: 100%;
+        flex: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>Active JavaScript pour jouer à GeoGame.</noscript>
+    <div id="root"></div>
+  </body>
+</html>

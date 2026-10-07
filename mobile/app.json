@@ -25,6 +25,8 @@
     },
     "web": {
       "output": "single",
+      "lang": "fr",
+      "name": "GeoGame",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
@@ -45,6 +47,12 @@
       "typedRoutes": true,
       "reactCompiler": true
     },
-    "backgroundColor": "#0B1020"
+    "backgroundColor": "#0B1020",
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "970ae91f-e9ee-4f14-9255-733683fdf13c"
+      }
+    }
   }
 }

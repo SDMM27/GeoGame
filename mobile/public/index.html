@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <!-- Web build template (expo export -p web). Makes the app installable from Safari/Chrome
-     ("Add to Home Screen"): full screen, own icon, content under the notch via safe-area insets. -->
+     ("Add to Home Screen"): full screen and own icon. The status bar is opaque so screens always
+     start below the iPhone camera (safe-area insets sometimes read 0 on first load). -->
 <html lang="%LANG_ISO_CODE%">
   <head>
     <meta charset="utf-8" />
@@ -12,7 +13,7 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="apple-mobile-web-app-title" content="GeoGame" />
     <style id="expo-reset">
       html,
@@ -31,6 +32,21 @@
         flex: 1;
       }
     </style>
+    <script>
+      // Like KeyboardAvoidingView on native: when the iPhone keyboard opens, shrink the app to the
+      // visible area instead of letting Safari slide the whole page up.
+      ;(function () {
+        var viewport = window.visualViewport
+        if (!viewport) return
+        function fit() {
+          document.documentElement.style.height = viewport.height + 'px'
+          if (window.scrollY || viewport.offsetTop) window.scrollTo(0, 0)
+        }
+        viewport.addEventListener('resize', fit)
+        viewport.addEventListener('scroll', fit)
+        fit()
+      })()
+    </script>
   </head>
   <body>
     <noscript>Active JavaScript pour jouer à GeoGame.</noscript>

@@ -5,7 +5,7 @@ import { Image } from 'expo-image'
 import { useLocalSearchParams } from 'expo-router'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native'
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native'
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -15,6 +15,7 @@ import { GAME_TYPES } from '@shared/utils/gameTypes'
 import { getAllCountryNames, getCountryName } from '@shared/utils/getCountryName'
 import { normalize } from '@shared/utils/normalizeAnswer'
 
+import { confirmAction } from '@/components/confirm'
 import { DailyLeaderboard } from '@/components/game/DailyLeaderboard'
 import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
 import { GuessInputBar } from '@/components/game/GuessInputBar'
@@ -152,10 +153,13 @@ export default function VoyageScreen() {
   }
 
   const onNewPath = () => {
-    Alert.alert(t('voyage_voyage.confirm_new_path'), undefined, [
-      { text: t('mobile.game.cancel'), style: 'cancel' },
-      { text: clean(t('buttons.new_path')), onPress: resetGame },
-    ])
+    confirmAction({
+      title: t('voyage_voyage.confirm_new_path'),
+      confirmLabel: clean(t('buttons.new_path')),
+      cancelLabel: t('mobile.game.cancel'),
+      destructive: false,
+      onConfirm: resetGame,
+    })
   }
 
   const HINTS: { type: 'next' | 'all' | 'initials'; label: string; enabled: boolean }[] = [

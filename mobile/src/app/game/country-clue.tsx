@@ -280,7 +280,7 @@ function CountryClueGame({ mode, play }: { mode: string; play?: RoomPlay }) {
 
       {!(isComplete && isDaily) && !rounds.showResults && (
         <GameTopBar confirmQuit={!!play} onQuit={play?.exit}>
-          {play && <RoomHudPill code={play.room.id} />}
+          {play && <RoomHudPill code={play.room.id} gameIndex={play.room.gameIndex} />}
           {play && <HudPill icon="timer-outline" label={formatTime(rounds.elapsedTime ?? elapsed).slice(0, 5)} />}
           {isDaily && hasStarted && <HudPill icon="timer-outline" label={formatTime(elapsedTime ?? elapsed).slice(0, 5)} />}
           <HudPill icon="target" label={`${guesses.length} ${attemptsLabel}`} color={ACCENT} />
@@ -307,7 +307,7 @@ function CountryClueGame({ mode, play }: { mode: string; play?: RoomPlay }) {
           }}
           onHome={play.exit}
           homeLabel={t('mobile.multi.back_to_room')}>
-          <Standings code={play.room.id} />
+          <Standings code={play.room.id} gameIndex={play.room.gameIndex} />
         </ResultsSheet>
       )}
 

@@ -68,6 +68,16 @@ export default function RootLayout() {
               contentStyle: { backgroundColor: colors.surface },
             }}
           />
+          <Stack.Screen
+            name="multi/add"
+            options={{
+              presentation: 'formSheet',
+              sheetAllowedDetents: [0.75, 1],
+              sheetGrabberVisible: true,
+              sheetCornerRadius: 28,
+              contentStyle: { backgroundColor: colors.surface },
+            }}
+          />
           <Stack.Screen name="multi/[code]" options={{ animation: 'fade_from_bottom' }} />
           <Stack.Screen name="game" options={{ gestureEnabled: false, animation: 'fade_from_bottom' }} />
         </Stack>

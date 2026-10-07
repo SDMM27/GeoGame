@@ -685,6 +685,17 @@
     "difficulty": "Difficulté",
     "answer_mode": "Réponses",
     "countries_count": "Nombre de pays",
-    "questions_count": "Nombre de questions"
+    "questions_count": "Nombre de questions",
+    "games": "Jeux de la partie",
+    "remove_game": "Retirer ce jeu",
+    "game_n": "Jeu {{n}}",
+    "add_another": "Ajouter un autre jeu",
+    "add_game": "Ajouter un jeu",
+    "cancel": "Annuler",
+    "overall": "Général",
+    "points": "{{count}} pts",
+    "n_games": "{{count}} jeux",
+    "next_game": "Lancer le jeu {{n}}",
+    "waiting_next": "En attente du jeu suivant…"
   }
 }

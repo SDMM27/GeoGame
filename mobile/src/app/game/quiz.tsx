@@ -598,7 +598,7 @@ function PracticeQuiz({ play }: { play?: RoomPlay }) {
         <GameTopBar confirmQuit={stats.answered > 0} onQuit={play?.exit ?? (() => navigate('/'))}>
           {maxDifficulty && (
             <>
-              {play && <RoomHudPill code={play.room.id} />}
+              {play && <RoomHudPill code={play.room.id} gameIndex={play.room.gameIndex} />}
               <HudPill icon="star-outline" label={`${stats.score}`} color={ACCENT} />
               <HudPill icon="check" label={`${stats.correct}/${stats.answered}`} />
               <HudPill icon="fire" label={`${stats.streak}`} color={stats.streak >= 3 ? colors.warning : colors.text} />
@@ -645,7 +645,7 @@ function PracticeQuiz({ play }: { play?: RoomPlay }) {
           onHome={play?.exit ?? (() => navigate('/'))}
           homeLabel={play ? t('mobile.multi.back_to_room') : undefined}>
           {play ? (
-            <Standings code={play.room.id} />
+            <Standings code={play.room.id} gameIndex={play.room.gameIndex} />
           ) : (
             <Button label={t('quiz.change_difficulty')} variant="secondary" onPress={backToDifficulty} />
           )}

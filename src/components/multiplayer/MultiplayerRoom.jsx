@@ -1,6 +1,7 @@
 // src/components/multiplayer/MultiplayerRoom.jsx
-// A multiplayer room, created on the website or in the mobile app: one game, 'live' (everyone starts together)
-// or 'challenge' (play whenever). Join with a username, lobby and countdown (live), play, then the live standings.
+// A multiplayer room, created on the website or in the mobile app: one or more games in a row.
+// 'live': everyone starts each game together when the host launches it. 'challenge': everyone plays the games in
+// order, whenever they want. Join with a username, lobby and countdown (live), play, then the standings.
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAccount } from '../../auth'
@@ -10,11 +11,20 @@ import { formatTime } from '../../utils/formatTime'
 import { serverNow } from '../../utils/serverTime'
 import { snapshotKey } from '../../utils/multiplayerSnapshot'
 import {
+  addGame,
+  currentGameIndex,
   getRoomContent,
   joinRoom,
+  launchNextGame,
   launchRoom,
+  nextGameToPlay,
+  overallStandings,
+  progressForGame,
   rankRoomResults,
   reportProgress,
+  resultsForGame,
+  roomForGame,
+  roomGames,
   roomScoringMode,
   submitResult,
 } from '../../utils/multiplayerRoom'
@@ -25,16 +35,9 @@ import { MultiplayerCapitalsGame } from '../../pages/CapitalsGamePage'
 import { PracticeQuiz } from '../../pages/QuizPage'
 import MultiplayerBorderGuess from './MultiplayerBorderGuess'
 import MultiplayerCountryClue from './MultiplayerCountryClue'
+import { GameEditor, buildRoomGame, draftReady, gameLabel, newDraft } from './RoomConfig'
+import './RoomConfig.css'
 import './MultiplayerRoom.css'
-
-const GAME_ICONS = {
-  placement: '🌍',
-  flags: '🚩',
-  capitals: '🏛️',
-  border_guess: '🧩',
-  country_clue: '🧭',
-  quiz: '❓',
-}
 
 const PLAYABLE_TYPES = [
   GAME_TYPES.PLACEMENT,
@@ -58,14 +61,6 @@ function useCountdown(startAt) {
     return () => clearInterval(id)
   }, [running])
   return remaining
-}
-
-function gameSettings(game, t) {
-  if (game.phases) return 'Ascension'
-  if (game.continent) return t(`continents.${game.continent}`, game.continent)
-  if (game.difficulty) return t(`difficulties.${game.difficulty}`, game.difficulty)
-  if (game.quizDifficulty) return t(`difficulties.${game.quizDifficulty}`, game.quizDifficulty)
-  return null
 }
 
 function resultLine(game, result, t) {
@@ -141,53 +136,167 @@ function Players({ room, playerId }) {
   )
 }
 
-export function Standings({ room, progress, gameResults, playerId }) {
+/** Standings of game `index`: results, then the players still playing it or who did not play it yet. */
+export function Standings({ room, progress, results, playerId, index }) {
   const { t } = useTranslation()
-  const results = Object.values(gameResults)
-  const ranked = rankRoomResults(room.game, results)
-  const finishedIds = new Set(results.map((result) => result.playerId))
+  const game = roomGames(room)[index]
+  const ranked = rankRoomResults(game, resultsForGame(results, index))
+  const live = progressForGame(progress, index)
+  const finishedIds = new Set(ranked.map((result) => result.playerId))
   const others = Object.entries(room.players).filter(([id]) => !finishedIds.has(id))
+
+  return (
+    <ul className="mpr-list">
+      {ranked.map((result, i) => (
+        <li
+          key={result.playerId}
+          className={`mpr-row${i < 3 ? ' mpr-row--top' : ''}${result.playerId === playerId ? ' mpr-row--me' : ''}`}
+        >
+          <span className="mpr-rank">{MEDALS[result.rank - 1] ?? result.rank}</span>
+          <span className="mpr-name">
+            {result.pseudo}
+            {result.playerId === playerId && ` (${t('mp_room.you')})`}
+          </span>
+          <span className="mpr-score">{resultLine(game, result, t)}</span>
+        </li>
+      ))}
+      {others.map(([id, player]) => (
+        <li key={id} className="mpr-row mpr-row--waiting">
+          <span className="mpr-rank">{live[id] ? '⏳' : '·'}</span>
+          <span className="mpr-name">
+            {player.pseudo}
+            {id === playerId && ` (${t('mp_room.you')})`}
+          </span>
+          <span className="mpr-score">
+            {live[id] ? `${t('mp_room.playing')} · ${live[id].found ?? 0}/${live[id].total ?? '?'}` : t('mp_room.not_played')}
+          </span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+/** Points over every game. */
+function OverallStandings({ room, results, playerId }) {
+  const { t } = useTranslation()
+  const total = roomGames(room).length
+  return (
+    <ul className="mpr-list">
+      {overallStandings(room, results).map((entry, i) => (
+        <li
+          key={entry.playerId}
+          className={`mpr-row${i < 3 ? ' mpr-row--top' : ''}${entry.playerId === playerId ? ' mpr-row--me' : ''}`}
+        >
+          <span className="mpr-rank">{MEDALS[entry.rank - 1] ?? entry.rank}</span>
+          <span className="mpr-name">
+            {entry.pseudo}
+            {entry.playerId === playerId && ` (${t('mp_room.you')})`}
+          </span>
+          <span className="mpr-score">
+            {t('mp_room.points', { count: entry.points })} · {entry.played}/{total}
+          </span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+/** Overall standings and each game's, one tab each. */
+function StandingsCard({ room, progress, results, playerId, defaultTab }) {
+  const { t } = useTranslation()
+  const games = roomGames(room)
+  const [tab, setTab] = useState(defaultTab)
+  const shown = games.length === 1 ? 0 : tab
 
   return (
     <div className="mpr-card">
       <h3>{t('mp_room.standings')}</h3>
-      <ul className="mpr-list">
-        {ranked.map((result, index) => (
-          <li
-            key={result.playerId}
-            className={`mpr-row${index < 3 ? ' mpr-row--top' : ''}${result.playerId === playerId ? ' mpr-row--me' : ''}`}
-          >
-            <span className="mpr-rank">{MEDALS[result.rank - 1] ?? result.rank}</span>
-            <span className="mpr-name">
-              {result.pseudo}
-              {result.playerId === playerId && ` (${t('mp_room.you')})`}
-            </span>
-            <span className="mpr-score">{resultLine(room.game, result, t)}</span>
-          </li>
-        ))}
-        {others.map(([id, player]) => {
-          const live = progress[id]
-          return (
-            <li key={id} className="mpr-row mpr-row--waiting">
-              <span className="mpr-rank">{live ? '⏳' : '·'}</span>
-              <span className="mpr-name">
-                {player.pseudo}
-                {id === playerId && ` (${t('mp_room.you')})`}
-              </span>
-              <span className="mpr-score">
-                {live ? `${t('mp_room.playing')} · ${live.found ?? 0}/${live.total ?? '?'}` : t('mp_room.not_played')}
-              </span>
-            </li>
-          )
-        })}
-      </ul>
-      {ranked.length === 0 && others.length === 0 && <p className="mpr-muted">{t('mp_room.no_players')}</p>}
+      {games.length > 1 && (
+        <div className="mpr-tabs">
+          <button type="button" className={shown === 'overall' ? 'active' : ''} onClick={() => setTab('overall')}>
+            {t('mp_room.overall')}
+          </button>
+          {games.map((_, i) => (
+            <button key={i} type="button" className={shown === i ? 'active' : ''} onClick={() => setTab(i)}>
+              {t('mp_room.game_n', { n: i + 1 })}
+            </button>
+          ))}
+        </div>
+      )}
+      {shown === 'overall' ? (
+        <OverallStandings room={room} results={results} playerId={playerId} />
+      ) : (
+        <Standings room={room} progress={progress} results={results} playerId={playerId} index={shown} />
+      )}
+      {Object.keys(room.players).length === 0 && <p className="mpr-muted">{t('mp_room.no_players')}</p>}
     </div>
   )
 }
 
-function RoomGame({ room, progress, gameResults, playerId, onDone }) {
-  const { game, seed } = room
+/** The room's games, with the player's progress through them. */
+function GameList({ room, results, playerId }) {
+  const { t } = useTranslation()
+  const games = roomGames(room)
+  const current = currentGameIndex(room)
+  const played = new Set(results.filter((result) => result.playerId === playerId).map((result) => result.gameIndex ?? 0))
+  return (
+    <ol className="mpr-games">
+      {games.map((game, i) => {
+        const isCurrent = room.mode === 'live' && room.status === 'playing' && i === current
+        return (
+          <li key={i} className={`${isCurrent ? 'mpr-games--current' : ''}${played.has(i) ? ' mpr-games--done' : ''}`}>
+            <span className="mpr-games-n">{played.has(i) ? '✓' : i + 1}</span>
+            <span>{gameLabel(game, t)}</span>
+          </li>
+        )
+      })}
+    </ol>
+  )
+}
+
+/** Host: adds a game at the end of the room. */
+function AddGame({ room }) {
+  const { t } = useTranslation()
+  const [draft, setDraft] = useState(null)
+  const [saving, setSaving] = useState(false)
+
+  if (!draft) {
+    return (
+      <button type="button" className="rc-add-btn" onClick={() => setDraft(newDraft())}>
+        + {t('mp_room.add_game')}
+      </button>
+    )
+  }
+  const onAdd = async () => {
+    setSaving(true)
+    try {
+      await addGame(room, buildRoomGame(draft))
+      setDraft(null)
+    } catch (err) {
+      console.error(err)
+    }
+    setSaving(false)
+  }
+  return (
+    <div className="mpr-card">
+      <h3>{t('mp_room.game_n', { n: roomGames(room).length + 1 })}</h3>
+      <GameEditor draft={draft} onChange={setDraft} />
+      <div className="mpr-actions">
+        <button type="button" className="mpr-btn" onClick={onAdd} disabled={saving || !draftReady(draft)}>
+          {t('mp_room.add_game')}
+        </button>
+        <button type="button" className="mpr-link-btn" onClick={() => setDraft(null)}>
+          {t('mp_room.cancel')}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function RoomGame({ room, progress, results, playerId, onDone }) {
+  const { t } = useTranslation()
+  // This game's view of the room: its game and its own seed
+  const { game, seed, gameIndex } = room
   const content = useMemo(() => getRoomContent(game, seed), [game, seed])
   const { total } = content
   const doneRef = useRef(false)
@@ -196,14 +305,14 @@ function RoomGame({ room, progress, gameResults, playerId, onDone }) {
 
   // Announce the player as soon as the game starts
   useEffect(() => {
-    reportProgress(room.id, playerId, { found: 0, total, finished: false }).catch(console.error)
-  }, [room.id, playerId, total])
+    reportProgress(room.id, playerId, { gameIndex, found: 0, total, finished: false }).catch(console.error)
+  }, [room.id, playerId, gameIndex, total])
 
   const reportFound = useCallback((found) => {
     if (doneRef.current) return
     foundRef.current = found
-    reportProgress(room.id, playerId, { found, total, finished: false }).catch(console.error)
-  }, [room.id, playerId, total])
+    reportProgress(room.id, playerId, { gameIndex, found, total, finished: false }).catch(console.error)
+  }, [room.id, playerId, gameIndex, total])
 
   const onCountryFound = useCallback(() => reportFound(foundRef.current + 1), [reportFound])
 
@@ -220,12 +329,12 @@ function RoomGame({ room, progress, gameResults, playerId, onDone }) {
       total,
     }
     Promise.all([
-      submitResult(room.id, playerId, pseudo, result),
-      reportProgress(room.id, playerId, { found: solved, total, finished: true }),
+      submitResult(room.id, playerId, pseudo, result, gameIndex),
+      reportProgress(room.id, playerId, { gameIndex, found: solved, total, finished: true }),
     ])
       .catch(console.error)
-      .finally(onDone)
-  }, [game, room.id, playerId, pseudo, total, onDone])
+      .finally(() => onDone(gameIndex))
+  }, [game, room.id, playerId, pseudo, gameIndex, total, onDone])
 
   const quizRoom = useMemo(() => ({
     seed,
@@ -251,11 +360,11 @@ function RoomGame({ room, progress, gameResults, playerId, onDone }) {
     onGameFinished,
     roomId: room.id,
     playerId,
-    gameIndex: 0,
+    gameIndex,
   }
   // Players time their own game, from when they start it
   const ownClock = { ...room, startAt: null }
-  const snapKey = snapshotKey(room.id, playerId, 0)
+  const snapKey = snapshotKey(room.id, playerId, gameIndex)
 
   const renderGame = () => {
     switch (game.type) {
@@ -277,7 +386,10 @@ function RoomGame({ room, progress, gameResults, playerId, onDone }) {
         {renderGame()}
       </div>
       <aside className="mpr-sidebar">
-        <Standings room={room} progress={progress} gameResults={gameResults} playerId={playerId} />
+        <div className="mpr-card">
+          <h3>{gameLabel(game, t)}</h3>
+          <Standings room={room} progress={progress} results={results} playerId={playerId} index={gameIndex} />
+        </div>
       </aside>
     </div>
   )
@@ -285,44 +397,63 @@ function RoomGame({ room, progress, gameResults, playerId, onDone }) {
 
 export default function MultiplayerRoom({ room, progress, gameResults, playerId }) {
   const { t } = useTranslation()
-  const [playing, setPlaying] = useState(false)
-  const [done, setDone] = useState(false)
+  const [playingIndex, setPlayingIndex] = useState(null)
+  // Games finished here whose result may not be back from Firestore yet
+  const [doneHere, setDoneHere] = useState([])
   const [launching, setLaunching] = useState(false)
   const [copied, setCopied] = useState(false)
-  const sawCountdownRef = useRef(false)
+  const sawCountdownRef = useRef(null)
   useLobbyHost(room, playerId)
 
+  const games = roomGames(room)
+  const current = currentGameIndex(room)
+  const results = useMemo(() => Object.values(gameResults), [gameResults])
+  const known = useMemo(
+    () => [...results, ...doneHere.map((gameIndex) => ({ playerId, gameIndex }))],
+    [results, doneHere, playerId]
+  )
   const startAt = room.startAt?.toMillis ? room.startAt.toMillis() : null
   const remaining = useCountdown(startAt)
   const joined = playerId in room.players
-  const hasPlayed = done || Object.values(gameResults).some((result) => result.playerId === playerId)
-  const playable = PLAYABLE_TYPES.includes(room.game?.type)
-  const onDone = useCallback(() => {
-    setDone(true)
-    setPlaying(false)
+  const isHost = room.hostId === playerId
+  const toPlay = joined ? nextGameToPlay(room, known, playerId) : null
+  const playable = (index) => PLAYABLE_TYPES.includes(games[index]?.type)
+  const onDone = useCallback((index) => {
+    setDoneHere((previous) => [...previous, index])
+    setPlayingIndex(null)
   }, [])
 
-  // Live: start together when the countdown reaches zero (only for players who were waiting for it)
+  // Live: start together when the countdown of a game reaches zero (only for players who were waiting for it)
   useEffect(() => {
-    if (remaining != null && remaining > 0 && joined && !hasPlayed) sawCountdownRef.current = true
-    else if (remaining === 0 && sawCountdownRef.current && !hasPlayed && playable) {
-      sawCountdownRef.current = false
-      setPlaying(true)
+    if (room.mode !== 'live' || toPlay !== current) return
+    if (remaining != null && remaining > 0) sawCountdownRef.current = startAt
+    else if (remaining === 0 && sawCountdownRef.current === startAt && playable(current)) {
+      sawCountdownRef.current = null
+      setPlayingIndex(current)
     }
-  }, [remaining, joined, hasPlayed, playable])
+  })
 
-  if (playing && joined && !hasPlayed) {
-    return <RoomGame room={room} progress={progress} gameResults={gameResults} playerId={playerId} onDone={onDone} />
+  if (playingIndex != null && joined) {
+    return (
+      <RoomGame
+        key={playingIndex}
+        room={roomForGame(room, playingIndex)}
+        progress={progress}
+        results={results}
+        playerId={playerId}
+        onDone={onDone}
+      />
+    )
   }
 
-  const settings = gameSettings(room.game, t)
-  const counting = !hasPlayed && remaining != null && remaining > 0
-  const isHost = room.hostId === playerId
+  const counting = room.mode === 'live' && toPlay === current && remaining != null && remaining > 0
+  const allPlayed = joined && toPlay == null && room.status === 'playing'
+  const hasNextLive = room.mode === 'live' && room.status === 'playing' && current < games.length - 1
 
-  const onLaunch = async () => {
+  const onLaunch = async (launch) => {
     setLaunching(true)
     try {
-      await launchRoom(room.id)
+      await launch()
     } catch (err) {
       console.error(err)
     }
@@ -345,12 +476,11 @@ export default function MultiplayerRoom({ room, progress, gameResults, playerId 
         <span className="mpr-label">
           {t('multiplayer.title')} · {t(room.mode === 'live' ? 'mp_room.live' : 'mp_room.challenge')}
         </span>
-        <h2>
-          {GAME_ICONS[room.game.id] ?? '🎮'} {t(`games.${room.game.id}.title`)}
-          {settings && <small> · {settings}</small>}
-        </h2>
+        <h2>{games.length === 1 ? gameLabel(games[0], t) : t('mp_room.n_games', { count: games.length })}</h2>
         {room.createdOn !== 'web' && <p className="mpr-muted">📱 {t('mp_room.from_app')}</p>}
       </header>
+
+      {games.length > 1 && <GameList room={room} results={known} playerId={playerId} />}
 
       <div className="mpr-card mpr-code">
         <span className="mpr-label">{t('mp_room.code')}</span>
@@ -360,41 +490,63 @@ export default function MultiplayerRoom({ room, progress, gameResults, playerId 
         </button>
       </div>
 
-      {!playable ? (
-        <p className="mpr-card mpr-muted">{t('mp_room.unsupported')}</p>
-      ) : !joined ? (
+      {!joined ? (
         <JoinForm room={room} playerId={playerId} />
       ) : room.status === 'lobby' ? (
         <>
           <Players room={room} playerId={playerId} />
           {isHost ? (
-            <button type="button" className="mpr-btn" onClick={onLaunch} disabled={launching}>
-              ▶ {t('mp_room.launch')}
-            </button>
+            <>
+              <AddGame room={room} />
+              <button type="button" className="mpr-btn" onClick={() => onLaunch(() => launchRoom(room.id))} disabled={launching}>
+                ▶ {t('mp_room.launch')}
+              </button>
+            </>
           ) : (
             <p className="mpr-waiting">{t('mp_room.waiting_host')}</p>
           )}
         </>
       ) : counting ? (
         <div className="mpr-countdown">
-          <span className="mpr-label">{t('mp_room.starting_in')}</span>
+          <span className="mpr-label">
+            {games.length > 1 ? `${t('mp_room.game_n', { n: current + 1 })} · ` : ''}{t('mp_room.starting_in')}
+          </span>
           <strong key={Math.ceil(remaining / 1000)}>{Math.ceil(remaining / 1000)}</strong>
         </div>
       ) : (
         <>
-          {hasPlayed ? (
-            <p className="mpr-finished">✓ {t('mp_room.finished')}</p>
-          ) : (
+          {toPlay != null && (
             <div className="mpr-card">
               <p className="mpr-muted">
+                {games.length > 1 && <strong>{t('mp_room.game_n', { n: toPlay + 1 })} · {gameLabel(games[toPlay], t)}<br /></strong>}
                 {t(room.mode === 'live' ? 'mp_room.late_hint' : 'mp_room.challenge_play_hint')}
               </p>
-              <button type="button" className="mpr-btn" onClick={() => setPlaying(true)}>
-                ▶ {t('mp_room.play')}
-              </button>
+              {playable(toPlay) ? (
+                <button type="button" className="mpr-btn" onClick={() => setPlayingIndex(toPlay)}>
+                  ▶ {t('mp_room.play')}
+                </button>
+              ) : (
+                <p className="mpr-muted">{t('mp_room.unsupported')}</p>
+              )}
             </div>
           )}
-          <Standings room={room} progress={progress} gameResults={gameResults} playerId={playerId} />
+          {toPlay == null && room.mode === 'live' && hasNextLive && !isHost && (
+            <p className="mpr-waiting">{t('mp_room.waiting_next')}</p>
+          )}
+          {allPlayed && !hasNextLive && <p className="mpr-finished">✓ {t('mp_room.finished')}</p>}
+          {isHost && hasNextLive && (
+            <button type="button" className="mpr-btn" onClick={() => onLaunch(() => launchNextGame(room))} disabled={launching}>
+              ▶ {t('mp_room.next_game', { n: current + 2 })} · {gameLabel(games[current + 1], t)}
+            </button>
+          )}
+          {isHost && <AddGame room={room} />}
+          <StandingsCard
+            room={room}
+            progress={progress}
+            results={results}
+            playerId={playerId}
+            defaultTab={games.length > 1 ? 'overall' : 0}
+          />
         </>
       )}
     </div>

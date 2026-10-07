@@ -1,14 +1,24 @@
 // Glue between a game screen and its multiplayer room (`?room=CODE`):
-// loads the room's seeded content, reports progress and the final result, shows the live standings.
+// picks the room's game to play, loads its seeded content, reports progress and the final result,
+// shows the live standings.
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { router } from 'expo-router'
-import { getDoc } from 'firebase/firestore'
+import { collection, getDoc, getDocs, query, where } from 'firebase/firestore'
 import type { TFunction } from 'i18next'
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
 
+import { firestore } from '@shared/Firebase'
 import useMultiplayerRoom from '@shared/hooks/useMultiplayerRoom'
+import {
+  nextGameToPlay,
+  overallStandings,
+  progressForGame,
+  resultsForGame,
+  roomForGame,
+  roomGames,
+} from '@shared/utils/multiplayerRoom'
 import { formatTime } from '@shared/utils/formatTime'
 
 import { HudPill } from '@/components/game/GameTopBar'
@@ -18,7 +28,8 @@ import { getRoomContent, rankRoomResults, scoringMode, type RoomContent } from '
 import { getPlayerId, reportProgress, roomRef, submitResult, type GameResult, type PlayerProgress, type PlayerResult, type Room } from './room'
 
 export type RoomPlay = {
-  room: Room
+  // The room as seen by the game being played: its `game`, `gameIndex` and own `seed`
+  room: Room & { gameIndex: number }
   content: RoomContent
   // Countries found / questions answered so far
   reportFound: (found: number) => void
@@ -27,24 +38,32 @@ export type RoomPlay = {
   exit: () => void
 }
 
-// Rooms whose result was sent from this device: a room is played once.
-const finishedRooms = new Set<string>()
+// Games (`CODE_index`) whose result was sent from this device: each game of a room is played once.
+const finishedGames = new Set<string>()
 
 export const openRoom = (code: string) => router.replace({ pathname: '/multi/[code]', params: { code } })
 
-// Loads the room once, then renders the game with the room's content.
+// Loads the room and the player's results once, then renders the game they have to play with its content.
 export function RoomGate({ code, children }: { code: string; children: (play: RoomPlay) => ReactNode }) {
   const { t } = useTranslation()
-  const [room, setRoom] = useState<Room | null>(null)
+  const [room, setRoom] = useState<RoomPlay['room'] | null>(null)
   const [failed, setFailed] = useState(false)
 
   useEffect(() => {
     let cancelled = false
-    getDoc(roomRef(code))
-      .then((snap) => {
+    const playerId = getPlayerId()
+    Promise.all([
+      getDoc(roomRef(code)),
+      getDocs(query(collection(firestore, 'rooms', code, 'gameResults'), where('playerId', '==', playerId))),
+    ])
+      .then(([snap, mine]) => {
         if (cancelled) return
-        if (snap.exists()) setRoom({ id: snap.id, ...(snap.data() as Omit<Room, 'id'>) })
-        else setFailed(true)
+        if (!snap.exists()) return setFailed(true)
+        const loaded = { id: snap.id, ...(snap.data() as Omit<Room, 'id'>) }
+        const index: number | null = nextGameToPlay(loaded, mine.docs.map((d) => d.data()), playerId)
+        // Nothing left to play here (already played, or not launched yet): back to the room
+        if (index == null) return openRoom(code)
+        setRoom(roomForGame(loaded, index))
       })
       .catch((error) => {
         console.error(error)
@@ -57,23 +76,25 @@ export function RoomGate({ code, children }: { code: string; children: (play: Ro
 
   const content = useMemo(() => (room ? getRoomContent(room.game, room.seed) : null), [room])
   const total = content?.total ?? 0
+  const gameIndex = room?.gameIndex ?? 0
+  const gameKey = `${code}_${gameIndex}`
 
   const reportFound = useCallback(
     (found: number) => {
-      if (!finishedRooms.has(code)) reportProgress(code, { found, total, finished: false }).catch(console.error)
+      if (!finishedGames.has(gameKey)) reportProgress(code, { gameIndex, found, total, finished: false }).catch(console.error)
     },
-    [code, total]
+    [code, gameKey, gameIndex, total]
   )
 
   const finish = useCallback(
     (result: Omit<GameResult, 'total'>) => {
-      if (finishedRooms.has(code) || !room) return
-      finishedRooms.add(code)
+      if (finishedGames.has(gameKey) || !room) return
+      finishedGames.add(gameKey)
       const pseudo = room.players[getPlayerId()]?.pseudo ?? '?'
-      const progress: PlayerProgress = { found: result.countriesSolved, total, finished: true }
-      Promise.all([submitResult(code, pseudo, { ...result, total }), reportProgress(code, progress)]).catch(console.error)
+      const progress: PlayerProgress = { gameIndex, found: result.countriesSolved, total, finished: true }
+      Promise.all([submitResult(code, gameIndex, pseudo, { ...result, total }), reportProgress(code, progress)]).catch(console.error)
     },
-    [code, room, total]
+    [code, gameKey, gameIndex, room, total]
   )
 
   const play = useMemo(
@@ -83,8 +104,8 @@ export function RoomGate({ code, children }: { code: string; children: (play: Ro
 
   // Announce the player as soon as the game starts
   useEffect(() => {
-    if (room) reportProgress(code, { found: 0, total, finished: false }).catch(console.error)
-  }, [code, room, total])
+    if (room) reportProgress(code, { gameIndex, found: 0, total, finished: false }).catch(console.error)
+  }, [code, room, gameIndex, total])
 
   if (failed) {
     return (
@@ -124,9 +145,9 @@ function useLiveRoom(code: string) {
   return { room, progress, results: Object.values(gameResults) }
 }
 
-export function resultLine(room: Room, result: PlayerResult, t: TFunction) {
+export function resultLine(game: Room['game'], result: PlayerResult, t: TFunction) {
   const time = formatTime(result.elapsedTime ?? 0).slice(0, 5)
-  if (scoringMode(room.game) === 'solved') {
+  if (scoringMode(game) === 'solved') {
     return `${result.countriesSolved}/${result.total} · ${t('mobile.multi.errors', { count: result.attempts })} · ${time}`
   }
   return `${Math.round(result.weightedScore)} ${t('units.pts')} · ${time}`
@@ -134,19 +155,83 @@ export function resultLine(room: Room, result: PlayerResult, t: TFunction) {
 
 const MEDALS = ['🥇', '🥈', '🥉']
 
-export function Standings({ code, title }: { code: string; title?: string }) {
+// Standings of game `gameIndex`, or of every game ('overall', points by rank summed).
+// Rooms of several games get tabs to switch between them, unless `gameIndex` is fixed by the caller.
+export function Standings({ code, title, gameIndex }: { code: string; title?: string; gameIndex?: number }) {
   const { t } = useTranslation()
   const { room, progress, results } = useLiveRoom(code)
-  const playerId = getPlayerId()
+  const [tab, setTab] = useState<number | 'overall'>('overall')
   if (!room) return <ActivityIndicator color={colors.textMuted} style={{ paddingVertical: space.lg }} />
 
-  const ranked = rankRoomResults(room.game, results)
-  const finishedIds = new Set(results.map((result) => result.playerId))
-  const others = Object.entries(room.players).filter(([id]) => !finishedIds.has(id))
+  const games: Room['game'][] = roomGames(room)
+  const shown = gameIndex ?? (games.length === 1 ? 0 : tab)
 
   return (
     <View style={styles.card}>
       <Text variant="bodyStrong">{title ?? t('mobile.multi.standings')}</Text>
+      {gameIndex == null && games.length > 1 && (
+        <View style={styles.tabs}>
+          {(['overall', ...games.map((_, i) => i)] as const).map((value) => (
+            <Text
+              key={value}
+              variant="caption"
+              onPress={() => setTab(value)}
+              color={shown === value ? colors.accent : colors.textMuted}
+              style={[styles.tab, shown === value && { borderColor: colors.accent }]}>
+              {value === 'overall' ? t('mp_room.overall') : t('mp_room.game_n', { n: value + 1 })}
+            </Text>
+          ))}
+        </View>
+      )}
+      {shown === 'overall' ? (
+        <OverallRows room={room} results={results} />
+      ) : (
+        <GameRows room={room} progress={progress} results={results} index={shown} />
+      )}
+    </View>
+  )
+}
+
+function OverallRows({ room, results }: { room: Room; results: PlayerResult[] }) {
+  const { t } = useTranslation()
+  const playerId = getPlayerId()
+  const total = roomGames(room).length
+  const standings: { playerId: string; pseudo: string; points: number; played: number; rank: number }[] = overallStandings(room, results)
+  if (standings.length === 0) return <Text variant="caption">{t('mobile.multi.no_players')}</Text>
+  return (
+    <>
+      {standings.map((entry, index) => {
+        const me = entry.playerId === playerId
+        return (
+          <View key={entry.playerId} style={[styles.row, index < 3 && styles.rowTop, me && styles.rowMe]}>
+            <Text variant="bodyStrong" style={styles.rank}>
+              {MEDALS[entry.rank - 1] ?? `${entry.rank}`}
+            </Text>
+            <Text variant="body" numberOfLines={1} style={{ flex: 1 }}>
+              {entry.pseudo}
+              {me ? ` (${t('mobile.multi.you')})` : ''}
+            </Text>
+            <Text variant="caption" style={{ fontVariant: ['tabular-nums'] }}>
+              {t('mp_room.points', { count: entry.points })} · {entry.played}/{total}
+            </Text>
+          </View>
+        )
+      })}
+    </>
+  )
+}
+
+function GameRows({ room, progress, results, index }: { room: Room; progress: Progress; results: PlayerResult[]; index: number }) {
+  const { t } = useTranslation()
+  const playerId = getPlayerId()
+  const game: Room['game'] = roomGames(room)[index]
+  const ranked = rankRoomResults(game, resultsForGame(results, index))
+  const live: Progress = progressForGame(progress, index)
+  const finishedIds = new Set(ranked.map((result) => result.playerId))
+  const others = Object.entries(room.players).filter(([id]) => !finishedIds.has(id))
+
+  return (
+    <>
       {ranked.map((result, index) => {
         const me = result.playerId === playerId
         return (
@@ -159,38 +244,39 @@ export function Standings({ code, title }: { code: string; title?: string }) {
               {me ? ` (${t('mobile.multi.you')})` : ''}
             </Text>
             <Text variant="caption" style={{ fontVariant: ['tabular-nums'] }}>
-              {resultLine(room, result, t)}
+              {resultLine(game, result, t)}
             </Text>
           </View>
         )
       })}
       {others.map(([id, player]) => {
-        const live = progress[id]
+        const playing = live[id]
         return (
           <View key={id} style={styles.row}>
-            <MaterialCommunityIcons name={live ? 'progress-clock' : 'clock-outline'} size={18} color={colors.textFaint} style={styles.rank} />
+            <MaterialCommunityIcons name={playing ? 'progress-clock' : 'clock-outline'} size={18} color={colors.textFaint} style={styles.rank} />
             <Text variant="body" numberOfLines={1} color={colors.textMuted} style={{ flex: 1 }}>
               {player.pseudo}
               {id === playerId ? ` (${t('mobile.multi.you')})` : ''}
             </Text>
             <Text variant="caption">
-              {live ? `${t('mobile.multi.playing')} · ${live.found}/${live.total}` : t('mobile.multi.not_played')}
+              {playing ? `${t('mobile.multi.playing')} · ${playing.found}/${playing.total}` : t('mobile.multi.not_played')}
             </Text>
           </View>
         )
       })}
       {ranked.length === 0 && others.length === 0 && <Text variant="caption">{t('mobile.multi.no_players')}</Text>}
-    </View>
+    </>
   )
 }
 
-// HUD pill: your position among the players, by countries found so far.
-export function RoomHudPill({ code }: { code: string }) {
-  const { room, progress } = useLiveRoom(code)
+// HUD pill: your position among the players of this game, by countries found so far.
+export function RoomHudPill({ code, gameIndex }: { code: string; gameIndex: number }) {
+  const { room, progress: all } = useLiveRoom(code)
   const playerId = getPlayerId()
   if (!room) return null
   const ids = Object.keys(room.players)
   if (ids.length < 2) return null
+  const progress: Progress = progressForGame(all, gameIndex)
   const mine = progress[playerId]?.found ?? 0
   const ahead = ids.filter((id) => id !== playerId && (progress[id]?.found ?? 0) > mine).length
   return <HudPill icon="account-group" label={`${ahead + 1}/${ids.length}`} color={colors.highlight} />
@@ -203,4 +289,6 @@ const styles = StyleSheet.create({
   rowTop: { backgroundColor: colors.surfaceHigh },
   rowMe: { borderWidth: 1, borderColor: `${colors.accent}66` },
   rank: { width: 28, textAlign: 'center' },
+  tabs: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
+  tab: { paddingHorizontal: space.md, paddingVertical: 4, borderRadius: radius.pill, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
 })

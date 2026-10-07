@@ -2,7 +2,7 @@
 // A room holds one game. 'live': everyone starts together after the host launches it.
 // 'challenge': anyone with the code plays the same game whenever they want.
 // A live room keeps accepting players once launched, so it also works as a challenge afterwards.
-import { doc, type Timestamp } from 'firebase/firestore'
+import { doc, getDoc, type Timestamp } from 'firebase/firestore'
 
 import { firestore } from '@shared/Firebase'
 import * as shared from '@shared/utils/multiplayerRoom'
@@ -37,6 +37,11 @@ export type Room = {
   hostId: string
   mode: RoomMode
   status: 'lobby' | 'playing'
+  // Games in a row (missing on the first rooms, which hold `game` only); read them with roomGames()
+  games?: RoomGame[]
+  // The live game being played
+  gameIndex?: number
+  // Current game, for app versions that only know one game. A view from roomForGame() holds the game being played.
   game: RoomGame
   seed: number
   startAt: Timestamp | null
@@ -52,9 +57,9 @@ export type GameResult = {
   total: number
 }
 
-export type PlayerResult = GameResult & { playerId: string; pseudo: string }
+export type PlayerResult = GameResult & { playerId: string; pseudo: string; gameIndex?: number }
 
-export type PlayerProgress = { found: number; total: number; finished: boolean }
+export type PlayerProgress = { gameIndex: number; found: number; total: number; finished: boolean }
 
 const PLAYER_ID_KEY = 'mp_player_id'
 const PSEUDO_KEY = 'geogame_pseudo'
@@ -106,7 +111,7 @@ export function rememberRoom(room: Pick<Room, 'id' | 'mode' | 'game'>) {
 
 export async function createRoom({ game, mode, pseudo, uid }: { game: RoomGame; mode: RoomMode; pseudo: string; uid?: string | null }) {
   savePseudo(pseudo)
-  const code: string = await shared.createRoom({ game, mode, hostId: getPlayerId(), pseudo, uid, createdOn: 'app' })
+  const code: string = await shared.createRoom({ games: [game], mode, hostId: getPlayerId(), pseudo, uid, createdOn: 'app' })
   rememberRoom({ id: code, mode, game })
   return code
 }
@@ -121,10 +126,21 @@ export async function launchRoom(code: string) {
   await shared.launchRoom(code)
 }
 
+export async function launchNextGame(room: Room) {
+  await shared.launchNextGame(room)
+}
+
+// Host: adds a game at the end of the room
+export async function addGameToRoom(code: string, game: RoomGame) {
+  const snap = await getDoc(roomRef(code))
+  if (!snap.exists()) throw new Error('Room not found')
+  await shared.addGame({ id: code, ...snap.data() }, game)
+}
+
 export async function reportProgress(code: string, progress: PlayerProgress) {
   await shared.reportProgress(code, getPlayerId(), progress)
 }
 
-export async function submitResult(code: string, pseudo: string, result: GameResult) {
-  await shared.submitResult(code, getPlayerId(), pseudo, result)
+export async function submitResult(code: string, gameIndex: number, pseudo: string, result: GameResult) {
+  await shared.submitResult(code, getPlayerId(), pseudo, result, gameIndex)
 }

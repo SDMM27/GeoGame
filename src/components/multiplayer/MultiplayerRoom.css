@@ -28,6 +28,17 @@
 .mpr-countdown strong { font-size: 6rem; line-height: 1; color: #00d4ff; animation: mpr-pop 0.35s ease-out; }
 @keyframes mpr-pop { from { transform: scale(1.4); opacity: 0.4; } to { transform: scale(1); opacity: 1; } }
 
+/* Games of the room */
+.mpr-games { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.3rem; }
+.mpr-games li { display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0.7rem; border-radius: 8px; border: 1px solid #334155; background: #1e293b; font-weight: 600; font-size: 0.95rem; }
+.mpr-games-n { width: 1.5rem; height: 1.5rem; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #0f172a; color: #94a3b8; font-size: 0.8rem; }
+.mpr-games--current { border-color: #00d4ff !important; }
+.mpr-games--done .mpr-games-n { background: #4ade8033; color: #4ade80; }
+.mpr-tabs { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.mpr-tabs button { padding: 0.3rem 0.7rem; border-radius: 20px; border: 1px solid #475569; background: transparent; color: #94a3b8; font-size: 0.8rem; cursor: pointer; }
+.mpr-tabs button.active { border-color: #00d4ff; background: #00d4ff22; color: #00d4ff; }
+.mpr-actions { display: flex; align-items: center; gap: 0.75rem; }
+
 /* In game: the game beside the standings */
 .mp-game-view { display: flex; height: calc(100vh - 56px); overflow: hidden; }
 .mp-game-content { flex: 1; overflow: hidden; position: relative; }

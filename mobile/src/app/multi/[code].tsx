@@ -1,4 +1,4 @@
-// A multiplayer room: join with a username, lobby and countdown (live), play, then the live standings.
+// A multiplayer room: join with a username, lobby and countdown (live), play each game, then the live standings.
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
@@ -11,6 +11,7 @@ import { useFriendships } from '@shared/hooks/usePlayerProfile'
 import useLobbyHost from '@shared/hooks/useLobbyHost'
 import useMultiplayerRoom from '@shared/hooks/useMultiplayerRoom'
 import { dismissInvite, inviteId, sendRoomInvite } from '@shared/utils/invites'
+import { currentGameIndex, nextGameToPlay, roomGames } from '@shared/utils/multiplayerRoom'
 import { serverNow } from '@shared/utils/serverTime'
 
 import { useAccount, type Account } from '@/account/auth'
@@ -20,7 +21,17 @@ import { Button, Pill, Text, Touchable } from '@/components/ui'
 import { getGame } from '@/games'
 import { notifyInvite } from '@/multiplayer/invites'
 import { Standings } from '@/multiplayer/RoomPlay'
-import { getPlayerId, getSavedPseudo, joinRoom, launchRoom, rememberRoom, type PlayerResult, type Room } from '@/multiplayer/room'
+import {
+  getPlayerId,
+  getSavedPseudo,
+  joinRoom,
+  launchNextGame,
+  launchRoom,
+  rememberRoom,
+  type PlayerResult,
+  type Room,
+  type RoomGame,
+} from '@/multiplayer/room'
 import { navigate } from '@/shims/react-router-dom'
 import { colors, fonts, radius, space } from '@/theme'
 
@@ -183,21 +194,29 @@ export default function RoomScreen() {
   const playerId = getPlayerId()
   const startAt = room?.startAt ? room.startAt.toMillis() : null
   const remaining = useCountdown(startAt)
-  const sawCountdownRef = useRef(false)
+  const sawCountdownRef = useRef<number | null>(null)
   const startedRef = useRef(false)
 
-  const game = room ? getGame(room.game.id) : null
+  const games: RoomGame[] = room ? roomGames(room) : []
+  const current: number = room ? currentGameIndex(room) : 0
+  const results = Object.values(gameResults)
   const joined = !!room?.players[playerId]
-  const hasPlayed = Object.values(gameResults).some((result) => result.playerId === playerId)
+  const toPlay: number | null = room && joined ? nextGameToPlay(room, results, playerId) : null
+  // Header color and title: the game to play, else the current one
+  const game = room ? getGame(games[toPlay ?? current]?.id ?? room.game.id) : null
   const isHost = room?.hostId === playerId
   const inLobby = room?.status === 'lobby'
+  const isLive = room?.mode === 'live'
+  const hasNextLive = isLive && room?.status === 'playing' && current < games.length - 1
   // Heartbeat, and the host role passes on when the host is gone
   useLobbyHost(room, playerId)
 
+  // The game screen picks the game to play from the room and the player's results
   const play = () => {
-    if (!game || startedRef.current) return
+    const target = toPlay != null ? getGame(games[toPlay].id) : null
+    if (!target || startedRef.current) return
     startedRef.current = true
-    router.replace({ pathname: game.route as never, params: { room: code } })
+    router.replace({ pathname: target.route as never, params: { room: code } })
   }
 
   // Keep the room in the recent list of everyone who opens it
@@ -210,10 +229,11 @@ export default function RoomScreen() {
     if (account?.uid && code) dismissInvite(inviteId(code, account.uid))
   }, [account?.uid, code])
 
-  // Live: start together when the countdown reaches zero (only for players who were waiting for it)
+  // Live: start together when a game's countdown reaches zero (only for players who were waiting for it)
   useEffect(() => {
-    if (remaining != null && remaining > 0 && joined && !hasPlayed) sawCountdownRef.current = true
-    else if (remaining === 0 && sawCountdownRef.current) play()
+    if (!isLive || toPlay !== current) return
+    if (remaining != null && remaining > 0) sawCountdownRef.current = startAt
+    else if (remaining === 0 && sawCountdownRef.current === startAt) play()
   })
 
   const onShare = () => {
@@ -223,17 +243,29 @@ export default function RoomScreen() {
     })
   }
 
-  const onLaunch = async () => {
+  const onLaunch = async (launch: () => Promise<void>) => {
     setLaunching(true)
     try {
-      await launchRoom(code)
+      await launch()
     } catch (launchError) {
       console.error(launchError)
-      setLaunching(false)
     }
+    setLaunching(false)
   }
 
+  const addGame = () => router.push({ pathname: '/multi/add', params: { code } })
+
   const notFound = !loading && (error || !room || room.source !== 'app' || !game)
+  const counting = isLive && toPlay === current && remaining != null && remaining > 0
+
+  const addGameButton = isHost && (
+    <Button
+      label={t('mp_room.add_game')}
+      variant="secondary"
+      onPress={addGame}
+      icon={<MaterialCommunityIcons name="plus" size={18} color={colors.text} />}
+    />
+  )
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
@@ -247,7 +279,7 @@ export default function RoomScreen() {
               {t('mobile.multi.title')} · {t(room!.mode === 'live' ? 'mobile.multi.live' : 'mobile.multi.challenge')}
             </Text>
             <Text variant="heading" numberOfLines={1}>
-              {t(game.titleKey)}
+              {games.length > 1 ? t('mp_room.n_games', { count: games.length }) : t(game.titleKey)}
             </Text>
           </View>
         )}
@@ -280,6 +312,8 @@ export default function RoomScreen() {
             />
           </View>
 
+          {games.length > 1 && <GameList room={room!} results={results} playerId={playerId} />}
+
           {!joined ? (
             <JoinCard room={room!} account={account} autoJoin={invited === '1'} />
           ) : inLobby ? (
@@ -287,13 +321,16 @@ export default function RoomScreen() {
               <Players room={room!} />
               {account?.username && <InviteFriends room={room!} account={account} color={game!.color} />}
               {isHost ? (
-                <Button
-                  label={t('mobile.multi.launch')}
-                  color={game!.color}
-                  onPress={onLaunch}
-                  loading={launching}
-                  icon={<MaterialCommunityIcons name="play" size={20} color={colors.onAccent} />}
-                />
+                <>
+                  {addGameButton}
+                  <Button
+                    label={t('mobile.multi.launch')}
+                    color={game!.color}
+                    onPress={() => onLaunch(() => launchRoom(code))}
+                    loading={launching}
+                    icon={<MaterialCommunityIcons name="play" size={20} color={colors.onAccent} />}
+                  />
+                </>
               ) : (
                 <View style={styles.waiting}>
                   <ActivityIndicator color={colors.textMuted} />
@@ -303,19 +340,27 @@ export default function RoomScreen() {
                 </View>
               )}
             </>
-          ) : !hasPlayed && remaining != null && remaining > 0 ? (
+          ) : counting ? (
             <View style={styles.countdown}>
-              <Text variant="label">{t('mobile.multi.starting_in')}</Text>
-              <Animated.View key={Math.ceil(remaining / 1000)} entering={ZoomIn.springify().damping(12)}>
+              <Text variant="label">
+                {games.length > 1 ? `${t('mp_room.game_n', { n: current + 1 })} · ` : ''}
+                {t('mobile.multi.starting_in')}
+              </Text>
+              <Animated.View key={Math.ceil(remaining! / 1000)} entering={ZoomIn.springify().damping(12)}>
                 <Text variant="hero" color={game!.color} style={{ fontSize: 96, lineHeight: 104 }}>
-                  {Math.ceil(remaining / 1000)}
+                  {Math.ceil(remaining! / 1000)}
                 </Text>
               </Animated.View>
             </View>
           ) : (
             <>
-              {!hasPlayed && (
+              {toPlay != null && (
                 <View style={styles.card}>
+                  {games.length > 1 && (
+                    <Text variant="bodyStrong">
+                      {t('mp_room.game_n', { n: toPlay + 1 })} · {t(game!.titleKey)}
+                    </Text>
+                  )}
                   <Text variant="body" color={colors.textMuted}>
                     {t(room!.mode === 'live' ? 'mobile.multi.late_hint' : 'mobile.multi.challenge_play_hint')}
                   </Text>
@@ -327,6 +372,24 @@ export default function RoomScreen() {
                   />
                 </View>
               )}
+              {toPlay == null && hasNextLive && !isHost && (
+                <View style={styles.waiting}>
+                  <ActivityIndicator color={colors.textMuted} />
+                  <Text variant="body" color={colors.textMuted}>
+                    {t('mp_room.waiting_next')}
+                  </Text>
+                </View>
+              )}
+              {isHost && hasNextLive && (
+                <Button
+                  label={`${t('mp_room.next_game', { n: current + 2 })} · ${t(getGame(games[current + 1].id)?.titleKey ?? '')}`}
+                  color={game!.color}
+                  onPress={() => onLaunch(() => launchNextGame(room!))}
+                  loading={launching}
+                  icon={<MaterialCommunityIcons name="skip-next" size={20} color={colors.onAccent} />}
+                />
+              )}
+              {addGameButton}
               {account?.username && <InviteFriends room={room!} account={account} color={game!.color} />}
               <Standings code={code} />
             </>
@@ -335,6 +398,50 @@ export default function RoomScreen() {
       )}
     </View>
   )
+}
+
+// The room's games, with the player's progress through them
+function GameList({ room, results, playerId }: { room: Room; results: PlayerResult[]; playerId: string }) {
+  const { t } = useTranslation()
+  const games: RoomGame[] = roomGames(room)
+  const current: number = currentGameIndex(room)
+  const played = new Set(results.filter((result) => result.playerId === playerId).map((result) => result.gameIndex ?? 0))
+  return (
+    <View style={styles.card}>
+      {games.map((roomGame, i) => {
+        const definition = getGame(roomGame.id)
+        const isCurrent = room.mode === 'live' && room.status === 'playing' && i === current
+        const done = played.has(i)
+        return (
+          <View key={i} style={styles.playerRow}>
+            <View style={[styles.gameNumber, done && { backgroundColor: `${colors.accent}33` }, isCurrent && { borderColor: definition?.color ?? colors.accent }]}>
+              {done ? (
+                <MaterialCommunityIcons name="check" size={14} color={colors.accent} />
+              ) : (
+                <Text variant="caption">{i + 1}</Text>
+              )}
+            </View>
+            {definition && <MaterialCommunityIcons name={definition.icon} size={20} color={definition.color} />}
+            <Text variant="body" numberOfLines={1} style={{ flex: 1 }}>
+              {definition ? t(definition.titleKey) : roomGame.id}
+              {roomGameSettings(roomGame, t)}
+            </Text>
+          </View>
+        )
+      })}
+    </View>
+  )
+}
+
+function roomGameSettings(roomGame: RoomGame, t: (key: string, options?: Record<string, unknown>) => string) {
+  const settings = roomGame.phases
+    ? t('mobile.setup.ascension')
+    : roomGame.continent
+      ? t(`continents.${roomGame.continent}`)
+      : (roomGame.difficulty ?? roomGame.quizDifficulty)
+        ? t(`difficulties.${roomGame.difficulty ?? roomGame.quizDifficulty}`)
+        : null
+  return `${settings ? ` · ${settings}` : ''}${roomGame.count ? ` · ${roomGame.count}` : ''}`
 }
 
 const styles = StyleSheet.create({
@@ -362,6 +469,16 @@ const styles = StyleSheet.create({
   card: { gap: space.md, padding: space.lg, borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   playerRow: { flexDirection: 'row', alignItems: 'center', gap: space.md, paddingVertical: 4 },
   inviteButton: { minHeight: 36, paddingHorizontal: space.md },
+  gameNumber: {
+    width: 24,
+    height: 24,
+    borderRadius: radius.pill,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.bg,
+    borderWidth: 1.5,
+    borderColor: 'transparent',
+  },
   waiting: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.md, padding: space.lg },
   countdown: { alignItems: 'center', paddingVertical: space.xl },
   input: {

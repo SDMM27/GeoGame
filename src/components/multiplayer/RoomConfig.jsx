@@ -1,5 +1,6 @@
 // src/components/multiplayer/RoomConfig.jsx
-// Creates a multiplayer room for one game, like the mobile app: the game, live or challenge, and its options.
+// Creates a multiplayer room, like the mobile app: live or challenge, then one or more games with their options.
+// GameEditor (one game) is also used in the room, when the host adds a game.
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAccount } from '../../auth'
@@ -120,9 +121,23 @@ function SetupSettings({ type, setup, onChange }) {
   )
 }
 
-/** The room's `game`, in the app's format. */
-export function buildRoomGame(gameId, { setup, count, quizDifficulty, answerMode }) {
-  const { type } = ROOM_GAMES.find(g => g.id === gameId)
+export const newDraft = () => ({
+  gameId: 'placement',
+  setup: { mode: 'standard', difficulty: 'Moyen', phases: { ...DEFAULT_ASCENSION_PRESET.phases } },
+  count: 10,
+  quizDifficulty: 'Moyen',
+  answerMode: 'choices',
+})
+
+const typeOf = (gameId) => ROOM_GAMES.find(g => g.id === gameId).type
+
+// An Ascension game needs at least one country
+export const draftReady = ({ gameId, setup }) =>
+  !(SETUP_TYPES.includes(typeOf(gameId)) && setup.mode === 'ascension' && Object.values(setup.phases).every(n => !n))
+
+/** A game of the room, in the shared format (src/utils/multiplayerRoom.js). */
+export function buildRoomGame({ gameId, setup, count, quizDifficulty, answerMode }) {
+  const type = typeOf(gameId)
   const ascension = SETUP_TYPES.includes(type) && setup.mode === 'ascension'
   const game = {
     id: gameId,
@@ -137,38 +152,105 @@ export function buildRoomGame(gameId, { setup, count, quizDifficulty, answerMode
   return game
 }
 
+/** "🚩 Trouve le Drapeau · Moyen" */
+export function gameLabel(game, t) {
+  const icon = ROOM_GAMES.find(g => g.id === game.id)?.icon ?? '🎮'
+  const settings = game.phases
+    ? 'Ascension'
+    : game.continent
+      ? t(`continents.${game.continent}`, game.continent)
+      : (game.difficulty ?? game.quizDifficulty)
+        ? t(`difficulties.${game.difficulty ?? game.quizDifficulty}`)
+        : null
+  return `${icon} ${t(`games.${game.id}.title`)}${settings ? ` · ${settings}` : ''}${game.count ? ` · ${game.count}` : ''}`
+}
+
+/** One game: which one, and its options. */
+export function GameEditor({ draft, onChange }) {
+  const { t } = useTranslation()
+  const { gameId, setup, count, quizDifficulty, answerMode } = draft
+  const type = typeOf(gameId)
+  const isQuiz = type === GAME_TYPES.QUIZ
+  const set = (patch) => onChange({ ...draft, ...patch })
+
+  return (
+    <>
+      <div className="rc-game-grid">
+        {ROOM_GAMES.map(g => (
+          <button
+            key={g.id}
+            type="button"
+            className={`rc-game-pick${gameId === g.id ? ' active' : ''}`}
+            onClick={() => set({ gameId: g.id, count: 10 })}
+          >
+            <span className="rc-game-icon">{g.icon}</span>
+            {t(`games.${g.id}.title`)}
+          </button>
+        ))}
+      </div>
+
+      {SETUP_TYPES.includes(type) && <SetupSettings type={type} setup={setup} onChange={next => set({ setup: next })} />}
+
+      {isQuiz && (
+        <>
+          <h3 className="rc-games-title">{t('mp_room.difficulty')}</h3>
+          <div className="rc-difficulties">
+            {QUIZ_DIFFICULTIES.map(d => (
+              <button
+                key={d}
+                type="button"
+                className={`rc-diff-btn${quizDifficulty === d ? ' active' : ''}`}
+                onClick={() => set({ quizDifficulty: d })}
+              >
+                <span style={{ color: DIFFICULTY_COLORS[d] }}>{t(`difficulties.${d}`)}</span>
+              </button>
+            ))}
+          </div>
+          <h3 className="rc-games-title">{t('mp_room.answer_mode')}</h3>
+          <Choices
+            options={[{ value: 'choices', label: t('quiz.modes.choices') }, { value: 'free', label: t('quiz.modes.free') }]}
+            value={answerMode}
+            onChange={value => set({ answerMode: value })}
+          />
+        </>
+      )}
+
+      {!SETUP_TYPES.includes(type) && (
+        <>
+          <h3 className="rc-games-title">{t(isQuiz ? 'mp_room.questions_count' : 'mp_room.countries_count')}</h3>
+          <Choices
+            options={(isQuiz ? QUIZ_COUNTS : COUNTS).map(n => ({ value: n, label: String(n) }))}
+            value={count}
+            onChange={value => set({ count: value })}
+          />
+        </>
+      )}
+    </>
+  )
+}
+
 export default function RoomConfig({ onSubmit, submitting }) {
   const { t } = useTranslation()
   const { account } = useAccount()
   // Signed in: the account's username until the player types another one
   const [typed, setTyped] = useState(null)
   const pseudo = typed ?? account?.username ?? getSavedPseudo()
-  const [gameId, setGameId] = useState('placement')
   const [mode, setMode] = useState('live')
-  const [setup, setSetup] = useState({ mode: 'standard', difficulty: 'Moyen', phases: { ...DEFAULT_ASCENSION_PRESET.phases } })
-  const [count, setCount] = useState(10)
-  const [quizDifficulty, setQuizDifficulty] = useState('Moyen')
-  const [answerMode, setAnswerMode] = useState('choices')
+  // Games already added, then the one being edited (the last game of the room)
+  const [games, setGames] = useState([])
+  const [draft, setDraft] = useState(newDraft)
+  const canSubmit = pseudo.trim() && draftReady(draft) && !submitting
 
-  const { type } = ROOM_GAMES.find(g => g.id === gameId)
-  const isQuiz = type === GAME_TYPES.QUIZ
-  const ascensionEmpty = SETUP_TYPES.includes(type) && setup.mode === 'ascension'
-    && Object.values(setup.phases).every(n => !n)
-  const canSubmit = pseudo.trim() && !ascensionEmpty && !submitting
-
-  const pickGame = (id) => {
-    setGameId(id)
-    setCount(10)
+  const addAnother = () => {
+    if (!draftReady(draft)) return
+    setGames(previous => [...previous, buildRoomGame(draft)])
+    setDraft(newDraft())
   }
 
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!canSubmit) return
-    onSubmit({
-      pseudo: pseudo.trim(),
-      mode,
-      game: buildRoomGame(gameId, { setup, count, quizDifficulty, answerMode }),
-    })
+    onSubmit({ pseudo: pseudo.trim(), mode, games: [...games, buildRoomGame(draft)] })
   }
 
   return (
@@ -187,23 +269,6 @@ export default function RoomConfig({ onSubmit, submitting }) {
       </div>
 
       <section className="rc-section">
-        <h3 className="rc-games-title">{t('labels.game')}</h3>
-        <div className="rc-game-grid">
-          {ROOM_GAMES.map(g => (
-            <button
-              key={g.id}
-              type="button"
-              className={`rc-game-pick${gameId === g.id ? ' active' : ''}`}
-              onClick={() => pickGame(g.id)}
-            >
-              <span className="rc-game-icon">{g.icon}</span>
-              {t(`games.${g.id}.title`)}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section className="rc-section">
         <Choices
           options={[{ value: 'live', label: t('mp_room.live') }, { value: 'challenge', label: t('mp_room.challenge') }]}
           value={mode}
@@ -212,43 +277,30 @@ export default function RoomConfig({ onSubmit, submitting }) {
         <p className="rc-hint">{t(mode === 'live' ? 'mp_room.live_hint' : 'mp_room.challenge_hint')}</p>
       </section>
 
-      <section className="rc-section">
-        {SETUP_TYPES.includes(type) && <SetupSettings type={type} setup={setup} onChange={setSetup} />}
-
-        {isQuiz && (
-          <>
-            <h3 className="rc-games-title">{t('mp_room.difficulty')}</h3>
-            <div className="rc-difficulties">
-              {QUIZ_DIFFICULTIES.map(d => (
+      {games.length > 0 && (
+        <section className="rc-section">
+          <h3 className="rc-games-title">{t('mp_room.games')}</h3>
+          <ol className="rc-game-list">
+            {games.map((game, index) => (
+              <li key={index}>
+                <span>{gameLabel(game, t)}</span>
                 <button
-                  key={d}
                   type="button"
-                  className={`rc-diff-btn${quizDifficulty === d ? ' active' : ''}`}
-                  onClick={() => setQuizDifficulty(d)}
-                >
-                  <span style={{ color: DIFFICULTY_COLORS[d] }}>{t(`difficulties.${d}`)}</span>
-                </button>
-              ))}
-            </div>
-            <h3 className="rc-games-title">{t('mp_room.answer_mode')}</h3>
-            <Choices
-              options={[{ value: 'choices', label: t('quiz.modes.choices') }, { value: 'free', label: t('quiz.modes.free') }]}
-              value={answerMode}
-              onChange={setAnswerMode}
-            />
-          </>
-        )}
+                  aria-label={t('mp_room.remove_game')}
+                  onClick={() => setGames(previous => previous.filter((_, i) => i !== index))}
+                >✕</button>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
 
-        {!SETUP_TYPES.includes(type) && (
-          <>
-            <h3 className="rc-games-title">{t(isQuiz ? 'mp_room.questions_count' : 'mp_room.countries_count')}</h3>
-            <Choices
-              options={(isQuiz ? QUIZ_COUNTS : COUNTS).map(n => ({ value: n, label: String(n) }))}
-              value={count}
-              onChange={setCount}
-            />
-          </>
-        )}
+      <section className="rc-section">
+        <h3 className="rc-games-title">{t('mp_room.game_n', { n: games.length + 1 })}</h3>
+        <GameEditor draft={draft} onChange={setDraft} />
+        <button type="button" className="rc-add-btn" onClick={addAnother} disabled={!draftReady(draft)}>
+          + {t('mp_room.add_another')}
+        </button>
       </section>
 
       <button type="submit" className="rc-submit" disabled={!canSubmit}>

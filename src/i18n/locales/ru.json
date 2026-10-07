@@ -707,6 +707,17 @@
     "difficulty": "Сложность",
     "answer_mode": "Ответы",
     "countries_count": "Количество стран",
-    "questions_count": "Количество вопросов"
+    "questions_count": "Количество вопросов",
+    "games": "Игры",
+    "remove_game": "Убрать эту игру",
+    "game_n": "Игра {{n}}",
+    "add_another": "Добавить ещё игру",
+    "add_game": "Добавить игру",
+    "cancel": "Отмена",
+    "overall": "Общий",
+    "points": "{{count}} очк.",
+    "n_games": "Игр: {{count}}",
+    "next_game": "Запустить игру {{n}}",
+    "waiting_next": "Ожидание следующей игры…"
   }
 }

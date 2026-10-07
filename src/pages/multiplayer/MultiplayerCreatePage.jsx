@@ -13,7 +13,7 @@ export default function MultiplayerCreatePage() {
   const { account } = useAccount()
   const [submitting, setSubmitting] = useState(false)
 
-  const handleSubmit = async ({ pseudo, mode, game }) => {
+  const handleSubmit = async ({ pseudo, mode, games }) => {
     setSubmitting(true)
     try {
       try {
@@ -22,7 +22,7 @@ export default function MultiplayerCreatePage() {
         // Storage unavailable — prefill is only a convenience.
       }
       const code = await createRoom({
-        game,
+        games,
         mode,
         hostId: getOrCreatePlayerId(),
         pseudo,

@@ -24,5 +24,12 @@
 .rc-preset.active { border-color: #00d4ff; color: #00d4ff; background: #00d4ff11; }
 .rc-asc-row { display: grid; grid-template-columns: 100px 60px 1fr; align-items: center; gap: 0.5rem; font-size: 0.9rem; }
 .rc-asc-val { text-align: right; color: #64748b; font-size: 0.8rem; }
+.rc-game-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+.rc-game-list li { display: flex; align-items: center; gap: 0.5rem; padding: 0.55rem 0.8rem; border-radius: 10px; border: 1px solid #334155; background: #1e293b; font-weight: 600; }
+.rc-game-list li span { flex: 1; min-width: 0; }
+.rc-game-list button { padding: 0.2rem 0.5rem; border-radius: 6px; border: 1px solid #475569; background: transparent; color: #94a3b8; cursor: pointer; }
+.rc-add-btn { align-self: flex-start; padding: 0.5rem 0.85rem; border-radius: 10px; border: 1px dashed #475569; background: transparent; color: #94a3b8; font-size: 0.9rem; cursor: pointer; }
+.rc-add-btn:hover:not(:disabled) { border-color: #00d4ff; color: #00d4ff; }
+.rc-add-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .rc-submit { width: 100%; padding: 0.85rem; border-radius: 10px; border: none; background: #00d4ff; color: #0f172a; font-size: 1rem; font-weight: 700; cursor: pointer; }
 .rc-submit:disabled { opacity: 0.5; cursor: not-allowed; }

@@ -685,6 +685,17 @@
     "difficulty": "Difficulty",
     "answer_mode": "Answers",
     "countries_count": "Number of countries",
-    "questions_count": "Number of questions"
+    "questions_count": "Number of questions",
+    "games": "Games",
+    "remove_game": "Remove this game",
+    "game_n": "Game {{n}}",
+    "add_another": "Add another game",
+    "add_game": "Add a game",
+    "cancel": "Cancel",
+    "overall": "Overall",
+    "points": "{{count}} pts",
+    "n_games": "{{count}} games",
+    "next_game": "Launch game {{n}}",
+    "waiting_next": "Waiting for the next game…"
   }
 }

@@ -1,4 +1,5 @@
-// Voyage Voyage map: start, target and guessed countries colored like the website (Travle colors).
+// Voyage Voyage map: like the website, only the start, the target, the guesses and the hints are drawn,
+// over a graticule; every other country stays hidden.
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native'
 
@@ -21,6 +22,22 @@ function styleFor(color: VoyageColor): LeafletStyle {
   if (color === 'hint') return { fillColor: VOYAGE_COLORS.hint, fillOpacity: 0.08, color: '#EEF1F8', weight: 2 }
   return { fillColor: VOYAGE_COLORS[color], fillOpacity: color === 'red' ? 0.4 : 0.55, color: VOYAGE_COLORS[color], weight: 2 }
 }
+
+const GRATICULE_COLOR = '#1E3A5F'
+const GRATICULE: Overlay[] = [
+  ...[-60, -30, 0, 30, 60].map((lat) => ({
+    type: 'line' as const,
+    points: [-180, -90, 0, 90, 180].map((lng) => [lat, lng] as [number, number]),
+    color: GRATICULE_COLOR,
+    width: 1,
+  })),
+  ...[-150, -120, -90, -60, -30, 0, 30, 60, 90, 120, 150].map((lng) => ({
+    type: 'line' as const,
+    points: [[-85, lng], [85, lng]] as [number, number][],
+    color: GRATICULE_COLOR,
+    width: 1,
+  })),
+]
 
 const CENTERS = new Map(
   allCountries.map((feature) => [feature.properties.ADMIN, feature.properties.center as [number, number] | undefined])
@@ -55,15 +72,19 @@ export function VoyageMap({
     return byName
   }, [start, target, guesses, hints])
   const signature = [...colored].map(([name, color]) => `${name}:${color}`).join('|')
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const visible = useMemo(() => [...colored.keys()].sort(), [signature])
 
   // A dot on each country keeps tiny ones visible.
   const overlays = useMemo<Overlay[]>(
     () =>
-      [...colored].flatMap(([name, color]) => {
-        const center = CENTERS.get(name)
-        if (!center || color === 'hint') return []
-        return [{ type: 'circle' as const, center: [center[1], center[0]] as [number, number], radius: 4, color: VOYAGE_COLORS[color] }]
-      }),
+      GRATICULE.concat(
+        [...colored].flatMap(([name, color]) => {
+          const center = CENTERS.get(name)
+          if (!center || color === 'hint') return []
+          return [{ type: 'circle' as const, center: [center[1], center[0]] as [number, number], radius: 4, color: VOYAGE_COLORS[color] }]
+        })
+      ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [signature]
   )
@@ -87,6 +108,7 @@ export function VoyageMap({
     <View style={[styles.frame, style]}>
       <WorldMap
         ref={mapRef}
+        countries={visible}
         interactive={interactive}
         showSmallCountryMarkers={false}
         overlays={overlays}

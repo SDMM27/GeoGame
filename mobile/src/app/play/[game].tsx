@@ -12,6 +12,7 @@ import { getTotalCountries, getTotalCountriesByContinent } from '@shared/hooks/u
 import { ASCENSION_PRESETS, matchPreset } from '@shared/utils/ascensionPresets'
 import { CONTINENTS } from '@shared/utils/continents'
 
+import { SheetCloseButton } from '@/components/SheetCloseButton'
 import { Button, Segmented, Text, Touchable } from '@/components/ui'
 import { DIFFICULTIES, DIFFICULTY_COLORS, getGame } from '@/games'
 import { colors, radius, space } from '@/theme'
@@ -117,6 +118,7 @@ export default function GameSetupSheet() {
             </Text>
             <Text variant="caption">{t(game.descKey)}</Text>
           </View>
+          <SheetCloseButton />
         </View>
 
         <Segmented<Mode>

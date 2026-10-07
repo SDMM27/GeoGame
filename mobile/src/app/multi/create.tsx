@@ -9,6 +9,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { QUIZ_DIFFICULTIES } from '@shared/utils/quizQuestions'
 
+import { SheetCloseButton } from '@/components/SheetCloseButton'
 import { Button, Segmented, Text } from '@/components/ui'
 import { DIFFICULTY_COLORS, getGame } from '@/games'
 import { createRoom, getSavedPseudo, type RoomGame, type RoomMode } from '@/multiplayer/room'
@@ -86,6 +87,7 @@ export default function CreateRoomSheet() {
             </Text>
             {setupLabel && <Text variant="caption">{setupLabel}</Text>}
           </View>
+          <SheetCloseButton />
         </View>
 
         <View style={{ gap: space.sm }}>

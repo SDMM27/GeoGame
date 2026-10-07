@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
-import { addDoc, collection, getDocs, query, where, deleteDoc } from 'firebase/firestore'
+import { addDoc, collection, getDocs, query, where, setDoc } from 'firebase/firestore'
 import { toast } from 'react-toastify'
 import NavBar from '../components/NavBar'
 import RankingLeaderboard from './RankingLeaderboard'
@@ -97,21 +97,7 @@ export default function RankingGamePage() {
         )
       )
 
-      if (!existing.empty) {
-        const prev = existing.docs[0].data()
-        const better =
-          score > prev.score ||
-          (score === prev.score && totalError < (prev.totalError ?? Infinity))
-        if (better) {
-          await deleteDoc(existing.docs[0].ref)
-        } else {
-          toast.info(t('ranking.better_score_exists'), { containerId: 'topRightToast' })
-          setSubmitting(false)
-          return
-        }
-      }
-
-      await addDoc(ref, {
+      const entry = {
         name,
         gameType: GAME_TYPES.RANKING,
         dailyKey,
@@ -119,7 +105,23 @@ export default function RankingGamePage() {
         totalError,
         attemptsUsed: attemptNumber,
         playerOrder: countries.map((c) => c.properties.ADMIN),
-      })
+      }
+
+      if (!existing.empty) {
+        const prev = existing.docs[0].data()
+        const better =
+          score > prev.score ||
+          (score === prev.score && totalError < (prev.totalError ?? Infinity))
+        if (!better) {
+          toast.info(t('ranking.better_score_exists'), { containerId: 'topRightToast' })
+          setSubmitting(false)
+          return
+        }
+        // Les règles Firestore interdisent de supprimer un score : on remplace l'ancien.
+        await setDoc(existing.docs[0].ref, entry)
+      } else {
+        await addDoc(ref, entry)
+      }
 
       if (rankingSavedKey) localStorage.setItem(rankingSavedKey, '1')
       setLeaderboardSubmitted(true)

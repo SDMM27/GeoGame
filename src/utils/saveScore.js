@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, getDocs, query, serverTimestamp, where } from 'firebase/firestore'
+import { addDoc, collection, getDocs, query, serverTimestamp, setDoc, where } from 'firebase/firestore'
 import { firestore } from '../Firebase'
 import { isBetterDailyScore, sortDailyScores } from './dailyScores'
 
@@ -30,11 +30,13 @@ export async function saveScore({ name, score, difficulty, elapsedTime, gameType
     if (!isBetter(score, elapsedTime, existing.score, existing.elapsedTime)) {
       return { status: 'blocked', existing: { score: existing.score, elapsedTime: existing.elapsedTime } }
     }
-    await deleteDoc(existingSnapshot.docs[0].ref)
+    // Firestore rules only allow replacing a score with a better one, never deleting it.
+    await setDoc(existingSnapshot.docs[0].ref, data)
+    return { status: 'updated' }
   }
 
   await addDoc(ref, data)
-  return { status: existingSnapshot.empty ? 'saved' : 'updated' }
+  return { status: 'saved' }
 }
 
 // Saves an Ascension score, keeping only the best one per (name, gameType, presetName).
@@ -50,10 +52,9 @@ export async function saveAscensionScore({ name, gameType, presetName, timer, sc
     if (!isBetter(score, timer, prev.globalScore, prev.globalTimeMs)) {
       return { status: 'blocked', existing: { timeMs: prev.globalTimeMs, score: prev.globalScore } }
     }
-    await deleteDoc(existing.docs[0].ref)
   }
 
-  await addDoc(ref, {
+  const data = {
     name,
     gameType,
     presetName,
@@ -63,8 +64,13 @@ export async function saveAscensionScore({ name, gameType, presetName, timer, sc
     totalSkipped: stats.skipped,
     phaseStats,
     date: serverTimestamp(),
-  })
-  return { status: existing.empty ? 'saved' : 'updated' }
+  }
+  if (!existing.empty) {
+    await setDoc(existing.docs[0].ref, data)
+    return { status: 'updated' }
+  }
+  await addDoc(ref, data)
+  return { status: 'saved' }
 }
 
 // Saves a daily-challenge score, keeping only the best one per (name, gameType, dailyKey).
@@ -82,11 +88,12 @@ export async function saveDailyScore({ name, gameType, dailyKey, attempts, elaps
     if (!isBetterDailyScore(newScore, existing)) {
       return { status: 'blocked', existing: { attempts: existing.attempts, elapsedTime: existing.elapsedTime } }
     }
-    await deleteDoc(existingSnapshot.docs[0].ref)
+    await setDoc(existingSnapshot.docs[0].ref, newScore)
+    return { status: 'updated' }
   }
 
   await addDoc(ref, newScore)
-  return { status: existingSnapshot.empty ? 'saved' : 'updated' }
+  return { status: 'saved' }
 }
 
 // Daily-challenge scores of one day, best first.

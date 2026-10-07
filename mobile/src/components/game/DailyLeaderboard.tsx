@@ -14,7 +14,18 @@ type DailyScore = { name: string; attempts: number; hints?: number; elapsedTime?
 const MEDALS = ['🥇', '🥈', '🥉']
 const MAX_ROWS = 20
 
-export function DailyLeaderboard({ gameType, dailyKey, refreshKey }: { gameType: string; dailyKey: string; refreshKey?: unknown }) {
+export function DailyLeaderboard({
+  gameType,
+  dailyKey,
+  refreshKey,
+  formatSecondary = (elapsedTime) => (elapsedTime != null ? formatTime(elapsedTime) : '—'),
+}: {
+  gameType: string
+  dailyKey: string
+  refreshKey?: unknown
+  // Last column; Voyage Voyage stores its error count in elapsedTime.
+  formatSecondary?: (elapsedTime: number | null | undefined) => string
+}) {
   const { t } = useTranslation()
   const [scores, setScores] = useState<DailyScore[] | null>(null)
   const [failed, setFailed] = useState(false)
@@ -58,7 +69,7 @@ export function DailyLeaderboard({ gameType, dailyKey, refreshKey }: { gameType:
               {score.attempts + (score.hints ?? 0)}
             </Text>
             <Text variant="caption" style={styles.time}>
-              {score.elapsedTime != null ? formatTime(score.elapsedTime) : '—'}
+              {formatSecondary(score.elapsedTime)}
             </Text>
           </View>
         ))

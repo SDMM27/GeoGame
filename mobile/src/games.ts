@@ -92,6 +92,16 @@ export const GAMES: GameDefinition[] = [
     route: '/game/ranking',
     kind: 'daily',
   },
+  {
+    id: 'quiz',
+    type: GAME_TYPES.QUIZ,
+    titleKey: 'games.quiz.title',
+    descKey: 'games.quiz.description',
+    icon: 'help-circle-outline',
+    color: gameColors.quiz,
+    route: '/game/quiz',
+    kind: 'daily',
+  },
 ]
 
 export function getGame(id: string) {

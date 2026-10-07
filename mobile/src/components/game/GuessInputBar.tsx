@@ -27,12 +27,12 @@ export function GuessInputBar({
   onChangeText: (value: string) => void
   // Called after render, so the hook's handleSubmit sees the current input
   onSubmit: () => void
-  onReveal: () => void
+  onReveal?: () => void
   suggestions: string[]
   locked: boolean
   placeholder: string
   accent: string
-  revealLabel: string
+  revealLabel?: string
   revealIcon?: IconName
 }) {
   const { t } = useTranslation()
@@ -91,14 +91,16 @@ export function GuessInputBar({
           editable={!locked}
           style={[styles.input, locked && { opacity: 0.5 }]}
         />
-        <Touchable
-          accessibilityRole="button"
-          accessibilityLabel={revealLabel}
-          onPress={onReveal}
-          disabled={locked}
-          style={[styles.iconButton, locked && { opacity: 0.4 }]}>
-          <MaterialCommunityIcons name={revealIcon} size={22} color={colors.text} />
-        </Touchable>
+        {onReveal && (
+          <Touchable
+            accessibilityRole="button"
+            accessibilityLabel={revealLabel}
+            onPress={onReveal}
+            disabled={locked}
+            style={[styles.iconButton, locked && { opacity: 0.4 }]}>
+            <MaterialCommunityIcons name={revealIcon} size={22} color={colors.text} />
+          </Touchable>
+        )}
         <Touchable
           accessibilityRole="button"
           accessibilityLabel={clean(t('buttons.validate'))}

@@ -31,6 +31,7 @@ export const gameColors = {
   country_clue: '#3DDC97',
   voyage_voyage: '#5FD4F4',
   ranking: '#FF9EC7',
+  quiz: '#B4E05A',
 } as const
 
 export const fonts = {

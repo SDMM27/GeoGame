@@ -12,6 +12,7 @@ import { formatTime } from '@shared/utils/formatTime'
 import { saveAscensionScore, saveDailyScore, saveScore } from '@shared/utils/saveScore'
 import { generateShareText } from '@shared/utils/shareScore'
 
+import { saveRankingScore } from '@/rankingScores'
 import { colors, fonts, radius, space } from '@/theme'
 import { Button, Text } from '../ui'
 
@@ -22,7 +23,18 @@ const SITE_ORIGIN = 'https://geogame.vercel.app'
 export type SaveConfig =
   | { kind: 'standard'; gameType: string; difficulty: string; elapsedTime: number; continent?: string | null }
   | { kind: 'ascension'; gameType: string; presetName: string; timer: number; stats: unknown; phaseStats: unknown }
-  | { kind: 'daily'; gameType: string; dailyKey: string; attempts: number; elapsedTime: number | null; guesses: string[]; hints?: number }
+  | {
+      kind: 'daily'
+      gameType: string
+      dailyKey: string
+      attempts: number
+      elapsedTime: number | null
+      guesses: string[]
+      hints?: number
+      // Shown for an existing better score; defaults to its time
+      formatSecondary?: (elapsedTime: number | null | undefined) => string
+    }
+  | { kind: 'ranking'; dailyKey: string; totalError: number; attemptsUsed: number; playerOrder: string[] }
 
 export type ShareConfig = {
   gameType: string
@@ -36,6 +48,8 @@ export type ShareConfig = {
 type Props = {
   title?: string
   score: number
+  // Displayed instead of the rounded score (e.g. Voyage Voyage's half points)
+  scoreText?: string
   scoreLabel?: string
   accent?: string
   stats: { label: string; value: string; color?: string }[]
@@ -50,10 +64,15 @@ type Props = {
 type SaveState = 'idle' | 'saving' | 'saved' | 'blocked' | 'error'
 
 // Same key as the website's DailyForm: one save per daily challenge.
+// Ranking uses the website's RankingGamePage key.
 const dailySavedKey = (save: SaveConfig | null | undefined) =>
-  save?.kind === 'daily' ? `daily-saved:${save.gameType}:${save.dailyKey}` : null
+  save?.kind === 'daily'
+    ? `daily-saved:${save.gameType}:${save.dailyKey}`
+    : save?.kind === 'ranking'
+      ? `ranking-saved:${save.dailyKey}`
+      : null
 
-export function ResultsSheet({ title, score, scoreLabel, accent = colors.accent, stats, save, share, onReplay, onHome, onSaved, children }: Props) {
+export function ResultsSheet({ title, score, scoreText, scoreLabel, accent = colors.accent, stats, save, share, onReplay, onHome, onSaved, children }: Props) {
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   const [pseudo, setPseudo] = useState(() => globalThis.localStorage?.getItem(PSEUDO_KEY) ?? '')
@@ -76,16 +95,33 @@ export function ResultsSheet({ title, score, scoreLabel, accent = colors.accent,
       const result =
         save.kind === 'daily'
           ? await saveDailyScore({ name, ...save })
-          : save.kind === 'ascension'
-            ? await saveAscensionScore({ name, score, ...save })
-            : await saveScore({ name, score, ...save })
+          : save.kind === 'ranking'
+            ? await saveRankingScore({
+                name,
+                score,
+                dailyKey: save.dailyKey,
+                totalError: save.totalError,
+                attemptsUsed: save.attemptsUsed,
+                playerOrder: save.playerOrder,
+              })
+            : save.kind === 'ascension'
+              ? await saveAscensionScore({ name, score, ...save })
+              : await saveScore({ name, score, ...save })
       if (result.status === 'blocked') {
-        const existing = result.existing as { score?: number; attempts?: number; elapsedTime?: number; timeMs?: number }
-        const value =
-          save.kind === 'daily'
-            ? `${existing.attempts} ${existing.attempts === 1 ? t('units.attempt_one') : t('units.attempt_other')}`
-            : `${existing.score} ${t('units.pts')}`
-        setBlockedBy(`${value} · ${formatTime(existing.elapsedTime ?? existing.timeMs ?? 0)}`)
+        const existing = result.existing as { score?: number; attempts?: number; elapsedTime?: number; timeMs?: number; totalError?: number }
+        if (save.kind === 'ranking') {
+          setBlockedBy(`${existing.score} ${t('units.pts')} · ${existing.totalError} ${t('units.position', { count: existing.totalError })}`)
+        } else {
+          const value =
+            save.kind === 'daily'
+              ? `${existing.attempts} ${existing.attempts === 1 ? t('units.attempt_one') : t('units.attempt_other')}`
+              : `${existing.score} ${t('units.pts')}`
+          const secondary =
+            save.kind === 'daily' && save.formatSecondary
+              ? save.formatSecondary(existing.elapsedTime)
+              : formatTime(existing.elapsedTime ?? existing.timeMs ?? 0)
+          setBlockedBy(`${value} · ${secondary}`)
+        }
         setSaveState('blocked')
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning)
         return
@@ -121,7 +157,7 @@ export function ResultsSheet({ title, score, scoreLabel, accent = colors.accent,
           <Animated.View entering={ZoomIn.springify().damping(14)} style={{ alignItems: 'center' }}>
             <Text variant="label">{title ?? t('mobile.game.finished')}</Text>
             <Text variant="hero" color={accent} style={{ fontSize: 64, lineHeight: 72, marginTop: space.sm }}>
-              {Math.round(score).toLocaleString()}
+              {scoreText ?? Math.round(score).toLocaleString()}
             </Text>
             <Text variant="caption">{scoreLabel ?? t('units.pts')}</Text>
           </Animated.View>
@@ -174,7 +210,7 @@ export function ResultsSheet({ title, score, scoreLabel, accent = colors.accent,
               )}
               {saveState === 'blocked' && (
                 <Text variant="caption" color={colors.warning}>
-                  {save.kind === 'daily'
+                  {save.kind === 'daily' || save.kind === 'ranking'
                     ? `${t('form.better_daily_score')} ${blockedBy}. ${t('form.use_different_name_daily')}`
                     : `${t('form.better_score_exists')} (${blockedBy}). ${t('form.use_different_name')}`}
                 </Text>

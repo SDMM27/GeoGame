@@ -11,6 +11,8 @@ import { colors, radius, space } from '@/theme'
 import { Text } from './ui'
 
 const DISMISSED_KEY = 'install_hint_dismissed'
+// Keeps the guide above the bottom tab bar ((tabs)/_layout.web.tsx).
+const TAB_BAR_CLEARANCE = 64
 
 // Other iOS browsers and in-app browsers (Instagram, Facebook…) can't reliably add to the home screen.
 const NOT_SAFARI = /CriOS|FxiOS|EdgiOS|OPiOS|GSA|Instagram|FBAN|FBAV|Snapchat|TikTok/
@@ -50,7 +52,7 @@ export function InstallHint() {
   }
 
   return (
-    <View style={[styles.card, { bottom: insets.bottom + space.md }]} accessibilityRole="alert">
+    <View style={[styles.card, { bottom: insets.bottom + TAB_BAR_CLEARANCE }]} accessibilityRole="alert">
       <View style={styles.header}>
         <Text variant="heading" style={{ flex: 1 }}>
           {t('mobile.install.title')}

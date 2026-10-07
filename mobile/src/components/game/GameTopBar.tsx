@@ -1,11 +1,12 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Alert, StyleSheet, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { navigate } from '@/shims/react-router-dom'
 import { colors, radius, space } from '@/theme'
+import { confirmAction } from '../confirm'
 import { Text, Touchable } from '../ui'
 
 export function HudPill({ icon, label, color = colors.text }: { icon?: keyof typeof MaterialCommunityIcons.glyphMap; label: string; color?: string }) {
@@ -27,10 +28,13 @@ export function GameTopBar({ children, confirmQuit = true, onQuit }: { children?
 
   const onClose = () => {
     if (!confirmQuit) return quit()
-    Alert.alert(t('mobile.game.quit_title'), t('mobile.game.quit_message'), [
-      { text: t('mobile.game.cancel'), style: 'cancel' },
-      { text: t('mobile.game.quit'), style: 'destructive', onPress: quit },
-    ])
+    confirmAction({
+      title: t('mobile.game.quit_title'),
+      message: t('mobile.game.quit_message'),
+      confirmLabel: t('mobile.game.quit'),
+      cancelLabel: t('mobile.game.cancel'),
+      onConfirm: quit,
+    })
   }
 
   return (

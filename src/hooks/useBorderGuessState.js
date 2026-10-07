@@ -2,11 +2,11 @@
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
-import L from 'leaflet'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { checkAnswer, normalize } from '../utils/normalizeAnswer'
 import { getAllCountryNames, getCountryName } from '../utils/getCountryName'
 import countryAliases from '../data/countryAliases.json'
+import { getGeographicCenter } from '../utils/countryArea'
 
 const DAILY_TIME_ZONE = 'Europe/Paris'
 const DAILY_STORAGE_PREFIX = 'border-guess-daily'
@@ -76,50 +76,7 @@ function normalizeLongitudeDelta(deltaLng) {
   return normalized
 }
 
-function collectCoordinates(geometry) {
-  if (!geometry) return []
 
-  if (geometry.type === 'Polygon') {
-    return geometry.coordinates.flat()
-  }
-
-  if (geometry.type === 'MultiPolygon') {
-    return geometry.coordinates.flat(2)
-  }
-
-  return []
-}
-
-function getGeographicCenter(country) {
-  const coordinates = collectCoordinates(country.geometry)
-  if (coordinates.length === 0) {
-    return L.geoJSON(country).getBounds().getCenter()
-  }
-
-  let x = 0
-  let y = 0
-  let z = 0
-
-  coordinates.forEach(([lng, lat]) => {
-    const latRad = (lat * Math.PI) / 180
-    const lngRad = (lng * Math.PI) / 180
-
-    x += Math.cos(latRad) * Math.cos(lngRad)
-    y += Math.cos(latRad) * Math.sin(lngRad)
-    z += Math.sin(latRad)
-  })
-
-  const total = coordinates.length
-  x /= total
-  y /= total
-  z /= total
-
-  const lng = Math.atan2(y, x) * (180 / Math.PI)
-  const hyp = Math.sqrt(x * x + y * y)
-  const lat = Math.atan2(z, hyp) * (180 / Math.PI)
-
-  return L.latLng(lat, lng)
-}
 
 const COUNTRY_CENTER_MAP = new Map(
   BORDER_GUESS_COUNTRIES.map((country) => [country.properties.ADMIN, getGeographicCenter(country)])
@@ -452,7 +409,6 @@ export default function useBorderGuessState(mode, options = {}) {
     setGuesses([])
     setStatus('playing')
     setInputValue('')
-    toast.info(t('toasts.found_country', { name: getCountryName(nextCountry.properties.ISO_A2, i18n.language) || nextCountry.properties.ADMIN }), { containerId: 'topRightToast' })
   }
 
   const revealCountry = () => {
@@ -484,6 +440,7 @@ export default function useBorderGuessState(mode, options = {}) {
     goHome,
     hasStarted,
     startGame,
+    startedAt,
     elapsedTime,
   }
 }

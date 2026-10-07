@@ -2,21 +2,14 @@ import React, { useRef, useState } from "react";
 import { useTranslation } from 'react-i18next';
 import "./form.css";
 import "react-toastify/dist/ReactToastify.css";
-import { firestore } from "../Firebase";
-import { addDoc, collection, getDocs, query, where, deleteDoc } from "firebase/firestore";
+import { saveScore } from "../utils/saveScore";
 import { toast } from "react-toastify";
 import { formatTime } from "../utils/formatTime";
-
-function isBetter(newScore, newTime, existingScore, existingTime) {
-  if (newScore > existingScore) return true;
-  if (newScore === existingScore && newTime < existingTime) return true;
-  return false;
-}
+import { getSavedPseudo } from "../utils/account";
 
 export default function Form({ finalScore, difficulty, elapsedTime, gameType, continent }) {
   const { t } = useTranslation();
   const nameRef = useRef();
-  const ref = collection(firestore, "scores");
   const [saved, setSaved] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [blockedByBetterScore, setBlockedByBetterScore] = useState(null);
@@ -31,39 +24,15 @@ export default function Form({ finalScore, difficulty, elapsedTime, gameType, co
     }
     setSubmitting(true);
 
-    const data = {
-      name,
-      score: finalScore,
-      difficulty,
-      elapsedTime,
-      gameType,
-      ...(continent != null && { continent }),
-    };
-
-    const existingSnapshot = await getDocs(
-      query(
-        ref,
-        where("name", "==", name),
-        where("difficulty", "==", difficulty),
-        where("gameType", "==", gameType)
-      )
-    );
-
-    if (!existingSnapshot.empty) {
-      const existing = existingSnapshot.docs[0].data();
-      if (!isBetter(finalScore, elapsedTime, existing.score, existing.elapsedTime)) {
-        setBlockedByBetterScore({ score: existing.score, elapsedTime: existing.elapsedTime });
+    try {
+      const result = await saveScore({ name, score: finalScore, difficulty, elapsedTime, gameType, continent });
+      if (result.status === "blocked") {
+        setBlockedByBetterScore(result.existing);
         setSubmitting(false);
         return;
       }
-      await deleteDoc(existingSnapshot.docs[0].ref);
-    }
-
-    try {
-      await addDoc(ref, data);
-      const wasReplaced = !existingSnapshot.empty;
       toast.success(
-        wasReplaced ? "Score mis à jour !" : `Score de ${name} sauvegardé !`,
+        result.status === "updated" ? "Score mis à jour !" : `Score de ${name} sauvegardé !`,
         { containerId: "topRightToast" }
       );
       setSaved(true);
@@ -101,6 +70,7 @@ export default function Form({ finalScore, difficulty, elapsedTime, gameType, co
           type="text"
           id="name"
           ref={nameRef}
+          defaultValue={getSavedPseudo()}
           className="form-input"
           placeholder={t('placeholders.username')}
           maxLength={20}

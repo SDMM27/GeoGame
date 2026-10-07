@@ -1,0 +1,195 @@
+// Friends: add one by username, answer requests, see who played today's daily challenges.
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
+import { router } from 'expo-router'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+
+import { useFriendships, useFriendsToday } from '@shared/hooks/usePlayerProfile'
+import { USERNAME_MAX } from '@shared/utils/account'
+import { acceptFriendRequest, friendErrorKey, removeFriendship, sendFriendRequest } from '@shared/utils/friends'
+
+import { useAccount } from '@/account/auth'
+import { confirmAction } from '@/components/confirm'
+import { Avatar, DailyChips, SectionTitle } from '@/components/profile/ProfileSections'
+import { ScreenHeader } from '@/components/ScreenHeader'
+import { Button, Text, Touchable } from '@/components/ui'
+import { colors, fonts, radius, space } from '@/theme'
+
+type Friendship = { id: string; uid: string; username: string; status: 'friend' | 'incoming' | 'outgoing' }
+
+const openPlayer = (uid: string) => router.push({ pathname: '/player/[uid]', params: { uid } })
+
+export default function FriendsScreen() {
+  const { t } = useTranslation()
+  const insets = useSafeAreaInsets()
+  const { account } = useAccount()
+  const friendships = useFriendships(account?.uid)
+  const today = useFriendsToday(friendships.friends) as Record<string, Record<string, { solved?: boolean }>>
+  const [username, setUsername] = useState('')
+  const [sending, setSending] = useState(false)
+  const [message, setMessage] = useState<{ kind: 'error' | 'notice'; text: string } | null>(null)
+
+  const onAdd = async () => {
+    if (!account?.username || !username.trim()) return
+    setSending(true)
+    setMessage(null)
+    try {
+      const player = await sendFriendRequest({ uid: account.uid, username: account.username }, username, friendships.all)
+      const accepted = friendships.incoming.some((item: Friendship) => item.uid === player?.uid)
+      setMessage({ kind: 'notice', text: t(accepted ? 'friends.now_friends' : 'friends.sent', { username: player?.username ?? username.trim() }) })
+      setUsername('')
+    } catch (error) {
+      setMessage({ kind: 'error', text: t(`friends.errors.${friendErrorKey(error)}`) })
+    }
+    setSending(false)
+  }
+
+  const onRemove = (friend: Friendship) =>
+    confirmAction({
+      title: t('friends.remove_confirm', { username: friend.username }),
+      confirmLabel: t('friends.remove'),
+      cancelLabel: t('account.cancel'),
+      onConfirm: () => removeFriendship(friend.id),
+    })
+
+  return (
+    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: colors.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingTop: insets.top + space.lg, paddingHorizontal: space.lg, paddingBottom: space.xxl * 2, gap: space.xl }}>
+        <ScreenHeader title={t('friends.title')} />
+
+        <View style={styles.card}>
+          <Text variant="heading">{t('friends.add_title')}</Text>
+          <View style={{ flexDirection: 'row', gap: space.sm }}>
+            <TextInput
+              value={username}
+              onChangeText={(value) => {
+                setUsername(value)
+                setMessage(null)
+              }}
+              placeholder={t('friends.add_placeholder')}
+              placeholderTextColor={colors.textFaint}
+              maxLength={USERNAME_MAX}
+              autoCapitalize="none"
+              autoCorrect={false}
+              returnKeyType="send"
+              onSubmitEditing={onAdd}
+              style={styles.input}
+            />
+            <Button label={t('friends.add')} onPress={onAdd} loading={sending} disabled={!username.trim() || !account} style={{ paddingHorizontal: space.lg }} />
+          </View>
+          {message && (
+            <Text variant="caption" color={message.kind === 'error' ? colors.danger : colors.accent}>
+              {message.text}
+            </Text>
+          )}
+        </View>
+
+        {friendships.loading ? (
+          <ActivityIndicator color={colors.accent} />
+        ) : (
+          <>
+            {friendships.incoming.length > 0 && (
+              <View style={{ gap: space.md }}>
+                <SectionTitle title={t('friends.requests_title')} />
+                <View style={styles.list}>
+                  {friendships.incoming.map((request: Friendship, index: number) => (
+                    <View key={request.id} style={[styles.row, index > 0 && styles.divider]}>
+                      <Touchable accessibilityRole="button" onPress={() => openPlayer(request.uid)} style={styles.who}>
+                        <Avatar username={request.username} size={40} />
+                        <Text variant="bodyStrong" numberOfLines={1} style={{ flex: 1 }}>
+                          {request.username}
+                        </Text>
+                      </Touchable>
+                      <Button label={t('friends.accept')} onPress={() => acceptFriendRequest(request.id)} style={styles.smallButton} />
+                      <Touchable accessibilityRole="button" accessibilityLabel={t('friends.decline')} onPress={() => removeFriendship(request.id)} style={styles.iconButton}>
+                        <MaterialCommunityIcons name="close" size={20} color={colors.textMuted} />
+                      </Touchable>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+
+            <View style={{ gap: space.md }}>
+              <SectionTitle
+                title={t('friends.title')}
+                right={<Text variant="bodyStrong" color={colors.textMuted}>{friendships.friends.length}</Text>}
+              />
+              {friendships.friends.length === 0 ? (
+                <Text variant="caption">{t('friends.empty')}</Text>
+              ) : (
+                <>
+                  <Text variant="caption">{t('friends.today_title')}</Text>
+                  <View style={styles.list}>
+                    {friendships.friends.map((friend: Friendship, index: number) => (
+                      <View key={friend.id} style={[styles.row, index > 0 && styles.divider]}>
+                        <Touchable accessibilityRole="button" onPress={() => openPlayer(friend.uid)} style={styles.who}>
+                          <Avatar username={friend.username} size={40} />
+                          <View style={{ flex: 1, gap: space.xs }}>
+                            <Text variant="bodyStrong" numberOfLines={1}>
+                              {friend.username}
+                            </Text>
+                            <DailyChips today={today[friend.uid] ?? {}} size={22} />
+                          </View>
+                        </Touchable>
+                        <Touchable accessibilityRole="button" accessibilityLabel={t('friends.remove')} onPress={() => onRemove(friend)} style={styles.iconButton}>
+                          <MaterialCommunityIcons name="account-remove-outline" size={20} color={colors.textMuted} />
+                        </Touchable>
+                      </View>
+                    ))}
+                  </View>
+                </>
+              )}
+            </View>
+
+            {friendships.outgoing.length > 0 && (
+              <View style={{ gap: space.md }}>
+                <SectionTitle title={t('friends.outgoing_title')} />
+                <View style={styles.list}>
+                  {friendships.outgoing.map((request: Friendship, index: number) => (
+                    <View key={request.id} style={[styles.row, index > 0 && styles.divider]}>
+                      <Touchable accessibilityRole="button" onPress={() => openPlayer(request.uid)} style={styles.who}>
+                        <Avatar username={request.username} size={40} />
+                        <Text variant="bodyStrong" numberOfLines={1} style={{ flex: 1 }}>
+                          {request.username}
+                        </Text>
+                      </Touchable>
+                      <Button label={t('friends.cancel')} variant="ghost" onPress={() => removeFriendship(request.id)} style={styles.smallButton} />
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+          </>
+        )}
+      </ScrollView>
+    </KeyboardAvoidingView>
+  )
+}
+
+const styles = StyleSheet.create({
+  card: { gap: space.md, padding: space.lg, borderRadius: radius.xl, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
+  input: {
+    flex: 1,
+    minWidth: 0,
+    height: 52,
+    borderRadius: radius.md,
+    backgroundColor: colors.bg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: space.lg,
+    color: colors.text,
+    fontFamily: fonts.bodyMedium,
+    fontSize: 16,
+  },
+  list: { borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
+  row: { flexDirection: 'row', alignItems: 'center', gap: space.sm, paddingHorizontal: space.md, paddingVertical: space.md },
+  divider: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },
+  who: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: space.md },
+  smallButton: { minHeight: 38, paddingHorizontal: space.md },
+  iconButton: { width: 38, height: 38, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surfaceHigh },
+})

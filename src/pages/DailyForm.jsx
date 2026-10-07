@@ -1,10 +1,9 @@
 import React, { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { addDoc, collection, getDocs, query, where, deleteDoc } from 'firebase/firestore'
 import { toast } from 'react-toastify'
-import { firestore } from '../Firebase'
-import { isBetterDailyScore } from '../utils/dailyScores'
+import { saveDailyScore } from '../utils/saveScore'
 import { formatTime } from '../utils/formatTime'
+import { getSavedPseudo } from '../utils/account'
 import './DailyLeaderboard.css'
 
 export default function DailyForm({ attempts, elapsedTime, guesses, gameType, dailyKey, statText, hints }) {
@@ -14,7 +13,6 @@ export default function DailyForm({ attempts, elapsedTime, guesses, gameType, da
   const [saved, setSaved] = useState(() => !!localStorage.getItem(savedKey))
   const [submitting, setSubmitting] = useState(false)
   const [blockedByBetter, setBlockedByBetter] = useState(null)
-  const ref = collection(firestore, 'daily_scores')
 
   const handleSave = async (e) => {
     e.preventDefault()
@@ -26,26 +24,14 @@ export default function DailyForm({ attempts, elapsedTime, guesses, gameType, da
     }
     setSubmitting(true)
 
-    const newScore = { name, gameType, dailyKey, attempts, elapsedTime, guesses, ...(hints != null && { hints }) }
-
-    const existingSnapshot = await getDocs(
-      query(ref, where('name', '==', name), where('gameType', '==', gameType), where('dailyKey', '==', dailyKey))
-    )
-
-    if (!existingSnapshot.empty) {
-      const existing = existingSnapshot.docs[0].data()
-      if (!isBetterDailyScore(newScore, existing)) {
-        setBlockedByBetter({ attempts: existing.attempts, elapsedTime: existing.elapsedTime })
+    try {
+      const result = await saveDailyScore({ name, gameType, dailyKey, attempts, elapsedTime, guesses, hints })
+      if (result.status === 'blocked') {
+        setBlockedByBetter(result.existing)
         setSubmitting(false)
         return
       }
-      await deleteDoc(existingSnapshot.docs[0].ref)
-    }
-
-    try {
-      await addDoc(ref, newScore)
-      const wasReplaced = !existingSnapshot.empty
-      toast.success(wasReplaced ? 'Score mis à jour !' : `Score de ${name} sauvegardé !`, { containerId: 'topRightToast' })
+      toast.success(result.status === 'updated' ? 'Score mis à jour !' : `Score de ${name} sauvegardé !`, { containerId: 'topRightToast' })
       localStorage.setItem(savedKey, '1')
       setSaved(true)
     } catch (err) {
@@ -72,6 +58,7 @@ export default function DailyForm({ attempts, elapsedTime, guesses, gameType, da
         <input
           id="daily-pseudo"
           ref={nameRef}
+          defaultValue={getSavedPseudo()}
           className="daily-form__input"
           type="text"
           placeholder={t('placeholders.username')}

@@ -11,8 +11,10 @@ import ChallengeBanner from '../components/ChallengeBanner'
 import { resolveMode } from '../utils/challenge'
 import useRankingGameState from '../hooks/useRankingGameState'
 import { GAME_TYPES } from '../utils/gameTypes'
+import { useRecordGame } from '../auth'
 import { firestore } from '../Firebase'
 import { getCountryName } from '../utils/getCountryName'
+import { getSavedPseudo } from '../utils/account'
 import './RankingGamePage.css'
 
 const FLAG_URL = (iso2) =>
@@ -35,7 +37,7 @@ export default function RankingGamePage() {
   const initialMode = resolveMode(location, 'daily')
   const [mode, setMode] = useState(initialMode)
   const [countryCount, setCountryCount] = useState(5)
-  const [submitName, setSubmitName] = useState('')
+  const [submitName, setSubmitName] = useState(getSavedPseudo)
   const [submitting, setSubmitting] = useState(false)
 
   const CATEGORY_OPTIONS = [
@@ -129,6 +131,12 @@ export default function RankingGamePage() {
   }
 
   const isSubmitted = status === 'submitted'
+
+  useRecordGame(
+    isSubmitted && mode === 'daily' && dailyKey
+      ? { gameType: GAME_TYPES.RANKING, mode: 'daily', dailyKey, score, solved: score > 0, attempts: attemptNumber, totalError }
+      : null
+  )
 
   const errorChips = isSubmitted
     ? correctOrder

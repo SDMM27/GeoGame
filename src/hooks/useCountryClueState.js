@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { checkAnswer, normalize } from '../utils/normalizeAnswer'
-import { collectCoordinates, getRingAreaKm2, getCountryAreaKm2, EARTH_RADIUS_KM } from '../utils/countryArea'
+import { collectCoordinates, getRingAreaKm2, getCountryAreaKm2, getGeographicCenter, EARTH_RADIUS_KM } from '../utils/countryArea'
 import { getCountryName, getAllCountryNames } from '../utils/getCountryName'
 import countryAliases from '../data/countryAliases.json'
 
@@ -29,38 +29,6 @@ function normalizeLongitudeDelta(deltaLng) {
   return normalized
 }
 
-function getGeographicCenter(country) {
-  const polygons = collectCoordinates(country.geometry)
-  const coordinates = polygons.flat(2)
-
-  if (coordinates.length === 0) {
-    return { lat: 0, lng: 0 }
-  }
-
-  let x = 0
-  let y = 0
-  let z = 0
-
-  coordinates.forEach(([lng, lat]) => {
-    const latRad = (lat * Math.PI) / 180
-    const lngRad = (lng * Math.PI) / 180
-
-    x += Math.cos(latRad) * Math.cos(lngRad)
-    y += Math.cos(latRad) * Math.sin(lngRad)
-    z += Math.sin(latRad)
-  })
-
-  const total = coordinates.length
-  x /= total
-  y /= total
-  z /= total
-
-  const lng = Math.atan2(y, x) * (180 / Math.PI)
-  const hyp = Math.sqrt(x * x + y * y)
-  const lat = Math.atan2(z, hyp) * (180 / Math.PI)
-
-  return { lat, lng }
-}
 
 export const COUNTRY_CENTER_MAP = new Map(
   COUNTRY_CLUE_COUNTRIES.map((country) => [country.properties.ADMIN, getGeographicCenter(country)])
@@ -510,7 +478,6 @@ export default function useCountryClueState(mode, options = {}) {
     setGuesses([])
     setStatus('playing')
     setInputValue('')
-    toast.info(t('toasts.found_country', { name: getCountryName(nextCountry.properties.ISO_A2, i18n.language) || nextCountry.properties.ADMIN }), { containerId: 'topRightToast' })
   }
 
   const revealCountry = () => {
@@ -537,6 +504,7 @@ export default function useCountryClueState(mode, options = {}) {
     dailyKey,
     hasStarted,
     startGame,
+    startedAt,
     elapsedTime,
     handleSubmit,
     startNextInfiniteRound,

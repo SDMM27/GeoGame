@@ -1,8 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { collection, getDocs, query, where } from 'firebase/firestore'
-import { firestore } from '../Firebase'
-import { sortDailyScores } from '../utils/dailyScores'
+import { fetchDailyScores } from '../utils/saveScore'
 import { formatTime } from '../utils/formatTime'
 import { getLast7Days } from '../utils/dateUtils'
 import './DailyLeaderboard.css'
@@ -69,14 +67,7 @@ export default function DailyLeaderboard({ gameType, dailyKey, columnLabels, sec
     const fetchScores = async () => {
       setLoading(true)
       try {
-        const snapshot = await getDocs(
-          query(
-            collection(firestore, 'daily_scores'),
-            where('gameType', '==', gameType),
-            where('dailyKey', '==', selectedDate)
-          )
-        )
-        setScores(sortDailyScores(snapshot.docs.map((doc) => doc.data())))
+        setScores(await fetchDailyScores(gameType, selectedDate))
       } finally {
         setLoading(false)
       }

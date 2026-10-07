@@ -66,22 +66,6 @@ function CountryChip({ feature, color, lang }: { feature: CountryFeature; color:
   )
 }
 
-function Endpoint({ feature, label, color, align }: { feature: CountryFeature; label: string; color: string; align: 'left' | 'right' }) {
-  const { i18n } = useTranslation()
-  const flag = getFlag(feature.properties.ISO_A2)
-  return (
-    <View
-      accessible
-      accessibilityLabel={`${label} : ${nameOf(feature, i18n.language)}`}
-      style={[styles.endpoint, align === 'right' && { flexDirection: 'row-reverse' }]}>
-      {flag && <Image source={flag} contentFit="cover" style={styles.endpointFlag} />}
-      <Text variant="bodyStrong" color={color} numberOfLines={2} style={{ flex: 1, fontSize: 14, lineHeight: 18, textAlign: align }}>
-        {nameOf(feature, i18n.language)}
-      </Text>
-    </View>
-  )
-}
-
 function OptimalPath({ path, chain }: { path: CountryFeature[]; chain: CountryFeature[] }) {
   const { t, i18n } = useTranslation()
   const guessed = new Set(chain.map((feature) => feature.properties.ISO_A2))
@@ -196,12 +180,6 @@ export default function VoyageScreen() {
 
           {startCountry && targetCountry && (
             <>
-              <View style={styles.endpoints}>
-                <Endpoint feature={startCountry} label={t('labels.start')} color={VOYAGE_COLORS.start} align="left" />
-                <MaterialCommunityIcons name="airplane" size={18} color={colors.textMuted} />
-                <Endpoint feature={targetCountry} label={t('labels.arrival')} color={VOYAGE_COLORS.target} align="right" />
-              </View>
-
               <View style={{ gap: space.sm }}>
                 <View style={styles.chain}>
                   {(chainHistory as Guess[]).map((guess, index) => (
@@ -231,6 +209,8 @@ export default function VoyageScreen() {
                           </Text>
                         </View>
                       )}
+                      <MaterialCommunityIcons name="chevron-right" size={16} color={colors.textFaint} />
+                      <CountryChip feature={targetCountry} color="target" lang={i18n.language} />
                     </>
                   )}
                 </View>
@@ -374,19 +354,6 @@ export default function VoyageScreen() {
 
 const styles = StyleSheet.create({
   content: { paddingHorizontal: space.xl, paddingBottom: space.xl, gap: space.lg },
-  endpoints: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space.sm,
-    paddingVertical: space.sm,
-    paddingHorizontal: space.md,
-    borderRadius: radius.md,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  endpoint: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: space.sm },
-  endpointFlag: { width: 27, height: 18, borderRadius: 3 },
   chain: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6 },
   chainItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   chip: {

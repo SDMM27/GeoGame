@@ -55,6 +55,8 @@ type Props = {
   overlays?: Overlay[]
   showSmallCountryMarkers?: boolean
   interactive?: boolean
+  // Called once the map is measured and framed: the handle's view methods work from then on.
+  onReady?: () => void
 }
 
 const MAX_SCALE = 2 ** (18 - BASE_ZOOM)
@@ -183,6 +185,7 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
     overlays = [],
     showSmallCountryMarkers = true,
     interactive = true,
+    onReady,
   },
   ref
 ) {
@@ -401,7 +404,8 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
     framed.current = true
     if (initialView) setView(initialView.center, initialView.zoom, { animate: false })
     else setView([25, 10], 2.4, { animate: false })
-  }, [size, initialView, setView, applyView])
+    onReady?.()
+  }, [size, initialView, setView, applyView, onReady])
 
   // ---- Hit testing ---------------------------------------------------------------
   const handleTap = useCallback(

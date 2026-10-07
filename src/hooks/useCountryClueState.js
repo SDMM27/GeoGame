@@ -505,6 +505,7 @@ export default function useCountryClueState(mode, options = {}) {
     dailyKey,
     hasStarted,
     startGame,
+    startedAt,
     elapsedTime,
     handleSubmit,
     startNextInfiniteRound,

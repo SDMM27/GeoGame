@@ -2,9 +2,9 @@
 // Game rules come from the website hook (useBorderGuessState).
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { useLocalSearchParams } from 'expo-router'
-import { useEffect, useEffectEvent, useRef, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, View } from 'react-native'
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native'
 import Animated, { FadeIn, FadeInDown, LinearTransition, ZoomIn } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -15,12 +15,14 @@ import { getCountryName } from '@shared/utils/getCountryName'
 
 import { DailyLeaderboard } from '@/components/game/DailyLeaderboard'
 import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
+import { GuessInputBar } from '@/components/game/GuessInputBar'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
 import { CountrySilhouette } from '@/components/map/CountrySilhouette'
-import { Button, Text, Touchable } from '@/components/ui'
+import { Button, Text } from '@/components/ui'
+import { useElapsed } from '@/hooks/useElapsed'
 import { clean } from '@/i18n'
 import { navigate } from '@/shims/react-router-dom'
-import { colors, fonts, gameColors, radius, space } from '@/theme'
+import { colors, gameColors, radius, space } from '@/theme'
 
 const ACCENT = gameColors.border_guess
 
@@ -31,17 +33,6 @@ type Guess = {
   distanceKm: number | null
   direction: string | null
   directionArrow: string | null
-}
-
-// Live timer for the daily challenge (the hook only stores the start time).
-function useElapsed(startedAt: number | null, running: boolean) {
-  const [now, setNow] = useState(() => Date.now())
-  useEffect(() => {
-    if (!running) return
-    const id = setInterval(() => setNow(Date.now()), 1000)
-    return () => clearInterval(id)
-  }, [running])
-  return startedAt != null ? Math.max(0, now - startedAt) : 0
 }
 
 function GuessRow({ guess, index }: { guess: Guess; index: number }) {
@@ -99,21 +90,9 @@ export default function BorderGuessScreen() {
     elapsedTime,
   } = useBorderGuessState(mode)
   const [leaderboardVersion, setLeaderboardVersion] = useState(0)
-  // Submit right after a suggestion fills the input (handleSubmit reads the rendered value).
-  const pendingSubmitRef = useRef<string | null>(null)
-  const inputRef = useRef<TextInput>(null)
-  const submit = useEffectEvent(() => handleSubmit())
-  useEffect(() => {
-    if (pendingSubmitRef.current === null || pendingSubmitRef.current !== inputValue) return
-    pendingSubmitRef.current = null
-    submit()
-  }, [inputValue])
-
   const elapsed = useElapsed(startedAt, isDaily && hasStarted && !isComplete)
   const locked = isComplete || (isDaily && !hasStarted)
   const answer = getCountryName(currentCountryISO, i18n.language) || answerName
-  const trimmed = inputValue.trim()
-  const suggestions: string[] = locked || filteredCountrySuggestions.includes(trimmed) ? [] : filteredCountrySuggestions
   const attemptsLabel = guesses.length === 1 ? t('units.attempt_one') : t('units.attempt_other')
 
   return (
@@ -181,60 +160,17 @@ export default function BorderGuessScreen() {
         </ScrollView>
 
         {!isComplete && (
-          <View style={[styles.inputBar, { paddingBottom: Math.max(insets.bottom, space.md) }]}>
-            {suggestions.length > 0 && (
-              <ScrollView horizontal keyboardShouldPersistTaps="always" showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestions}>
-                {suggestions.map((name) => (
-                  <Touchable
-                    key={name}
-                    onPress={() => {
-                      pendingSubmitRef.current = name
-                      setInputValue(name)
-                      inputRef.current?.focus()
-                    }}
-                    style={styles.suggestion}>
-                    <Text variant="bodyStrong" style={{ fontSize: 14 }}>
-                      {name}
-                    </Text>
-                  </Touchable>
-                ))}
-              </ScrollView>
-            )}
-            <View style={styles.inputRow}>
-              <TextInput
-                ref={inputRef}
-                value={inputValue}
-                onChangeText={setInputValue}
-                onSubmitEditing={() => handleSubmit()}
-                submitBehavior="submit"
-                placeholder={t('placeholders.country_examples')}
-                placeholderTextColor={colors.textFaint}
-                autoCapitalize="words"
-                autoCorrect={false}
-                spellCheck={false}
-                autoComplete="off"
-                returnKeyType="send"
-                editable={!locked}
-                style={[styles.input, locked && { opacity: 0.5 }]}
-              />
-              <Touchable
-                accessibilityRole="button"
-                accessibilityLabel={clean(t('buttons.reveal_country'))}
-                onPress={revealCountry}
-                disabled={locked}
-                style={[styles.iconButton, locked && { opacity: 0.4 }]}>
-                <MaterialCommunityIcons name="flag-outline" size={22} color={colors.text} />
-              </Touchable>
-              <Touchable
-                accessibilityRole="button"
-                accessibilityLabel={clean(t('buttons.validate'))}
-                onPress={() => handleSubmit()}
-                disabled={locked || !trimmed}
-                style={[styles.iconButton, { backgroundColor: ACCENT, borderColor: ACCENT }, (locked || !trimmed) && { opacity: 0.4 }]}>
-                <MaterialCommunityIcons name="arrow-right" size={22} color={colors.bg} />
-              </Touchable>
-            </View>
-          </View>
+          <GuessInputBar
+            value={inputValue}
+            onChangeText={setInputValue}
+            onSubmit={handleSubmit}
+            onReveal={revealCountry}
+            suggestions={filteredCountrySuggestions}
+            locked={locked}
+            placeholder={t('placeholders.country_examples')}
+            accent={ACCENT}
+            revealLabel={clean(t('buttons.reveal_country'))}
+          />
         )}
       </KeyboardAvoidingView>
 
@@ -321,44 +257,4 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   hint: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  inputBar: {
-    gap: space.sm,
-    paddingTop: space.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    backgroundColor: colors.surface,
-  },
-  suggestions: { gap: space.sm, paddingHorizontal: space.lg },
-  suggestion: {
-    paddingHorizontal: space.md,
-    paddingVertical: space.sm,
-    borderRadius: radius.pill,
-    backgroundColor: colors.surfaceHigh,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  inputRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm, paddingHorizontal: space.lg },
-  input: {
-    flex: 1,
-    minWidth: 0,
-    height: 52,
-    borderRadius: radius.md,
-    backgroundColor: colors.bg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingHorizontal: space.lg,
-    color: colors.text,
-    fontFamily: fonts.bodyMedium,
-    fontSize: 17,
-  },
-  iconButton: {
-    width: 52,
-    height: 52,
-    borderRadius: radius.md,
-    backgroundColor: colors.surfaceHigh,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
 })

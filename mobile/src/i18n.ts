@@ -155,6 +155,7 @@ const fr = {
     step_add: 'Choisis « Sur l’écran d’accueil »',
     step_done: 'Touche « Ajouter », puis ouvre GeoGame depuis l’icône',
     close: 'Fermer',
+    back_to_site: 'Tu préfères le site ? Retourner sur le site',
   },
   common: { coming_soon: 'Bientôt disponible', back: 'Retour', language: 'Langue' },
 }
@@ -313,6 +314,7 @@ const en: typeof fr = {
     step_add: 'Choose “Add to Home Screen”',
     step_done: 'Tap “Add”, then open GeoGame from its icon',
     close: 'Close',
+    back_to_site: 'Prefer the website? Go back to the site',
   },
   common: { coming_soon: 'Coming soon', back: 'Back', language: 'Language' },
 }
@@ -471,6 +473,7 @@ const ru: typeof fr = {
     step_add: 'Выбери «На экран „Домой“»',
     step_done: 'Нажми «Добавить» и открой GeoGame с иконки',
     close: 'Закрыть',
+    back_to_site: 'Больше нравится сайт? Вернуться на сайт',
   },
   common: { coming_soon: 'Скоро', back: 'Назад', language: 'Язык' },
 }

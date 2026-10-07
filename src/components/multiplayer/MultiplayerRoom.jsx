@@ -1,6 +1,6 @@
-// src/components/multiplayer/AppRoom.jsx
-// A room created in the mobile app: one game, 'live' (everyone starts together) or 'challenge' (play whenever).
-// Join with a username, lobby and countdown (live), play, then the live standings.
+// src/components/multiplayer/MultiplayerRoom.jsx
+// A multiplayer room, created on the website or in the mobile app: one game, 'live' (everyone starts together)
+// or 'challenge' (play whenever). Join with a username, lobby and countdown (live), play, then the live standings.
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAccount } from '../../auth'
@@ -10,21 +10,22 @@ import { formatTime } from '../../utils/formatTime'
 import { serverNow } from '../../utils/serverTime'
 import { snapshotKey } from '../../utils/multiplayerSnapshot'
 import {
-  appRoomScoringMode,
-  getAppRoomContent,
-  joinAppRoom,
-  rankAppRoomResults,
-  reportAppProgress,
-  submitAppResult,
-} from '../../utils/appRoom'
+  getRoomContent,
+  joinRoom,
+  launchRoom,
+  rankRoomResults,
+  reportProgress,
+  roomScoringMode,
+  submitResult,
+} from '../../utils/multiplayerRoom'
+import useLobbyHost from '../../hooks/useLobbyHost'
 import { MultiplayerPlacementGame } from '../../pages/GamePage'
 import { MultiplayerFlagsGame } from '../../pages/FlagGamePage'
 import { MultiplayerCapitalsGame } from '../../pages/CapitalsGamePage'
 import { PracticeQuiz } from '../../pages/QuizPage'
 import MultiplayerBorderGuess from './MultiplayerBorderGuess'
 import MultiplayerCountryClue from './MultiplayerCountryClue'
-import './MultiplayerGame.css'
-import './AppRoom.css'
+import './MultiplayerRoom.css'
 
 const GAME_ICONS = {
   placement: '🌍',
@@ -69,8 +70,8 @@ function gameSettings(game, t) {
 
 function resultLine(game, result, t) {
   const time = formatTime(result.elapsedTime ?? 0).slice(0, 5)
-  if (appRoomScoringMode(game) === 'solved') {
-    return `${result.countriesSolved}/${result.total} · ${t('app_room.errors', { count: result.attempts })} · ${time}`
+  if (roomScoringMode(game) === 'solved') {
+    return `${result.countriesSolved}/${result.total} · ${t('mp_room.errors', { count: result.attempts })} · ${time}`
   }
   return `${Math.round(result.weightedScore)} ${t('units.pts')} · ${time}`
 }
@@ -94,7 +95,7 @@ function JoinForm({ room, playerId }) {
       } catch {
         // Storage unavailable — prefill is only a convenience.
       }
-      await joinAppRoom(room.id, playerId, name, account?.uid)
+      await joinRoom(room.id, playerId, name, account?.uid)
     } catch (err) {
       console.error(err)
       setJoining(false)
@@ -102,18 +103,18 @@ function JoinForm({ room, playerId }) {
   }
 
   return (
-    <form className="app-room-card" onSubmit={onSubmit}>
-      <p className="app-room-muted">{t('app_room.join_hint')}</p>
+    <form className="mpr-card" onSubmit={onSubmit}>
+      <p className="mpr-muted">{t('mp_room.join_hint')}</p>
       <input
-        className="app-room-input"
+        className="mpr-input"
         placeholder={t('placeholders.username')}
         value={pseudo}
         onChange={(e) => setTyped(e.target.value)}
         maxLength={20}
         autoFocus
       />
-      <button type="submit" className="app-room-btn" disabled={!pseudo.trim() || joining}>
-        {joining ? t('lobby.connecting') : t('app_room.join')}
+      <button type="submit" className="mpr-btn" disabled={!pseudo.trim() || joining}>
+        {joining ? t('lobby.connecting') : t('mp_room.join')}
       </button>
     </form>
   )
@@ -123,16 +124,16 @@ function Players({ room, playerId }) {
   const { t } = useTranslation()
   const players = Object.entries(room.players)
   return (
-    <div className="app-room-card">
-      <h3>{t('app_room.players', { count: players.length })}</h3>
-      <ul className="app-room-list">
+    <div className="mpr-card">
+      <h3>{t('mp_room.players', { count: players.length })}</h3>
+      <ul className="mpr-list">
         {players.map(([id, player]) => (
-          <li key={id} className={`app-room-row${id === playerId ? ' app-room-row--me' : ''}`}>
-            <span className="app-room-name">
+          <li key={id} className={`mpr-row${id === playerId ? ' mpr-row--me' : ''}`}>
+            <span className="mpr-name">
               {player.pseudo}
-              {id === playerId && ` (${t('app_room.you')})`}
+              {id === playerId && ` (${t('mp_room.you')})`}
             </span>
-            {id === room.hostId && <span className="app-room-badge">{t('app_room.host')}</span>}
+            {id === room.hostId && <span className="mpr-badge">{t('mp_room.host')}</span>}
           </li>
         ))}
       </ul>
@@ -143,51 +144,51 @@ function Players({ room, playerId }) {
 export function Standings({ room, progress, gameResults, playerId }) {
   const { t } = useTranslation()
   const results = Object.values(gameResults)
-  const ranked = rankAppRoomResults(room.game, results)
+  const ranked = rankRoomResults(room.game, results)
   const finishedIds = new Set(results.map((result) => result.playerId))
   const others = Object.entries(room.players).filter(([id]) => !finishedIds.has(id))
 
   return (
-    <div className="app-room-card">
-      <h3>{t('app_room.standings')}</h3>
-      <ul className="app-room-list">
+    <div className="mpr-card">
+      <h3>{t('mp_room.standings')}</h3>
+      <ul className="mpr-list">
         {ranked.map((result, index) => (
           <li
             key={result.playerId}
-            className={`app-room-row${index < 3 ? ' app-room-row--top' : ''}${result.playerId === playerId ? ' app-room-row--me' : ''}`}
+            className={`mpr-row${index < 3 ? ' mpr-row--top' : ''}${result.playerId === playerId ? ' mpr-row--me' : ''}`}
           >
-            <span className="app-room-rank">{MEDALS[result.rank - 1] ?? result.rank}</span>
-            <span className="app-room-name">
+            <span className="mpr-rank">{MEDALS[result.rank - 1] ?? result.rank}</span>
+            <span className="mpr-name">
               {result.pseudo}
-              {result.playerId === playerId && ` (${t('app_room.you')})`}
+              {result.playerId === playerId && ` (${t('mp_room.you')})`}
             </span>
-            <span className="app-room-score">{resultLine(room.game, result, t)}</span>
+            <span className="mpr-score">{resultLine(room.game, result, t)}</span>
           </li>
         ))}
         {others.map(([id, player]) => {
           const live = progress[id]
           return (
-            <li key={id} className="app-room-row app-room-row--waiting">
-              <span className="app-room-rank">{live ? '⏳' : '·'}</span>
-              <span className="app-room-name">
+            <li key={id} className="mpr-row mpr-row--waiting">
+              <span className="mpr-rank">{live ? '⏳' : '·'}</span>
+              <span className="mpr-name">
                 {player.pseudo}
-                {id === playerId && ` (${t('app_room.you')})`}
+                {id === playerId && ` (${t('mp_room.you')})`}
               </span>
-              <span className="app-room-score">
-                {live ? `${t('app_room.playing')} · ${live.found ?? 0}/${live.total ?? '?'}` : t('app_room.not_played')}
+              <span className="mpr-score">
+                {live ? `${t('mp_room.playing')} · ${live.found ?? 0}/${live.total ?? '?'}` : t('mp_room.not_played')}
               </span>
             </li>
           )
         })}
       </ul>
-      {ranked.length === 0 && others.length === 0 && <p className="app-room-muted">{t('app_room.no_players')}</p>}
+      {ranked.length === 0 && others.length === 0 && <p className="mpr-muted">{t('mp_room.no_players')}</p>}
     </div>
   )
 }
 
-function AppRoomGame({ room, progress, gameResults, playerId, onDone }) {
+function RoomGame({ room, progress, gameResults, playerId, onDone }) {
   const { game, seed } = room
-  const content = useMemo(() => getAppRoomContent(game, seed), [game, seed])
+  const content = useMemo(() => getRoomContent(game, seed), [game, seed])
   const { total } = content
   const doneRef = useRef(false)
   const foundRef = useRef(0)
@@ -195,13 +196,13 @@ function AppRoomGame({ room, progress, gameResults, playerId, onDone }) {
 
   // Announce the player as soon as the game starts
   useEffect(() => {
-    reportAppProgress(room.id, playerId, { found: 0, total, finished: false }).catch(console.error)
+    reportProgress(room.id, playerId, { found: 0, total, finished: false }).catch(console.error)
   }, [room.id, playerId, total])
 
   const reportFound = useCallback((found) => {
     if (doneRef.current) return
     foundRef.current = found
-    reportAppProgress(room.id, playerId, { found, total, finished: false }).catch(console.error)
+    reportProgress(room.id, playerId, { found, total, finished: false }).catch(console.error)
   }, [room.id, playerId, total])
 
   const onCountryFound = useCallback(() => reportFound(foundRef.current + 1), [reportFound])
@@ -212,15 +213,15 @@ function AppRoomGame({ room, progress, gameResults, playerId, onDone }) {
     // Same result as the app: Border Guess / Country Clue score the countries found
     const solved = countriesSolved ?? 0
     const result = {
-      weightedScore: appRoomScoringMode(game) === 'solved' ? solved : (weightedScore ?? 0),
+      weightedScore: roomScoringMode(game) === 'solved' ? solved : (weightedScore ?? 0),
       countriesSolved: solved,
       attempts: attempts ?? 0,
       elapsedTime: Math.round(elapsedTime ?? 0),
       total,
     }
     Promise.all([
-      submitAppResult(room.id, playerId, pseudo, result),
-      reportAppProgress(room.id, playerId, { found: solved, total, finished: true }),
+      submitResult(room.id, playerId, pseudo, result),
+      reportProgress(room.id, playerId, { found: solved, total, finished: true }),
     ])
       .catch(console.error)
       .finally(onDone)
@@ -272,21 +273,24 @@ function AppRoomGame({ room, progress, gameResults, playerId, onDone }) {
 
   return (
     <div className="mp-game-view">
-      <div className={`mp-game-content${game.type === GAME_TYPES.QUIZ ? ' app-room-scroll' : ''}`}>
+      <div className={`mp-game-content${game.type === GAME_TYPES.QUIZ ? ' mpr-scroll' : ''}`}>
         {renderGame()}
       </div>
-      <aside className="app-room-sidebar">
+      <aside className="mpr-sidebar">
         <Standings room={room} progress={progress} gameResults={gameResults} playerId={playerId} />
       </aside>
     </div>
   )
 }
 
-export default function AppRoom({ room, progress, gameResults, playerId }) {
+export default function MultiplayerRoom({ room, progress, gameResults, playerId }) {
   const { t } = useTranslation()
   const [playing, setPlaying] = useState(false)
   const [done, setDone] = useState(false)
+  const [launching, setLaunching] = useState(false)
+  const [copied, setCopied] = useState(false)
   const sawCountdownRef = useRef(false)
+  useLobbyHost(room, playerId)
 
   const startAt = room.startAt?.toMillis ? room.startAt.toMillis() : null
   const remaining = useCountdown(startAt)
@@ -308,55 +312,85 @@ export default function AppRoom({ room, progress, gameResults, playerId }) {
   }, [remaining, joined, hasPlayed, playable])
 
   if (playing && joined && !hasPlayed) {
-    return <AppRoomGame room={room} progress={progress} gameResults={gameResults} playerId={playerId} onDone={onDone} />
+    return <RoomGame room={room} progress={progress} gameResults={gameResults} playerId={playerId} onDone={onDone} />
   }
 
   const settings = gameSettings(room.game, t)
   const counting = !hasPlayed && remaining != null && remaining > 0
+  const isHost = room.hostId === playerId
+
+  const onLaunch = async () => {
+    setLaunching(true)
+    try {
+      await launchRoom(room.id)
+    } catch (err) {
+      console.error(err)
+    }
+    setLaunching(false)
+  }
+
+  const onCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}/multiplayer/room/${room.id}`)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      // Clipboard unavailable: the code stays on screen.
+    }
+  }
 
   return (
-    <div className="app-room">
-      <header className="app-room-header">
-        <span className="app-room-label">
-          {t('multiplayer.title')} · {t(room.mode === 'live' ? 'app_room.live' : 'app_room.challenge')}
+    <div className="mpr">
+      <header className="mpr-header">
+        <span className="mpr-label">
+          {t('multiplayer.title')} · {t(room.mode === 'live' ? 'mp_room.live' : 'mp_room.challenge')}
         </span>
         <h2>
           {GAME_ICONS[room.game.id] ?? '🎮'} {t(`games.${room.game.id}.title`)}
           {settings && <small> · {settings}</small>}
         </h2>
-        <p className="app-room-muted">📱 {t('app_room.from_app')}</p>
+        {room.createdOn !== 'web' && <p className="mpr-muted">📱 {t('mp_room.from_app')}</p>}
       </header>
 
-      <div className="app-room-card app-room-code">
-        <span className="app-room-label">{t('app_room.code')}</span>
+      <div className="mpr-card mpr-code">
+        <span className="mpr-label">{t('mp_room.code')}</span>
         <code>{room.id}</code>
+        <button type="button" className="mpr-link-btn" onClick={onCopyLink}>
+          {copied ? `✓ ${t('mp_room.link_copied')}` : `🔗 ${t('mp_room.copy_link')}`}
+        </button>
       </div>
 
       {!playable ? (
-        <p className="app-room-card app-room-muted">{t('app_room.unsupported')}</p>
+        <p className="mpr-card mpr-muted">{t('mp_room.unsupported')}</p>
       ) : !joined ? (
         <JoinForm room={room} playerId={playerId} />
       ) : room.status === 'lobby' ? (
         <>
           <Players room={room} playerId={playerId} />
-          <p className="app-room-waiting">{t('app_room.waiting_host')}</p>
+          {isHost ? (
+            <button type="button" className="mpr-btn" onClick={onLaunch} disabled={launching}>
+              ▶ {t('mp_room.launch')}
+            </button>
+          ) : (
+            <p className="mpr-waiting">{t('mp_room.waiting_host')}</p>
+          )}
         </>
       ) : counting ? (
-        <div className="app-room-countdown">
-          <span className="app-room-label">{t('app_room.starting_in')}</span>
+        <div className="mpr-countdown">
+          <span className="mpr-label">{t('mp_room.starting_in')}</span>
           <strong key={Math.ceil(remaining / 1000)}>{Math.ceil(remaining / 1000)}</strong>
         </div>
       ) : (
         <>
           {hasPlayed ? (
-            <p className="app-room-finished">✓ {t('app_room.finished')}</p>
+            <p className="mpr-finished">✓ {t('mp_room.finished')}</p>
           ) : (
-            <div className="app-room-card">
-              <p className="app-room-muted">
-                {t(room.mode === 'live' ? 'app_room.late_hint' : 'app_room.challenge_play_hint')}
+            <div className="mpr-card">
+              <p className="mpr-muted">
+                {t(room.mode === 'live' ? 'mp_room.late_hint' : 'mp_room.challenge_play_hint')}
               </p>
-              <button type="button" className="app-room-btn" onClick={() => setPlaying(true)}>
-                ▶ {t('app_room.play')}
+              <button type="button" className="mpr-btn" onClick={() => setPlaying(true)}>
+                ▶ {t('mp_room.play')}
               </button>
             </div>
           )}

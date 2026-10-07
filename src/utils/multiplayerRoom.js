@@ -1,19 +1,40 @@
 // src/utils/multiplayerRoom.js
-import {
-  doc,
-  setDoc,
-  getDoc,
-  updateDoc,
-  collection,
-  getDocs,
-  writeBatch,
-  serverTimestamp,
-  Timestamp,
-  increment,
-} from 'firebase/firestore'
+// Multiplayer rooms, shared by the website and the mobile app: one game per room.
+// 'live': everyone starts together after the host launches it. 'challenge': everyone plays whenever they want.
+// A live room keeps accepting players once launched, so it also works as a challenge afterwards.
+//
+// Room document (rooms/{code}):
+//   source: 'app'            the format marker (older app versions only open rooms carrying it)
+//   createdOn: 'web' | 'app' where the room was created (missing on the first app rooms)
+//   hostId, mode, status: 'lobby' | 'playing', game, seed, startAt
+//   players: { [playerId]: { pseudo, uid?, seenAt? } }   seenAt: lobby heartbeat, to hand the host role over
+// Subcollections: progress/{playerId} { found, total, finished }, gameResults/0_{playerId}.
+import { doc, getDoc, serverTimestamp, setDoc, Timestamp, updateDoc } from 'firebase/firestore'
 import { firestore } from '../Firebase'
+import countries from '../data/countriesWithDifficulty_FR.json'
+import { GAME_TYPES } from './gameTypes'
+import {
+  getSeededAscensionOverrides,
+  getSeededBorderGuessCountries,
+  getSeededCapitalCountries,
+  getSeededCountryClueCountries,
+  getSeededFlagCountries,
+  getSeededPlacementCountries,
+} from './multiplayerSeed'
+import { rankResults } from './multiplayerScoring'
+import { seededShuffle } from './prng'
 
-/** Génère un code de room lisible de 6 caractères (sans ambiguïtés O/0/I/1). */
+export const ROOM_FORMAT = 'app'
+export const isRoomFormat = (room) => room?.source === ROOM_FORMAT
+
+// Live countdown, so that every player gets the launch before the game starts.
+const LAUNCH_DELAY_MS = 5000
+// Lobby heartbeat; a host silent for HOST_GONE_MS hands the room to the next player. Generous, since a phone
+// suspends the page while its player shares the code in another app.
+export const HEARTBEAT_MS = 15000
+export const HOST_GONE_MS = 120000
+
+/** Readable 6-character room code (no O/0/I/1). */
 export function generateRoomId() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
   let id = ''
@@ -23,7 +44,7 @@ export function generateRoomId() {
   return id
 }
 
-/** UUID stable par navigateur, persisté en localStorage (cross-onglets). */
+/** Stable id per browser, kept in localStorage (shared across tabs). */
 export function getOrCreatePlayerId() {
   let id = localStorage.getItem('mp_player_id')
   if (!id) {
@@ -33,181 +54,136 @@ export function getOrCreatePlayerId() {
   return id
 }
 
+// ─── Content and ranking ───────────────────────────────────────────────────
+
+const SETUP_TYPES = [GAME_TYPES.PLACEMENT, GAME_TYPES.FLAGS, GAME_TYPES.CAPITALS]
+
+// Same pools as the solo continent mode of each game
+function continentPool(type, continent) {
+  const features = countries.features.filter((c) => c.properties.continent === continent)
+  if (type === GAME_TYPES.PLACEMENT) return features.map((c) => c.properties.ADMIN)
+  if (type === GAME_TYPES.CAPITALS) return features.filter((c) => c.properties.ISO_A2 && c.properties.capital)
+  return features.filter((c) => c.properties.ISO_A2)
+}
+
 /**
- * Crée une room dans Firestore et retourne le roomId.
- * @param {{ hostId: string, hostPseudo: string, config: object }} params
+ * What every player of a room gets: the same countries in the same order, drawn from the room's seed.
+ * `list`: Placement / Flags / Capitals (standard or continent), Border Guess, Country Clue.
+ * `byDifficulty`: Ascension. Quiz: neither, the questions are drawn by useQuizState from the seed.
  */
-export async function createRoom({ hostId, hostPseudo, config }) {
-  let roomId = generateRoomId()
-  // Retry on collision (extremely rare at ~1 billion possible IDs)
-  while ((await getDoc(doc(firestore, 'rooms', roomId))).exists()) {
-    roomId = generateRoomId()
+export function getRoomContent(game, seed) {
+  if (SETUP_TYPES.includes(game.type)) {
+    if (game.phases) {
+      const byDifficulty = getSeededAscensionOverrides(game.phases, game.type, seed, 0)
+      const total = Object.values(byDifficulty).reduce((sum, list) => sum + list.length, 0)
+      return { list: null, byDifficulty, total }
+    }
+    const list = game.continent
+      ? seededShuffle(continentPool(game.type, game.continent), seed)
+      : game.type === GAME_TYPES.PLACEMENT
+        ? getSeededPlacementCountries(game.difficulty, seed, 0)
+        : game.type === GAME_TYPES.FLAGS
+          ? getSeededFlagCountries(game.difficulty, seed, 0)
+          : getSeededCapitalCountries(game.difficulty, seed, 0)
+    return { list, byDifficulty: null, total: list.length }
   }
-  const seed = Math.floor(Math.random() * 2 ** 31)
-  await setDoc(doc(firestore, 'rooms', roomId), {
+  if (game.type === GAME_TYPES.BORDER_GUESS || game.type === GAME_TYPES.COUNTRY_CLUE) {
+    const pick = game.type === GAME_TYPES.BORDER_GUESS ? getSeededBorderGuessCountries : getSeededCountryClueCountries
+    const list = pick(game.count ?? 10, seed, 0)
+    return { list, byDifficulty: null, total: list.length }
+  }
+  return { list: null, byDifficulty: null, total: game.count ?? 10 }
+}
+
+// Border Guess / Country Clue rank on countries found, then attempts, then time; the others on score, then time.
+export function roomScoringMode(game) {
+  return game.type === GAME_TYPES.BORDER_GUESS || game.type === GAME_TYPES.COUNTRY_CLUE ? 'solved' : 'weighted'
+}
+
+export function rankRoomResults(game, results) {
+  return rankResults(results, results.length, roomScoringMode(game))
+}
+
+// ─── Host hand-over ────────────────────────────────────────────────────────
+
+const millis = (value) => (value?.toMillis ? value.toMillis() : null)
+
+/**
+ * In a live lobby whose host stopped sending heartbeats, the player who takes over: the one with the smallest id
+ * among those seen recently, so every client agrees. null when nothing has to change.
+ * A host with no heartbeat at all (an app version without it) is never replaced.
+ */
+export function pickNewHost(room, now) {
+  if (room?.status !== 'lobby') return null
+  const host = room.players?.[room.hostId]
+  const hostSeen = millis(host?.seenAt)
+  if (host && (hostSeen == null || now - hostSeen < HOST_GONE_MS)) return null
+  const active = Object.entries(room.players ?? {})
+    .filter(([id, player]) => id !== room.hostId && now - (millis(player.seenAt) ?? -Infinity) < HOST_GONE_MS)
+    .map(([id]) => id)
+    .sort()
+  return active[0] ?? null
+}
+
+// ─── Firestore ─────────────────────────────────────────────────────────────
+
+const roomRef = (code) => doc(firestore, 'rooms', code)
+const roomPlayer = (pseudo, uid) => (uid ? { pseudo, uid } : { pseudo })
+
+/**
+ * Creates a room for one game and returns its code.
+ * `game`: { id, type, difficulty?, continent?, phases?, presetName?, count?, quizDifficulty?, answerMode? }
+ */
+export async function createRoom({ game, mode, hostId, pseudo, uid, createdOn }) {
+  let code = generateRoomId()
+  while ((await getDoc(roomRef(code))).exists()) code = generateRoomId()
+  await setDoc(roomRef(code), {
+    source: ROOM_FORMAT,
+    createdOn,
     hostId,
-    status: 'lobby',
-    currentGameIndex: 0,
-    config,
-    seed,
+    mode,
+    status: mode === 'live' ? 'lobby' : 'playing',
+    game,
+    seed: Math.floor(Math.random() * 2 ** 31),
     startAt: null,
-    players: {
-      [hostId]: { pseudo: hostPseudo, totalPoints: 0, disconnected: false },
-    },
+    players: { [hostId]: roomPlayer(pseudo, uid) },
     createdAt: serverTimestamp(),
   })
-  return roomId
+  return code
 }
 
-/** Ajoute un joueur dans la room. */
-export async function joinRoom({ roomId, playerId, pseudo }) {
-  await updateDoc(doc(firestore, 'rooms', roomId), {
-    [`players.${playerId}`]: { pseudo, totalPoints: 0, disconnected: false },
-  })
+export async function joinRoom(code, playerId, pseudo, uid) {
+  await updateDoc(roomRef(code), { [`players.${playerId}`]: roomPlayer(pseudo, uid) })
 }
 
-/** Le host lance la partie : startAt = maintenant + 5s, status = 'playing'. */
-export async function launchRoom(roomId) {
-  const startAt = Timestamp.fromDate(new Date(Date.now() + 5000))
-  await updateDoc(doc(firestore, 'rooms', roomId), {
+export async function launchRoom(code) {
+  await updateDoc(roomRef(code), {
     status: 'playing',
-    startAt,
+    startAt: Timestamp.fromDate(new Date(Date.now() + LAUNCH_DELAY_MS)),
   })
 }
 
-/** Met à jour le status de la room + champs optionnels supplémentaires. */
-export async function updateRoomStatus(roomId, status, extra = {}) {
-  await updateDoc(doc(firestore, 'rooms', roomId), { status, ...extra })
+/** Lobby heartbeat of a player who already joined. */
+export async function touchPlayer(code, playerId) {
+  await updateDoc(roomRef(code), { [`players.${playerId}.seenAt`]: serverTimestamp() })
 }
 
-/** Met à jour la progression d'un joueur pour le jeu en cours. */
-export async function updatePlayerProgress(roomId, playerId, progressData) {
-  // Sécurité : si le temps arrive du client et qu'il est < 0, on le redresse
-  if (progressData.elapsedTime && progressData.elapsedTime < 0) {
-    progressData.elapsedTime = 0;
-  }
-
-  await setDoc(
-    doc(firestore, 'rooms', roomId, 'progress', playerId),
-    progressData,
-    { merge: true }
-  )
+export async function transferHost(code, newHostId) {
+  await updateDoc(roomRef(code), { hostId: newHostId })
 }
 
-/**
- * Écrit le résultat d'un joueur pour un jeu donné.
- * Clé : `{gameIndex}_{playerId}` pour garantir l'unicité.
- */
-export async function writeGameResult(roomId, gameIndex, playerId, resultData) {
-  await setDoc(
-    doc(firestore, 'rooms', roomId, 'gameResults', `${gameIndex}_${playerId}`),
-    { playerId, gameIndex, ...resultData }
-  )
+/** `progress`: { found, total, finished } */
+export async function reportProgress(code, playerId, progress) {
+  await setDoc(doc(firestore, 'rooms', code, 'progress', playerId), { ...progress, lastSeen: serverTimestamp() }, { merge: true })
 }
 
-/** Marque un joueur comme déconnecté. */
-export async function markDisconnected(roomId, playerId) {
-  await updateDoc(doc(firestore, 'rooms', roomId), {
-    [`players.${playerId}.disconnected`]: true,
-  })
-}
-
-/** Transfère le rôle de host à un autre joueur. */
-export async function transferHost(roomId, newHostId) {
-  await updateDoc(doc(firestore, 'rooms', roomId), { hostId: newHostId })
-}
-
-/**
- * Incrémente les points de plusieurs joueurs en un seul updateDoc.
- * @param {string} roomId
- * @param {{ playerId: string, points: number }[]} playerPoints
- */
-export async function updateTotalPoints(roomId, playerPoints) {
-  const updates = {}
-  playerPoints.forEach(({ playerId, points }) => {
-    updates[`players.${playerId}.totalPoints`] = increment(points)
-  })
-  await updateDoc(doc(firestore, 'rooms', roomId), updates)
-}
-
-/**
- * Supprime tous les documents de la sous-collection gameResults pour une room.
- * Doit être appelé avant tout reset (revanche ou reconfig).
- */
-export async function clearGameResults(roomId) {
-  const snapshot = await getDocs(collection(firestore, 'rooms', roomId, 'gameResults'))
-  if (snapshot.empty) return
-  const batch = writeBatch(firestore)
-  snapshot.docs.forEach(d => batch.delete(d.ref))
-  await batch.commit()
-}
-
-export async function updatePlayerGameFlags(roomId, playerId, flags) {
-  await setDoc(
-    doc(firestore, 'rooms', roomId, 'progress', playerId),
-    flags,
-    { merge: true }
-  )
-}
-
-// ─── Chill Mode ─────────────────────────────────────────────────────────────
-
-/**
- * Initialise chillState au démarrage d'un jeu chill.
- * Appelé par le host uniquement.
- */
-export async function initChillState(roomId, gameIndex, countdownMs) {
-  const state = {
-    gameIndex,
-    phase: 'playing',
-    currentCountryIndex: 0,
-    mancheStartIndex: 0,
-    reviewStep: 0,
-    playerAnswers: {},
-  }
-  if (countdownMs != null) {
-    state.countdownStart = serverTimestamp()
-    state.countdownDurationMs = countdownMs
-  }
-  await updateDoc(doc(firestore, 'rooms', roomId), { chillState: state })
-}
-
-/**
- * Host : passe au pays suivant ou déclenche la review.
- * @param {string} phase        - 'playing' | 'review'
- * @param {number} nextIndex    - nouveau currentCountryIndex
- * @param {number} mancheStart  - mancheStartIndex inchangé ou mis à jour
- * @param {number|null} countdownMs - si phase='playing', durée du nouveau countdown
- */
-export async function advanceChillTurn(roomId, phase, nextIndex, mancheStart, countdownMs) {
-  const update = {
-    'chillState.phase': phase,
-    'chillState.currentCountryIndex': nextIndex,
-    'chillState.mancheStartIndex': mancheStart,
-    'chillState.reviewStep': 0,
-  }
-  if (phase === 'playing' && countdownMs != null) {
-    update['chillState.countdownStart'] = serverTimestamp()
-    update['chillState.countdownDurationMs'] = countdownMs
-  }
-  await updateDoc(doc(firestore, 'rooms', roomId), update)
-}
-
-/**
- * Un joueur soumet sa réponse pour le pays courant.
- * Chaque joueur écrit sur son propre chemin — pas de conflit.
- */
-export async function submitChillAnswer(roomId, playerId, countryIndex, answerData) {
-  await updateDoc(doc(firestore, 'rooms', roomId), {
-    [`chillState.playerAnswers.${playerId}.${countryIndex}`]: answerData,
-  })
-}
-
-/**
- * Host : avance d'un pas dans la review (ou déclenche onContinue côté client).
- */
-export async function setChillReviewStep(roomId, step) {
-  await updateDoc(doc(firestore, 'rooms', roomId), {
-    'chillState.reviewStep': step,
+/** `result`: { weightedScore, countriesSolved, attempts, elapsedTime, total } */
+export async function submitResult(code, playerId, pseudo, result) {
+  await setDoc(doc(firestore, 'rooms', code, 'gameResults', `0_${playerId}`), {
+    playerId,
+    pseudo,
+    gameIndex: 0,
+    ...result,
+    finishedAt: serverTimestamp(),
   })
 }

@@ -1,32 +1,38 @@
 // src/components/multiplayer/RoomConfig.jsx
+// Creates a multiplayer room for one game, like the mobile app: the game, live or challenge, and its options.
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useAccount } from '../../auth'
 import { GAME_TYPES } from '../../utils/gameTypes'
 import { getSavedPseudo } from '../../utils/account'
 import { ASCENSION_PRESETS, matchPreset } from '../../utils/ascensionPresets'
+import { QUIZ_DIFFICULTIES } from '../../utils/quizQuestions'
 import { getTotalCountries } from '../../hooks/useGameState'
 import { getTotalFlagCountries } from '../../hooks/useFlagGameState'
 import { getTotalCapitalCountries } from '../../hooks/useCapitalsGameState'
-import { BORDER_GUESS_COUNTRY_COUNT } from '../../hooks/useBorderGuessState'
-import { COUNTRY_CLUE_COUNTRY_COUNT } from '../../hooks/useCountryClueState'
 import './RoomConfig.css'
 
 const DEFAULT_ASCENSION_PRESET = ASCENSION_PRESETS.find(p => p.name === 'Progressif') ?? ASCENSION_PRESETS[1]
 
-export const GAME_META = {
-  [GAME_TYPES.PLACEMENT]:    { labelKey: 'games.placement.title',  icon: '🌍', hasMode: true },
-  [GAME_TYPES.FLAGS]:        { labelKey: 'games.flags.title',      icon: '🚩', hasMode: true },
-  [GAME_TYPES.CAPITALS]:     { labelKey: 'games.capitals.title',   icon: '🏛️', hasMode: true },
-  [GAME_TYPES.BORDER_GUESS]: { label: 'BorderGuess',               icon: '🧭', hasMode: false },
-  [GAME_TYPES.COUNTRY_CLUE]: { label: 'Country Clue',              icon: '🔎', hasMode: false },
-}
+// Same games and ids as the app (mobile/src/games.ts)
+export const ROOM_GAMES = [
+  { id: 'placement', type: GAME_TYPES.PLACEMENT, icon: '🌍' },
+  { id: 'flags', type: GAME_TYPES.FLAGS, icon: '🚩' },
+  { id: 'capitals', type: GAME_TYPES.CAPITALS, icon: '🏛️' },
+  { id: 'border_guess', type: GAME_TYPES.BORDER_GUESS, icon: '🧩' },
+  { id: 'country_clue', type: GAME_TYPES.COUNTRY_CLUE, icon: '🧭' },
+  { id: 'quiz', type: GAME_TYPES.QUIZ, icon: '❓' },
+]
 
+const SETUP_TYPES = [GAME_TYPES.PLACEMENT, GAME_TYPES.FLAGS, GAME_TYPES.CAPITALS]
 const DIFFICULTIES = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
 const ASCENSION_DIFFS = ['Facile', 'Moyen', 'Difficile', 'Impossible']
 const DIFFICULTY_COLORS = {
   Facile: '#4ade80', Moyen: '#00d4ff', Difficile: '#fbbf24',
   Impossible: '#f97316', Hardcore: '#f87171',
 }
+const COUNTS = [5, 10, 15]
+const QUIZ_COUNTS = [5, 10, 20]
 
 function getCountFn(type) {
   if (type === GAME_TYPES.FLAGS) return getTotalFlagCountries
@@ -34,106 +40,52 @@ function getCountFn(type) {
   return getTotalCountries
 }
 
-function getCaps(type) {
-  const fn = getCountFn(type)
-  return Object.fromEntries(ASCENSION_DIFFS.map(d => [d, fn(d)]))
+function Choices({ options, value, onChange }) {
+  return (
+    <div className="rc-mode-tabs">
+      {options.map(option => (
+        <button
+          key={option.value}
+          type="button"
+          className={`rc-mode-tab${value === option.value ? ' active' : ''}`}
+          onClick={() => onChange(option.value)}
+        >{option.label}</button>
+      ))}
+    </div>
+  )
 }
 
-export function defaultGame(type) {
-  if (type === GAME_TYPES.BORDER_GUESS) {
-    return { type, countryCount: 10 }
-  }
-  if (type === GAME_TYPES.COUNTRY_CLUE) {
-    return { type, countryCount: 10, showGlobe: true }
-  }
-  return {
-    type,
-    mode: 'standard',
-    difficulty: 'Moyen',
-    phases: { ...DEFAULT_ASCENSION_PRESET.phases },
-  }
-}
-
-export function GameSettings({ game, onChange }) {
+// Placement / Flags / Capitals: a difficulty, or Ascension phases
+function SetupSettings({ type, setup, onChange }) {
   const { t } = useTranslation()
-  const meta = GAME_META[game.type]
-
-  if (!meta.hasMode) {
-    const maxCount = game.type === GAME_TYPES.BORDER_GUESS
-      ? BORDER_GUESS_COUNTRY_COUNT
-      : COUNTRY_CLUE_COUNTRY_COUNT
-    return (
-      <div className="rc-game-settings">
-        <label className="rc-slider-label">
-          <span>Nombre de pays : <strong>{game.countryCount}</strong></span>
-          <input
-            type="range"
-            min={1}
-            max={maxCount}
-            value={game.countryCount}
-            onChange={e => onChange({ ...game, countryCount: Number(e.target.value) })}
-          />
-        </label>
-        {game.type === GAME_TYPES.COUNTRY_CLUE && (
-          <label className="rc-checkbox-label">
-            <input
-              type="checkbox"
-              checked={game.showGlobe ?? true}
-              onChange={e => onChange({ ...game, showGlobe: e.target.checked })}
-            />
-            Afficher le globe pendant la partie
-          </label>
-        )}
-      </div>
-    )
-  }
-
-  const countFn = getCountFn(game.type)
-  const caps = getCaps(game.type)
-  const detectedPreset = matchPreset(game.phases ?? {})
+  const countFn = getCountFn(type)
+  const caps = Object.fromEntries(ASCENSION_DIFFS.map(d => [d, countFn(d)]))
+  const detectedPreset = matchPreset(setup.phases)
 
   const handlePreset = (preset) => {
-    const nextPhases = Object.fromEntries(
-      ASCENSION_DIFFS.map(d => [d, Math.min(preset.phases[d] ?? 0, caps[d] ?? 0)])
-    )
-    onChange({ ...game, phases: nextPhases })
-  }
-
-  const handleSlider = (d, val) => {
-    onChange({ ...game, phases: { ...game.phases, [d]: Math.min(Number(val), caps[d]) } })
+    onChange({ ...setup, phases: Object.fromEntries(ASCENSION_DIFFS.map(d => [d, Math.min(preset.phases[d] ?? 0, caps[d])])) })
   }
 
   return (
-    <div className="rc-game-settings">
-      <div className="rc-mode-tabs">
-        <button
-          type="button"
-          className={`rc-mode-tab${game.mode === 'standard' ? ' active' : ''}`}
-          onClick={() => onChange({ ...game, mode: 'standard' })}
-        >{t('modes.standard')}</button>
-        <button
-          type="button"
-          className={`rc-mode-tab${game.mode === 'ascension' ? ' active' : ''}`}
-          onClick={() => onChange({ ...game, mode: 'ascension' })}
-        >{t('modes.ascension')}</button>
-      </div>
-
-      {game.mode === 'standard' ? (
+    <>
+      <Choices
+        options={[{ value: 'standard', label: t('modes.standard') }, { value: 'ascension', label: t('modes.ascension') }]}
+        value={setup.mode}
+        onChange={mode => onChange({ ...setup, mode })}
+      />
+      {setup.mode === 'standard' ? (
         <div className="rc-difficulties">
           {DIFFICULTIES.map(d => (
             <button
               key={d}
               type="button"
-              className={`rc-diff-btn${game.difficulty === d ? ' active' : ''}`}
-              style={{ '--diff-color': DIFFICULTY_COLORS[d] }}
-              onClick={() => onChange({ ...game, difficulty: d })}
+              className={`rc-diff-btn${setup.difficulty === d ? ' active' : ''}`}
+              onClick={() => onChange({ ...setup, difficulty: d })}
             >
               <span style={{ color: DIFFICULTY_COLORS[d] }}>
-                {d === 'Hardcore' ? '💀 Hardcore' : d}
+                {d === 'Hardcore' ? '💀 Hardcore' : t(`difficulties.${d}`)}
               </span>
-              <span className="rc-diff-count">
-                {d === 'Hardcore' ? t('labels.all_countries') : countFn(d)}
-              </span>
+              <span className="rc-diff-count">{d === 'Hardcore' ? t('labels.all_countries') : countFn(d)}</span>
             </button>
           ))}
         </div>
@@ -151,62 +103,71 @@ export function GameSettings({ game, onChange }) {
           </div>
           {ASCENSION_DIFFS.map(d => (
             <label key={d} className="rc-asc-row">
-              <span style={{ color: DIFFICULTY_COLORS[d] }}>{d}</span>
-              <span className="rc-asc-val">{game.phases?.[d] ?? 0} / {caps[d]}</span>
+              <span style={{ color: DIFFICULTY_COLORS[d] }}>{t(`difficulties.${d}`)}</span>
+              <span className="rc-asc-val">{setup.phases[d] ?? 0} / {caps[d]}</span>
               <input
                 type="range"
                 min={0}
                 max={caps[d]}
-                value={game.phases?.[d] ?? 0}
-                onChange={e => handleSlider(d, e.target.value)}
+                value={setup.phases[d] ?? 0}
+                onChange={e => onChange({ ...setup, phases: { ...setup.phases, [d]: Math.min(Number(e.target.value), caps[d]) } })}
               />
             </label>
           ))}
         </div>
       )}
-    </div>
+    </>
   )
+}
+
+/** The room's `game`, in the app's format. */
+export function buildRoomGame(gameId, { setup, count, quizDifficulty, answerMode }) {
+  const { type } = ROOM_GAMES.find(g => g.id === gameId)
+  const ascension = SETUP_TYPES.includes(type) && setup.mode === 'ascension'
+  const game = {
+    id: gameId,
+    type,
+    difficulty: SETUP_TYPES.includes(type) && !ascension ? setup.difficulty : null,
+    continent: null,
+    phases: ascension ? setup.phases : null,
+    presetName: ascension ? (matchPreset(setup.phases) ?? null) : null,
+  }
+  if (!SETUP_TYPES.includes(type)) game.count = count
+  if (type === GAME_TYPES.QUIZ) Object.assign(game, { quizDifficulty, answerMode })
+  return game
 }
 
 export default function RoomConfig({ onSubmit, submitting }) {
   const { t } = useTranslation()
-  const [pseudo, setPseudo] = useState(getSavedPseudo)
-  const [games, setGames] = useState([defaultGame(GAME_TYPES.PLACEMENT)])
-  const [chillMode, setChillMode] = useState(false)
-  const [chillTimers, setChillTimers] = useState({ Facile: 6, Moyen: 8, Difficile: 10, Impossible: 15 })
+  const { account } = useAccount()
+  // Signed in: the account's username until the player types another one
+  const [typed, setTyped] = useState(null)
+  const pseudo = typed ?? account?.username ?? getSavedPseudo()
+  const [gameId, setGameId] = useState('placement')
+  const [mode, setMode] = useState('live')
+  const [setup, setSetup] = useState({ mode: 'standard', difficulty: 'Moyen', phases: { ...DEFAULT_ASCENSION_PRESET.phases } })
+  const [count, setCount] = useState(10)
+  const [quizDifficulty, setQuizDifficulty] = useState('Moyen')
+  const [answerMode, setAnswerMode] = useState('choices')
 
-  const usedTypes = new Set(games.map(g => g.type))
-  const availableToAdd = Object.keys(GAME_META).filter(t => !usedTypes.has(t))
+  const { type } = ROOM_GAMES.find(g => g.id === gameId)
+  const isQuiz = type === GAME_TYPES.QUIZ
+  const ascensionEmpty = SETUP_TYPES.includes(type) && setup.mode === 'ascension'
+    && Object.values(setup.phases).every(n => !n)
+  const canSubmit = pseudo.trim() && !ascensionEmpty && !submitting
 
-  const addGame = (type) => setGames(prev => [...prev, defaultGame(type)])
-  const removeGame = (i) => setGames(prev => prev.filter((_, idx) => idx !== i))
-
-  const moveUp = (i) => setGames(prev => {
-    if (i === 0) return prev
-    const arr = [...prev]
-    ;[arr[i - 1], arr[i]] = [arr[i], arr[i - 1]]
-    return arr
-  })
-
-  const moveDown = (i) => setGames(prev => {
-    if (i === prev.length - 1) return prev
-    const arr = [...prev]
-    ;[arr[i], arr[i + 1]] = [arr[i + 1], arr[i]]
-    return arr
-  })
-
-  const updateGame = (i, updated) =>
-    setGames(prev => prev.map((g, idx) => (idx === i ? updated : g)))
+  const pickGame = (id) => {
+    setGameId(id)
+    setCount(10)
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (!pseudo.trim() || games.length === 0) return
+    if (!canSubmit) return
     onSubmit({
       pseudo: pseudo.trim(),
-      config: {
-        games,
-        ...(chillMode ? { chillConfig: { timers: chillTimers } } : {}),
-      },
+      mode,
+      game: buildRoomGame(gameId, { setup, count, quizDifficulty, answerMode }),
     })
   }
 
@@ -215,93 +176,82 @@ export default function RoomConfig({ onSubmit, submitting }) {
       <h2 className="rc-title">{t('config.title')}</h2>
 
       <div className="rc-pseudo">
-        <label htmlFor="rc-pseudo-input">{t('labels.your_username')}</label>
+        <label htmlFor="pseudo-input">{t('labels.your_username')}</label>
         <input
-          id="rc-pseudo-input"
+          id="pseudo-input"
           value={pseudo}
-          onChange={e => setPseudo(e.target.value)}
+          onChange={e => setTyped(e.target.value)}
           placeholder={t('placeholders.username')}
           maxLength={20}
-          required
         />
       </div>
 
-      <div className="rc-games">
-        <h3 className="rc-games-title">Jeux ({games.length})</h3>
-        {games.map((game, i) => {
-          const meta = GAME_META[game.type]
-          return (
-            <div key={game.type} className="rc-game">
-              <div className="rc-game-header">
-                <span className="rc-game-label">{meta.icon} {meta.labelKey ? t(meta.labelKey) : meta.label}</span>
-                <div className="rc-game-actions">
-                  <button type="button" onClick={() => moveUp(i)} disabled={i === 0} aria-label={t('buttons.move_up')}>↑</button>
-                  <button type="button" onClick={() => moveDown(i)} disabled={i === games.length - 1} aria-label={t('buttons.move_down')}>↓</button>
-                  <button type="button" onClick={() => removeGame(i)} disabled={games.length === 1} aria-label={t('buttons.delete')}>✕</button>
-                </div>
-              </div>
-              <GameSettings game={game} onChange={updated => updateGame(i, updated)} />
-            </div>
-          )
-        })}
+      <section className="rc-section">
+        <h3 className="rc-games-title">{t('labels.game')}</h3>
+        <div className="rc-game-grid">
+          {ROOM_GAMES.map(g => (
+            <button
+              key={g.id}
+              type="button"
+              className={`rc-game-pick${gameId === g.id ? ' active' : ''}`}
+              onClick={() => pickGame(g.id)}
+            >
+              <span className="rc-game-icon">{g.icon}</span>
+              {t(`games.${g.id}.title`)}
+            </button>
+          ))}
+        </div>
+      </section>
 
-        {availableToAdd.length > 0 && (
-          <div className="rc-add-games">
-            <span className="rc-add-label">{t('config.add_game')}</span>
-            {availableToAdd.map(type => {
-              const meta = GAME_META[type]
-              return (
-                <button key={type} type="button" className="rc-add-btn" onClick={() => addGame(type)}>
-                  + {meta.icon} {meta.labelKey ? t(meta.labelKey) : meta.label}
+      <section className="rc-section">
+        <Choices
+          options={[{ value: 'live', label: t('mp_room.live') }, { value: 'challenge', label: t('mp_room.challenge') }]}
+          value={mode}
+          onChange={setMode}
+        />
+        <p className="rc-hint">{t(mode === 'live' ? 'mp_room.live_hint' : 'mp_room.challenge_hint')}</p>
+      </section>
+
+      <section className="rc-section">
+        {SETUP_TYPES.includes(type) && <SetupSettings type={type} setup={setup} onChange={setSetup} />}
+
+        {isQuiz && (
+          <>
+            <h3 className="rc-games-title">{t('mp_room.difficulty')}</h3>
+            <div className="rc-difficulties">
+              {QUIZ_DIFFICULTIES.map(d => (
+                <button
+                  key={d}
+                  type="button"
+                  className={`rc-diff-btn${quizDifficulty === d ? ' active' : ''}`}
+                  onClick={() => setQuizDifficulty(d)}
+                >
+                  <span style={{ color: DIFFICULTY_COLORS[d] }}>{t(`difficulties.${d}`)}</span>
                 </button>
-              )
-            })}
-          </div>
+              ))}
+            </div>
+            <h3 className="rc-games-title">{t('mp_room.answer_mode')}</h3>
+            <Choices
+              options={[{ value: 'choices', label: t('quiz.modes.choices') }, { value: 'free', label: t('quiz.modes.free') }]}
+              value={answerMode}
+              onChange={setAnswerMode}
+            />
+          </>
         )}
-      </div>
 
-      {/* Mode Chill temporairement désactivé - en cours de correction */}
-      {false && <div className="rc-chill-section">
-        <label className="rc-checkbox-label">
-          <input
-            type="checkbox"
-            checked={chillMode}
-            onChange={e => setChillMode(e.target.checked)}
-          />
-          <span>{t('modes.chill')}</span>
-          <span className="rc-chill-hint" style={{ color: '#94a3b8', fontSize: '0.85em', marginLeft: 8 }}>
-            {t('config.chill_hint')}
-          </span>
-        </label>
-
-        {chillMode && (
-          <div className="rc-chill-options" style={{ marginTop: 12, paddingLeft: 24 }}>
-            <span style={{ color: '#94a3b8', fontSize: '0.85em', display: 'block', marginBottom: 8 }}>
-              {t('config.seconds_by_difficulty')}
-            </span>
-            {['Facile', 'Moyen', 'Difficile', 'Impossible'].map(d => (
-              <label key={d} className="rc-asc-row" style={{ marginBottom: 6 }}>
-                <span style={{ color: DIFFICULTY_COLORS[d], minWidth: 80 }}>{d}</span>
-                <span className="rc-asc-val">{chillTimers[d]}s</span>
-                <input
-                  type="range"
-                  min={2}
-                  max={30}
-                  step={1}
-                  value={chillTimers[d]}
-                  onChange={e => setChillTimers(prev => ({ ...prev, [d]: Number(e.target.value) }))}
-                />
-              </label>
-            ))}
-          </div>
+        {!SETUP_TYPES.includes(type) && (
+          <>
+            <h3 className="rc-games-title">{t(isQuiz ? 'mp_room.questions_count' : 'mp_room.countries_count')}</h3>
+            <Choices
+              options={(isQuiz ? QUIZ_COUNTS : COUNTS).map(n => ({ value: n, label: String(n) }))}
+              value={count}
+              onChange={setCount}
+            />
+          </>
         )}
-      </div>}
+      </section>
 
-      <button
-        type="submit"
-        className="rc-submit"
-        disabled={!pseudo.trim() || games.length === 0 || submitting}
-      >
+      <button type="submit" className="rc-submit" disabled={!canSubmit}>
         {submitting ? t('config.creating') : t('buttons.create_game')}
       </button>
     </form>

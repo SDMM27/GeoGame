@@ -58,7 +58,6 @@
     "infinite": "Infini",
     "standard": "Standard",
     "ascension": "🚀 Ascension",
-    "chill": "🛋️ Mode Chill",
     "continent": "🌍 Continent"
   },
   "buttons": {
@@ -83,15 +82,8 @@
     "next_round": "Round suivant",
     "submit_ranking": "✓ Soumettre mon classement",
     "save_score": "Sauvegarder le score",
-    "copy_link": "Copier le lien",
-    "launch_game": "Lancer la partie",
     "create_game": "Créer une partie",
     "join": "Rejoindre",
-    "move_up": "Monter",
-    "move_down": "Descendre",
-    "delete": "Supprimer",
-    "see_final_ranking": "Voir le classement final",
-    "next_game": "Jeu suivant →",
     "hide_history": "Masquer l'historique",
     "show_full_history": "Voir tout l'historique"
   },
@@ -141,18 +133,10 @@
     "preset": "Preset :",
     "total_time": "Temps total",
     "all_countries": "Tous",
-    "code": "Code :",
-    "host": "Host",
-    "disconnected": "Déconnecté",
     "game": "Jeu",
-    "finished": "terminé !",
-    "points_earned": "Points gagnés",
     "total": "Total",
-    "rank": "Rang",
     "player": "Joueur",
     "countries_found": "Pays trouvés",
-    "failed_attempts": "Tentatives Ratées",
-    "points": "Points",
     "you": "(Toi)",
     "optimal_path": "Chemin optimal :",
     "unknown": "Inconnue"
@@ -289,18 +273,10 @@
     "title": "Multijoueur"
   },
   "lobby": {
-    "join_title": "Rejoindre la partie",
-    "connecting": "Connexion...",
-    "waiting_room": "Salle d'attente",
-    "invite_link": "Lien d'invitation",
-    "waiting_for_players": "En attente de joueurs... (min. 2)",
-    "waiting_for_host": "En attente du host..."
+    "connecting": "Connexion..."
   },
   "config": {
     "title": "Configurer la partie",
-    "add_game": "Ajouter un jeu :",
-    "chill_hint": "Compte à rebours commun · Revue après chaque manche",
-    "seconds_by_difficulty": "Secondes par difficulté :",
     "creating": "Création en cours...",
     "typing_tolerance_note": "⚠️ Pour les jeux de saisie (drapeaux, capitales), la première hésitation par pays est tolérée et n'impacte pas le score — les fautes de frappe arrivent !"
   },
@@ -676,7 +652,7 @@
     "retry": "Réessayer",
     "you": "Toi"
   },
-  "app_room": {
+  "mp_room": {
     "live": "En direct",
     "challenge": "Défi",
     "from_app": "Partie créée sur l'app mobile",
@@ -699,6 +675,16 @@
     "question": "Question {{n}} / {{total}}",
     "see_results": "Voir les résultats",
     "finished": "Partie terminée !",
-    "unsupported": "Ce jeu n'est pas encore jouable sur le site."
+    "unsupported": "Ce jeu n'est pas encore jouable sur le site.",
+    "launch": "Lancer la partie",
+    "copy_link": "Copier le lien",
+    "link_copied": "Lien copié",
+    "not_found": "Partie introuvable. Vérifie le code : les anciennes parties ne sont plus disponibles.",
+    "live_hint": "Tout le monde démarre en même temps quand l'hôte lance la partie. Progression en direct.",
+    "challenge_hint": "Chacun joue quand il veut avec le code ; le classement se remplit au fil des parties.",
+    "difficulty": "Difficulté",
+    "answer_mode": "Réponses",
+    "countries_count": "Nombre de pays",
+    "questions_count": "Nombre de questions"
   }
 }

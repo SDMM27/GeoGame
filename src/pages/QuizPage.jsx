@@ -113,7 +113,7 @@ function Summary({ stats, maxDifficulty, onRestart, onChangeDifficulty }) {
   )
 }
 
-// In a room created in the mobile app (`room`): its difficulty and answer mode, the same questions for everyone,
+// In a multiplayer room (`room`): its difficulty and answer mode, the same questions for everyone,
 // a fixed number of them. `room`: { seed, difficulty, answerMode, total, onAnswered(count), onFinished(result) }
 export function PracticeQuiz({ room = null }) {
   const { t, i18n } = useTranslation()
@@ -210,7 +210,7 @@ export function PracticeQuiz({ room = null }) {
             {t('games.quiz.title')}
             {room && (
               <small className="quiz-room-count">
-                {t('app_room.question', { n: Math.min(stats.answered + (isAnswered ? 0 : 1), room.total), total: room.total })}
+                {t('mp_room.question', { n: Math.min(stats.answered + (isAnswered ? 0 : 1), room.total), total: room.total })}
               </small>
             )}
           </h1>
@@ -309,7 +309,7 @@ export function PracticeQuiz({ room = null }) {
               )}
               {(isAnswered || !isFree) && (
                 <button className="quiz-btn quiz-btn--primary" onClick={goNext} disabled={!isAnswered}>
-                  {isLastQuestion ? t('app_room.see_results') : t('quiz.next')}
+                  {isLastQuestion ? t('mp_room.see_results') : t('quiz.next')}
                 </button>
               )}
             </div>

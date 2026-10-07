@@ -8,6 +8,7 @@ import Animated, { FadeIn, ZoomIn } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useFriendships } from '@shared/hooks/usePlayerProfile'
+import useLobbyHost from '@shared/hooks/useLobbyHost'
 import useMultiplayerRoom from '@shared/hooks/useMultiplayerRoom'
 import { dismissInvite, inviteId, sendRoomInvite } from '@shared/utils/invites'
 import { serverNow } from '@shared/utils/serverTime'
@@ -190,6 +191,8 @@ export default function RoomScreen() {
   const hasPlayed = Object.values(gameResults).some((result) => result.playerId === playerId)
   const isHost = room?.hostId === playerId
   const inLobby = room?.status === 'lobby'
+  // Heartbeat, and the host role passes on when the host is gone
+  useLobbyHost(room, playerId)
 
   const play = () => {
     if (!game || startedRef.current) return

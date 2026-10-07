@@ -1,15 +1,18 @@
-// src/components/multiplayer/AppRoom.test.jsx
+// src/components/multiplayer/MultiplayerRoom.test.jsx
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import AppRoom from './AppRoom'
-import { joinAppRoom } from '../../utils/appRoom'
+import MultiplayerRoom from './MultiplayerRoom'
+import { joinRoom, launchRoom } from '../../utils/multiplayerRoom'
 
 vi.mock('../../auth', () => ({ useAccount: () => ({ account: null }) }))
-vi.mock('../../utils/appRoom', async (importOriginal) => ({
+vi.mock('../../utils/multiplayerRoom', async (importOriginal) => ({
   ...(await importOriginal()),
-  joinAppRoom: vi.fn().mockResolvedValue(undefined),
-  reportAppProgress: vi.fn().mockResolvedValue(undefined),
-  submitAppResult: vi.fn().mockResolvedValue(undefined),
+  joinRoom: vi.fn().mockResolvedValue(undefined),
+  launchRoom: vi.fn().mockResolvedValue(undefined),
+  touchPlayer: vi.fn().mockResolvedValue(undefined),
+  transferHost: vi.fn().mockResolvedValue(undefined),
+  reportProgress: vi.fn().mockResolvedValue(undefined),
+  submitResult: vi.fn().mockResolvedValue(undefined),
 }))
 vi.mock('../../Firebase', () => ({ firestore: {} }))
 vi.mock('../../pages/GamePage', () => ({ MultiplayerPlacementGame: () => null }))
@@ -32,19 +35,19 @@ const makeRoom = (overrides = {}) => ({
   ...overrides,
 })
 
-describe('AppRoom', () => {
+describe('MultiplayerRoom', () => {
   it('lets a website player join a room created in the app', async () => {
-    render(<AppRoom room={makeRoom()} progress={{}} gameResults={{}} playerId="web" />)
+    render(<MultiplayerRoom room={makeRoom()} progress={{}} gameResults={{}} playerId="web" />)
     fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Bob' } })
     fireEvent.submit(screen.getByRole('textbox').closest('form'))
-    await waitFor(() => expect(joinAppRoom).toHaveBeenCalledWith('ABC234', 'web', 'Bob', undefined))
+    await waitFor(() => expect(joinRoom).toHaveBeenCalledWith('ABC234', 'web', 'Bob', undefined))
   })
 
   it('waits for the host in a live lobby', () => {
     const room = makeRoom({ mode: 'live', status: 'lobby', players: { host: { pseudo: 'Alice' }, web: { pseudo: 'Bob' } } })
-    render(<AppRoom room={room} progress={{}} gameResults={{}} playerId="web" />)
+    render(<MultiplayerRoom room={room} progress={{}} gameResults={{}} playerId="web" />)
     expect(screen.getByText('Alice')).toBeInTheDocument()
-    expect(screen.queryByRole('button')).toBeNull()
+    expect(screen.queryByRole('button', { name: /▶/ })).toBeNull()
   })
 
   it('plays a challenge and shows the standings', () => {
@@ -52,9 +55,16 @@ describe('AppRoom', () => {
     const gameResults = {
       '0_host': { playerId: 'host', pseudo: 'Alice', weightedScore: 120, countriesSolved: 10, attempts: 2, elapsedTime: 65000, total: 10 },
     }
-    render(<AppRoom room={room} progress={{}} gameResults={gameResults} playerId="web" />)
+    render(<MultiplayerRoom room={room} progress={{}} gameResults={gameResults} playerId="web" />)
     expect(screen.getByText(/120/)).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button'))
+    fireEvent.click(screen.getByRole('button', { name: /▶/ }))
     expect(screen.getByText('flags-game')).toBeInTheDocument()
+  })
+
+  it('lets the host launch a live room', async () => {
+    const room = makeRoom({ mode: 'live', status: 'lobby', createdOn: 'web', players: { web: { pseudo: 'Bob' } }, hostId: 'web' })
+    render(<MultiplayerRoom room={room} progress={{}} gameResults={{}} playerId="web" />)
+    fireEvent.click(screen.getByRole('button', { name: /▶/ }))
+    await waitFor(() => expect(launchRoom).toHaveBeenCalledWith('ABC234'))
   })
 })

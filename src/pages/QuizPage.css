@@ -419,7 +419,7 @@
   }
 }
 
-/* Quiz played in a room created in the mobile app */
+/* Quiz played in a multiplayer room */
 .quiz-page--room {
   min-height: 0;
 }

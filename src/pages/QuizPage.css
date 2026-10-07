@@ -220,6 +220,25 @@
   opacity: 0.45;
 }
 
+/* Retirée par un indice */
+.quiz-choice--removed {
+  opacity: 0.25;
+  text-decoration: line-through;
+}
+
+.quiz-badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.quiz-points {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
 .quiz-free {
   display: flex;
   flex-direction: column;

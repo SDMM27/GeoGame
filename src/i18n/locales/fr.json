@@ -432,6 +432,7 @@
     "hints_label": "Indices",
     "hint_n": "Indice {{n}}",
     "hint_button": "💡 Indice ({{used}}/{{max}})",
+    "hint_cost": "Chaque indice réduit les points de la question",
     "give_up": "Abandonner",
     "already_tried": "Tu as déjà proposé cette réponse.",
     "daily_won": "✓ Trouvé en {{attempts}} !",

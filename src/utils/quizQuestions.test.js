@@ -12,6 +12,7 @@ import {
   generateQuestion,
   getAllowedDifficulties,
   getDailyQuestion,
+  getQuizPoints,
   getQuestionHints,
   localizeQuestion,
   MAX_HINTS,
@@ -236,5 +237,19 @@ describe('daily question', () => {
         expect(hints[2]).toMatch(/\p{L}.*_|_.*\p{L}|^[^_]*\p{L}[^_]*$/u)
       }
     }
+  })
+})
+
+describe('getQuizPoints', () => {
+  it('donne tous les points sans indice', () => {
+    expect(getQuizPoints('Facile')).toBe(1)
+    expect(getQuizPoints('Impossible', 0)).toBe(5)
+  })
+
+  it('réduit les points à chaque indice, sans descendre sous 1', () => {
+    expect(getQuizPoints('Impossible', 1)).toBe(3)
+    expect(getQuizPoints('Impossible', 2)).toBe(2)
+    expect(getQuizPoints('Difficile', 3)).toBe(1)
+    expect(getQuizPoints('Facile', 3)).toBe(1)
   })
 })

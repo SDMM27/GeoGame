@@ -432,6 +432,7 @@
     "hints_label": "Hints",
     "hint_n": "Hint {{n}}",
     "hint_button": "💡 Hint ({{used}}/{{max}})",
+    "hint_cost": "Each hint lowers the points for this question",
     "give_up": "Give up",
     "already_tried": "You already tried this answer.",
     "daily_won": "✓ Found in {{attempts}}!",

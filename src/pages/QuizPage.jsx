@@ -103,7 +103,8 @@ function PracticeQuiz() {
   const { t, i18n } = useTranslation()
   const {
     maxDifficulty, answerMode, question, selectedId, freeResult, isAnswered, isCorrect, stats, isFinished,
-    start, answer, submitFree, next, quit, backToDifficulty,
+    hintsUsed, maxHints, canUseHint, hiddenChoiceIds, points,
+    start, answer, submitFree, takeHint, next, quit, backToDifficulty,
   } = useQuizState()
   const isFree = answerMode === ANSWER_MODES.FREE
   const [inputValue, setInputValue] = useState('')
@@ -112,6 +113,10 @@ function PracticeQuiz() {
   const localized = useMemo(
     () => (question ? localizeQuestion(question, i18n.language, t) : null),
     [question, i18n.language, t]
+  )
+  const hints = useMemo(
+    () => (question && isFree ? getQuestionHints(question, i18n.language, t) : []),
+    [question, isFree, i18n.language, t]
   )
 
   useEffect(() => {
@@ -148,6 +153,7 @@ function PracticeQuiz() {
   }
 
   const choiceClass = (id) => {
+    if (hiddenChoiceIds.includes(id)) return 'quiz-choice quiz-choice--removed'
     if (!isAnswered) return 'quiz-choice'
     if (id === question.correctId) return 'quiz-choice quiz-choice--correct'
     if (id === selectedId) return 'quiz-choice quiz-choice--wrong'
@@ -182,10 +188,23 @@ function PracticeQuiz() {
 
         {maxDifficulty && !isFinished && localized && (
           <section className="quiz-card">
-            <span className="quiz-badge" style={{ color: DIFFICULTY_COLORS[question.difficulty] }}>
-              {t(`difficulties.${question.difficulty}`)}
-            </span>
+            <div className="quiz-badge-row">
+              <span className="quiz-badge" style={{ color: DIFFICULTY_COLORS[question.difficulty] }}>
+                {t(`difficulties.${question.difficulty}`)}
+              </span>
+              {!isAnswered && (
+                <span className="quiz-points">+{points} {points === 1 ? t('units.pt') : t('units.pts')}</span>
+              )}
+            </div>
             <h2 className="quiz-question">{localized.prompt}</h2>
+
+            {hintsUsed > 0 && hints.length > 0 && (
+              <ol className="quiz-hints">
+                {hints.slice(0, hintsUsed).map((hint, i) => (
+                  <li key={i}><span className="quiz-hints-label">{t('quiz.hint_n', { n: i + 1 })}</span>{hint}</li>
+                ))}
+              </ol>
+            )}
 
             {isFree ? (
               <div className="quiz-free">
@@ -212,7 +231,7 @@ function PracticeQuiz() {
             ) : (
               <div className="quiz-choices">
                 {localized.choices.map((c, i) => (
-                  <button key={c.id} className={choiceClass(c.id)} onClick={() => answer(c.id)} disabled={isAnswered}>
+                  <button key={c.id} className={choiceClass(c.id)} onClick={() => answer(c.id)} disabled={isAnswered || hiddenChoiceIds.includes(c.id)}>
                     <span className="quiz-choice-key">{i + 1}</span>
                     {c.label}
                   </button>
@@ -235,6 +254,11 @@ function PracticeQuiz() {
 
             <div className="quiz-actions">
               <button className="quiz-btn" onClick={quit}>{t('quiz.quit')}</button>
+              {!isAnswered && maxHints > 0 && (
+                <button className="quiz-btn" onClick={takeHint} disabled={!canUseHint} title={t('quiz.hint_cost')}>
+                  {t('quiz.hint_button', { used: hintsUsed, max: maxHints })}
+                </button>
+              )}
               {(isAnswered || !isFree) && (
                 <button className="quiz-btn quiz-btn--primary" onClick={next} disabled={!isAnswered}>
                   {t('quiz.next')}

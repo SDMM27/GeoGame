@@ -382,9 +382,15 @@ function PracticeQuiz() {
     isCorrect,
     stats,
     isFinished,
+    hintsUsed,
+    maxHints,
+    canUseHint,
+    hiddenChoiceIds,
+    points,
     start,
     answer,
     submitFree,
+    takeHint,
     next,
     quit,
     backToDifficulty,
@@ -395,6 +401,11 @@ function PracticeQuiz() {
   const scrollRef = useRef<ScrollView>(null)
 
   const localized = useMemo<Localized | null>(() => (question ? localizeQuestion(question, i18n.language, t) : null), [question, i18n.language, t])
+  const hints = useMemo<string[]>(
+    () => (question && isFree ? getQuestionHints(question, i18n.language, t) : []),
+    [question, isFree, i18n.language, t]
+  )
+  const hidden = hiddenChoiceIds as string[]
   const current = question as Question | null
   const result = freeResult as { input: string; match: { match: string; name: string } | null } | null
 
@@ -411,6 +422,7 @@ function PracticeQuiz() {
   }, [question, isFree])
 
   const choiceStyle = (id: string) => {
+    if (hidden.includes(id)) return { opacity: 0.2 }
     if (!isAnswered || !current) return null
     if (id === current.correctId) return { borderColor: colors.accent, backgroundColor: `${colors.accent}1A` }
     if (id === selectedId) return { borderColor: colors.danger, backgroundColor: `${colors.danger}1A` }
@@ -432,10 +444,32 @@ function PracticeQuiz() {
 
           {maxDifficulty && !isFinished && localized && current && (
             <View style={styles.card}>
-              <DifficultyBadge difficulty={current.difficulty} />
+              <View style={styles.badgeRow}>
+                <DifficultyBadge difficulty={current.difficulty} />
+                {!isAnswered && (
+                  <Text variant="bodyStrong" color={colors.textMuted} style={{ fontSize: 13 }}>
+                    +{points} {points === 1 ? t('units.pt') : t('units.pts')}
+                  </Text>
+                )}
+              </View>
               <Animated.View key={localized.prompt} entering={FadeIn.duration(220)}>
                 <Text variant="heading">{localized.prompt}</Text>
               </Animated.View>
+
+              {hintsUsed > 0 && hints.length > 0 && (
+                <View style={{ gap: space.sm }}>
+                  {hints.slice(0, hintsUsed).map((hint, index) => (
+                    <Animated.View key={index} entering={FadeInDown.springify().damping(18)} style={styles.hint}>
+                      <Text variant="label" color={ACCENT}>
+                        {t('quiz.hint_n', { n: index + 1 })}
+                      </Text>
+                      <Text variant="bodyStrong" style={{ letterSpacing: 0.5 }}>
+                        {hint}
+                      </Text>
+                    </Animated.View>
+                  ))}
+                </View>
+              )}
 
               {isFree ? (
                 <View style={{ gap: space.sm }}>
@@ -467,14 +501,16 @@ function PracticeQuiz() {
                       key={choice.id}
                       accessibilityRole="button"
                       onPress={() => answer(choice.id)}
-                      disabled={isAnswered}
+                      disabled={isAnswered || hidden.includes(choice.id)}
                       style={[styles.choice, choiceStyle(choice.id)]}>
                       <View style={styles.choiceKey}>
                         <Text variant="bodyStrong" color={colors.textMuted} style={{ fontSize: 13 }}>
                           {index + 1}
                         </Text>
                       </View>
-                      <Text variant="bodyStrong" style={{ flex: 1 }}>
+                      <Text
+                        variant="bodyStrong"
+                        style={[{ flex: 1 }, hidden.includes(choice.id) && { textDecorationLine: 'line-through' }]}>
                         {choice.label}
                       </Text>
                       {isAnswered && choice.id === current.correctId && (
@@ -500,6 +536,21 @@ function PracticeQuiz() {
                     localized.fact,
                   ]}
                 />
+              )}
+
+              {!isAnswered && maxHints > 0 && (
+                <View style={{ gap: space.xs }}>
+                  <Button
+                    label={`${t('quiz.hints_label')} ${hintsUsed}/${maxHints}`}
+                    variant="secondary"
+                    onPress={takeHint}
+                    disabled={!canUseHint}
+                    icon={<MaterialCommunityIcons name="lightbulb-on-outline" size={18} color={colors.text} />}
+                  />
+                  <Text variant="caption" style={{ textAlign: 'center' }}>
+                    {t('quiz.hint_cost')}
+                  </Text>
+                </View>
               )}
 
               <View style={styles.actions}>
@@ -574,6 +625,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
+  badgeRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.md },
   badge: { alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 4, borderRadius: radius.pill, borderWidth: 1 },
   input: {
     height: 52,

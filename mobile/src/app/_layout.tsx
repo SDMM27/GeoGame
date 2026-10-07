@@ -1,4 +1,5 @@
 import '@/polyfills'
+import '@/emulators'
 import '@/i18n'
 
 import {
@@ -14,6 +15,8 @@ import { useEffect } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 import { InstallHint } from '@/components/InstallHint'
+import { InviteBanner } from '@/components/InviteBanner'
+import { PushNotifications } from '@/components/PushNotifications'
 import { ToastHost } from '@/components/ToastHost'
 import { colors } from '@/theme'
 
@@ -69,6 +72,8 @@ export default function RootLayout() {
           <Stack.Screen name="game" options={{ gestureEnabled: false, animation: 'fade_from_bottom' }} />
         </Stack>
         <InstallHint />
+        <InviteBanner />
+        <PushNotifications />
         <ToastHost />
       </ThemeProvider>
     </GestureHandlerRootView>

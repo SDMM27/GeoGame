@@ -63,6 +63,16 @@ service cloud.firestore {
         allow read: if true;
         allow write: if request.auth != null && request.auth.uid == uid;
       }
+
+      // This account's devices for push notifications (mobile/src/notifications/push.ts), read by api/invite-push.
+      match /pushTokens/{token} {
+        allow read, delete: if request.auth != null && request.auth.uid == uid;
+        allow create, update: if request.auth != null && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['token', 'lang', 'platform', 'updatedAt'])
+          && request.resource.data.token == token
+          && request.resource.data.lang is string && request.resource.data.lang.size() <= 10
+          && request.resource.data.platform in ['ios', 'android'];
+      }
     }
 
     match /friendships/{id} {
@@ -78,6 +88,37 @@ service cloud.firestore {
         && request.resource.data.status == 'accepted'
         && request.resource.data.users == resource.data.users;
       allow delete: if request.auth != null && request.auth.uid in resource.data.users;
+    }
+
+    // Room invites between friends (src/utils/invites.js): invites/{room}_{to}
+    // { from, fromUsername, to, room, gameId, mode, createdAt }
+    match /invites/{id} {
+      function friendshipOf(a, b) {
+        return a < b ? a + '_' + b : b + '_' + a;
+      }
+
+      function validInvite(data) {
+        return data.keys().hasOnly(['from', 'fromUsername', 'to', 'room', 'gameId', 'mode', 'createdAt'])
+          && data.from == request.auth.uid
+          && data.to is string && data.to != data.from
+          && data.room is string && data.room.size() == 6
+          && id == data.room + '_' + data.to
+          && validLabel(data.gameId)
+          && data.mode in ['live', 'challenge']
+          && data.createdAt == request.time
+          && data.fromUsername == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.username
+          && exists(/databases/$(database)/documents/rooms/$(data.room))
+          && get(/databases/$(database)/documents/friendships/$(friendshipOf(data.from, data.to))).data.status == 'accepted';
+      }
+
+      allow read: if request.auth != null
+        && (request.auth.uid == resource.data.to || request.auth.uid == resource.data.from);
+      // Opening a room clears the invite to it, whether there is one or not.
+      allow delete: if request.auth != null
+        && (resource == null || request.auth.uid == resource.data.to || request.auth.uid == resource.data.from);
+      allow create: if request.auth != null && validInvite(request.resource.data);
+      allow update: if request.auth != null && validInvite(request.resource.data)
+        && request.resource.data.to == resource.data.to;
     }
 
     // ---------- Leaderboards ----------

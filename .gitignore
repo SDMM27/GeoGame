@@ -37,3 +37,8 @@ archiveScoresToV1.js
 
 # Firebase Admin keys (scripts/purgeAnonymousScores.mjs)
 serviceAccount*.json
+
+# Firebase emulators
+firebase-debug.log
+firestore-debug.log
+ui-debug.log

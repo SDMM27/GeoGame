@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "836573704596",
+    "project_id": "geogame-sdmm",
+    "storage_bucket": "geogame-sdmm.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:836573704596:android:97ec773804a9fddb7c9f81",
+        "android_client_info": {
+          "package_name": "com.sdmm27.geogame"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "836573704596-1cpp3drid3kvcl8f7rh2p9d1asltlko3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA4XukgxYH9KMNUQXvqui_RB4lUEcbxxYU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "836573704596-1cpp3drid3kvcl8f7rh2p9d1asltlko3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

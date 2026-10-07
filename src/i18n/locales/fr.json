@@ -656,5 +656,13 @@
       "title": "Oiseau de nuit",
       "desc": "Joue entre minuit et 5 h"
     }
+  },
+  "app_banner": {
+    "title": "GeoGame en mode app",
+    "subtitle": "Plein écran avec une icône sur ton écran d’accueil. À installer depuis Safari.",
+    "open": "Ouvrir",
+    "close": "Fermer",
+    "subtitle_android": "Télécharge l’APK, puis autorise l’installation quand Android te le demande.",
+    "download": "Télécharger"
   }
 }

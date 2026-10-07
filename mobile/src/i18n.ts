@@ -146,6 +146,16 @@ const fr = {
     errors_label: 'Erreurs',
     leave: 'Quitter',
   },
+  install: {
+    title: 'Installe GeoGame',
+    subtitle: 'Ajoute l’app à ton écran d’accueil pour jouer en plein écran.',
+    not_safari: 'Tu n’es pas dans Safari : copie l’adresse de cette page et ouvre-la dans Safari.',
+    step_safari: 'Ouvre cette page dans Safari (obligatoire)',
+    step_share: 'Touche le bouton Partager en bas de Safari',
+    step_add: 'Choisis « Sur l’écran d’accueil »',
+    step_done: 'Touche « Ajouter », puis ouvre GeoGame depuis l’icône',
+    close: 'Fermer',
+  },
   common: { coming_soon: 'Bientôt disponible', back: 'Retour', language: 'Langue' },
 }
 
@@ -294,6 +304,16 @@ const en: typeof fr = {
     errors_label: 'Wrong guesses',
     leave: 'Leave',
   },
+  install: {
+    title: 'Install GeoGame',
+    subtitle: 'Add the app to your home screen to play full screen.',
+    not_safari: 'You’re not in Safari: copy this page’s address and open it in Safari.',
+    step_safari: 'Open this page in Safari (required)',
+    step_share: 'Tap the Share button at the bottom of Safari',
+    step_add: 'Choose “Add to Home Screen”',
+    step_done: 'Tap “Add”, then open GeoGame from its icon',
+    close: 'Close',
+  },
   common: { coming_soon: 'Coming soon', back: 'Back', language: 'Language' },
 }
 
@@ -441,6 +461,16 @@ const ru: typeof fr = {
     errors: '{{count}} ош.',
     errors_label: 'Ошибки',
     leave: 'Выйти',
+  },
+  install: {
+    title: 'Установи GeoGame',
+    subtitle: 'Добавь приложение на экран «Домой», чтобы играть на весь экран.',
+    not_safari: 'Ты не в Safari: скопируй адрес этой страницы и открой её в Safari.',
+    step_safari: 'Открой эту страницу в Safari (обязательно)',
+    step_share: 'Нажми кнопку «Поделиться» внизу Safari',
+    step_add: 'Выбери «На экран „Домой“»',
+    step_done: 'Нажми «Добавить» и открой GeoGame с иконки',
+    close: 'Закрыть',
   },
   common: { coming_soon: 'Скоро', back: 'Назад', language: 'Язык' },
 }

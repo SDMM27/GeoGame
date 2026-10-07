@@ -380,6 +380,11 @@ export default function RoomScreen() {
                   </Text>
                 </View>
               )}
+              {toPlay == null && !hasNextLive && (
+                <Text variant="bodyStrong" color={colors.accent} style={{ textAlign: 'center' }}>
+                  ✓ {t('mp_room.finished')}
+                </Text>
+              )}
               {isHost && hasNextLive && (
                 <Button
                   label={`${t('mp_room.next_game', { n: current + 2 })} · ${t(getGame(games[current + 1].id)?.titleKey ?? '')}`}

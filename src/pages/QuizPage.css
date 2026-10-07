@@ -420,8 +420,9 @@
 }
 
 /* Quiz played in a multiplayer room */
+/* Fills the room's game area (which scrolls), whatever the length of the question */
 .quiz-page--room {
-  min-height: 0;
+  min-height: 100%;
 }
 
 .quiz-room-count {

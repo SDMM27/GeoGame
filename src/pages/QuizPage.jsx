@@ -3,12 +3,14 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import NavBar from '../components/NavBar'
+import ChallengeBanner from '../components/ChallengeBanner'
 import ShareScoreButton from '../components/ShareScoreButton'
 import useQuizState from '../hooks/useQuizState'
 import useDailyQuizState from '../hooks/useDailyQuizState'
 import DailyForm from './DailyForm'
 import DailyLeaderboard from './DailyLeaderboard'
 import { GAME_TYPES } from '../utils/gameTypes'
+import { resolveMode } from '../utils/challenge'
 import { formatTime } from '../utils/formatTime'
 import { ANSWER_MODES, MAX_HINTS, QUIZ_DIFFICULTIES, getQuestionHints, localizeQuestion } from '../utils/quizQuestions'
 import './QuizPage.css'
@@ -299,6 +301,11 @@ function DailyQuiz() {
     <div className="quiz-page">
       <NavBar />
       <main className="quiz-main">
+        <ChallengeBanner
+          gameType={GAME_TYPES.QUIZ}
+          dailyKey={dailyKey}
+          result={isComplete ? { score: attempts + hintsUsed, solved: isSolved } : null}
+        />
         <header className="quiz-header">
           <h1>{t('quiz.daily_title')}</h1>
           {hasStarted && (
@@ -390,6 +397,7 @@ function DailyQuiz() {
               difficulty="Daily"
               scoreLabel={t('share.score_attempts')}
               details={isSolved ? statText : t('quiz.daily_lost')}
+              challenge={{ route: '/quiz', dailyKey, solved: isSolved }}
             />
             {isSolved && (
               <DailyForm
@@ -420,5 +428,5 @@ function DailyQuiz() {
 export default function QuizPage() {
   const location = useLocation()
   // Comme les autres jeux du jour : sans mode explicite, on arrive sur la question du jour
-  return location.state?.mode === 'infinite' ? <PracticeQuiz /> : <DailyQuiz />
+  return resolveMode(location, 'daily') === 'infinite' ? <PracticeQuiz /> : <DailyQuiz />
 }

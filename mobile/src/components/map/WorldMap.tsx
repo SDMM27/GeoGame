@@ -5,7 +5,7 @@ import { Canvas, Circle, Group, Path, Skia, type SkPath } from '@shopify/react-n
 import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { StyleSheet, View, type LayoutChangeEvent } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import { Easing, useDerivedValue, useSharedValue, withTiming, type SharedValue } from 'react-native-reanimated'
+import { Easing, cancelAnimation, useDerivedValue, useSharedValue, withTiming, type SharedValue } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
 
 import { colors } from '@/theme'
@@ -62,6 +62,9 @@ type Props = {
 const MAX_SCALE = 2 ** (18 - BASE_ZOOM)
 const MARKER_THRESHOLD_PX = 8
 const TAP_TOLERANCE_PX = 16
+// A finger that moves further than this is dragging the map, not tapping a country
+const TAP_MAX_MOVE_PX = 10
+const INERTIA_MS = 350
 
 // The website's hooks pass Leaflet colors; map them onto the app palette.
 const COLOR_MAP: Record<string, string> = {
@@ -113,13 +116,11 @@ const MapScene = memo(function MapScene({
   base,
   fills,
   strokes,
-  hairline,
   thick,
 }: {
   base: SkPath
   fills: { key: string; path: SkPath; color: string; opacity: number }[]
   strokes: { key: string; path: SkPath; color: string; thick: boolean }[]
-  hairline: SharedValue<number>
   thick: SharedValue<number>
 }) {
   return (
@@ -128,14 +129,16 @@ const MapScene = memo(function MapScene({
       {fills.map((fill) => (
         <Path key={fill.key} path={fill.path} color={fill.color} opacity={fill.opacity} />
       ))}
-      <Path path={base} color={colors.landStroke} style="stroke" strokeWidth={hairline} />
+      {/* Width 0 is a Skia hairline: one device pixel at any zoom, drawn without re-stroking
+          the whole world on every frame of a pan or pinch. */}
+      <Path path={base} color={colors.landStroke} style="stroke" strokeWidth={0} />
       {strokes.map((stroke) => (
         <Path
           key={stroke.key}
           path={stroke.path}
           color={stroke.color}
           style="stroke"
-          strokeWidth={stroke.thick ? thick : hairline}
+          strokeWidth={stroke.thick ? thick : 0}
         />
       ))}
     </>
@@ -216,7 +219,6 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
     { translateY: ty.value },
     { scale: scale.value },
   ])
-  const hairline = useDerivedValue(() => 0.8 / scale.value)
   const thick = useDerivedValue(() => 2 / scale.value)
   const markerRadius = useDerivedValue(() => 6 / scale.value)
 
@@ -279,7 +281,7 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
           name: shape.name,
           x: shape.x + shape.width / 2,
           y: shape.y + shape.height / 2,
-          color: isVisibleFill(style) ? mapColor(style!.fillColor)! : colors.textMuted,
+          color: isVisibleFill(style) ? mapColor(style!.fillColor)! : colors.text,
           styled: isVisibleFill(style),
         }
       })
@@ -447,6 +449,9 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
   // ---- Gestures ------------------------------------------------------------------
   const start = useSharedValue({ scale: 1, tx: 0, ty: 0, fx: 0, fy: 0 })
   const minScaleValue = useDerivedValue(() => (viewW.value > 0 ? viewW.value / WORLD_SIZE : 0.3))
+  // While the map still glides after a pan, a touch only stops it. Zooming never counts as a tap.
+  const glideUntil = useSharedValue(0)
+  const ignoreTap = useSharedValue(false)
 
   const pan = Gesture.Pan()
     .enabled(interactive)
@@ -462,13 +467,15 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
       // Light inertia
       const targetX = tx.value + event.velocityX * 0.12
       const targetY = clampY(ty.value + event.velocityY * 0.12, scale.value, viewH.value)
-      tx.value = withTiming(targetX, { duration: 350, easing: Easing.out(Easing.cubic) })
-      ty.value = withTiming(targetY, { duration: 350, easing: Easing.out(Easing.cubic) })
+      tx.value = withTiming(targetX, { duration: INERTIA_MS, easing: Easing.out(Easing.cubic) })
+      ty.value = withTiming(targetY, { duration: INERTIA_MS, easing: Easing.out(Easing.cubic) })
+      glideUntil.value = Date.now() + INERTIA_MS
     })
 
   const pinch = Gesture.Pinch()
     .enabled(interactive)
     .onStart((event) => {
+      ignoreTap.value = true
       start.value = { scale: scale.value, tx: tx.value, ty: ty.value, fx: event.focalX, fy: event.focalY }
     })
     .onUpdate((event) => {
@@ -485,15 +492,24 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
   const tap = Gesture.Tap()
     .enabled(interactive)
     .maxDuration(400)
+    .maxDistance(TAP_MAX_MOVE_PX)
+    .onBegin(() => {
+      ignoreTap.value = Date.now() < glideUntil.value
+      if (ignoreTap.value) {
+        cancelAnimation(tx)
+        cancelAnimation(ty)
+        glideUntil.value = 0
+      }
+    })
     .onEnd((event, success) => {
-      if (success) scheduleOnRN(handleTap, event.x, event.y)
+      if (success && !ignoreTap.value) scheduleOnRN(handleTap, event.x, event.y)
     })
 
   const gesture = Gesture.Simultaneous(pinch, pan, tap)
 
   const scene = (
     <>
-      <MapScene base={basePath} fills={fills} strokes={strokes} hairline={hairline} thick={thick} />
+      <MapScene base={basePath} fills={fills} strokes={strokes} thick={thick} />
       {markers.map((marker) => (
         <Circle
           key={marker.name}
@@ -501,7 +517,7 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
           cy={marker.y}
           r={markerRadius}
           color={marker.color}
-          opacity={marker.styled ? 0.95 : 0.45}
+          opacity={marker.styled ? 0.95 : 0.55}
         />
       ))}
       {overlays.map((overlay, index) =>

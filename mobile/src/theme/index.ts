@@ -16,9 +16,9 @@ export const colors = {
   warning: '#F5B83D',
   onWarning: '#2A1C02',
 
-  ocean: '#081226',
-  land: '#1A2A4A',
-  landStroke: '#2E4370',
+  ocean: '#060E1F',
+  land: '#2A3E66',
+  landStroke: '#6F88BD',
   highlight: '#7AA2FF',
 } as const
 

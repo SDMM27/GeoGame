@@ -9,6 +9,7 @@ export const GAME_LABELS = {
   COUNTRY_CLUE: 'Country Clue',
   RANKING: 'Country Ranking',
   VOYAGE_VOYAGE: 'Voyage Voyage',
+  QUIZ: 'Quiz Géo',
 }
 
 // Maps game type keys → i18n locale paths
@@ -20,6 +21,7 @@ const GAME_TYPE_LOCALE_KEYS = {
   COUNTRY_CLUE: 'games.country_clue.title',
   RANKING: 'games.ranking.title',
   VOYAGE_VOYAGE: 'games.voyage_voyage.title',
+  QUIZ: 'games.quiz.title',
 }
 
 function getGameLabel(gameType) {

@@ -6,4 +6,5 @@ export const GAME_TYPES = {
     COUNTRY_CLUE: 'COUNTRY_CLUE',
     RANKING: 'RANKING',
     VOYAGE_VOYAGE: 'VOYAGE_VOYAGE',
+    QUIZ: 'QUIZ',
 };

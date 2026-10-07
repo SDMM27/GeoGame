@@ -52,6 +52,8 @@ describe('compareToChallenge', () => {
     expect(compareToChallenge('COUNTRY_CLUE', { score: 9, solved: true }, { score: 2, solved: false })).toBe('win')
     expect(compareToChallenge('COUNTRY_CLUE', { score: 2, solved: false }, { score: 9, solved: true })).toBe('lose')
     expect(compareToChallenge('COUNTRY_CLUE', { score: 6, solved: false }, { score: 4, solved: false })).toBe('tie')
+    // Quiz du jour : essais + indices, le plus petit total gagne
+    expect(compareToChallenge('QUIZ', { score: 2, solved: true }, { score: 4, solved: true })).toBe('win')
   })
 
   it('point games: higher score wins', () => {

@@ -69,12 +69,12 @@ function Endpoint({ feature, label, color, align }: { feature: CountryFeature; l
   const { i18n } = useTranslation()
   const flag = getFlag(feature.properties.ISO_A2)
   return (
-    <View style={[styles.endpoint, { alignItems: align === 'left' ? 'flex-start' : 'flex-end' }]}>
-      <Text variant="label" color={color}>
-        {label}
-      </Text>
+    <View
+      accessible
+      accessibilityLabel={`${label} : ${nameOf(feature, i18n.language)}`}
+      style={[styles.endpoint, align === 'right' && { flexDirection: 'row-reverse' }]}>
       {flag && <Image source={flag} contentFit="cover" style={styles.endpointFlag} />}
-      <Text variant="bodyStrong" numberOfLines={2} style={{ textAlign: align }}>
+      <Text variant="bodyStrong" color={color} numberOfLines={2} style={{ flex: 1, fontSize: 14, lineHeight: 18, textAlign: align }}>
         {nameOf(feature, i18n.language)}
       </Text>
     </View>
@@ -193,7 +193,7 @@ export default function VoyageScreen() {
             <>
               <View style={styles.endpoints}>
                 <Endpoint feature={startCountry} label={t('labels.start')} color={VOYAGE_COLORS.start} align="left" />
-                <MaterialCommunityIcons name="airplane" size={26} color={ACCENT} />
+                <MaterialCommunityIcons name="airplane" size={18} color={colors.textMuted} />
                 <Endpoint feature={targetCountry} label={t('labels.arrival')} color={VOYAGE_COLORS.target} align="right" />
               </View>
 
@@ -369,15 +369,16 @@ const styles = StyleSheet.create({
   endpoints: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: space.md,
-    padding: space.lg,
-    borderRadius: radius.lg,
+    gap: space.sm,
+    paddingVertical: space.sm,
+    paddingHorizontal: space.md,
+    borderRadius: radius.md,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
   },
-  endpoint: { flex: 1, gap: 6 },
-  endpointFlag: { width: 48, height: 32, borderRadius: 5 },
+  endpoint: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: space.sm },
+  endpointFlag: { width: 27, height: 18, borderRadius: 3 },
   chain: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6 },
   chainItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   chip: {

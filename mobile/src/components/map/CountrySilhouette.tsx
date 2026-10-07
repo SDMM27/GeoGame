@@ -19,13 +19,10 @@ const OUTLINES = silhouettes as unknown as Record<string, Geometry>
 export function CountrySilhouette({
   country,
   color = colors.highlight,
-  bottomInset = 0,
   style,
 }: {
   country: CountryFeature
   color?: string
-  // Extra space kept free at the bottom (e.g. under an overlay)
-  bottomInset?: number
   style?: StyleProp<ViewStyle>
 }) {
   const [size, setSize] = useState({ width: 0, height: 0 })
@@ -42,13 +39,13 @@ export function CountrySilhouette({
       .fitExtent(
         [
           [PADDING, PADDING],
-          [size.width - PADDING, Math.max(PADDING * 2, size.height - PADDING - bottomInset)],
+          [size.width - PADDING, size.height - PADDING],
         ],
         focus
       )
     const d = geoPath(projection)(focus)
     return d ? Skia.Path.MakeFromSVGString(d) : null
-  }, [country, size, bottomInset])
+  }, [country, size])
 
   const onLayout = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout

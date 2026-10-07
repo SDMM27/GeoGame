@@ -36,37 +36,16 @@ type Guess = {
   directionArrow: string | null
 }
 
-// Where to look next, from the latest wrong guess: shown over the silhouette so it stays visible with the keyboard up.
-function LastHint({ guess }: { guess: Guess }) {
-  const { t, i18n } = useTranslation()
-  if (guess.isCorrect || guess.distanceKm == null) return null
-  const name = (guess.iso && getCountryName(guess.iso, i18n.language)) || guess.value
-  return (
-    <Animated.View key={guess.value} entering={FadeIn.duration(200)} style={styles.lastHint}>
-      {guess.directionArrow && (
-        <Text variant="title" color={ACCENT} style={{ fontSize: 26, lineHeight: 30 }}>
-          {guess.directionArrow}
-        </Text>
-      )}
-      <View style={{ flex: 1 }}>
-        <Text variant="bodyStrong" style={{ fontVariant: ['tabular-nums'] }}>
-          {guess.distanceKm.toLocaleString(i18n.language)} km
-          {guess.direction ? ` · ${t(`mobile.directions.${guess.direction}`)}` : ''}
-        </Text>
-        <Text variant="caption" numberOfLines={1}>
-          {t('mobile.game.from_country', { name })}
-        </Text>
-      </View>
-    </Animated.View>
-  )
-}
-
-function GuessRow({ guess, index }: { guess: Guess; index: number }) {
+// The latest guess is highlighted: it tells where to look next.
+function GuessRow({ guess, index, latest }: { guess: Guess; index: number; latest: boolean }) {
   const { t, i18n } = useTranslation()
   const name = (guess.iso && getCountryName(guess.iso, i18n.language)) || guess.value
   const color = guess.isCorrect ? colors.accent : colors.danger
   return (
-    <Animated.View entering={FadeInDown.springify().damping(18)} layout={LinearTransition.springify()} style={styles.guess}>
+    <Animated.View
+      entering={FadeInDown.springify().damping(18)}
+      layout={LinearTransition.springify()}
+      style={[styles.guess, latest && !guess.isCorrect && styles.guessLatest]}>
       <Text variant="caption" style={{ width: 22 }}>
         {index + 1}
       </Text>
@@ -77,11 +56,11 @@ function GuessRow({ guess, index }: { guess: Guess; index: number }) {
       {!guess.isCorrect && guess.distanceKm != null && (
         <View style={styles.hint}>
           {guess.directionArrow && (
-            <Text variant="bodyStrong" color={ACCENT}>
+            <Text variant="bodyStrong" color={ACCENT} style={latest && { fontSize: 22, lineHeight: 26 }}>
               {guess.directionArrow}
             </Text>
           )}
-          <Text variant="caption" style={{ fontVariant: ['tabular-nums'] }}>
+          <Text variant={latest ? 'bodyStrong' : 'caption'} style={{ fontVariant: ['tabular-nums'] }}>
             {guess.distanceKm.toLocaleString(i18n.language)} km
             {guess.direction ? ` · ${t(`mobile.directions.${guess.direction}`)}` : ''}
           </Text>
@@ -124,7 +103,6 @@ export default function BorderGuessScreen() {
   const { height: windowHeight } = useWindowDimensions()
   const keyboardVisible = useKeyboardVisible()
   const mapHeight = Math.max(150, Math.round(windowHeight * (keyboardVisible ? 0.22 : 0.32)))
-  const lastGuess: Guess | undefined = guesses[guesses.length - 1]
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
@@ -156,12 +134,10 @@ export default function BorderGuessScreen() {
                 <CountrySilhouette
                   country={currentCountry}
                   color={ACCENT}
-                  bottomInset={!isComplete && lastGuess && !lastGuess.isCorrect ? 52 : 0}
                   style={{ flex: 1 }}
                 />
               </Animated.View>
             ) : null}
-            {!isComplete && lastGuess && <LastHint guess={lastGuess} />}
           </Animated.View>
 
           {isComplete && !isDaily && (
@@ -189,7 +165,7 @@ export default function BorderGuessScreen() {
               [...guesses]
                 .map((guess: Guess, index: number) => ({ guess, index }))
                 .reverse()
-                .map(({ guess, index }) => <GuessRow key={`${guess.value}-${index}`} guess={guess} index={index} />)
+                .map(({ guess, index }) => <GuessRow key={`${guess.value}-${index}`} guess={guess} index={index} latest={index === guesses.length - 1} />)
             )}
           </View>
         </ScrollView>
@@ -278,21 +254,6 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     backgroundColor: 'rgba(11,16,32,0.8)',
   },
-  lastHint: {
-    position: 'absolute',
-    left: space.sm,
-    right: space.sm,
-    bottom: space.sm,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space.md,
-    paddingHorizontal: space.md,
-    paddingVertical: space.sm,
-    borderRadius: radius.md,
-    backgroundColor: 'rgba(11,16,32,0.88)',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
   start: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: space.lg, padding: space.xl },
   result: {
     alignItems: 'center',
@@ -314,5 +275,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
+  guessLatest: { borderColor: ACCENT, backgroundColor: `${ACCENT}14` },
   hint: { flexDirection: 'row', alignItems: 'center', gap: 6 },
 })

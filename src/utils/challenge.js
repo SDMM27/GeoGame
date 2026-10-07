@@ -1,7 +1,7 @@
 // Liens de défi pour les jeux journaliers : un joueur partage son score du jour
 // via une URL, l'ami qui l'ouvre joue le même daily et voit la comparaison.
 
-const LOWER_IS_BETTER = new Set(['BORDER_GUESS', 'COUNTRY_CLUE'])
+const LOWER_IS_BETTER = new Set(['BORDER_GUESS', 'COUNTRY_CLUE', 'QUIZ'])
 const VALID_MODES = new Set(['daily', 'infinite'])
 const DAY_PATTERN = /^\d{4}-\d{2}-\d{2}$/
 

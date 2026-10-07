@@ -1,7 +1,7 @@
 .mp-border-guess {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 56px);
+    height: 100%;
     background: var(--bg-dark, #0f172a);
     color: #f1f5f9;
 }

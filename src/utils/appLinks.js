@@ -1,8 +1,8 @@
 // Adresse de l'app web (projet Vercel séparé, dossier mobile/). Surchargée par VITE_APP_URL.
 export const APP_URL = import.meta.env.VITE_APP_URL || 'https://geogame-app.vercel.app'
-// APK Android publié en asset de la dernière release GitHub. Surchargé par VITE_APK_URL.
+// APK Android publié en asset de la dernière release du dépôt public GeoGame-releases (le code reste privé). Surchargé par VITE_APK_URL.
 export const APK_URL =
-  import.meta.env.VITE_APK_URL || 'https://github.com/SDMM27/GeoGame/releases/latest/download/geogame.apk'
+  import.meta.env.VITE_APK_URL || 'https://github.com/SDMM27/GeoGame-releases/releases/latest/download/geogame.apk'
 
 const REDIRECT_DONE_KEY = 'app_redirect_done'
 // Navigateurs iOS autres que Safari et navigateurs intégrés (Instagram, Facebook…) :

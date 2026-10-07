@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { Pressable, StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
+import { SITE_ORIGIN } from '@/links'
 import { colors, radius, space } from '@/theme'
 import { Text } from './ui'
 
@@ -75,6 +76,12 @@ export function InstallHint() {
           <Text style={{ flex: 1 }}>{t(`mobile.install.${step.key}`)}</Text>
         </View>
       ))}
+      {/* The website only sends iPhone visitors here once, so going back is for good. */}
+      <Pressable onPress={() => window.location.assign(SITE_ORIGIN)} hitSlop={8} style={styles.siteLink} accessibilityRole="link">
+        <Text variant="caption" style={{ textDecorationLine: 'underline' }}>
+          {t('mobile.install.back_to_site')}
+        </Text>
+      </Pressable>
     </View>
   )
 }
@@ -93,6 +100,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
   },
+  siteLink: { alignSelf: 'center', marginTop: space.sm },
   header: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   step: { flexDirection: 'row', alignItems: 'center', gap: space.md, marginTop: space.xs },
   badge: {

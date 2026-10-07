@@ -1,12 +1,7 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { APK_URL, APP_URL } from '../utils/appLinks'
 import './AppBanner.css'
-
-// Adresse de l'app web (projet Vercel séparé, dossier mobile/). Surchargée par VITE_APP_URL.
-export const APP_URL = import.meta.env.VITE_APP_URL || 'https://geogame-app.vercel.app'
-// APK Android publié en asset de la dernière release GitHub. Surchargé par VITE_APK_URL.
-export const APK_URL =
-  import.meta.env.VITE_APK_URL || 'https://github.com/SDMM27/GeoGame/releases/latest/download/geogame.apk'
 
 const DISMISSED_KEY = 'app_banner_dismissed'
 

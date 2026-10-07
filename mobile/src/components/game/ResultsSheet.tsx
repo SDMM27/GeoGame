@@ -13,13 +13,12 @@ import { saveAscensionScore, saveDailyScore, saveScore } from '@shared/utils/sav
 import { generateShareText } from '@shared/utils/shareScore'
 
 import { useRecordGame, type GameRecord } from '@/account/history'
+import { SITE_ORIGIN } from '@/links'
 import { saveRankingScore } from '@/rankingScores'
 import { colors, fonts, radius, space } from '@/theme'
 import { Button, Text } from '../ui'
 
 const PSEUDO_KEY = 'geogame_pseudo'
-// Challenge links open the daily on the website.
-const SITE_ORIGIN = 'https://geogame.vercel.app'
 
 export type SaveConfig =
   | { kind: 'standard'; gameType: string; difficulty: string; elapsedTime: number; continent?: string | null }

@@ -409,7 +409,6 @@ export default function useBorderGuessState(mode, options = {}) {
     setGuesses([])
     setStatus('playing')
     setInputValue('')
-    toast.info(t('toasts.found_country', { name: getCountryName(nextCountry.properties.ISO_A2, i18n.language) || nextCountry.properties.ADMIN }), { containerId: 'topRightToast' })
   }
 
   const revealCountry = () => {

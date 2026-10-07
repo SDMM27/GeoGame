@@ -9,6 +9,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { LanguageButton } from '@/components/LanguageButton'
 import { Text, Touchable } from '@/components/ui'
 import { GAMES, type GameDefinition } from '@/games'
+import { startMultiGame } from '@/multiplayer/navigation'
 import { colors, radius, space } from '@/theme'
 
 const DAILY_GAMES = GAMES.filter((game) => game.kind === 'daily')
@@ -44,6 +45,15 @@ function DailyCard({ game, width }: { game: GameDefinition; width: number }) {
           style={styles.dailySecondary}>
           <MaterialCommunityIcons name="infinity" size={20} color={colors.text} />
         </Touchable>
+        {game.multi && (
+          <Touchable
+            accessibilityRole="button"
+            accessibilityLabel={t('mobile.multi.title')}
+            onPress={() => startMultiGame(game)}
+            style={styles.dailySecondary}>
+            <MaterialCommunityIcons name="account-group" size={20} color={colors.text} />
+          </Touchable>
+        )}
       </View>
     </View>
   )

@@ -22,6 +22,8 @@ import { Button, Text } from '@/components/ui'
 import { useElapsed } from '@/hooks/useElapsed'
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible'
 import { clean } from '@/i18n'
+import { RoomGate, RoomHudPill, Standings, type RoomPlay } from '@/multiplayer/RoomPlay'
+import { useRoomRounds, useRoundResult } from '@/multiplayer/useRoomRounds'
 import { navigate } from '@/shims/react-router-dom'
 import { colors, gameColors, radius, space } from '@/theme'
 
@@ -71,10 +73,16 @@ function GuessRow({ guess, index, latest }: { guess: Guess; index: number; lates
 }
 
 export default function BorderGuessScreen() {
+  const { mode = 'daily', room } = useLocalSearchParams<{ mode?: string; room?: string }>()
+  if (room) return <RoomGate code={room}>{(play) => <BorderGuessGame mode="daily" play={play} />}</RoomGate>
+  return <BorderGuessGame mode={mode} />
+}
+
+function BorderGuessGame({ mode, play }: { mode: string; play?: RoomPlay }) {
   const { t, i18n } = useTranslation()
   const insets = useSafeAreaInsets()
-  const { mode = 'daily' } = useLocalSearchParams<{ mode?: string }>()
-  const isDaily = mode === 'daily'
+  const isDaily = mode === 'daily' && !play
+  const rounds = useRoomRounds(play)
   const {
     currentCountry,
     currentCountryISO,
@@ -93,9 +101,15 @@ export default function BorderGuessScreen() {
     startGame,
     startedAt,
     elapsedTime,
-  } = useBorderGuessState(mode)
+  } = useBorderGuessState(mode, { overrideCountry: rounds.country })
+  useRoundResult(rounds, {
+    isCurrent: currentCountry === rounds.country,
+    isComplete,
+    isSolved,
+    wrongGuesses: (guesses as Guess[]).filter((guess) => !guess.isCorrect).length,
+  })
   const [leaderboardVersion, setLeaderboardVersion] = useState(0)
-  const elapsed = useElapsed(startedAt, isDaily && hasStarted && !isComplete)
+  const elapsed = useElapsed(play ? rounds.startedAt : startedAt, (isDaily && hasStarted && !isComplete) || (!!play && rounds.endedAt == null))
   const locked = isComplete || (isDaily && !hasStarted)
   const answer = getCountryName(currentCountryISO, i18n.language) || answerName
   const attemptsLabel = guesses.length === 1 ? t('units.attempt_one') : t('units.attempt_other')
@@ -113,7 +127,11 @@ export default function BorderGuessScreen() {
           <Animated.View layout={LinearTransition.duration(200)} style={[styles.mapCard, { height: mapHeight }]}>
             <View style={styles.modeTag}>
               <Text variant="label" color={ACCENT} style={{ fontSize: 10 }}>
-                {isDaily ? t('mobile.home.daily') : t('mobile.home.infinite')}
+                {play
+                  ? t('mobile.multi.round', { n: rounds.index + 1, total: rounds.total })
+                  : isDaily
+                    ? t('mobile.home.daily')
+                    : t('mobile.home.infinite')}
               </Text>
             </View>
             {isDaily && !hasStarted && !isComplete ? (
@@ -147,9 +165,9 @@ export default function BorderGuessScreen() {
                 {answer}
               </Text>
               <Button
-                label={clean(t('buttons.new_country'))}
+                label={play ? (rounds.isLast ? t('mobile.multi.see_results') : t('mobile.multi.next_country')) : clean(t('buttons.new_country'))}
                 color={ACCENT}
-                onPress={startNextInfiniteRound}
+                onPress={play ? rounds.next : startNextInfiniteRound}
                 icon={<MaterialCommunityIcons name="arrow-right" size={20} color={colors.onAccent} />}
                 style={{ alignSelf: 'stretch', marginTop: space.sm }}
               />
@@ -185,11 +203,29 @@ export default function BorderGuessScreen() {
         )}
       </KeyboardAvoidingView>
 
-      {!(isComplete && isDaily) && (
-        <GameTopBar confirmQuit={false}>
+      {!(isComplete && isDaily) && !rounds.showResults && (
+        <GameTopBar confirmQuit={!!play} onQuit={play?.exit}>
+          {play && <RoomHudPill code={play.room.id} />}
+          {play && <HudPill icon="timer-outline" label={formatTime(rounds.elapsedTime ?? elapsed).slice(0, 5)} />}
           {isDaily && hasStarted && <HudPill icon="timer-outline" label={formatTime(elapsedTime ?? elapsed).slice(0, 5)} />}
           <HudPill icon="target" label={`${guesses.length} ${attemptsLabel}`} color={ACCENT} />
         </GameTopBar>
+      )}
+
+      {play && rounds.showResults && (
+        <ResultsSheet
+          score={rounds.tally.solved}
+          scoreText={`${rounds.tally.solved}/${rounds.total}`}
+          scoreLabel={t('labels.countries_found')}
+          accent={ACCENT}
+          stats={[
+            { label: t('mobile.multi.errors_label'), value: String(rounds.tally.errors) },
+            { label: t('mobile.game.time'), value: formatTime(rounds.elapsedTime ?? 0).slice(0, 5) },
+          ]}
+          onHome={play.exit}
+          homeLabel={t('mobile.multi.back_to_room')}>
+          <Standings code={play.room.id} />
+        </ResultsSheet>
       )}
 
       {isComplete && isDaily && dailyKey && (

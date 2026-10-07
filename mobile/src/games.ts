@@ -19,6 +19,8 @@ export type GameDefinition = {
   route: string
   // 'setup': difficulty/continent/ascension sheet. 'daily': daily + infinite modes.
   kind: 'setup' | 'daily'
+  // Playable in a multiplayer room
+  multi: boolean
 }
 
 export const GAMES: GameDefinition[] = [
@@ -31,6 +33,7 @@ export const GAMES: GameDefinition[] = [
     color: gameColors.placement,
     route: '/game/placement',
     kind: 'setup',
+    multi: true,
   },
   {
     id: 'flags',
@@ -41,6 +44,7 @@ export const GAMES: GameDefinition[] = [
     color: gameColors.flags,
     route: '/game/flags',
     kind: 'setup',
+    multi: true,
   },
   {
     id: 'capitals',
@@ -51,6 +55,7 @@ export const GAMES: GameDefinition[] = [
     color: gameColors.capitals,
     route: '/game/capitals',
     kind: 'setup',
+    multi: true,
   },
   {
     id: 'border_guess',
@@ -61,6 +66,7 @@ export const GAMES: GameDefinition[] = [
     color: gameColors.border_guess,
     route: '/game/border-guess',
     kind: 'daily',
+    multi: true,
   },
   {
     id: 'country_clue',
@@ -71,6 +77,7 @@ export const GAMES: GameDefinition[] = [
     color: gameColors.country_clue,
     route: '/game/country-clue',
     kind: 'daily',
+    multi: true,
   },
   {
     id: 'voyage_voyage',
@@ -81,6 +88,7 @@ export const GAMES: GameDefinition[] = [
     color: gameColors.voyage_voyage,
     route: '/game/voyage',
     kind: 'daily',
+    multi: false,
   },
   {
     id: 'ranking',
@@ -91,6 +99,7 @@ export const GAMES: GameDefinition[] = [
     color: gameColors.ranking,
     route: '/game/ranking',
     kind: 'daily',
+    multi: false,
   },
   {
     id: 'quiz',
@@ -101,8 +110,11 @@ export const GAMES: GameDefinition[] = [
     color: gameColors.quiz,
     route: '/game/quiz',
     kind: 'daily',
+    multi: true,
   },
 ]
+
+export const MULTI_GAMES = GAMES.filter((game) => game.multi)
 
 export function getGame(id: string) {
   return GAMES.find((game) => game.id === id)

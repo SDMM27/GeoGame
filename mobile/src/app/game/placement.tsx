@@ -20,6 +20,7 @@ import { allCountries } from '@/components/map/geometry'
 import { Button, Text } from '@/components/ui'
 import { DIFFICULTY_COLORS } from '@/games'
 import { clean } from '@/i18n'
+import { RoomGate, RoomHudPill, Standings, useReportFound, type RoomPlay } from '@/multiplayer/RoomPlay'
 import { navigate } from '@/shims/react-router-dom'
 import { colors, gameColors, radius, space } from '@/theme'
 
@@ -30,7 +31,7 @@ const CONTINENT_VIEW: Record<string, { center: [number, number]; zoom: number }>
   Océanie: { center: [-10, 170], zoom: 3.5 },
 }
 
-type Params = { difficulty?: string; continent?: string; training?: string; ascension?: string; preset?: string }
+type Params = { difficulty?: string; continent?: string; training?: string; ascension?: string; preset?: string; room?: string }
 
 function formatDuration(ms: number) {
   const totalSeconds = Math.floor(ms / 1000)
@@ -52,12 +53,14 @@ function PlacementGame({
   continent,
   isTraining,
   ascension,
+  play,
 }: {
   state: GameState
   difficulty: string | null
   continent: string | null
   isTraining: boolean
   ascension: { presetName: string | null } | null
+  play?: RoomPlay
 }) {
   const { t, i18n } = useTranslation()
   const insets = useSafeAreaInsets()
@@ -82,6 +85,11 @@ function PlacementGame({
     if (mapRef.current) attachMap(state, mapRef.current)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useReportFound(play, stats.found)
+  useEffect(() => {
+    if (isGameOver) play?.finish({ weightedScore: score, countriesSolved: stats.found, attempts: stats.totalErrors ?? 0, elapsedTime: timer })
+  }, [isGameOver, play, score, stats, timer])
 
   // Frame the continent once the map is ready
   useEffect(() => {
@@ -111,7 +119,8 @@ function PlacementGame({
       <WorldMap ref={mapRef} onCountryPress={(layer) => onCountryClick({ target: layer })} />
 
       {!isGameOver && (
-        <GameTopBar>
+        <GameTopBar onQuit={play?.exit}>
+          {play && <RoomHudPill code={play.room.id} />}
           <HudPill icon="timer-outline" label={displayTimer} />
           {!isTraining && <HudPill icon="star-four-points-outline" label={String(score)} color={colors.accent} />}
         </GameTopBar>
@@ -168,7 +177,7 @@ function PlacementGame({
             { label: clean(t('stats.first_try')), value: String(stats.foundFirstTry ?? 0) },
           ]}
           save={
-            isTraining
+            isTraining || play
               ? null
               : ascension
                 ? ascension.presetName
@@ -176,14 +185,20 @@ function PlacementGame({
                   : null
                 : { kind: 'standard', gameType: 'PLACEMENT', difficulty: (difficulty ?? continent)!, elapsedTime: timer, continent }
           }
-          share={{
-            gameType: 'PLACEMENT',
-            difficulty: difficulty ?? continent ?? ascension?.presetName,
-            details: t('share.details_placement_timer', { found: stats.found, total: stats.total, time: formatDuration(timer) }),
-          }}
-          onReplay={restartGame}
-          onHome={() => navigate('/')}
-        />
+          share={
+            play
+              ? null
+              : {
+                  gameType: 'PLACEMENT',
+                  difficulty: difficulty ?? continent ?? ascension?.presetName,
+                  details: t('share.details_placement_timer', { found: stats.found, total: stats.total, time: formatDuration(timer) }),
+                }
+          }
+          onReplay={play ? undefined : restartGame}
+          onHome={play?.exit ?? (() => navigate('/'))}
+          homeLabel={play ? t('mobile.multi.back_to_room') : undefined}>
+          {play && <Standings code={play.room.id} />}
+        </ResultsSheet>
       )}
     </View>
   )
@@ -199,9 +214,31 @@ function AscensionGame({ phases, presetName, isTraining }: { phases: Record<stri
   return <PlacementGame state={state} difficulty={null} continent={null} isTraining={isTraining} ascension={{ presetName }} />
 }
 
+function RoomGame({ play }: { play: RoomPlay }) {
+  const { game } = play.room
+  const { list, byDifficulty } = play.content
+  return byDifficulty ? (
+    <RoomAscensionGame play={play} phases={game.phases!} byDifficulty={byDifficulty} />
+  ) : (
+    <RoomStandardGame play={play} list={list!} />
+  )
+}
+
+function RoomStandardGame({ play, list }: { play: RoomPlay; list: unknown[] }) {
+  const { difficulty = null, continent = null } = play.room.game
+  const state = useGameState(difficulty, false, list, null, null, continent)
+  return <PlacementGame state={state} difficulty={difficulty} continent={continent} isTraining={false} ascension={null} play={play} />
+}
+
+function RoomAscensionGame({ play, phases, byDifficulty }: { play: RoomPlay; phases: Record<string, number>; byDifficulty: Record<string, unknown[]> }) {
+  const state = useAscensionState(GAME_TYPES.PLACEMENT, phases, false, true, byDifficulty)
+  return <PlacementGame state={state} difficulty={null} continent={null} isTraining={false} ascension={{ presetName: null }} play={play} />
+}
+
 export default function PlacementScreen() {
   const params = useLocalSearchParams<Params>()
   const isTraining = params.training === '1'
+  if (params.room) return <RoomGate code={params.room}>{(play) => <RoomGame play={play} />}</RoomGate>
   if (params.ascension) {
     return <AscensionGame phases={JSON.parse(params.ascension)} presetName={params.preset ?? null} isTraining={isTraining} />
   }

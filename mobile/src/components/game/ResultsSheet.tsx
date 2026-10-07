@@ -57,6 +57,7 @@ type Props = {
   share?: ShareConfig | null
   onReplay?: () => void
   onHome: () => void
+  homeLabel?: string
   onSaved?: () => void
   children?: React.ReactNode
 }
@@ -72,7 +73,7 @@ const dailySavedKey = (save: SaveConfig | null | undefined) =>
       ? `ranking-saved:${save.dailyKey}`
       : null
 
-export function ResultsSheet({ title, score, scoreText, scoreLabel, accent = colors.accent, stats, save, share, onReplay, onHome, onSaved, children }: Props) {
+export function ResultsSheet({ title, score, scoreText, scoreLabel, accent = colors.accent, stats, save, share, onReplay, onHome, homeLabel, onSaved, children }: Props) {
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   const [pseudo, setPseudo] = useState(() => globalThis.localStorage?.getItem(PSEUDO_KEY) ?? '')
@@ -246,7 +247,7 @@ export function ResultsSheet({ title, score, scoreText, scoreLabel, accent = col
                 />
               )}
             </View>
-            <Button label={t('mobile.game.home')} variant="ghost" onPress={onHome} />
+            <Button label={homeLabel ?? t('mobile.game.home')} variant="ghost" onPress={onHome} />
           </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>

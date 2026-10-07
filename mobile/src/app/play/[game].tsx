@@ -61,7 +61,7 @@ function Stepper({ value, max, onChange, color }: { value: number; max: number; 
 export default function GameSetupSheet() {
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
-  const { game: gameId } = useLocalSearchParams<{ game: string }>()
+  const { game: gameId, multi } = useLocalSearchParams<{ game: string; multi?: string }>()
   const game = getGame(gameId)!
   const counts = countFunctions(gameId)
 
@@ -92,6 +92,17 @@ export default function GameSetupSheet() {
   }
 
   const canPlay = mode === 'ascension' ? ascensionTotal > 0 : selection === 'difficulty' || !!continent
+
+  // Same choices, played in a multiplayer room
+  const startMulti = () => {
+    const config =
+      mode === 'ascension'
+        ? { phases, presetName }
+        : selection === 'continent' && continent
+          ? { continent }
+          : { difficulty }
+    router.replace({ pathname: '/multi/create', params: { game: game.id, config: JSON.stringify(config) } })
+  }
 
   return (
     <View style={{ flex: 1 }}>
@@ -223,20 +234,41 @@ export default function GameSetupSheet() {
       </ScrollView>
 
       <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, space.lg) }]}>
-        <Button
-          label={t('mobile.setup.training')}
-          variant="secondary"
-          onPress={() => start(true)}
-          disabled={mode === 'standard' && selection === 'continent' && !continent}
-          style={{ flex: 1 }}
-        />
-        <Button
-          label={t('mobile.setup.play')}
-          onPress={() => start(false)}
-          disabled={!canPlay}
-          style={{ flex: 1.4 }}
-          icon={<MaterialCommunityIcons name="play" size={20} color={colors.onAccent} />}
-        />
+        {multi === '1' ? (
+          <Button
+            label={t('mobile.multi.continue')}
+            onPress={startMulti}
+            disabled={!canPlay}
+            color={game.color}
+            style={{ flex: 1 }}
+            icon={<MaterialCommunityIcons name="account-group" size={20} color={colors.onAccent} />}
+          />
+        ) : (
+          <>
+            <Touchable
+              accessibilityRole="button"
+              accessibilityLabel={t('mobile.multi.title')}
+              onPress={startMulti}
+              disabled={!canPlay}
+              style={[styles.multiButton, !canPlay && { opacity: 0.4 }]}>
+              <MaterialCommunityIcons name="account-group" size={22} color={colors.text} />
+            </Touchable>
+            <Button
+              label={t('mobile.setup.training')}
+              variant="secondary"
+              onPress={() => start(true)}
+              disabled={mode === 'standard' && selection === 'continent' && !continent}
+              style={{ flex: 1 }}
+            />
+            <Button
+              label={t('mobile.setup.play')}
+              onPress={() => start(false)}
+              disabled={!canPlay}
+              style={{ flex: 1.4 }}
+              icon={<MaterialCommunityIcons name="play" size={20} color={colors.onAccent} />}
+            />
+          </>
+        )}
       </View>
     </View>
   )
@@ -283,6 +315,15 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: radius.sm,
     backgroundColor: colors.surfaceHigh,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  multiButton: {
+    width: 52,
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceHigh,
+    borderWidth: 1,
+    borderColor: colors.border,
     alignItems: 'center',
     justifyContent: 'center',
   },

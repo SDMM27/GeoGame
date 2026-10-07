@@ -4,7 +4,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { Image } from 'expo-image'
 import { useEffect, useEffectEvent, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, View } from 'react-native'
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, View, useWindowDimensions } from 'react-native'
 import Animated, { FadeIn, FadeInDown, ZoomIn } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -14,8 +14,10 @@ import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
 import { ResultsSheet, type SaveConfig } from '@/components/game/ResultsSheet'
 import { Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
+import { useKeyboardHeight } from '@/hooks/useKeyboardVisible'
 import { DIFFICULTY_COLORS } from '@/games'
 import { clean } from '@/i18n'
+import { RoomHudPill, Standings, useReportFound, type RoomPlay } from '@/multiplayer/RoomPlay'
 import { navigate } from '@/shims/react-router-dom'
 import { colors, fonts, radius, space } from '@/theme'
 
@@ -50,6 +52,7 @@ export function TypingGame({
   continent,
   isTraining,
   ascension,
+  play,
 }: {
   config: TypingGameConfig
   state: GameState
@@ -57,6 +60,7 @@ export function TypingGame({
   continent: string | null
   isTraining: boolean
   ascension: { presetName: string | null } | null
+  play?: RoomPlay
 }) {
   const { t, i18n } = useTranslation()
   const insets = useSafeAreaInsets()
@@ -93,6 +97,11 @@ export function TypingGame({
     if (shouldAutoSubmit) autoSubmit()
   }, [shouldAutoSubmit])
 
+  useReportFound(play, stats.found)
+  useEffect(() => {
+    if (isGameOver) play?.finish({ weightedScore: score, countriesSolved: stats.found, attempts: stats.totalErrors ?? 0, elapsedTime: timer })
+  }, [isGameOver, play, score, stats, timer])
+
   // Keep the keyboard up from one country to the next
   useEffect(() => {
     if (targetCountry && !revealedName && !isGameOver) inputRef.current?.focus()
@@ -105,8 +114,38 @@ export function TypingGame({
   const remaining = stats.total - stats.found - stats.skipped
   const phaseColor = currentPhase ? DIFFICULTY_COLORS[currentPhase] : null
   const locked = !!revealedName || isGameOver
+  // While typing, everything must fit between the top bar and the keyboard: tighter spacing,
+  // and the flag takes whatever height is left.
+  const keyboardHeight = useKeyboardHeight()
+  const { height: windowHeight } = useWindowDimensions()
+  const typing = keyboardHeight > 0
+  const gap = typing ? space.md : space.xl
+  const paddingTop = insets.top + 42 + (typing ? space.sm : space.lg)
+  const inputBarHeight = 52 + space.md + Math.max(insets.bottom, space.md)
+  const otherBlocks =
+    (currentPhase ? 16 + gap : 0) + // phase row
+    30 + gap + // progress
+    (config.clue ? 56 : 16) + gap + // question (+ country name)
+    (revealedName ? 40 + gap : 0) // revealed answer
+  const flagHeight = Math.min(
+    280,
+    Math.max(60, windowHeight - keyboardHeight - inputBarHeight - paddingTop - space.md - otherBlocks)
+  )
 
-  const save: SaveConfig | null = isTraining
+  const question = (
+    <View style={{ alignItems: 'center', gap: space.xs }}>
+      <Text variant="label">{t(config.promptKey)}</Text>
+      {config.clue && targetCountry && (
+        <Animated.View key={targetCountryISO} entering={FadeIn.duration(220)}>
+          <Text variant="title" numberOfLines={2} adjustsFontSizeToFit style={{ textAlign: 'center' }}>
+            {config.clue(targetCountry, i18n.language)}
+          </Text>
+        </Animated.View>
+      )}
+    </View>
+  )
+
+  const save: SaveConfig | null = isTraining || play
     ? null
     : ascension
       ? ascension.presetName
@@ -119,7 +158,7 @@ export function TypingGame({
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <ScrollView
           keyboardShouldPersistTaps="always"
-          contentContainerStyle={[styles.content, { paddingTop: insets.top + 42 + space.lg }]}>
+          contentContainerStyle={[styles.content, { paddingTop, gap }, typing && { paddingBottom: space.md }]}>
           {currentPhase && (
             <View style={styles.row}>
               <Text variant="label" color={phaseColor ?? colors.textMuted}>
@@ -140,8 +179,14 @@ export function TypingGame({
             </Text>
           </View>
 
+          {/* Capitals: the country name comes first, the keyboard would hide it under the flag */}
+          {config.clue && question}
+
           {targetCountry && (
-            <Animated.View key={targetCountryISO ?? targetCountry.properties.ADMIN} entering={ZoomIn.springify().damping(16)} style={styles.flagCard}>
+            <Animated.View
+              key={targetCountryISO ?? targetCountry.properties.ADMIN}
+              entering={ZoomIn.springify().damping(16)}
+              style={[styles.flagCard, typing && { width: flagHeight * 1.5, height: flagHeight, padding: space.sm }]}>
               {flag ? (
                 <Image source={flag} contentFit="contain" style={styles.flag} accessibilityLabel={t(config.promptKey)} />
               ) : (
@@ -150,16 +195,7 @@ export function TypingGame({
             </Animated.View>
           )}
 
-          <View style={{ alignItems: 'center', gap: space.xs }}>
-            <Text variant="label">{t(config.promptKey)}</Text>
-            {config.clue && targetCountry && (
-              <Animated.View key={targetCountryISO} entering={FadeIn.duration(220)}>
-                <Text variant="title" numberOfLines={2} adjustsFontSizeToFit style={{ textAlign: 'center' }}>
-                  {config.clue(targetCountry, i18n.language)}
-                </Text>
-              </Animated.View>
-            )}
-          </View>
+          {!config.clue && question}
 
           {revealedName && targetCountry && (
             <Animated.View entering={FadeInDown.springify().damping(18)} style={styles.reveal}>
@@ -210,7 +246,8 @@ export function TypingGame({
       </KeyboardAvoidingView>
 
       {!isGameOver && (
-        <GameTopBar>
+        <GameTopBar onQuit={play?.exit}>
+          {play && <RoomHudPill code={play.room.id} />}
           <HudPill icon="timer-outline" label={displayTimer} />
           {!isTraining && <HudPill icon="star-four-points-outline" label={String(score)} color={colors.accent} />}
         </GameTopBar>
@@ -226,14 +263,20 @@ export function TypingGame({
             { label: clean(t('stats.first_try')), value: String(stats.foundFirstTry ?? 0) },
           ]}
           save={save}
-          share={{
-            gameType: config.scoreGameType,
-            difficulty: difficulty ?? continent ?? ascension?.presetName,
-            details: t(config.shareDetailsKey, { found: stats.found, total: stats.total, time: formatDuration(timer) }),
-          }}
-          onReplay={restartGame}
-          onHome={() => navigate('/')}
-        />
+          share={
+            play
+              ? null
+              : {
+                  gameType: config.scoreGameType,
+                  difficulty: difficulty ?? continent ?? ascension?.presetName,
+                  details: t(config.shareDetailsKey, { found: stats.found, total: stats.total, time: formatDuration(timer) }),
+                }
+          }
+          onReplay={play ? undefined : restartGame}
+          onHome={play?.exit ?? (() => navigate('/'))}
+          homeLabel={play ? t('mobile.multi.back_to_room') : undefined}>
+          {play && <Standings code={play.room.id} />}
+        </ResultsSheet>
       )}
     </View>
   )

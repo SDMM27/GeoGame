@@ -1,6 +1,7 @@
 // src/hooks/useQuizState.js
 import { useCallback, useRef, useState } from 'react'
 import { ANSWER_MODES, CHOICE_HINTS, checkFreeAnswer, generateQuestion, getQuizPoints, MAX_HINTS } from '../utils/quizQuestions'
+import { mulberry32 } from '../utils/prng'
 
 const EMPTY_STATS = { answered: 0, correct: 0, score: 0, streak: 0, bestStreak: 0, hints: 0 }
 
@@ -13,7 +14,10 @@ function shuffled(items) {
   return a
 }
 
-export default function useQuizState() {
+/**
+ * `seed` (multijoueur) : tous les joueurs tirent la même suite de questions.
+ */
+export default function useQuizState({ seed = null } = {}) {
   const [maxDifficulty, setMaxDifficulty] = useState(null)
   const [answerMode, setAnswerMode] = useState(ANSWER_MODES.CHOICES)
   const [question, setQuestion] = useState(null)
@@ -26,9 +30,10 @@ export default function useQuizState() {
   const [eliminationOrder, setEliminationOrder] = useState([])
   const [isFinished, setIsFinished] = useState(false)
   const usedKeysRef = useRef(new Set())
+  const randomRef = useRef(Math.random)
 
   const drawQuestion = useCallback((difficulty, mode) => {
-    const next = generateQuestion(difficulty, usedKeysRef.current, Math.random, mode)
+    const next = generateQuestion(difficulty, usedKeysRef.current, randomRef.current, mode)
     next?.usedKeys.forEach((k) => usedKeysRef.current.add(k))
     setQuestion(next)
     setSelectedId(null)
@@ -39,12 +44,13 @@ export default function useQuizState() {
 
   const start = useCallback((difficulty, mode = answerMode) => {
     usedKeysRef.current = new Set()
+    randomRef.current = seed == null ? Math.random : mulberry32(seed)
     setMaxDifficulty(difficulty)
     setAnswerMode(mode)
     setStats(EMPTY_STATS)
     setIsFinished(false)
     drawQuestion(difficulty, mode)
-  }, [answerMode, drawQuestion])
+  }, [answerMode, drawQuestion, seed])
 
   const isAnswered = Boolean(selectedId || freeResult)
   const isCorrect = answerMode === ANSWER_MODES.FREE

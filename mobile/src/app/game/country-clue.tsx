@@ -23,6 +23,8 @@ import { Button, Text } from '@/components/ui'
 import { getFlag } from '@/flags'
 import { useElapsed } from '@/hooks/useElapsed'
 import { clean } from '@/i18n'
+import { RoomGate, RoomHudPill, Standings, type RoomPlay } from '@/multiplayer/RoomPlay'
+import { useRoomRounds, useRoundResult } from '@/multiplayer/useRoomRounds'
 import { navigate } from '@/shims/react-router-dom'
 import { colors, gameColors, radius, space } from '@/theme'
 
@@ -148,10 +150,16 @@ function AnswerCard({ iso, name, capital, solved }: { iso: string | null; name: 
 }
 
 export default function CountryClueScreen() {
+  const { mode = 'daily', room } = useLocalSearchParams<{ mode?: string; room?: string }>()
+  if (room) return <RoomGate code={room}>{(play) => <CountryClueGame mode="daily" play={play} />}</RoomGate>
+  return <CountryClueGame mode={mode} />
+}
+
+function CountryClueGame({ mode, play }: { mode: string; play?: RoomPlay }) {
   const { t, i18n } = useTranslation()
   const insets = useSafeAreaInsets()
-  const { mode = 'daily' } = useLocalSearchParams<{ mode?: string }>()
-  const isDaily = mode === 'daily'
+  const isDaily = mode === 'daily' && !play
+  const rounds = useRoomRounds(play)
   const {
     inputValue,
     setInputValue,
@@ -171,10 +179,19 @@ export default function CountryClueScreen() {
     startGame,
     startedAt,
     elapsedTime,
-  } = useCountryClueState(mode)
+  } = useCountryClueState(mode, { overrideCountry: rounds.country })
+  useRoundResult(rounds, {
+    isCurrent: !!rounds.country && currentCountryISO === rounds.country.properties.ISO_A2,
+    isComplete,
+    isSolved,
+    wrongGuesses: (guesses as Guess[]).filter((guess) => !guess.isCorrect).length,
+  })
   const [leaderboardVersion, setLeaderboardVersion] = useState(0)
 
-  const elapsed = useElapsed(startedAt ?? null, isDaily && hasStarted && !isComplete)
+  const elapsed = useElapsed(
+    play ? rounds.startedAt : (startedAt ?? null),
+    (isDaily && hasStarted && !isComplete) || (!!play && rounds.endedAt == null)
+  )
   const locked = isComplete || (isDaily && !hasStarted)
   const answer = getCountryName(currentCountryISO, i18n.language) || answerName
   const capital = getCapitalName(currentCountryISO, i18n.language) || answerCapital
@@ -198,7 +215,12 @@ export default function CountryClueScreen() {
           contentContainerStyle={[styles.content, { paddingTop: insets.top + 42 + space.md }]}>
           <View style={{ gap: space.xs }}>
             <Text variant="label" color={ACCENT}>
-              {isDaily ? t('mobile.home.daily') : t('mobile.home.infinite')} · {t('games.country_clue.title')}
+              {play
+                ? t('mobile.multi.round', { n: rounds.index + 1, total: rounds.total })
+                : isDaily
+                  ? t('mobile.home.daily')
+                  : t('mobile.home.infinite')}{' '}
+              · {t('games.country_clue.title')}
             </Text>
             {guesses.length === 0 && !isComplete && <Text variant="caption">{t('country_clue.intro_text')}</Text>}
           </View>
@@ -219,9 +241,9 @@ export default function CountryClueScreen() {
             <Animated.View entering={FadeIn.duration(220)} style={{ gap: space.md }}>
               {recap}
               <Button
-                label={clean(t('buttons.new_country'))}
+                label={play ? (rounds.isLast ? t('mobile.multi.see_results') : t('mobile.multi.next_country')) : clean(t('buttons.new_country'))}
                 color={ACCENT}
-                onPress={startNextInfiniteRound}
+                onPress={play ? rounds.next : startNextInfiniteRound}
                 icon={<MaterialCommunityIcons name="arrow-right" size={20} color={colors.onAccent} />}
               />
             </Animated.View>
@@ -256,11 +278,29 @@ export default function CountryClueScreen() {
         )}
       </KeyboardAvoidingView>
 
-      {!(isComplete && isDaily) && (
-        <GameTopBar confirmQuit={false}>
+      {!(isComplete && isDaily) && !rounds.showResults && (
+        <GameTopBar confirmQuit={!!play} onQuit={play?.exit}>
+          {play && <RoomHudPill code={play.room.id} />}
+          {play && <HudPill icon="timer-outline" label={formatTime(rounds.elapsedTime ?? elapsed).slice(0, 5)} />}
           {isDaily && hasStarted && <HudPill icon="timer-outline" label={formatTime(elapsedTime ?? elapsed).slice(0, 5)} />}
           <HudPill icon="target" label={`${guesses.length} ${attemptsLabel}`} color={ACCENT} />
         </GameTopBar>
+      )}
+
+      {play && rounds.showResults && (
+        <ResultsSheet
+          score={rounds.tally.solved}
+          scoreText={`${rounds.tally.solved}/${rounds.total}`}
+          scoreLabel={t('labels.countries_found')}
+          accent={ACCENT}
+          stats={[
+            { label: t('mobile.multi.errors_label'), value: String(rounds.tally.errors) },
+            { label: t('mobile.game.time'), value: formatTime(rounds.elapsedTime ?? 0).slice(0, 5) },
+          ]}
+          onHome={play.exit}
+          homeLabel={t('mobile.multi.back_to_room')}>
+          <Standings code={play.room.id} />
+        </ResultsSheet>
       )}
 
       {isComplete && isDaily && dailyKey && (

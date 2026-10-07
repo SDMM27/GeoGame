@@ -22,6 +22,7 @@ import { Button, Segmented, Text, Touchable } from '@/components/ui'
 import { DIFFICULTY_COLORS } from '@/games'
 import { useElapsed } from '@/hooks/useElapsed'
 import { clean } from '@/i18n'
+import { RoomGate, RoomHudPill, Standings, useReportFound, type RoomPlay } from '@/multiplayer/RoomPlay'
 import { navigate } from '@/shims/react-router-dom'
 import { colors, fonts, gameColors, radius, space } from '@/theme'
 
@@ -369,7 +370,8 @@ function DifficultyPicker({ onPick }: { onPick: (difficulty: string, mode: Answe
   )
 }
 
-function PracticeQuiz() {
+// In a room (`play`): the room's difficulty and answer mode, the same questions for everyone, a fixed number of them.
+function PracticeQuiz({ play }: { play?: RoomPlay }) {
   const { t, i18n } = useTranslation()
   const insets = useSafeAreaInsets()
   const {
@@ -394,8 +396,27 @@ function PracticeQuiz() {
     next,
     quit,
     backToDifficulty,
-  } = useQuizState()
+  } = useQuizState({ seed: play?.room.seed })
   const isFree = answerMode === ANSWER_MODES.FREE
+  const [startedAt] = useState(() => Date.now())
+  const questionCount = play?.content.total ?? 0
+  const isLastQuestion = !!play && stats.answered >= questionCount
+
+  useEffect(() => {
+    if (play) start(play.room.game.quizDifficulty, play.room.game.answerMode)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useReportFound(play, stats.answered)
+  useEffect(() => {
+    if (isFinished)
+      play?.finish({
+        weightedScore: stats.score,
+        countriesSolved: stats.correct,
+        attempts: stats.answered - stats.correct,
+        elapsedTime: Date.now() - startedAt,
+      })
+  }, [isFinished, play, stats, startedAt])
   const [input, setInput] = useState('')
   const inputRef = useRef<TextInput>(null)
   const scrollRef = useRef<ScrollView>(null)
@@ -437,10 +458,13 @@ function PracticeQuiz() {
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={[styles.content, { paddingTop: insets.top + 42 + space.md, paddingBottom: insets.bottom + space.xl }]}>
           <Text variant="label" color={ACCENT}>
-            {t('mobile.home.infinite')} · {t('games.quiz.title')}
+            {play
+              ? t('mobile.multi.question', { n: Math.min(stats.answered + (isAnswered ? 0 : 1), questionCount), total: questionCount })
+              : t('mobile.home.infinite')}{' '}
+            · {t('games.quiz.title')}
           </Text>
 
-          {!maxDifficulty && <DifficultyPicker onPick={(difficulty, mode) => start(difficulty, mode)} />}
+          {!maxDifficulty && !play && <DifficultyPicker onPick={(difficulty, mode) => start(difficulty, mode)} />}
 
           {maxDifficulty && !isFinished && localized && current && (
             <View style={styles.card}>
@@ -554,11 +578,11 @@ function PracticeQuiz() {
               )}
 
               <View style={styles.actions}>
-                <Button label={t('quiz.quit')} variant="secondary" onPress={quit} style={{ flex: 1 }} />
+                {!play && <Button label={t('quiz.quit')} variant="secondary" onPress={quit} style={{ flex: 1 }} />}
                 <Button
-                  label={t('mobile.quiz.next')}
+                  label={isLastQuestion ? t('mobile.multi.see_results') : t('mobile.quiz.next')}
                   color={ACCENT}
-                  onPress={next}
+                  onPress={isLastQuestion ? quit : next}
                   disabled={!isAnswered}
                   icon={<MaterialCommunityIcons name="arrow-right" size={20} color={colors.onAccent} />}
                   style={{ flex: 1.4 }}
@@ -570,9 +594,10 @@ function PracticeQuiz() {
       </KeyboardAvoidingView>
 
       {!isFinished && (
-        <GameTopBar confirmQuit={stats.answered > 0} onQuit={() => navigate('/')}>
+        <GameTopBar confirmQuit={stats.answered > 0} onQuit={play?.exit ?? (() => navigate('/'))}>
           {maxDifficulty && (
             <>
+              {play && <RoomHudPill code={play.room.id} />}
               <HudPill icon="star-outline" label={`${stats.score}`} color={ACCENT} />
               <HudPill icon="check" label={`${stats.correct}/${stats.answered}`} />
               <HudPill icon="fire" label={`${stats.streak}`} color={stats.streak >= 3 ? colors.warning : colors.text} />
@@ -592,7 +617,7 @@ function PracticeQuiz() {
             { label: t('quiz.best_streak'), value: `${stats.bestStreak}` },
           ]}
           share={
-            stats.answered > 0
+            stats.answered > 0 && !play
               ? {
                   gameType: GAME_TYPES.QUIZ,
                   difficulty: maxDifficulty,
@@ -601,9 +626,14 @@ function PracticeQuiz() {
                 }
               : null
           }
-          onReplay={() => start(maxDifficulty, answerMode)}
-          onHome={() => navigate('/')}>
-          <Button label={t('quiz.change_difficulty')} variant="secondary" onPress={backToDifficulty} />
+          onReplay={play ? undefined : () => start(maxDifficulty, answerMode)}
+          onHome={play?.exit ?? (() => navigate('/'))}
+          homeLabel={play ? t('mobile.multi.back_to_room') : undefined}>
+          {play ? (
+            <Standings code={play.room.id} />
+          ) : (
+            <Button label={t('quiz.change_difficulty')} variant="secondary" onPress={backToDifficulty} />
+          )}
         </ResultsSheet>
       )}
     </View>
@@ -611,7 +641,8 @@ function PracticeQuiz() {
 }
 
 export default function QuizScreen() {
-  const { mode = 'daily' } = useLocalSearchParams<{ mode?: string }>()
+  const { mode = 'daily', room } = useLocalSearchParams<{ mode?: string; room?: string }>()
+  if (room) return <RoomGate code={room}>{(play) => <PracticeQuiz play={play} />}</RoomGate>
   return mode === 'infinite' ? <PracticeQuiz /> : <DailyQuiz />
 }
 

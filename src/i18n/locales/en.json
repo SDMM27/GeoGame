@@ -664,5 +664,16 @@
     "close": "Close",
     "subtitle_android": "Download the APK, then allow the install when Android asks.",
     "download": "Download"
+  },
+  "score_save": {
+    "saving": "Saving to the leaderboard…",
+    "saved_as": "Score saved to the leaderboard as {{name}} ✓",
+    "updated_as": "New record saved as {{name}} ✓",
+    "record_kept": "Your record is still better: {{record}}",
+    "taken": "This username belongs to an account. Sign in to use it, or pick another one.",
+    "sign_in_hint": "Sign in to save your scores to your account.",
+    "sign_in": "Sign in",
+    "retry": "Retry",
+    "you": "You"
   }
 }

@@ -2,8 +2,9 @@ rules_version = '2';
 
 // Firestore security rules. Copy this file into Firebase console > Firestore > Rules to publish it.
 //
-// Leaderboards have no accounts: anyone may add a score, but nobody may delete one, and an existing
-// score can only be replaced by a better one for the same player and mode (see src/utils/saveScore.js).
+// Leaderboards: nobody may delete a score, and an existing score can only be replaced by a better one
+// for the same player and mode (see src/utils/saveScore.js). A score with a `uid` belongs to that account
+// and carries its username; a score without one (visitor) can't use an account's username.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -22,6 +23,16 @@ service cloud.firestore {
 
     function validLabel(value) {
       return value is string && value.size() > 0 && value.size() <= 60;
+    }
+
+    // Leaderboard entry owner: either the signed-in account under its own username,
+    // or a visitor (no uid) under a name that no account owns (usernames/{lowercase}, see account.js).
+    function validOwner(data) {
+      return data.get('uid', null) == null
+        ? !exists(/databases/$(database)/documents/usernames/$(data.name.lower()))
+        : request.auth != null
+          && data.uid == request.auth.uid
+          && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.username == data.name;
     }
 
     // Fields that identify a leaderboard entry must not change when it is replaced.
@@ -71,12 +82,13 @@ service cloud.firestore {
 
     // ---------- Leaderboards ----------
 
-    // Solo scores: { name, score, difficulty, elapsedTime, gameType, continent? }
+    // Solo scores: { name, uid?, score, difficulty, elapsedTime, gameType, continent? }
     match /scores/{scoreId} {
       function validScore(data) {
-        return data.keys().hasOnly(['name', 'score', 'difficulty', 'elapsedTime', 'gameType', 'continent'])
+        return data.keys().hasOnly(['name', 'uid', 'score', 'difficulty', 'elapsedTime', 'gameType', 'continent'])
           && data.keys().hasAll(['name', 'score', 'difficulty', 'gameType'])
           && validName(data.name)
+          && validOwner(data)
           && inRange(data.score, 1000000)
           && validLabel(data.difficulty)
           && validLabel(data.gameType)
@@ -87,22 +99,36 @@ service cloud.firestore {
       allow read: if true;
       allow create: if validScore(request.resource.data);
       allow update: if validScore(request.resource.data)
-        && sameFields(['name', 'difficulty', 'gameType', 'continent'])
+        && sameFields(['name', 'uid', 'difficulty', 'gameType', 'continent'])
         && isBetter(request.resource.data.score, request.resource.data.get('elapsedTime', null),
                     resource.data.score, resource.data.get('elapsedTime', null));
     }
 
-    // Archive of the first leaderboard: read only.
+    // Archives, read only: the first leaderboard (scores_v1), and every leaderboard before scores
+    // were tied to accounts (*_v2, see scripts/purgeAnonymousScores.mjs).
     match /scores_v1/{document=**} {
       allow read: if true;
     }
 
-    // Ascension scores: { name, gameType, presetName, globalTimeMs, globalScore, totalFound, totalSkipped, phaseStats, date }
+    match /scores_v2/{document=**} {
+      allow read: if true;
+    }
+
+    match /ascension_scores_v2/{document=**} {
+      allow read: if true;
+    }
+
+    match /daily_scores_v2/{document=**} {
+      allow read: if true;
+    }
+
+    // Ascension scores: { name, uid?, gameType, presetName, globalTimeMs, globalScore, totalFound, totalSkipped, phaseStats, date }
     match /ascension_scores/{scoreId} {
       function validAscension(data) {
-        return data.keys().hasOnly(['name', 'gameType', 'presetName', 'globalTimeMs', 'globalScore',
+        return data.keys().hasOnly(['name', 'uid', 'gameType', 'presetName', 'globalTimeMs', 'globalScore',
                                     'totalFound', 'totalSkipped', 'phaseStats', 'date'])
           && validName(data.name)
+          && validOwner(data)
           && validLabel(data.gameType)
           && validLabel(data.presetName)
           && inRange(data.globalTimeMs, 1000000000)
@@ -116,18 +142,18 @@ service cloud.firestore {
       allow read: if true;
       allow create: if validAscension(request.resource.data);
       allow update: if validAscension(request.resource.data)
-        && sameFields(['name', 'gameType', 'presetName'])
+        && sameFields(['name', 'uid', 'gameType', 'presetName'])
         && isBetter(request.resource.data.globalScore, request.resource.data.globalTimeMs,
                     resource.data.globalScore, resource.data.get('globalTimeMs', null));
     }
 
-    // Daily challenges, two shapes:
+    // Daily challenges (all with name and uid?), two shapes:
     //  - Country Ranking: { name, gameType: 'RANKING', dailyKey, score, totalError, attemptsUsed, playerOrder }
     //  - other games:     { name, gameType, dailyKey, attempts, elapsedTime, guesses, hints? } (fewer attempts wins)
     match /daily_scores/{scoreId} {
       function validRanking(data) {
         return data.gameType == 'RANKING'
-          && data.keys().hasOnly(['name', 'gameType', 'dailyKey', 'score', 'totalError', 'attemptsUsed', 'playerOrder'])
+          && data.keys().hasOnly(['name', 'uid', 'gameType', 'dailyKey', 'score', 'totalError', 'attemptsUsed', 'playerOrder'])
           && data.keys().hasAll(['name', 'gameType', 'dailyKey', 'score', 'totalError'])
           && inRange(data.score, 1000000)
           && inRange(data.totalError, 1000000)
@@ -137,7 +163,7 @@ service cloud.firestore {
 
       function validAttempts(data) {
         return data.gameType != 'RANKING'
-          && data.keys().hasOnly(['name', 'gameType', 'dailyKey', 'attempts', 'elapsedTime', 'guesses', 'hints'])
+          && data.keys().hasOnly(['name', 'uid', 'gameType', 'dailyKey', 'attempts', 'elapsedTime', 'guesses', 'hints'])
           && data.keys().hasAll(['name', 'gameType', 'dailyKey', 'attempts'])
           && inRange(data.attempts, 1000)
           && (data.get('elapsedTime', null) == null || inRange(data.elapsedTime, 1000000000))
@@ -146,6 +172,7 @@ service cloud.firestore {
 
       function validDaily(data) {
         return validName(data.name)
+          && validOwner(data)
           && validLabel(data.gameType)
           && validLabel(data.dailyKey)
           && (validRanking(data) || validAttempts(data));
@@ -167,7 +194,7 @@ service cloud.firestore {
       allow read: if true;
       allow create: if validDaily(request.resource.data);
       allow update: if validDaily(request.resource.data)
-        && sameFields(['name', 'gameType', 'dailyKey'])
+        && sameFields(['name', 'uid', 'gameType', 'dailyKey'])
         && isBetterDaily(request.resource.data, resource.data);
     }
 

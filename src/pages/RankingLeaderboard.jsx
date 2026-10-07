@@ -5,24 +5,25 @@ import { firestore } from '../Firebase'
 import { GAME_TYPES } from '../utils/gameTypes'
 import { sortRankingScores } from '../utils/rankingScores'
 import { getLast7Days } from '../utils/dateUtils'
+import { useAccount } from '../auth'
+import { useLeaderboardRefresh } from '../hooks/useLeaderboardRefresh'
+import PlayerName, { mineClass } from '../components/PlayerName'
 import './DailyLeaderboard.css'
 import './RankingLeaderboard.css'
 
 const MEDAL = ['🥇', '🥈', '🥉']
 
-function AccordionRow({ score, index, playerName }) {
+function AccordionRow({ score, index, account }) {
   const [open, setOpen] = useState(false)
-  const isSelf = score.name === playerName
 
   return (
-    <div className={`daily-lb__row${index < 3 ? ' daily-lb__row--top' : ''}${isSelf ? ' ranking-lb__row--self' : ''}`}>
+    <div className={`daily-lb__row${index < 3 ? ' daily-lb__row--top' : ''}${mineClass(score, account)}`}>
       <div className="daily-lb__row-main" onClick={() => setOpen((prev) => !prev)}>
         <span className="daily-lb__rank">
           {index < 3 ? MEDAL[index] : `#${index + 1}`}
         </span>
         <span className="daily-lb__name">
-          {score.name}
-          {isSelf && <span className="ranking-lb__self-badge">vous</span>}
+          <PlayerName entry={score} account={account} />
         </span>
         <span className="ranking-lb__score">{score.score} pts</span>
         <span className="ranking-lb__error">{score.totalError} pos.</span>
@@ -48,7 +49,9 @@ function AccordionRow({ score, index, playerName }) {
   )
 }
 
-export default function RankingLeaderboard({ dailyKey, playerName = null }) {
+export default function RankingLeaderboard({ dailyKey }) {
+  const { account } = useAccount()
+  const refreshKey = useLeaderboardRefresh()
   const [selectedDate, setSelectedDate] = useState(dailyKey ?? '')
   const [scores, setScores] = useState([])
   const [loading, setLoading] = useState(true)
@@ -73,7 +76,7 @@ export default function RankingLeaderboard({ dailyKey, playerName = null }) {
       }
     }
     fetchScores()
-  }, [selectedDate])
+  }, [selectedDate, refreshKey])
 
   if (!dailyKey) return null
 
@@ -129,7 +132,7 @@ export default function RankingLeaderboard({ dailyKey, playerName = null }) {
               key={`${score.name}-${score.dailyKey}-${index}`}
               score={score}
               index={index}
-              playerName={playerName}
+              account={account}
             />
           ))}
         </>

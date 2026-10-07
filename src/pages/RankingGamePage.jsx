@@ -2,8 +2,6 @@ import React, { useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
-import { addDoc, collection, getDocs, query, where, setDoc } from 'firebase/firestore'
-import { toast } from 'react-toastify'
 import NavBar from '../components/NavBar'
 import RankingLeaderboard from './RankingLeaderboard'
 import ShareScoreButton from '../components/ShareScoreButton'
@@ -11,10 +9,11 @@ import ChallengeBanner from '../components/ChallengeBanner'
 import { resolveMode } from '../utils/challenge'
 import useRankingGameState from '../hooks/useRankingGameState'
 import { GAME_TYPES } from '../utils/gameTypes'
-import { useRecordGame } from '../auth'
-import { firestore } from '../Firebase'
+import { useAccount, useRecordGame } from '../auth'
+import { useScoreSave } from '../hooks/useScoreSave'
+import { saveRankingScore } from '../utils/saveScore'
+import LeaderboardSave from '../components/LeaderboardSave'
 import { getCountryName } from '../utils/getCountryName'
-import { getSavedPseudo } from '../utils/account'
 import './RankingGamePage.css'
 
 const FLAG_URL = (iso2) =>
@@ -37,8 +36,6 @@ export default function RankingGamePage() {
   const initialMode = resolveMode(location, 'daily')
   const [mode, setMode] = useState(initialMode)
   const [countryCount, setCountryCount] = useState(5)
-  const [submitName, setSubmitName] = useState(getSavedPseudo)
-  const [submitting, setSubmitting] = useState(false)
 
   const CATEGORY_OPTIONS = [
     { key: null,         emoji: '🎲', label: t('ranking.random') },
@@ -65,11 +62,6 @@ export default function RankingGamePage() {
     retryAttempt,
   } = useRankingGameState(mode, { countryCount })
 
-  const rankingSavedKey = dailyKey ? `ranking-saved:${dailyKey}` : null
-  const [leaderboardSubmitted, setLeaderboardSubmitted] = useState(() =>
-    rankingSavedKey ? !!localStorage.getItem(rankingSavedKey) : false
-  )
-
   function onDragEnd(result) {
     if (!result.destination) return
     const newOrder = Array.from(countries)
@@ -78,61 +70,27 @@ export default function RankingGamePage() {
     reorderCountries(newOrder)
   }
 
-  async function submitToLeaderboard(e) {
-    e.preventDefault()
-    const name = submitName.trim()
-    if (!name) {
-      toast.error(t('messages.please_enter_username'), { containerId: 'topRightToast' })
-      return
-    }
-    setSubmitting(true)
-    try {
-      const ref = collection(firestore, 'daily_scores')
-      const existing = await getDocs(
-        query(
-          ref,
-          where('name', '==', name),
-          where('gameType', '==', GAME_TYPES.RANKING),
-          where('dailyKey', '==', dailyKey)
-        )
-      )
+  const isSubmitted = status === 'submitted'
 
-      const entry = {
-        name,
-        gameType: GAME_TYPES.RANKING,
+  const rankingSavedKey = dailyKey ? `ranking-saved:${dailyKey}` : null
+  const saver = useScoreSave(
+    useAccount(),
+    async (player) => {
+      const result = await saveRankingScore({
+        ...player,
         dailyKey,
         score,
         totalError,
         attemptsUsed: attemptNumber,
         playerOrder: countries.map((c) => c.properties.ADMIN),
+      })
+      if (rankingSavedKey && (result.status === 'saved' || result.status === 'updated')) {
+        localStorage.setItem(rankingSavedKey, '1')
       }
-
-      if (!existing.empty) {
-        const prev = existing.docs[0].data()
-        const better =
-          score > prev.score ||
-          (score === prev.score && totalError < (prev.totalError ?? Infinity))
-        if (!better) {
-          toast.info(t('ranking.better_score_exists'), { containerId: 'topRightToast' })
-          setSubmitting(false)
-          return
-        }
-        // Les règles Firestore interdisent de supprimer un score : on remplace l'ancien.
-        await setDoc(existing.docs[0].ref, entry)
-      } else {
-        await addDoc(ref, entry)
-      }
-
-      if (rankingSavedKey) localStorage.setItem(rankingSavedKey, '1')
-      setLeaderboardSubmitted(true)
-      toast.success(t('messages.score_saved'), { containerId: 'topRightToast' })
-    } catch {
-      toast.error(t('messages.save_error'), { containerId: 'topRightToast' })
-    }
-    setSubmitting(false)
-  }
-
-  const isSubmitted = status === 'submitted'
+      return result
+    },
+    { enabled: isSubmitted && mode === 'daily' && !!dailyKey, alreadySaved: rankingSavedKey ? !!localStorage.getItem(rankingSavedKey) : false }
+  )
 
   useRecordGame(
     isSubmitted && mode === 'daily' && dailyKey
@@ -378,26 +336,21 @@ export default function RankingGamePage() {
             })}
 
             {/* Daily leaderboard submission */}
-            {mode === 'daily' && !leaderboardSubmitted && (
-              <form onSubmit={submitToLeaderboard} className="ranking-leaderboard-form">
-                <input
-                  className="ranking-leaderboard-input"
-                  placeholder={t('labels.your_username')}
-                  value={submitName}
-                  onChange={(e) => setSubmitName(e.target.value)}
-                  maxLength={30}
-                />
-                <button className="ranking-leaderboard-submit" type="submit" disabled={submitting}>
-                  {submitting ? '...' : '📤'}
-                </button>
-              </form>
+            {mode === 'daily' && (
+              <LeaderboardSave
+                saver={saver}
+                variant="ranking"
+                maxLength={30}
+                existingText={(existing) =>
+                  `${existing.score} ${t('units.pts')} · ${existing.totalError} ${t('units.position', { count: existing.totalError })}`
+                }
+                blockedLabel={t('ranking.better_score_exists')}
+                blockedHint={t('form.use_different_name_daily')}
+              />
             )}
 
             {mode === 'daily' && (
-              <RankingLeaderboard
-                dailyKey={dailyKey}
-                playerName={leaderboardSubmitted ? submitName : null}
-              />
+              <RankingLeaderboard dailyKey={dailyKey} />
             )}
 
             {mode === 'infinite' && (

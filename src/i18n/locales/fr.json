@@ -664,5 +664,16 @@
     "close": "Fermer",
     "subtitle_android": "Télécharge l’APK, puis autorise l’installation quand Android te le demande.",
     "download": "Télécharger"
+  },
+  "score_save": {
+    "saving": "Enregistrement au classement…",
+    "saved_as": "Score enregistré au classement sous {{name}} ✓",
+    "updated_as": "Nouveau record enregistré sous {{name}} ✓",
+    "record_kept": "Ton record reste meilleur : {{record}}",
+    "taken": "Ce pseudo appartient à un compte. Connecte-toi pour l'utiliser, ou choisis-en un autre.",
+    "sign_in_hint": "Connecte-toi pour enregistrer tes scores sous ton compte.",
+    "sign_in": "Se connecter",
+    "retry": "Réessayer",
+    "you": "Toi"
   }
 }

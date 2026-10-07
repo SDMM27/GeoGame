@@ -1,6 +1,7 @@
 // End-of-game screen: score, stats, save to leaderboard, share, replay.
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import * as Haptics from 'expo-haptics'
+import { router } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { KeyboardAvoidingView, Platform, ScrollView, Share, StyleSheet, TextInput, View } from 'react-native'
@@ -9,12 +10,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { buildChallengeUrl } from '@shared/utils/challenge'
 import { formatTime } from '@shared/utils/formatTime'
-import { saveAscensionScore, saveDailyScore, saveScore } from '@shared/utils/saveScore'
+import { useScoreSave } from '@shared/hooks/useScoreSave'
+import { saveAscensionScore, saveDailyScore, saveRankingScore, saveScore } from '@shared/utils/saveScore'
 import { generateShareText } from '@shared/utils/shareScore'
 
+import { useAccount } from '@/account/auth'
 import { useRecordGame, type GameRecord } from '@/account/history'
 import { SITE_ORIGIN } from '@/links'
-import { saveRankingScore } from '@/rankingScores'
 import { colors, fonts, radius, space } from '@/theme'
 import { Button, Text } from '../ui'
 
@@ -64,8 +66,6 @@ type Props = {
   children?: React.ReactNode
 }
 
-type SaveState = 'idle' | 'saving' | 'saved' | 'blocked' | 'error'
-
 // Same key as the website's DailyForm: one save per daily challenge.
 // Ranking uses the website's RankingGamePage key.
 const dailySavedKey = (save: SaveConfig | null | undefined) =>
@@ -78,68 +78,63 @@ const dailySavedKey = (save: SaveConfig | null | undefined) =>
 export function ResultsSheet({ title, score, scoreText, scoreLabel, accent = colors.accent, stats, save, share, record, onReplay, onHome, homeLabel, onSaved, children }: Props) {
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
-  const [pseudo, setPseudo] = useState(() => globalThis.localStorage?.getItem(PSEUDO_KEY) ?? '')
-  const [saveState, setSaveState] = useState<SaveState>(() => {
-    const key = dailySavedKey(save)
-    return key && globalThis.localStorage?.getItem(key) ? 'saved' : 'idle'
-  })
-  const [blockedBy, setBlockedBy] = useState<string | null>(null)
+  const [typedPseudo, setTypedPseudo] = useState(() => globalThis.localStorage?.getItem(PSEUDO_KEY) ?? '')
   useRecordGame(record)
 
   useEffect(() => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
   }, [])
 
-  const onSave = async () => {
-    const name = pseudo.trim()
-    if (!name || !save) return
-    globalThis.localStorage?.setItem(PSEUDO_KEY, name)
-    setSaveState('saving')
-    try {
+  // Signed in: saved on its own under the account. Visitor: saved under the name they type.
+  const savedKey = dailySavedKey(save)
+  const saver = useScoreSave(
+    useAccount(),
+    async (player: { name: string; uid?: string }) => {
+      if (!save) return { status: 'saved' }
       const result =
         save.kind === 'daily'
-          ? await saveDailyScore({ name, ...save })
+          ? await saveDailyScore({ ...player, ...save })
           : save.kind === 'ranking'
-            ? await saveRankingScore({
-                name,
-                score,
-                dailyKey: save.dailyKey,
-                totalError: save.totalError,
-                attemptsUsed: save.attemptsUsed,
-                playerOrder: save.playerOrder,
-              })
+            ? await saveRankingScore({ ...player, score, ...save })
             : save.kind === 'ascension'
-              ? await saveAscensionScore({ name, score, ...save })
-              : await saveScore({ name, score, ...save })
-      if (result.status === 'blocked') {
-        const existing = result.existing as { score?: number; attempts?: number; elapsedTime?: number; timeMs?: number; totalError?: number }
-        if (save.kind === 'ranking') {
-          setBlockedBy(`${existing.score} ${t('units.pts')} · ${existing.totalError} ${t('units.position', { count: existing.totalError })}`)
-        } else {
-          const value =
-            save.kind === 'daily'
-              ? `${existing.attempts} ${existing.attempts === 1 ? t('units.attempt_one') : t('units.attempt_other')}`
-              : `${existing.score} ${t('units.pts')}`
-          const secondary =
-            save.kind === 'daily' && save.formatSecondary
-              ? save.formatSecondary(existing.elapsedTime)
-              : formatTime(existing.elapsedTime ?? existing.timeMs ?? 0)
-          setBlockedBy(`${value} · ${secondary}`)
-        }
-        setSaveState('blocked')
+              ? await saveAscensionScore({ ...player, score, ...save })
+              : await saveScore({ ...player, score, ...save })
+      if (result.status === 'saved' || result.status === 'updated') {
+        if (savedKey) globalThis.localStorage?.setItem(savedKey, '1')
+        onSaved?.()
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+      } else {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning)
-        return
       }
-      const savedKey = dailySavedKey(save)
-      if (savedKey) globalThis.localStorage?.setItem(savedKey, '1')
-      setSaveState('saved')
-      onSaved?.()
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
-    } catch (error) {
-      console.error(error)
-      setSaveState('error')
-    }
+      return result
+    },
+    { enabled: Boolean(save), alreadySaved: Boolean(savedKey && globalThis.localStorage?.getItem(savedKey)) }
+  )
+  const pseudo = saver.username ?? typedPseudo
+
+  const onSave = () => {
+    const name = typedPseudo.trim()
+    if (!name || !save) return
+    globalThis.localStorage?.setItem(PSEUDO_KEY, name)
+    saver.submit(name)
   }
+
+  // The player's better entry, when the save is blocked.
+  const existingText = (existing: { score?: number; attempts?: number; elapsedTime?: number; timeMs?: number; totalError?: number }) => {
+    if (save?.kind === 'ranking') {
+      return `${existing.score} ${t('units.pts')} · ${existing.totalError} ${t('units.position', { count: existing.totalError })}`
+    }
+    const value =
+      save?.kind === 'daily'
+        ? `${existing.attempts} ${existing.attempts === 1 ? t('units.attempt_one') : t('units.attempt_other')}`
+        : `${existing.score} ${t('units.pts')}`
+    const secondary =
+      save?.kind === 'daily' && save.formatSecondary
+        ? save.formatSecondary(existing.elapsedTime)
+        : formatTime(existing.elapsedTime ?? existing.timeMs ?? 0)
+    return `${value} · ${secondary}`
+  }
+  const isDaily = save?.kind === 'daily' || save?.kind === 'ranking'
 
   const onShare = async () => {
     if (!share) return
@@ -179,50 +174,92 @@ export function ResultsSheet({ title, score, scoreText, scoreLabel, accent = col
             ))}
           </Animated.View>
 
-          {save && (
+          {save && !saver.loading && (
             <Animated.View entering={FadeInDown.delay(250).springify()} style={styles.saveCard}>
               <Text variant="bodyStrong">{t('buttons.save_score')}</Text>
-              <View style={styles.saveRow}>
-                <TextInput
-                  value={pseudo}
-                  onChangeText={(value) => {
-                    setPseudo(value)
-                    if (saveState !== 'saving') setSaveState('idle')
-                  }}
-                  placeholder={t('labels.your_username')}
-                  placeholderTextColor={colors.textFaint}
-                  maxLength={20}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  editable={saveState !== 'saved'}
-                  returnKeyType="done"
-                  onSubmitEditing={onSave}
-                  style={styles.input}
-                />
-                <Button
-                  label={saveState === 'saved' ? '✓' : t('mobile.game.save')}
-                  onPress={onSave}
-                  loading={saveState === 'saving'}
-                  disabled={!pseudo.trim() || saveState === 'saved'}
-                  style={{ paddingHorizontal: space.lg }}
-                />
-              </View>
-              {saveState === 'saved' && (
-                <Text variant="caption" color={colors.accent}>
-                  {t('form.score_saved')}
-                </Text>
-              )}
-              {saveState === 'blocked' && (
-                <Text variant="caption" color={colors.warning}>
-                  {save.kind === 'daily' || save.kind === 'ranking'
-                    ? `${t('form.better_daily_score')} ${blockedBy}. ${t('form.use_different_name_daily')}`
-                    : `${t('form.better_score_exists')} (${blockedBy}). ${t('form.use_different_name')}`}
-                </Text>
-              )}
-              {saveState === 'error' && (
-                <Text variant="caption" color={colors.danger}>
-                  {t('mobile.game.save_error')}
-                </Text>
+              {saver.signedIn ? (
+                <>
+                  {saver.status === 'saving' && <Text variant="caption">{t('score_save.saving')}</Text>}
+                  {saver.status === 'saved' && (
+                    <Text variant="caption" color={colors.accent}>
+                      {saver.name ? t('score_save.saved_as', { name: saver.name }) : t('form.score_saved')}
+                    </Text>
+                  )}
+                  {saver.status === 'updated' && (
+                    <Text variant="caption" color={colors.accent}>
+                      {t('score_save.updated_as', { name: saver.name })}
+                    </Text>
+                  )}
+                  {saver.status === 'blocked' && (
+                    <Text variant="caption">{t('score_save.record_kept', { record: existingText(saver.existing) })}</Text>
+                  )}
+                  {saver.status === 'error' && (
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
+                      <Text variant="caption" color={colors.danger} style={{ flex: 1 }}>
+                        {t('mobile.game.save_error')}
+                      </Text>
+                      <Button label={t('score_save.retry')} variant="secondary" onPress={saver.retry} />
+                    </View>
+                  )}
+                </>
+              ) : (
+                <>
+                  <View style={styles.saveRow}>
+                    <TextInput
+                      value={typedPseudo}
+                      onChangeText={(value) => {
+                        setTypedPseudo(value)
+                        saver.clear()
+                      }}
+                      placeholder={t('labels.your_username')}
+                      placeholderTextColor={colors.textFaint}
+                      maxLength={20}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      editable={!saver.done}
+                      returnKeyType="done"
+                      onSubmitEditing={onSave}
+                      style={styles.input}
+                    />
+                    <Button
+                      label={saver.done ? '✓' : t('mobile.game.save')}
+                      onPress={onSave}
+                      loading={saver.status === 'saving'}
+                      disabled={!typedPseudo.trim() || saver.done}
+                      style={{ paddingHorizontal: space.lg }}
+                    />
+                  </View>
+                  {saver.done && (
+                    <Text variant="caption" color={colors.accent}>
+                      {t('form.score_saved')}
+                    </Text>
+                  )}
+                  {saver.status === 'blocked' && (
+                    <Text variant="caption" color={colors.warning}>
+                      {isDaily
+                        ? `${t('form.better_daily_score')} ${existingText(saver.existing)}. ${t('form.use_different_name_daily')}`
+                        : `${t('form.better_score_exists')} (${existingText(saver.existing)}). ${t('form.use_different_name')}`}
+                    </Text>
+                  )}
+                  {saver.status === 'taken' && (
+                    <Text variant="caption" color={colors.warning}>
+                      {t('score_save.taken')}
+                    </Text>
+                  )}
+                  {saver.status === 'error' && (
+                    <Text variant="caption" color={colors.danger}>
+                      {t('mobile.game.save_error')}
+                    </Text>
+                  )}
+                  {!saver.done && (
+                    <Text variant="caption" onPress={() => router.push('/profile')}>
+                      {t('score_save.sign_in_hint')}{' '}
+                      <Text variant="caption" color={colors.accent}>
+                        {t('score_save.sign_in')}
+                      </Text>
+                    </Text>
+                  )}
+                </>
               )}
             </Animated.View>
           )}

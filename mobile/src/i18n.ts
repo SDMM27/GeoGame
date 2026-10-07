@@ -74,7 +74,7 @@ const fr = {
     population_lower: 'Moins peuplé',
     population_neutral: 'Inconnue',
   },
-  common: { coming_soon: 'Bientôt disponible', back: 'Retour' },
+  common: { coming_soon: 'Bientôt disponible', back: 'Retour', language: 'Langue' },
 }
 
 const en: typeof fr = {
@@ -150,7 +150,7 @@ const en: typeof fr = {
     population_lower: 'Fewer people',
     population_neutral: 'Unknown',
   },
-  common: { coming_soon: 'Coming soon', back: 'Back' },
+  common: { coming_soon: 'Coming soon', back: 'Back', language: 'Language' },
 }
 
 const ru: typeof fr = {
@@ -226,7 +226,7 @@ const ru: typeof fr = {
     population_lower: 'Меньше людей',
     population_neutral: 'Неизвестно',
   },
-  common: { coming_soon: 'Скоро', back: 'Назад' },
+  common: { coming_soon: 'Скоро', back: 'Назад', language: 'Язык' },
 }
 
 i18n.addResourceBundle('fr', 'translation', { mobile: fr }, true, true)

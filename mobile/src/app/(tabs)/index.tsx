@@ -6,6 +6,7 @@ import { ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
+import { LanguageButton } from '@/components/LanguageButton'
 import { Text, Touchable } from '@/components/ui'
 import { GAMES, type GameDefinition } from '@/games'
 import { colors, radius, space } from '@/theme'
@@ -86,10 +87,11 @@ export default function HomeScreen() {
       showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
         <Image source={require('@/assets/images/logo.png')} style={styles.logo} contentFit="contain" />
-        <View>
+        <View style={{ flex: 1 }}>
           <Text variant="title">GeoGame</Text>
           <Text variant="caption">{t('mobile.home.greeting')}</Text>
         </View>
+        <LanguageButton />
       </View>
 
       <View style={styles.sectionHeader}>

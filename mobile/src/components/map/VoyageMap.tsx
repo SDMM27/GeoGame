@@ -1,0 +1,139 @@
+// Voyage Voyage map: like the website, only the start, the target, the guesses and the hints are drawn,
+// over a graticule; every other country stays hidden.
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native'
+
+import { colors, radius } from '@/theme'
+import { allCountries, type CountryFeature } from './geometry'
+import { WorldMap, type LeafletStyle, type Overlay, type WorldMapHandle } from './WorldMap'
+
+export type VoyageColor = 'start' | 'green' | 'yellow' | 'red' | 'target' | 'hint'
+
+export const VOYAGE_COLORS: Record<VoyageColor, string> = {
+  start: '#5FD4F4',
+  green: colors.accent,
+  yellow: colors.warning,
+  red: colors.danger,
+  target: '#FF9EC7',
+  hint: colors.textMuted,
+}
+
+function styleFor(color: VoyageColor): LeafletStyle {
+  if (color === 'hint') return { fillColor: VOYAGE_COLORS.hint, fillOpacity: 0.08, color: '#EEF1F8', weight: 2 }
+  return { fillColor: VOYAGE_COLORS[color], fillOpacity: color === 'red' ? 0.4 : 0.55, color: VOYAGE_COLORS[color], weight: 2 }
+}
+
+const GRATICULE_COLOR = '#1E3A5F'
+const GRATICULE: Overlay[] = [
+  ...[-60, -30, 0, 30, 60].map((lat) => ({
+    type: 'line' as const,
+    points: [-180, -90, 0, 90, 180].map((lng) => [lat, lng] as [number, number]),
+    color: GRATICULE_COLOR,
+    width: 1,
+  })),
+  ...[-150, -120, -90, -60, -30, 0, 30, 60, 90, 120, 150].map((lng) => ({
+    type: 'line' as const,
+    points: [[-85, lng], [85, lng]] as [number, number][],
+    color: GRATICULE_COLOR,
+    width: 1,
+  })),
+]
+
+const CENTERS = new Map(
+  allCountries.map((feature) => [feature.properties.ADMIN, feature.properties.center as [number, number] | undefined])
+)
+
+export function VoyageMap({
+  start,
+  target,
+  guesses,
+  hints,
+  interactive,
+  style,
+}: {
+  start: CountryFeature
+  target: CountryFeature
+  guesses: { feature: CountryFeature; color: VoyageColor }[]
+  hints: CountryFeature[]
+  interactive: boolean
+  style?: StyleProp<ViewStyle>
+}) {
+  const mapRef = useRef<WorldMapHandle>(null)
+  const [ready, setReady] = useState(false)
+  const framed = useRef(false)
+
+  // Later entries win: the target keeps its color until it is reached.
+  const colored = useMemo(() => {
+    const byName = new Map<string, VoyageColor>()
+    hints.forEach((feature) => byName.set(feature.properties.ADMIN, 'hint'))
+    byName.set(target.properties.ADMIN, 'target')
+    guesses.forEach(({ feature, color }) => byName.set(feature.properties.ADMIN, color))
+    byName.set(start.properties.ADMIN, 'start')
+    return byName
+  }, [start, target, guesses, hints])
+  const signature = [...colored].map(([name, color]) => `${name}:${color}`).join('|')
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const visible = useMemo(() => [...colored.keys()].sort(), [signature])
+
+  // A dot on each country keeps tiny ones visible.
+  const overlays = useMemo<Overlay[]>(
+    () =>
+      GRATICULE.concat(
+        [...colored].flatMap(([name, color]) => {
+          const center = CENTERS.get(name)
+          if (!center || color === 'hint') return []
+          return [{ type: 'circle' as const, center: [center[1], center[0]] as [number, number], radius: 4, color: VOYAGE_COLORS[color] }]
+        })
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [signature]
+  )
+
+  // Hints are not framed: a huge country (Russia, Canada) would take over the view.
+  const frame = (animate: boolean) => {
+    const framedNames = [...colored].filter(([, color]) => color !== 'hint' && color !== 'red').map(([name]) => name)
+    mapRef.current?.fitCountries(framedNames, { animate, maxZoom: 5 })
+  }
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!ready || !map) return
+    map.geoJson.resetStyle()
+    for (const layer of map.geoJson.getLayers()) {
+      const color = colored.get(layer.feature.properties.ADMIN)
+      if (color) layer.setStyle(styleFor(color))
+    }
+    frame(framed.current)
+    framed.current = true
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, signature])
+
+  return (
+    <View
+      style={[styles.frame, style]}
+      // The map shrinks while the keyboard is up: frame the route again once it is measured.
+      onLayout={() => {
+        if (ready) requestAnimationFrame(() => frame(false))
+      }}>
+      <WorldMap
+        ref={mapRef}
+        countries={visible}
+        interactive={interactive}
+        showSmallCountryMarkers={false}
+        overlays={overlays}
+        onReady={() => setReady(true)}
+      />
+    </View>
+  )
+}
+
+const styles = StyleSheet.create({
+  frame: {
+    height: 240,
+    borderRadius: radius.lg,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.ocean,
+  },
+})

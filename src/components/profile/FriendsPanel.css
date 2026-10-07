@@ -1,0 +1,50 @@
+.friends-add { display: flex; gap: 0.5rem; }
+.friends-add input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+.friends-add input:focus { outline: none; border-color: var(--accent-cyan); }
+.friends-add button {
+  padding: 0.6rem 1.1rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--accent-cyan);
+  color: #0a0a1a;
+  font-weight: 700;
+  cursor: pointer;
+}
+.friends-add button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.friends-group { display: flex; flex-direction: column; gap: 0.4rem; }
+.friends-row { display: flex; align-items: center; gap: 0.6rem; padding: 0.6rem 0.9rem; }
+.friends-row + .friends-row { border-top: 1px solid var(--border-subtle); }
+.friends-who { flex: 1; min-width: 0; display: flex; align-items: center; gap: 0.7rem; color: var(--text-primary); text-decoration: none; font-weight: 600; }
+.friends-who span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.friends-who:hover span { color: var(--accent-cyan); }
+
+.friends-btn {
+  padding: 0.35rem 0.8rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.friends-btn:hover { border-color: rgba(255, 255, 255, 0.3); }
+.friends-btn--primary { background: var(--accent-cyan); border-color: var(--accent-cyan); color: #0a0a1a; }
+.friends-btn--icon { width: 30px; height: 30px; padding: 0; color: var(--text-muted); }
+.friends-btn--danger { color: var(--danger); }
+
+@media (max-width: 600px) {
+  .friends-row { flex-wrap: wrap; }
+  .friends-row .profile-daily-chips--small { order: 3; width: 100%; padding-left: 46px; }
+}

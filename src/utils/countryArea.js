@@ -32,10 +32,45 @@ export function getRingAreaKm2(ring) {
 }
 
 export function getCountryAreaKm2(country) {
+  // Precomputed from full-resolution geometry for the mobile app
+  if (country?.properties?.areaKm2 != null) return country.properties.areaKm2
   return collectCoordinates(country.geometry).reduce((totalArea, polygon) => {
     const [outerRing, ...holes] = polygon
     const outerArea = getRingAreaKm2(outerRing)
     const holesArea = holes.reduce((sum, ring) => sum + getRingAreaKm2(ring), 0)
     return totalArea + Math.max(outerArea - holesArea, 0)
   }, 0)
+}
+
+// Mean of all ring vertices on the unit sphere. Uses the precomputed `center`
+// property when present (the mobile app ships simplified geometries).
+export function getGeographicCenter(country) {
+  const precomputed = country?.properties?.center
+  if (precomputed) return { lat: precomputed[1], lng: precomputed[0] }
+
+  const coordinates = collectCoordinates(country.geometry).flat(2)
+  if (coordinates.length === 0) return { lat: 0, lng: 0 }
+
+  let x = 0
+  let y = 0
+  let z = 0
+
+  coordinates.forEach(([lng, lat]) => {
+    const latRad = (lat * Math.PI) / 180
+    const lngRad = (lng * Math.PI) / 180
+
+    x += Math.cos(latRad) * Math.cos(lngRad)
+    y += Math.cos(latRad) * Math.sin(lngRad)
+    z += Math.sin(latRad)
+  })
+
+  const total = coordinates.length
+  x /= total
+  y /= total
+  z /= total
+
+  const lng = Math.atan2(y, x) * (180 / Math.PI)
+  const lat = Math.atan2(z, Math.sqrt(x * x + y * y)) * (180 / Math.PI)
+
+  return { lat, lng }
 }

@@ -432,6 +432,7 @@
     "hints_label": "Indices",
     "hint_n": "Indice {{n}}",
     "hint_button": "💡 Indice ({{used}}/{{max}})",
+    "hint_cost": "Chaque indice réduit les points de la question",
     "give_up": "Abandonner",
     "already_tried": "Tu as déjà proposé cette réponse.",
     "daily_won": "✓ Trouvé en {{attempts}} !",
@@ -455,6 +456,205 @@
       "digits_one": "C'est un nombre à {{count}} chiffre",
       "digits_other": "C'est un nombre à {{count}} chiffres",
       "between": "Entre {{min}} et {{max}}"
+    }
+  },
+  "account": {
+    "nav": "Compte",
+    "title": "Mon compte",
+    "signin_tab": "Connexion",
+    "signup_tab": "Inscription",
+    "signin_intro": "Connecte-toi pour retrouver ton pseudo sur le site et l’app.",
+    "signup_intro": "Crée ton compte pour réserver ton pseudo.",
+    "email": "Email",
+    "password": "Mot de passe",
+    "username": "Pseudo",
+    "email_placeholder": "toi@exemple.com",
+    "password_placeholder": "6 caractères minimum",
+    "username_placeholder": "Ton pseudo",
+    "username_hint": "3 à 20 caractères",
+    "signin": "Se connecter",
+    "signup": "Créer mon compte",
+    "forgot": "Mot de passe oublié ?",
+    "reset_sent": "Email envoyé à {{email}} pour choisir un nouveau mot de passe.",
+    "welcome": "Bienvenue {{username}} !",
+    "signed_in_as": "Connecté en tant que",
+    "signout": "Se déconnecter",
+    "prefill_hint": "Ton pseudo est pré-rempli quand tu enregistres un score ou rejoins une partie.",
+    "delete": "Supprimer mon compte",
+    "delete_confirm": "Ton compte et ton pseudo seront supprimés. Entre ton mot de passe pour confirmer.",
+    "delete_button": "Supprimer définitivement",
+    "deleted": "Compte supprimé.",
+    "cancel": "Annuler",
+    "errors": {
+      "invalid_email": "Adresse email invalide.",
+      "email_in_use": "Un compte existe déjà avec cet email.",
+      "weak_password": "Le mot de passe doit faire au moins 6 caractères.",
+      "wrong_credentials": "Email ou mot de passe incorrect.",
+      "too_many_requests": "Trop de tentatives. Réessaie dans quelques minutes.",
+      "network": "Pas de connexion. Vérifie ton réseau.",
+      "not_enabled": "La création de compte n’est pas encore activée.",
+      "username_length": "Le pseudo doit faire entre 3 et 20 caractères.",
+      "username_chars": "Le pseudo ne peut contenir que des lettres, chiffres, espaces, « _ », « - » et « . ».",
+      "username_taken": "Ce pseudo est déjà pris.",
+      "generic": "Une erreur est survenue. Réessaie.",
+      "popup_blocked": "La fenêtre Google a été bloquée. Autorise les pop-ups et réessaie.",
+      "different_provider": "Cet email est déjà utilisé avec une autre méthode de connexion.",
+      "cancelled": "Connexion annulée."
+    },
+    "google": "Continuer avec Google",
+    "or": "ou",
+    "choose_title": "Choisis ton pseudo",
+    "choose_intro": "C’est sous ce nom que tes scores apparaîtront. Il sera réservé à ton compte.",
+    "choose_submit": "Valider mon pseudo",
+    "delete_confirm_google": "Ton compte et ton pseudo seront supprimés. Confirme avec Google."
+  },
+  "profile": {
+    "member_since": "Membre depuis {{date}}",
+    "stats_title": "Statistiques",
+    "games": "Parties",
+    "play_time": "Temps de jeu",
+    "countries": "Pays trouvés",
+    "days": "Jours joués",
+    "streak_title": "Série de défis du jour",
+    "streak_current": "Série actuelle",
+    "streak_best": "Record",
+    "days_count_one": "{{count}} jour",
+    "days_count_other": "{{count}} jours",
+    "streak_hint": "Fais au moins un défi du jour chaque jour pour garder ta série.",
+    "today_title": "Défis d'aujourd'hui",
+    "today_done": "{{done}}/{{total}}",
+    "by_game_title": "Par jeu",
+    "games_count_one": "{{count}} partie",
+    "games_count_other": "{{count}} parties",
+    "best_score": "Record {{score}} pts",
+    "best_attempts_one": "Meilleur : {{count}} essai",
+    "best_attempts_other": "Meilleur : {{count}} essais",
+    "wins": "{{wins}}/{{dailies}} défis réussis",
+    "achievements_title": "Succès",
+    "achievements_count": "{{unlocked}}/{{total}}",
+    "history_title": "Dernières parties",
+    "history_all": "Tout voir",
+    "history_full_title": "Historique",
+    "history_empty": "Aucune partie enregistrée pour l'instant. Joue en étant connecté et elles apparaîtront ici.",
+    "all_games": "Tous les jeux",
+    "modes": {
+      "standard": "Classique",
+      "ascension": "Ascension",
+      "daily": "Défi du jour",
+      "infinite": "Infini",
+      "multi": "Multijoueur"
+    },
+    "solved": "Trouvé",
+    "failed": "Raté",
+    "attempts_count_one": "{{count}} essai",
+    "attempts_count_other": "{{count}} essais",
+    "load_error": "Impossible de charger le profil. Vérifie ta connexion.",
+    "not_found": "Joueur introuvable.",
+    "settings_title": "Compte",
+    "favorite": "Jeu préféré",
+    "sign_in_title": "Ton profil de joueur",
+    "sign_in_pitch": "Connecte-toi pour garder l’historique de tes parties, suivre tes stats, débloquer des succès et jouer avec tes amis.",
+    "show_less": "Voir moins"
+  },
+  "friends": {
+    "title": "Amis",
+    "count_one": "{{count}} ami",
+    "count_other": "{{count}} amis",
+    "add_title": "Ajouter un ami",
+    "add_placeholder": "Pseudo de ton ami",
+    "add": "Ajouter",
+    "sent": "Demande envoyée à {{username}} !",
+    "now_friends": "{{username}} et toi êtes maintenant amis !",
+    "requests_title": "Demandes reçues",
+    "outgoing_title": "Demandes envoyées",
+    "accept": "Accepter",
+    "decline": "Refuser",
+    "cancel": "Annuler",
+    "remove": "Retirer de mes amis",
+    "remove_confirm": "Retirer {{username}} de tes amis ?",
+    "empty": "Tu n'as pas encore d'amis. Ajoute-les avec leur pseudo !",
+    "today_title": "Défis du jour de tes amis",
+    "today_none": "Pas encore joué aujourd'hui",
+    "add_friend": "Ajouter en ami",
+    "request_sent": "Demande envoyée",
+    "is_friend": "Ami",
+    "accept_request": "Accepter sa demande",
+    "see_all": "Gérer mes amis",
+    "pending_badge_one": "{{count}} demande",
+    "pending_badge_other": "{{count}} demandes",
+    "errors": {
+      "not_found": "Aucun joueur avec ce pseudo.",
+      "self": "C'est toi !",
+      "already_friends": "Vous êtes déjà amis.",
+      "already_sent": "Demande déjà envoyée.",
+      "network": "Pas de connexion. Vérifie ton réseau.",
+      "generic": "Une erreur est survenue. Réessaie."
+    }
+  },
+  "achievements": {
+    "first_game": {
+      "title": "Premier pas",
+      "desc": "Termine ta première partie"
+    },
+    "games_50": {
+      "title": "Habitué",
+      "desc": "Joue 50 parties"
+    },
+    "games_250": {
+      "title": "Accro",
+      "desc": "Joue 250 parties"
+    },
+    "all_games": {
+      "title": "Touche-à-tout",
+      "desc": "Joue à chacun des jeux"
+    },
+    "streak_3": {
+      "title": "Bien lancé",
+      "desc": "3 jours de suite de défis du jour"
+    },
+    "streak_7": {
+      "title": "Semaine parfaite",
+      "desc": "7 jours de suite de défis du jour"
+    },
+    "streak_30": {
+      "title": "Inarrêtable",
+      "desc": "30 jours de suite de défis du jour"
+    },
+    "daily_sweep": {
+      "title": "Grand chelem",
+      "desc": "Fais tous les défis du jour le même jour"
+    },
+    "first_try": {
+      "title": "Du premier coup",
+      "desc": "Trouve un défi du jour au premier essai"
+    },
+    "explorer": {
+      "title": "Explorateur",
+      "desc": "Trouve 500 pays au total"
+    },
+    "globetrotter": {
+      "title": "Globe-trotteur",
+      "desc": "Trouve 5 000 pays au total"
+    },
+    "hardcore": {
+      "title": "Sans filet",
+      "desc": "Termine une partie en difficulté Hardcore"
+    },
+    "ascension": {
+      "title": "Au sommet",
+      "desc": "Termine une partie en mode Ascension"
+    },
+    "multiplayer": {
+      "title": "Esprit d’équipe",
+      "desc": "Joue une partie multijoueur"
+    },
+    "friend": {
+      "title": "Sociable",
+      "desc": "Ajoute ton premier ami"
+    },
+    "night_owl": {
+      "title": "Oiseau de nuit",
+      "desc": "Joue entre minuit et 5 h"
     }
   }
 }

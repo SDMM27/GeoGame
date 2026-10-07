@@ -217,7 +217,7 @@ export function generateShareText({ score, gameType, difficulty, pseudo, scoreLa
   const playedBy = t('share.played_by', 'joué par')
   const canYouBeat = t('share.can_you_beat', 'Peux-tu faire mieux ?')
   const translatedDiff = translateDifficulty(difficulty)
-  const site = typeof window !== 'undefined' ? window.location.hostname : 'geogame.vercel.app'
+  const site = typeof window !== 'undefined' && window.location?.hostname ? window.location.hostname : 'geogame.vercel.app'
 
   const lines = [
     `🌍 GeoGame — ${label}`,

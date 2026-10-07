@@ -10,6 +10,8 @@ import CountryCluePage from "./pages/CountryCluePage";
 import RankingGamePage from "./pages/RankingGamePage";
 import VoyageVoyagePage from "./pages/VoyageVoyagePage";
 import QuizPage from "./pages/QuizPage";
+import AccountPage from "./pages/AccountPage";
+import PlayerPage from "./pages/PlayerPage";
 import ScoresPage from "./pages/ScoresPage";
 import MultiplayerHomePage from "./pages/multiplayer/MultiplayerHomePage";
 import MultiplayerCreatePage from "./pages/multiplayer/MultiplayerCreatePage";
@@ -30,6 +32,8 @@ export default function App() {
         <Route path="/ranking" element={<RankingGamePage />} />
         <Route path="/quiz" element={<QuizPage />} />
         <Route path="/scores" element={<ScoresPage />} />
+        <Route path="/account" element={<AccountPage />} />
+        <Route path="/player/:uid" element={<PlayerPage />} />
         <Route path="/multiplayer" element={<MultiplayerHomePage />} />
         <Route path="/multiplayer/create" element={<MultiplayerCreatePage />} />
         <Route path="/multiplayer/room/:roomId" element={<MultiplayerRoomPage />} />

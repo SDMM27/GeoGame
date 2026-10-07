@@ -2,11 +2,12 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { joinRoom, launchRoom } from '../../utils/multiplayerRoom'
+import { getSavedPseudo } from '../../utils/account'
 import './LobbyScreen.css'
 
 export default function LobbyScreen({ room, playerId, onPseudoSet }) {
   const { t } = useTranslation()
-  const [pseudo, setPseudo] = useState('')
+  const [pseudo, setPseudo] = useState(getSavedPseudo)
   const [joining, setJoining] = useState(false)
 
   const isInRoom = playerId in room.players

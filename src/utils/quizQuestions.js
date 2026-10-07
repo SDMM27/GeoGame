@@ -18,6 +18,15 @@ export const QUIZ_DIFFICULTIES = ['Facile', 'Moyen', 'Difficile', 'Impossible']
 
 export const QUIZ_POINTS = { Facile: 1, Moyen: 2, Difficile: 3, Impossible: 5 }
 
+// Mode infini, choix multiples : chaque indice retire une mauvaise réponse, il en reste toujours deux
+export const CHOICE_HINTS = 2
+
+// Chaque indice réduit les points de la question ; une bonne réponse rapporte toujours au moins 1 point
+export function getQuizPoints(difficulty, hintsUsed = 0) {
+  const base = QUIZ_POINTS[difficulty] ?? 1
+  return Math.max(1, Math.ceil(base / (hintsUsed + 1)))
+}
+
 export const ANSWER_MODES = { CHOICES: 'choices', FREE: 'free' }
 
 const LANGS = ['fr', 'en', 'ru']

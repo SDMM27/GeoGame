@@ -89,6 +89,12 @@ export function VoyageMap({
     [signature]
   )
 
+  // Hints are not framed: a huge country (Russia, Canada) would take over the view.
+  const frame = (animate: boolean) => {
+    const framedNames = [...colored].filter(([, color]) => color !== 'hint' && color !== 'red').map(([name]) => name)
+    mapRef.current?.fitCountries(framedNames, { animate, maxZoom: 5 })
+  }
+
   useEffect(() => {
     const map = mapRef.current
     if (!ready || !map) return
@@ -97,15 +103,18 @@ export function VoyageMap({
       const color = colored.get(layer.feature.properties.ADMIN)
       if (color) layer.setStyle(styleFor(color))
     }
-    // Hints are not framed: a huge country (Russia, Canada) would take over the view.
-    const framedNames = [...colored].filter(([, color]) => color !== 'hint' && color !== 'red').map(([name]) => name)
-    map.fitCountries(framedNames, { animate: framed.current, maxZoom: 5 })
+    frame(framed.current)
     framed.current = true
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, signature])
 
   return (
-    <View style={[styles.frame, style]}>
+    <View
+      style={[styles.frame, style]}
+      // The map shrinks while the keyboard is up: frame the route again once it is measured.
+      onLayout={() => {
+        if (ready) requestAnimationFrame(() => frame(false))
+      }}>
       <WorldMap
         ref={mapRef}
         countries={visible}

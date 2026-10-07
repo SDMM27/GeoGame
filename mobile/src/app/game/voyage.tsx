@@ -5,7 +5,7 @@ import { Image } from 'expo-image'
 import { useLocalSearchParams } from 'expo-router'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native'
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native'
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -23,6 +23,7 @@ import { type CountryFeature } from '@/components/map/geometry'
 import { VOYAGE_COLORS, VoyageMap, type VoyageColor } from '@/components/map/VoyageMap'
 import { Button, Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
+import { useKeyboardVisible } from '@/hooks/useKeyboardVisible'
 import { clean } from '@/i18n'
 import { navigate } from '@/shims/react-router-dom'
 import { toast } from '@/shims/react-toastify'
@@ -125,6 +126,10 @@ export default function VoyageScreen() {
     dailyKey,
   } = useVoyageVoyageState(isDaily ? 'daily' : 'infinite')
   const [input, setInput] = useState('')
+  // Keep the map compact so the guesses stay on screen, smaller still while typing.
+  const { height: windowHeight } = useWindowDimensions()
+  const keyboardVisible = useKeyboardVisible()
+  const mapHeight = Math.max(130, Math.round(windowHeight * (keyboardVisible ? 0.2 : 0.3)))
   const [leaderboardVersion, setLeaderboardVersion] = useState(0)
 
   const chain = validatedChain as CountryFeature[]
@@ -197,7 +202,50 @@ export default function VoyageScreen() {
                 <Endpoint feature={targetCountry} label={t('labels.arrival')} color={VOYAGE_COLORS.target} align="right" />
               </View>
 
+              <View style={{ gap: space.sm }}>
+                <View style={styles.chain}>
+                  {(chainHistory as Guess[]).map((guess, index) => (
+                    <Animated.View key={guess.feature.properties.ISO_A2} entering={FadeInDown.springify().damping(18)} style={styles.chainItem}>
+                      {index > 0 && <MaterialCommunityIcons name="chevron-right" size={16} color={colors.textFaint} />}
+                      <CountryChip feature={guess.feature} color={guess.color} lang={i18n.language} />
+                    </Animated.View>
+                  ))}
+                  {!isGameOver && (
+                    <>
+                      <MaterialCommunityIcons name="chevron-right" size={16} color={colors.textFaint} />
+                      {showInitials && unguessed.length > 0 ? (
+                        unguessed.map((feature, index) => (
+                          <View key={feature.properties.ISO_A2} style={styles.chainItem}>
+                            {index > 0 && <MaterialCommunityIcons name="chevron-right" size={16} color={colors.textFaint} />}
+                            <View style={[styles.chip, styles.chipMissed]}>
+                              <Text variant="bodyStrong" color={colors.textMuted} style={{ fontSize: 13 }}>
+                                {feature.properties.ADMIN.charAt(0).toUpperCase()}
+                              </Text>
+                            </View>
+                          </View>
+                        ))
+                      ) : (
+                        <View style={[styles.chip, styles.chipMissed]}>
+                          <Text variant="bodyStrong" color={colors.textMuted} style={{ fontSize: 13 }}>
+                            ?
+                          </Text>
+                        </View>
+                      )}
+                    </>
+                  )}
+                </View>
+
+                {wrongs.length > 0 && (
+                  <View style={styles.chain}>
+                    {wrongs.map((feature) => (
+                      <CountryChip key={feature.properties.ISO_A2} feature={feature} color="red" lang={i18n.language} />
+                    ))}
+                  </View>
+                )}
+              </View>
+
               <VoyageMap
+                style={{ height: mapHeight }}
                 start={startCountry}
                 target={targetCountry}
                 guesses={guessHistory as Guess[]}
@@ -205,46 +253,6 @@ export default function VoyageScreen() {
                 interactive={isGameOver}
               />
             </>
-          )}
-
-          <View style={styles.chain}>
-            {(chainHistory as Guess[]).map((guess, index) => (
-              <Animated.View key={guess.feature.properties.ISO_A2} entering={FadeInDown.springify().damping(18)} style={styles.chainItem}>
-                {index > 0 && <MaterialCommunityIcons name="chevron-right" size={16} color={colors.textFaint} />}
-                <CountryChip feature={guess.feature} color={guess.color} lang={i18n.language} />
-              </Animated.View>
-            ))}
-            {!isGameOver && (
-              <>
-                <MaterialCommunityIcons name="chevron-right" size={16} color={colors.textFaint} />
-                {showInitials && unguessed.length > 0 ? (
-                  unguessed.map((feature, index) => (
-                    <View key={feature.properties.ISO_A2} style={styles.chainItem}>
-                      {index > 0 && <MaterialCommunityIcons name="chevron-right" size={16} color={colors.textFaint} />}
-                      <View style={[styles.chip, styles.chipMissed]}>
-                        <Text variant="bodyStrong" color={colors.textMuted} style={{ fontSize: 13 }}>
-                          {feature.properties.ADMIN.charAt(0).toUpperCase()}
-                        </Text>
-                      </View>
-                    </View>
-                  ))
-                ) : (
-                  <View style={[styles.chip, styles.chipMissed]}>
-                    <Text variant="bodyStrong" color={colors.textMuted} style={{ fontSize: 13 }}>
-                      ?
-                    </Text>
-                  </View>
-                )}
-              </>
-            )}
-          </View>
-
-          {wrongs.length > 0 && (
-            <View style={styles.chain}>
-              {wrongs.map((feature) => (
-                <CountryChip key={feature.properties.ISO_A2} feature={feature} color="red" lang={i18n.language} />
-              ))}
-            </View>
           )}
 
           {!isGameOver && (

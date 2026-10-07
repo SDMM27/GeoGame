@@ -1,0 +1,200 @@
+rules_version = '2';
+
+// Firestore security rules. Copy this file into Firebase console > Firestore > Rules to publish it.
+//
+// Leaderboards have no accounts: anyone may add a score, but nobody may delete one, and an existing
+// score can only be replaced by a better one for the same player and mode (see src/utils/saveScore.js).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isNumber(value) {
+      return value is int || value is float;
+    }
+
+    function inRange(value, max) {
+      return isNumber(value) && value >= 0 && value <= max;
+    }
+
+    // Pseudos are capped at 20 characters in the forms (30 for Country Ranking).
+    function validName(name) {
+      return name is string && name.size() > 0 && name.size() <= 30;
+    }
+
+    function validLabel(value) {
+      return value is string && value.size() > 0 && value.size() <= 60;
+    }
+
+    // Fields that identify a leaderboard entry must not change when it is replaced.
+    function sameFields(fields) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasAny(fields) == false;
+    }
+
+    // Higher score first, then the shorter time. A missing time loses against any time.
+    function isBetter(newScore, newTime, oldScore, oldTime) {
+      return newScore > oldScore
+        || (newScore == oldScore && isNumber(newTime) && (!isNumber(oldTime) || newTime < oldTime));
+    }
+
+    // ---------- Accounts ----------
+
+    match /usernames/{name} {
+      allow read: if true;
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+
+    match /users/{uid} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == uid;
+
+      match /games/{gameId} {
+        allow read: if true;
+        allow write: if request.auth != null && request.auth.uid == uid;
+      }
+    }
+
+    match /friendships/{id} {
+      allow read: if request.auth != null && request.auth.uid in resource.data.users;
+      allow create: if request.auth != null
+        && request.resource.data.requester == request.auth.uid
+        && request.auth.uid in request.resource.data.users
+        && request.resource.data.users.size() == 2
+        && request.resource.data.status == 'pending';
+      allow update: if request.auth != null
+        && request.auth.uid in resource.data.users
+        && request.auth.uid != resource.data.requester
+        && request.resource.data.status == 'accepted'
+        && request.resource.data.users == resource.data.users;
+      allow delete: if request.auth != null && request.auth.uid in resource.data.users;
+    }
+
+    // ---------- Leaderboards ----------
+
+    // Solo scores: { name, score, difficulty, elapsedTime, gameType, continent? }
+    match /scores/{scoreId} {
+      function validScore(data) {
+        return data.keys().hasOnly(['name', 'score', 'difficulty', 'elapsedTime', 'gameType', 'continent'])
+          && data.keys().hasAll(['name', 'score', 'difficulty', 'gameType'])
+          && validName(data.name)
+          && inRange(data.score, 1000000)
+          && validLabel(data.difficulty)
+          && validLabel(data.gameType)
+          && (data.get('elapsedTime', null) == null || inRange(data.elapsedTime, 1000000000))
+          && (data.get('continent', null) == null || validLabel(data.continent));
+      }
+
+      allow read: if true;
+      allow create: if validScore(request.resource.data);
+      allow update: if validScore(request.resource.data)
+        && sameFields(['name', 'difficulty', 'gameType', 'continent'])
+        && isBetter(request.resource.data.score, request.resource.data.get('elapsedTime', null),
+                    resource.data.score, resource.data.get('elapsedTime', null));
+    }
+
+    // Archive of the first leaderboard: read only.
+    match /scores_v1/{document=**} {
+      allow read: if true;
+    }
+
+    // Ascension scores: { name, gameType, presetName, globalTimeMs, globalScore, totalFound, totalSkipped, phaseStats, date }
+    match /ascension_scores/{scoreId} {
+      function validAscension(data) {
+        return data.keys().hasOnly(['name', 'gameType', 'presetName', 'globalTimeMs', 'globalScore',
+                                    'totalFound', 'totalSkipped', 'phaseStats', 'date'])
+          && validName(data.name)
+          && validLabel(data.gameType)
+          && validLabel(data.presetName)
+          && inRange(data.globalTimeMs, 1000000000)
+          && inRange(data.globalScore, 1000000)
+          && inRange(data.totalFound, 10000)
+          && inRange(data.totalSkipped, 10000)
+          && data.phaseStats is list && data.phaseStats.size() <= 20
+          && data.date == request.time;
+      }
+
+      allow read: if true;
+      allow create: if validAscension(request.resource.data);
+      allow update: if validAscension(request.resource.data)
+        && sameFields(['name', 'gameType', 'presetName'])
+        && isBetter(request.resource.data.globalScore, request.resource.data.globalTimeMs,
+                    resource.data.globalScore, resource.data.get('globalTimeMs', null));
+    }
+
+    // Daily challenges, two shapes:
+    //  - Country Ranking: { name, gameType: 'RANKING', dailyKey, score, totalError, attemptsUsed, playerOrder }
+    //  - other games:     { name, gameType, dailyKey, attempts, elapsedTime, guesses, hints? } (fewer attempts wins)
+    match /daily_scores/{scoreId} {
+      function validRanking(data) {
+        return data.gameType == 'RANKING'
+          && data.keys().hasOnly(['name', 'gameType', 'dailyKey', 'score', 'totalError', 'attemptsUsed', 'playerOrder'])
+          && data.keys().hasAll(['name', 'gameType', 'dailyKey', 'score', 'totalError'])
+          && inRange(data.score, 1000000)
+          && inRange(data.totalError, 1000000)
+          && (data.get('attemptsUsed', null) == null || inRange(data.attemptsUsed, 100))
+          && (data.get('playerOrder', null) == null || (data.playerOrder is list && data.playerOrder.size() <= 300));
+      }
+
+      function validAttempts(data) {
+        return data.gameType != 'RANKING'
+          && data.keys().hasOnly(['name', 'gameType', 'dailyKey', 'attempts', 'elapsedTime', 'guesses', 'hints'])
+          && data.keys().hasAll(['name', 'gameType', 'dailyKey', 'attempts'])
+          && inRange(data.attempts, 1000)
+          && (data.get('elapsedTime', null) == null || inRange(data.elapsedTime, 1000000000))
+          && (data.get('hints', null) == null || inRange(data.hints, 1000));
+      }
+
+      function validDaily(data) {
+        return validName(data.name)
+          && validLabel(data.gameType)
+          && validLabel(data.dailyKey)
+          && (validRanking(data) || validAttempts(data));
+      }
+
+      function effectiveAttempts(data) {
+        return data.attempts + data.get('hints', 0);
+      }
+
+      function isBetterDaily(next, prev) {
+        return next.gameType == 'RANKING'
+          ? isBetter(next.score, -next.totalError, prev.score, -prev.get('totalError', 1000000000))
+          : (effectiveAttempts(next) < effectiveAttempts(prev)
+              || (effectiveAttempts(next) == effectiveAttempts(prev)
+                  && isNumber(next.get('elapsedTime', null))
+                  && (!isNumber(prev.get('elapsedTime', null)) || next.elapsedTime < prev.elapsedTime)));
+      }
+
+      allow read: if true;
+      allow create: if validDaily(request.resource.data);
+      allow update: if validDaily(request.resource.data)
+        && sameFields(['name', 'gameType', 'dailyKey'])
+        && isBetterDaily(request.resource.data, resource.data);
+    }
+
+    // ---------- Multiplayer ----------
+
+    // Players have no account (random id stored on the device): any player of a room has to be able
+    // to update it (host transfer, scores, reconfiguration). Rooms can't be deleted.
+    match /rooms/{roomId} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if true;
+
+      match /progress/{playerId} {
+        allow read: if true;
+        allow write: if true;
+      }
+
+      match /gameResults/{docId} {
+        allow read: if true;
+        allow write: if true;
+      }
+    }
+
+    // Server clock calibration (src/utils/serverTime.js): a throwaway document holding only the server time.
+    match /_clockSync/{id} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasOnly(['t']) && request.resource.data.t == request.time;
+      allow delete: if true;
+    }
+  }
+}

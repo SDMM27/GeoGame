@@ -195,15 +195,12 @@ export default function CountryClueScreen() {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <ScrollView
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={[styles.content, { paddingTop: insets.top + 42 + space.lg }]}>
-          <View>
+          contentContainerStyle={[styles.content, { paddingTop: insets.top + 42 + space.md }]}>
+          <View style={{ gap: space.xs }}>
             <Text variant="label" color={ACCENT}>
-              {isDaily ? t('mobile.home.daily') : t('mobile.home.infinite')}
+              {isDaily ? t('mobile.home.daily') : t('mobile.home.infinite')} · {t('games.country_clue.title')}
             </Text>
-            <Text variant="title">{t('games.country_clue.title')}</Text>
-            <Text variant="caption" style={{ marginTop: space.xs }}>
-              {t('country_clue.intro_text')}
-            </Text>
+            {guesses.length === 0 && !isComplete && <Text variant="caption">{t('country_clue.intro_text')}</Text>}
           </View>
 
           {isDaily && !hasStarted && !isComplete && (

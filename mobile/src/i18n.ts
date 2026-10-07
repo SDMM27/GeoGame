@@ -46,6 +46,7 @@ const fr = {
     remaining: 'restants',
     which_country: 'Quel est ce pays ?',
     which_capital: 'Quelle est sa capitale ?',
+    from_country: 'depuis {{name}}',
     load_error: 'Chargement impossible. Vérifie ta connexion.',
   },
   directions: {
@@ -122,6 +123,7 @@ const en: typeof fr = {
     remaining: 'left',
     which_country: 'Which country is this?',
     which_capital: 'What is its capital?',
+    from_country: 'from {{name}}',
     load_error: "Couldn't load. Check your connection.",
   },
   directions: {
@@ -198,6 +200,7 @@ const ru: typeof fr = {
     remaining: 'осталось',
     which_country: 'Что это за страна?',
     which_capital: 'Какая у неё столица?',
+    from_country: 'от: {{name}}',
     load_error: 'Не удалось загрузить. Проверь подключение.',
   },
   directions: {

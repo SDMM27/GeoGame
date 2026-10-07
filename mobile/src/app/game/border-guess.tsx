@@ -4,7 +4,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native'
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native'
 import Animated, { FadeIn, FadeInDown, LinearTransition, ZoomIn } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -20,6 +20,7 @@ import { ResultsSheet } from '@/components/game/ResultsSheet'
 import { CountrySilhouette } from '@/components/map/CountrySilhouette'
 import { Button, Text } from '@/components/ui'
 import { useElapsed } from '@/hooks/useElapsed'
+import { useKeyboardVisible } from '@/hooks/useKeyboardVisible'
 import { clean } from '@/i18n'
 import { navigate } from '@/shims/react-router-dom'
 import { colors, gameColors, radius, space } from '@/theme'
@@ -33,6 +34,31 @@ type Guess = {
   distanceKm: number | null
   direction: string | null
   directionArrow: string | null
+}
+
+// Where to look next, from the latest wrong guess: shown over the silhouette so it stays visible with the keyboard up.
+function LastHint({ guess }: { guess: Guess }) {
+  const { t, i18n } = useTranslation()
+  if (guess.isCorrect || guess.distanceKm == null) return null
+  const name = (guess.iso && getCountryName(guess.iso, i18n.language)) || guess.value
+  return (
+    <Animated.View key={guess.value} entering={FadeIn.duration(200)} style={styles.lastHint}>
+      {guess.directionArrow && (
+        <Text variant="title" color={ACCENT} style={{ fontSize: 26, lineHeight: 30 }}>
+          {guess.directionArrow}
+        </Text>
+      )}
+      <View style={{ flex: 1 }}>
+        <Text variant="bodyStrong" style={{ fontVariant: ['tabular-nums'] }}>
+          {guess.distanceKm.toLocaleString(i18n.language)} km
+          {guess.direction ? ` · ${t(`mobile.directions.${guess.direction}`)}` : ''}
+        </Text>
+        <Text variant="caption" numberOfLines={1}>
+          {t('mobile.game.from_country', { name })}
+        </Text>
+      </View>
+    </Animated.View>
+  )
 }
 
 function GuessRow({ guess, index }: { guess: Guess; index: number }) {
@@ -94,21 +120,24 @@ export default function BorderGuessScreen() {
   const locked = isComplete || (isDaily && !hasStarted)
   const answer = getCountryName(currentCountryISO, i18n.language) || answerName
   const attemptsLabel = guesses.length === 1 ? t('units.attempt_one') : t('units.attempt_other')
+  // Keep the silhouette compact so the latest guesses stay on screen, smaller still while typing.
+  const { height: windowHeight } = useWindowDimensions()
+  const keyboardVisible = useKeyboardVisible()
+  const mapHeight = Math.max(150, Math.round(windowHeight * (keyboardVisible ? 0.22 : 0.32)))
+  const lastGuess: Guess | undefined = guesses[guesses.length - 1]
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <ScrollView
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={[styles.content, { paddingTop: insets.top + 42 + space.lg }]}>
-          <View>
-            <Text variant="label" color={ACCENT}>
-              {isDaily ? t('mobile.home.daily') : t('mobile.home.infinite')}
-            </Text>
-            <Text variant="title">{t('games.border_guess.title')}</Text>
-          </View>
-
-          <View style={styles.mapCard}>
+          contentContainerStyle={[styles.content, { paddingTop: insets.top + 42 + space.md }]}>
+          <Animated.View layout={LinearTransition.duration(200)} style={[styles.mapCard, { height: mapHeight }]}>
+            <View style={styles.modeTag}>
+              <Text variant="label" color={ACCENT} style={{ fontSize: 10 }}>
+                {isDaily ? t('mobile.home.daily') : t('mobile.home.infinite')}
+              </Text>
+            </View>
             {isDaily && !hasStarted && !isComplete ? (
               <View style={styles.start}>
                 <MaterialCommunityIcons name="vector-polygon" size={40} color={ACCENT} />
@@ -124,10 +153,16 @@ export default function BorderGuessScreen() {
               </View>
             ) : currentCountry ? (
               <Animated.View key={currentCountry.properties.ADMIN} entering={ZoomIn.springify().damping(16)} style={{ flex: 1 }}>
-                <CountrySilhouette country={currentCountry} color={ACCENT} style={{ flex: 1 }} />
+                <CountrySilhouette
+                  country={currentCountry}
+                  color={ACCENT}
+                  bottomInset={!isComplete && lastGuess && !lastGuess.isCorrect ? 52 : 0}
+                  style={{ flex: 1 }}
+                />
               </Animated.View>
             ) : null}
-          </View>
+            {!isComplete && lastGuess && <LastHint guess={lastGuess} />}
+          </Animated.View>
 
           {isComplete && !isDaily && (
             <Animated.View entering={FadeIn.duration(220)} style={styles.result}>
@@ -227,13 +262,36 @@ export default function BorderGuessScreen() {
 const styles = StyleSheet.create({
   content: { paddingHorizontal: space.xl, paddingBottom: space.xl, gap: space.lg },
   mapCard: {
-    aspectRatio: 1,
-    maxHeight: 420,
     borderRadius: radius.xl,
     backgroundColor: colors.ocean,
     borderWidth: 1,
     borderColor: colors.border,
     overflow: 'hidden',
+  },
+  modeTag: {
+    position: 'absolute',
+    top: space.sm,
+    left: space.sm,
+    zIndex: 1,
+    paddingHorizontal: space.sm,
+    paddingVertical: 3,
+    borderRadius: radius.pill,
+    backgroundColor: 'rgba(11,16,32,0.8)',
+  },
+  lastHint: {
+    position: 'absolute',
+    left: space.sm,
+    right: space.sm,
+    bottom: space.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.md,
+    paddingHorizontal: space.md,
+    paddingVertical: space.sm,
+    borderRadius: radius.md,
+    backgroundColor: 'rgba(11,16,32,0.88)',
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   start: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: space.lg, padding: space.xl },
   result: {

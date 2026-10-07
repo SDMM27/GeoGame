@@ -9,8 +9,10 @@ import ChillGame from '../../components/multiplayer/chill/ChillGame'
 import BetweenGamesScreen from '../../components/multiplayer/BetweenGamesScreen'
 import FinalLeaderboard from '../../components/multiplayer/FinalLeaderboard'
 import ReconfigureScreen from '../../components/multiplayer/ReconfigureScreen'
+import AppRoom from '../../components/multiplayer/AppRoom'
 import useMultiplayerRoom from '../../hooks/useMultiplayerRoom'
 import { getOrCreatePlayerId } from '../../utils/multiplayerRoom'
+import { isAppRoom } from '../../utils/appRoom'
 import './MultiplayerRoomPage.css'
 
 export default function MultiplayerRoomPage() {
@@ -44,6 +46,16 @@ export default function MultiplayerRoomPage() {
   }
 
   if (!room) return null
+
+  // Created in the mobile app: one game, its own flow
+  if (isAppRoom(room)) {
+    return (
+      <div className="mp-room">
+        <NavBar />
+        <AppRoom room={room} progress={progress} gameResults={gameResults} playerId={playerId} />
+      </div>
+    )
+  }
 
   if (room.status === 'lobby') {
     return (

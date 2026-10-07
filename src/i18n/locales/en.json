@@ -675,5 +675,30 @@
     "sign_in": "Sign in",
     "retry": "Retry",
     "you": "You"
+  },
+  "app_room": {
+    "live": "Live",
+    "challenge": "Challenge",
+    "from_app": "Game created in the mobile app",
+    "code": "Game code",
+    "join_hint": "Choose your username to join the game.",
+    "join": "Join",
+    "players": "Players · {{count}}",
+    "you": "you",
+    "host": "Host",
+    "waiting_host": "Waiting for the host to start…",
+    "starting_in": "Starting in",
+    "late_hint": "The game has already started, you can still play it.",
+    "challenge_play_hint": "Play whenever you want: everyone gets the same countries.",
+    "play": "Play",
+    "standings": "Standings",
+    "playing": "Playing",
+    "not_played": "Not played yet",
+    "no_players": "Nobody has played yet.",
+    "errors": "{{count}} wrong",
+    "question": "Question {{n}} / {{total}}",
+    "see_results": "See the results",
+    "finished": "Game over!",
+    "unsupported": "This game can't be played on the website yet."
   }
 }

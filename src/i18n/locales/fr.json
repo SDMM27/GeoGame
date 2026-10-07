@@ -675,5 +675,30 @@
     "sign_in": "Se connecter",
     "retry": "Réessayer",
     "you": "Toi"
+  },
+  "app_room": {
+    "live": "En direct",
+    "challenge": "Défi",
+    "from_app": "Partie créée sur l'app mobile",
+    "code": "Code de la partie",
+    "join_hint": "Choisis ton pseudo pour rejoindre la partie.",
+    "join": "Rejoindre",
+    "players": "Joueurs · {{count}}",
+    "you": "toi",
+    "host": "Hôte",
+    "waiting_host": "En attente du lancement par l'hôte…",
+    "starting_in": "Début dans",
+    "late_hint": "La partie a déjà commencé, tu peux quand même la jouer.",
+    "challenge_play_hint": "Joue quand tu veux : tout le monde a les mêmes pays.",
+    "play": "Jouer",
+    "standings": "Classement",
+    "playing": "En jeu",
+    "not_played": "Pas encore joué",
+    "no_players": "Personne n'a encore joué.",
+    "errors": "{{count}} err.",
+    "question": "Question {{n}} / {{total}}",
+    "see_results": "Voir les résultats",
+    "finished": "Partie terminée !",
+    "unsupported": "Ce jeu n'est pas encore jouable sur le site."
   }
 }

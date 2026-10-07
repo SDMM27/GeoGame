@@ -13,6 +13,7 @@ import { dismissInvite, inviteId, sendRoomInvite } from '@shared/utils/invites'
 import { serverNow } from '@shared/utils/serverTime'
 
 import { useAccount, type Account } from '@/account/auth'
+import { SITE_ORIGIN } from '@/links'
 import { Avatar } from '@/components/profile/ProfileSections'
 import { Button, Pill, Text, Touchable } from '@/components/ui'
 import { getGame } from '@/games'
@@ -215,7 +216,7 @@ export default function RoomScreen() {
   const onShare = () => {
     if (!game) return
     Share.share({
-      message: t('mobile.multi.share_message', { game: t(game.titleKey), code, link: `geogame://multi/${code}` }),
+      message: t('mobile.multi.share_message', { game: t(game.titleKey), code, link: `${SITE_ORIGIN}/multiplayer/room/${code}` }),
     })
   }
 

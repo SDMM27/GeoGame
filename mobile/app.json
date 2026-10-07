@@ -21,7 +21,8 @@
         "foregroundImage": "./assets/images/android-icon-foreground.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.sdmm27.geogame"
+      "package": "com.sdmm27.geogame",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "output": "single",
@@ -46,7 +47,10 @@
         "expo-build-properties",
         {
           "android": {
-            "buildArchs": ["armeabi-v7a", "arm64-v8a"]
+            "buildArchs": [
+              "armeabi-v7a",
+              "arm64-v8a"
+            ]
           }
         }
       ],
@@ -69,6 +73,12 @@
       "eas": {
         "projectId": "970ae91f-e9ee-4f14-9255-733683fdf13c"
       }
+    },
+    "runtimeVersion": {
+      "policy": "fingerprint"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/970ae91f-e9ee-4f14-9255-733683fdf13c"
     }
   }
 }

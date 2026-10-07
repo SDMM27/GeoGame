@@ -50,7 +50,7 @@
     },
     "quiz": {
       "title": "Гео-викторина",
-      "description": "Отвечай на вопросы по географии один за другим, пока не решишь остановиться."
+      "description": "Вопрос дня, чтобы бросить вызов друзьям, или вопросы один за другим на выбранном уровне сложности."
     }
   },
   "modes": {
@@ -354,11 +354,7 @@
   },
   "quiz": {
     "pick_difficulty": "Выбери сложность",
-    "pick_difficulty_hint": "Вопросы будут не сложнее выбранного уровня. Остановиться можно в любой момент.",
-    "points_one": "{{count}} очко",
-    "points_few": "{{count}} очка",
-    "points_many": "{{count}} очков",
-    "points_other": "{{count}} очка",
+    "pick_difficulty_hint": "Все вопросы будут этого уровня сложности. Остановиться можно в любой момент.",
     "score": "Счёт",
     "correct_answers": "Верные ответы",
     "streak": "Серия",
@@ -410,6 +406,45 @@
     "dont_know": "Не знаю",
     "typo_accepted": "Опечатка засчитана: {{name}}",
     "answer_was": "Ответ: {{answer}}",
-    "accepted_answers": "Возможные ответы: {{answer}}"
+    "accepted_answers": "Возможные ответы: {{answer}}",
+    "daily_title": "Вопрос дня",
+    "daily_rules": "Один вопрос, сегодня одинаковый для всех. Без вариантов: ответ нужно написать самому. У тебя {{attempts}} попыток и до {{hints}} подсказок, но каждая подсказка считается попыткой в рейтинге. Вопрос появится, когда ты запустишь таймер.",
+    "attempts_left": "Осталось попыток",
+    "attempts_used": "Попытки",
+    "hints_label": "Подсказки",
+    "hint_n": "Подсказка {{n}}",
+    "hint_button": "💡 Подсказка ({{used}}/{{max}})",
+    "give_up": "Сдаться",
+    "already_tried": "Этот ответ уже предлагался.",
+    "daily_won": "✓ Найдено: {{attempts}}!",
+    "daily_lost": "✗ На этот раз не угадано",
+    "daily_come_back": "Возвращайся завтра за новым вопросом.",
+    "daily_stat": "{{attempts}} · {{hints}} — {{time}}",
+    "attempts_count_one": "{{count}} попытка",
+    "attempts_count_few": "{{count}} попытки",
+    "attempts_count_many": "{{count}} попыток",
+    "attempts_count_other": "{{count}} попытки",
+    "hints_count_one": "{{count}} подсказка",
+    "hints_count_few": "{{count}} подсказки",
+    "hints_count_many": "{{count}} подсказок",
+    "hints_count_other": "{{count}} подсказки",
+    "guesses_title": "Предложенные ответы",
+    "play_infinite": "Бесконечный режим",
+    "hints": {
+      "continent": "Это страна на этом континенте: {{continent}}",
+      "height": "Высота вершины — {{height}} м",
+      "river_length": "Длина — {{length}} км",
+      "located_in": "Находится здесь: {{countries}}",
+      "one_of": "Один из ответов:",
+      "letters_one": "{{count}} буква",
+      "letters_few": "{{count}} буквы",
+      "letters_many": "{{count}} букв",
+      "letters_other": "{{count}} буквы",
+      "digits_one": "Это {{count}}-значное число",
+      "digits_few": "Это {{count}}-значное число",
+      "digits_many": "Это {{count}}-значное число",
+      "digits_other": "Это {{count}}-значное число",
+      "between": "От {{min}} до {{max}}"
+    }
   }
 }

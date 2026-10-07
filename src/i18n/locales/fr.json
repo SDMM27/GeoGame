@@ -50,7 +50,7 @@
     },
     "quiz": {
       "title": "Quiz Géo",
-      "description": "Enchaîne les questions de culture géographique jusqu'à ce que tu décides d'arrêter."
+      "description": "Une question du jour pour défier tes amis, ou enchaîne les questions à la difficulté de ton choix."
     }
   },
   "modes": {
@@ -354,9 +354,7 @@
   },
   "quiz": {
     "pick_difficulty": "Choisis ta difficulté",
-    "pick_difficulty_hint": "Les questions iront jusqu'à cette difficulté. Tu peux arrêter quand tu veux.",
-    "points_one": "{{count}} point",
-    "points_other": "{{count}} points",
+    "pick_difficulty_hint": "Toutes les questions seront de cette difficulté. Tu peux arrêter quand tu veux.",
     "score": "Score",
     "correct_answers": "Bonnes réponses",
     "streak": "Série",
@@ -408,6 +406,37 @@
     "dont_know": "Je ne sais pas",
     "typo_accepted": "Faute de frappe acceptée : {{name}}",
     "answer_was": "Réponse : {{answer}}",
-    "accepted_answers": "Réponses possibles : {{answer}}"
+    "accepted_answers": "Réponses possibles : {{answer}}",
+    "daily_title": "Question du jour",
+    "daily_rules": "Une seule question, la même pour tout le monde aujourd'hui. Pas de propositions : tu écris ta réponse. Tu as {{attempts}} essais et jusqu'à {{hints}} indices, mais chaque indice compte comme un essai au classement. La question s'affiche quand tu lances le chrono.",
+    "attempts_left": "Essais restants",
+    "attempts_used": "Essais",
+    "hints_label": "Indices",
+    "hint_n": "Indice {{n}}",
+    "hint_button": "💡 Indice ({{used}}/{{max}})",
+    "give_up": "Abandonner",
+    "already_tried": "Tu as déjà proposé cette réponse.",
+    "daily_won": "✓ Trouvé en {{attempts}} !",
+    "daily_lost": "✗ Pas trouvé cette fois",
+    "daily_come_back": "Reviens demain pour une nouvelle question.",
+    "daily_stat": "{{attempts}} · {{hints}} — {{time}}",
+    "attempts_count_one": "{{count}} essai",
+    "attempts_count_other": "{{count}} essais",
+    "hints_count_one": "{{count}} indice",
+    "hints_count_other": "{{count}} indices",
+    "guesses_title": "Réponses tentées",
+    "play_infinite": "Mode infini",
+    "hints": {
+      "continent": "C'est un pays de ce continent : {{continent}}",
+      "height": "Il culmine à {{height}} m",
+      "river_length": "Il est long de {{length}} km",
+      "located_in": "Se trouve ici : {{countries}}",
+      "one_of": "Une des réponses :",
+      "letters_one": "{{count}} lettre",
+      "letters_other": "{{count}} lettres",
+      "digits_one": "C'est un nombre à {{count}} chiffre",
+      "digits_other": "C'est un nombre à {{count}} chiffres",
+      "between": "Entre {{min}} et {{max}}"
+    }
   }
 }

@@ -12,6 +12,7 @@ import { getCountryAreaKm2 } from './countryArea'
 import { getCountryName, getAllCountryNames } from './getCountryName'
 import { CONTINENTS } from './continents'
 import { matchAnswer } from './normalizeAnswer'
+import { mulberry32 } from './prng'
 
 export const QUIZ_DIFFICULTIES = ['Facile', 'Moyen', 'Difficile', 'Impossible']
 
@@ -479,30 +480,95 @@ function curatedToQuestion(q, random) {
 }
 
 /**
- * Tire une nouvelle question dont la difficulté est ≤ maxDifficulty.
+ * Tire une nouvelle question de la difficulté demandée.
+ * Les éléments plus faciles restent utilisables comme ingrédients (un lac facile dans un pays
+ * difficile donne une question difficile), mais la question elle-même doit avoir cette difficulté.
  * `usedKeys` évite de reposer une question déjà vue dans la session.
  */
-export function generateQuestion(maxDifficulty, usedKeys = new Set(), random = Math.random, answerMode = ANSWER_MODES.CHOICES) {
-  const allowed = getAllowedDifficulties(maxDifficulty)
-  const weights = TEMPLATES[answerMode] ?? TEMPLATES.choices
+export function generateQuestion(
+  difficulty, usedKeys = new Set(), random = Math.random, answerMode = ANSWER_MODES.CHOICES,
+  weights = TEMPLATES[answerMode] ?? TEMPLATES.choices
+) {
+  const allowed = getAllowedDifficulties(difficulty)
   const curatedPool = curatedQuestions.filter(
-    (q) => allowed.includes(q.difficulty) && !usedKeys.has(`curated:${q.id}`)
+    (q) => q.difficulty === difficulty && !usedKeys.has(`curated:${q.id}`)
   )
 
   if (curatedPool.length && random() < CURATED_RATIO) {
     return curatedToQuestion(pick(curatedPool, random), random)
   }
 
-  let fallback = null
+  // Repli, du meilleur au pire : bonne difficulté mais déjà vue, puis plus facile mais inédite
+  let alreadySeen = null
+  let easier = null
   for (let i = 0; i < MAX_ATTEMPTS; i++) {
     const type = pickWeighted(weights, random)
     const question = generators[type](allowed, random, answerMode)
     if (!question || !allowed.includes(question.difficulty)) continue
-    if (!question.usedKeys.some((k) => usedKeys.has(k))) return question
-    fallback = fallback ?? question
+    const isNew = !question.usedKeys.some((k) => usedKeys.has(k))
+    if (question.difficulty === difficulty) {
+      if (isNew) return question
+      alreadySeen = alreadySeen ?? question
+    } else if (isNew) {
+      easier = easier ?? question
+    }
   }
-  if (fallback) return fallback
-  return curatedPool.length ? curatedToQuestion(pick(curatedPool, random), random) : null
+  if (alreadySeen) return alreadySeen
+  if (curatedPool.length) return curatedToQuestion(pick(curatedPool, random), random)
+  return easier
+}
+
+// ─── Question du jour ──────────────────────────────────────────────────────
+
+// Jamais facile (sans intérêt pour un défi entre amis) ni impossible (trop obscur)
+const DAILY_DIFFICULTY_WEIGHTS = { Moyen: 1, Difficile: 1 }
+
+// Le continent se devine presque au hasard (5 possibilités) : sans intérêt comme question du jour
+const { feature_continent: _continent, ...DAILY_TEMPLATES } = TEMPLATES.free
+
+function hashString(value) {
+  let hash = 0
+  for (let i = 0; i < value.length; i++) hash = (hash * 31 + value.charCodeAt(i)) >>> 0
+  return hash
+}
+
+// Nombre de jours pendant lesquels on évite de reparler du même sujet
+const DAILY_HISTORY_DAYS = 30
+// Premier jour de la question du jour : point de départ de la suite des tirages
+const DAILY_EPOCH = '2026-10-01'
+const dailyCache = new Map()
+
+function shiftDateKey(dateKey, days) {
+  const [y, m, d] = dateKey.split('-').map(Number)
+  return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10)
+}
+
+function drawDaily(dateKey, usedKeys) {
+  const random = mulberry32(hashString(`quiz:${dateKey}`))
+  const difficulty = pickWeighted(DAILY_DIFFICULTY_WEIGHTS, random)
+  return generateQuestion(difficulty, usedKeys, random, ANSWER_MODES.FREE, DAILY_TEMPLATES)
+}
+
+/**
+ * Question du jour : la même pour tout le monde à une date donnée, toujours en réponse libre.
+ * Les sujets tirés les jours précédents sont écartés, pour ne pas retomber sur le mont Blanc chaque semaine.
+ */
+export function getDailyQuestion(dateKey) {
+  // On rejoue chaque jour depuis le lancement, chacun évitant les sujets des DAILY_HISTORY_DAYS jours
+  // d'avant : tout le monde obtient exactement la même suite. Un tirage coûte ~0,1 ms, donc même
+  // après des années on reste bien sous la seconde, et le résultat est gardé en cache.
+  let day = DAILY_EPOCH < dateKey ? DAILY_EPOCH : dateKey
+  while (!dailyCache.has(dateKey)) {
+    if (!dailyCache.has(day)) {
+      const recent = new Set()
+      for (let i = 1; i <= DAILY_HISTORY_DAYS; i++) {
+        dailyCache.get(shiftDateKey(day, -i))?.usedKeys.forEach((k) => recent.add(k))
+      }
+      dailyCache.set(day, drawDaily(day, recent))
+    }
+    day = shiftDateKey(day, 1)
+  }
+  return dailyCache.get(dateKey)
 }
 
 // ─── Affichage ─────────────────────────────────────────────────────────────
@@ -559,6 +625,72 @@ export function localizeQuestion(question, lang, t) {
     multipleAnswers: answers.length > 1,
     fact: question.fact ? localizeText(question.fact, lang) : null,
   }
+}
+
+// ─── Indices ───────────────────────────────────────────────────────────────
+
+export const MAX_HINTS = 3
+
+// Lettres masquées : `reveal(index)` décide, pour chaque mot, quelles lettres montrer
+function maskAnswer(label, reveal) {
+  return label.split(' ').map((word) => {
+    let letterIndex = 0
+    return [...word].map((char) => {
+      if (!/\p{L}|\p{N}/u.test(char)) return char
+      return reveal(letterIndex++) ? char : '_'
+    }).join(' ')
+  }).join('   ')
+}
+
+function contextHint(question, choice, lang, t) {
+  const { params } = question
+  if (choice.kind === 'country') {
+    const continent = BY_ISO.get(choice.value)?.continent
+    return continent ? t('quiz.hints.continent', { continent: t(`continents.${continent}`) }) : null
+  }
+  if (choice.kind !== 'feature') return null
+  const f = FEATURE_BY_ID.get(choice.value)
+  if (!f) return null
+  if (f.type === 'mountain' && f.height && question.type !== 'mountain_height') {
+    return t('quiz.hints.height', { height: f.height.toLocaleString(LOCALES[lang] ?? 'fr-FR') })
+  }
+  if (f.type === 'river' && f.length) {
+    return t('quiz.hints.river_length', { length: f.length.toLocaleString(LOCALES[lang] ?? 'fr-FR') })
+  }
+  // Inutile de rappeler le pays quand la question le donne déjà
+  if (!params.country && f.countries.length) {
+    return t('quiz.hints.located_in', { countries: f.countries.map((iso) => countryLabel(iso, lang)).join(', ') })
+  }
+  return null
+}
+
+/**
+ * Indices progressifs pour la réponse libre, du plus vague au plus révélateur.
+ * Renvoie toujours MAX_HINTS indices.
+ */
+export function getQuestionHints(question, lang, t) {
+  const target = question.choices.find((c) => c.id === question.correctId) ?? question.accepted[0]
+  if (!target) return []
+  // L'article n'aide pas à deviner et brouillerait les lettres masquées
+  const label = choiceLabel(target, lang, t).replace(/^(?:(?:les?|la|the)\s+|l['’])(?=\p{L})/iu, '')
+  if (/^\d+$/.test(label)) {
+    // Fourchettes décentrées : leur milieu ne doit pas donner la réponse
+    const n = Number(label)
+    return [
+      t('quiz.hints.digits', { count: label.length }),
+      t('quiz.hints.between', { min: Math.floor(n * 0.5), max: Math.ceil(n * 1.2) }),
+      t('quiz.hints.between', { min: Math.floor(n * 0.8), max: Math.ceil(n * 1.1) }),
+    ]
+  }
+  const prefix = question.accepted.length > 1 ? `${t('quiz.hints.one_of')} ` : ''
+  const letterCount = [...label].filter((c) => /\p{L}|\p{N}/u.test(c)).length
+
+  const blank = `${prefix}${maskAnswer(label, () => false)} — ${t('quiz.hints.letters', { count: letterCount })}`
+  const initials = `${prefix}${maskAnswer(label, (i) => i === 0)}`
+  const half = `${prefix}${maskAnswer(label, (i) => i % 2 === 0)}`
+
+  const context = contextHint(question, target, lang, t)
+  return context ? [context, initials, half] : [blank, initials, half]
 }
 
 // ─── Réponse libre ─────────────────────────────────────────────────────────

@@ -1,12 +1,16 @@
 // src/pages/QuizPage.jsx
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import NavBar from '../components/NavBar'
 import ShareScoreButton from '../components/ShareScoreButton'
 import useQuizState from '../hooks/useQuizState'
+import useDailyQuizState from '../hooks/useDailyQuizState'
+import DailyForm from './DailyForm'
+import DailyLeaderboard from './DailyLeaderboard'
 import { GAME_TYPES } from '../utils/gameTypes'
-import { ANSWER_MODES, QUIZ_DIFFICULTIES, QUIZ_POINTS, localizeQuestion } from '../utils/quizQuestions'
+import { formatTime } from '../utils/formatTime'
+import { ANSWER_MODES, MAX_HINTS, QUIZ_DIFFICULTIES, getQuestionHints, localizeQuestion } from '../utils/quizQuestions'
 import './QuizPage.css'
 
 const DIFFICULTY_COLORS = {
@@ -57,7 +61,6 @@ function DifficultyPicker({ onPick }) {
         {QUIZ_DIFFICULTIES.map((d) => (
           <button key={d} className="quiz-difficulty-btn" onClick={() => onPick(d, mode)}>
             <span style={{ color: DIFFICULTY_COLORS[d] }}>{t(`difficulties.${d}`)}</span>
-            <small>{t('quiz.points', { count: QUIZ_POINTS[d] })}</small>
           </button>
         ))}
       </div>
@@ -94,7 +97,7 @@ function Summary({ stats, maxDifficulty, onRestart, onChangeDifficulty }) {
   )
 }
 
-export default function QuizPage() {
+function PracticeQuiz() {
   const { t, i18n } = useTranslation()
   const {
     maxDifficulty, answerMode, question, selectedId, freeResult, isAnswered, isCorrect, stats, isFinished,
@@ -178,7 +181,7 @@ export default function QuizPage() {
         {maxDifficulty && !isFinished && localized && (
           <section className="quiz-card">
             <span className="quiz-badge" style={{ color: DIFFICULTY_COLORS[question.difficulty] }}>
-              {t(`difficulties.${question.difficulty}`)} · {t('quiz.points', { count: QUIZ_POINTS[question.difficulty] })}
+              {t(`difficulties.${question.difficulty}`)}
             </span>
             <h2 className="quiz-question">{localized.prompt}</h2>
 
@@ -241,4 +244,181 @@ export default function QuizPage() {
       </main>
     </div>
   )
+}
+
+function DailyQuiz() {
+  const { t, i18n } = useTranslation()
+  const navigate = useNavigate()
+  const {
+    dailyKey, question, guesses, hintsUsed, elapsedTime, hasStarted, isComplete, isSolved, attemptsLeft, canUseHint,
+    start, submit, takeHint, giveUp,
+  } = useDailyQuizState()
+  const [inputValue, setInputValue] = useState('')
+  const [notice, setNotice] = useState(null)
+  const inputRef = useRef(null)
+
+  const localized = useMemo(
+    () => (question ? localizeQuestion(question, i18n.language, t) : null),
+    [question, i18n.language, t]
+  )
+  const hints = useMemo(
+    () => (question ? getQuestionHints(question, i18n.language, t) : []),
+    [question, i18n.language, t]
+  )
+
+  useEffect(() => {
+    if (hasStarted && !isComplete) inputRef.current?.focus()
+  }, [hasStarted, isComplete])
+
+  const onSubmit = () => {
+    const result = submit(inputValue)
+    if (result === 'duplicate') {
+      setNotice(t('quiz.already_tried'))
+      return
+    }
+    if (result) {
+      setInputValue('')
+      setNotice(null)
+      inputRef.current?.focus()
+    }
+  }
+
+  const onInputKeyDown = (e) => {
+    if (e.key === 'Enter' && inputValue.trim()) onSubmit()
+  }
+
+  const attempts = guesses.length
+  const lastGuess = guesses[guesses.length - 1]
+  const statText = t('quiz.daily_stat', {
+    attempts: t('quiz.attempts_count', { count: attempts }),
+    hints: t('quiz.hints_count', { count: hintsUsed }),
+    time: elapsedTime != null ? formatTime(elapsedTime) : '—',
+  })
+
+  return (
+    <div className="quiz-page">
+      <NavBar />
+      <main className="quiz-main">
+        <header className="quiz-header">
+          <h1>{t('quiz.daily_title')}</h1>
+          {hasStarted && (
+            <div className="quiz-hud">
+              <div>
+                <strong>{isComplete ? attempts : attemptsLeft}</strong>
+                <small>{t(isComplete ? 'quiz.attempts_used' : 'quiz.attempts_left')}</small>
+              </div>
+              <div><strong>{hintsUsed}/{MAX_HINTS}</strong><small>{t('quiz.hints_label')}</small></div>
+            </div>
+          )}
+        </header>
+
+        {localized && (
+          <section className="quiz-card">
+            <span className="quiz-badge" style={{ color: DIFFICULTY_COLORS[question.difficulty] }}>
+              {t(`difficulties.${question.difficulty}`)}
+            </span>
+
+            {!hasStarted ? (
+              <>
+                <p className="quiz-daily-rules">{t('quiz.daily_rules', { attempts: attemptsLeft, hints: MAX_HINTS })}</p>
+                <button className="daily-start-btn" onClick={start}>{t('buttons.start_timer')}</button>
+              </>
+            ) : (
+              <>
+                <h2 className="quiz-question">{localized.prompt}</h2>
+
+                {hintsUsed > 0 && (
+                  <ol className="quiz-hints">
+                    {hints.slice(0, hintsUsed).map((hint, i) => (
+                      <li key={i}><span className="quiz-hints-label">{t('quiz.hint_n', { n: i + 1 })}</span>{hint}</li>
+                    ))}
+                  </ol>
+                )}
+
+                {guesses.some((g) => !g.correct) && (
+                  <ul className="quiz-guesses">
+                    {guesses.filter((g) => !g.correct).map((g) => <li key={g.input}>✗ {g.input}</li>)}
+                  </ul>
+                )}
+
+                {!isComplete ? (
+                  <div className="quiz-free">
+                    <input
+                      ref={inputRef}
+                      className="quiz-input"
+                      type="text"
+                      placeholder={t('quiz.input_placeholder')}
+                      value={inputValue}
+                      onChange={(e) => { setInputValue(e.target.value); setNotice(null) }}
+                      onKeyDown={onInputKeyDown}
+                      autoComplete="off"
+                    />
+                    {notice && <p className="quiz-notice">{notice}</p>}
+                    <div className="quiz-free-actions">
+                      <button className="quiz-btn" onClick={takeHint} disabled={!canUseHint}>
+                        {t('quiz.hint_button', { used: hintsUsed, max: MAX_HINTS })}
+                      </button>
+                      <button className="quiz-btn" onClick={giveUp}>{t('quiz.give_up')}</button>
+                      <button className="quiz-btn quiz-btn--primary" onClick={onSubmit} disabled={!inputValue.trim()}>
+                        {t('buttons.validate')}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className={`quiz-feedback${isSolved ? ' quiz-feedback--correct' : ' quiz-feedback--wrong'}`}>
+                    <strong>
+                      {isSolved
+                        ? t('quiz.daily_won', { attempts: t('quiz.attempts_count', { count: attempts }) })
+                        : t('quiz.daily_lost')}
+                    </strong>
+                    {isSolved && lastGuess?.typo && <p>{t('quiz.typo_accepted', { name: lastGuess.typo })}</p>}
+                    <p>{t(localized.multipleAnswers ? 'quiz.accepted_answers' : 'quiz.answer_was', { answer: localized.answer })}</p>
+                    {localized.fact && <p>{localized.fact}</p>}
+                    <p>{t('quiz.daily_come_back')}</p>
+                  </div>
+                )}
+              </>
+            )}
+          </section>
+        )}
+
+        {isComplete && (
+          <>
+            <ShareScoreButton
+              score={attempts + hintsUsed}
+              gameType={GAME_TYPES.QUIZ}
+              difficulty="Daily"
+              scoreLabel={t('share.score_attempts')}
+              details={isSolved ? statText : t('quiz.daily_lost')}
+            />
+            {isSolved && (
+              <DailyForm
+                attempts={attempts}
+                hints={hintsUsed}
+                elapsedTime={elapsedTime}
+                guesses={guesses.map((g) => g.input)}
+                gameType={GAME_TYPES.QUIZ}
+                dailyKey={dailyKey}
+                statText={statText}
+              />
+            )}
+            <DailyLeaderboard gameType={GAME_TYPES.QUIZ} dailyKey={dailyKey} guessesTitle={t('quiz.guesses_title')} />
+          </>
+        )}
+
+        <div className="quiz-actions">
+          <button className="quiz-btn" onClick={() => navigate('/')}>{t('buttons.return_home')}</button>
+          <button className="quiz-btn" onClick={() => navigate('/quiz', { state: { mode: 'infinite' } })}>
+            {t('quiz.play_infinite')}
+          </button>
+        </div>
+      </main>
+    </div>
+  )
+}
+
+export default function QuizPage() {
+  const location = useLocation()
+  // Comme les autres jeux du jour : sans mode explicite, on arrive sur la question du jour
+  return location.state?.mode === 'infinite' ? <PracticeQuiz /> : <DailyQuiz />
 }

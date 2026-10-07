@@ -125,7 +125,6 @@ const GAMES = [
     titleKey: "games.quiz.title",
     descKey: "games.quiz.description",
     route: "/quiz",
-    directLaunch: true,
     active: true,
   },
   {
@@ -349,6 +348,7 @@ const DAILY_INFINITE_GAMES = new Set([
   GAME_TYPES.COUNTRY_CLUE,
   GAME_TYPES.VOYAGE_VOYAGE,
   "ranking",
+  GAME_TYPES.QUIZ,
 ]);
 
 function GameTile({ game, onConfigure }) {

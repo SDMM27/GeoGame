@@ -50,7 +50,7 @@
     },
     "quiz": {
       "title": "Geo Quiz",
-      "description": "Answer geography trivia questions one after another until you decide to stop."
+      "description": "A daily question to challenge your friends, or keep answering questions at the difficulty of your choice."
     }
   },
   "modes": {
@@ -354,9 +354,7 @@
   },
   "quiz": {
     "pick_difficulty": "Choose your difficulty",
-    "pick_difficulty_hint": "Questions will go up to this difficulty. You can stop whenever you want.",
-    "points_one": "{{count}} point",
-    "points_other": "{{count}} points",
+    "pick_difficulty_hint": "Every question will be at this difficulty. You can stop whenever you want.",
     "score": "Score",
     "correct_answers": "Correct answers",
     "streak": "Streak",
@@ -408,6 +406,37 @@
     "dont_know": "I don't know",
     "typo_accepted": "Typo accepted: {{name}}",
     "answer_was": "Answer: {{answer}}",
-    "accepted_answers": "Possible answers: {{answer}}"
+    "accepted_answers": "Possible answers: {{answer}}",
+    "daily_title": "Question of the day",
+    "daily_rules": "A single question, the same for everyone today. No options: you type your answer. You get {{attempts}} attempts and up to {{hints}} hints, but each hint counts as an attempt in the leaderboard. The question appears when you start the timer.",
+    "attempts_left": "Attempts left",
+    "attempts_used": "Attempts",
+    "hints_label": "Hints",
+    "hint_n": "Hint {{n}}",
+    "hint_button": "💡 Hint ({{used}}/{{max}})",
+    "give_up": "Give up",
+    "already_tried": "You already tried this answer.",
+    "daily_won": "✓ Found in {{attempts}}!",
+    "daily_lost": "✗ Not found this time",
+    "daily_come_back": "Come back tomorrow for a new question.",
+    "daily_stat": "{{attempts}} · {{hints}} — {{time}}",
+    "attempts_count_one": "{{count}} attempt",
+    "attempts_count_other": "{{count}} attempts",
+    "hints_count_one": "{{count}} hint",
+    "hints_count_other": "{{count}} hints",
+    "guesses_title": "Answers tried",
+    "play_infinite": "Infinite mode",
+    "hints": {
+      "continent": "It's a country in this continent: {{continent}}",
+      "height": "Its summit is {{height}} m high",
+      "river_length": "It is {{length}} km long",
+      "located_in": "Located in: {{countries}}",
+      "one_of": "One of the answers:",
+      "letters_one": "{{count}} letter",
+      "letters_other": "{{count}} letters",
+      "digits_one": "It's a {{count}}-digit number",
+      "digits_other": "It's a {{count}}-digit number",
+      "between": "Between {{min}} and {{max}}"
+    }
   }
 }

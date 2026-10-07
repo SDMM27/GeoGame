@@ -11,7 +11,10 @@ import {
   checkFreeAnswer,
   generateQuestion,
   getAllowedDifficulties,
+  getDailyQuestion,
+  getQuestionHints,
   localizeQuestion,
+  MAX_HINTS,
 } from './quizQuestions'
 import { mulberry32 } from './prng'
 
@@ -20,7 +23,11 @@ const LANGS = ['fr', 'en', 'ru']
 
 // Traduction réelle, pour vérifier aussi que chaque clé de question existe
 const makeT = (lang) => (key, params = {}) => {
-  const value = key.split('.').reduce((o, p) => o?.[p], LOCALES[lang])
+  const resolve = (k) => k.split('.').reduce((o, p) => o?.[p], LOCALES[lang])
+  let value = resolve(key)
+  if (typeof value !== 'string' && params.count != null) {
+    value = resolve(`${key}_${params.count === 1 ? 'one' : 'other'}`)
+  }
   if (typeof value !== 'string') throw new Error(`missing ${lang} key ${key}`)
   return value.replace(/{{(\w+)}}/g, (_, name) => params[name] ?? '')
 }
@@ -72,11 +79,22 @@ describe('getAllowedDifficulties', () => {
 })
 
 describe('generateQuestion', () => {
-  it.each(QUIZ_DIFFICULTIES)('never exceeds the max difficulty (%s)', (max) => {
-    const allowed = getAllowedDifficulties(max)
-    for (const q of generate(300, { max, seed: 42 })) {
-      expect(q).not.toBeNull()
-      expect(allowed).toContain(q.difficulty)
+  it.each(QUIZ_DIFFICULTIES)('always asks questions of the chosen difficulty (%s)', (difficulty) => {
+    for (const mode of Object.values(ANSWER_MODES)) {
+      for (const q of generate(300, { max: difficulty, mode, seed: 42 })) {
+        expect(q).not.toBeNull()
+        expect(q.difficulty).toBe(difficulty)
+      }
+    }
+  })
+
+  it('keeps the chosen difficulty over a whole session', () => {
+    const random = mulberry32(11)
+    const used = new Set()
+    for (let i = 0; i < 40; i++) {
+      const q = generateQuestion('Difficile', used, random)
+      expect(q.difficulty).toBe('Difficile')
+      q.usedKeys.forEach((k) => used.add(k))
     }
   })
 
@@ -175,8 +193,48 @@ describe('free answer mode', () => {
   })
 
   it('tolerates typos on long answers', () => {
-    const q = generate(2000, { mode: ANSWER_MODES.FREE, seed: 17 })
+    const max = GEO_FEATURES.find((f) => f.id === 'mississippi').difficulty
+    const q = generate(2000, { max, mode: ANSWER_MODES.FREE, seed: 17 })
       .find((x) => x.type === 'river_city' && x.accepted[0].value === 'mississippi')
     expect(checkFreeAnswer(q, 'Missisippi')?.match).toBe('typo')
+  })
+})
+
+describe('daily question', () => {
+  const days = Array.from({ length: 60 }, (_, i) => {
+    const d = new Date(2026, 0, 1 + i)
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  })
+
+  it('is the same for everyone on a given day and changes from day to day', () => {
+    expect(getDailyQuestion('2026-10-07')).toEqual(getDailyQuestion('2026-10-07'))
+    expect(new Set(days.map((d) => getDailyQuestion(d).key)).size).toBeGreaterThan(50)
+  })
+
+  it('is always answerable without choices, at medium or hard difficulty', () => {
+    const freeTypes = ['curated', 'feature_country', 'river_mouth', 'river_city',
+      'mountain_range', 'highest_point', 'mountain_height', 'range_highest', 'neighbor_free']
+    for (const d of days) {
+      const q = getDailyQuestion(d)
+      expect(freeTypes).toContain(q.type)
+      expect(['Moyen', 'Difficile']).toContain(q.difficulty)
+      expect(q.accepted.length).toBeGreaterThan(0)
+    }
+  })
+
+  it(`offers ${MAX_HINTS} progressive hints in every language`, () => {
+    for (const d of days) {
+      const q = getDailyQuestion(d)
+      for (const lang of LANGS) {
+        const hints = getQuestionHints(q, lang, makeT(lang))
+        expect(hints).toHaveLength(MAX_HINTS)
+        for (const hint of hints) {
+          expect(hint.trim()).not.toBe('')
+          expect(hint).not.toMatch(/undefined|null|\{\{/)
+        }
+        // Le dernier indice dévoile des lettres de la réponse
+        expect(hints[2]).toMatch(/\p{L}.*_|_.*\p{L}|^[^_]*\p{L}[^_]*$/u)
+      }
+    }
   })
 })

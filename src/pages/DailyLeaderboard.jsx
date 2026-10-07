@@ -9,7 +9,7 @@ import './DailyLeaderboard.css'
 
 const MEDAL = ['🥇', '🥈', '🥉']
 
-function AccordionRow({ score, index, secondaryFormatter }) {
+function AccordionRow({ score, index, secondaryFormatter, guessesTitle }) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
 
@@ -35,7 +35,7 @@ function AccordionRow({ score, index, secondaryFormatter }) {
           )}
           {Array.isArray(score.guesses) && score.guesses.length > 0 && (
             <>
-              <p className="daily-lb__accordion-title">{t('leaderboard.attempted_countries')}</p>
+              <p className="daily-lb__accordion-title">{guessesTitle ?? t('leaderboard.attempted_countries')}</p>
               <ol className="daily-lb__guess-list">
                 {score.guesses.map((country, i) => (
                   <li
@@ -54,7 +54,7 @@ function AccordionRow({ score, index, secondaryFormatter }) {
   )
 }
 
-export default function DailyLeaderboard({ gameType, dailyKey, columnLabels, secondaryFormatter }) {
+export default function DailyLeaderboard({ gameType, dailyKey, columnLabels, secondaryFormatter, guessesTitle }) {
   const { t, i18n } = useTranslation()
   const [selectedDate, setSelectedDate] = useState(dailyKey ?? '')
   const [scores, setScores] = useState([])
@@ -131,7 +131,7 @@ export default function DailyLeaderboard({ gameType, dailyKey, columnLabels, sec
             <span>{columnLabels?.secondary ?? t('leaderboard.time')}</span>
           </div>
           {scores.map((score, index) => (
-            <AccordionRow key={`${score.name}-${score.dailyKey}-${index}`} score={score} index={index} secondaryFormatter={secondaryFormatter} />
+            <AccordionRow key={`${score.name}-${score.dailyKey}-${index}`} score={score} index={index} secondaryFormatter={secondaryFormatter} guessesTitle={guessesTitle} />
           ))}
         </>
       )}

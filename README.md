@@ -1,6 +1,6 @@
 #Accéder au site en ligne
 
-https://geogaame.netlify.app/
+https://geo-game-delta.vercel.app/
 
 
 

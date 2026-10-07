@@ -441,6 +441,7 @@ export default function useBorderGuessState(mode, options = {}) {
     goHome,
     hasStarted,
     startGame,
+    startedAt,
     elapsedTime,
   }
 }

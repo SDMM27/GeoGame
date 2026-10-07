@@ -55,6 +55,7 @@
     "typecheck": "tsc --noEmit",
     "build:countries": "node scripts/build-countries.mjs",
     "build:flags": "node scripts/build-flags.mjs",
+    "build:silhouettes": "node scripts/build-silhouettes.mjs",
     "postinstall": "setup-skia-web public"
   },
   "private": true

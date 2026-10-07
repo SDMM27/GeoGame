@@ -1,5 +1,6 @@
 import { addDoc, collection, deleteDoc, getDocs, query, serverTimestamp, where } from 'firebase/firestore'
 import { firestore } from '../Firebase'
+import { isBetterDailyScore, sortDailyScores } from './dailyScores'
 
 function isBetter(newScore, newTime, existingScore, existingTime) {
   if (newScore > existingScore) return true
@@ -64,4 +65,34 @@ export async function saveAscensionScore({ name, gameType, presetName, timer, sc
     date: serverTimestamp(),
   })
   return { status: existing.empty ? 'saved' : 'updated' }
+}
+
+// Saves a daily-challenge score, keeping only the best one per (name, gameType, dailyKey).
+// Returns { status: 'saved' | 'updated' } or { status: 'blocked', existing: { attempts, elapsedTime } }.
+export async function saveDailyScore({ name, gameType, dailyKey, attempts, elapsedTime, guesses, hints }) {
+  const ref = collection(firestore, 'daily_scores')
+  const newScore = { name, gameType, dailyKey, attempts, elapsedTime, guesses, ...(hints != null && { hints }) }
+
+  const existingSnapshot = await getDocs(
+    query(ref, where('name', '==', name), where('gameType', '==', gameType), where('dailyKey', '==', dailyKey))
+  )
+
+  if (!existingSnapshot.empty) {
+    const existing = existingSnapshot.docs[0].data()
+    if (!isBetterDailyScore(newScore, existing)) {
+      return { status: 'blocked', existing: { attempts: existing.attempts, elapsedTime: existing.elapsedTime } }
+    }
+    await deleteDoc(existingSnapshot.docs[0].ref)
+  }
+
+  await addDoc(ref, newScore)
+  return { status: existingSnapshot.empty ? 'saved' : 'updated' }
+}
+
+// Daily-challenge scores of one day, best first.
+export async function fetchDailyScores(gameType, dailyKey) {
+  const snapshot = await getDocs(
+    query(collection(firestore, 'daily_scores'), where('gameType', '==', gameType), where('dailyKey', '==', dailyKey))
+  )
+  return sortDailyScores(snapshot.docs.map((doc) => doc.data()))
 }

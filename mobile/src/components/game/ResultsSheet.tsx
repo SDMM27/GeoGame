@@ -7,20 +7,31 @@ import { KeyboardAvoidingView, Platform, ScrollView, Share, StyleSheet, TextInpu
 import Animated, { FadeIn, FadeInDown, ZoomIn } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
+import { buildChallengeUrl } from '@shared/utils/challenge'
 import { formatTime } from '@shared/utils/formatTime'
-import { saveAscensionScore, saveScore } from '@shared/utils/saveScore'
+import { saveAscensionScore, saveDailyScore, saveScore } from '@shared/utils/saveScore'
 import { generateShareText } from '@shared/utils/shareScore'
 
 import { colors, fonts, radius, space } from '@/theme'
 import { Button, Text } from '../ui'
 
 const PSEUDO_KEY = 'geogame_pseudo'
+// Challenge links open the daily on the website.
+const SITE_ORIGIN = 'https://geogame.vercel.app'
 
 export type SaveConfig =
   | { kind: 'standard'; gameType: string; difficulty: string; elapsedTime: number; continent?: string | null }
   | { kind: 'ascension'; gameType: string; presetName: string; timer: number; stats: unknown; phaseStats: unknown }
+  | { kind: 'daily'; gameType: string; dailyKey: string; attempts: number; elapsedTime: number | null; guesses: string[]; hints?: number }
 
-export type ShareConfig = { gameType: string; difficulty?: string | null; details?: string; scoreLabel?: string }
+export type ShareConfig = {
+  gameType: string
+  difficulty?: string | null
+  details?: string
+  scoreLabel?: string
+  // Daily games: share a link to beat this score (website route, e.g. '/border-guess')
+  challenge?: { route: string; dailyKey: string; solved: boolean } | null
+}
 
 type Props = {
   title?: string
@@ -32,16 +43,24 @@ type Props = {
   share?: ShareConfig | null
   onReplay?: () => void
   onHome: () => void
+  onSaved?: () => void
   children?: React.ReactNode
 }
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'blocked' | 'error'
 
-export function ResultsSheet({ title, score, scoreLabel, accent = colors.accent, stats, save, share, onReplay, onHome, children }: Props) {
+// Same key as the website's DailyForm: one save per daily challenge.
+const dailySavedKey = (save: SaveConfig | null | undefined) =>
+  save?.kind === 'daily' ? `daily-saved:${save.gameType}:${save.dailyKey}` : null
+
+export function ResultsSheet({ title, score, scoreLabel, accent = colors.accent, stats, save, share, onReplay, onHome, onSaved, children }: Props) {
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   const [pseudo, setPseudo] = useState(() => globalThis.localStorage?.getItem(PSEUDO_KEY) ?? '')
-  const [saveState, setSaveState] = useState<SaveState>('idle')
+  const [saveState, setSaveState] = useState<SaveState>(() => {
+    const key = dailySavedKey(save)
+    return key && globalThis.localStorage?.getItem(key) ? 'saved' : 'idle'
+  })
   const [blockedBy, setBlockedBy] = useState<string | null>(null)
 
   useEffect(() => {
@@ -55,17 +74,26 @@ export function ResultsSheet({ title, score, scoreLabel, accent = colors.accent,
     setSaveState('saving')
     try {
       const result =
-        save.kind === 'ascension'
-          ? await saveAscensionScore({ name, score, ...save })
-          : await saveScore({ name, score, ...save })
+        save.kind === 'daily'
+          ? await saveDailyScore({ name, ...save })
+          : save.kind === 'ascension'
+            ? await saveAscensionScore({ name, score, ...save })
+            : await saveScore({ name, score, ...save })
       if (result.status === 'blocked') {
-        const existing = result.existing as { score: number; elapsedTime?: number; timeMs?: number }
-        setBlockedBy(`${existing.score} ${t('units.pts')} · ${formatTime(existing.elapsedTime ?? existing.timeMs ?? 0)}`)
+        const existing = result.existing as { score?: number; attempts?: number; elapsedTime?: number; timeMs?: number }
+        const value =
+          save.kind === 'daily'
+            ? `${existing.attempts} ${existing.attempts === 1 ? t('units.attempt_one') : t('units.attempt_other')}`
+            : `${existing.score} ${t('units.pts')}`
+        setBlockedBy(`${value} · ${formatTime(existing.elapsedTime ?? existing.timeMs ?? 0)}`)
         setSaveState('blocked')
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning)
         return
       }
+      const savedKey = dailySavedKey(save)
+      if (savedKey) globalThis.localStorage?.setItem(savedKey, '1')
       setSaveState('saved')
+      onSaved?.()
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
     } catch (error) {
       console.error(error)
@@ -75,7 +103,11 @@ export function ResultsSheet({ title, score, scoreLabel, accent = colors.accent,
 
   const onShare = async () => {
     if (!share) return
-    const message = generateShareText({ score, pseudo, ...share })
+    const { challenge, ...rest } = share
+    const challengeUrl = challenge
+      ? buildChallengeUrl({ ...challenge, pseudo, score, origin: SITE_ORIGIN })
+      : undefined
+    const message = generateShareText({ score, pseudo, ...rest, challengeUrl })
     await Share.share({ message })
   }
 
@@ -106,8 +138,6 @@ export function ResultsSheet({ title, score, scoreLabel, accent = colors.accent,
               </View>
             ))}
           </Animated.View>
-
-          {children}
 
           {save && (
             <Animated.View entering={FadeInDown.delay(250).springify()} style={styles.saveCard}>
@@ -144,7 +174,9 @@ export function ResultsSheet({ title, score, scoreLabel, accent = colors.accent,
               )}
               {saveState === 'blocked' && (
                 <Text variant="caption" color={colors.warning}>
-                  {t('form.better_score_exists')} ({blockedBy}). {t('form.use_different_name')}
+                  {save.kind === 'daily'
+                    ? `${t('form.better_daily_score')} ${blockedBy}. ${t('form.use_different_name_daily')}`
+                    : `${t('form.better_score_exists')} (${blockedBy}). ${t('form.use_different_name')}`}
                 </Text>
               )}
               {saveState === 'error' && (
@@ -154,6 +186,8 @@ export function ResultsSheet({ title, score, scoreLabel, accent = colors.accent,
               )}
             </Animated.View>
           )}
+
+          {children}
 
           <Animated.View entering={FadeInDown.delay(320).springify()} style={{ gap: space.md }}>
             <View style={{ flexDirection: 'row', gap: space.md }}>
@@ -201,6 +235,7 @@ const styles = StyleSheet.create({
   saveRow: { flexDirection: 'row', gap: space.sm },
   input: {
     flex: 1,
+    minWidth: 0,
     height: 52,
     borderRadius: radius.md,
     backgroundColor: colors.bg,

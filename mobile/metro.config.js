@@ -20,6 +20,7 @@ const REDIRECTS = {
   'react-router-dom': shim('react-router-dom.ts'),
   'react-toastify': shim('react-toastify.ts'),
   'i18next-browser-languagedetector': shim('language-detector.ts'),
+  leaflet: shim('leaflet.ts'),
 }
 
 config.resolver.resolveRequest = (context, moduleName, platform) => {

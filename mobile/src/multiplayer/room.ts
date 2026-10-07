@@ -26,7 +26,8 @@ export type RoomGame = {
   answerMode?: 'choices' | 'free'
 }
 
-export type RoomPlayer = { pseudo: string }
+// `uid`: the player's account, when signed in.
+export type RoomPlayer = { pseudo: string; uid?: string }
 
 export type Room = {
   id: string
@@ -103,7 +104,9 @@ export function rememberRoom(room: Pick<Room, 'id' | 'mode' | 'game'>) {
 
 // ─── Firestore ─────────────────────────────────────────────────────────────
 
-export async function createRoom({ game, mode, pseudo }: { game: RoomGame; mode: RoomMode; pseudo: string }) {
+const roomPlayer = (pseudo: string, uid?: string | null): RoomPlayer => (uid ? { pseudo, uid } : { pseudo })
+
+export async function createRoom({ game, mode, pseudo, uid }: { game: RoomGame; mode: RoomMode; pseudo: string; uid?: string | null }) {
   const hostId = getPlayerId()
   savePseudo(pseudo)
   let code = generateRoomId()
@@ -116,16 +119,16 @@ export async function createRoom({ game, mode, pseudo }: { game: RoomGame; mode:
     game,
     seed: Math.floor(Math.random() * 2 ** 31),
     startAt: null,
-    players: { [hostId]: { pseudo } },
+    players: { [hostId]: roomPlayer(pseudo, uid) },
   }
   await setDoc(roomRef(code), { ...room, createdAt: serverTimestamp() })
   rememberRoom({ id: code, mode, game })
   return code
 }
 
-export async function joinRoom(room: Room, pseudo: string) {
+export async function joinRoom(room: Room, pseudo: string, uid?: string | null) {
   savePseudo(pseudo)
-  await updateDoc(roomRef(room.id), { [`players.${getPlayerId()}`]: { pseudo } })
+  await updateDoc(roomRef(room.id), { [`players.${getPlayerId()}`]: roomPlayer(pseudo, uid) })
   rememberRoom(room)
 }
 

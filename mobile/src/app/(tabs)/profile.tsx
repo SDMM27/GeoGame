@@ -23,7 +23,11 @@ import { auth, useAccount, type Account } from '@/account/auth'
 import { reauthenticateWithGoogle, signInWithGoogle } from '@/account/google'
 import { Avatar, ProfileBody, SectionTitle } from '@/components/profile/ProfileSections'
 import { Button, Pill, Segmented, Text, Touchable } from '@/components/ui'
+import { forgetDevice } from '@/notifications/push'
 import { colors, fonts, radius, space } from '@/theme'
+
+// This device stops receiving the account's invite notifications.
+const signOutDevice = () => forgetDevice().then(() => signOut(auth))
 
 type Mode = 'signin' | 'signup'
 
@@ -235,7 +239,7 @@ function ChooseUsername() {
       />
       {error && <Message kind="error" text={t(`account.errors.${error}`)} />}
       <Button label={t('account.choose_submit')} onPress={onSubmit} loading={submitting} disabled={!username.trim()} />
-      <Touchable accessibilityRole="button" onPress={() => signOut(auth)} style={styles.link}>
+      <Touchable accessibilityRole="button" onPress={signOutDevice} style={styles.link}>
         <Text variant="bodyStrong" color={colors.textMuted} style={{ fontSize: 14 }}>
           {t('account.signout')}
         </Text>
@@ -255,6 +259,7 @@ function AccountSettings({ account }: { account: Account }) {
     setSubmitting(true)
     setError(null)
     try {
+      await forgetDevice()
       await deleteAccount(auth, account.hasPassword ? { password } : { reauthenticate: reauthenticateWithGoogle })
     } catch (err) {
       const key = accountErrorKey(err)
@@ -275,7 +280,7 @@ function AccountSettings({ account }: { account: Account }) {
         <Button
           label={t('account.signout')}
           variant="secondary"
-          onPress={() => signOut(auth)}
+          onPress={signOutDevice}
           icon={<MaterialCommunityIcons name="logout" size={20} color={colors.text} />}
         />
       </View>

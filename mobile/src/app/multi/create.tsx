@@ -9,6 +9,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { QUIZ_DIFFICULTIES } from '@shared/utils/quizQuestions'
 
+import { useAccount } from '@/account/auth'
 import { SheetCloseButton } from '@/components/SheetCloseButton'
 import { Button, Segmented, Text } from '@/components/ui'
 import { DIFFICULTY_COLORS, getGame } from '@/games'
@@ -31,7 +32,10 @@ export default function CreateRoomSheet() {
   const [count, setCount] = useState<string>('10')
   const [quizDifficulty, setQuizDifficulty] = useState('Moyen')
   const [answerMode, setAnswerMode] = useState<'choices' | 'free'>('choices')
-  const [pseudo, setPseudo] = useState(getSavedPseudo)
+  const { account } = useAccount()
+  // Signed in: the account's username until the player types another one
+  const [typed, setPseudo] = useState<string | null>(null)
+  const pseudo = typed ?? account?.username ?? getSavedPseudo()
   const [creating, setCreating] = useState(false)
   const [failed, setFailed] = useState(false)
 
@@ -62,7 +66,7 @@ export default function CreateRoomSheet() {
     setCreating(true)
     setFailed(false)
     try {
-      const code = await createRoom({ game: roomGame, mode, pseudo: name })
+      const code = await createRoom({ game: roomGame, mode, pseudo: name, uid: account?.uid })
       router.replace({ pathname: '/multi/[code]', params: { code } })
     } catch (error) {
       console.error(error)

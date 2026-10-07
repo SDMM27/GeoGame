@@ -1,10 +1,12 @@
 // App Auth instance: the session survives restarts thanks to expo-sqlite's key-value store.
 import * as firebaseAuth from 'firebase/auth'
-import { initializeAuth, type Persistence } from 'firebase/auth'
+import { connectAuthEmulator, initializeAuth, type Persistence } from 'firebase/auth'
 import Storage from 'expo-sqlite/kv-store'
 
 import { app } from '@shared/Firebase'
 import { useAccountState } from '@shared/hooks/useAccount'
+
+import { EMULATOR_HOST } from '@/emulators'
 
 // Exported by Firebase's React Native build, but missing from the typings (they're the browser ones).
 const { getReactNativePersistence } = firebaseAuth as typeof firebaseAuth & {
@@ -12,6 +14,7 @@ const { getReactNativePersistence } = firebaseAuth as typeof firebaseAuth & {
 }
 
 export const auth = initializeAuth(app, { persistence: getReactNativePersistence(Storage) })
+if (EMULATOR_HOST) connectAuthEmulator(auth, `http://${EMULATOR_HOST}:9099`, { disableWarnings: true })
 
 export type Account = {
   uid: string

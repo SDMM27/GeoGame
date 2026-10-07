@@ -24,6 +24,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/setupTests.js'],
     globals: true,
-    exclude: ['**/node_modules/**', '**/.worktrees/**'],
+    // tests/emulator needs the Firebase emulators: npm run test:emulator
+    exclude: ['**/node_modules/**', '**/.worktrees/**', ...(process.env.FIRESTORE_EMULATOR_HOST ? [] : ['tests/emulator/**'])],
   },
 })

@@ -1,10 +1,13 @@
 // Expo web: the browser's own persistence, like the website.
-import { getAuth } from 'firebase/auth'
+import { connectAuthEmulator, getAuth } from 'firebase/auth'
 
 import { app } from '@shared/Firebase'
 import { useAccountState } from '@shared/hooks/useAccount'
 
+import { EMULATOR_HOST } from '@/emulators'
+
 export const auth = getAuth(app)
+if (EMULATOR_HOST) connectAuthEmulator(auth, `http://${EMULATOR_HOST}:9099`, { disableWarnings: true })
 
 export type Account = {
   uid: string

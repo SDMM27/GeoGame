@@ -7,11 +7,16 @@ import { ActivityIndicator, ScrollView, Share, StyleSheet, TextInput, View } fro
 import Animated, { FadeIn, ZoomIn } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
+import { useFriendships } from '@shared/hooks/usePlayerProfile'
 import useMultiplayerRoom from '@shared/hooks/useMultiplayerRoom'
+import { dismissInvite, inviteId, sendRoomInvite } from '@shared/utils/invites'
 import { serverNow } from '@shared/utils/serverTime'
 
+import { useAccount, type Account } from '@/account/auth'
+import { Avatar } from '@/components/profile/ProfileSections'
 import { Button, Pill, Text, Touchable } from '@/components/ui'
 import { getGame } from '@/games'
+import { notifyInvite } from '@/multiplayer/invites'
 import { Standings } from '@/multiplayer/RoomPlay'
 import { getPlayerId, getSavedPseudo, joinRoom, launchRoom, rememberRoom, type PlayerResult, type Room } from '@/multiplayer/room'
 import { navigate } from '@/shims/react-router-dom'
@@ -30,21 +35,30 @@ function useCountdown(startAt: number | null) {
   return remaining
 }
 
-function JoinCard({ room }: { room: Room }) {
+// `autoJoin`: opened from a friend's invite with an account, so the player joins under their username right away.
+function JoinCard({ room, account, autoJoin }: { room: Room; account: Account | null; autoJoin: boolean }) {
   const { t } = useTranslation()
-  const [pseudo, setPseudo] = useState(getSavedPseudo)
+  // Signed in: the account's username until the player types another one
+  const [typed, setPseudo] = useState<string | null>(null)
+  const pseudo = typed ?? account?.username ?? getSavedPseudo()
   const [joining, setJoining] = useState(false)
-  const onJoin = async () => {
-    const name = pseudo.trim()
+  const autoJoinedRef = useRef(false)
+  const onJoin = async (name = pseudo.trim()) => {
     if (!name) return
     setJoining(true)
     try {
-      await joinRoom(room, name)
+      await joinRoom(room, name, account?.uid)
     } catch (error) {
       console.error(error)
       setJoining(false)
     }
   }
+  useEffect(() => {
+    if (!autoJoin || !account?.username || autoJoinedRef.current) return
+    autoJoinedRef.current = true
+    onJoin(account.username)
+  })
+  if (autoJoin && account?.username) return <ActivityIndicator color={colors.textMuted} style={{ marginTop: space.lg }} />
   return (
     <View style={styles.card}>
       <Text variant="body" color={colors.textMuted}>
@@ -59,10 +73,10 @@ function JoinCard({ room }: { room: Room }) {
         autoCapitalize="none"
         autoCorrect={false}
         returnKeyType="done"
-        onSubmitEditing={onJoin}
+        onSubmitEditing={() => onJoin()}
         style={styles.input}
       />
-      <Button label={t('mobile.multi.join')} onPress={onJoin} loading={joining} disabled={!pseudo.trim()} />
+      <Button label={t('mobile.multi.join')} onPress={() => onJoin()} loading={joining} disabled={!pseudo.trim()} />
     </View>
   )
 }
@@ -88,10 +102,75 @@ function Players({ room }: { room: Room }) {
   )
 }
 
+type Friend = { id: string; uid: string; username: string }
+
+// Signed-in players invite their friends straight into the room; they get a banner in the app.
+function InviteFriends({ room, account, color }: { room: Room; account: Account; color: string }) {
+  const { t } = useTranslation()
+  const friendships = useFriendships(account.uid)
+  const [invited, setInvited] = useState<Record<string, 'sending' | 'sent' | 'failed'>>({})
+  const inRoom = new Set(Object.values(room.players).map((player) => player.uid).filter(Boolean))
+
+  if (friendships.loading) return null
+
+  const invite = async (friend: Friend) => {
+    setInvited((previous) => ({ ...previous, [friend.uid]: 'sending' }))
+    try {
+      await sendRoomInvite({ uid: account.uid, username: account.username }, friend.uid, room)
+      notifyInvite(inviteId(room.id, friend.uid))
+      setInvited((previous) => ({ ...previous, [friend.uid]: 'sent' }))
+    } catch (error) {
+      console.warn('[invites]', error)
+      setInvited((previous) => ({ ...previous, [friend.uid]: 'failed' }))
+    }
+  }
+
+  return (
+    <View style={styles.card}>
+      <Text variant="bodyStrong">{t('mobile.invites.title')}</Text>
+      {friendships.friends.length === 0 ? (
+        <Touchable accessibilityRole="button" onPress={() => router.push('/friends')} style={styles.playerRow}>
+          <MaterialCommunityIcons name="account-plus-outline" size={22} color={colors.textMuted} />
+          <Text variant="body" color={colors.textMuted} style={{ flex: 1 }}>
+            {t('mobile.invites.no_friends')}
+          </Text>
+          <MaterialCommunityIcons name="chevron-right" size={20} color={colors.textFaint} />
+        </Touchable>
+      ) : (
+        friendships.friends.map((friend: Friend) => {
+          const state = inRoom.has(friend.uid) ? 'joined' : invited[friend.uid]
+          return (
+            <View key={friend.id} style={styles.playerRow}>
+              <Avatar username={friend.username} size={32} />
+              <Text variant="body" numberOfLines={1} style={{ flex: 1 }}>
+                {friend.username}
+              </Text>
+              {state === 'joined' ? (
+                <Pill label={t('mobile.invites.joined')} color={colors.accent} />
+              ) : state === 'sent' ? (
+                <Pill label={t('mobile.invites.sent')} color={color} icon={<MaterialCommunityIcons name="check" size={14} color={color} />} />
+              ) : (
+                <Button
+                  label={t(state === 'failed' ? 'mobile.invites.retry' : 'mobile.invites.invite')}
+                  variant="secondary"
+                  onPress={() => invite(friend)}
+                  loading={state === 'sending'}
+                  style={styles.inviteButton}
+                />
+              )}
+            </View>
+          )
+        })
+      )}
+    </View>
+  )
+}
+
 export default function RoomScreen() {
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
-  const { code } = useLocalSearchParams<{ code: string }>()
+  const { code, invited } = useLocalSearchParams<{ code: string; invited?: string }>()
+  const { account } = useAccount()
   const { room, gameResults, loading, error } = useMultiplayerRoom(code) as {
     room: Room | null
     gameResults: Record<string, PlayerResult>
@@ -121,6 +200,11 @@ export default function RoomScreen() {
   useEffect(() => {
     if (room && joined) rememberRoom(room)
   }, [room, joined])
+
+  // Opening the room answers any invite to it
+  useEffect(() => {
+    if (account?.uid && code) dismissInvite(inviteId(code, account.uid))
+  }, [account?.uid, code])
 
   // Live: start together when the countdown reaches zero (only for players who were waiting for it)
   useEffect(() => {
@@ -193,10 +277,11 @@ export default function RoomScreen() {
           </View>
 
           {!joined ? (
-            <JoinCard room={room!} />
+            <JoinCard room={room!} account={account} autoJoin={invited === '1'} />
           ) : inLobby ? (
             <>
               <Players room={room!} />
+              {account?.username && <InviteFriends room={room!} account={account} color={game!.color} />}
               {isHost ? (
                 <Button
                   label={t('mobile.multi.launch')}
@@ -238,6 +323,7 @@ export default function RoomScreen() {
                   />
                 </View>
               )}
+              {account?.username && <InviteFriends room={room!} account={account} color={game!.color} />}
               <Standings code={code} />
             </>
           )}
@@ -271,6 +357,7 @@ const styles = StyleSheet.create({
   code: { letterSpacing: 6, fontVariant: ['tabular-nums'] },
   card: { gap: space.md, padding: space.lg, borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   playerRow: { flexDirection: 'row', alignItems: 'center', gap: space.md, paddingVertical: 4 },
+  inviteButton: { minHeight: 36, paddingHorizontal: space.md },
   waiting: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.md, padding: space.lg },
   countdown: { alignItems: 'center', paddingVertical: space.xl },
   input: {

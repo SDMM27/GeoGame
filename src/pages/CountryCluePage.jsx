@@ -4,6 +4,8 @@ import { useLocation } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import NavBar from '../components/NavBar'
 import ShareScoreButton from '../components/ShareScoreButton'
+import ChallengeBanner from '../components/ChallengeBanner'
+import { resolveMode } from '../utils/challenge'
 import useCountryClueState from '../hooks/useCountryClueState'
 import CountryClueMap from './CountryClueMap'
 import DailyForm from './DailyForm'
@@ -59,7 +61,7 @@ function GuessRow({ guess, lang }) {
 export default function CountryCluePage() {
   const { t, i18n } = useTranslation()
   const location = useLocation()
-  const mode = location.state?.mode ?? 'daily'
+  const mode = resolveMode(location, 'daily')
   const {
     inputValue,
     setInputValue,
@@ -109,6 +111,13 @@ export default function CountryCluePage() {
     <div className="country-clue-page">
       <NavBar />
       <main className="country-clue-main">
+        {mode === 'daily' && (
+          <ChallengeBanner
+            gameType="COUNTRY_CLUE"
+            dailyKey={dailyKey}
+            result={isComplete ? { score: guesses.length, solved: isSolved } : null}
+          />
+        )}
         <section className="country-clue-hero">
           <div>
             <p className="country-clue-eyebrow">{t('labels.new_game')}</p>
@@ -187,6 +196,7 @@ export default function CountryCluePage() {
                 details={isSolved
                   ? t('share.details_found_attempts', { count: guesses.length })
                   : t('share.details_not_found_attempts', { count: guesses.length })}
+                challenge={mode === 'daily' ? { route: '/country-clue', dailyKey, solved: isSolved } : null}
               />
             )}
 

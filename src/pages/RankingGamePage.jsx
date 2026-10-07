@@ -7,6 +7,8 @@ import { toast } from 'react-toastify'
 import NavBar from '../components/NavBar'
 import RankingLeaderboard from './RankingLeaderboard'
 import ShareScoreButton from '../components/ShareScoreButton'
+import ChallengeBanner from '../components/ChallengeBanner'
+import { resolveMode } from '../utils/challenge'
 import useRankingGameState from '../hooks/useRankingGameState'
 import { GAME_TYPES } from '../utils/gameTypes'
 import { firestore } from '../Firebase'
@@ -30,7 +32,7 @@ function CriterionBanner({ criterion, t }) {
 export default function RankingGamePage() {
   const { t, i18n } = useTranslation()
   const location = useLocation()
-  const initialMode = location.state?.mode ?? 'daily'
+  const initialMode = resolveMode(location, 'daily')
   const [mode, setMode] = useState(initialMode)
   const [countryCount, setCountryCount] = useState(5)
   const [submitName, setSubmitName] = useState('')
@@ -168,6 +170,14 @@ export default function RankingGamePage() {
             </button>
           ))}
         </div>
+
+        {mode === 'daily' && (
+          <ChallengeBanner
+            gameType="RANKING"
+            dailyKey={dailyKey}
+            result={isSubmitted ? { score, solved: true } : null}
+          />
+        )}
 
         {/* Country count slider — infinite mode only, before choosing category */}
         {mode === 'infinite' && status === 'choosing-category' && (
@@ -315,6 +325,7 @@ export default function RankingGamePage() {
               gameType="RANKING"
               difficulty={mode === 'daily' ? 'Daily' : 'Infini'}
               details={t('share.details_ranking_error', { count: totalError })}
+              challenge={mode === 'daily' ? { route: '/ranking', dailyKey } : null}
             />
 
             {/* Correct ranking revealed */}

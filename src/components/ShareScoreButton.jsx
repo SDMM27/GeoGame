@@ -1,12 +1,16 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { copyShareText } from '../utils/shareScore'
+import { copyShareText, shareChallenge } from '../utils/shareScore'
+import { buildChallengeUrl } from '../utils/challenge'
 import './ShareScoreButton.css'
 
-export default function ShareScoreButton({ score, gameType, difficulty, scoreLabel = 'POINTS', details }) {
+// `challenge` ({ route, dailyKey, solved }) : à fournir en mode daily pour afficher
+// le bouton « Défier un ami », qui partage un lien vers le même défi du jour.
+export default function ShareScoreButton({ score, gameType, difficulty, scoreLabel = 'POINTS', details, challenge }) {
   const { t } = useTranslation()
   const [pseudo, setPseudo] = useState(() => localStorage.getItem('geogame_pseudo') ?? '')
   const [copied, setCopied] = useState(false)
+  const [challengeCopied, setChallengeCopied] = useState(false)
 
   const handleCopy = async () => {
     localStorage.setItem('geogame_pseudo', pseudo)
@@ -14,6 +18,26 @@ export default function ShareScoreButton({ score, gameType, difficulty, scoreLab
       await copyShareText({ score, gameType, difficulty, pseudo, scoreLabel, details })
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  const handleChallenge = async () => {
+    localStorage.setItem('geogame_pseudo', pseudo)
+    const challengeUrl = buildChallengeUrl({
+      route: challenge.route,
+      pseudo,
+      score,
+      dailyKey: challenge.dailyKey,
+      solved: challenge.solved,
+    })
+    try {
+      const result = await shareChallenge({ score, gameType, difficulty, pseudo, scoreLabel, details, challengeUrl })
+      if (result === 'copied') {
+        setChallengeCopied(true)
+        setTimeout(() => setChallengeCopied(false), 2000)
+      }
     } catch (err) {
       console.error(err)
     }
@@ -30,13 +54,23 @@ export default function ShareScoreButton({ score, gameType, difficulty, scoreLab
         onChange={e => setPseudo(e.target.value)}
         maxLength={30}
       />
-      <button
-        className="share-copy-btn"
-        onClick={handleCopy}
-        aria-label={copied ? t('share.copied') : t('share.copy_button')}
-      >
-        {copied ? t('share.copied') : t('share.copy_button')}
-      </button>
+      {challenge ? (
+        <button
+          className="share-copy-btn share-challenge-btn"
+          onClick={handleChallenge}
+          aria-label={challengeCopied ? t('challenge.link_copied') : t('challenge.button')}
+        >
+          {challengeCopied ? t('challenge.link_copied') : t('challenge.button')}
+        </button>
+      ) : (
+        <button
+          className="share-copy-btn"
+          onClick={handleCopy}
+          aria-label={copied ? t('share.copied') : t('share.copy_button')}
+        >
+          {copied ? t('share.copied') : t('share.copy_button')}
+        </button>
+      )}
     </div>
   )
 }

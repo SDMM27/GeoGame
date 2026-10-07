@@ -352,6 +352,24 @@
     "details_capitals_timer": "{{found}}/{{total}} capitales trouvées · {{time}}",
     "details_voyage": "{{steps}} étape(s) · optimal : {{optimal}}"
   },
+  "challenge": {
+    "button": "🔗 Défier un ami",
+    "link_copied": "✓ Lien de défi copié !",
+    "share_cta": "🎯 Je te défie ! Bats mon score :",
+    "a_friend": "Un ami",
+    "banner_title": "🎯 {{name}} te défie sur le jeu du jour !",
+    "their_score": "Score de {{name}} : {{score}}",
+    "your_score": "Ton score : {{score}}",
+    "your_turn": "à toi de jouer !",
+    "result_win": "🏆 Tu as battu {{name}} !",
+    "result_lose": "😅 {{name}} garde l'avantage… Revanche demain ?",
+    "result_tie": "🤝 Égalité parfaite avec {{name}} !",
+    "stale": "Ce défi date du {{day}} : le jeu du jour a changé depuis, pas de comparaison possible.",
+    "attempts_one": "{{count}} essai",
+    "attempts_other": "{{count}} essais",
+    "not_found": "pays non trouvé",
+    "points": "{{score}} pts"
+  },
   "quiz": {
     "pick_difficulty": "Choisis ta difficulté",
     "pick_difficulty_hint": "Toutes les questions seront de cette difficulté. Tu peux arrêter quand tu veux.",

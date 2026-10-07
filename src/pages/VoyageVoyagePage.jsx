@@ -5,6 +5,8 @@ import { ToastContainer } from 'react-toastify'
 import NavBar from '../components/NavBar'
 import VoyageVoyageMap from '../components/VoyageVoyageMap'
 import ShareScoreButton from '../components/ShareScoreButton'
+import ChallengeBanner from '../components/ChallengeBanner'
+import { resolveMode } from '../utils/challenge'
 import useVoyageVoyageState from '../hooks/useVoyageVoyageState'
 import DailyForm from './DailyForm'
 import DailyLeaderboard from './DailyLeaderboard'
@@ -34,7 +36,7 @@ function getSuggestions(input) {
 export default function VoyageVoyagePage() {
   const { t, i18n } = useTranslation()
   const location = useLocation()
-  const [mode] = useState(location.state?.mode ?? 'infinite')
+  const [mode] = useState(() => resolveMode(location, 'infinite'))
   const [showModal, setShowModal] = useState(false)
   const [input, setInput] = useState('')
   const [suggestions, setSuggestions] = useState([])
@@ -128,6 +130,14 @@ export default function VoyageVoyagePage() {
   return (
     <div className="voyage-page">
       <NavBar />
+
+      {mode === 'daily' && (
+        <ChallengeBanner
+          gameType="VOYAGE_VOYAGE"
+          dailyKey={dailyKey}
+          result={isGameOver && score != null ? { score, solved: true } : null}
+        />
+      )}
 
       <div className="voyage-header">
         <div className="voyage-country voyage-start">
@@ -321,12 +331,21 @@ export default function VoyageVoyagePage() {
               </div>
             )}
 
+            {mode === 'daily' && (
+              <ChallengeBanner
+                gameType="VOYAGE_VOYAGE"
+                dailyKey={dailyKey}
+                result={score != null ? { score, solved: true } : null}
+              />
+            )}
+
             <ShareScoreButton
               score={score ?? 0}
               gameType="VOYAGE_VOYAGE"
               difficulty={mode === 'daily' ? 'Daily' : 'Infini'}
               scoreLabel="PTS"
               details={t('share.details_voyage', { steps: stepsUsed, optimal: optimalLength })}
+              challenge={mode === 'daily' ? { route: '/voyage-voyage', dailyKey } : null}
             />
 
             {mode === 'daily' && (

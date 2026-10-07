@@ -29,7 +29,8 @@ service cloud.firestore {
       return request.resource.data.diff(resource.data).affectedKeys().hasAny(fields) == false;
     }
 
-    // Higher score first, then the shorter time. A missing time loses against any time.
+    // Higher score first, then the smaller tiebreaker (time, or total error for Country Ranking).
+    // A missing tiebreaker loses against any value.
     function isBetter(newScore, newTime, oldScore, oldTime) {
       return newScore > oldScore
         || (newScore == oldScore && isNumber(newTime) && (!isNumber(oldTime) || newTime < oldTime));
@@ -156,7 +157,7 @@ service cloud.firestore {
 
       function isBetterDaily(next, prev) {
         return next.gameType == 'RANKING'
-          ? isBetter(next.score, -next.totalError, prev.score, -prev.get('totalError', 1000000000))
+          ? isBetter(next.score, next.totalError, prev.score, prev.get('totalError', null))
           : (effectiveAttempts(next) < effectiveAttempts(prev)
               || (effectiveAttempts(next) == effectiveAttempts(prev)
                   && isNumber(next.get('elapsedTime', null))

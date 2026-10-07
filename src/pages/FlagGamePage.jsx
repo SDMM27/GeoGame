@@ -7,6 +7,8 @@ import useFlagGameState from '../hooks/useFlagGameState'
 import { snapshotKey, loadSnapshot } from '../utils/multiplayerSnapshot'
 import useAscensionState from '../hooks/useAscensionState'
 import { GAME_TYPES } from '../utils/gameTypes'
+import { setupGameRecord } from '../utils/gameHistory'
+import { useRecordGame } from '../auth'
 import { matchKnownAnswer } from '../utils/answerLexicon'
 import { getCountryName, getAllCountryNames } from '../utils/getCountryName'
 import PhaseIndicator from '../components/PhaseIndicator'
@@ -27,6 +29,13 @@ function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state
     seeCountry, restartGame, goHome,
     currentPhase, phaseCountRemaining, totalPhaseCount, phaseStats,
   } = state
+
+  // Multiplayer games (onGameFinished) belong to their room, not to the history.
+  useRecordGame(
+    isGameOver && !onGameFinished
+      ? setupGameRecord({ gameType: GAME_TYPES.FLAGS, isTraining, isAscension, presetName, difficulty, continent, score, stats, timer })
+      : null
+  )
 
   const inputRef = useRef(null)
   const [isInputFocused, setIsInputFocused] = useState(false)

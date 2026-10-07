@@ -457,5 +457,204 @@
       "digits_other": "It's a {{count}}-digit number",
       "between": "Between {{min}} and {{max}}"
     }
+  },
+  "account": {
+    "nav": "Account",
+    "title": "My account",
+    "signin_tab": "Sign in",
+    "signup_tab": "Sign up",
+    "signin_intro": "Sign in to get your username on both the website and the app.",
+    "signup_intro": "Create your account to reserve your username.",
+    "email": "Email",
+    "password": "Password",
+    "username": "Username",
+    "email_placeholder": "you@example.com",
+    "password_placeholder": "At least 6 characters",
+    "username_placeholder": "Your username",
+    "username_hint": "3 to 20 characters",
+    "signin": "Sign in",
+    "signup": "Create my account",
+    "forgot": "Forgot your password?",
+    "reset_sent": "We sent an email to {{email}} to choose a new password.",
+    "welcome": "Welcome {{username}}!",
+    "signed_in_as": "Signed in as",
+    "signout": "Sign out",
+    "prefill_hint": "Your username is filled in when you save a score or join a game.",
+    "delete": "Delete my account",
+    "delete_confirm": "Your account and username will be deleted. Enter your password to confirm.",
+    "delete_button": "Delete for good",
+    "deleted": "Account deleted.",
+    "cancel": "Cancel",
+    "errors": {
+      "invalid_email": "Invalid email address.",
+      "email_in_use": "An account already exists with this email.",
+      "weak_password": "The password must be at least 6 characters.",
+      "wrong_credentials": "Wrong email or password.",
+      "too_many_requests": "Too many attempts. Try again in a few minutes.",
+      "network": "No connection. Check your network.",
+      "not_enabled": "Account creation is not enabled yet.",
+      "username_length": "The username must be 3 to 20 characters.",
+      "username_chars": "The username can only contain letters, digits, spaces, \"_\", \"-\" and \".\".",
+      "username_taken": "This username is already taken.",
+      "generic": "Something went wrong. Try again.",
+      "popup_blocked": "The Google window was blocked. Allow pop-ups and try again.",
+      "different_provider": "This email is already used with another sign-in method.",
+      "cancelled": "Sign-in cancelled."
+    },
+    "google": "Continue with Google",
+    "or": "or",
+    "choose_title": "Choose your username",
+    "choose_intro": "Your scores will show under this name. It will be reserved for your account.",
+    "choose_submit": "Confirm my username",
+    "delete_confirm_google": "Your account and username will be deleted. Confirm with Google."
+  },
+  "profile": {
+    "member_since": "Member since {{date}}",
+    "stats_title": "Stats",
+    "games": "Games",
+    "play_time": "Play time",
+    "countries": "Countries found",
+    "days": "Days played",
+    "streak_title": "Daily challenge streak",
+    "streak_current": "Current streak",
+    "streak_best": "Best",
+    "days_count_one": "{{count}} day",
+    "days_count_other": "{{count}} days",
+    "streak_hint": "Do at least one daily challenge every day to keep your streak.",
+    "today_title": "Today's challenges",
+    "today_done": "{{done}}/{{total}}",
+    "by_game_title": "By game",
+    "games_count_one": "{{count}} game",
+    "games_count_other": "{{count}} games",
+    "best_score": "Best {{score}} pts",
+    "best_attempts_one": "Best: {{count}} attempt",
+    "best_attempts_other": "Best: {{count}} attempts",
+    "wins": "{{wins}}/{{dailies}} challenges solved",
+    "achievements_title": "Achievements",
+    "achievements_count": "{{unlocked}}/{{total}}",
+    "history_title": "Recent games",
+    "history_all": "See all",
+    "history_full_title": "History",
+    "history_empty": "No games saved yet. Play while signed in and they will show up here.",
+    "all_games": "All games",
+    "modes": {
+      "standard": "Classic",
+      "ascension": "Ascension",
+      "daily": "Daily",
+      "infinite": "Infinite",
+      "multi": "Multiplayer"
+    },
+    "solved": "Found",
+    "failed": "Missed",
+    "attempts_count_one": "{{count}} attempt",
+    "attempts_count_other": "{{count}} attempts",
+    "load_error": "Couldn't load the profile. Check your connection.",
+    "not_found": "Player not found.",
+    "settings_title": "Account",
+    "favorite": "Favorite game",
+    "sign_in_title": "Your player profile",
+    "sign_in_pitch": "Sign in to keep your game history, follow your stats, unlock achievements and play with your friends.",
+    "show_less": "Show less"
+  },
+  "friends": {
+    "title": "Friends",
+    "count_one": "{{count}} friend",
+    "count_other": "{{count}} friends",
+    "add_title": "Add a friend",
+    "add_placeholder": "Your friend's username",
+    "add": "Add",
+    "sent": "Request sent to {{username}}!",
+    "now_friends": "You and {{username}} are now friends!",
+    "requests_title": "Requests received",
+    "outgoing_title": "Requests sent",
+    "accept": "Accept",
+    "decline": "Decline",
+    "cancel": "Cancel",
+    "remove": "Remove from friends",
+    "remove_confirm": "Remove {{username}} from your friends?",
+    "empty": "You don't have any friends yet. Add them with their username!",
+    "today_title": "Your friends' daily challenges",
+    "today_none": "Not played yet today",
+    "add_friend": "Add as a friend",
+    "request_sent": "Request sent",
+    "is_friend": "Friend",
+    "accept_request": "Accept their request",
+    "see_all": "Manage my friends",
+    "pending_badge_one": "{{count}} request",
+    "pending_badge_other": "{{count}} requests",
+    "errors": {
+      "not_found": "No player with this username.",
+      "self": "That's you!",
+      "already_friends": "You're already friends.",
+      "already_sent": "Request already sent.",
+      "network": "No connection. Check your network.",
+      "generic": "Something went wrong. Try again."
+    }
+  },
+  "achievements": {
+    "first_game": {
+      "title": "First steps",
+      "desc": "Finish your first game"
+    },
+    "games_50": {
+      "title": "Regular",
+      "desc": "Play 50 games"
+    },
+    "games_250": {
+      "title": "Hooked",
+      "desc": "Play 250 games"
+    },
+    "all_games": {
+      "title": "Jack of all trades",
+      "desc": "Play every game"
+    },
+    "streak_3": {
+      "title": "On a roll",
+      "desc": "3 days in a row of daily challenges"
+    },
+    "streak_7": {
+      "title": "Perfect week",
+      "desc": "7 days in a row of daily challenges"
+    },
+    "streak_30": {
+      "title": "Unstoppable",
+      "desc": "30 days in a row of daily challenges"
+    },
+    "daily_sweep": {
+      "title": "Clean sweep",
+      "desc": "Do every daily challenge on the same day"
+    },
+    "first_try": {
+      "title": "First try",
+      "desc": "Solve a daily challenge on the first attempt"
+    },
+    "explorer": {
+      "title": "Explorer",
+      "desc": "Find 500 countries in total"
+    },
+    "globetrotter": {
+      "title": "Globetrotter",
+      "desc": "Find 5,000 countries in total"
+    },
+    "hardcore": {
+      "title": "No safety net",
+      "desc": "Finish a game on Hardcore"
+    },
+    "ascension": {
+      "title": "Summit",
+      "desc": "Finish a game in Ascension mode"
+    },
+    "multiplayer": {
+      "title": "Team spirit",
+      "desc": "Play a multiplayer game"
+    },
+    "friend": {
+      "title": "Sociable",
+      "desc": "Add your first friend"
+    },
+    "night_owl": {
+      "title": "Night owl",
+      "desc": "Play between midnight and 5 am"
+    }
   }
 }

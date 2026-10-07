@@ -320,6 +320,17 @@ export default function VoyageScreen() {
             { label: clean(t('labels.optimal')).replace(/\s*:$/, ''), value: `${optimalLength}` },
             { label: errorsLabel(wrongs.length), value: `${wrongs.length}`, color: wrongs.length ? colors.danger : undefined },
           ]}
+          record={{
+            gameType: GAME_TYPES.VOYAGE_VOYAGE,
+            mode: 'daily',
+            dailyKey,
+            score,
+            solved: true,
+            attempts: stepsUsed,
+            optimal: optimalLength,
+            errors: wrongs.length,
+            hints: hintsUsed.length,
+          }}
           save={{
             kind: 'daily',
             gameType: GAME_TYPES.VOYAGE_VOYAGE,

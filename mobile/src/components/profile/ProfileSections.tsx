@@ -1,0 +1,382 @@
+// Building blocks of a player profile: stats, daily streak, achievements, per-game records and history.
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
+import { useFocusEffect } from 'expo-router'
+import { useCallback, useState, type ComponentProps, type ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
+import { ActivityIndicator, StyleSheet, View } from 'react-native'
+
+import { usePlayerProfile } from '@shared/hooks/usePlayerProfile'
+import { describeBest, describeMode, describeResult, formatPlayedAt } from '@shared/utils/profileFormat'
+import { DAILY_GAME_TYPES, formatPlayTime } from '@shared/utils/profileStats'
+
+import { Text, Touchable } from '@/components/ui'
+import { getGameByType } from '@/games'
+import { colors, fonts, radius, space } from '@/theme'
+
+type IconName = ComponentProps<typeof MaterialCommunityIcons>['name']
+
+export type HistoryGame = {
+  id: string
+  gameType: string
+  mode: string
+  playedAt: number
+  score?: number
+  attempts?: number
+  solved?: boolean
+  found?: number
+  total?: number
+  dailyKey?: string
+  [extra: string]: unknown
+}
+
+type GameStats = { played: number; wins: number; dailies: number; bestScore: number | null; bestAttempts: number | null }
+
+export type ProfileStats = {
+  total: number
+  totalTime: number
+  countriesFound: number
+  daysPlayed: number
+  streak: { current: number; best: number }
+  todayDaily: Record<string, HistoryGame>
+  byGame: Record<string, GameStats>
+}
+
+export type Achievement = { id: string; icon: IconName; target: number; progress: number; unlocked: boolean }
+
+const AVATAR_COLORS = ['#3DDC97', '#7AA2FF', '#FF7A6B', '#F5B83D', '#C792FF', '#5FD4F4', '#FF9EC7', '#B4E05A']
+
+export function avatarColor(username: string) {
+  let hash = 0
+  for (const char of username) hash = (hash * 31 + char.charCodeAt(0)) | 0
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length]
+}
+
+export function Avatar({ username, size = 44 }: { username: string; size?: number }) {
+  return (
+    <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: avatarColor(username), alignItems: 'center', justifyContent: 'center' }}>
+      <Text style={{ fontFamily: fonts.display, fontSize: size * 0.45, lineHeight: size * 0.55 }} color={colors.onAccent}>
+        {username.charAt(0).toUpperCase()}
+      </Text>
+    </View>
+  )
+}
+
+export function SectionTitle({ title, right }: { title: string; right?: ReactNode }) {
+  return (
+    <View style={styles.sectionTitle}>
+      <Text variant="heading">{title}</Text>
+      {right}
+    </View>
+  )
+}
+
+export function LinkButton({ label, onPress, color = colors.accent }: { label: string; onPress: () => void; color?: string }) {
+  return (
+    <Touchable accessibilityRole="button" onPress={onPress} style={{ paddingVertical: space.xs, paddingHorizontal: space.sm }}>
+      <Text variant="bodyStrong" color={color} style={{ fontSize: 14 }}>
+        {label}
+      </Text>
+    </Touchable>
+  )
+}
+
+function Tile({ icon, value, label, color }: { icon: IconName; value: string; label: string; color: string }) {
+  return (
+    <View style={styles.tile}>
+      <MaterialCommunityIcons name={icon} size={20} color={color} />
+      <Text variant="number" numberOfLines={1} adjustsFontSizeToFit>
+        {value}
+      </Text>
+      <Text variant="caption" numberOfLines={1}>
+        {label}
+      </Text>
+    </View>
+  )
+}
+
+export function StatTiles({ stats }: { stats: ProfileStats }) {
+  const { t } = useTranslation()
+  return (
+    <View style={styles.tiles}>
+      <Tile icon="gamepad-variant-outline" value={String(stats.total)} label={t('profile.games')} color={colors.highlight} />
+      <Tile icon="timer-outline" value={formatPlayTime(stats.totalTime)} label={t('profile.play_time')} color={colors.warning} />
+      <Tile icon="earth" value={String(stats.countriesFound)} label={t('profile.countries')} color={colors.accent} />
+      <Tile icon="calendar-month-outline" value={String(stats.daysPlayed)} label={t('profile.days')} color="#C792FF" />
+    </View>
+  )
+}
+
+export function StreakCard({ stats }: { stats: ProfileStats }) {
+  const { t } = useTranslation()
+  const doneToday = DAILY_GAME_TYPES.filter((type: string) => stats.todayDaily[type]).length
+  const alive = stats.streak.current > 0
+  return (
+    <View style={styles.card}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.lg }}>
+        <View style={[styles.flame, { backgroundColor: alive ? `${colors.warning}26` : colors.surfaceHigh }]}>
+          <MaterialCommunityIcons name="fire" size={30} color={alive ? colors.warning : colors.textFaint} />
+        </View>
+        <View style={{ flex: 1, gap: 2 }}>
+          <Text variant="label">{t('profile.streak_title')}</Text>
+          <Text variant="title" color={alive ? colors.warning : colors.text}>
+            {t('profile.days_count', { count: stats.streak.current })}
+          </Text>
+        </View>
+        <View style={{ alignItems: 'flex-end' }}>
+          <Text variant="caption">{t('profile.streak_best')}</Text>
+          <Text variant="bodyStrong">{stats.streak.best}</Text>
+        </View>
+      </View>
+
+      <View style={{ gap: space.sm }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <Text variant="caption">{t('profile.today_title')}</Text>
+          <Text variant="caption">{t('profile.today_done', { done: doneToday, total: DAILY_GAME_TYPES.length })}</Text>
+        </View>
+        <DailyChips today={stats.todayDaily} />
+      </View>
+    </View>
+  )
+}
+
+// One chip per daily challenge: colored when done (green if solved), faded otherwise.
+export function DailyChips({ today, size = 36 }: { today: Record<string, { solved?: boolean }>; size?: number }) {
+  return (
+    <View style={{ flexDirection: 'row', gap: space.sm }}>
+      {DAILY_GAME_TYPES.map((type: string) => {
+        const game = getGameByType(type)
+        const result = today[type]
+        if (!game) return null
+        return (
+          <View
+            key={type}
+            style={[
+              styles.chip,
+              { width: size, height: size, borderRadius: size / 3 },
+              result ? { backgroundColor: `${game.color}26`, borderColor: game.color } : { opacity: 0.35 },
+            ]}>
+            <MaterialCommunityIcons name={game.icon} size={size * 0.5} color={result ? game.color : colors.textMuted} />
+            {result && (
+              <View style={[styles.chipBadge, { backgroundColor: result.solved === false ? colors.danger : colors.accent }]}>
+                <MaterialCommunityIcons name={result.solved === false ? 'close' : 'check'} size={9} color={colors.bg} />
+              </View>
+            )}
+          </View>
+        )
+      })}
+    </View>
+  )
+}
+
+export function AchievementsSection({ achievements }: { achievements: Achievement[] }) {
+  const { t } = useTranslation()
+  const [expanded, setExpanded] = useState(false)
+  const unlocked = achievements.filter((item) => item.unlocked).length
+  const visible = expanded ? achievements : achievements.slice(0, 6)
+  return (
+    <View style={{ gap: space.md }}>
+      <SectionTitle
+        title={t('profile.achievements_title')}
+        right={<Text variant="bodyStrong" color={colors.textMuted}>{t('profile.achievements_count', { unlocked, total: achievements.length })}</Text>}
+      />
+      <View style={styles.grid}>
+        {visible.map((achievement) => (
+          <View key={achievement.id} style={[styles.achievement, !achievement.unlocked && { opacity: 0.55 }]}>
+            <View style={[styles.achievementIcon, { backgroundColor: achievement.unlocked ? `${colors.warning}26` : colors.surfaceHigh }]}>
+              <MaterialCommunityIcons name={achievement.icon} size={22} color={achievement.unlocked ? colors.warning : colors.textFaint} />
+            </View>
+            <Text variant="bodyStrong" numberOfLines={1} style={{ fontSize: 14 }}>
+              {t(`achievements.${achievement.id}.title`)}
+            </Text>
+            <Text variant="caption" numberOfLines={2} style={{ fontSize: 12, lineHeight: 16 }}>
+              {t(`achievements.${achievement.id}.desc`)}
+            </Text>
+            {!achievement.unlocked && achievement.target > 1 && (
+              <View style={{ gap: 3 }}>
+                <View style={styles.track}>
+                  <View style={[styles.bar, { width: `${(achievement.progress / achievement.target) * 100}%` }]} />
+                </View>
+                <Text variant="caption" style={{ fontSize: 11 }}>
+                  {achievement.progress}/{achievement.target}
+                </Text>
+              </View>
+            )}
+          </View>
+        ))}
+      </View>
+      {achievements.length > 6 && (
+        <View style={{ alignItems: 'center' }}>
+          <LinkButton label={expanded ? t('profile.show_less') : t('profile.history_all')} onPress={() => setExpanded((value) => !value)} />
+        </View>
+      )}
+    </View>
+  )
+}
+
+export function ByGameSection({ stats }: { stats: ProfileStats }) {
+  const { t } = useTranslation()
+  const entries = Object.entries(stats.byGame).sort((a, b) => b[1].played - a[1].played)
+  if (entries.length === 0) return null
+  return (
+    <View style={{ gap: space.md }}>
+      <SectionTitle title={t('profile.by_game_title')} />
+      <View style={styles.list}>
+        {entries.map(([type, gameStats], index) => {
+          const game = getGameByType(type)
+          if (!game) return null
+          const best = describeBest(gameStats, t)
+          return (
+            <View key={type} style={[styles.listRow, index > 0 && styles.listDivider]}>
+              <View style={[styles.gameIcon, { backgroundColor: `${game.color}1F` }]}>
+                <MaterialCommunityIcons name={game.icon} size={20} color={game.color} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text variant="bodyStrong" numberOfLines={1}>
+                  {t(game.titleKey)}
+                </Text>
+                <Text variant="caption" numberOfLines={1}>
+                  {[
+                    t('profile.games_count', { count: gameStats.played }),
+                    gameStats.dailies > 0 ? t('profile.wins', { wins: gameStats.wins, dailies: gameStats.dailies }) : null,
+                  ]
+                    .filter(Boolean)
+                    .join(' · ')}
+                </Text>
+              </View>
+              {best && (
+                <Text variant="bodyStrong" color={game.color} style={{ fontSize: 13 }}>
+                  {best}
+                </Text>
+              )}
+            </View>
+          )
+        })}
+      </View>
+    </View>
+  )
+}
+
+export function GameHistoryRow({ game, divider }: { game: HistoryGame; divider?: boolean }) {
+  const { t, i18n } = useTranslation()
+  const meta = getGameByType(game.gameType)
+  if (!meta) return null
+  return (
+    <View style={[styles.listRow, divider && styles.listDivider]}>
+      <View style={[styles.gameIcon, { backgroundColor: `${meta.color}1F` }]}>
+        <MaterialCommunityIcons name={meta.icon} size={20} color={meta.color} />
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text variant="bodyStrong" numberOfLines={1}>
+          {t(meta.titleKey)}
+        </Text>
+        <Text variant="caption" numberOfLines={1}>
+          {describeMode(game, t)}
+        </Text>
+      </View>
+      <View style={{ alignItems: 'flex-end', maxWidth: '45%' }}>
+        <Text variant="bodyStrong" numberOfLines={1} style={{ fontSize: 13 }} color={game.solved === false ? colors.danger : colors.text}>
+          {describeResult(game, t)}
+        </Text>
+        <Text variant="caption" style={{ fontSize: 12 }}>
+          {formatPlayedAt(game.playedAt, i18n.language)}
+        </Text>
+      </View>
+    </View>
+  )
+}
+
+export function HistoryList({ games }: { games: HistoryGame[] }) {
+  return (
+    <View style={styles.list}>
+      {games.map((game, index) => (
+        <GameHistoryRow key={game.id} game={game} divider={index > 0} />
+      ))}
+    </View>
+  )
+}
+
+// Everything computed from a player's history. Reloads when the screen comes back into focus.
+export function ProfileBody({ uid, friendsCount, onSeeHistory }: { uid: string; friendsCount?: number; onSeeHistory: () => void }) {
+  const { t } = useTranslation()
+  const profile = usePlayerProfile(uid, { friendsCount })
+  const { reload } = profile
+  useFocusEffect(useCallback(() => reload(), [reload]))
+
+  if (profile.loading) return <ActivityIndicator color={colors.accent} style={{ marginVertical: space.xxl }} />
+  if (profile.error) return <Text variant="caption">{t('profile.load_error')}</Text>
+  return (
+    <ProfileView
+      games={profile.games as HistoryGame[]}
+      stats={profile.stats as ProfileStats}
+      achievements={profile.achievements as Achievement[]}
+      onSeeHistory={onSeeHistory}
+    />
+  )
+}
+
+// The sections themselves, from already loaded data.
+export function ProfileView({
+  games,
+  stats,
+  achievements,
+  onSeeHistory,
+}: {
+  games: HistoryGame[]
+  stats: ProfileStats
+  achievements: Achievement[]
+  onSeeHistory: () => void
+}) {
+  const { t } = useTranslation()
+  return (
+    <View style={{ gap: space.xl }}>
+      <StatTiles stats={stats} />
+      <StreakCard stats={stats} />
+      <AchievementsSection achievements={achievements} />
+      <View style={{ gap: space.md }}>
+        <SectionTitle
+          title={t('profile.history_title')}
+          right={games.length > 5 ? <LinkButton label={t('profile.history_all')} onPress={onSeeHistory} /> : undefined}
+        />
+        {games.length === 0 ? <Text variant="caption">{t('profile.history_empty')}</Text> : <HistoryList games={games.slice(0, 5)} />}
+      </View>
+      <ByGameSection stats={stats} />
+    </View>
+  )
+}
+
+const styles = StyleSheet.create({
+  sectionTitle: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  card: { gap: space.lg, padding: space.lg, borderRadius: radius.xl, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
+  tiles: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
+  tile: {
+    flexBasis: '47%',
+    flexGrow: 1,
+    gap: 2,
+    padding: space.md,
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  flame: { width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center' },
+  chip: { borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surfaceHigh, alignItems: 'center', justifyContent: 'center' },
+  chipBadge: { position: 'absolute', right: -4, top: -4, width: 15, height: 15, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
+  achievement: {
+    flexBasis: '47%',
+    flexGrow: 1,
+    gap: space.xs,
+    padding: space.md,
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  achievementIcon: { width: 40, height: 40, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center', marginBottom: space.xs },
+  track: { height: 4, borderRadius: 2, backgroundColor: colors.border, overflow: 'hidden' },
+  bar: { height: 4, borderRadius: 2, backgroundColor: colors.warning },
+  list: { borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
+  listRow: { flexDirection: 'row', alignItems: 'center', gap: space.md, paddingHorizontal: space.md, paddingVertical: space.md },
+  listDivider: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },
+  gameIcon: { width: 38, height: 38, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },
+})

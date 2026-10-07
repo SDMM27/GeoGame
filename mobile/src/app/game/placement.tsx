@@ -13,6 +13,7 @@ import useGameState from '@shared/hooks/useGameState'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
 import { getCountryName } from '@shared/utils/getCountryName'
 
+import { setupGameRecord } from '@/account/history'
 import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
 import { WorldMap, type WorldMapHandle } from '@/components/map/WorldMap'
@@ -176,6 +177,18 @@ function PlacementGame({
             { label: t('mobile.game.time'), value: formatDuration(timer) },
             { label: clean(t('stats.first_try')), value: String(stats.foundFirstTry ?? 0) },
           ]}
+          record={setupGameRecord({
+            gameType: GAME_TYPES.PLACEMENT,
+            isTraining,
+            roomCode: play?.room.id,
+            isAscension: !!ascension,
+            presetName: ascension?.presetName,
+            difficulty,
+            continent,
+            score,
+            stats,
+            timer,
+          })}
           save={
             isTraining || play
               ? null

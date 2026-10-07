@@ -13,6 +13,7 @@ import { getCountryStyle, getFocusCountry, getViewportSettings } from '../utils/
 import DailyForm from './DailyForm'
 import DailyLeaderboard from './DailyLeaderboard'
 import { GAME_TYPES } from '../utils/gameTypes'
+import { useRecordGame } from '../auth'
 import 'leaflet/dist/leaflet.css'
 import 'react-toastify/dist/ReactToastify.css'
 import './BorderGuessPage.css'
@@ -90,6 +91,12 @@ export default function BorderGuessPage() {
     startGame,
     elapsedTime,
   } = useBorderGuessState(mode)
+
+  useRecordGame(
+    isComplete && mode === 'daily'
+      ? { gameType: GAME_TYPES.BORDER_GUESS, mode: 'daily', dailyKey, solved: isSolved, attempts: guesses.length, elapsedTime }
+      : null
+  )
 
   const localizedAnswerName = getCountryName(currentCountryISO, i18n.language) || answerName
 

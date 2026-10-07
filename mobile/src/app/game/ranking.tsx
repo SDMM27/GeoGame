@@ -12,6 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import useRankingGameState from '@shared/hooks/useRankingGameState'
 import { getCountryName } from '@shared/utils/getCountryName'
+import { GAME_TYPES } from '@shared/utils/gameTypes'
 
 import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
 import { RankingLeaderboard } from '@/components/game/RankingLeaderboard'
@@ -295,6 +296,15 @@ export default function RankingScreen() {
             { label: t('mobile.ranking.attempts'), value: `${attemptNumber} / ${MAX_ATTEMPTS}` },
             { label: clean(t('ranking.total_error')).replace(/\s*:$/, ''), value: `${totalError}`, color: totalError ? colors.warning : colors.accent },
           ]}
+          record={{
+            gameType: GAME_TYPES.RANKING,
+            mode: 'daily',
+            dailyKey,
+            score,
+            solved: score > 0,
+            attempts: attemptNumber,
+            totalError,
+          }}
           save={{
             kind: 'ranking',
             dailyKey,

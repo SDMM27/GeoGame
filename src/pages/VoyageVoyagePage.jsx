@@ -11,6 +11,7 @@ import useVoyageVoyageState from '../hooks/useVoyageVoyageState'
 import DailyForm from './DailyForm'
 import DailyLeaderboard from './DailyLeaderboard'
 import { GAME_TYPES } from '../utils/gameTypes'
+import { useRecordGame } from '../auth'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { normalize } from '../utils/normalizeAnswer'
 import { getCountryName } from '../utils/getCountryName'
@@ -126,6 +127,22 @@ export default function VoyageVoyagePage() {
   }, [isGameOver])
 
   const isPerfect = isGameOver && stepsUsed === optimalLength
+
+  useRecordGame(
+    isGameOver && mode === 'daily' && score != null
+      ? {
+          gameType: GAME_TYPES.VOYAGE_VOYAGE,
+          mode: 'daily',
+          dailyKey,
+          score,
+          solved: true,
+          attempts: stepsUsed,
+          optimal: optimalLength,
+          errors: wrongGuesses.length,
+          hints: hintsUsed.length,
+        }
+      : null
+  )
 
   return (
     <div className="voyage-page">

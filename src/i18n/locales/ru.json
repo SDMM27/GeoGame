@@ -467,5 +467,216 @@
       "digits_other": "Это {{count}}-значное число",
       "between": "От {{min}} до {{max}}"
     }
+  },
+  "account": {
+    "nav": "Аккаунт",
+    "title": "Мой аккаунт",
+    "signin_tab": "Вход",
+    "signup_tab": "Регистрация",
+    "signin_intro": "Войди, чтобы твой ник был и на сайте, и в приложении.",
+    "signup_intro": "Создай аккаунт, чтобы закрепить за собой ник.",
+    "email": "Email",
+    "password": "Пароль",
+    "username": "Ник",
+    "email_placeholder": "ty@primer.com",
+    "password_placeholder": "Минимум 6 символов",
+    "username_placeholder": "Твой ник",
+    "username_hint": "От 3 до 20 символов",
+    "signin": "Войти",
+    "signup": "Создать аккаунт",
+    "forgot": "Забыл пароль?",
+    "reset_sent": "Мы отправили письмо на {{email}}, чтобы задать новый пароль.",
+    "welcome": "Добро пожаловать, {{username}}!",
+    "signed_in_as": "Ты вошёл как",
+    "signout": "Выйти",
+    "prefill_hint": "Твой ник подставляется, когда ты сохраняешь результат или входишь в игру.",
+    "delete": "Удалить аккаунт",
+    "delete_confirm": "Аккаунт и ник будут удалены. Введи пароль для подтверждения.",
+    "delete_button": "Удалить навсегда",
+    "deleted": "Аккаунт удалён.",
+    "cancel": "Отмена",
+    "errors": {
+      "invalid_email": "Неверный адрес email.",
+      "email_in_use": "Аккаунт с этим email уже существует.",
+      "weak_password": "Пароль должен содержать минимум 6 символов.",
+      "wrong_credentials": "Неверный email или пароль.",
+      "too_many_requests": "Слишком много попыток. Попробуй через несколько минут.",
+      "network": "Нет соединения. Проверь сеть.",
+      "not_enabled": "Создание аккаунтов пока не включено.",
+      "username_length": "Ник должен содержать от 3 до 20 символов.",
+      "username_chars": "Ник может содержать только буквы, цифры, пробелы, «_», «-» и «.».",
+      "username_taken": "Этот ник уже занят.",
+      "generic": "Что-то пошло не так. Попробуй ещё раз.",
+      "popup_blocked": "Окно Google заблокировано. Разреши всплывающие окна и попробуй снова.",
+      "different_provider": "Этот email уже используется с другим способом входа.",
+      "cancelled": "Вход отменён."
+    },
+    "google": "Войти через Google",
+    "or": "или",
+    "choose_title": "Выбери ник",
+    "choose_intro": "Под этим именем будут видны твои результаты. Ник закрепится за твоим аккаунтом.",
+    "choose_submit": "Подтвердить ник",
+    "delete_confirm_google": "Аккаунт и ник будут удалены. Подтверди через Google."
+  },
+  "profile": {
+    "member_since": "С нами с {{date}}",
+    "stats_title": "Статистика",
+    "games": "Игры",
+    "play_time": "Время в игре",
+    "countries": "Найдено стран",
+    "days": "Дней в игре",
+    "streak_title": "Серия заданий дня",
+    "streak_current": "Текущая серия",
+    "streak_best": "Рекорд",
+    "days_count_one": "{{count}} день",
+    "days_count_few": "{{count}} дня",
+    "days_count_many": "{{count}} дней",
+    "days_count_other": "{{count}} дня",
+    "streak_hint": "Выполняй хотя бы одно задание дня каждый день, чтобы не прервать серию.",
+    "today_title": "Задания на сегодня",
+    "today_done": "{{done}}/{{total}}",
+    "by_game_title": "По играм",
+    "games_count_one": "{{count}} игра",
+    "games_count_few": "{{count}} игры",
+    "games_count_many": "{{count}} игр",
+    "games_count_other": "{{count}} игры",
+    "best_score": "Рекорд {{score}} очк.",
+    "best_attempts_one": "Лучшее: {{count}} попытка",
+    "best_attempts_few": "Лучшее: {{count}} попытки",
+    "best_attempts_many": "Лучшее: {{count}} попыток",
+    "best_attempts_other": "Лучшее: {{count}} попытки",
+    "wins": "Решено заданий: {{wins}}/{{dailies}}",
+    "achievements_title": "Достижения",
+    "achievements_count": "{{unlocked}}/{{total}}",
+    "history_title": "Последние игры",
+    "history_all": "Все",
+    "history_full_title": "История",
+    "history_empty": "Пока нет сохранённых игр. Играй, войдя в аккаунт, и они появятся здесь.",
+    "all_games": "Все игры",
+    "modes": {
+      "standard": "Классика",
+      "ascension": "Восхождение",
+      "daily": "Задание дня",
+      "infinite": "Бесконечно",
+      "multi": "Мультиплеер"
+    },
+    "solved": "Найдено",
+    "failed": "Не найдено",
+    "attempts_count_one": "{{count}} попытка",
+    "attempts_count_few": "{{count}} попытки",
+    "attempts_count_many": "{{count}} попыток",
+    "attempts_count_other": "{{count}} попытки",
+    "load_error": "Не удалось загрузить профиль. Проверь подключение.",
+    "not_found": "Игрок не найден.",
+    "settings_title": "Аккаунт",
+    "favorite": "Любимая игра",
+    "sign_in_title": "Твой профиль игрока",
+    "sign_in_pitch": "Войди, чтобы сохранять историю игр, следить за статистикой, получать достижения и играть с друзьями.",
+    "show_less": "Свернуть"
+  },
+  "friends": {
+    "title": "Друзья",
+    "count_one": "{{count}} друг",
+    "count_few": "{{count}} друга",
+    "count_many": "{{count}} друзей",
+    "count_other": "{{count}} друга",
+    "add_title": "Добавить друга",
+    "add_placeholder": "Ник друга",
+    "add": "Добавить",
+    "sent": "Заявка отправлена игроку {{username}}!",
+    "now_friends": "Теперь вы с {{username}} друзья!",
+    "requests_title": "Входящие заявки",
+    "outgoing_title": "Отправленные заявки",
+    "accept": "Принять",
+    "decline": "Отклонить",
+    "cancel": "Отменить",
+    "remove": "Удалить из друзей",
+    "remove_confirm": "Удалить {{username}} из друзей?",
+    "empty": "У тебя пока нет друзей. Добавь их по нику!",
+    "today_title": "Задания дня твоих друзей",
+    "today_none": "Сегодня ещё не играл",
+    "add_friend": "Добавить в друзья",
+    "request_sent": "Заявка отправлена",
+    "is_friend": "Друг",
+    "accept_request": "Принять заявку",
+    "see_all": "Мои друзья",
+    "pending_badge_one": "{{count}} заявка",
+    "pending_badge_few": "{{count}} заявки",
+    "pending_badge_many": "{{count}} заявок",
+    "pending_badge_other": "{{count}} заявки",
+    "errors": {
+      "not_found": "Игрока с таким ником нет.",
+      "self": "Это ты!",
+      "already_friends": "Вы уже друзья.",
+      "already_sent": "Заявка уже отправлена.",
+      "network": "Нет соединения. Проверь сеть.",
+      "generic": "Что-то пошло не так. Попробуй ещё раз."
+    }
+  },
+  "achievements": {
+    "first_game": {
+      "title": "Первый шаг",
+      "desc": "Заверши первую игру"
+    },
+    "games_50": {
+      "title": "Завсегдатай",
+      "desc": "Сыграй 50 игр"
+    },
+    "games_250": {
+      "title": "Не оторваться",
+      "desc": "Сыграй 250 игр"
+    },
+    "all_games": {
+      "title": "Мастер на все руки",
+      "desc": "Сыграй в каждую игру"
+    },
+    "streak_3": {
+      "title": "Хорошее начало",
+      "desc": "3 дня подряд заданий дня"
+    },
+    "streak_7": {
+      "title": "Идеальная неделя",
+      "desc": "7 дней подряд заданий дня"
+    },
+    "streak_30": {
+      "title": "Не остановить",
+      "desc": "30 дней подряд заданий дня"
+    },
+    "daily_sweep": {
+      "title": "Большой шлем",
+      "desc": "Выполни все задания дня за один день"
+    },
+    "first_try": {
+      "title": "С первой попытки",
+      "desc": "Реши задание дня с первой попытки"
+    },
+    "explorer": {
+      "title": "Исследователь",
+      "desc": "Найди 500 стран в сумме"
+    },
+    "globetrotter": {
+      "title": "Путешественник",
+      "desc": "Найди 5000 стран в сумме"
+    },
+    "hardcore": {
+      "title": "Без страховки",
+      "desc": "Заверши игру на сложности Hardcore"
+    },
+    "ascension": {
+      "title": "На вершине",
+      "desc": "Заверши игру в режиме Восхождение"
+    },
+    "multiplayer": {
+      "title": "Командный дух",
+      "desc": "Сыграй в мультиплеер"
+    },
+    "friend": {
+      "title": "Общительный",
+      "desc": "Добавь первого друга"
+    },
+    "night_owl": {
+      "title": "Сова",
+      "desc": "Сыграй между полуночью и 5 утра"
+    }
   }
 }

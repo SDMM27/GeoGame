@@ -10,6 +10,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { matchKnownAnswer } from '@shared/utils/answerLexicon'
 
+import { setupGameRecord } from '@/account/history'
 import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
 import { ResultsSheet, type SaveConfig } from '@/components/game/ResultsSheet'
 import { Text, Touchable } from '@/components/ui'
@@ -263,6 +264,18 @@ export function TypingGame({
             { label: clean(t('stats.first_try')), value: String(stats.foundFirstTry ?? 0) },
           ]}
           save={save}
+          record={setupGameRecord({
+            gameType: config.gameType,
+            isTraining,
+            roomCode: play?.room.id,
+            isAscension: !!ascension,
+            presetName: ascension?.presetName,
+            difficulty,
+            continent,
+            score,
+            stats,
+            timer,
+          })}
           share={
             play
               ? null

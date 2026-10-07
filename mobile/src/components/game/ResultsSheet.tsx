@@ -12,6 +12,7 @@ import { formatTime } from '@shared/utils/formatTime'
 import { saveAscensionScore, saveDailyScore, saveScore } from '@shared/utils/saveScore'
 import { generateShareText } from '@shared/utils/shareScore'
 
+import { useRecordGame, type GameRecord } from '@/account/history'
 import { saveRankingScore } from '@/rankingScores'
 import { colors, fonts, radius, space } from '@/theme'
 import { Button, Text } from '../ui'
@@ -55,6 +56,8 @@ type Props = {
   stats: { label: string; value: string; color?: string }[]
   save?: SaveConfig | null
   share?: ShareConfig | null
+  // Saved to the signed-in player's history when the sheet appears
+  record?: GameRecord | null
   onReplay?: () => void
   onHome: () => void
   homeLabel?: string
@@ -73,7 +76,7 @@ const dailySavedKey = (save: SaveConfig | null | undefined) =>
       ? `ranking-saved:${save.dailyKey}`
       : null
 
-export function ResultsSheet({ title, score, scoreText, scoreLabel, accent = colors.accent, stats, save, share, onReplay, onHome, homeLabel, onSaved, children }: Props) {
+export function ResultsSheet({ title, score, scoreText, scoreLabel, accent = colors.accent, stats, save, share, record, onReplay, onHome, homeLabel, onSaved, children }: Props) {
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   const [pseudo, setPseudo] = useState(() => globalThis.localStorage?.getItem(PSEUDO_KEY) ?? '')
@@ -82,6 +85,7 @@ export function ResultsSheet({ title, score, scoreText, scoreLabel, accent = col
     return key && globalThis.localStorage?.getItem(key) ? 'saved' : 'idle'
   })
   const [blockedBy, setBlockedBy] = useState<string | null>(null)
+  useRecordGame(record)
 
   useEffect(() => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)

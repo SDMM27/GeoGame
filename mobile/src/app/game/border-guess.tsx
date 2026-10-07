@@ -222,6 +222,14 @@ function BorderGuessGame({ mode, play }: { mode: string; play?: RoomPlay }) {
             { label: t('mobile.multi.errors_label'), value: String(rounds.tally.errors) },
             { label: t('mobile.game.time'), value: formatTime(rounds.elapsedTime ?? 0).slice(0, 5) },
           ]}
+          record={{
+            gameType: GAME_TYPES.BORDER_GUESS,
+            mode: 'multi',
+            roomCode: play.room.id,
+            found: rounds.tally.solved,
+            total: rounds.total,
+            elapsedTime: rounds.elapsedTime,
+          }}
           onHome={play.exit}
           homeLabel={t('mobile.multi.back_to_room')}>
           <Standings code={play.room.id} />
@@ -238,6 +246,7 @@ function BorderGuessGame({ mode, play }: { mode: string; play?: RoomPlay }) {
             { label: t('labels.country'), value: answer, color: isSolved ? colors.accent : colors.warning },
             { label: t('mobile.game.time'), value: elapsedTime != null ? formatTime(elapsedTime).slice(0, 5) : '—' },
           ]}
+          record={{ gameType: GAME_TYPES.BORDER_GUESS, mode: 'daily', dailyKey, solved: isSolved, attempts: guesses.length, elapsedTime }}
           save={
             isSolved
               ? {

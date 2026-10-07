@@ -5,6 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { saveScore } from "../utils/saveScore";
 import { toast } from "react-toastify";
 import { formatTime } from "../utils/formatTime";
+import { getSavedPseudo } from "../utils/account";
 
 export default function Form({ finalScore, difficulty, elapsedTime, gameType, continent }) {
   const { t } = useTranslation();
@@ -69,6 +70,7 @@ export default function Form({ finalScore, difficulty, elapsedTime, gameType, co
           type="text"
           id="name"
           ref={nameRef}
+          defaultValue={getSavedPseudo()}
           className="form-input"
           placeholder={t('placeholders.username')}
           maxLength={20}

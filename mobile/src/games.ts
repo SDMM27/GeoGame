@@ -129,3 +129,8 @@ export const DIFFICULTY_COLORS: Record<string, string> = {
   Impossible: '#FF9A4D',
   Hardcore: '#FF7A6B',
 }
+
+// Game of a GAME_TYPES value (history, scores).
+export function getGameByType(type: string) {
+  return GAMES.find((game) => game.type === type)
+}

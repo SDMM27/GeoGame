@@ -2,6 +2,7 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { GAME_TYPES } from '../../utils/gameTypes'
+import { getSavedPseudo } from '../../utils/account'
 import { ASCENSION_PRESETS, matchPreset } from '../../utils/ascensionPresets'
 import { getTotalCountries } from '../../hooks/useGameState'
 import { getTotalFlagCountries } from '../../hooks/useFlagGameState'
@@ -169,7 +170,7 @@ export function GameSettings({ game, onChange }) {
 
 export default function RoomConfig({ onSubmit, submitting }) {
   const { t } = useTranslation()
-  const [pseudo, setPseudo] = useState('')
+  const [pseudo, setPseudo] = useState(getSavedPseudo)
   const [games, setGames] = useState([defaultGame(GAME_TYPES.PLACEMENT)])
   const [chillMode, setChillMode] = useState(false)
   const [chillTimers, setChillTimers] = useState({ Facile: 6, Moyen: 8, Difficile: 10, Impossible: 15 })

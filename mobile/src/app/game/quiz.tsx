@@ -291,6 +291,7 @@ function DailyQuiz() {
             { label: t('quiz.hints_label'), value: `${hintsUsed}/${MAX_HINTS}` },
             { label: t('mobile.game.time'), value: elapsedTime != null ? formatTime(elapsedTime).slice(0, 5) : '—' },
           ]}
+          record={{ gameType: GAME_TYPES.QUIZ, mode: 'daily', dailyKey, solved: isSolved, attempts, hints: hintsUsed, elapsedTime }}
           save={
             isSolved
               ? {
@@ -616,6 +617,20 @@ function PracticeQuiz({ play }: { play?: RoomPlay }) {
             { label: t('quiz.correct_answers'), value: `${stats.correct}/${stats.answered}` },
             { label: t('quiz.best_streak'), value: `${stats.bestStreak}` },
           ]}
+          record={
+            stats.answered > 0
+              ? {
+                  gameType: GAME_TYPES.QUIZ,
+                  mode: play ? 'multi' : 'infinite',
+                  roomCode: play?.room.id,
+                  score: stats.score,
+                  correct: stats.correct,
+                  answered: stats.answered,
+                  bestStreak: stats.bestStreak,
+                  difficulty: maxDifficulty,
+                }
+              : null
+          }
           share={
             stats.answered > 0 && !play
               ? {

@@ -10,6 +10,7 @@ import useDailyQuizState from '../hooks/useDailyQuizState'
 import DailyForm from './DailyForm'
 import DailyLeaderboard from './DailyLeaderboard'
 import { GAME_TYPES } from '../utils/gameTypes'
+import { useRecordGame } from '../auth'
 import { resolveMode } from '../utils/challenge'
 import { formatTime } from '../utils/formatTime'
 import { ANSWER_MODES, MAX_HINTS, QUIZ_DIFFICULTIES, getQuestionHints, localizeQuestion } from '../utils/quizQuestions'
@@ -73,6 +74,19 @@ function DifficultyPicker({ onPick }) {
 function Summary({ stats, maxDifficulty, onRestart, onChangeDifficulty }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  useRecordGame(
+    stats.answered > 0
+      ? {
+          gameType: GAME_TYPES.QUIZ,
+          mode: 'infinite',
+          score: stats.score,
+          correct: stats.correct,
+          answered: stats.answered,
+          bestStreak: stats.bestStreak,
+          difficulty: maxDifficulty,
+        }
+      : null
+  )
   return (
     <section className="quiz-card quiz-summary">
       <h2 className="quiz-card-title">{t('quiz.summary_title')}</h2>
@@ -314,6 +328,11 @@ function DailyQuiz() {
   }
 
   const attempts = guesses.length
+  useRecordGame(
+    isComplete
+      ? { gameType: GAME_TYPES.QUIZ, mode: 'daily', dailyKey, solved: isSolved, attempts, hints: hintsUsed, elapsedTime }
+      : null
+  )
   const lastGuess = guesses[guesses.length - 1]
   const statText = t('quiz.daily_stat', {
     attempts: t('quiz.attempts_count', { count: attempts }),

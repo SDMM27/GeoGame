@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
 import { saveDailyScore } from '../utils/saveScore'
 import { formatTime } from '../utils/formatTime'
+import { getSavedPseudo } from '../utils/account'
 import './DailyLeaderboard.css'
 
 export default function DailyForm({ attempts, elapsedTime, guesses, gameType, dailyKey, statText, hints }) {
@@ -57,6 +58,7 @@ export default function DailyForm({ attempts, elapsedTime, guesses, gameType, da
         <input
           id="daily-pseudo"
           ref={nameRef}
+          defaultValue={getSavedPseudo()}
           className="daily-form__input"
           type="text"
           placeholder={t('placeholders.username')}

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { saveAscensionScore } from '../utils/saveScore'
 import { toast } from 'react-toastify'
 import { formatTime } from '../utils/formatTime'
+import { getSavedPseudo } from '../utils/account'
 
 /**
  * End-of-game summary and score save for Ascension mode.
@@ -117,6 +118,7 @@ export default function AscensionForm({ score, timer, stats, phaseStats, gameTyp
               type="text"
               id="ascension-name"
               ref={nameRef}
+              defaultValue={getSavedPseudo()}
               className="form-input"
               placeholder={t('placeholders.username')}
               maxLength={20}

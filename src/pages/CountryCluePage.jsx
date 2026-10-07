@@ -11,6 +11,7 @@ import CountryClueMap from './CountryClueMap'
 import DailyForm from './DailyForm'
 import DailyLeaderboard from './DailyLeaderboard'
 import { GAME_TYPES } from '../utils/gameTypes'
+import { useRecordGame } from '../auth'
 import { getCountryName } from '../utils/getCountryName'
 import 'react-toastify/dist/ReactToastify.css'
 import './CountryCluePage.css'
@@ -83,6 +84,12 @@ export default function CountryCluePage() {
     startGame,
     elapsedTime,
   } = useCountryClueState(mode)
+
+  useRecordGame(
+    isComplete && mode === 'daily'
+      ? { gameType: GAME_TYPES.COUNTRY_CLUE, mode: 'daily', dailyKey, solved: isSolved, attempts: guesses.length, elapsedTime }
+      : null
+  )
 
   const lang = i18n.language
   const translatedAnswerName =

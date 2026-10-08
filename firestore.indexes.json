@@ -1,0 +1,70 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "scores",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "gameType", "order": "ASCENDING" },
+        { "fieldPath": "difficulty", "order": "ASCENDING" },
+        { "fieldPath": "score", "order": "DESCENDING" },
+        { "fieldPath": "elapsedTime", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "scores",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "difficulty", "order": "ASCENDING" },
+        { "fieldPath": "score", "order": "DESCENDING" },
+        { "fieldPath": "elapsedTime", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "ascension_scores",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "gameType", "order": "ASCENDING" },
+        { "fieldPath": "presetName", "order": "ASCENDING" },
+        { "fieldPath": "globalTimeMs", "order": "ASCENDING" },
+        { "fieldPath": "globalScore", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "ascension_scores",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "gameType", "order": "ASCENDING" },
+        { "fieldPath": "globalTimeMs", "order": "ASCENDING" },
+        { "fieldPath": "globalScore", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "ascension_scores",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "presetName", "order": "ASCENDING" },
+        { "fieldPath": "globalTimeMs", "order": "ASCENDING" },
+        { "fieldPath": "globalScore", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "ascension_scores",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "globalTimeMs", "order": "ASCENDING" },
+        { "fieldPath": "globalScore", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "daily_scores",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "gameType", "order": "ASCENDING" },
+        { "fieldPath": "dailyKey", "order": "ASCENDING" },
+        { "fieldPath": "score", "order": "DESCENDING" },
+        { "fieldPath": "totalError", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

@@ -1,7 +1,8 @@
-import { addDoc, collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, where } from 'firebase/firestore'
+import { addDoc, collection, doc, getDoc, getDocs, limit, orderBy, query, serverTimestamp, setDoc, where } from 'firebase/firestore'
 import { firestore } from '../Firebase'
 import { isBetterDailyScore, sortDailyScores } from './dailyScores'
 import { sortRankingScores } from './rankingScores'
+import { LEADERBOARD_SIZE, ascensionLeaderboard, ascensionQuery, soloLeaderboard, soloQueries } from './leaderboards'
 import { GAME_TYPES } from './gameTypes'
 import { normalizeUsername } from './account'
 
@@ -114,10 +115,46 @@ export async function fetchDailyScores(gameType, dailyKey) {
   return sortDailyScores(snapshot.docs.map((doc) => doc.data()))
 }
 
-// Country Ranking scores of one day, best first.
+// Country Ranking scores of one day, best first (the best LEADERBOARD_SIZE).
 export async function fetchRankingScores(dailyKey) {
   const snapshot = await getDocs(
-    query(collection(firestore, 'daily_scores'), where('gameType', '==', GAME_TYPES.RANKING), where('dailyKey', '==', dailyKey))
+    query(
+      collection(firestore, 'daily_scores'),
+      where('gameType', '==', GAME_TYPES.RANKING),
+      where('dailyKey', '==', dailyKey),
+      orderBy('score', 'desc'),
+      orderBy('totalError', 'asc'),
+      limit(LEADERBOARD_SIZE)
+    )
   )
   return sortRankingScores(snapshot.docs.map((doc) => doc.data()))
+}
+
+// Runs one query per set of equality filters, each in the given leaderboard order (see firestore.indexes.json).
+async function fetchTop(collectionName, filterSets, orderFields) {
+  const results = await Promise.all(
+    filterSets.map((filters) =>
+      getDocs(
+        query(
+          collection(firestore, collectionName),
+          ...Object.entries(filters).map(([field, value]) => where(field, '==', value)),
+          ...orderFields.map(([field, direction]) => orderBy(field, direction)),
+          limit(LEADERBOARD_SIZE)
+        )
+      )
+    )
+  )
+  return results.flatMap((snapshot) => snapshot.docs.map((doc) => doc.data()))
+}
+
+// Solo leaderboard (the best LEADERBOARD_SIZE), for { game, continentMode, difficulty, continent } (see leaderboards.js).
+export async function fetchSoloScores(filters) {
+  const scores = await fetchTop('scores', soloQueries(filters), [['score', 'desc'], ['elapsedTime', 'asc']])
+  return soloLeaderboard(scores, filters)
+}
+
+// Ascension leaderboard (the best LEADERBOARD_SIZE), for { game, preset }.
+export async function fetchAscensionScores(filters) {
+  const scores = await fetchTop('ascension_scores', [ascensionQuery(filters)], [['globalTimeMs', 'asc'], ['globalScore', 'desc']])
+  return ascensionLeaderboard(scores)
 }

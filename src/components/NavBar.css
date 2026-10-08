@@ -1,8 +1,10 @@
 .navbar {
+  position: relative;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 40px;
+  padding: 0.5rem 0;
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -44,11 +46,6 @@
   }
 }
 
-@media (max-width: 600px) {
-  .navbar {
-    padding: 16px 20px;
-  }
-}
 .navbar-mp-link { color: #00d4ff; text-decoration: none; font-weight: 600; font-size: 0.9rem; margin-left: auto; }
 .navbar-mp-link:hover { text-decoration: underline; }
 

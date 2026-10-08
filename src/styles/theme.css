@@ -47,9 +47,10 @@ body {
 }
 
 body {
-  background-color: var(--bg-primary);
-  font-family: var(--font-main);
-  color: var(--text-primary);
+  /* Kept as rendered while Bootstrap was loaded (its body rules won over the variables). */
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  color: #212529;
+  background-color: #fff;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
   min-height: 100dvh;
@@ -59,4 +60,126 @@ body {
 #root {
   min-height: 100vh;
   min-height: 100dvh;
+}
+
+/* Base element styles the site relied on, formerly provided by Bootstrap's Reboot (only what is visible here) */
+@media (prefers-reduced-motion: no-preference) {
+  :root {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1, h2, h3 {
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+h1 { font-size: calc(1.375rem + 1.5vw); }
+h2 { font-size: calc(1.325rem + 0.9vw); }
+h3 { font-size: calc(1.3rem + 0.6vw); }
+
+@media (min-width: 1200px) {
+  h1 { font-size: 2.5rem; }
+  h2 { font-size: 2rem; }
+  h3 { font-size: 1.75rem; }
+}
+
+p {
+  margin-bottom: 1rem;
+}
+
+ol, ul {
+  padding-left: 2rem;
+  margin-bottom: 1rem;
+}
+
+ol ol, ul ul, ol ul, ul ol {
+  margin-bottom: 0;
+}
+
+a {
+  color: #0d6efd;
+  text-decoration: underline;
+}
+
+a:hover {
+  color: #0a58ca;
+}
+
+strong, b {
+  font-weight: bolder;
+}
+
+small {
+  font-size: 0.875em;
+}
+
+code {
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.875em;
+  color: #d63384;
+}
+
+iframe {
+  border: 0;
+}
+
+img, svg {
+  vertical-align: middle;
+}
+
+table {
+  caption-side: bottom;
+  border-collapse: collapse;
+}
+
+th {
+  text-align: inherit;
+}
+
+thead, tbody, tr, td, th {
+  border: 0 solid;
+  border-color: inherit;
+}
+
+label {
+  display: inline-block;
+}
+
+button, input, select, textarea {
+  margin: 0;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+button {
+  border-radius: 0;
+}
+
+button:focus:not(:focus-visible) {
+  outline: 0;
+}
+
+button, select {
+  text-transform: none;
+}
+
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+select {
+  overflow-wrap: normal;
+}
+
+[hidden] {
+  display: none !important;
 }

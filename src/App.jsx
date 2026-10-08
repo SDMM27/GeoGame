@@ -16,7 +16,6 @@ import ScoresPage from "./pages/ScoresPage";
 import MultiplayerHomePage from "./pages/multiplayer/MultiplayerHomePage";
 import MultiplayerCreatePage from "./pages/multiplayer/MultiplayerCreatePage";
 import MultiplayerRoomPage from "./pages/multiplayer/MultiplayerRoomPage";
-import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function App() {
   return (

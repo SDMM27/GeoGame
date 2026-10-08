@@ -279,7 +279,8 @@
     "time": "Temps",
     "hints_used": "Indices utilisés :",
     "no_hints": "aucun",
-    "attempted_countries": "Pays tentés"
+    "attempted_countries": "Pays tentés",
+    "played_order": "Classement joué"
   },
   "multiplayer": {
     "title": "Multijoueur"

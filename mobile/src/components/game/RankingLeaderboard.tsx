@@ -9,6 +9,7 @@ import { useLeaderboard } from '@/hooks/useLeaderboard'
 import { loadErrorKey } from '@/leaderboards'
 import { colors, radius, space } from '@/theme'
 import { Text } from '../ui'
+import { AnswerList, ExpandableRow } from './ExpandableRow'
 import { visibleRows } from './leaderboardRows'
 
 const MEDALS = ['🥇', '🥈', '🥉']
@@ -32,9 +33,14 @@ export function RankingLeaderboard({ dailyKey, refreshKey, maxRows = DEFAULT_MAX
         <Text variant="caption">{t('leaderboard.no_scores_today')}</Text>
       ) : (
         visibleRows(scores, account?.uid, maxRows).map(({ score, index }) => (
-          <View
+          <ExpandableRow
             key={`${score.name}-${index}`}
-            style={[styles.row, index < 3 && styles.rowTop, Boolean(score.uid) && score.uid === account?.uid && styles.rowMine]}>
+            style={[styles.row, index < 3 && styles.rowTop, Boolean(score.uid) && score.uid === account?.uid && styles.rowMine]}
+            details={
+              Array.isArray(score.playerOrder) && score.playerOrder.length > 0 ? (
+                <AnswerList title={t('leaderboard.played_order')} answers={score.playerOrder} />
+              ) : undefined
+            }>
             <Text variant="bodyStrong" style={styles.rank}>
               {MEDALS[index] ?? `${index + 1}`}
             </Text>
@@ -57,7 +63,7 @@ export function RankingLeaderboard({ dailyKey, refreshKey, maxRows = DEFAULT_MAX
             <Text variant="caption" style={styles.error}>
               {score.totalError} {t('mobile.ranking.pos')}
             </Text>
-          </View>
+          </ExpandableRow>
         ))
       )}
     </View>
@@ -66,7 +72,7 @@ export function RankingLeaderboard({ dailyKey, refreshKey, maxRows = DEFAULT_MAX
 
 const styles = StyleSheet.create({
   card: { gap: space.sm, padding: space.lg, borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
-  row: { flexDirection: 'row', alignItems: 'center', gap: space.md, paddingVertical: 6, paddingHorizontal: space.sm, borderRadius: radius.sm },
+  row: { paddingVertical: 6, paddingHorizontal: space.sm, borderRadius: radius.sm },
   rowTop: { backgroundColor: colors.surfaceHigh },
   rowMine: { borderWidth: 1, borderColor: colors.accent },
   rank: { width: 28, textAlign: 'center' },

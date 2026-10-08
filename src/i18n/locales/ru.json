@@ -279,7 +279,8 @@
     "time": "Время",
     "hints_used": "Использованные подсказки:",
     "no_hints": "нет",
-    "attempted_countries": "Угаданные страны"
+    "attempted_countries": "Угаданные страны",
+    "played_order": "Сыгранный порядок"
   },
   "multiplayer": {
     "title": "Мультиплеер"

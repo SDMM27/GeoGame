@@ -583,7 +583,7 @@ export function getDailyQuestion(dateKey) {
 // ─── Affichage ─────────────────────────────────────────────────────────────
 
 function capitalize(text) {
-  return text ? text.charAt(0).toLocaleUpperCase() + text.slice(1) : text
+  return text ? text.charAt(0).toUpperCase() + text.slice(1) : text
 }
 
 function localizeText(text, lang) {
@@ -720,7 +720,7 @@ const GENERIC_SUFFIXES = [
 
 function shortForms(name) {
   const forms = new Set([name])
-  let current = name.toLocaleLowerCase()
+  let current = name.toLowerCase()
   for (let changed = true; changed;) {
     changed = false
     for (const prefix of GENERIC_PREFIXES) {

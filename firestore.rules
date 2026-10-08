@@ -25,11 +25,40 @@ service cloud.firestore {
       return value is string && value.size() > 0 && value.size() <= 60;
     }
 
+    // A visitor's name as saveScore.js sends it (normalizeUsername): no space at either end, no double space,
+    // and no whitespace other than a single plain space. Otherwise "Alice " would slip past the usernames/ check.
+    function visitorName(name) {
+      return name.matches('^[^\\s\\p{Z}\\x{FEFF}](?:[^\\s\\p{Z}\\x{FEFF}]| [^\\s\\p{Z}\\x{FEFF}])*$');
+    }
+
+    // Account usernames, as validateUsername (account.js) accepts them once normalized:
+    // 3 to 20 characters, a letter or digit first, then letters, digits, single spaces, _ . -
+    // The size is also capped at 60 because the rules may count bytes rather than characters.
+    function validUsername(name) {
+      return name is string && name.size() >= 3 && name.size() <= 60
+        && name.matches('^[\\p{L}\\p{N}](?:[\\p{L}\\p{N}_.-]| [\\p{L}\\p{N}_.-])*$');
+    }
+
+    // usernames/{key}: the lowercase username. The rules' lower() only handles ASCII while the app lowercases
+    // every letter (toLowerCase), so for a username with other characters the key is only checked to be lowercase
+    // and as long as the username.
+    function validUsernameKey(key, username) {
+      return key == username.lower()
+        || (key.lower() == key && key.size() == username.size() && !username.matches('^[\\x00-\\x7F]*$'));
+    }
+
+    // Key of the usernames/ document of an account: users/{uid}.usernameKey (written by claimUsername), which is
+    // only needed when the rules' ASCII-only lower() can't compute it, otherwise the lowercase username.
+    function userKey(user) {
+      return user.get('usernameKey', user.username.lower());
+    }
+
     // Leaderboard entry owner: either the signed-in account under its own username,
     // or a visitor (no uid) under a name that no account owns (usernames/{lowercase}, see account.js).
     function validOwner(data) {
       return data.get('uid', null) == null
-        ? !exists(/databases/$(database)/documents/usernames/$(data.name.lower()))
+        ? visitorName(data.name)
+          && !exists(/databases/$(database)/documents/usernames/$(data.name.lower()))
         : request.auth != null
           && data.uid == request.auth.uid
           && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.username == data.name;
@@ -49,19 +78,70 @@ service cloud.firestore {
 
     // ---------- Accounts ----------
 
+    // Claiming a username writes usernames/{lowercase} and users/{uid} in the same transaction (account.js):
+    // each rule checks the other document as it will be after the write (getAfter).
+    // A username can't be changed, nor can an account hold two: both documents are only deleted together.
     match /usernames/{name} {
       allow read: if true;
-      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
-      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['uid', 'username'])
+        && request.resource.data.uid == request.auth.uid
+        && validUsername(request.resource.data.username)
+        && validUsernameKey(name, request.resource.data.username)
+        && !exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.username == request.resource.data.username;
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid
+        && !existsAfter(/databases/$(database)/documents/users/$(request.auth.uid));
     }
 
     match /users/{uid} {
       allow read: if true;
-      allow write: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['username', 'usernameKey', 'createdAt'])
+        && request.resource.data.createdAt == request.time
+        && validUsername(request.resource.data.username)
+        && validUsernameKey(userKey(request.resource.data), request.resource.data.username)
+        && getAfter(/databases/$(database)/documents/usernames/$(userKey(request.resource.data))).data.uid == uid
+        && getAfter(/databases/$(database)/documents/usernames/$(userKey(request.resource.data))).data.username == request.resource.data.username;
+      allow delete: if request.auth != null && request.auth.uid == uid
+        && (resource == null || !existsAfter(/databases/$(database)/documents/usernames/$(userKey(resource.data))));
 
+      // Game history (src/utils/gameHistory.js): written once, never edited.
       match /games/{gameId} {
+        function inBounds(value, max) {
+          return isNumber(value) && value >= -max && value <= max;
+        }
+
+        function optionalLabel(data, field) {
+          return data.get(field, null) == null || validLabel(data[field]);
+        }
+
+        function optionalCount(data, field) {
+          return data.get(field, null) == null || inRange(data[field], 100000);
+        }
+
+        function validGame(data) {
+          return data.keys().hasOnly(['gameType', 'mode', 'score', 'attempts', 'solved', 'found', 'total', 'elapsedTime',
+                                      'difficulty', 'continent', 'presetName', 'dailyKey', 'roomCode', 'correct',
+                                      'answered', 'bestStreak', 'optimal', 'errors', 'hints', 'totalError', 'playedAt'])
+          && data.keys().hasAll(['gameType', 'mode', 'playedAt'])
+          && validLabel(data.gameType)
+          && data.mode in ['standard', 'ascension', 'daily', 'infinite', 'multi']
+          && data.playedAt == request.time
+          && (data.get('score', null) == null || inBounds(data.score, 1000000000))
+          && (data.get('elapsedTime', null) == null || inRange(data.elapsedTime, 1000000000))
+          && (data.get('totalError', null) == null || inBounds(data.totalError, 1000000000))
+          && (data.get('solved', null) == null || data.solved is bool)
+          && optionalCount(data, 'attempts') && optionalCount(data, 'found') && optionalCount(data, 'total')
+          && optionalCount(data, 'correct') && optionalCount(data, 'answered') && optionalCount(data, 'bestStreak')
+          && optionalCount(data, 'optimal') && optionalCount(data, 'errors') && optionalCount(data, 'hints')
+          && optionalLabel(data, 'difficulty') && optionalLabel(data, 'continent') && optionalLabel(data, 'presetName')
+          && optionalLabel(data, 'dailyKey') && optionalLabel(data, 'roomCode');
+        }
+
         allow read: if true;
-        allow write: if request.auth != null && request.auth.uid == uid;
+        allow create: if request.auth != null && request.auth.uid == uid && validGame(request.resource.data);
+        allow delete: if request.auth != null && request.auth.uid == uid;
       }
 
       // This account's devices for push notifications (mobile/src/notifications/push.ts), read by api/invite-push.

@@ -6,7 +6,8 @@ import { ProfileView } from './ProfileBody'
 import { computeStats, dayKey } from '../../utils/profileStats'
 import { computeAchievements } from '../../utils/achievements'
 
-const now = Date.now()
+// Midi plutôt que l'heure réelle : lancé entre minuit et 5 h, le test débloquerait « Oiseau de nuit »
+const now = new Date().setHours(12, 0, 0, 0)
 const today = dayKey()
 
 const games = [

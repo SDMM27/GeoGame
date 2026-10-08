@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [dev, master]
+
+# A new push cancels the run still going on the same branch / pull request
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # Node 22: satisfies Vite, firebase-tools and React Native 0.86 (^20.19.4 || ^22.13.0 || ^24.3.0)
+  NODE_VERSION: 22
+  EXPO_NO_TELEMETRY: '1'
+
+jobs:
+  site:
+    name: Site tests (vitest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+      - run: npm test
+
+  build:
+    name: Site build (vite)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+      # No secret needed: VITE_CARTO_API_KEY and the other VITE_* variables are optional
+      - run: npm run build
+
+  emulator:
+    name: Firestore rules and API (emulators)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+      # firebase-tools downloads the Firestore emulator jar here; the key follows firebase-tools' version
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/firebase/emulators
+          key: firebase-emulators-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: firebase-emulators-${{ runner.os }}-
+      - run: npm run test:emulator
+
+  mobile:
+    name: App (typecheck, lint, jest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      # mobile/ is self-contained: Metro, tsc and jest resolve the website code's (../src) packages from
+      # mobile/node_modules (see metro.config.js, jest.resolver.js), so no npm ci at the repository root.
+      - run: npm ci
+      # Expo's generated files (expo-env.d.ts, .expo/types) are git-ignored and not needed:
+      # the typecheck passes without them (the route types of typedRoutes only tighten router.push()).
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npx jest --ci

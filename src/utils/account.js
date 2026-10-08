@@ -28,6 +28,7 @@ import {
   writeBatch,
 } from 'firebase/firestore'
 import { firestore } from '../Firebase'
+import { containsProfanity } from './profanity'
 
 export const USERNAME_MIN = 3
 export const USERNAME_MAX = 20
@@ -53,6 +54,7 @@ export function validateUsername(username) {
   const name = normalizeUsername(username)
   if (name.length < USERNAME_MIN || name.length > USERNAME_MAX) return 'username_length'
   if (!USERNAME_PATTERN.test(name)) return 'username_chars'
+  if (containsProfanity(name)) return 'username_forbidden'
   return null
 }
 

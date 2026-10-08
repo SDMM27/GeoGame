@@ -8,12 +8,14 @@ import {
 } from '@expo-google-fonts/bricolage-grotesque'
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold } from '@expo-google-fonts/inter'
 import { useFonts } from 'expo-font'
-import { DarkTheme, Stack, ThemeProvider } from 'expo-router'
+import { DarkTheme, router, Stack, ThemeProvider, type ErrorBoundaryProps } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
+import { ErrorScreen } from '@/components/ErrorScreen'
 import { InstallHint } from '@/components/InstallHint'
 import { InviteBanner } from '@/components/InviteBanner'
 import { PushNotifications } from '@/components/PushNotifications'
@@ -25,6 +27,32 @@ SplashScreen.preventAutoHideAsync()
 const navigationTheme = {
   ...DarkTheme,
   colors: { ...DarkTheme.colors, background: colors.bg, card: colors.bg, primary: colors.accent, text: colors.text, border: colors.border },
+}
+
+// Replaces the whole app when a screen throws (Expo Router error boundary): retry re-renders it, home goes back to the start.
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  const { t } = useTranslation()
+  useEffect(() => {
+    console.error(error)
+  }, [error])
+  return (
+    <ErrorScreen
+      icon="alert-circle-outline"
+      title={t('mobile.common.error_title')}
+      message={t('mobile.common.error_message')}
+      actions={[
+        { label: t('mobile.common.retry'), onPress: () => void retry() },
+        {
+          label: t('mobile.common.go_home'),
+          variant: 'secondary',
+          onPress: () => {
+            router.replace('/')
+            void retry()
+          },
+        },
+      ]}
+    />
+  )
 }
 
 export default function RootLayout() {

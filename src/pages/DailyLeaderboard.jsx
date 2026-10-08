@@ -18,7 +18,7 @@ function AccordionRow({ score, index, account, secondaryFormatter, guessesTitle 
     <div className={`daily-lb__row${index < 3 ? ' daily-lb__row--top' : ''}${mineClass(score, account)}`}>
       <div className="daily-lb__row-main" onClick={() => setOpen((prev) => !prev)}>
         <span className="daily-lb__rank">{index < 3 ? MEDAL[index] : `#${index + 1}`}</span>
-        <span className="daily-lb__name"><PlayerName entry={score} account={account} /></span>
+        <span className="daily-lb__name"><PlayerName entry={score} account={account} reportIn="daily_scores" /></span>
         <span className="daily-lb__attempts">
           {score.hints > 0
             ? <>{score.attempts + score.hints} <span className="daily-lb__attempts-detail">({score.attempts}+{score.hints})</span></>

@@ -1,19 +1,23 @@
-import { addDoc, collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, where } from 'firebase/firestore'
+import { addDoc, collection, doc, getDoc, getDocs, limit, orderBy, query, serverTimestamp, setDoc, where } from 'firebase/firestore'
 import { firestore } from '../Firebase'
 import { isBetterDailyScore, sortDailyScores } from './dailyScores'
 import { sortRankingScores } from './rankingScores'
+import { LEADERBOARD_SIZE, ascensionLeaderboard, ascensionQuery, soloLeaderboard, soloQueries } from './leaderboards'
 import { GAME_TYPES } from './gameTypes'
 import { normalizeUsername } from './account'
+import { containsProfanity } from './profanity'
 
 // Every save takes the player as { name, uid? }:
 //  - signed in: uid and the account's username. One entry per account, owned by it (see firestore.rules).
 //  - visitor: a free name, as long as no account owns it.
 // Each save returns { status: 'saved' | 'updated' }, { status: 'blocked', existing } when the player
-// already has a better entry, or { status: 'taken' } when a visitor picks an account's username.
+// already has a better entry, { status: 'taken' } when a visitor picks an account's username, or
+// { status: 'forbidden' } when a visitor's name is offensive (utils/profanity.js).
 
+// A missing time (null) is the worst one.
 function isBetter(newScore, newTime, existingScore, existingTime) {
   if (newScore > existingScore) return true
-  if (newScore === existingScore && newTime < existingTime) return true
+  if (newScore === existingScore && (newTime ?? Infinity) < (existingTime ?? Infinity)) return true
   return false
 }
 
@@ -30,6 +34,7 @@ async function saveBest(collectionName, player, filters, data, isBetterThan, toE
   const { uid } = player
   // Spaces normalized like usernames, so the rules' check against usernames/ sees the same key.
   const name = uid ? player.name : normalizeUsername(player.name)
+  if (!uid && containsProfanity(name)) return { status: 'forbidden' }
   if (!uid && (await isNameTaken(name))) return { status: 'taken' }
 
   const ref = collection(firestore, collectionName)
@@ -56,7 +61,7 @@ export function saveScore({ name, uid, score, difficulty, elapsedTime, gameType,
     'scores',
     { name, uid },
     { difficulty, gameType, ...(continent != null && { continent }) },
-    { score, elapsedTime },
+    { score, elapsedTime: elapsedTime ?? null }, // always written, null if missing: orderBy('elapsedTime') skips documents without the key
     (next, previous) => isBetter(next.score, next.elapsedTime, previous.score, previous.elapsedTime),
     (previous) => ({ score: previous.score, elapsedTime: previous.elapsedTime })
   )
@@ -106,18 +111,57 @@ export function saveRankingScore({ name, uid, dailyKey, score, totalError, attem
   )
 }
 
+// A leaderboard row: the document's fields and its id, which reports/ points at (utils/reports.js).
+const withId = (doc) => ({ ...doc.data(), id: doc.id })
+
 // Daily-challenge scores of one day, best first.
 export async function fetchDailyScores(gameType, dailyKey) {
   const snapshot = await getDocs(
     query(collection(firestore, 'daily_scores'), where('gameType', '==', gameType), where('dailyKey', '==', dailyKey))
   )
-  return sortDailyScores(snapshot.docs.map((doc) => doc.data()))
+  return sortDailyScores(snapshot.docs.map(withId))
 }
 
-// Country Ranking scores of one day, best first.
+// Country Ranking scores of one day, best first (the best LEADERBOARD_SIZE).
 export async function fetchRankingScores(dailyKey) {
   const snapshot = await getDocs(
-    query(collection(firestore, 'daily_scores'), where('gameType', '==', GAME_TYPES.RANKING), where('dailyKey', '==', dailyKey))
+    query(
+      collection(firestore, 'daily_scores'),
+      where('gameType', '==', GAME_TYPES.RANKING),
+      where('dailyKey', '==', dailyKey),
+      orderBy('score', 'desc'),
+      orderBy('totalError', 'asc'),
+      limit(LEADERBOARD_SIZE)
+    )
   )
-  return sortRankingScores(snapshot.docs.map((doc) => doc.data()))
+  return sortRankingScores(snapshot.docs.map(withId))
+}
+
+// Runs one query per set of equality filters, each in the given leaderboard order (see firestore.indexes.json).
+async function fetchTop(collectionName, filterSets, orderFields) {
+  const results = await Promise.all(
+    filterSets.map((filters) =>
+      getDocs(
+        query(
+          collection(firestore, collectionName),
+          ...Object.entries(filters).map(([field, value]) => where(field, '==', value)),
+          ...orderFields.map(([field, direction]) => orderBy(field, direction)),
+          limit(LEADERBOARD_SIZE)
+        )
+      )
+    )
+  )
+  return results.flatMap((snapshot) => snapshot.docs.map(withId))
+}
+
+// Solo leaderboard (the best LEADERBOARD_SIZE), for { game, continentMode, difficulty, continent } (see leaderboards.js).
+export async function fetchSoloScores(filters) {
+  const scores = await fetchTop('scores', soloQueries(filters), [['score', 'desc'], ['elapsedTime', 'asc']])
+  return soloLeaderboard(scores, filters)
+}
+
+// Ascension leaderboard (the best LEADERBOARD_SIZE), for { game, preset }.
+export async function fetchAscensionScores(filters) {
+  const scores = await fetchTop('ascension_scores', [ascensionQuery(filters)], [['globalTimeMs', 'asc'], ['globalScore', 'desc']])
+  return ascensionLeaderboard(scores)
 }

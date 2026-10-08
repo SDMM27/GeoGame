@@ -23,7 +23,7 @@ function AccordionRow({ score, index, account }) {
           {index < 3 ? MEDAL[index] : `#${index + 1}`}
         </span>
         <span className="daily-lb__name">
-          <PlayerName entry={score} account={account} />
+          <PlayerName entry={score} account={account} reportIn="daily_scores" />
         </span>
         <span className="ranking-lb__score">{score.score} pts</span>
         <span className="ranking-lb__error">{score.totalError} pos.</span>

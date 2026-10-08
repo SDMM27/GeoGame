@@ -10,6 +10,12 @@ export function collectCoordinates(geometry) {
   return []
 }
 
+// True when the country has (or, for the metadata-only dataset, had) a geometry:
+// the website loads the geometries separately, after the properties.
+export function hasCountryGeometry(country) {
+  return Boolean(country?.geometry?.coordinates?.length || country?.properties?.center)
+}
+
 export function getRingAreaKm2(ring) {
   if (!Array.isArray(ring) || ring.length < 3) return 0
 

@@ -1,6 +1,6 @@
 rules_version = '2';
 
-// Firestore security rules. Copy this file into Firebase console > Firestore > Rules to publish it.
+// Firestore security rules, published with `npm run deploy:rules` (tests first, then firebase deploy: see the README).
 //
 // Leaderboards: nobody may delete a score, and an existing score can only be replaced by a better one
 // for the same player and mode (see src/utils/saveScore.js). A score with a `uid` belongs to that account
@@ -16,9 +16,16 @@ service cloud.firestore {
       return isNumber(value) && value >= 0 && value <= max;
     }
 
+    // Last line of defense against the most explicit insults in a name (the real filter is src/utils/profanity.js,
+    // on the client). RE2 has no accent or leetspeak normalization, so this only catches plain spellings; it is
+    // case-insensitive and kept short on purpose (one match per name, and no word that sits inside a place or a name).
+    function cleanName(name) {
+      return !name.matches('(?is).*(fuck|nigger|nigga|connard|connasse|salope|putain|encul|pedophile|hitler|bitch|asshole|faggot|whore|хуй|пизд|бляд|мудак|пидор).*');
+    }
+
     // Pseudos are capped at 20 characters in the forms (30 for Country Ranking).
     function validName(name) {
-      return name is string && name.size() > 0 && name.size() <= 30;
+      return name is string && name.size() > 0 && name.size() <= 30 && cleanName(name);
     }
 
     function validLabel(value) {
@@ -35,7 +42,7 @@ service cloud.firestore {
     // 3 to 20 characters, a letter or digit first, then letters, digits, single spaces, _ . -
     // The size is also capped at 60 because the rules may count bytes rather than characters.
     function validUsername(name) {
-      return name is string && name.size() >= 3 && name.size() <= 60
+      return name is string && name.size() >= 3 && name.size() <= 60 && cleanName(name)
         && name.matches('^[\\p{L}\\p{N}](?:[\\p{L}\\p{N}_.-]| [\\p{L}\\p{N}_.-])*$');
     }
 
@@ -585,6 +592,8 @@ service cloud.firestore {
     //
     // Rooms from before these rules (source 'app', written by app 1.0.1 and the old website) carry no secrets:
     // they stay open to everyone, with size limits only, until the cutoff below. They can't be created after it.
+    // After 2026-12-01, once no 'app' room is left in the database and no app 1.0.1 is in use, every `legacyOpen()` branch,
+    // validLegacy* and the 'app' handling in the clients and tests can go (grep legacyOpen / isRoomFormat).
     function legacyOpen() {
       return request.time < timestamp.date(2026, 12, 1);
     }
@@ -836,6 +845,33 @@ service cloud.firestore {
         allow read: if true;
         allow create, update: if allowedResult(request.resource.data);
       }
+    }
+
+    // Reports of a leaderboard entry (src/utils/reports.js): reports/{reporter}_{collection}_{scoreId}. Create only:
+    // nothing is read, edited or deleted from the apps; the admin reads them in the Firebase console or with
+    // scripts/reports.mjs. One report per reporter and entry (the id; a second one would be an update, refused).
+    // A signed-in reporter is their uid; a visitor is 'v-' + the id kept on their device (a visitor can make up as
+    // many as they want, so this stops accidents and double taps, not a determined spammer). The entry must exist.
+    match /reports/{reportId} {
+      function validReport(data) {
+        return data.keys().hasOnly(['reporter', 'targetCollection', 'targetId', 'targetName', 'reason', 'note', 'createdAt'])
+          && data.keys().hasAll(['reporter', 'targetCollection', 'targetId', 'reason', 'createdAt'])
+          && data.reporter is string
+          && (request.auth != null
+              ? data.reporter == request.auth.uid
+              : data.reporter.matches('^v-[A-Za-z0-9-]{8,64}$'))
+          && data.targetCollection in ['scores', 'ascension_scores', 'daily_scores']
+          && data.targetId is string && data.targetId.matches('^[A-Za-z0-9]{1,64}$')
+          && reportId == data.reporter + '_' + data.targetCollection + '_' + data.targetId
+          && (data.get('targetName', null) == null || (data.targetName is string && data.targetName.size() <= 60))
+          && data.reason in ['offensive_name', 'cheating', 'other']
+          && (data.get('note', null) == null || (data.note is string && data.note.size() <= 200))
+          && data.createdAt == request.time
+          && exists(/databases/$(database)/documents/$(data.targetCollection)/$(data.targetId));
+      }
+
+      allow create: if validReport(request.resource.data);
+      allow read, update, delete: if false;
     }
 
     // Server clock calibration (src/utils/serverTime.js): a throwaway document holding only the server time.

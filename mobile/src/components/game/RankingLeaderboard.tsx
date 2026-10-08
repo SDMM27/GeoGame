@@ -1,52 +1,37 @@
 // Leaderboard of one Country Ranking daily challenge (best score, then smallest total error).
 import { router } from 'expo-router'
-import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
 
 import { fetchRankingScores, type RankingScore } from '@/rankingScores'
 import { useAccount } from '@/account/auth'
+import { useLeaderboard } from '@/hooks/useLeaderboard'
+import { loadErrorKey } from '@/leaderboards'
 import { colors, radius, space } from '@/theme'
 import { Text } from '../ui'
 import { visibleRows } from './leaderboardRows'
 
 const MEDALS = ['🥇', '🥈', '🥉']
-const MAX_ROWS = 20
+const DEFAULT_MAX_ROWS = 20
 
-export function RankingLeaderboard({ dailyKey, refreshKey }: { dailyKey: string; refreshKey?: unknown }) {
+export function RankingLeaderboard({ dailyKey, refreshKey, maxRows = DEFAULT_MAX_ROWS, onSettled }: { dailyKey: string; refreshKey?: unknown; maxRows?: number; onSettled?: () => void }) {
   const { t } = useTranslation()
   const { account } = useAccount()
-  const [scores, setScores] = useState<RankingScore[] | null>(null)
-  const [failed, setFailed] = useState(false)
-
-  useEffect(() => {
-    let cancelled = false
-    fetchRankingScores(dailyKey)
-      .then((result) => {
-        if (!cancelled) setScores(result)
-      })
-      .catch((error: unknown) => {
-        console.error(error)
-        if (!cancelled) setFailed(true)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [dailyKey, refreshKey])
+  const { scores, error } = useLeaderboard<RankingScore>(dailyKey, () => fetchRankingScores(dailyKey), refreshKey, onSettled)
 
   return (
     <View style={styles.card}>
       <Text variant="bodyStrong">{t('leaderboard.title')}</Text>
-      {failed ? (
+      {error ? (
         <Text variant="caption" color={colors.danger}>
-          {t('mobile.game.load_error')}
+          {t(loadErrorKey(error))}
         </Text>
       ) : !scores ? (
         <ActivityIndicator color={colors.textMuted} style={{ paddingVertical: space.lg }} />
       ) : scores.length === 0 ? (
         <Text variant="caption">{t('leaderboard.no_scores_today')}</Text>
       ) : (
-        visibleRows(scores, account?.uid, MAX_ROWS).map(({ score, index }) => (
+        visibleRows(scores, account?.uid, maxRows).map(({ score, index }) => (
           <View
             key={`${score.name}-${index}`}
             style={[styles.row, index < 3 && styles.rowTop, Boolean(score.uid) && score.uid === account?.uid && styles.rowMine]}>

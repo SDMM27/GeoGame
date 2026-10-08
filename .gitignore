@@ -45,3 +45,6 @@ ui-debug.log
 
 # Firebase service account keys
 *firebase-adminsdk*.json
+
+# production build (Vite)
+/dist

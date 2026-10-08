@@ -241,6 +241,11 @@ export function ResultsSheet({ title, score, scoreText, scoreLabel, accent = col
                         : `${t('form.better_score_exists')} (${existingText(saver.existing)}). ${t('form.use_different_name')}`}
                     </Text>
                   )}
+                  {saver.status === 'forbidden' && (
+                    <Text variant="caption" color={colors.warning}>
+                      {t('account.errors.username_forbidden')}
+                    </Text>
+                  )}
                   {saver.status === 'taken' && (
                     <Text variant="caption" color={colors.warning}>
                       {t('score_save.taken')}

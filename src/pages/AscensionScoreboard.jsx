@@ -1,11 +1,12 @@
-﻿import React, { useEffect, useMemo, useState } from 'react'
-import { collection, getDocs } from 'firebase/firestore'
-import { firestore } from '../Firebase'
+﻿import React, { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { fetchAscensionScores } from '../utils/saveScore'
 import { formatTime } from '../utils/formatTime'
 import { useAccount } from '../auth'
 import PlayerName, { mineClass } from '../components/PlayerName'
 import { GAME_TYPES } from '../utils/gameTypes'
 import { ASCENSION_PRESETS } from '../utils/ascensionPresets'
+import { ALL_PRESETS } from '../utils/leaderboards'
 
 const MEDAL = ['\uD83E\uDD47', '\uD83E\uDD48', '\uD83E\uDD49']
 const ACTIVE_GAMES = [
@@ -14,48 +15,42 @@ const ACTIVE_GAMES = [
   { id: GAME_TYPES.CAPITALS, label: 'Trouve la Capitale' },
 ]
 
-export function sortAscensionScores(scores) {
-  return [...scores].sort((a, b) => {
-    if ((a.globalTimeMs ?? Infinity) !== (b.globalTimeMs ?? Infinity)) {
-      return (a.globalTimeMs ?? Infinity) - (b.globalTimeMs ?? Infinity)
-    }
-    return (b.globalScore ?? 0) - (a.globalScore ?? 0)
-  })
-}
-
 export default function AscensionScoreboard({ defaultGame = GAME_TYPES.PLACEMENT }) {
+  const { t } = useTranslation()
   const { account } = useAccount()
-  const [allScores, setAllScores] = useState([])
+  const [scores, setScores] = useState([])
   const [selectedGame, setSelectedGame] = useState(defaultGame)
-  const [selectedPreset, setSelectedPreset] = useState('AllPresets')
+  const [selectedPreset, setSelectedPreset] = useState(ALL_PRESETS)
   const [loading, setLoading] = useState(true)
+  const [failed, setFailed] = useState(false)
 
   useEffect(() => {
     setSelectedGame(defaultGame)
   }, [defaultGame])
 
+  // The 100 fastest scores of the selected filters, fetched again whenever they change.
   useEffect(() => {
-    const fetchScores = async () => {
-      setLoading(true)
-      try {
-        const snapshot = await getDocs(collection(firestore, 'ascension_scores'))
-        setAllScores(snapshot.docs.map((doc) => doc.data()))
-      } finally {
-        setLoading(false)
-      }
+    let cancelled = false
+    setLoading(true)
+    setFailed(false)
+    fetchAscensionScores({ game: selectedGame, preset: selectedPreset })
+      .then((result) => {
+        if (!cancelled) setScores(result)
+      })
+      .catch((error) => {
+        console.error(error)
+        if (!cancelled) {
+          setScores([])
+          setFailed(true)
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
     }
-
-    fetchScores()
-  }, [])
-
-  const scores = useMemo(() => {
-    const filtered = allScores.filter((score) => {
-      const matchesGame = selectedGame === 'AllGames' || score.gameType === selectedGame
-      const matchesPreset = selectedPreset === 'AllPresets' || score.presetName === selectedPreset
-      return matchesGame && matchesPreset
-    })
-    return sortAscensionScores(filtered)
-  }, [allScores, selectedGame, selectedPreset])
+  }, [selectedGame, selectedPreset])
 
   return (
     <div className="scoreboard">
@@ -81,12 +76,14 @@ export default function AscensionScoreboard({ defaultGame = GAME_TYPES.PLACEMENT
           {ASCENSION_PRESETS.map((preset) => (
             <option key={preset.name} value={preset.name}>{preset.icon} {preset.name}</option>
           ))}
-          <option value="AllPresets">Tous les presets</option>
+          <option value={ALL_PRESETS}>Tous les presets</option>
         </select>
       </div>
 
       {loading ? (
         <p className="scoreboard-loading">Chargement...</p>
+      ) : failed ? (
+        <p className="scoreboard-empty">{t('messages.page_load_error')}</p>
       ) : scores.length === 0 ? (
         <p className="scoreboard-empty">Aucun score Ascension pour ce filtre.</p>
       ) : (
@@ -106,7 +103,7 @@ export default function AscensionScoreboard({ defaultGame = GAME_TYPES.PLACEMENT
               <span className="scoreboard-rank">
                 {index < 3 ? MEDAL[index] : `#${index + 1}`}
               </span>
-              <span className="scoreboard-name"><PlayerName entry={score} account={account} /></span>
+              <span className="scoreboard-name"><PlayerName entry={score} account={account} reportIn="ascension_scores" /></span>
               <span className="scoreboard-time scoreboard-time--strong">
                 {score.globalTimeMs != null ? formatTime(score.globalTimeMs) : '—'}
               </span>

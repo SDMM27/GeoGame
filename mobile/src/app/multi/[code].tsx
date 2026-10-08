@@ -11,6 +11,7 @@ import { useFriendships } from '@shared/hooks/usePlayerProfile'
 import useLobbyHost from '@shared/hooks/useLobbyHost'
 import useMultiplayerRoom from '@shared/hooks/useMultiplayerRoom'
 import { dismissInvite, inviteId, sendRoomInvite } from '@shared/utils/invites'
+import { containsProfanity } from '@shared/utils/profanity'
 import { currentGameIndex, isRoomFormat, nextGameToPlay, roomGames } from '@shared/utils/multiplayerRoom'
 import { serverNow } from '@shared/utils/serverTime'
 
@@ -55,6 +56,7 @@ function JoinCard({ room, account, autoJoin }: { room: Room; account: Account | 
   const [typed, setPseudo] = useState<string | null>(null)
   const pseudo = typed ?? account?.username ?? getSavedPseudo()
   const [joining, setJoining] = useState(false)
+  const forbidden = containsProfanity(pseudo)
   const autoJoinedRef = useRef(false)
   const onJoin = async (name = pseudo.trim()) => {
     if (!name) return
@@ -86,10 +88,15 @@ function JoinCard({ room, account, autoJoin }: { room: Room; account: Account | 
         autoCapitalize="none"
         autoCorrect={false}
         returnKeyType="done"
-        onSubmitEditing={() => onJoin()}
+        onSubmitEditing={() => !forbidden && onJoin()}
         style={styles.input}
       />
-      <Button label={t('mobile.multi.join')} onPress={() => onJoin()} loading={joining} disabled={!pseudo.trim()} />
+      {forbidden && (
+        <Text variant="caption" color={colors.danger}>
+          {t('account.errors.username_forbidden')}
+        </Text>
+      )}
+      <Button label={t('mobile.multi.join')} onPress={() => onJoin()} loading={joining} disabled={!pseudo.trim() || forbidden} />
     </View>
   )
 }

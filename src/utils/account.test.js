@@ -21,6 +21,19 @@ describe('validateUsername', () => {
   })
 })
 
+describe('validateUsername: offensive names', () => {
+  it('refuses them, disguised or not, with their own error', () => {
+    expect(validateUsername('Connard42')).toBe('username_forbidden')
+    expect(validateUsername('f.u.c.k')).toBe('username_forbidden')
+    expect(validateUsername('Пидор')).toBe('username_forbidden')
+  })
+
+  it('keeps accepting names that only look alike', () => {
+    expect(validateUsername('Scunthorpe')).toBeNull()
+    expect(validateUsername('Cassandra')).toBeNull()
+  })
+})
+
 describe('normalizeUsername', () => {
   it('trims and collapses spaces', () => {
     expect(normalizeUsername('  Le   Voyageur ')).toBe('Le Voyageur')

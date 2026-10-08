@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { useAccount } from '../../auth'
 import { GAME_TYPES } from '../../utils/gameTypes'
 import { getSavedPseudo } from '../../utils/account'
+import { containsProfanity } from '../../utils/profanity'
 import { ASCENSION_PRESETS, matchPreset } from '../../utils/ascensionPresets'
 import { QUIZ_DIFFICULTIES } from '../../utils/quizQuestions'
 import { getTotalCountries } from '../../hooks/useGameState'
@@ -239,7 +240,8 @@ export default function RoomConfig({ onSubmit, submitting }) {
   // Games already added, then the one being edited (the last game of the room)
   const [games, setGames] = useState([])
   const [draft, setDraft] = useState(newDraft)
-  const canSubmit = pseudo.trim() && draftReady(draft) && !submitting
+  const forbiddenPseudo = containsProfanity(pseudo)
+  const canSubmit = pseudo.trim() && !forbiddenPseudo && draftReady(draft) && !submitting
 
   const addAnother = () => {
     if (!draftReady(draft)) return
@@ -265,7 +267,9 @@ export default function RoomConfig({ onSubmit, submitting }) {
           onChange={e => setTyped(e.target.value)}
           placeholder={t('placeholders.username')}
           maxLength={20}
+          aria-invalid={forbiddenPseudo}
         />
+        {forbiddenPseudo && <p className="rc-hint" role="alert">{t('account.errors.username_forbidden')}</p>}
       </div>
 
       <section className="rc-section">

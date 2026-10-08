@@ -6,7 +6,7 @@ import countries from '../data/countriesWithDifficulty_FR.json'
 import { checkAnswer, normalize } from '../utils/normalizeAnswer'
 import { getAllCountryNames, getCountryName } from '../utils/getCountryName'
 import countryAliases from '../data/countryAliases.json'
-import { getGeographicCenter } from '../utils/countryArea'
+import { getGeographicCenter, hasCountryGeometry } from '../utils/countryArea'
 
 const DAILY_TIME_ZONE = 'Europe/Paris'
 const DAILY_STORAGE_PREFIX = 'border-guess-daily'
@@ -61,7 +61,7 @@ const BORDER_GUESS_EXCLUDED = new Set([
 export const BORDER_GUESS_COUNTRIES = countries.features.filter(
   (country) =>
     country?.properties?.ADMIN &&
-    country?.geometry?.coordinates?.length &&
+    hasCountryGeometry(country) &&
     !BORDER_GUESS_EXCLUDED.has(country.properties.ADMIN)
 )
 

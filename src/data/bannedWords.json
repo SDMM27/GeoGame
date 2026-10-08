@@ -1,0 +1,50 @@
+{
+  "_comment": "Words refused in usernames (see src/utils/profanity.js). Lowercase, accents optional, spaces ignored. 'substring': refused anywhere inside a name, only for words that don't appear inside common names or places. 'word': refused only as a whole word (a name, or a part separated by space . - _ or digits), to avoid Scunthorpe-style false positives: 'cunt' is in Scunthorpe, 'nique' in Monique, 'anal' in Analyse. Cyrillic words are matched against the Cyrillic reading of the name, Latin ones (including Russian written in Latin letters) against the Latin reading.",
+  "substring": {
+    "fr": [
+      "connard", "connasse", "conasse", "enculer", "encule", "enfoire", "salope", "salaud", "putain", "pouffiasse",
+      "merdeux", "merdique", "couille", "couillon", "branleur", "branlette", "niquetamere", "niquetagrandmere",
+      "fildepute", "filsdepute", "fermetagueule", "tagueule", "pedophile", "pedocriminel", "trouduc", "trouducul",
+      "tafiole", "tarlouze", "gouine", "tapette", "sodomite", "bougnoul", "youpin", "bamboula", "chintoque",
+      "salejuif", "salearabe", "salenoir", "salenegre", "saleraton", "salerace", "salepute", "grossepute",
+      "vatefairefoutre", "vatefairencule", "vatenencule", "violeur", "zgeg", "nikatamere"
+    ],
+    "en": [
+      "fuck", "motherfucker", "shit", "bullshit", "shithead", "bitch", "bastard", "asshole", "arsehole", "dickhead",
+      "cocksucker", "cocksuck", "pussy", "wanker", "bollocks", "blowjob", "handjob", "jerkoff", "cumshot",
+      "dildo", "molest", "pedophile", "paedophile", "nigger", "nigga", "faggot", "whore", "shemale", "wetback",
+      "towelhead", "raghead", "killyourself", "neonazi", "hitler", "heilhitler", "siegheil", "goebbels", "himmler",
+      "whitepower", "whitepride", "swastika", "gasthejews", "pornhub", "xvideos"
+    ],
+    "ru": [
+      "хуй", "хуев", "хуес", "хуел", "хуя", "похуй", "нахуй", "пизд", "ебан", "ебат", "ебал", "ебну", "ебуч", "еблан", "ебло", "уебок", "уебан",
+      "заеб", "наеб", "долбоеб", "долбаеб", "блят", "бляд", "мудак", "мудил", "мудозвон", "пидор", "пидарас", "пидарок", "пидр", "педик",
+      "гандон", "гондон", "залуп", "шлюх", "шалав", "говно", "говн", "дерьмо", "мандавош", "дебил", "ублюд", "сволоч",
+      "сучар", "сучк", "хуесос", "нацист", "гитлер", "зигхайль", "сигхайль",
+      "blyad", "blyat", "pizd", "pidor", "pidaras", "pidr", "xuy", "khuy", "nahuy", "pohuy", "ebat", "ebal", "ebany", "mudak",
+      "mudil", "gandon", "gondon", "zaebal", "zaebis", "xuesos", "dolboeb", "dolbaeb", "pizdec"
+    ]
+  },
+  "word": {
+    "fr": [
+      "merde", "pute", "putes", "bite", "zob", "chatte", "chier", "nique", "niquer", "ntm", "fdp", "pede", "pedo", "tarlouse",
+      "nazi", "nazis", "negre", "negres", "negro", "bicot", "bicots", "fiotte", "branle", "baise", "foutre",
+      "bordel", "cul", "nibard", "nibards", "chiasse", "salopard", "salopes", "viol", "violer", "sexe", "porno",
+      "enculees", "pouffe", "pouffiasses", "kkk", "nsdap"
+    ],
+    "en": [
+      "ass", "asses", "arse", "dick", "dicks", "cock", "cocks", "cunt", "cunts", "twat", "wank", "prick", "slut", "sluts",
+      "cum", "anal", "anus", "penis", "vagina", "boner", "horny", "porn", "porno", "sex", "milf", "hentai", "boob",
+      "boobs", "tits", "titty", "rape", "raped", "rapist", "fag", "fags", "dyke", "tranny", "retard", "retarded",
+      "spastic", "spic", "chink", "gook", "coon", "wop", "paki", "beaner", "negro", "nazi", "nazis", "kkk", "kys",
+      "fck", "fuk", "bitches", "shite", "jizz"
+    ],
+    "ru": [
+      "сука", "суки", "сучка", "жопа", "жопу", "жопы", "хер", "херня", "манда", "даун", "чмо", "урод", "тварь", "мразь", "мразота",
+      "падла", "гнида", "хач", "чурка", "чурки", "жид", "жиды", "нацик", "нацисты", "пидоры", "пидар", "ссыкло", "дрочила", "дрочить",
+      "ебать", "ебаться", "ебись", "бляха", "лох", "лошара", "гомик", "гомосек",
+      "suka", "pidar", "zhopa", "jopa", "chmo", "padla", "gnida", "churka", "zhid", "dolbayob"
+    ]
+  },
+  "digits": ["1488"]
+}

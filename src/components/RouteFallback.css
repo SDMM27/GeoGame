@@ -1,0 +1,86 @@
+.route-fallback {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: var(--bg-primary);
+  color: var(--text-muted);
+  font-family: var(--font-main);
+  font-size: 1rem;
+}
+
+.route-fallback__spinner {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid var(--accent-cyan-dim);
+  border-top-color: var(--accent-cyan);
+  animation: route-fallback-spin 0.8s linear infinite;
+}
+
+@keyframes route-fallback-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-fallback__spinner { animation-duration: 2.4s; }
+}
+
+.route-fallback__retry {
+  padding: 8px 20px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--accent-cyan-border);
+  background: var(--accent-cyan-dim);
+  color: var(--text-primary);
+  font: inherit;
+  cursor: pointer;
+}
+
+.route-fallback__retry:hover {
+  background: var(--bg-card-hover);
+}
+
+.route-fallback--error {
+  padding: 24px;
+  text-align: center;
+}
+
+.route-fallback__title {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.6rem;
+  font-weight: 900;
+}
+
+.route-fallback__message {
+  max-width: 420px;
+  margin: 0;
+}
+
+.route-fallback__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.route-fallback__retry {
+  text-decoration: none;
+}
+
+.route-fallback__retry--secondary {
+  background: transparent;
+}
+
+.route-fallback__retry:hover,
+.route-fallback__retry:focus-visible {
+  color: var(--text-primary);
+}
+
+.route-fallback__retry:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}

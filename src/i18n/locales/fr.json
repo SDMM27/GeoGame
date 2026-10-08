@@ -235,7 +235,19 @@
     "please_enter_username": "Veuillez rentrer un pseudo",
     "score_saved": "Score enregistré !",
     "save_error": "Erreur lors de la sauvegarde.",
-    "loading": "Chargement..."
+    "loading": "Chargement...",
+    "page_load_error": "Impossible de charger la page. Vérifie ta connexion.",
+    "reload": "Recharger"
+  },
+  "errors": {
+    "title": "Oups, une erreur est survenue",
+    "message": "Vérifie ta connexion, puis recharge la page ou reviens à l'accueil.",
+    "home": "Retour à l'accueil"
+  },
+  "not_found": {
+    "title": "Page introuvable",
+    "message": "Cette page n'existe pas ou a été déplacée.",
+    "home": "Retour à l'accueil"
   },
   "units": {
     "pt": "pt",
@@ -471,6 +483,7 @@
       "not_enabled": "La création de compte n’est pas encore activée.",
       "username_length": "Le pseudo doit faire entre 3 et 20 caractères.",
       "username_chars": "Le pseudo ne peut contenir que des lettres, chiffres, espaces, « _ », « - » et « . ».",
+      "username_forbidden": "Ce pseudo n’est pas autorisé. Choisis-en un autre.",
       "username_taken": "Ce pseudo est déjà pris.",
       "generic": "Une erreur est survenue. Réessaie.",
       "popup_blocked": "La fenêtre Google a été bloquée. Autorise les pop-ups et réessaie.",
@@ -640,6 +653,24 @@
     "close": "Fermer",
     "subtitle_android": "Télécharge l’APK, puis autorise l’installation quand Android te le demande.",
     "download": "Télécharger"
+  },
+  "report": {
+    "button": "Signaler {{name}}",
+    "title": "Signaler {{name}}",
+    "reason": "Motif",
+    "reasons": {
+      "offensive_name": "Pseudo injurieux ou inapproprié",
+      "cheating": "Score truqué ou triche",
+      "other": "Autre"
+    },
+    "note": "Précision (facultatif)",
+    "cancel": "Annuler",
+    "submit": "Signaler",
+    "sending": "Envoi…",
+    "sent": "Merci, le signalement a été envoyé.",
+    "already": "Tu as déjà signalé ce score.",
+    "error": "Le signalement n'a pas pu être envoyé. Réessaie.",
+    "close": "Fermer"
   },
   "score_save": {
     "saving": "Enregistrement au classement…",

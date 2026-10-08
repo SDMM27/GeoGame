@@ -1,0 +1,57 @@
+.not-found-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+}
+
+.not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 72px 24px;
+  text-align: center;
+}
+
+.not-found__code {
+  margin: 0;
+  font-size: 5rem;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--accent-cyan);
+  text-shadow: var(--shadow-glow);
+}
+
+.not-found__title {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 900;
+}
+
+.not-found__message {
+  max-width: 420px;
+  margin: 0 0 12px;
+  color: var(--text-muted);
+}
+
+.not-found__home {
+  padding: 10px 24px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--accent-cyan-border);
+  background: var(--accent-cyan-dim);
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.not-found__home:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+}
+
+.not-found__home:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}

@@ -96,6 +96,7 @@ export default function LeaderboardSave({ saver, variant = 'form', existingText,
         </div>
       )}
       {saver.status === 'taken' && <p className="leaderboard-save__error">{t('score_save.taken')}</p>}
+      {saver.status === 'forbidden' && <p className="leaderboard-save__error">{t('account.errors.username_forbidden')}</p>}
       {saver.status === 'error' && <p className="leaderboard-save__error">{t('messages.save_error')}</p>}
 
       <form onSubmit={handleSubmit} className={classes.form}>

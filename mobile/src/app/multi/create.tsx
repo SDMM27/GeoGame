@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
+import { containsProfanity } from '@shared/utils/profanity'
 import { QUIZ_DIFFICULTIES } from '@shared/utils/quizQuestions'
 
 import { useAccount } from '@/account/auth'
@@ -40,6 +41,7 @@ export default function CreateRoomSheet() {
   const pseudo = typed ?? account?.username ?? getSavedPseudo()
   const [creating, setCreating] = useState(false)
   const [failed, setFailed] = useState(false)
+  const forbidden = containsProfanity(pseudo)
 
   const isQuiz = game.id === 'quiz'
   const isRounds = game.id === 'border_guess' || game.id === 'country_clue'
@@ -54,7 +56,7 @@ export default function CreateRoomSheet() {
 
   const onCreate = async () => {
     const name = pseudo.trim()
-    if (!name && !addTo) return
+    if ((!name || forbidden) && !addTo) return
     const roomGame: RoomGame = {
       id: game.id,
       type: game.type,
@@ -178,6 +180,11 @@ export default function CreateRoomSheet() {
               />
             </>
           )}
+          {!addTo && forbidden && (
+            <Text variant="caption" color={colors.danger}>
+              {t('account.errors.username_forbidden')}
+            </Text>
+          )}
           {failed && (
             <Text variant="caption" color={colors.danger}>
               {t('mobile.game.load_error')}
@@ -191,7 +198,7 @@ export default function CreateRoomSheet() {
           label={addTo ? t('mp_room.add_game') : t('mobile.multi.create')}
           onPress={onCreate}
           loading={creating}
-          disabled={!addTo && !pseudo.trim()}
+          disabled={!addTo && (!pseudo.trim() || forbidden)}
           color={game.color}
           icon={<MaterialCommunityIcons name="account-group" size={20} color={colors.onAccent} />}
           style={{ flex: 1 }}

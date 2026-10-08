@@ -170,7 +170,29 @@ const fr = {
     close: 'Fermer',
     back_to_site: 'Tu préfères le site ? Retourner sur le site',
   },
-  common: { coming_soon: 'Bientôt disponible', back: 'Retour', language: 'Langue' },
+  leaderboards: {
+    solo: "Solo",
+    daily: "Du jour",
+    game: "Jeu",
+    preset: "Preset",
+    day: "Jour",
+    empty: "Aucun score pour ce filtre.",
+    empty_ascension: "Aucun score Ascension pour ce filtre.",
+    error_index: "Ce classement n’est pas encore disponible : il est en cours de mise en place. Réessaie plus tard.",
+    error_network: "Chargement impossible. Vérifie ta connexion.",
+    error_other: "Chargement impossible. Vérifie ta connexion.",
+  },
+  common: {
+    coming_soon: 'Bientôt disponible',
+    back: 'Retour',
+    language: 'Langue',
+    error_title: 'Oups, une erreur est survenue',
+    error_message: "Vérifie ta connexion, puis réessaie ou reviens à l'accueil.",
+    retry: 'Réessayer',
+    go_home: "Retour à l'accueil",
+    not_found_title: 'Page introuvable',
+    not_found_message: "Cet écran n'existe pas ou a été déplacé.",
+  },
 }
 
 const en: typeof fr = {
@@ -342,7 +364,29 @@ const en: typeof fr = {
     close: 'Close',
     back_to_site: 'Prefer the website? Go back to the site',
   },
-  common: { coming_soon: 'Coming soon', back: 'Back', language: 'Language' },
+  leaderboards: {
+    solo: "Solo",
+    daily: "Daily",
+    game: "Game",
+    preset: "Preset",
+    day: "Day",
+    empty: "No scores for this filter.",
+    empty_ascension: "No Ascension scores for this filter.",
+    error_index: "This leaderboard isn’t available yet: it’s still being set up. Try again later.",
+    error_network: "Couldn’t load. Check your connection.",
+    error_other: "Couldn’t load. Check your connection.",
+  },
+  common: {
+    coming_soon: 'Coming soon',
+    back: 'Back',
+    language: 'Language',
+    error_title: 'Oops, something went wrong',
+    error_message: 'Check your connection, then try again or go back home.',
+    retry: 'Try again',
+    go_home: 'Back to home',
+    not_found_title: 'Page not found',
+    not_found_message: 'This screen does not exist or has been moved.',
+  },
 }
 
 const ru: typeof fr = {
@@ -514,7 +558,29 @@ const ru: typeof fr = {
     close: 'Закрыть',
     back_to_site: 'Больше нравится сайт? Вернуться на сайт',
   },
-  common: { coming_soon: 'Скоро', back: 'Назад', language: 'Язык' },
+  leaderboards: {
+    solo: "Соло",
+    daily: "Дня",
+    game: "Игра",
+    preset: "Пресет",
+    day: "День",
+    empty: "Для этого фильтра нет результатов.",
+    empty_ascension: "Для этого фильтра нет результатов Восхождения.",
+    error_index: "Этот рейтинг пока недоступен: он ещё настраивается. Попробуй позже.",
+    error_network: "Не удалось загрузить. Проверь подключение.",
+    error_other: "Не удалось загрузить. Проверь подключение.",
+  },
+  common: {
+    coming_soon: 'Скоро',
+    back: 'Назад',
+    language: 'Язык',
+    error_title: 'Упс, что-то пошло не так',
+    error_message: 'Проверьте подключение, затем повторите попытку или вернитесь на главную.',
+    retry: 'Повторить',
+    go_home: 'На главную',
+    not_found_title: 'Страница не найдена',
+    not_found_message: 'Такого экрана нет или он был перемещён.',
+  },
 }
 
 i18n.addResourceBundle('fr', 'translation', { mobile: fr }, true, true)

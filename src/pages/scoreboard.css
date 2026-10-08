@@ -53,7 +53,7 @@
 .scoreboard-mode-tab--active {
   color: var(--text-primary);
   border-color: var(--accent-cyan-border);
-  background: rgba(0, 212, 255, 0.12);
+  background: var(--accent-cyan-dim);
 }
 
 .scoreboard-era-tab {
@@ -182,4 +182,36 @@
 .scoreboard-preset {
   color: var(--text-muted);
   font-size: 0.82rem;
+}
+
+/* Narrow screens: five columns do not fit, so each row becomes two lines (rank, name, score / time, difficulty). */
+@media (max-width: 520px) {
+  .scoreboard {
+    padding: 24px 12px;
+  }
+
+  .scoreboard-mode-tabs {
+    padding: 0 12px;
+  }
+
+  .scoreboard-header {
+    display: none;
+  }
+
+  .scoreboard-row {
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    grid-template-areas:
+      'rank name score'
+      '. time extra';
+    column-gap: 8px;
+    row-gap: 2px;
+    padding: 10px 12px;
+  }
+
+  .scoreboard-rank { grid-area: rank; }
+  .scoreboard-name { grid-area: name; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .scoreboard-score { grid-area: score; text-align: right; }
+  .scoreboard-time { grid-area: time; }
+  .scoreboard-difficulty,
+  .scoreboard-preset { grid-area: extra; text-align: right; }
 }

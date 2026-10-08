@@ -31,6 +31,10 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
   if (moduleName.endsWith('countriesWithDifficulty_FR.json')) {
     return { type: 'sourceFile', filePath: path.resolve(projectRoot, 'assets/data/countries.json') }
   }
+  // The site key comes from import.meta.env on the website, from EXPO_PUBLIC_* in the app
+  if (moduleName === './appCheckKey' && context.originModulePath.endsWith('Firebase.js')) {
+    return { type: 'sourceFile', filePath: shim('app-check-key.ts') }
+  }
   if (moduleName.startsWith('@shared/')) {
     return context.resolveRequest(context, path.join(sharedRoot, moduleName.slice('@shared/'.length)), platform)
   }

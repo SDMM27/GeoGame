@@ -13,6 +13,7 @@ const analyze = process.env.ANALYZE
 
 export default defineConfig({
   plugins: [react(), ...analyze],
+  define: { __USE_EMULATORS__: JSON.stringify(process.env.VITE_USE_EMULATORS === '1') },
   resolve: {
     alias: [
       // The full-resolution dataset (~90 MB) never goes into the bundle. The games import it under its

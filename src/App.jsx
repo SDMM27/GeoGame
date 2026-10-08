@@ -1,42 +1,45 @@
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react"
 import HomePage from "./pages/HomePage";
-import GamePage from "./pages/GamePage";
-import FlagGamePage from "./pages/FlagGamePage";
-import CapitalsGamePage from "./pages/CapitalsGamePage";
-import BorderGuessPage from "./pages/BorderGuessPage";
-import CountryCluePage from "./pages/CountryCluePage";
-import RankingGamePage from "./pages/RankingGamePage";
-import VoyageVoyagePage from "./pages/VoyageVoyagePage";
-import QuizPage from "./pages/QuizPage";
-import AccountPage from "./pages/AccountPage";
-import PlayerPage from "./pages/PlayerPage";
-import ScoresPage from "./pages/ScoresPage";
-import MultiplayerHomePage from "./pages/multiplayer/MultiplayerHomePage";
-import MultiplayerCreatePage from "./pages/multiplayer/MultiplayerCreatePage";
-import MultiplayerRoomPage from "./pages/multiplayer/MultiplayerRoomPage";
+import RouteFallback from "./components/RouteFallback";
+const GamePage = lazy(() => import("./pages/GamePage"));
+const FlagGamePage = lazy(() => import("./pages/FlagGamePage"));
+const CapitalsGamePage = lazy(() => import("./pages/CapitalsGamePage"));
+const BorderGuessPage = lazy(() => import("./pages/BorderGuessPage"));
+const CountryCluePage = lazy(() => import("./pages/CountryCluePage"));
+const RankingGamePage = lazy(() => import("./pages/RankingGamePage"));
+const VoyageVoyagePage = lazy(() => import("./pages/VoyageVoyagePage"));
+const QuizPage = lazy(() => import("./pages/QuizPage"));
+const AccountPage = lazy(() => import("./pages/AccountPage"));
+const PlayerPage = lazy(() => import("./pages/PlayerPage"));
+const ScoresPage = lazy(() => import("./pages/ScoresPage"));
+const MultiplayerHomePage = lazy(() => import("./pages/multiplayer/MultiplayerHomePage"));
+const MultiplayerCreatePage = lazy(() => import("./pages/multiplayer/MultiplayerCreatePage"));
+const MultiplayerRoomPage = lazy(() => import("./pages/multiplayer/MultiplayerRoomPage"));
 
 export default function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/game" element={<GamePage />} />
-        <Route path="/flag-game" element={<FlagGamePage />} />
-        <Route path="/capitals-game" element={<CapitalsGamePage />} />
-        <Route path="/border-guess" element={<BorderGuessPage />} />
-        <Route path="/country-clue" element={<CountryCluePage />} />
-        <Route path="/voyage-voyage" element={<VoyageVoyagePage />} />
-        <Route path="/ranking" element={<RankingGamePage />} />
-        <Route path="/quiz" element={<QuizPage />} />
-        <Route path="/scores" element={<ScoresPage />} />
-        <Route path="/account" element={<AccountPage />} />
-        <Route path="/player/:uid" element={<PlayerPage />} />
-        <Route path="/multiplayer" element={<MultiplayerHomePage />} />
-        <Route path="/multiplayer/create" element={<MultiplayerCreatePage />} />
-        <Route path="/multiplayer/room/:roomId" element={<MultiplayerRoomPage />} />
-      </Routes>
+      <Suspense fallback={<RouteFallback />}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/game" element={<GamePage />} />
+          <Route path="/flag-game" element={<FlagGamePage />} />
+          <Route path="/capitals-game" element={<CapitalsGamePage />} />
+          <Route path="/border-guess" element={<BorderGuessPage />} />
+          <Route path="/country-clue" element={<CountryCluePage />} />
+          <Route path="/voyage-voyage" element={<VoyageVoyagePage />} />
+          <Route path="/ranking" element={<RankingGamePage />} />
+          <Route path="/quiz" element={<QuizPage />} />
+          <Route path="/scores" element={<ScoresPage />} />
+          <Route path="/account" element={<AccountPage />} />
+          <Route path="/player/:uid" element={<PlayerPage />} />
+          <Route path="/multiplayer" element={<MultiplayerHomePage />} />
+          <Route path="/multiplayer/create" element={<MultiplayerCreatePage />} />
+          <Route path="/multiplayer/room/:roomId" element={<MultiplayerRoomPage />} />
+        </Routes>
+      </Suspense>
       <Analytics />
     </Router>
   );

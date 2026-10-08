@@ -194,7 +194,7 @@ service cloud.firestore {
     }
 
     // Room invites between friends (src/utils/invites.js): invites/{room}_{to}
-    // { from, fromUsername, to, room, gameId, mode, createdAt, expiresAt? } (expiresAt: TTL, missing from older apps)
+    // { from, fromUsername, to, room, gameId, mode, createdAt, expiresAt? } (expiresAt: see api/cleanup-expired.mjs, missing from older apps)
     match /invites/{id} {
       function isFriendship(friendship, data) {
         return friendship.status == 'accepted' && data.to in friendship.users && data.from in friendship.users;
@@ -593,7 +593,7 @@ service cloud.firestore {
       return id is string && id.size() >= 1 && id.size() <= 64 && id.matches('^[A-Za-z0-9_-]+$');
     }
 
-    // expiresAt, for Firestore's TTL: later than `min` and at most `max` from now. Clients use the lifetime
+    // expiresAt, for the daily cleanup (api/cleanup-expired.mjs): later than `min` and at most `max` from now. Clients use the lifetime
     // they want from their own clock, so the bounds leave room for clocks that are off by a day or two.
     function expiresWithin(value, min, max) {
       return value is timestamp && value > request.time + min && value <= request.time + max;
@@ -839,7 +839,7 @@ service cloud.firestore {
     }
 
     // Server clock calibration (src/utils/serverTime.js): a throwaway document holding only the server time.
-    // Nobody deletes it: it expires (TTL on expiresAt). Required from the cutoff on, as app 1.0.1 doesn't send it.
+    // Clients never delete it: the daily cleanup (api/cleanup-expired.mjs) does. Required from the cutoff on, as app 1.0.1 doesn't send it.
     match /_clockSync/{id} {
       allow read: if true;
       allow create: if request.resource.data.keys().hasOnly(['t', 'expiresAt'])

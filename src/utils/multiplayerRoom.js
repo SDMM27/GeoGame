@@ -14,7 +14,7 @@
 //   game                     copy of games[gameIndex], for app versions that only know one game
 //   players: { [playerId]: { pseudo, uid?, seenAt? } }   seenAt: lobby heartbeat, to hand the host role over
 //   by                       the player who wrote last (see below)
-//   expiresAt                when Firestore's TTL deletes the room
+//   expiresAt                when the daily cleanup (api/cleanup-expired.mjs) deletes the room
 // Subcollections: progress/{playerId} { gameIndex, found, total, finished, expiresAt },
 // gameResults/{gameIndex}_{playerId}, keys/{playerId} (the players' secrets, never readable).
 //
@@ -42,7 +42,7 @@ export const ROOM_FORMAT = 'app2'
 // 'app': rooms created before the players' secrets, still playable until firestore.rules close them (legacyOpen)
 export const isRoomFormat = (room) => room?.source === ROOM_FORMAT || room?.source === 'app'
 
-// Firestore's TTL deletes a room (and what it holds) a week after its creation.
+// The daily cleanup (api/cleanup-expired.mjs) deletes a room (and what it holds) a week after its creation.
 const ROOM_TTL_MS = 7 * 24 * 60 * 60 * 1000
 export const expiresIn = (ms) => Timestamp.fromMillis(Date.now() + ms)
 

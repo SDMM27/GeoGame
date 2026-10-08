@@ -1,0 +1,38 @@
+// GET /api/cleanup-expired, called once a day by Vercel Cron (see "crons" in vercel.json) with
+// Authorization: Bearer <CRON_SECRET>. Deletes expired rooms, invites and probes (see _lib/cleanupExpired.mjs).
+// Env: CRON_SECRET (any long random string, set in the Vercel project), FIREBASE_SERVICE_ACCOUNT as for
+// api/invite-push. Against the emulators, FIRESTORE_EMULATOR_HOST replaces the key.
+import { timingSafeEqual } from 'crypto'
+import { cert, getApps, initializeApp } from 'firebase-admin/app'
+import { getFirestore } from 'firebase-admin/firestore'
+
+import { cleanupExpired } from './_lib/cleanupExpired.mjs'
+
+function adminApp() {
+  if (getApps().length) return getApps()[0]
+  if (process.env.FIRESTORE_EMULATOR_HOST) return initializeApp({ projectId: process.env.GCLOUD_PROJECT ?? 'geogame-sdmm' })
+  return initializeApp({ credential: cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)) })
+}
+
+function isAuthorized(header, secret) {
+  const expected = Buffer.from(`Bearer ${secret}`)
+  const given = Buffer.from(header ?? '')
+  return given.length === expected.length && timingSafeEqual(given, expected)
+}
+
+export default async function handler(req, res) {
+  const secret = process.env.CRON_SECRET
+  // Without a secret, anyone could trigger the cleanup: refuse rather than run open.
+  if (!secret) return res.status(500).json({ error: 'not_configured' })
+  if (!isAuthorized(req.headers.authorization, secret)) return res.status(401).json({ error: 'unauthorized' })
+  if (req.method !== 'GET') return res.status(405).json({ error: 'method_not_allowed' })
+
+  try {
+    const deleted = await cleanupExpired({ db: getFirestore(adminApp()) })
+    console.log('[cleanup-expired]', deleted)
+    return res.status(200).json({ deleted })
+  } catch (error) {
+    console.error('[cleanup-expired]', error)
+    return res.status(500).json({ error: 'internal' })
+  }
+}

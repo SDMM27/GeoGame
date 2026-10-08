@@ -6,7 +6,7 @@
 import { doc, setDoc, getDoc, serverTimestamp, Timestamp } from 'firebase/firestore'
 import { firestore } from '../Firebase'
 
-// The probe document is not deleted (the rules do not allow it): Firestore's TTL removes it once expiresAt has passed.
+// The probe document is not deleted (the rules do not allow it): the daily cleanup (api/cleanup-expired.mjs) removes it.
 const CLOCK_DOC_TTL_MS = 10 * 60 * 1000
 
 let offset = 0

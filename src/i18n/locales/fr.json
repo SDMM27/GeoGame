@@ -235,7 +235,9 @@
     "please_enter_username": "Veuillez rentrer un pseudo",
     "score_saved": "Score enregistré !",
     "save_error": "Erreur lors de la sauvegarde.",
-    "loading": "Chargement..."
+    "loading": "Chargement...",
+    "page_load_error": "Impossible de charger la page. Vérifie ta connexion.",
+    "reload": "Recharger"
   },
   "units": {
     "pt": "pt",

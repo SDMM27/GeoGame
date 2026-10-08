@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { checkAnswer, normalize } from '../utils/normalizeAnswer'
-import { collectCoordinates, getRingAreaKm2, getCountryAreaKm2, getGeographicCenter, EARTH_RADIUS_KM } from '../utils/countryArea'
+import { hasCountryGeometry, collectCoordinates, getRingAreaKm2, getCountryAreaKm2, getGeographicCenter, EARTH_RADIUS_KM } from '../utils/countryArea'
 import { getCountryName, getAllCountryNames } from '../utils/getCountryName'
 import countryAliases from '../data/countryAliases.json'
 
@@ -14,7 +14,7 @@ const DAILY_STORAGE_PREFIX = 'country-clue-daily'
 export const COUNTRY_CLUE_COUNTRIES = countries.features.filter(
   (country) =>
     country?.properties?.ADMIN &&
-    country?.geometry?.coordinates?.length &&
+    hasCountryGeometry(country) &&
     country?.properties?.ISO_A2  // exclut les territoires sans code ISO (intraduisibles)
 )
 

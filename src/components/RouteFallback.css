@@ -28,3 +28,17 @@
 @media (prefers-reduced-motion: reduce) {
   .route-fallback__spinner { animation-duration: 2.4s; }
 }
+
+.route-fallback__retry {
+  padding: 8px 20px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--accent-cyan-border);
+  background: var(--accent-cyan-dim);
+  color: var(--text-primary);
+  font: inherit;
+  cursor: pointer;
+}
+
+.route-fallback__retry:hover {
+  background: var(--bg-card-hover);
+}

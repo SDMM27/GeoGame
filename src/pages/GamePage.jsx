@@ -31,7 +31,9 @@ function zoomThresholdForSpan(maxSpan) {
   return Math.ceil(Math.log2(14 / Math.max(maxSpan, 0.01)))
 }
 
-const smallCountries = (() => {
+// Computed on first use: the geometries are loaded after this module is evaluated
+let smallCountriesCache = null
+const getSmallCountries = () => smallCountriesCache ??= (() => {
   const result = []
   for (const f of countries.features) {
     try {
@@ -51,7 +53,7 @@ function SmallCountryCircles({ onCountryNameClick, foundCountriesRef, shownCount
   const [zoom, setZoom] = useState(3)
   useMapEvents({ zoomend: (e) => setZoom(e.target.getZoom()) })
 
-  return smallCountries
+  return getSmallCountries()
     .filter(c => zoom < c.zoomThreshold)
     .filter(c => !foundCountriesRef.current.has(c.name) && !shownCountriesRef.current.has(c.name))
     .map(c => (
@@ -79,8 +81,11 @@ function offsetFeatures(features, lngOffset) {
     geometry: { ...f.geometry, coordinates: shiftLng(f.geometry.coordinates, lngOffset) }
   }))
 }
-const featuresLeft = offsetFeatures(countries.features, -360)
-const featuresRight = offsetFeatures(countries.features, 360)
+let shiftedFeaturesCache = null
+const getShiftedFeatures = () => shiftedFeaturesCache ??= {
+  left: offsetFeatures(countries.features, -360),
+  right: offsetFeatures(countries.features, 360),
+}
 
 function RightClickDrag() {
   const map = useMap()
@@ -277,7 +282,7 @@ function PlacementGameLayout({ difficulty, isTraining, isAscension, presetName, 
           key="geojson-left"
           ref={geoJsonRefLeft}
           style={GEO_STYLE}
-          data={featuresLeft}
+          data={getShiftedFeatures().left}
           onEachFeature={onEachOffsetFeature}
         />
         <GeoJSON
@@ -292,7 +297,7 @@ function PlacementGameLayout({ difficulty, isTraining, isAscension, presetName, 
           key="geojson-right"
           ref={geoJsonRefRight}
           style={GEO_STYLE}
-          data={featuresRight}
+          data={getShiftedFeatures().right}
           onEachFeature={onEachOffsetFeature}
         />
         {onCountryNameClick && foundCountriesRef && shownCountriesRef && (

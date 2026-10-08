@@ -235,7 +235,9 @@
     "please_enter_username": "Please enter a username",
     "score_saved": "Score saved!",
     "save_error": "Error while saving.",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "page_load_error": "The page could not be loaded. Check your connection.",
+    "reload": "Reload"
   },
   "units": {
     "pt": "pt",

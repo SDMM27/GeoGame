@@ -1,7 +1,7 @@
 // src/hooks/useRankingGameState.js
 import { useEffect, useMemo, useState } from 'react'
 import countries from '../data/countriesWithDifficulty_FR.json'
-import { getCountryAreaKm2 } from '../utils/countryArea'
+import { getCountryAreaKm2, hasCountryGeometry } from '../utils/countryArea'
 import { CRITERIA, CRITERIA_KEYS, buildCountryPool } from '../utils/rankingCriteria'
 import { getRankingAttemptScore } from '../utils/scoringRules'
 
@@ -10,7 +10,7 @@ const DAILY_STORAGE_PREFIX = 'ranking-daily'
 const DAILY_COUNT = 5
 
 const RANKING_COUNTRIES = countries.features.filter(
-  (country) => country?.properties?.ADMIN && country?.geometry?.coordinates?.length
+  (country) => country?.properties?.ADMIN && hasCountryGeometry(country)
 )
 
 // --- Pure helpers (exported for testing) ---

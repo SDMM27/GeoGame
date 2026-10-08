@@ -6,7 +6,7 @@ import { Timestamp, getFirestore } from 'firebase-admin/firestore'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import handler from '../../api/invite-push.mjs'
-import { EXPO_PUSH_URL, RESEND_DELAY_MS, inviteMessage, sendInvitePush } from '../../api/_lib/invitePush.mjs'
+import { EXPO_PUSH_URL, RESEND_DELAY_MS, SENDER_PUSH_LIMIT, SENDER_WINDOW_MS, inviteMessage, sendInvitePush } from '../../api/_lib/invitePush.mjs'
 
 const PROJECT = 'geogame-sdmm'
 const ROOM = 'ABC234'
@@ -110,6 +110,29 @@ describe('sendInvitePush', () => {
     expect((await send({ idToken: tokens.alice, fetchImpl, now: now + 1000 })).status).toBe(429)
     expect((await send({ idToken: tokens.alice, fetchImpl, now: now + RESEND_DELAY_MS + 1 })).status).toBe(200)
     expect(fetchImpl).toHaveBeenCalledTimes(2)
+  })
+
+  it('limits the pushes one sender can send per hour, across invites', async () => {
+    const now = Date.now()
+    const fetchImpl = fakeExpo()
+    const invitation = (from, room) => ({ from, fromUsername: from, to: 'bob', room, gameId: 'flags', mode: 'live', createdAt: Timestamp.now() })
+    for (let index = 0; index < SENDER_PUSH_LIMIT; index++) {
+      await db.doc(`invites/R${index}_bob`).set(invitation('alice', `R${index}`))
+      expect((await send({ idToken: tokens.alice, fetchImpl, now, inviteId: `R${index}_bob` })).status).toBe(200)
+    }
+    await db.doc('invites/EXTRA1_bob').set(invitation('alice', 'EXTRA1'))
+    const refused = await send({ idToken: tokens.alice, fetchImpl, now: now + 1000, inviteId: 'EXTRA1_bob' })
+    expect(refused).toEqual({ status: 429, body: { error: 'rate_limited' } })
+    expect(fetchImpl).toHaveBeenCalledTimes(SENDER_PUSH_LIMIT)
+    expect((await db.doc('invitePushLimits/alice').get()).data().count).toBe(SENDER_PUSH_LIMIT)
+    // Another sender is not affected
+    await db.doc('invites/ZZZ234_bob').set(invitation('carol', 'ZZZ234'))
+    expect((await send({ idToken: tokens.carol, fetchImpl, inviteId: 'ZZZ234_bob', now })).status).toBe(200)
+    // The window passes
+    const later = now + SENDER_WINDOW_MS + 1
+    await db.doc('invites/EXTRA1_bob').update({ createdAt: Timestamp.fromMillis(later) })
+    expect((await send({ idToken: tokens.alice, fetchImpl, now: later, inviteId: 'EXTRA1_bob' })).status).toBe(200)
+    expect((await db.doc('invitePushLimits/alice').get()).data().count).toBe(1)
   })
 
   it('only lets the inviter trigger it', async () => {

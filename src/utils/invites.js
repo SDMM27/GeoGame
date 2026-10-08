@@ -1,7 +1,7 @@
 // Invitations to a multiplayer room, sent to a friend from inside the app.
 // invites/{room}_{to}: { from, fromUsername, to, room, gameId, mode, createdAt }
 // One invite per friend and room: inviting again only refreshes it. The guest deletes it when they join or dismiss it.
-import { collection, deleteDoc, doc, onSnapshot, query, serverTimestamp, setDoc, where } from 'firebase/firestore'
+import { collection, deleteDoc, doc, onSnapshot, query, serverTimestamp, setDoc, Timestamp, where } from 'firebase/firestore'
 import { firestore } from '../Firebase'
 
 // Past this, the room has most likely been played: the invite is dropped.
@@ -19,6 +19,7 @@ export function sendRoomInvite(me, friendUid, room) {
     gameId: room.game.id,
     mode: room.mode,
     createdAt: serverTimestamp(),
+    expiresAt: Timestamp.fromMillis(Date.now() + INVITE_TTL_MS),
   })
 }
 

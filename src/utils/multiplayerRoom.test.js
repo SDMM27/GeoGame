@@ -1,7 +1,7 @@
 // src/utils/multiplayerRoom.test.js
 import { describe, it, expect, vi } from 'vitest'
 import {
-  getRoomContent, pickNewHost, rankRoomResults, HOST_GONE_MS,
+  getPlayerKey, getRoomContent, isRoomFormat, pickNewHost, rankRoomResults, HOST_GONE_MS,
   nextGameToPlay, overallStandings, roomForGame, roomGames,
 } from './multiplayerRoom'
 import { getSeededFlagCountries, getSeededBorderGuessCountries } from './multiplayerSeed'
@@ -134,5 +134,24 @@ describe('multi-game rooms', () => {
     // a: 2 + 1 = 3 over 2 games; b: 1 + 2 + 1 = 4 over 3 games
     expect(overallStandings(room, results).map(({ playerId, points, played, rank }) => [playerId, points, played, rank]))
       .toEqual([['b', 4, 3, 1], ['a', 3, 2, 2]])
+  })
+})
+
+describe('player secret', () => {
+  it('is generated once and kept on the device', () => {
+    localStorage.removeItem('mp_player_key')
+    const key = getPlayerKey()
+    expect(key).toMatch(/^[0-9a-f]{48}$/)
+    expect(getPlayerKey()).toBe(key)
+    expect(localStorage.getItem('mp_player_key')).toBe(key)
+  })
+})
+
+describe('isRoomFormat', () => {
+  it('opens current rooms and the ones from before the secrets, nothing else', () => {
+    expect(isRoomFormat({ source: 'app2' })).toBe(true)
+    expect(isRoomFormat({ source: 'app' })).toBe(true)
+    expect(isRoomFormat({})).toBe(false)
+    expect(isRoomFormat(null)).toBe(false)
   })
 })

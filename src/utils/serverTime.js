@@ -3,8 +3,11 @@
 // offset = serverTime - localMidpoint (positif si l'horloge locale est en retard)
 // serverNow() = Date.now() + offset ≈ heure serveur courante
 
-import { doc, setDoc, getDoc, deleteDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, setDoc, getDoc, serverTimestamp, Timestamp } from 'firebase/firestore'
 import { firestore } from '../Firebase'
+
+// The probe document is not deleted (the rules do not allow it): Firestore's TTL removes it once expiresAt has passed.
+const CLOCK_DOC_TTL_MS = 10 * 60 * 1000
 
 let offset = 0
 let calibrationPromise = null
@@ -16,7 +19,7 @@ export function calibrateServerTime() {
   const ref = doc(firestore, '_clockSync', id)
   const localBefore = Date.now()
 
-  calibrationPromise = setDoc(ref, { t: serverTimestamp() })
+  calibrationPromise = setDoc(ref, { t: serverTimestamp(), expiresAt: Timestamp.fromMillis(Date.now() + CLOCK_DOC_TTL_MS) })
     .then(() => getDoc(ref))
     .then((snap) => {
       const localAfter = Date.now()
@@ -24,7 +27,6 @@ export function calibrateServerTime() {
         const serverTime = snap.data().t.toMillis()
         offset = serverTime - Math.round((localBefore + localAfter) / 2)
       }
-      deleteDoc(ref).catch(() => {})
     })
     .catch(() => {
       calibrationPromise = null  // permet de réessayer

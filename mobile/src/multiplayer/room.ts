@@ -32,7 +32,7 @@ export type RoomPlayer = { pseudo: string; uid?: string; seenAt?: Timestamp }
 export type Room = {
   id: string
   // Format marker, on every room, wherever it was created
-  source: 'app'
+  source: 'app' | 'app2'
   createdOn?: 'web' | 'app'
   hostId: string
   mode: RoomMode
@@ -123,18 +123,18 @@ export async function joinRoom(room: Room, pseudo: string, uid?: string | null) 
 }
 
 export async function launchRoom(code: string) {
-  await shared.launchRoom(code)
+  await shared.launchRoom(code, getPlayerId())
 }
 
 export async function launchNextGame(room: Room) {
-  await shared.launchNextGame(room)
+  await shared.launchNextGame(room, getPlayerId())
 }
 
 // Host: adds a game at the end of the room
 export async function addGameToRoom(code: string, game: RoomGame) {
   const snap = await getDoc(roomRef(code))
   if (!snap.exists()) throw new Error('Room not found')
-  await shared.addGame({ id: code, ...snap.data() }, game)
+  await shared.addGame({ id: code, ...snap.data() }, game, getPlayerId())
 }
 
 export async function reportProgress(code: string, progress: PlayerProgress) {

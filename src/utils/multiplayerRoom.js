@@ -5,16 +5,25 @@
 // A live room keeps accepting players once launched, so it also works as a challenge afterwards.
 //
 // Room document (rooms/{code}):
-//   source: 'app'            the format marker (older app versions only open rooms carrying it)
+//   source: 'app2'           the format marker (older app versions only open rooms with source 'app', so they
+//                            do not see these rooms; rooms they created are source 'app' and stay playable)
 //   createdOn: 'web' | 'app' where the room was created (missing on the first app rooms)
 //   hostId, mode, status: 'lobby' | 'playing', seed, startAt (start of the current live game)
 //   games: [game, …]         missing on the first rooms, which hold `game` only
 //   gameIndex                the live game being played (0 in a challenge)
 //   game                     copy of games[gameIndex], for app versions that only know one game
 //   players: { [playerId]: { pseudo, uid?, seenAt? } }   seenAt: lobby heartbeat, to hand the host role over
-// Subcollections: progress/{playerId} { gameIndex, found, total, finished },
-// gameResults/{gameIndex}_{playerId}.
-import { doc, getDoc, serverTimestamp, setDoc, Timestamp, updateDoc } from 'firebase/firestore'
+//   by                       the player who wrote last (see below)
+//   expiresAt                when Firestore's TTL deletes the room
+// Subcollections: progress/{playerId} { gameIndex, found, total, finished, expiresAt },
+// gameResults/{gameIndex}_{playerId}, keys/{playerId} (the players' secrets, never readable).
+//
+// Players have no account, so firestore.rules identify them by a secret kept on their device (getPlayerKey):
+// every write goes through ownedBatch(), which sets keys/{playerId} = { key, at } next to the real write, and
+// the rules only accept it when `key` is the secret stored as the player joined. Only the host changes the games,
+// the status and the launch. Rooms from before that (source 'app') are still written the same way: the rules just
+// don't check the secret on them until their cutoff (see legacyOpen in firestore.rules).
+import { doc, getDoc, serverTimestamp, Timestamp, writeBatch } from 'firebase/firestore'
 import { firestore } from '../Firebase'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { GAME_TYPES } from './gameTypes'
@@ -29,8 +38,13 @@ import {
 import { rankResults } from './multiplayerScoring'
 import { seededShuffle } from './prng'
 
-export const ROOM_FORMAT = 'app'
-export const isRoomFormat = (room) => room?.source === ROOM_FORMAT
+export const ROOM_FORMAT = 'app2'
+// 'app': rooms created before the players' secrets, still playable until firestore.rules close them (legacyOpen)
+export const isRoomFormat = (room) => room?.source === ROOM_FORMAT || room?.source === 'app'
+
+// Firestore's TTL deletes a room (and what it holds) a week after its creation.
+const ROOM_TTL_MS = 7 * 24 * 60 * 60 * 1000
+export const expiresIn = (ms) => Timestamp.fromMillis(Date.now() + ms)
 
 // Live countdown, so that every player gets the launch before the game starts.
 const LAUNCH_DELAY_MS = 5000
@@ -47,6 +61,28 @@ export function generateRoomId() {
     id += chars[Math.floor(Math.random() * chars.length)]
   }
   return id
+}
+
+const storage = () => { try { return globalThis.localStorage ?? null } catch { return null } }
+const memory = {}
+const read = (key) => storage()?.getItem(key) ?? memory[key] ?? null
+const write = (key, value) => { memory[key] = value; try { storage()?.setItem(key, value) } catch { /* private mode */ } }
+
+function randomSecret() {
+  const bytes = new Uint8Array(24)
+  if (globalThis.crypto?.getRandomValues) globalThis.crypto.getRandomValues(bytes)
+  else for (let i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256)
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')
+}
+
+/** This device's secret, which proves to firestore.rules that a write comes from the player it claims to be. */
+export function getPlayerKey() {
+  let key = read('mp_player_key')
+  if (!key) {
+    key = randomSecret()
+    write('mp_player_key', key)
+  }
+  return key
 }
 
 /** Stable id per browser, kept in localStorage (shared across tabs). */
@@ -187,7 +223,21 @@ export function pickNewHost(room, now) {
 // ─── Firestore ─────────────────────────────────────────────────────────────
 
 const roomRef = (code) => doc(firestore, 'rooms', code)
-const roomPlayer = (pseudo, uid) => (uid ? { pseudo, uid } : { pseudo })
+const roomPlayer = (pseudo, uid) => (uid ? { pseudo, uid, seenAt: serverTimestamp() } : { pseudo, seenAt: serverTimestamp() })
+
+/** A batch that also proves, to firestore.rules, that its writes come from `playerId`. */
+function ownedBatch(code, playerId) {
+  const batch = writeBatch(firestore)
+  batch.set(doc(firestore, 'rooms', code, 'keys', playerId), { key: getPlayerKey(), at: serverTimestamp() })
+  return batch
+}
+
+/** Updates the room as `playerId` (`by` tells the rules who writes). */
+async function updateRoom(code, playerId, changes) {
+  const batch = ownedBatch(code, playerId)
+  batch.update(roomRef(code), { ...changes, by: playerId })
+  await batch.commit()
+}
 
 /**
  * Creates a room and returns its code.
@@ -196,38 +246,45 @@ const roomPlayer = (pseudo, uid) => (uid ? { pseudo, uid } : { pseudo })
 export async function createRoom({ games, mode, hostId, pseudo, uid, createdOn }) {
   let code = generateRoomId()
   while ((await getDoc(roomRef(code))).exists()) code = generateRoomId()
-  await setDoc(roomRef(code), {
+  const batch = ownedBatch(code, hostId)
+  batch.set(roomRef(code), {
     source: ROOM_FORMAT,
     createdOn,
     hostId,
     mode,
     status: mode === 'live' ? 'lobby' : 'playing',
-    games,
+    games: games.slice(0, 1),
     gameIndex: 0,
     game: games[0],
     seed: Math.floor(Math.random() * 2 ** 31),
     startAt: null,
     players: { [hostId]: roomPlayer(pseudo, uid) },
     createdAt: serverTimestamp(),
+    expiresAt: expiresIn(ROOM_TTL_MS),
+    by: hostId,
   })
+  await batch.commit()
+  // firestore.rules check a game at a time: the others are added one by one, before the code is shared
+  for (let count = 2; count <= games.length; count++) await updateRoom(code, hostId, { games: games.slice(0, count) })
   return code
 }
 
 export async function joinRoom(code, playerId, pseudo, uid) {
-  await updateDoc(roomRef(code), { [`players.${playerId}`]: roomPlayer(pseudo, uid) })
+  await updateRoom(code, playerId, { [`players.${playerId}`]: roomPlayer(pseudo, uid) })
 }
 
-export async function launchRoom(code) {
-  await updateDoc(roomRef(code), {
+/** Live: the host launches the first game. */
+export async function launchRoom(code, playerId) {
+  await updateRoom(code, playerId, {
     status: 'playing',
     startAt: Timestamp.fromDate(new Date(Date.now() + LAUNCH_DELAY_MS)),
   })
 }
 
 /** Live: the host launches the next game. */
-export async function launchNextGame(room) {
+export async function launchNextGame(room, playerId) {
   const index = currentGameIndex(room) + 1
-  await updateDoc(roomRef(room.id), {
+  await updateRoom(room.id, playerId, {
     gameIndex: index,
     game: roomGames(room)[index],
     status: 'playing',
@@ -236,31 +293,41 @@ export async function launchNextGame(room) {
 }
 
 /** The host adds a game at the end of the room. */
-export async function addGame(room, game) {
-  await updateDoc(roomRef(room.id), { games: [...roomGames(room), game] })
+export async function addGame(room, game, playerId) {
+  await updateRoom(room.id, playerId, { games: [...roomGames(room), game] })
 }
 
 /** Lobby heartbeat of a player who already joined. */
 export async function touchPlayer(code, playerId) {
-  await updateDoc(roomRef(code), { [`players.${playerId}.seenAt`]: serverTimestamp() })
+  await updateRoom(code, playerId, { [`players.${playerId}.seenAt`]: serverTimestamp() })
 }
 
+/** `newHostId` takes the room over: it is the player who writes. */
 export async function transferHost(code, newHostId) {
-  await updateDoc(roomRef(code), { hostId: newHostId })
+  await updateRoom(code, newHostId, { hostId: newHostId })
 }
 
 /** `progress`: { gameIndex, found, total, finished } */
 export async function reportProgress(code, playerId, progress) {
-  await setDoc(doc(firestore, 'rooms', code, 'progress', playerId), { ...progress, lastSeen: serverTimestamp() }, { merge: true })
+  const batch = ownedBatch(code, playerId)
+  batch.set(
+    doc(firestore, 'rooms', code, 'progress', playerId),
+    { ...progress, lastSeen: serverTimestamp(), expiresAt: expiresIn(ROOM_TTL_MS) },
+    { merge: true },
+  )
+  await batch.commit()
 }
 
 /** `result`: { weightedScore, countriesSolved, attempts, elapsedTime, total } */
 export async function submitResult(code, playerId, pseudo, result, gameIndex = 0) {
-  await setDoc(doc(firestore, 'rooms', code, 'gameResults', `${gameIndex}_${playerId}`), {
+  const batch = ownedBatch(code, playerId)
+  batch.set(doc(firestore, 'rooms', code, 'gameResults', `${gameIndex}_${playerId}`), {
     playerId,
     pseudo,
     gameIndex,
     ...result,
     finishedAt: serverTimestamp(),
+    expiresAt: expiresIn(ROOM_TTL_MS),
   })
+  await batch.commit()
 }

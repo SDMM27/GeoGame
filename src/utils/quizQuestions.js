@@ -783,5 +783,7 @@ function knownAnswersFor(question, choice) {
  */
 export function checkFreeAnswer(question, input) {
   const accepted = [...question.accepted.flatMap(choiceAnswers), ...(question.accept ?? [])].flatMap(shortForms)
-  return matchAnswer(input, accepted, knownAnswersFor(question, question.accepted[0]))
+  return matchAnswer(input, accepted, knownAnswersFor(question, question.accepted[0]), {
+    coreOf: (name) => shortForms(name).at(-1),
+  })
 }

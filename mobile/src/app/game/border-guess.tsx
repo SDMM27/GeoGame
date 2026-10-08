@@ -8,7 +8,7 @@ import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View, useWindow
 import Animated, { FadeIn, LinearTransition, ZoomIn } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import useBorderGuessState from '@shared/hooks/useBorderGuessState'
+import useBorderGuessState, { ROOM_MAX_ATTEMPTS, roomRoundErrors } from '@shared/hooks/useBorderGuessState'
 import { formatTime } from '@shared/utils/formatTime'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
 import { getCountryName } from '@shared/utils/getCountryName'
@@ -59,12 +59,12 @@ function BorderGuessGame({ mode, play }: { mode: string; play?: RoomPlay }) {
     startGame,
     startedAt,
     elapsedTime,
-  } = useBorderGuessState(mode, { overrideCountry: rounds.country })
+  } = useBorderGuessState(mode, { overrideCountry: rounds.country, maxAttempts: play ? ROOM_MAX_ATTEMPTS : null })
   useRoundResult(rounds, {
     isCurrent: currentCountry === rounds.country,
     isComplete,
     isSolved,
-    wrongGuesses: (guesses as BorderGuess[]).filter((guess) => !guess.isCorrect).length,
+    wrongGuesses: roomRoundErrors(guesses, isSolved),
   })
   const [leaderboardVersion, setLeaderboardVersion] = useState(0)
   const elapsed = useElapsed(play ? rounds.startedAt : startedAt, (isDaily && hasStarted && !isComplete) || (!!play && rounds.endedAt == null))
@@ -166,7 +166,11 @@ function BorderGuessGame({ mode, play }: { mode: string; play?: RoomPlay }) {
           {play && <RoomHudPill code={play.room.id} gameIndex={play.room.gameIndex} />}
           {play && <HudPill icon="timer-outline" label={formatTime(rounds.elapsedTime ?? elapsed).slice(0, 5)} />}
           {isDaily && hasStarted && <HudPill icon="timer-outline" label={formatTime(elapsedTime ?? elapsed).slice(0, 5)} />}
-          <HudPill icon="target" label={`${guesses.length} ${attemptsLabel}`} color={ACCENT} />
+          <HudPill
+            icon="target"
+            label={play ? `${guesses.length} / ${ROOM_MAX_ATTEMPTS}` : `${guesses.length} ${attemptsLabel}`}
+            color={ACCENT}
+          />
         </GameTopBar>
       )}
 

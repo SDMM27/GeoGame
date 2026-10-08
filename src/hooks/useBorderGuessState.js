@@ -68,6 +68,15 @@ export const BORDER_GUESS_COUNTRIES = countries.features.filter(
 
 export const BORDER_GUESS_COUNTRY_COUNT = BORDER_GUESS_COUNTRIES.length
 
+// Multiplayer: guesses allowed per country. A country not found (passed or out of guesses) counts as this many errors,
+// so passing never ranks better than trying.
+export const ROOM_MAX_ATTEMPTS = 3
+
+/** Errors a finished multiplayer round adds to the player's total. */
+export function roomRoundErrors(guesses, isSolved) {
+  return isSolved ? guesses.filter((guess) => !guess.isCorrect).length : ROOM_MAX_ATTEMPTS
+}
+
 function normalizeLongitudeDelta(deltaLng) {
   let normalized = deltaLng
 
@@ -246,7 +255,7 @@ export function buildBorderGuess(guessedCountry, normalizedInput, isCorrect, ans
 }
 
 export default function useBorderGuessState(mode, options = {}) {
-  const { overrideCountry = null, initialGuesses = null } = options
+  const { overrideCountry = null, initialGuesses = null, maxAttempts = null } = options
   const navigate = useNavigate()
   const { t, i18n } = useTranslation()
   const [currentCountry, setCurrentCountry] = useState(null)
@@ -409,6 +418,9 @@ export default function useBorderGuessState(mode, options = {}) {
       return
     }
 
+    if (maxAttempts != null && nextGuesses.length >= maxAttempts) {
+      setStatus('lost')
+    }
 
     toast.error(t('toasts.wrong'), { containerId: 'topRightToast' })
   }
@@ -437,6 +449,7 @@ export default function useBorderGuessState(mode, options = {}) {
     inputValue,
     setInputValue,
     guesses,
+    attemptsLeft: maxAttempts != null ? Math.max(0, maxAttempts - guesses.length) : null,
     status,
     isSolved,
     isLost,

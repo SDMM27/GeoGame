@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { GeoJSON, MapContainer, useMap } from 'react-leaflet'
 import { ToastContainer } from 'react-toastify'
-import useBorderGuessState from '../../hooks/useBorderGuessState'
+import useBorderGuessState, { ROOM_MAX_ATTEMPTS, roomRoundErrors } from '../../hooks/useBorderGuessState'
 import { getCountryStyle, getFocusCountry, getViewportSettings } from '../../utils/borderGuessMap'
 import { getGuessGamePoints } from '../../utils/scoringRules'
 import { loadSnapshot, saveSnapshot } from '../../utils/multiplayerSnapshot'
@@ -52,7 +52,11 @@ export default function MultiplayerBorderGuess({ countries, onCountryFound, onGa
     inputValue, setInputValue,
     guesses, isSolved, isLost, isComplete, answerName,
     filteredCountrySuggestions, handleSubmit, revealCountry,
-  } = useBorderGuessState('daily', { overrideCountry: currentCountry, initialGuesses: snap?.currentGuesses ?? null })
+  } = useBorderGuessState('daily', {
+    overrideCountry: currentCountry,
+    initialGuesses: snap?.currentGuesses ?? null,
+    maxAttempts: ROOM_MAX_ATTEMPTS,
+  })
 
   const guessesRef = useRef(snap?.currentGuesses ?? [])
   guessesRef.current = guesses
@@ -60,7 +64,7 @@ export default function MultiplayerBorderGuess({ countries, onCountryFound, onGa
   const handleReveal = () => {
     revealCountry()
     const acc = accRef.current
-    const wrongGuesses = guessesRef.current.filter(g => !g.isCorrect).length
+    const wrongGuesses = roomRoundErrors(guessesRef.current, false)
     const newTotal = acc.totalAttempts + wrongGuesses
     const newFailures = acc.totalFailures + 1
 
@@ -97,7 +101,7 @@ export default function MultiplayerBorderGuess({ countries, onCountryFound, onGa
 
     roundTransitionRef.current = true
 
-    const wrongGuesses = guesses.filter(g => !g.isCorrect).length
+    const wrongGuesses = roomRoundErrors(guesses, isSolved)
     const newTotal = totalAttempts + wrongGuesses
     const newSolved = isSolved ? totalSolved + 1 : totalSolved
     const roundScore = isSolved ? getGuessGamePoints(wrongGuesses) : 0
@@ -181,7 +185,7 @@ export default function MultiplayerBorderGuess({ countries, onCountryFound, onGa
     <div className="mp-border-guess">
       <div className="mp-border-guess-header">
         <span className="mp-border-guess-round">Manche {roundIndex + 1} / {countries.length}</span>
-        <span className="mp-border-guess-attempts">{guesses.length} tentative{guesses.length !== 1 ? 's' : ''}</span>
+        <span className="mp-border-guess-attempts">{guesses.length} / {ROOM_MAX_ATTEMPTS} tentatives</span>
       </div>
 
       <div className="mp-border-guess-layout">

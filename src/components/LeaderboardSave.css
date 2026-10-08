@@ -21,7 +21,7 @@
 .leaderboard-save__hint {
   margin: 10px 0 0;
   font-size: 0.8rem;
-  color: var(--text-dim);
+  color: var(--text-muted);
 }
 
 .leaderboard-save__hint a,

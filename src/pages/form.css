@@ -104,6 +104,6 @@
 }
 
 .form-blocked-hint {
-  color: var(--text-dim);
+  color: var(--text-muted);
   font-size: 0.8rem;
 }

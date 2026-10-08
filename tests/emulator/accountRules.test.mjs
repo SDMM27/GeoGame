@@ -228,6 +228,7 @@ describe('game history', () => {
       { gameType: 'VOYAGE_VOYAGE', mode: 'daily', dailyKey: '2026-10-08', score: 70, solved: true, attempts: 6, optimal: 5, errors: 1, hints: 0, playedAt: now() },
       { gameType: 'QUIZ', mode: 'infinite', score: 40, correct: 8, answered: 10, bestStreak: 5, difficulty: 'Difficile', playedAt: now() },
       { gameType: 'COUNTRY_CLUE', mode: 'multi', roomCode: 'ABC234', found: 2, total: 3, elapsedTime: 33.5, playedAt: now() },
+      { gameType: 'SURVIVAL', mode: 'survival', score: 14, total: 300, errors: 3, lives: 3, difficulty: 'FLAGS+QUIZ', elapsedTime: 98000, playedAt: now() },
     ]
     for (const record of records) await assertSucceeds(games().add(record))
   })

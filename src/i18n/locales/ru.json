@@ -44,13 +44,13 @@
       "title": "Размести страну",
       "description": "Поставь страну на нужное место на карте."
     },
-    "lives_mode": {
-      "title": "Режим жизней",
-      "description": "Найди как можно больше стран без ошибок."
-    },
     "quiz": {
       "title": "Гео-викторина",
       "description": "Вопрос дня, чтобы бросить вызов друзьям, или вопросы один за другим на выбранном уровне сложности."
+    },
+    "survival": {
+      "title": "Выживание",
+      "description": "Раунды разных игр подряд: каждая ошибка стоит одну жизнь."
     }
   },
   "modes": {
@@ -548,7 +548,8 @@
       "ascension": "Восхождение",
       "daily": "Задание дня",
       "infinite": "Бесконечно",
-      "multi": "Мультиплеер"
+      "multi": "Мультиплеер",
+      "survival": "Выживание"
     },
     "solved": "Найдено",
     "failed": "Не найдено",
@@ -751,5 +752,62 @@
     "n_games": "Игр: {{count}}",
     "next_game": "Запустить игру {{n}}",
     "waiting_next": "Ожидание следующей игры…"
+  },
+  "survival": {
+    "choose_games": "Раунды",
+    "choose_lives": "Жизни",
+    "pick_one_game": "Выбери хотя бы одну игру.",
+    "round_type": {
+      "PLACEMENT": "Найди страну",
+      "FLAGS": "Флаг",
+      "CAPITALS": "Столица",
+      "BORDER_GUESS": "Границы",
+      "COUNTRY_CLUE": "Country Clue",
+      "QUIZ": "Викторина"
+    },
+    "prompt": {
+      "PLACEMENT": "Нажми на страну",
+      "FLAGS": "Чей это флаг?",
+      "CAPITALS": "Какая у неё столица?",
+      "BORDER_GUESS": "У какой страны такая форма?",
+      "COUNTRY_CLUE": "Найди загаданную страну",
+      "QUIZ": "Вопрос викторины"
+    },
+    "round": "Раунд {{n}}",
+    "rounds_short": "раундов",
+    "rounds_count_one": "{{count}} раунд",
+    "rounds_count_few": "{{count}} раунда",
+    "rounds_count_many": "{{count}} раундов",
+    "rounds_count_other": "{{count}} раунда",
+    "lives_count_one": "{{count}} жизнь",
+    "lives_count_few": "{{count}} жизни",
+    "lives_count_many": "{{count}} жизней",
+    "lives_count_other": "{{count}} жизни",
+    "correct": "Отлично!",
+    "answer_was": "Ответ: {{answer}}",
+    "next": "Дальше →",
+    "give_up": "Пропустить (−1 ❤️)",
+    "life_lost": "Неверно! −1 жизнь",
+    "not_a_country": "Не знаю такой страны.",
+    "capital_placeholder": "Название столицы",
+    "clue_hint": "Называй страны: каждая ошибка стоит жизнь, но даёт подсказки.",
+    "game_over": "Жизни закончились!",
+    "victory": "Ты прошёл все раунды!",
+    "rounds_survived": "Пройдено раундов",
+    "time": "Время",
+    "lives_at_start": "Жизней в начале",
+    "see_leaderboard": "Рейтинг «Выживания»",
+    "leaderboard_title": "Рейтинг «Выживания»",
+    "all_combinations": "Все сочетания",
+    "all_six": "Все 6 игр",
+    "no_scores": "Нет результатов для этого фильтра.",
+    "col_player": "Игрок",
+    "col_rounds": "Раунды",
+    "col_games": "Игры",
+    "room_label": "Выживание · {{lives}} ❤️",
+    "progress_lives": "{{lives}} ❤️",
+    "eliminated": "Выбыл",
+    "best": "Рекорд: {{rounds}}",
+    "missed_answer": "Пропущенный ответ"
   }
 }

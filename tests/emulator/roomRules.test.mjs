@@ -156,6 +156,15 @@ describe('creating a room', () => {
     await assertSucceeds(createRoom({ games: [quiz], game: quiz }))
   })
 
+  it('creates a survival room, with known games and lives only', async () => {
+    const survival = game({ id: 'survival', type: 'SURVIVAL', difficulty: null, modes: 'FLAGS+BORDER_GUESS+QUIZ', lives: 3 })
+    await assertSucceeds(createRoom({ games: [survival], game: survival }))
+    const cheat = game({ id: 'survival', type: 'SURVIVAL', difficulty: null, modes: 'FLAGS+CHEAT', lives: 3 })
+    await assertFails(createRoom({ games: [cheat], game: cheat }, 'host', { room: 'XYZ789' }))
+    const lives = game({ id: 'survival', type: 'SURVIVAL', difficulty: null, modes: 'FLAGS', lives: 99 })
+    await assertFails(createRoom({ games: [lives], game: lives }, 'host', { room: 'XYZ788' }))
+  })
+
   it('refuses a room code that is not 6 characters of the alphabet', async () => {
     for (const room of ['ABC23', 'ABC2345', 'abc234', 'ABCO34', 'ABC1E4']) {
       await assertFails(createRoom({}, 'host', { room }))
@@ -463,6 +472,13 @@ describe('progress and results', () => {
     await assertSucceeds(reportProgress('p2'))
     await assertSucceeds(reportProgress('p2', { gameIndex: 0, found: 10, total: 10, finished: true, lastSeen: serverTime(), expiresAt: inDays(7) }))
     await assertSucceeds(reportProgress('host'))
+  })
+
+  it('lets a survival player report their lives left, within bounds', async () => {
+    await assertSucceeds(reportProgress('p2', progressDoc({ lives: 2 })))
+    await assertSucceeds(reportProgress('p2', progressDoc({ lives: 0, finished: true })))
+    await assertFails(reportProgress('p2', progressDoc({ lives: 11 })))
+    await assertFails(reportProgress('p2', progressDoc({ lives: -1 })))
   })
 
   it('lets a player submit a result, for each game', async () => {

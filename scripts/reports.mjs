@@ -8,7 +8,7 @@
 //                                                             deletes the entry and its reports (asks first)
 //   node scripts/reports.mjs --dismiss scores/<id> --apply    deletes the reports of an entry, keeps the entry
 //
-// <collection> is scores, ascension_scores or daily_scores; the id is the document id (in the list below, and in
+// <collection> is scores, ascension_scores, daily_scores or survival_scores; the id is the document id (in the list below, and in
 // Firebase console > Firestore). Add --yes to skip the question (scripts, tests on the emulator).
 //
 // Credentials, in this order:
@@ -22,7 +22,7 @@ import { createInterface } from 'readline/promises'
 import { applicationDefault, cert, initializeApp } from 'firebase-admin/app'
 import { getFirestore } from 'firebase-admin/firestore'
 
-const COLLECTIONS = ['scores', 'ascension_scores', 'daily_scores']
+const COLLECTIONS = ['scores', 'ascension_scores', 'daily_scores', 'survival_scores']
 const PROJECT_ID = process.env.GCLOUD_PROJECT ?? 'geogame-sdmm'
 const BATCH_SIZE = 400
 

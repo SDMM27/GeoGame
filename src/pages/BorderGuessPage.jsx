@@ -18,7 +18,7 @@ import 'leaflet/dist/leaflet.css'
 import 'react-toastify/dist/ReactToastify.css'
 import './BorderGuessPage.css'
 
-function FitCountryBounds({ country }) {
+export function FitCountryBounds({ country }) {
   const map = useMap()
 
   useEffect(() => {
@@ -32,7 +32,7 @@ function FitCountryBounds({ country }) {
   return null
 }
 
-function GuessHistory({ guesses, t, i18n }) {
+export function GuessHistory({ guesses, t, i18n }) {
   if (guesses.length === 0) {
     return <p className="border-guess-empty">{t('labels.no_attempts')}</p>
   }

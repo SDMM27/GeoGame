@@ -44,13 +44,13 @@
       "title": "Placement Pays",
       "description": "Place le pays au bon endroit sur la carte."
     },
-    "lives_mode": {
-      "title": "Mode Vies",
-      "description": "Trouve un maximum de pays sans te tromper."
-    },
     "quiz": {
       "title": "Quiz Géo",
       "description": "Une question du jour pour défier tes amis, ou enchaîne les questions à la difficulté de ton choix."
+    },
+    "survival": {
+      "title": "Survie",
+      "description": "Enchaîne des manches de plusieurs jeux : chaque erreur te coûte une vie."
     }
   },
   "modes": {
@@ -532,7 +532,8 @@
       "ascension": "Ascension",
       "daily": "Défi du jour",
       "infinite": "Infini",
-      "multi": "Multijoueur"
+      "multi": "Multijoueur",
+      "survival": "Survie"
     },
     "solved": "Trouvé",
     "failed": "Raté",
@@ -729,5 +730,58 @@
     "n_games": "{{count}} jeux",
     "next_game": "Lancer le jeu {{n}}",
     "waiting_next": "En attente du jeu suivant…"
+  },
+  "survival": {
+    "choose_games": "Manches",
+    "choose_lives": "Vies",
+    "pick_one_game": "Choisis au moins un jeu.",
+    "round_type": {
+      "PLACEMENT": "Trouve le pays",
+      "FLAGS": "Drapeau",
+      "CAPITALS": "Capitale",
+      "BORDER_GUESS": "Frontières",
+      "COUNTRY_CLUE": "Country Clue",
+      "QUIZ": "Quiz"
+    },
+    "prompt": {
+      "PLACEMENT": "Clique sur le pays",
+      "FLAGS": "À quel pays est ce drapeau ?",
+      "CAPITALS": "Quelle est sa capitale ?",
+      "BORDER_GUESS": "Quel pays a cette forme ?",
+      "COUNTRY_CLUE": "Trouve le pays mystère",
+      "QUIZ": "Question de quiz"
+    },
+    "round": "Manche {{n}}",
+    "rounds_short": "manches",
+    "rounds_count_one": "{{count}} manche",
+    "rounds_count_other": "{{count}} manches",
+    "lives_count_one": "{{count}} vie",
+    "lives_count_other": "{{count}} vies",
+    "correct": "Bravo !",
+    "answer_was": "C'était : {{answer}}",
+    "next": "Suivant →",
+    "give_up": "Passer (−1 ❤️)",
+    "life_lost": "Raté ! −1 vie",
+    "not_a_country": "Je ne reconnais pas ce pays.",
+    "capital_placeholder": "Nom de la capitale",
+    "clue_hint": "Propose des pays : chaque mauvaise proposition coûte une vie, mais donne des indices.",
+    "game_over": "Plus de vies !",
+    "victory": "Tu as survécu à toutes les manches !",
+    "rounds_survived": "Manches réussies",
+    "time": "Temps",
+    "lives_at_start": "Vies au départ",
+    "see_leaderboard": "Voir le classement Survie",
+    "leaderboard_title": "Classement Survie",
+    "all_combinations": "Toutes les combinaisons",
+    "all_six": "Les 6 jeux",
+    "no_scores": "Aucun score pour ce filtre.",
+    "col_player": "Joueur",
+    "col_rounds": "Manches",
+    "col_games": "Jeux",
+    "room_label": "Survie · {{lives}} ❤️",
+    "progress_lives": "{{lives}} ❤️",
+    "eliminated": "Éliminé",
+    "best": "Record : {{rounds}}",
+    "missed_answer": "Réponse manquée"
   }
 }

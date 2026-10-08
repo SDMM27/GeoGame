@@ -32,6 +32,7 @@ export const gameColors = {
   voyage_voyage: '#5FD4F4',
   ranking: '#FF9EC7',
   quiz: '#B4E05A',
+  survival: '#FF5C7A',
 } as const
 
 export const fonts = {

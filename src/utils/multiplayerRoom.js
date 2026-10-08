@@ -38,6 +38,7 @@ import {
 } from './multiplayerSeed'
 import { rankResults } from './multiplayerScoring'
 import { seededShuffle } from './prng'
+import { SURVIVAL_MAX_ROUNDS } from './survivalConfig'
 
 export const ROOM_FORMAT = 'app2'
 // 'app': rooms created before the players' secrets, still playable until firestore.rules close them (legacyOpen)
@@ -166,8 +167,10 @@ function continentPool(type, continent) {
  * What every player of a room gets: the same countries in the same order, drawn from the room's seed.
  * `list`: Placement / Flags / Capitals (standard or continent), Border Guess, Country Clue.
  * `byDifficulty`: Ascension. Quiz: neither, the questions are drawn by useQuizState from the seed.
+ * Survival: neither, the rounds are drawn by useSurvivalState from the seed; `total` is the most a run can last.
  */
 export function getRoomContent(game, seed) {
+  if (game.type === GAME_TYPES.SURVIVAL) return { list: null, byDifficulty: null, total: SURVIVAL_MAX_ROUNDS }
   if (SETUP_TYPES.includes(game.type)) {
     if (game.phases) {
       const byDifficulty = getSeededAscensionOverrides(game.phases, game.type, seed, 0)
@@ -191,7 +194,8 @@ export function getRoomContent(game, seed) {
   return { list: null, byDifficulty: null, total: game.count ?? 10 }
 }
 
-// Border Guess / Country Clue rank on countries found, then attempts, then time; the others on score, then time.
+// Border Guess / Country Clue rank on countries found, then attempts, then time; the others on score, then time
+// (Survival: rounds cleared, then time).
 export function roomScoringMode(game) {
   return game.type === GAME_TYPES.BORDER_GUESS || game.type === GAME_TYPES.COUNTRY_CLUE ? 'solved' : 'weighted'
 }

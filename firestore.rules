@@ -130,10 +130,11 @@ service cloud.firestore {
         function validGame(data) {
           return data.keys().hasOnly(['gameType', 'mode', 'score', 'attempts', 'solved', 'found', 'total', 'elapsedTime',
                                       'difficulty', 'continent', 'presetName', 'dailyKey', 'roomCode', 'correct',
-                                      'answered', 'bestStreak', 'optimal', 'errors', 'hints', 'totalError', 'playedAt'])
+                                      'answered', 'bestStreak', 'optimal', 'errors', 'hints', 'totalError', 'lives',
+                                      'playedAt'])
           && data.keys().hasAll(['gameType', 'mode', 'playedAt'])
           && validLabel(data.gameType)
-          && data.mode in ['standard', 'ascension', 'daily', 'infinite', 'multi']
+          && data.mode in ['standard', 'ascension', 'daily', 'infinite', 'multi', 'survival']
           && data.playedAt == request.time
           && (data.get('score', null) == null || inBounds(data.score, 1000000000))
           && (data.get('elapsedTime', null) == null || inRange(data.elapsedTime, 1000000000))
@@ -142,6 +143,7 @@ service cloud.firestore {
           && optionalCount(data, 'attempts') && optionalCount(data, 'found') && optionalCount(data, 'total')
           && optionalCount(data, 'correct') && optionalCount(data, 'answered') && optionalCount(data, 'bestStreak')
           && optionalCount(data, 'optimal') && optionalCount(data, 'errors') && optionalCount(data, 'hints')
+          && optionalCount(data, 'lives')
           && optionalLabel(data, 'difficulty') && optionalLabel(data, 'continent') && optionalLabel(data, 'presetName')
           && optionalLabel(data, 'dailyKey') && optionalLabel(data, 'roomCode');
         }
@@ -339,6 +341,29 @@ service cloud.firestore {
       allow update: if validScore(request.resource.data)
         && sameFields(['name', 'uid', 'difficulty', 'gameType', 'continent'])
         && isBetter(request.resource.data.score, request.resource.data.get('elapsedTime', null),
+                    resource.data.score, resource.data.get('elapsedTime', null));
+    }
+
+    // Survival scores: { name, uid?, modes, lives, score, elapsedTime }, the best one per player, set of games and lives.
+    // `modes` names the games of the rounds ('FLAGS+QUIZ', see survivalModesKey in src/utils/survivalConfig.js); `score`
+    // counts the rounds cleared, at most SURVIVAL_MAX_ROUNDS (300), and a round can't be cleared in less than 300 ms.
+    match /survival_scores/{scoreId} {
+      function validSurvival(data) {
+        return data.keys().hasOnly(['name', 'uid', 'modes', 'lives', 'score', 'elapsedTime'])
+          && data.keys().hasAll(['name', 'modes', 'lives', 'score', 'elapsedTime'])
+          && validName(data.name)
+          && validOwner(data)
+          && validSurvivalModes(data.modes)
+          && data.lives in [1, 3, 5, 10]
+          && data.score is int && data.score >= 1 && data.score <= 300
+          && inRange(data.elapsedTime, 1000000000) && data.elapsedTime >= data.score * 300;
+      }
+
+      allow read: if true;
+      allow create: if validSurvival(request.resource.data);
+      allow update: if validSurvival(request.resource.data)
+        && sameFields(['name', 'uid', 'modes', 'lives'])
+        && isBetter(request.resource.data.score, request.resource.data.elapsedTime,
                     resource.data.score, resource.data.get('elapsedTime', null));
     }
 
@@ -613,6 +638,12 @@ service cloud.firestore {
       return value == null || (value is string && value.size() <= 60);
     }
 
+    // Games of a survival run, in setup order: 'PLACEMENT+FLAGS+QUIZ' (survivalModesKey in src/utils/survivalConfig.js).
+    function validSurvivalModes(modes) {
+      return modes is string && modes.size() <= 80
+        && modes.matches('^(PLACEMENT|FLAGS|CAPITALS|BORDER_GUESS|COUNTRY_CLUE|QUIZ)([+](PLACEMENT|FLAGS|CAPITALS|BORDER_GUESS|COUNTRY_CLUE|QUIZ))*$');
+    }
+
     // Ascension phases: the number of countries per difficulty.
     function validPhases(phases) {
       return phases is map
@@ -624,14 +655,16 @@ service cloud.firestore {
     function validRoomGame(game) {
       return game is map
         && game.keys().hasOnly(['id', 'type', 'difficulty', 'continent', 'phases', 'presetName', 'count',
-                                'quizDifficulty', 'answerMode'])
+                                'quizDifficulty', 'answerMode', 'modes', 'lives'])
         && game.id is string && game.id.size() > 0 && game.id.size() <= 60
         && game.type is string && game.type.size() > 0 && game.type.size() <= 60
         && shortOrNull(game.get('difficulty', null)) && shortOrNull(game.get('continent', null))
         && shortOrNull(game.get('presetName', null)) && shortOrNull(game.get('quizDifficulty', null))
         && (game.get('answerMode', null) == null || game.answerMode in ['choices', 'free'])
         && (game.get('count', null) == null || (isNumber(game.count) && game.count >= 1 && game.count <= 300))
-        && (game.get('phases', null) == null || validPhases(game.phases));
+        && (game.get('phases', null) == null || validPhases(game.phases))
+        && (game.get('modes', null) == null || validSurvivalModes(game.modes))
+        && (game.get('lives', null) == null || game.lives in [1, 3, 5, 10]);
     }
 
     // players.{id}: { pseudo, uid?, seenAt? }; seenAt is the heartbeat, always the server time.
@@ -790,13 +823,14 @@ service cloud.firestore {
           && request.resource.data.at == request.time;
       }
 
-      // progress/{playerId}: { gameIndex, found, total, finished, lastSeen, expiresAt }
+      // progress/{playerId}: { gameIndex, found, total, finished, lives?, lastSeen, expiresAt } (lives: survival)
       match /progress/{playerId} {
         function validProgress(data) {
-          return data.keys().hasOnly(['gameIndex', 'found', 'total', 'finished', 'lastSeen', 'expiresAt'])
+          return data.keys().hasOnly(['gameIndex', 'found', 'total', 'finished', 'lives', 'lastSeen', 'expiresAt'])
             && data.keys().hasAll(['gameIndex', 'found', 'total', 'finished'])
             && inRange(data.gameIndex, 19) && inRange(data.found, 1000) && inRange(data.total, 1000)
             && data.finished is bool
+            && (data.get('lives', null) == null || inRange(data.lives, 10))
             && (data.get('lastSeen', null) == null || data.lastSeen == request.time);
         }
 
@@ -860,7 +894,7 @@ service cloud.firestore {
           && (request.auth != null
               ? data.reporter == request.auth.uid
               : data.reporter.matches('^v-[A-Za-z0-9-]{8,64}$'))
-          && data.targetCollection in ['scores', 'ascension_scores', 'daily_scores']
+          && data.targetCollection in ['scores', 'ascension_scores', 'daily_scores', 'survival_scores']
           && data.targetId is string && data.targetId.matches('^[A-Za-z0-9]{1,64}$')
           && reportId == data.reporter + '_' + data.targetCollection + '_' + data.targetId
           && (data.get('targetName', null) == null || (data.targetName is string && data.targetName.size() <= 60))

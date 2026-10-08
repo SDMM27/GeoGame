@@ -5,7 +5,7 @@ import { useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native'
-import Animated, { FadeIn, FadeInDown, LinearTransition, ZoomIn } from 'react-native-reanimated'
+import Animated, { FadeIn, LinearTransition, ZoomIn } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import useBorderGuessState from '@shared/hooks/useBorderGuessState'
@@ -15,6 +15,7 @@ import { getCountryName } from '@shared/utils/getCountryName'
 
 import { DailyLeaderboard } from '@/components/game/DailyLeaderboard'
 import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
+import { BorderGuessRow, type BorderGuess } from '@/components/game/GuessCards'
 import { GuessInputBar } from '@/components/game/GuessInputBar'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
 import { CountrySilhouette } from '@/components/map/CountrySilhouette'
@@ -28,49 +29,6 @@ import { navigate } from '@/shims/react-router-dom'
 import { colors, gameColors, radius, space } from '@/theme'
 
 const ACCENT = gameColors.border_guess
-
-type Guess = {
-  value: string
-  iso: string | null
-  isCorrect: boolean
-  distanceKm: number | null
-  direction: string | null
-  directionArrow: string | null
-}
-
-// The latest guess is highlighted: it tells where to look next.
-function GuessRow({ guess, index, latest }: { guess: Guess; index: number; latest: boolean }) {
-  const { t, i18n } = useTranslation()
-  const name = (guess.iso && getCountryName(guess.iso, i18n.language)) || guess.value
-  const color = guess.isCorrect ? colors.accent : colors.danger
-  return (
-    <Animated.View
-      entering={FadeInDown.springify().damping(18)}
-      layout={LinearTransition.springify()}
-      style={[styles.guess, latest && !guess.isCorrect && styles.guessLatest]}>
-      <Text variant="caption" style={{ width: 22 }}>
-        {index + 1}
-      </Text>
-      <MaterialCommunityIcons name={guess.isCorrect ? 'check-circle' : 'close-circle'} size={18} color={color} />
-      <Text variant="bodyStrong" numberOfLines={1} style={{ flex: 1 }}>
-        {name}
-      </Text>
-      {!guess.isCorrect && guess.distanceKm != null && (
-        <View style={styles.hint}>
-          {guess.directionArrow && (
-            <Text variant="bodyStrong" color={ACCENT} style={latest && { fontSize: 22, lineHeight: 26 }}>
-              {guess.directionArrow}
-            </Text>
-          )}
-          <Text variant={latest ? 'bodyStrong' : 'caption'} style={{ fontVariant: ['tabular-nums'] }}>
-            {guess.distanceKm.toLocaleString(i18n.language)} km
-            {guess.direction ? ` · ${t(`mobile.directions.${guess.direction}`)}` : ''}
-          </Text>
-        </View>
-      )}
-    </Animated.View>
-  )
-}
 
 export default function BorderGuessScreen() {
   const { mode = 'daily', room } = useLocalSearchParams<{ mode?: string; room?: string }>()
@@ -106,7 +64,7 @@ function BorderGuessGame({ mode, play }: { mode: string; play?: RoomPlay }) {
     isCurrent: currentCountry === rounds.country,
     isComplete,
     isSolved,
-    wrongGuesses: (guesses as Guess[]).filter((guess) => !guess.isCorrect).length,
+    wrongGuesses: (guesses as BorderGuess[]).filter((guess) => !guess.isCorrect).length,
   })
   const [leaderboardVersion, setLeaderboardVersion] = useState(0)
   const elapsed = useElapsed(play ? rounds.startedAt : startedAt, (isDaily && hasStarted && !isComplete) || (!!play && rounds.endedAt == null))
@@ -181,9 +139,9 @@ function BorderGuessGame({ mode, play }: { mode: string; play?: RoomPlay }) {
               </Text>
             ) : (
               [...guesses]
-                .map((guess: Guess, index: number) => ({ guess, index }))
+                .map((guess: BorderGuess, index: number) => ({ guess, index }))
                 .reverse()
-                .map(({ guess, index }) => <GuessRow key={`${guess.value}-${index}`} guess={guess} index={index} latest={index === guesses.length - 1} />)
+                .map(({ guess, index }) => <BorderGuessRow key={`${guess.value}-${index}`} guess={guess} index={index} latest={index === guesses.length - 1} />)
             )}
           </View>
         </ScrollView>
@@ -255,7 +213,7 @@ function BorderGuessGame({ mode, play }: { mode: string; play?: RoomPlay }) {
                   dailyKey,
                   attempts: guesses.length,
                   elapsedTime,
-                  guesses: guesses.map((guess: Guess) => guess.value),
+                  guesses: guesses.map((guess: BorderGuess) => guess.value),
                 }
               : null
           }
@@ -309,17 +267,4 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  guess: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space.sm,
-    paddingVertical: space.md,
-    paddingHorizontal: space.lg,
-    borderRadius: radius.md,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  guessLatest: { borderColor: ACCENT, backgroundColor: `${ACCENT}14` },
-  hint: { flexDirection: 'row', alignItems: 'center', gap: 6 },
 })

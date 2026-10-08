@@ -12,6 +12,8 @@ import { QUIZ_DIFFICULTIES } from '../../utils/quizQuestions'
 import { getTotalCountries } from '../../hooks/useGameState'
 import { getTotalFlagCountries } from '../../hooks/useFlagGameState'
 import { getTotalCapitalCountries } from '../../hooks/useCapitalsGameState'
+import { DEFAULT_SURVIVAL_LIVES, SURVIVAL_ROUND_TYPES, parseSurvivalModes, survivalModesKey } from '../../utils/survivalConfig'
+import SurvivalOptions, { SURVIVAL_ROUND_ICONS } from '../SurvivalOptions'
 import './RoomConfig.css'
 
 const DEFAULT_ASCENSION_PRESET = ASCENSION_PRESETS.find(p => p.name === 'Progressif') ?? ASCENSION_PRESETS[1]
@@ -24,6 +26,7 @@ export const ROOM_GAMES = [
   { id: 'border_guess', type: GAME_TYPES.BORDER_GUESS, icon: '🧩' },
   { id: 'country_clue', type: GAME_TYPES.COUNTRY_CLUE, icon: '🧭' },
   { id: 'quiz', type: GAME_TYPES.QUIZ, icon: '❓' },
+  { id: 'survival', type: GAME_TYPES.SURVIVAL, icon: '❤️' },
 ]
 
 const SETUP_TYPES = [GAME_TYPES.PLACEMENT, GAME_TYPES.FLAGS, GAME_TYPES.CAPITALS]
@@ -128,16 +131,18 @@ export const newDraft = () => ({
   count: 10,
   quizDifficulty: 'Moyen',
   answerMode: 'choices',
+  survival: { modes: SURVIVAL_ROUND_TYPES, lives: DEFAULT_SURVIVAL_LIVES },
 })
 
 const typeOf = (gameId) => ROOM_GAMES.find(g => g.id === gameId).type
 
-// An Ascension game needs at least one country
-export const draftReady = ({ gameId, setup }) =>
+// An Ascension game needs at least one country, a survival game at least one kind of round
+export const draftReady = ({ gameId, setup, survival }) =>
   !(SETUP_TYPES.includes(typeOf(gameId)) && setup.mode === 'ascension' && Object.values(setup.phases).every(n => !n))
+  && !(typeOf(gameId) === GAME_TYPES.SURVIVAL && survival.modes.length === 0)
 
 /** A game of the room, in the shared format (src/utils/multiplayerRoom.js). */
-export function buildRoomGame({ gameId, setup, count, quizDifficulty, answerMode }) {
+export function buildRoomGame({ gameId, setup, count, quizDifficulty, answerMode, survival }) {
   const type = typeOf(gameId)
   const ascension = SETUP_TYPES.includes(type) && setup.mode === 'ascension'
   const game = {
@@ -148,14 +153,19 @@ export function buildRoomGame({ gameId, setup, count, quizDifficulty, answerMode
     phases: ascension ? setup.phases : null,
     presetName: ascension ? (matchPreset(setup.phases) ?? null) : null,
   }
+  if (type === GAME_TYPES.SURVIVAL) return { ...game, modes: survivalModesKey(survival.modes), lives: survival.lives }
   if (!SETUP_TYPES.includes(type)) game.count = count
   if (type === GAME_TYPES.QUIZ) Object.assign(game, { quizDifficulty, answerMode })
   return game
 }
 
-/** "🚩 Trouve le Drapeau · Moyen" */
+/** "🚩 Trouve le Drapeau · Moyen", "❤️ Survie · 3 ❤️ · 🚩🧠" */
 export function gameLabel(game, t) {
   const icon = ROOM_GAMES.find(g => g.id === game.id)?.icon ?? '🎮'
+  if (game.type === GAME_TYPES.SURVIVAL) {
+    const rounds = parseSurvivalModes(game.modes).map(type => SURVIVAL_ROUND_ICONS[type]).join('')
+    return `${icon} ${t('games.survival.title')} · ${game.lives} ❤️ · ${rounds}`
+  }
   const settings = game.phases
     ? 'Ascension'
     : game.continent
@@ -169,9 +179,10 @@ export function gameLabel(game, t) {
 /** One game: which one, and its options. */
 export function GameEditor({ draft, onChange }) {
   const { t } = useTranslation()
-  const { gameId, setup, count, quizDifficulty, answerMode } = draft
+  const { gameId, setup, count, quizDifficulty, answerMode, survival } = draft
   const type = typeOf(gameId)
   const isQuiz = type === GAME_TYPES.QUIZ
+  const isSurvival = type === GAME_TYPES.SURVIVAL
   const set = (patch) => onChange({ ...draft, ...patch })
 
   return (
@@ -191,6 +202,10 @@ export function GameEditor({ draft, onChange }) {
       </div>
 
       {SETUP_TYPES.includes(type) && <SetupSettings type={type} setup={setup} onChange={next => set({ setup: next })} />}
+
+      {isSurvival && (
+        <SurvivalOptions modes={survival.modes} lives={survival.lives} onChange={update => set({ survival: update(survival) })} />
+      )}
 
       {isQuiz && (
         <>
@@ -216,7 +231,7 @@ export function GameEditor({ draft, onChange }) {
         </>
       )}
 
-      {!SETUP_TYPES.includes(type) && (
+      {!SETUP_TYPES.includes(type) && !isSurvival && (
         <>
           <h3 className="rc-games-title">{t(isQuiz ? 'mp_room.questions_count' : 'mp_room.countries_count')}</h3>
           <Choices

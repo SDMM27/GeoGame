@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatTime } from '../../../utils/formatTime'
+import { GAME_TYPES } from '../../../utils/gameTypes'
 import {
   overallStandings,
   progressForGame,
@@ -14,10 +15,19 @@ const MEDALS = ['🥇', '🥈', '🥉']
 
 function resultLine(game, result, t) {
   const time = formatTime(result.elapsedTime ?? 0).slice(0, 5)
+  if (game.type === GAME_TYPES.SURVIVAL) return `${t('survival.rounds_count', { count: result.weightedScore ?? 0 })} · ${time}`
   if (roomScoringMode(game) === 'solved') {
     return `${result.countriesSolved}/${result.total} · ${t('mp_room.errors', { count: result.attempts })} · ${time}`
   }
   return `${Math.round(result.weightedScore)} ${t('units.pts')} · ${time}`
+}
+
+// A player still in the game: countries found, or rounds cleared and lives left (survival).
+function liveLine(game, entry, t) {
+  if (game.type === GAME_TYPES.SURVIVAL) {
+    return `${t('mp_room.playing')} · ${t('survival.rounds_count', { count: entry.found ?? 0 })} · ${entry.lives ?? game.lives} ❤️`
+  }
+  return `${t('mp_room.playing')} · ${entry.found ?? 0}/${entry.total ?? '?'}`
 }
 
 /** Standings of game `index`: results, then the players still playing it or who did not play it yet. */
@@ -52,7 +62,7 @@ export function Standings({ room, progress, results, playerId, index }) {
             {id === playerId && ` (${t('mp_room.you')})`}
           </span>
           <span className="mpr-score">
-            {live[id] ? `${t('mp_room.playing')} · ${live[id].found ?? 0}/${live[id].total ?? '?'}` : t('mp_room.not_played')}
+            {live[id] ? liveLine(game, live[id], t) : t('mp_room.not_played')}
           </span>
         </li>
       ))}

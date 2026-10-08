@@ -6,7 +6,7 @@ import { useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native'
-import Animated, { FadeIn, FadeInDown, LinearTransition } from 'react-native-reanimated'
+import Animated, { FadeIn } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import useCountryClueState from '@shared/hooks/useCountryClueState'
@@ -16,6 +16,7 @@ import { getCapitalName, getCountryName } from '@shared/utils/getCountryName'
 
 import { DailyLeaderboard } from '@/components/game/DailyLeaderboard'
 import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
+import { ClueGuessCard, type ClueGuess } from '@/components/game/GuessCards'
 import { GuessInputBar } from '@/components/game/GuessInputBar'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
 import { GuessesMap } from '@/components/map/GuessesMap'
@@ -29,107 +30,6 @@ import { navigate } from '@/shims/react-router-dom'
 import { colors, gameColors, radius, space } from '@/theme'
 
 const ACCENT = gameColors.country_clue
-
-type Tone = 'match' | 'higher' | 'lower' | 'neutral'
-type Hint = { arrow: string; tone: Tone }
-type Guess = {
-  value: string
-  isoA2: string | null
-  isCorrect: boolean
-  distanceKm: number | null
-  direction: string | null
-  directionArrow: string
-  hemisphereHint: Hint
-  areaHint: Hint
-  areaLabel: string
-  populationHint: Hint
-  populationLabel: string
-}
-
-const TONE_COLORS: Record<Tone, string> = {
-  match: colors.accent,
-  higher: colors.warning,
-  lower: colors.warning,
-  neutral: colors.textMuted,
-}
-
-// The hook's hint labels are French-only: rebuild them from the tone.
-function hintLabel(t: (key: string) => string, metric: 'hemisphere' | 'area' | 'population', guess: Guess, hint: Hint) {
-  if (guess.isCorrect) return t('mobile.clue.exact')
-  return t(`mobile.clue.${metric}_${hint.tone}`)
-}
-
-function HintChip({ label, hint, text, detail }: { label: string; hint: Hint; text: string; detail?: string }) {
-  const color = TONE_COLORS[hint.tone]
-  return (
-    <View style={[styles.chip, { borderColor: `${color}55`, backgroundColor: `${color}12` }]}>
-      <Text variant="label" style={{ fontSize: 10 }}>
-        {label}
-      </Text>
-      <Text variant="bodyStrong" color={color} numberOfLines={2} style={{ fontSize: 13, lineHeight: 17 }}>
-        {hint.arrow} {text}
-      </Text>
-      {detail ? (
-        <Text variant="caption" numberOfLines={1} style={{ fontSize: 12 }}>
-          {detail}
-        </Text>
-      ) : null}
-    </View>
-  )
-}
-
-function GuessCard({ guess, index }: { guess: Guess; index: number }) {
-  const { t, i18n } = useTranslation()
-  const name = (guess.isoA2 && getCountryName(guess.isoA2, i18n.language)) || guess.value
-  const flag = getFlag(guess.isoA2)
-  return (
-    <Animated.View
-      entering={FadeInDown.springify().damping(18)}
-      layout={LinearTransition.springify()}
-      style={[styles.card, guess.isCorrect && { borderColor: colors.accent }]}>
-      <View style={styles.cardHeader}>
-        <Text variant="caption" style={{ width: 18 }}>
-          {index + 1}
-        </Text>
-        {flag && <Image source={flag} contentFit="cover" style={styles.flag} />}
-        <Text variant="bodyStrong" numberOfLines={1} style={{ flex: 1 }}>
-          {name}
-        </Text>
-        {guess.isCorrect ? (
-          <MaterialCommunityIcons name="check-circle" size={20} color={colors.accent} />
-        ) : (
-          <View style={styles.distance}>
-            <Text variant="bodyStrong" color={ACCENT}>
-              {guess.directionArrow}
-            </Text>
-            <Text variant="bodyStrong" style={{ fontVariant: ['tabular-nums'] }}>
-              {guess.distanceKm?.toLocaleString(i18n.language)} km
-            </Text>
-          </View>
-        )}
-      </View>
-      {!guess.isCorrect && (
-        <>
-          {guess.direction && (
-            <Text variant="caption">
-              {t('country_clue.metric_direction')} : {t(`mobile.directions.${guess.direction}`)}
-            </Text>
-          )}
-          <View style={styles.chips}>
-            <HintChip label={t('country_clue.metric_hemisphere')} hint={guess.hemisphereHint} text={hintLabel(t, 'hemisphere', guess, guess.hemisphereHint)} />
-            <HintChip label={t('country_clue.metric_area')} hint={guess.areaHint} text={hintLabel(t, 'area', guess, guess.areaHint)} detail={guess.areaLabel} />
-            <HintChip
-              label={t('country_clue.metric_population')}
-              hint={guess.populationHint}
-              text={hintLabel(t, 'population', guess, guess.populationHint)}
-              detail={guess.populationLabel}
-            />
-          </View>
-        </>
-      )}
-    </Animated.View>
-  )
-}
 
 function AnswerCard({ iso, name, capital, solved }: { iso: string | null; name: string; capital: string; solved: boolean }) {
   const { t } = useTranslation()
@@ -184,7 +84,7 @@ function CountryClueGame({ mode, play }: { mode: string; play?: RoomPlay }) {
     isCurrent: !!rounds.country && currentCountryISO === rounds.country.properties.ISO_A2,
     isComplete,
     isSolved,
-    wrongGuesses: (guesses as Guess[]).filter((guess) => !guess.isCorrect).length,
+    wrongGuesses: (guesses as ClueGuess[]).filter((guess) => !guess.isCorrect).length,
   })
   const [leaderboardVersion, setLeaderboardVersion] = useState(0)
 
@@ -197,7 +97,7 @@ function CountryClueGame({ mode, play }: { mode: string; play?: RoomPlay }) {
   const capital = getCapitalName(currentCountryISO, i18n.language) || answerCapital
   const attemptsLabel = guesses.length === 1 ? t('units.attempt_one') : t('units.attempt_other')
   const mapGuesses = [
-    ...(guesses as Guess[]).map((guess) => ({ name: guess.value, correct: guess.isCorrect })),
+    ...(guesses as ClueGuess[]).map((guess) => ({ name: guess.value, correct: guess.isCorrect })),
     ...(isLost ? [{ name: answerName, correct: true }] : []),
   ]
   const recap = (
@@ -256,10 +156,10 @@ function CountryClueGame({ mode, play }: { mode: string; play?: RoomPlay }) {
                     {t('labels.no_attempts')}
                   </Text>
                 )
-              : (guesses as Guess[])
+              : (guesses as ClueGuess[])
                   .map((guess, index) => ({ guess, index }))
                   .reverse()
-                  .map(({ guess, index }) => <GuessCard key={`${guess.value}-${index}`} guess={guess} index={index} />)}
+                  .map(({ guess, index }) => <ClueGuessCard key={`${guess.value}-${index}`} guess={guess} index={index} />)}
           </View>
         </ScrollView>
 
@@ -327,7 +227,7 @@ function CountryClueGame({ mode, play }: { mode: string; play?: RoomPlay }) {
                   dailyKey,
                   attempts: guesses.length,
                   elapsedTime,
-                  guesses: (guesses as Guess[]).map((guess) => guess.value),
+                  guesses: (guesses as ClueGuess[]).map((guess) => guess.value),
                 }
               : null
           }
@@ -361,19 +261,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  card: {
-    gap: space.sm,
-    padding: space.md,
-    borderRadius: radius.md,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  cardHeader: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
-  flag: { width: 24, height: 16, borderRadius: 3 },
-  distance: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  chips: { flexDirection: 'row', gap: space.sm },
-  chip: { flex: 1, minWidth: 0, gap: 2, padding: space.sm, borderRadius: radius.sm, borderWidth: 1 },
   answer: {
     flexDirection: 'row',
     alignItems: 'center',

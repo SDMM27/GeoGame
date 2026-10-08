@@ -7,4 +7,5 @@ export const GAME_TYPES = {
     RANKING: 'RANKING',
     VOYAGE_VOYAGE: 'VOYAGE_VOYAGE',
     QUIZ: 'QUIZ',
+    SURVIVAL: 'SURVIVAL',
 };

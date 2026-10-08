@@ -264,3 +264,37 @@ describe('daily scores', () => {
     await assertFails(as('alice').doc(best.path).set(rankings({ dailyKey: 'z', score: 4, attemptsUsed: 1 })))
   })
 })
+
+const survivals = (overrides = {}) =>
+  clean({ name: 'Alice', uid: 'alice', modes: 'FLAGS+QUIZ', lives: 3, score: 12, elapsedTime: 90000, ...overrides })
+
+describe('survival scores', () => {
+  it('accepts a run of any set of games and lives, signed in or as a visitor', async () => {
+    await assertSucceeds(as('alice').collection('survival_scores').add(survivals()))
+    await assertSucceeds(as('alice').collection('survival_scores').add(survivals({ modes: 'PLACEMENT+FLAGS+CAPITALS+BORDER_GUESS+COUNTRY_CLUE+QUIZ', lives: 10 })))
+    await assertSucceeds(anonymous().collection('survival_scores').add(survivals({ name: 'Zoe', uid: undefined, modes: 'CAPITALS', lives: 1 })))
+  })
+
+  it('refuses unknown games or lives', async () => {
+    await assertFails(as('alice').collection('survival_scores').add(survivals({ modes: 'FLAGS+CHEAT' })))
+    await assertFails(as('alice').collection('survival_scores').add(survivals({ modes: '' })))
+    await assertFails(as('alice').collection('survival_scores').add(survivals({ lives: 2 })))
+    await assertFails(as('alice').collection('survival_scores').add(survivals({ lives: 100 })))
+  })
+
+  it('refuses more rounds than a run has, an empty run, and a run too fast', async () => {
+    await assertSucceeds(as('alice').collection('survival_scores').add(survivals({ score: 300, elapsedTime: 90000 })))
+    await assertFails(as('alice').collection('survival_scores').add(survivals({ score: 301, elapsedTime: 900000 })))
+    await assertFails(as('alice').collection('survival_scores').add(survivals({ score: 0 })))
+    await assertFails(as('alice').collection('survival_scores').add(survivals({ score: 12, elapsedTime: 3000 })))
+    await assertFails(as('alice').collection('survival_scores').add(survivals({ elapsedTime: undefined })))
+  })
+
+  it('only replaces a run with a better one of the same games and lives', async () => {
+    const ref = await as('alice').collection('survival_scores').add(survivals())
+    await assertSucceeds(as('alice').doc(ref.path).set(survivals({ score: 15, elapsedTime: 100000 })))
+    await assertFails(as('alice').doc(ref.path).set(survivals({ score: 10 })))
+    await assertFails(as('alice').doc(ref.path).set(survivals({ score: 20, lives: 5 })))
+    await assertFails(as('alice').doc(ref.path).set(survivals({ score: 20, modes: 'FLAGS' })))
+  })
+})

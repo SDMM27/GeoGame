@@ -82,6 +82,11 @@ export function getCountryByName(name) {
   return COUNTRY_CLUE_COUNTRIES.find((country) => country.properties.ADMIN === name) ?? null
 }
 
+/** The Country Clue country a typed name designates (any language), or null. */
+export function findCountryClueCountry(input) {
+  return COUNTRY_LOOKUP.get(normalize(input.trim())) ?? null
+}
+
 function hashString(value) {
   let hash = 0
   for (let index = 0; index < value.length; index += 1) {
@@ -260,7 +265,7 @@ function isoToFlag(isoA2) {
     .join('')
 }
 
-function buildGuessRecord(guessInput, targetName) {
+export function buildGuessRecord(guessInput, targetName) {
   const guessedName = guessInput?.value
   const normalizedInput = guessInput?.normalizedInput ?? normalize(guessedName ?? '')
   const isCorrect = Boolean(guessInput?.isCorrect || (guessedName && guessedName === targetName))

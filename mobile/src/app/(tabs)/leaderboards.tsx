@@ -1,4 +1,4 @@
-// Rankings tab: the website's leaderboards (solo per game / difficulty / continent, Ascension, daily challenges).
+// Rankings tab: the website's leaderboards (solo per game / difficulty / continent, Ascension, daily challenges, Survival).
 import { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { RefreshControl, ScrollView, View } from 'react-native'
@@ -17,22 +17,27 @@ import {
   DIFFICULTIES,
 } from '@shared/utils/leaderboards'
 import { dayKey } from '@shared/utils/profileStats'
+import { DEFAULT_SURVIVAL_LIVES, SURVIVAL_LIVES, SURVIVAL_ROUND_TYPES, survivalModesKey } from '@shared/utils/survivalConfig'
 
 import { DailyLeaderboard } from '@/components/game/DailyLeaderboard'
 import { RankingLeaderboard } from '@/components/game/RankingLeaderboard'
 import { AscensionLeaderboard } from '@/components/leaderboards/AscensionLeaderboard'
 import { FilterChips, type Chip } from '@/components/leaderboards/LeaderboardParts'
 import { SoloLeaderboard } from '@/components/leaderboards/SoloLeaderboard'
+import { SurvivalLeaderboard } from '@/components/leaderboards/SurvivalLeaderboard'
 import { LanguageButton } from '@/components/LanguageButton'
 import { Segmented, Text } from '@/components/ui'
-import { GAMES, DIFFICULTY_COLORS } from '@/games'
+import { GAMES, DIFFICULTY_COLORS, getGameByType } from '@/games'
 import { colors, space } from '@/theme'
 
-type Section = 'solo' | 'ascension' | 'daily'
+type Section = 'solo' | 'ascension' | 'daily' | 'survival'
 type SoloMode = 'difficulty' | 'continent'
 
 const SOLO_GAMES = GAMES.filter((game) => game.kind === 'setup')
 const DAILY_GAMES = GAMES.filter((game) => game.kind === 'daily')
+// Survival: every set of games together, the six mixed, or one game alone
+const ALL_SURVIVAL_MODES = 'all'
+const ALL_SIX = survivalModesKey(SURVIVAL_ROUND_TYPES)
 const CONTINENT_COLORS = Object.fromEntries(CONTINENTS.map(({ name, color }: { name: string; color: string }) => [name, color]))
 
 export default function LeaderboardsScreen() {
@@ -47,6 +52,8 @@ export default function LeaderboardsScreen() {
   const [ascensionGame, setAscensionGame] = useState<string>(ALL_GAMES)
   const [preset, setPreset] = useState<string>(ALL_PRESETS)
   const [dailyGame, setDailyGame] = useState<string>(DAILY_GAMES[0].type)
+  const [survivalLives, setSurvivalLives] = useState(String(DEFAULT_SURVIVAL_LIVES))
+  const [survivalModes, setSurvivalModes] = useState<string>(ALL_SURVIVAL_MODES)
   const todayKey = useMemo(() => dayKey(), [])
   const [day, setDay] = useState(todayKey)
 
@@ -85,6 +92,7 @@ export default function LeaderboardsScreen() {
           { value: 'solo', label: t('mobile.leaderboards.solo') },
           { value: 'ascension', label: t('mobile.setup.ascension') },
           { value: 'daily', label: t('mobile.leaderboards.daily') },
+          { value: 'survival', label: t('games.survival.title') },
         ]}
       />
 
@@ -140,6 +148,35 @@ export default function LeaderboardsScreen() {
             onChange={setPreset}
           />
           <AscensionLeaderboard filters={{ game: ascensionGame, preset }} allGames={ALL_GAMES} refreshKey={refreshKey} onSettled={onSettled} />
+        </>
+      )}
+
+      {section === 'survival' && (
+        <>
+          <FilterChips
+            label={t('survival.choose_lives')}
+            options={SURVIVAL_LIVES.map((count: number) => ({ value: String(count), label: t('survival.lives_count', { count }) }))}
+            value={survivalLives}
+            onChange={setSurvivalLives}
+          />
+          <FilterChips
+            label={t('survival.choose_games')}
+            options={[
+              { value: ALL_SURVIVAL_MODES, label: t('survival.all_combinations'), icon: 'view-grid-outline' },
+              { value: ALL_SIX, label: t('survival.all_six'), icon: 'shuffle-variant' },
+              ...SURVIVAL_ROUND_TYPES.map((type: string) => {
+                const game = getGameByType(type)!
+                return { value: type, label: t(`survival.round_type.${type}`), color: game.color, icon: game.icon }
+              }),
+            ]}
+            value={survivalModes}
+            onChange={setSurvivalModes}
+          />
+          <SurvivalLeaderboard
+            filters={{ lives: Number(survivalLives), modes: survivalModes === ALL_SURVIVAL_MODES ? null : survivalModes }}
+            refreshKey={refreshKey}
+            onSettled={onSettled}
+          />
         </>
       )}
 

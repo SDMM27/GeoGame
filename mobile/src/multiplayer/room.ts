@@ -24,6 +24,9 @@ export type RoomGame = {
   // Quiz only
   quizDifficulty?: string
   answerMode?: 'choices' | 'free'
+  // Survival only: the games of the rounds ('FLAGS+QUIZ', see survivalModesKey) and the lives
+  modes?: string
+  lives?: number
 }
 
 // `uid`: the player's account, when signed in. `seenAt`: lobby heartbeat.
@@ -59,7 +62,8 @@ export type GameResult = {
 
 export type PlayerResult = GameResult & { playerId: string; pseudo: string; gameIndex?: number }
 
-export type PlayerProgress = { gameIndex: number; found: number; total: number; finished: boolean }
+// `lives`: survival only, the lives left
+export type PlayerProgress = { gameIndex: number; found: number; total: number; finished: boolean; lives?: number }
 
 const PLAYER_ID_KEY = 'mp_player_id'
 const PSEUDO_KEY = 'geogame_pseudo'

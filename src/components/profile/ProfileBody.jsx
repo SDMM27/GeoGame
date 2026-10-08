@@ -17,6 +17,7 @@ export const GAME_META = {
   [GAME_TYPES.VOYAGE_VOYAGE]: { emoji: '✈️', titleKey: 'games.voyage_voyage.title', color: '#5FD4F4' },
   [GAME_TYPES.RANKING]: { emoji: '🏆', titleKey: 'games.ranking.title', color: '#FF9EC7' },
   [GAME_TYPES.QUIZ]: { emoji: '🧠', titleKey: 'games.quiz.title', color: '#B4E05A' },
+  [GAME_TYPES.SURVIVAL]: { emoji: '❤️', titleKey: 'games.survival.title', color: '#FF5C7A' },
 }
 
 const AVATAR_COLORS = ['#3DDC97', '#7AA2FF', '#FF7A6B', '#F5B83D', '#C792FF', '#5FD4F4', '#FF9EC7', '#B4E05A']
@@ -216,7 +217,7 @@ function ByGame({ stats }) {
         {entries.map(([type, gameStats]) => {
           const meta = GAME_META[type]
           if (!meta) return null
-          const best = describeBest(gameStats, t)
+          const best = describeBest(gameStats, t, type)
           return (
             <li key={type} className="profile-game-row">
               <span className="profile-game-icon" style={{ background: `${meta.color}1F` }}>{meta.emoji}</span>

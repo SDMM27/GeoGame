@@ -43,6 +43,7 @@ beforeEach(async () => {
     await db.doc('scores/score1').set({ name: 'Zoe', score: 10, difficulty: 'Facile', gameType: 'PLACEMENT' })
     await db.doc('ascension_scores/asc1').set({ name: 'Zoe' })
     await db.doc('daily_scores/daily1').set({ name: 'Zoe' })
+    await db.doc('survival_scores/surv1').set({ name: 'Zoe' })
   })
 })
 
@@ -51,6 +52,7 @@ describe('reports', () => {
     await assertSucceeds(send(as('bob')))
     await assertSucceeds(send(as('bob'), { targetCollection: 'ascension_scores', targetId: 'asc1', reason: 'offensive_name' }))
     await assertSucceeds(send(as('bob'), { targetCollection: 'daily_scores', targetId: 'daily1', reason: 'other' }))
+    await assertSucceeds(send(as('bob'), { targetCollection: 'survival_scores', targetId: 'surv1', reason: 'cheating' }))
   })
 
   it('lets a visitor report, under an id made of v- and the id kept on the device', async () => {

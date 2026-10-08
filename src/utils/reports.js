@@ -9,7 +9,7 @@ import { firestore } from '../Firebase'
 export const REPORT_REASONS = ['offensive_name', 'cheating', 'other']
 export const REPORT_NOTE_MAX = 200
 // The leaderboard collections whose entries can be reported.
-export const REPORTABLE = ['scores', 'ascension_scores', 'daily_scores']
+export const REPORTABLE = ['scores', 'ascension_scores', 'daily_scores', 'survival_scores']
 
 // The id kept on the device for multiplayer (same key as getOrCreatePlayerId in multiplayerRoom.js and the app's
 // getPlayerId), made here when it doesn't exist yet: crypto.randomUUID isn't in React Native.

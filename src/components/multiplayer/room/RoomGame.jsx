@@ -1,7 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { GAME_TYPES } from '../../../utils/gameTypes'
-import { snapshotKey } from '../../../utils/multiplayerSnapshot'
+import { loadSnapshot, snapshotKey } from '../../../utils/multiplayerSnapshot'
+import { parseSurvivalModes } from '../../../utils/survivalConfig'
 import { getRoomContent, reportProgress, roomScoringMode, submitResult } from '../../../utils/multiplayerRoom'
 import { MultiplayerPlacementGame } from '../../../pages/GamePage'
 import { MultiplayerFlagsGame } from '../../../pages/FlagGamePage'
@@ -9,6 +10,7 @@ import { MultiplayerCapitalsGame } from '../../../pages/CapitalsGamePage'
 import { PracticeQuiz } from '../../../pages/QuizPage'
 import MultiplayerBorderGuess from '../MultiplayerBorderGuess'
 import MultiplayerCountryClue from '../MultiplayerCountryClue'
+import SurvivalGame from '../../../pages/survival/SurvivalGame'
 import { gameLabel } from '../RoomConfig'
 import { Standings } from './Standings'
 
@@ -55,6 +57,16 @@ export default function RoomGame({ room, progress, results, playerId, onDone }) 
       .finally(() => onDone(gameIndex))
   }, [game, room.id, playerId, pseudo, gameIndex, total, onDone])
 
+  // Survival: rounds cleared and lives left as they change, then the rounds cleared as the score
+  const survivalRoom = useMemo(() => ({
+    onProgress: ({ score, lives }) => {
+      if (doneRef.current) return
+      reportProgress(room.id, playerId, { gameIndex, found: score, total, finished: false, lives }).catch(console.error)
+    },
+    onFinished: ({ score, errors, elapsedTime }) =>
+      onGameFinished({ weightedScore: score, countriesSolved: score, attempts: errors, elapsedTime }),
+  }), [room.id, playerId, gameIndex, total, onGameFinished])
+
   const quizRoom = useMemo(() => ({
     seed,
     difficulty: game.quizDifficulty,
@@ -84,6 +96,7 @@ export default function RoomGame({ room, progress, results, playerId, onDone }) 
   // Players time their own game, from when they start it
   const ownClock = { ...room, startAt: null }
   const snapKey = snapshotKey(room.id, playerId, gameIndex)
+  const [survivalSnapshot] = useState(() => (game.type === GAME_TYPES.SURVIVAL ? loadSnapshot(snapKey) : null))
 
   const renderGame = () => {
     switch (game.type) {
@@ -95,13 +108,24 @@ export default function RoomGame({ room, progress, results, playerId, onDone }) 
       case GAME_TYPES.COUNTRY_CLUE:
         return <MultiplayerCountryClue countries={content.list} snapshotKey={snapKey} onCountryFound={onCountryFound} onGameFinished={onGameFinished} room={ownClock} />
       case GAME_TYPES.QUIZ: return <PracticeQuiz room={quizRoom} />
+      case GAME_TYPES.SURVIVAL:
+        return (
+          <SurvivalGame
+            modes={parseSurvivalModes(game.modes)}
+            lives={game.lives}
+            seed={seed}
+            snapshot={survivalSnapshot}
+            snapshotKey={snapKey}
+            room={survivalRoom}
+          />
+        )
       default: return null
     }
   }
 
   return (
     <div className="mp-game-view">
-      <div className={`mp-game-content${game.type === GAME_TYPES.QUIZ ? ' mpr-scroll' : ''}`}>
+      <div className={`mp-game-content${game.type === GAME_TYPES.QUIZ || game.type === GAME_TYPES.SURVIVAL ? ' mpr-scroll' : ''}`}>
         {renderGame()}
       </div>
       <aside className="mpr-sidebar">

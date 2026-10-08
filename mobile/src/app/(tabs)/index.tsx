@@ -13,7 +13,8 @@ import { startMultiGame } from '@/multiplayer/navigation'
 import { colors, radius, space } from '@/theme'
 
 const DAILY_GAMES = GAMES.filter((game) => game.kind === 'daily')
-const SETUP_GAMES = GAMES.filter((game) => game.kind === 'setup')
+// Games with a setup sheet first: Placement, Flags, Capitals, Survival
+const SETUP_GAMES = GAMES.filter((game) => game.kind === 'setup' || game.kind === 'survival')
 
 function DailyCard({ game, width }: { game: GameDefinition; width: number }) {
   const { t } = useTranslation()

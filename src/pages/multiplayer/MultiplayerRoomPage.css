@@ -2,4 +2,3 @@
 .mp-room { min-height: 100vh; background: var(--bg-dark, #0f172a); color: #f1f5f9; }
 .mp-room-loading, .mp-room-error { display: flex; align-items: center; justify-content: center; height: 60vh; font-size: 1.1rem; color: #94a3b8; }
 .mp-room-error { color: #f87171; }
-.mp-game-placeholder { display: flex; align-items: center; justify-content: center; height: 60vh; font-size: 1.2rem; color: #64748b; }

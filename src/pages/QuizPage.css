@@ -418,3 +418,17 @@
     font-size: 1.2rem;
   }
 }
+
+/* Quiz played in a multiplayer room */
+/* Fills the room's game area (which scrolls), whatever the length of the question */
+.quiz-page--room {
+  min-height: 100%;
+}
+
+.quiz-room-count {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #94a3b8;
+}

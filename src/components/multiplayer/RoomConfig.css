@@ -1,17 +1,17 @@
 /* src/components/multiplayer/RoomConfig.css */
-.room-config { max-width: 640px; margin: 0 auto; padding: 2rem 1rem; color: #f1f5f9; }
+.room-config { max-width: 640px; margin: 0 auto; padding: 2rem 16px; color: #f1f5f9; }
 .rc-title { font-size: 1.75rem; font-weight: 700; margin-bottom: 1.5rem; }
 .rc-pseudo { margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.4rem; }
 .rc-pseudo label { font-weight: 600; color: #94a3b8; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
 .rc-pseudo input { padding: 0.6rem 0.9rem; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #f1f5f9; font-size: 1rem; }
-.rc-games-title { font-size: 1rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem; }
-.rc-game { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem; }
-.rc-game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
-.rc-game-label { font-weight: 600; font-size: 1rem; }
-.rc-game-actions { display: flex; gap: 0.4rem; }
-.rc-game-actions button { padding: 0.25rem 0.5rem; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: #94a3b8; cursor: pointer; font-size: 0.85rem; }
-.rc-game-actions button:disabled { opacity: 0.3; cursor: not-allowed; }
-.rc-mode-tabs { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
+.rc-section { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem; }
+.rc-games-title { font-size: 0.85rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin: 0; }
+.rc-hint { margin: 0; font-size: 0.9rem; color: #94a3b8; }
+.rc-game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.5rem; }
+.rc-game-pick { display: flex; align-items: center; gap: 0.5rem; padding: 0.7rem 0.8rem; border-radius: 10px; border: 1px solid #334155; background: #1e293b; color: #f1f5f9; font-size: 0.95rem; font-weight: 600; text-align: left; cursor: pointer; }
+.rc-game-pick.active { border-color: #00d4ff; background: #00d4ff18; }
+.rc-game-icon { font-size: 1.3rem; }
+.rc-mode-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .rc-mode-tab { padding: 0.35rem 0.75rem; border-radius: 20px; border: 1px solid #475569; background: transparent; color: #94a3b8; cursor: pointer; font-size: 0.85rem; }
 .rc-mode-tab.active { background: #00d4ff22; border-color: #00d4ff; color: #00d4ff; }
 .rc-difficulties { display: flex; flex-wrap: wrap; gap: 0.5rem; }
@@ -24,28 +24,12 @@
 .rc-preset.active { border-color: #00d4ff; color: #00d4ff; background: #00d4ff11; }
 .rc-asc-row { display: grid; grid-template-columns: 100px 60px 1fr; align-items: center; gap: 0.5rem; font-size: 0.9rem; }
 .rc-asc-val { text-align: right; color: #64748b; font-size: 0.8rem; }
-.rc-slider-label { display: flex; flex-direction: column; gap: 0.4rem; }
-.rc-game-settings { margin-top: 0.5rem; }
-.rc-add-games { margin-top: 0.75rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
-.rc-add-label { font-size: 0.85rem; color: #64748b; }
-.rc-add-btn { padding: 0.35rem 0.65rem; border-radius: 8px; border: 1px dashed #475569; background: transparent; color: #94a3b8; cursor: pointer; font-size: 0.85rem; }
-.rc-add-btn:hover { border-color: #00d4ff; color: #00d4ff; }
-.rc-submit { width: 100%; padding: 0.85rem; margin-top: 1.5rem; border-radius: 10px; border: none; background: #00d4ff; color: #0f172a; font-size: 1rem; font-weight: 700; cursor: pointer; }
+.rc-game-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+.rc-game-list li { display: flex; align-items: center; gap: 0.5rem; padding: 0.55rem 0.8rem; border-radius: 10px; border: 1px solid #334155; background: #1e293b; font-weight: 600; }
+.rc-game-list li span { flex: 1; min-width: 0; }
+.rc-game-list button { padding: 0.2rem 0.5rem; border-radius: 6px; border: 1px solid #475569; background: transparent; color: #94a3b8; cursor: pointer; }
+.rc-add-btn { align-self: flex-start; padding: 0.5rem 0.85rem; border-radius: 10px; border: 1px dashed #475569; background: transparent; color: #94a3b8; font-size: 0.9rem; cursor: pointer; }
+.rc-add-btn:hover:not(:disabled) { border-color: #00d4ff; color: #00d4ff; }
+.rc-add-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.rc-submit { width: 100%; padding: 0.85rem; border-radius: 10px; border: none; background: #00d4ff; color: #0f172a; font-size: 1rem; font-weight: 700; cursor: pointer; }
 .rc-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-
-.rc-checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
-  color: #d1d5db;
-  font-size: 0.9rem;
-  cursor: pointer;
-}
-
-.rc-checkbox-label input[type="checkbox"] {
-  accent-color: #00d4ff;
-  width: 1rem;
-  height: 1rem;
-  cursor: pointer;
-}

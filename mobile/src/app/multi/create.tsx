@@ -1,4 +1,5 @@
 // Creates a multiplayer room for one game: live or challenge, plus the game's options.
+// With `add` (a room code), adds the game at the end of that room instead (host, from multi/add).
 // Placement / Flags / Capitals get their difficulty, continent or Ascension from the setup sheet (`config`).
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { router, useLocalSearchParams } from 'expo-router'
@@ -13,7 +14,7 @@ import { useAccount } from '@/account/auth'
 import { SheetCloseButton } from '@/components/SheetCloseButton'
 import { Button, Segmented, Text } from '@/components/ui'
 import { DIFFICULTY_COLORS, getGame } from '@/games'
-import { createRoom, getSavedPseudo, type RoomGame, type RoomMode } from '@/multiplayer/room'
+import { addGameToRoom, createRoom, getSavedPseudo, type RoomGame, type RoomMode } from '@/multiplayer/room'
 import { colors, fonts, radius, space } from '@/theme'
 
 type SetupConfig = { difficulty?: string; continent?: string; phases?: Record<string, number>; presetName?: string | null }
@@ -24,7 +25,8 @@ const QUIZ_COUNTS = ['5', '10', '20'] as const
 export default function CreateRoomSheet() {
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
-  const params = useLocalSearchParams<{ game: string; config?: string }>()
+  const params = useLocalSearchParams<{ game: string; config?: string; add?: string }>()
+  const addTo = params.add
   const game = getGame(params.game)!
   const setup: SetupConfig = params.config ? JSON.parse(params.config) : {}
 
@@ -52,7 +54,7 @@ export default function CreateRoomSheet() {
 
   const onCreate = async () => {
     const name = pseudo.trim()
-    if (!name) return
+    if (!name && !addTo) return
     const roomGame: RoomGame = {
       id: game.id,
       type: game.type,
@@ -66,6 +68,11 @@ export default function CreateRoomSheet() {
     setCreating(true)
     setFailed(false)
     try {
+      if (addTo) {
+        await addGameToRoom(addTo, roomGame)
+        router.back()
+        return
+      }
       const code = await createRoom({ game: roomGame, mode, pseudo: name, uid: account?.uid })
       router.replace({ pathname: '/multi/[code]', params: { code } })
     } catch (error) {
@@ -94,17 +101,19 @@ export default function CreateRoomSheet() {
           <SheetCloseButton />
         </View>
 
-        <View style={{ gap: space.sm }}>
-          <Segmented<RoomMode>
-            value={mode}
-            onChange={setMode}
-            options={[
-              { value: 'live', label: t('mobile.multi.live') },
-              { value: 'challenge', label: t('mobile.multi.challenge') },
-            ]}
-          />
-          <Text variant="caption">{t(mode === 'live' ? 'mobile.multi.live_hint' : 'mobile.multi.challenge_hint')}</Text>
-        </View>
+        {!addTo && (
+          <View style={{ gap: space.sm }}>
+            <Segmented<RoomMode>
+              value={mode}
+              onChange={setMode}
+              options={[
+                { value: 'live', label: t('mobile.multi.live') },
+                { value: 'challenge', label: t('mobile.multi.challenge') },
+              ]}
+            />
+            <Text variant="caption">{t(mode === 'live' ? 'mobile.multi.live_hint' : 'mobile.multi.challenge_hint')}</Text>
+          </View>
+        )}
 
         {isQuiz && (
           <>
@@ -152,19 +161,23 @@ export default function CreateRoomSheet() {
         )}
 
         <View style={{ gap: space.sm }}>
-          <Text variant="label">{t('mobile.multi.pseudo')}</Text>
-          <TextInput
-            value={pseudo}
-            onChangeText={setPseudo}
-            placeholder={t('labels.your_username')}
-            placeholderTextColor={colors.textFaint}
-            maxLength={20}
-            autoCapitalize="none"
-            autoCorrect={false}
-            returnKeyType="done"
-            onSubmitEditing={onCreate}
-            style={styles.input}
-          />
+          {!addTo && (
+            <>
+              <Text variant="label">{t('mobile.multi.pseudo')}</Text>
+              <TextInput
+                value={pseudo}
+                onChangeText={setPseudo}
+                placeholder={t('labels.your_username')}
+                placeholderTextColor={colors.textFaint}
+                maxLength={20}
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="done"
+                onSubmitEditing={onCreate}
+                style={styles.input}
+              />
+            </>
+          )}
           {failed && (
             <Text variant="caption" color={colors.danger}>
               {t('mobile.game.load_error')}
@@ -175,10 +188,10 @@ export default function CreateRoomSheet() {
 
       <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, space.lg) }]}>
         <Button
-          label={t('mobile.multi.create')}
+          label={addTo ? t('mp_room.add_game') : t('mobile.multi.create')}
           onPress={onCreate}
           loading={creating}
-          disabled={!pseudo.trim()}
+          disabled={!addTo && !pseudo.trim()}
           color={game.color}
           icon={<MaterialCommunityIcons name="account-group" size={20} color={colors.onAccent} />}
           style={{ flex: 1 }}

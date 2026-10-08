@@ -121,7 +121,7 @@ function PlacementGame({
 
       {!isGameOver && (
         <GameTopBar onQuit={play?.exit}>
-          {play && <RoomHudPill code={play.room.id} />}
+          {play && <RoomHudPill code={play.room.id} gameIndex={play.room.gameIndex} />}
           <HudPill icon="timer-outline" label={displayTimer} />
           {!isTraining && <HudPill icon="star-four-points-outline" label={String(score)} color={colors.accent} />}
         </GameTopBar>
@@ -210,7 +210,7 @@ function PlacementGame({
           onReplay={play ? undefined : restartGame}
           onHome={play?.exit ?? (() => navigate('/'))}
           homeLabel={play ? t('mobile.multi.back_to_room') : undefined}>
-          {play && <Standings code={play.room.id} />}
+          {play && <Standings code={play.room.id} gameIndex={play.room.gameIndex} />}
         </ResultsSheet>
       )}
     </View>

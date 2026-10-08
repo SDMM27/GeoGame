@@ -113,14 +113,41 @@ function Summary({ stats, maxDifficulty, onRestart, onChangeDifficulty }) {
   )
 }
 
-function PracticeQuiz() {
+// In a multiplayer room (`room`): its difficulty and answer mode, the same questions for everyone,
+// a fixed number of them. `room`: { seed, difficulty, answerMode, total, onAnswered(count), onFinished(result) }
+export function PracticeQuiz({ room = null }) {
   const { t, i18n } = useTranslation()
   const {
     maxDifficulty, answerMode, question, selectedId, freeResult, isAnswered, isCorrect, stats, isFinished,
     hintsUsed, maxHints, canUseHint, hiddenChoiceIds, points,
     start, answer, submitFree, takeHint, next, quit, backToDifficulty,
-  } = useQuizState()
+  } = useQuizState({ seed: room?.seed ?? null })
   const isFree = answerMode === ANSWER_MODES.FREE
+  const isLastQuestion = !!room && stats.answered >= room.total
+  const goNext = isLastQuestion ? quit : next
+  const [startedAt] = useState(() => Date.now())
+
+  useEffect(() => {
+    if (room) start(room.difficulty, room.answerMode)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const onAnswered = room?.onAnswered
+  useEffect(() => {
+    if (onAnswered && stats.answered > 0) onAnswered(stats.answered)
+  }, [onAnswered, stats.answered])
+
+  const onFinished = room?.onFinished
+  useEffect(() => {
+    if (isFinished && onFinished) {
+      onFinished({
+        weightedScore: stats.score,
+        countriesSolved: stats.correct,
+        attempts: stats.answered - stats.correct,
+        elapsedTime: Date.now() - startedAt,
+      })
+    }
+  }, [isFinished, onFinished, stats, startedAt])
   const [inputValue, setInputValue] = useState('')
   const inputRef = useRef(null)
 
@@ -150,12 +177,12 @@ function PracticeQuiz() {
         const idx = Number(e.key) - 1
         if (idx >= 0 && idx < localized.choices.length) answer(localized.choices[idx].id)
       } else if (e.key === 'Enter') {
-        next()
+        goNext()
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [localized, isAnswered, isFinished, isFree, answer, next])
+  }, [localized, isAnswered, isFinished, isFree, answer, goNext])
 
   const onInputKeyDown = (e) => {
     if (e.key === 'Enter' && inputValue.trim()) {
@@ -175,11 +202,18 @@ function PracticeQuiz() {
   }
 
   return (
-    <div className="quiz-page">
-      <NavBar />
+    <div className={room ? 'quiz-page quiz-page--room' : 'quiz-page'}>
+      {!room && <NavBar />}
       <main className="quiz-main">
         <header className="quiz-header">
-          <h1>{t('games.quiz.title')}</h1>
+          <h1>
+            {t('games.quiz.title')}
+            {room && (
+              <small className="quiz-room-count">
+                {t('mp_room.question', { n: Math.min(stats.answered + (isAnswered ? 0 : 1), room.total), total: room.total })}
+              </small>
+            )}
+          </h1>
           {maxDifficulty && !isFinished && (
             <div className="quiz-hud">
               <div><strong>{stats.score}</strong><small>{t('quiz.score')}</small></div>
@@ -189,9 +223,9 @@ function PracticeQuiz() {
           )}
         </header>
 
-        {!maxDifficulty && <DifficultyPicker onPick={start} />}
+        {!maxDifficulty && !room && <DifficultyPicker onPick={start} />}
 
-        {maxDifficulty && isFinished && (
+        {maxDifficulty && isFinished && !room && (
           <Summary
             stats={stats}
             maxDifficulty={maxDifficulty}
@@ -267,15 +301,15 @@ function PracticeQuiz() {
             )}
 
             <div className="quiz-actions">
-              <button className="quiz-btn" onClick={quit}>{t('quiz.quit')}</button>
+              {!room && <button className="quiz-btn" onClick={quit}>{t('quiz.quit')}</button>}
               {!isAnswered && maxHints > 0 && (
                 <button className="quiz-btn" onClick={takeHint} disabled={!canUseHint} title={t('quiz.hint_cost')}>
                   {t('quiz.hint_button', { used: hintsUsed, max: maxHints })}
                 </button>
               )}
               {(isAnswered || !isFree) && (
-                <button className="quiz-btn quiz-btn--primary" onClick={next} disabled={!isAnswered}>
-                  {t('quiz.next')}
+                <button className="quiz-btn quiz-btn--primary" onClick={goNext} disabled={!isAnswered}>
+                  {isLastQuestion ? t('mp_room.see_results') : t('quiz.next')}
                 </button>
               )}
             </div>

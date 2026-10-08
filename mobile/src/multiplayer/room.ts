@@ -1,11 +1,11 @@
-// Single-game multiplayer rooms, stored in the website's `rooms` collection.
+// Multiplayer rooms, shared with the website (src/utils/multiplayerRoom.js holds the format and the Firestore writes).
 // A room holds one game. 'live': everyone starts together after the host launches it.
 // 'challenge': anyone with the code plays the same game whenever they want.
 // A live room keeps accepting players once launched, so it also works as a challenge afterwards.
-import { doc, getDoc, serverTimestamp, setDoc, Timestamp, updateDoc } from 'firebase/firestore'
+import { doc, getDoc, type Timestamp } from 'firebase/firestore'
 
 import { firestore } from '@shared/Firebase'
-import { generateRoomId } from '@shared/utils/multiplayerRoom'
+import * as shared from '@shared/utils/multiplayerRoom'
 
 import type { GameId } from '@/games'
 
@@ -26,15 +26,22 @@ export type RoomGame = {
   answerMode?: 'choices' | 'free'
 }
 
-// `uid`: the player's account, when signed in.
-export type RoomPlayer = { pseudo: string; uid?: string }
+// `uid`: the player's account, when signed in. `seenAt`: lobby heartbeat.
+export type RoomPlayer = { pseudo: string; uid?: string; seenAt?: Timestamp }
 
 export type Room = {
   id: string
+  // Format marker, on every room, wherever it was created
   source: 'app'
+  createdOn?: 'web' | 'app'
   hostId: string
   mode: RoomMode
   status: 'lobby' | 'playing'
+  // Games in a row (missing on the first rooms, which hold `game` only); read them with roomGames()
+  games?: RoomGame[]
+  // The live game being played
+  gameIndex?: number
+  // Current game, for app versions that only know one game. A view from roomForGame() holds the game being played.
   game: RoomGame
   seed: number
   startAt: Timestamp | null
@@ -50,16 +57,14 @@ export type GameResult = {
   total: number
 }
 
-export type PlayerResult = GameResult & { playerId: string; pseudo: string }
+export type PlayerResult = GameResult & { playerId: string; pseudo: string; gameIndex?: number }
 
-export type PlayerProgress = { found: number; total: number; finished: boolean }
+export type PlayerProgress = { gameIndex: number; found: number; total: number; finished: boolean }
 
 const PLAYER_ID_KEY = 'mp_player_id'
 const PSEUDO_KEY = 'geogame_pseudo'
 const RECENT_KEY = 'geogame_recent_rooms'
 const MAX_RECENT = 8
-// Live countdown, so that every player gets the launch before the game starts.
-const LAUNCH_DELAY_MS = 5000
 
 export const roomRef = (code: string) => doc(firestore, 'rooms', code)
 
@@ -104,52 +109,38 @@ export function rememberRoom(room: Pick<Room, 'id' | 'mode' | 'game'>) {
 
 // ─── Firestore ─────────────────────────────────────────────────────────────
 
-const roomPlayer = (pseudo: string, uid?: string | null): RoomPlayer => (uid ? { pseudo, uid } : { pseudo })
-
 export async function createRoom({ game, mode, pseudo, uid }: { game: RoomGame; mode: RoomMode; pseudo: string; uid?: string | null }) {
-  const hostId = getPlayerId()
   savePseudo(pseudo)
-  let code = generateRoomId()
-  while ((await getDoc(roomRef(code))).exists()) code = generateRoomId()
-  const room: Omit<Room, 'id'> = {
-    source: 'app',
-    hostId,
-    mode,
-    status: mode === 'live' ? 'lobby' : 'playing',
-    game,
-    seed: Math.floor(Math.random() * 2 ** 31),
-    startAt: null,
-    players: { [hostId]: roomPlayer(pseudo, uid) },
-  }
-  await setDoc(roomRef(code), { ...room, createdAt: serverTimestamp() })
+  const code: string = await shared.createRoom({ games: [game], mode, hostId: getPlayerId(), pseudo, uid, createdOn: 'app' })
   rememberRoom({ id: code, mode, game })
   return code
 }
 
 export async function joinRoom(room: Room, pseudo: string, uid?: string | null) {
   savePseudo(pseudo)
-  await updateDoc(roomRef(room.id), { [`players.${getPlayerId()}`]: roomPlayer(pseudo, uid) })
+  await shared.joinRoom(room.id, getPlayerId(), pseudo, uid)
   rememberRoom(room)
 }
 
 export async function launchRoom(code: string) {
-  await updateDoc(roomRef(code), {
-    status: 'playing',
-    startAt: Timestamp.fromDate(new Date(Date.now() + LAUNCH_DELAY_MS)),
-  })
+  await shared.launchRoom(code)
+}
+
+export async function launchNextGame(room: Room) {
+  await shared.launchNextGame(room)
+}
+
+// Host: adds a game at the end of the room
+export async function addGameToRoom(code: string, game: RoomGame) {
+  const snap = await getDoc(roomRef(code))
+  if (!snap.exists()) throw new Error('Room not found')
+  await shared.addGame({ id: code, ...snap.data() }, game)
 }
 
 export async function reportProgress(code: string, progress: PlayerProgress) {
-  await setDoc(doc(firestore, 'rooms', code, 'progress', getPlayerId()), { ...progress, lastSeen: serverTimestamp() }, { merge: true })
+  await shared.reportProgress(code, getPlayerId(), progress)
 }
 
-export async function submitResult(code: string, pseudo: string, result: GameResult) {
-  const playerId = getPlayerId()
-  await setDoc(doc(firestore, 'rooms', code, 'gameResults', `0_${playerId}`), {
-    playerId,
-    pseudo,
-    gameIndex: 0,
-    ...result,
-    finishedAt: serverTimestamp(),
-  })
+export async function submitResult(code: string, gameIndex: number, pseudo: string, result: GameResult) {
+  await shared.submitResult(code, getPlayerId(), pseudo, result, gameIndex)
 }

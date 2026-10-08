@@ -35,7 +35,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:emulator": "firebase emulators:exec --project geogame-sdmm --only firestore,auth \"vitest run tests/emulator\"",
+    "test:emulator": "firebase emulators:exec --project geogame-sdmm --only firestore,auth \"vitest run tests/emulator --no-file-parallelism\"",
     "emulators": "firebase emulators:start --project geogame-sdmm --only firestore,auth"
   },
   "browserslist": {

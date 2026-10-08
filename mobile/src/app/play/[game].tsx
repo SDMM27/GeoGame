@@ -62,7 +62,8 @@ function Stepper({ value, max, onChange, color }: { value: number; max: number; 
 export default function GameSetupSheet() {
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
-  const { game: gameId, multi } = useLocalSearchParams<{ game: string; multi?: string }>()
+  // `add`: the room the host adds this game to (see multi/add)
+  const { game: gameId, multi, add } = useLocalSearchParams<{ game: string; multi?: string; add?: string }>()
   const game = getGame(gameId)!
   const counts = countFunctions(gameId)
 
@@ -102,7 +103,7 @@ export default function GameSetupSheet() {
         : selection === 'continent' && continent
           ? { continent }
           : { difficulty }
-    router.replace({ pathname: '/multi/create', params: { game: game.id, config: JSON.stringify(config) } })
+    router.replace({ pathname: '/multi/create', params: { game: game.id, config: JSON.stringify(config), ...(add ? { add } : {}) } })
   }
 
   return (

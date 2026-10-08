@@ -7,12 +7,16 @@ import {
   checkCountryName,
   livesLeft,
   parseSurvivalModes,
+  survivalDifficulty,
+  SURVIVAL_RAMPS,
+  matchSurvivalRamp,
+  normalizeSurvivalRamp,
   survivalModesKey,
 } from './survival'
 import { sortSurvivalScores } from './leaderboards'
 
 const { PLACEMENT, FLAGS, CAPITALS, BORDER_GUESS, COUNTRY_CLUE, QUIZ } = GAME_TYPES
-const ALL = [PLACEMENT, FLAGS, CAPITALS, BORDER_GUESS, COUNTRY_CLUE, QUIZ]
+const ALL = [PLACEMENT, FLAGS, CAPITALS, BORDER_GUESS, QUIZ]
 const TIERS = ['Facile', 'Moyen', 'Difficile', 'Impossible']
 
 const roundKey = (round) => `${round.type}:${round.country?.properties.ADMIN ?? round.question.usedKeys.join(',')}`
@@ -22,6 +26,11 @@ describe('survivalModesKey', () => {
     expect(survivalModesKey([QUIZ, FLAGS, 'NOPE', FLAGS])).toBe('FLAGS+QUIZ')
     expect(parseSurvivalModes('QUIZ+FLAGS+NOPE')).toEqual([FLAGS, QUIZ])
     expect(parseSurvivalModes(null)).toEqual([])
+  })
+
+  it('has no Country Clue rounds', () => {
+    expect(survivalModesKey([FLAGS, COUNTRY_CLUE])).toBe('FLAGS')
+    expect(buildSurvivalRounds([COUNTRY_CLUE], 1)).toEqual([])
   })
 })
 
@@ -46,13 +55,45 @@ describe('buildSurvivalRounds', () => {
     rounds.slice(1).forEach((round, index) => expect(round.type).not.toBe(rounds[index].type))
   })
 
-  it('never asks the same country twice in a game and starts with the easy ones', () => {
-    const rounds = buildSurvivalRounds([FLAGS], 3)
+  it('gets harder with the round number as the ramp says, whatever the game', () => {
+    const gentle = SURVIVAL_RAMPS.gentle
+    expect([0, 9, 10, 24, 25, 44, 45, 200].map((index) => survivalDifficulty(index, gentle)))
+      .toEqual(['Facile', 'Facile', 'Moyen', 'Moyen', 'Difficile', 'Difficile', 'Impossible', 'Impossible'])
+    expect([0, 2, 3, 6, 7, 11, 12].map((index) => survivalDifficulty(index, SURVIVAL_RAMPS.express)))
+      .toEqual(['Facile', 'Facile', 'Moyen', 'Moyen', 'Difficile', 'Difficile', 'Impossible'])
+    expect(survivalDifficulty(0, SURVIVAL_RAMPS.hardcore)).toBe('Impossible')
+    // A custom ramp may skip a difficulty
+    expect([0, 1, 2, 3].map((index) => survivalDifficulty(index, { Facile: 2, Moyen: 0, Difficile: 1 })))
+      .toEqual(['Facile', 'Facile', 'Difficile', 'Impossible'])
+    const rounds = buildSurvivalRounds(ALL, 8, 70, gentle)
+    rounds.forEach((round, index) => {
+      const expected = TIERS.indexOf(survivalDifficulty(index, gentle))
+      // A quiz without a new question at that difficulty asks an easier one
+      if (round.type === QUIZ) expect(TIERS.indexOf(round.difficulty)).toBeLessThanOrEqual(expected)
+      else expect(round.difficulty).toBe(survivalDifficulty(index, gentle))
+    })
+  })
+
+  it('knows the presets and keeps custom ramps within bounds', () => {
+    expect(matchSurvivalRamp({ Facile: 3, Moyen: 4, Difficile: 5 })).toBe('express')
+    expect(matchSurvivalRamp({ Facile: 3, Moyen: 4, Difficile: 6 })).toBe(null)
+    expect(normalizeSurvivalRamp(null)).toEqual(SURVIVAL_RAMPS.normal)
+    expect(normalizeSurvivalRamp({ Facile: -3, Moyen: 2.6, Difficile: 999, Impossible: 4 })).toEqual({ Facile: 0, Moyen: 3, Difficile: 50 })
+  })
+
+  it('tags each country round with the difficulty of its country in that game', () => {
+    const field = { PLACEMENT: 'Difficulty', FLAGS: 'DifficultyFlag', CAPITALS: 'DifficultyCapitals' }
+    for (const round of buildSurvivalRounds([PLACEMENT, FLAGS, CAPITALS], 4, 60)) {
+      expect(round.country.properties[field[round.type]]).toBe(round.difficulty)
+    }
+  })
+
+  it('never asks the same country twice in a game, and plays the others once a difficulty runs out', () => {
+    const rounds = buildSurvivalRounds([FLAGS], 3, undefined, SURVIVAL_RAMPS.gentle)
     const names = rounds.map((round) => round.country.properties.ADMIN)
     expect(new Set(names).size).toBe(names.length)
-    const tiers = rounds.map((round) => TIERS.indexOf(round.country.properties.DifficultyFlag))
-    expect(tiers).toEqual([...tiers].sort((x, y) => x - y))
-    expect(tiers[0]).toBe(0)
+    expect(rounds.slice(0, 10).every((round) => round.difficulty === 'Facile')).toBe(true)
+    expect(rounds.slice(45, 60).every((round) => round.difficulty === 'Impossible')).toBe(true)
   })
 
   it('ends when a single game runs out of countries, and never exceeds the cap', () => {

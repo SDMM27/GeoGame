@@ -26,14 +26,24 @@ import { HudPill } from '@/components/game/GameTopBar'
 import { Button, Text } from '@/components/ui'
 import { colors, radius, space } from '@/theme'
 import { getRoomContent, rankRoomResults, scoringMode, type RoomContent } from './content'
-import { getPlayerId, reportProgress, roomRef, submitResult, type GameResult, type PlayerProgress, type PlayerResult, type Room } from './room'
+import {
+  getPlayerId,
+  reportProgress,
+  roomRef,
+  submitResult,
+  type GameResult,
+  type PlayerProgress,
+  type PlayerResult,
+  type Room,
+  type SurvivalProgress,
+} from './room'
 
 export type RoomPlay = {
   // The room as seen by the game being played: its `game`, `gameIndex` and own `seed`
   room: Room & { gameIndex: number }
   content: RoomContent
-  // Countries found / questions answered / survival rounds cleared so far (and the lives left, in survival)
-  reportFound: (found: number, lives?: number) => void
+  // Countries found / questions answered / survival rounds cleared so far (and the survival state)
+  reportFound: (found: number, survival?: SurvivalProgress) => void
   finish: (result: Omit<GameResult, 'total'>) => void
   // Back to the room screen (standings)
   exit: () => void
@@ -81,9 +91,9 @@ export function RoomGate({ code, children }: { code: string; children: (play: Ro
   const gameKey = `${code}_${gameIndex}`
 
   const reportFound = useCallback(
-    (found: number, lives?: number) => {
+    (found: number, survival?: SurvivalProgress) => {
       if (finishedGames.has(gameKey)) return
-      reportProgress(code, { gameIndex, found, total, finished: false, ...(lives != null && { lives }) }).catch(console.error)
+      reportProgress(code, { gameIndex, found, total, finished: false, ...survival }).catch(console.error)
     },
     [code, gameKey, gameIndex, total]
   )

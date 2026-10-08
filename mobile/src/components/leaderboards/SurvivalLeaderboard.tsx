@@ -1,4 +1,4 @@
-// Survival leaderboard of the Rankings tab: most rounds per number of lives, for a set of games or all of them
+// Survival leaderboard of the Rankings tab: most rounds per lives, timer and preset ramp, for a set of games or all of them
 // (collection survival_scores).
 import { useTranslation } from 'react-i18next'
 
@@ -13,7 +13,7 @@ import { visibleRows } from '../game/leaderboardRows'
 import { LeaderboardCard, LeaderboardRow } from './LeaderboardParts'
 
 // `modes`: a survivalModesKey, or null for every set of games
-export type SurvivalFilters = { lives: number; modes: string | null }
+export type SurvivalFilters = { lives: number; timer: number; ramp: string; modes: string | null }
 
 type SurvivalScore = { id?: string; name: string; uid?: string; modes: string; lives: number; score: number; elapsedTime?: number | null }
 
@@ -22,7 +22,7 @@ const MAX_ROWS = 50
 export function SurvivalLeaderboard({ filters, refreshKey, onSettled }: { filters: SurvivalFilters; refreshKey: number; onSettled: () => void }) {
   const { t } = useTranslation()
   const { account } = useAccount()
-  const key = `${filters.lives}|${filters.modes}`
+  const key = `${filters.lives}|${filters.timer}|${filters.ramp}|${filters.modes}`
   const { scores, error } = useLeaderboard<SurvivalScore>(key, () => fetchSurvivalScores(filters), refreshKey, onSettled)
 
   return (

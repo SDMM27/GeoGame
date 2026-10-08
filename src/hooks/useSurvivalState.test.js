@@ -47,20 +47,44 @@ describe('useSurvivalState', () => {
     expect(result.current.score).toBe(0)
   })
 
-  it('ignores names that are not countries, and repeated guesses', () => {
+  it('gives Border Guess one try, and ignores names that are not countries', () => {
     const { result } = play({ modes: [BORDER_GUESS], lives: 3, seed: 2 })
     const answer = result.current.round.country.properties.ADMIN
     expect(result.current.submitText('pas un pays')).toBe('unknown')
+    expect(result.current.lives).toBe(3)
     const wrong = answer === 'France' ? 'Espagne' : 'France'
     let first
     act(() => { first = result.current.submitText(wrong) })
     expect(first).toBe('wrong')
-    expect(result.current.guesses).toHaveLength(1)
-    expect(result.current.guesses[0].distanceKm).toBeGreaterThan(0)
-    let again
-    act(() => { again = result.current.submitText(wrong) })
-    expect(again).toBe('repeat')
     expect(result.current.lives).toBe(2)
+    expect(result.current.outcome).toBe('failed')
+    expect(result.current.guesses[0].distanceKm).toBeGreaterThan(0)
+    act(() => { vi.advanceTimersByTime(2500) })
+    expect(result.current.roundIndex).toBe(1)
+  })
+
+  it('costs a life when the time per round runs out', () => {
+    const { result } = play({ modes: [FLAGS], lives: 3, seed: 1, timer: 15 })
+    expect(result.current.timeLeftMs).toBe(15000)
+    act(() => { vi.advanceTimersByTime(15000) })
+    expect(result.current.lives).toBe(2)
+    expect(result.current.outcome).toBe('failed')
+    expect(result.current.timedOut).toBe(true)
+    act(() => { vi.advanceTimersByTime(2500) })
+    expect(result.current.roundIndex).toBe(1)
+    expect(result.current.timedOut).toBe(false)
+  })
+
+  it('waits for the room in a live game: no next round on its own, goTo moves on', () => {
+    const { result } = play({ modes: [FLAGS], lives: 3, seed: 1, autoAdvance: false })
+    act(() => { result.current.submitText(result.current.round.country.properties.ADMIN) })
+    act(() => { vi.advanceTimersByTime(10000) })
+    expect(result.current.roundIndex).toBe(0)
+    act(() => { result.current.goTo(3) })
+    expect(result.current.roundIndex).toBe(3)
+    expect(result.current.outcome).toBe(null)
+    act(() => { result.current.goTo(2) })
+    expect(result.current.roundIndex).toBe(3)
   })
 
   it('answers a quiz question once', () => {

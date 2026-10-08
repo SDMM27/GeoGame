@@ -740,7 +740,6 @@
       "FLAGS": "Flag",
       "CAPITALS": "Capital",
       "BORDER_GUESS": "Borders",
-      "COUNTRY_CLUE": "Country Clue",
       "QUIZ": "Quiz"
     },
     "prompt": {
@@ -748,7 +747,6 @@
       "FLAGS": "Which country has this flag?",
       "CAPITALS": "What's its capital?",
       "BORDER_GUESS": "Which country has this shape?",
-      "COUNTRY_CLUE": "Find the mystery country",
       "QUIZ": "Quiz question"
     },
     "round": "Round {{n}}",
@@ -764,7 +762,6 @@
     "life_lost": "Wrong! −1 life",
     "not_a_country": "I don't recognise this country.",
     "capital_placeholder": "Capital name",
-    "clue_hint": "Guess countries: every wrong guess costs a life, but gives you clues.",
     "game_over": "Out of lives!",
     "victory": "You survived every round!",
     "rounds_survived": "Rounds cleared",
@@ -782,6 +779,22 @@
     "progress_lives": "{{lives}} ❤️",
     "eliminated": "Out",
     "best": "Best: {{rounds}}",
-    "missed_answer": "Missed answer"
+    "missed_answer": "Missed answer",
+    "choose_timer": "Time per round",
+    "timer_none": "None",
+    "timer_seconds_one": "{{count}} s",
+    "timer_seconds_other": "{{count}} s",
+    "time_up": "Time's up!",
+    "waiting_players": "Waiting for the other players · {{done}}/{{total}}",
+    "choose_ramp": "Difficulty ramp",
+    "ramp": {
+      "express": "Express",
+      "normal": "Normal",
+      "gentle": "Gentle",
+      "hardcore": "Hardcore",
+      "custom": "Custom"
+    },
+    "ramp_summary": "{{facile}} easy rounds, {{moyen}} medium, {{difficile}} hard, then Impossible.",
+    "ramp_custom_hint": "Custom ramp: this game does not count for the leaderboard."
   }
 }

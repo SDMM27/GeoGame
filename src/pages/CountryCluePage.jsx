@@ -16,7 +16,7 @@ import { getCountryName } from '../utils/getCountryName'
 import 'react-toastify/dist/ReactToastify.css'
 import './CountryCluePage.css'
 
-export function GuessRow({ guess, lang }) {
+function GuessRow({ guess, lang }) {
   const { t } = useTranslation()
   const displayName =
     guess.isoA2 && lang

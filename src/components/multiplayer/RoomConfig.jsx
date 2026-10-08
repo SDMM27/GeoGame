@@ -12,8 +12,8 @@ import { QUIZ_DIFFICULTIES } from '../../utils/quizQuestions'
 import { getTotalCountries } from '../../hooks/useGameState'
 import { getTotalFlagCountries } from '../../hooks/useFlagGameState'
 import { getTotalCapitalCountries } from '../../hooks/useCapitalsGameState'
-import { DEFAULT_SURVIVAL_LIVES, SURVIVAL_ROUND_TYPES, parseSurvivalModes, survivalModesKey } from '../../utils/survivalConfig'
-import SurvivalOptions, { SURVIVAL_ROUND_ICONS } from '../SurvivalOptions'
+import { parseSurvivalModes, survivalModesKey } from '../../utils/survivalConfig'
+import SurvivalOptions, { SURVIVAL_ROUND_ICONS, defaultSurvivalOptions, rampLabel, timerLabel } from '../SurvivalOptions'
 import './RoomConfig.css'
 
 const DEFAULT_ASCENSION_PRESET = ASCENSION_PRESETS.find(p => p.name === 'Progressif') ?? ASCENSION_PRESETS[1]
@@ -131,7 +131,7 @@ export const newDraft = () => ({
   count: 10,
   quizDifficulty: 'Moyen',
   answerMode: 'choices',
-  survival: { modes: SURVIVAL_ROUND_TYPES, lives: DEFAULT_SURVIVAL_LIVES },
+  survival: defaultSurvivalOptions(),
 })
 
 const typeOf = (gameId) => ROOM_GAMES.find(g => g.id === gameId).type
@@ -153,18 +153,21 @@ export function buildRoomGame({ gameId, setup, count, quizDifficulty, answerMode
     phases: ascension ? setup.phases : null,
     presetName: ascension ? (matchPreset(setup.phases) ?? null) : null,
   }
-  if (type === GAME_TYPES.SURVIVAL) return { ...game, modes: survivalModesKey(survival.modes), lives: survival.lives }
+  if (type === GAME_TYPES.SURVIVAL) {
+    return { ...game, modes: survivalModesKey(survival.modes), lives: survival.lives, timer: survival.timer, ramp: survival.ramp }
+  }
   if (!SETUP_TYPES.includes(type)) game.count = count
   if (type === GAME_TYPES.QUIZ) Object.assign(game, { quizDifficulty, answerMode })
   return game
 }
 
-/** "🚩 Trouve le Drapeau · Moyen", "❤️ Survie · 3 ❤️ · 🚩🧠" */
+/** "🚩 Trouve le Drapeau · Moyen", "❤️ Survie · 3 ❤️ · ⏱ 30 s · 🎯 Normale · 🚩🧠" */
 export function gameLabel(game, t) {
   const icon = ROOM_GAMES.find(g => g.id === game.id)?.icon ?? '🎮'
   if (game.type === GAME_TYPES.SURVIVAL) {
     const rounds = parseSurvivalModes(game.modes).map(type => SURVIVAL_ROUND_ICONS[type]).join('')
-    return `${icon} ${t('games.survival.title')} · ${game.lives} ❤️ · ${rounds}`
+    const ramp = game.ramp ? ` · ${rampLabel(game.ramp, t)}` : ''
+    return `${icon} ${t('games.survival.title')} · ${game.lives} ❤️ · ⏱ ${timerLabel(game.timer ?? 0, t)}${ramp} · ${rounds}`
   }
   const settings = game.phases
     ? 'Ascension'
@@ -204,7 +207,7 @@ export function GameEditor({ draft, onChange }) {
       {SETUP_TYPES.includes(type) && <SetupSettings type={type} setup={setup} onChange={next => set({ setup: next })} />}
 
       {isSurvival && (
-        <SurvivalOptions modes={survival.modes} lives={survival.lives} onChange={update => set({ survival: update(survival) })} />
+        <SurvivalOptions options={survival} onChange={update => set({ survival: update(survival) })} />
       )}
 
       {isQuiz && (

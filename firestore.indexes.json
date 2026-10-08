@@ -70,6 +70,8 @@
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "lives", "order": "ASCENDING" },
+        { "fieldPath": "timer", "order": "ASCENDING" },
+        { "fieldPath": "ramp", "order": "ASCENDING" },
         { "fieldPath": "score", "order": "DESCENDING" },
         { "fieldPath": "elapsedTime", "order": "ASCENDING" }
       ]
@@ -80,6 +82,8 @@
       "fields": [
         { "fieldPath": "modes", "order": "ASCENDING" },
         { "fieldPath": "lives", "order": "ASCENDING" },
+        { "fieldPath": "timer", "order": "ASCENDING" },
+        { "fieldPath": "ramp", "order": "ASCENDING" },
         { "fieldPath": "score", "order": "DESCENDING" },
         { "fieldPath": "elapsedTime", "order": "ASCENDING" }
       ]

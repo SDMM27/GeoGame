@@ -740,7 +740,6 @@
       "FLAGS": "Drapeau",
       "CAPITALS": "Capitale",
       "BORDER_GUESS": "Frontières",
-      "COUNTRY_CLUE": "Country Clue",
       "QUIZ": "Quiz"
     },
     "prompt": {
@@ -748,7 +747,6 @@
       "FLAGS": "À quel pays est ce drapeau ?",
       "CAPITALS": "Quelle est sa capitale ?",
       "BORDER_GUESS": "Quel pays a cette forme ?",
-      "COUNTRY_CLUE": "Trouve le pays mystère",
       "QUIZ": "Question de quiz"
     },
     "round": "Manche {{n}}",
@@ -764,7 +762,6 @@
     "life_lost": "Raté ! −1 vie",
     "not_a_country": "Je ne reconnais pas ce pays.",
     "capital_placeholder": "Nom de la capitale",
-    "clue_hint": "Propose des pays : chaque mauvaise proposition coûte une vie, mais donne des indices.",
     "game_over": "Plus de vies !",
     "victory": "Tu as survécu à toutes les manches !",
     "rounds_survived": "Manches réussies",
@@ -782,6 +779,22 @@
     "progress_lives": "{{lives}} ❤️",
     "eliminated": "Éliminé",
     "best": "Record : {{rounds}}",
-    "missed_answer": "Réponse manquée"
+    "missed_answer": "Réponse manquée",
+    "choose_timer": "Temps par manche",
+    "timer_none": "Sans",
+    "timer_seconds_one": "{{count}} s",
+    "timer_seconds_other": "{{count}} s",
+    "time_up": "Temps écoulé !",
+    "waiting_players": "En attente des autres joueurs · {{done}}/{{total}}",
+    "choose_ramp": "Montée en difficulté",
+    "ramp": {
+      "express": "Express",
+      "normal": "Normale",
+      "gentle": "Douce",
+      "hardcore": "Hardcore",
+      "custom": "Personnalisée"
+    },
+    "ramp_summary": "{{facile}} manches faciles, {{moyen}} moyennes, {{difficile}} difficiles, puis Impossible.",
+    "ramp_custom_hint": "Montée personnalisée : la partie ne compte pas pour le classement."
   }
 }

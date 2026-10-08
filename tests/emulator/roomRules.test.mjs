@@ -157,12 +157,18 @@ describe('creating a room', () => {
   })
 
   it('creates a survival room, with known games and lives only', async () => {
-    const survival = game({ id: 'survival', type: 'SURVIVAL', difficulty: null, modes: 'FLAGS+BORDER_GUESS+QUIZ', lives: 3 })
+    const survival = game({ id: 'survival', type: 'SURVIVAL', difficulty: null, modes: 'FLAGS+BORDER_GUESS+QUIZ', lives: 3, timer: 30, ramp: { Facile: 2, Moyen: 0, Difficile: 6 } })
     await assertSucceeds(createRoom({ games: [survival], game: survival }))
     const cheat = game({ id: 'survival', type: 'SURVIVAL', difficulty: null, modes: 'FLAGS+CHEAT', lives: 3 })
     await assertFails(createRoom({ games: [cheat], game: cheat }, 'host', { room: 'XYZ789' }))
     const lives = game({ id: 'survival', type: 'SURVIVAL', difficulty: null, modes: 'FLAGS', lives: 99 })
     await assertFails(createRoom({ games: [lives], game: lives }, 'host', { room: 'XYZ788' }))
+    const timer = game({ id: 'survival', type: 'SURVIVAL', difficulty: null, modes: 'FLAGS', lives: 3, timer: 45 })
+    await assertFails(createRoom({ games: [timer], game: timer }, 'host', { room: 'XYZ787' }))
+    const ramp = game({ id: 'survival', type: 'SURVIVAL', difficulty: null, modes: 'FLAGS', lives: 3, ramp: { Facile: 51 } })
+    await assertFails(createRoom({ games: [ramp], game: ramp }, 'host', { room: 'XYZ786' }))
+    const rampKey = game({ id: 'survival', type: 'SURVIVAL', difficulty: null, modes: 'FLAGS', lives: 3, ramp: { Impossible: 3 } })
+    await assertFails(createRoom({ games: [rampKey], game: rampKey }, 'host', { room: 'XYZ785' }))
   })
 
   it('refuses a room code that is not 6 characters of the alphabet', async () => {
@@ -479,6 +485,15 @@ describe('progress and results', () => {
     await assertSucceeds(reportProgress('p2', progressDoc({ lives: 0, finished: true })))
     await assertFails(reportProgress('p2', progressDoc({ lives: 11 })))
     await assertFails(reportProgress('p2', progressDoc({ lives: -1 })))
+  })
+
+  it('lets a survival player of a live room report the round they play, within bounds', async () => {
+    const round = { lives: 2, round: 4, roundAt: Date.now(), roundDone: false }
+    await assertSucceeds(reportProgress('p2', progressDoc(round)))
+    await assertSucceeds(reportProgress('p2', progressDoc({ ...round, roundDone: true })))
+    await assertFails(reportProgress('p2', progressDoc({ ...round, round: 301 })))
+    await assertFails(reportProgress('p2', progressDoc({ ...round, roundAt: 'now' })))
+    await assertFails(reportProgress('p2', progressDoc({ ...round, roundDone: 'yes' })))
   })
 
   it('lets a player submit a result, for each game', async () => {

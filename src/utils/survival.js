@@ -1,18 +1,17 @@
 // src/utils/survival.js
 // Survival mode, shared by the website and the app: rounds of the chosen games one after another
 // (a flag, then a border, then a capital…), getting harder, until the player runs out of lives.
-// Every wrong answer costs a life; giving up a round too. Pure: no DOM, no Firestore.
+// Every wrong answer costs a life; giving up a round or running out of time too. Pure: no DOM, no Firestore.
 //
 // The rounds come from a seed, so every player of a multiplayer room gets the same ones.
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { BORDER_GUESS_COUNTRIES } from '../hooks/useBorderGuessState'
-import { COUNTRY_CLUE_COUNTRIES } from '../hooks/useCountryClueState'
 import { GAME_TYPES } from './gameTypes'
 import { matchKnownAnswer } from './answerLexicon'
 import { getAllCapitalNames, getAllCountryNames } from './getCountryName'
 import { ANSWER_MODES, generateQuestion } from './quizQuestions'
 import { mulberry32, seededShuffle } from './prng'
-import { SURVIVAL_MAX_ROUNDS, normalizeSurvivalModes } from './survivalConfig'
+import { SURVIVAL_MAX_ROUNDS, normalizeSurvivalModes, normalizeSurvivalRamp } from './survivalConfig'
 
 export * from './survivalConfig'
 
@@ -24,11 +23,21 @@ const DIFFICULTY_FIELD = {
   [GAME_TYPES.FLAGS]: 'DifficultyFlag',
   [GAME_TYPES.CAPITALS]: 'DifficultyCapitals',
   [GAME_TYPES.BORDER_GUESS]: 'Difficulty',
-  [GAME_TYPES.COUNTRY_CLUE]: 'Difficulty',
 }
 
-// Quiz: the quiz rounds from which each harder difficulty is asked.
-const QUIZ_TIER_STARTS = [0, 8, 20, 40]
+/**
+ * Difficulty of round `index` (0-based, all games together) of a run whose ramp is `steps`
+ * ({ Facile, Moyen, Difficile }: rounds at each difficulty, Impossible after them; see SURVIVAL_RAMPS).
+ */
+export function survivalDifficulty(index, steps) {
+  const ramp = normalizeSurvivalRamp(steps)
+  let end = 0
+  for (const tier of TIERS.slice(0, 3)) {
+    end += ramp[tier]
+    if (index < end) return tier
+  }
+  return 'Impossible'
+}
 
 function pool(type) {
   switch (type) {
@@ -42,8 +51,6 @@ function pool(type) {
       )
     case GAME_TYPES.BORDER_GUESS:
       return BORDER_GUESS_COUNTRIES
-    case GAME_TYPES.COUNTRY_CLUE:
-      return COUNTRY_CLUE_COUNTRIES
     default:
       return []
   }
@@ -54,20 +61,24 @@ const tierOf = (feature, type) => {
   return index === -1 ? TIERS.length - 1 : index
 }
 
-/** The countries of a game, easiest tier first, shuffled within each tier. */
-function countryQueue(type, seed) {
+/** The countries of a game by difficulty, each shuffled: [Facile[], Moyen[], Difficile[], Impossible[]]. */
+function countryTiers(type, seed) {
   const features = pool(type)
-  return TIERS.flatMap((_, tier) =>
+  return TIERS.map((_, tier) =>
     seededShuffle(features.filter((feature) => tierOf(feature, type) === tier), (seed + tier * 7919) >>> 0)
   )
 }
 
-function quizDifficulty(quizIndex) {
-  let tier = 0
-  QUIZ_TIER_STARTS.forEach((start, index) => {
-    if (quizIndex >= start) tier = index
-  })
-  return TIERS[tier]
+/**
+ * Takes a country of difficulty `tier` from `tiers` (removing it). When there are none left: the next harder ones,
+ * then the next easier ones. Null when the game has no country left.
+ */
+function takeCountry(tiers, tier) {
+  const order = [...TIERS.keys()].filter((i) => i >= tier).concat([...TIERS.keys()].filter((i) => i < tier).reverse())
+  for (const i of order) {
+    if (tiers[i].length) return { country: tiers[i].shift(), difficulty: TIERS[i] }
+  }
+  return null
 }
 
 const typeSeed = (seed, type) => {
@@ -77,20 +88,19 @@ const typeSeed = (seed, type) => {
 }
 
 /**
- * The rounds of a run: [{ type, country }] (a GeoJSON feature) or [{ type: QUIZ, question }].
- * Each cycle plays every chosen game once, in a shuffled order (never the same game twice in a row); each game
- * serves its easy countries first.
+ * The rounds of a run: [{ type, difficulty, country }] (a GeoJSON feature) or [{ type: QUIZ, difficulty, question }].
+ * Each cycle plays every chosen game once, in a shuffled order (never the same game twice in a row). The difficulty
+ * rises with the round number, whatever the game, as the ramp `steps` says (survivalDifficulty).
  * A game whose countries are all used drops out; the run ends after SURVIVAL_MAX_ROUNDS.
  */
-export function buildSurvivalRounds(types, seed, max = SURVIVAL_MAX_ROUNDS) {
+export function buildSurvivalRounds(types, seed, max = SURVIVAL_MAX_ROUNDS, steps = null) {
   const modes = normalizeSurvivalModes(types)
   if (modes.length === 0) return []
-  const queues = Object.fromEntries(
-    modes.filter((type) => type !== GAME_TYPES.QUIZ).map((type) => [type, countryQueue(type, typeSeed(seed, type))])
+  const tiers = Object.fromEntries(
+    modes.filter((type) => type !== GAME_TYPES.QUIZ).map((type) => [type, countryTiers(type, typeSeed(seed, type))])
   )
   const quizRandom = mulberry32(typeSeed(seed, GAME_TYPES.QUIZ))
   const quizKeys = new Set()
-  const taken = Object.fromEntries(modes.map((type) => [type, 0]))
   const rounds = []
 
   for (let cycle = 0; rounds.length < max; cycle++) {
@@ -100,17 +110,17 @@ export function buildSurvivalRounds(types, seed, max = SURVIVAL_MAX_ROUNDS) {
     let added = 0
     for (const type of order) {
       if (rounds.length >= max) break
+      const difficulty = survivalDifficulty(rounds.length, steps)
       if (type === GAME_TYPES.QUIZ) {
-        const question = generateQuestion(quizDifficulty(taken[type]), quizKeys, quizRandom, ANSWER_MODES.CHOICES)
+        const question = generateQuestion(difficulty, quizKeys, quizRandom, ANSWER_MODES.CHOICES)
         if (!question) continue
         question.usedKeys.forEach((key) => quizKeys.add(key))
-        rounds.push({ type, question })
+        rounds.push({ type, difficulty: question.difficulty, question })
       } else {
-        const country = queues[type][taken[type]]
-        if (!country) continue
-        rounds.push({ type, country })
+        const taken = takeCountry(tiers[type], TIERS.indexOf(difficulty))
+        if (!taken) continue
+        rounds.push({ type, ...taken })
       }
-      taken[type] += 1
       added += 1
     }
     if (added === 0) break

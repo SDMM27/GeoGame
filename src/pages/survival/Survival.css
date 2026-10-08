@@ -83,6 +83,21 @@
   font-variant-numeric: tabular-nums;
 }
 
+.survival-countdown {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.survival-countdown--low {
+  color: var(--danger);
+}
+
+.survival-waiting {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
 .survival-hud-stats strong {
   color: var(--accent-cyan);
   font-size: 1.1rem;
@@ -236,10 +251,6 @@
   overflow: hidden;
   background: linear-gradient(180deg, rgba(125, 211, 252, 0.08), rgba(15, 23, 42, 0.75));
   border: 1px solid var(--border-subtle);
-}
-
-.survival-clue-map .country-clue-map-container {
-  height: min(40vh, 360px);
 }
 
 .survival-hint {

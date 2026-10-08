@@ -18,7 +18,12 @@ export default function ScoresPage() {
     return (
       <div className="scores-page">
         <NavBar />
-        <SurvivalScoreboard initialLives={Number(searchParams.get('lives')) || null} initialModes={searchParams.get('modes')} />
+        <SurvivalScoreboard
+          initialLives={Number(searchParams.get('lives')) || null}
+          initialTimer={searchParams.get('timer') != null ? Number(searchParams.get('timer')) : null}
+          initialRamp={searchParams.get('ramp')}
+          initialModes={searchParams.get('modes')}
+        />
       </div>
     )
   }

@@ -7,12 +7,12 @@ import { useScoreSave } from '../../hooks/useScoreSave'
 import LeaderboardSave from '../../components/LeaderboardSave'
 import '../form.css'
 
-// End of a solo survival run: saves the rounds survived in the leaderboard of these games and lives.
-export default function SurvivalForm({ score, elapsedTime, modes, lives }) {
+// End of a solo survival run: saves the rounds survived in the leaderboard of these games, lives, timer and ramp.
+export default function SurvivalForm({ score, elapsedTime, modes, lives, timer, ramp }) {
   const { t } = useTranslation()
   const saver = useScoreSave(
     useAccount(),
-    (player) => saveSurvivalScore({ ...player, modes, lives, score, elapsedTime: Math.round(elapsedTime) }),
+    (player) => saveSurvivalScore({ ...player, modes, lives, timer, ramp, score, elapsedTime: Math.round(elapsedTime) }),
     { enabled: score > 0 }
   )
 

@@ -59,3 +59,57 @@
   font-size: 0.8rem;
   color: var(--warning);
 }
+
+.survival-options-hint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.survival-ramp-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.survival-ramp-step {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.survival-stepper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.survival-stepper strong {
+  min-width: 24px;
+  text-align: center;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.survival-stepper button {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.survival-stepper button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}

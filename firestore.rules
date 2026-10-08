@@ -227,17 +227,103 @@ service cloud.firestore {
 
     // ---------- Leaderboards ----------
 
+    // Score limits (validScore, validAscension, validDaily) are computed by scripts/scoreCaps.mjs from the game code
+    // and the country data. The maps between the scoreCaps markers are rewritten by "node scripts/scoreCaps.mjs --write"
+    // and verified by "--check" (and by npm test). Lookups default to -1, so a game or mode that isn't listed is refused.
+
     // Solo scores: { name, uid?, score, difficulty, elapsedTime, gameType, continent? }
+    // The best a game can give is a perfect run of its difficulty (or continent, which then fills `difficulty`) plus a
+    // margin, and a game of N countries can't be finished in less than 100 ms per country.
     match /scores/{scoreId} {
+      function soloCaps() {
+        return {
+          // scoreCaps:begin soloCaps
+          'PLACEMENT_Facile': 96,
+          'PLACEMENT_Moyen': 259,
+          'PLACEMENT_Difficile': 809,
+          'PLACEMENT_Impossible': 565,
+          'PLACEMENT_Hardcore': 1727,
+          'PLACEMENT_Europe': 286,
+          'PLACEMENT_Asie': 345,
+          'PLACEMENT_Afrique': 383,
+          'PLACEMENT_Amériques': 407,
+          'PLACEMENT_Océanie': 201,
+          'FLAGS_Facile': 109,
+          'FLAGS_Moyen': 347,
+          'FLAGS_Difficile': 655,
+          'FLAGS_Impossible': 466,
+          'FLAGS_Hardcore': 1576,
+          'FLAGS_Europe': 270,
+          'FLAGS_Asie': 325,
+          'FLAGS_Afrique': 389,
+          'FLAGS_Amériques': 383,
+          'FLAGS_Océanie': 211,
+          'CAPITALS_Facile': 103,
+          'CAPITALS_Moyen': 297,
+          'CAPITALS_Difficile': 732,
+          'CAPITALS_Impossible': 476,
+          'CAPITALS_Hardcore': 1606,
+          'CAPITALS_Europe': 260,
+          'CAPITALS_Asie': 330,
+          'CAPITALS_Afrique': 400,
+          'CAPITALS_Amériques': 407,
+          'CAPITALS_Océanie': 211
+          // scoreCaps:end soloCaps
+        };
+      }
+
+      function soloMinTime() {
+        return {
+          // scoreCaps:begin soloMinTime
+          'PLACEMENT_Facile': 2900,
+          'PLACEMENT_Moyen': 4700,
+          'PLACEMENT_Difficile': 10500,
+          'PLACEMENT_Impossible': 5700,
+          'PLACEMENT_Hardcore': 23800,
+          'PLACEMENT_Europe': 5100,
+          'PLACEMENT_Asie': 5200,
+          'PLACEMENT_Afrique': 5600,
+          'PLACEMENT_Amériques': 5200,
+          'PLACEMENT_Océanie': 2400,
+          'FLAGS_Facile': 3300,
+          'FLAGS_Moyen': 6300,
+          'FLAGS_Difficile': 8500,
+          'FLAGS_Impossible': 4700,
+          'FLAGS_Hardcore': 22800,
+          'FLAGS_Europe': 5000,
+          'FLAGS_Asie': 5200,
+          'FLAGS_Afrique': 5600,
+          'FLAGS_Amériques': 5200,
+          'FLAGS_Océanie': 2400,
+          'CAPITALS_Facile': 3100,
+          'CAPITALS_Moyen': 5400,
+          'CAPITALS_Difficile': 9500,
+          'CAPITALS_Impossible': 4800,
+          'CAPITALS_Hardcore': 22800,
+          'CAPITALS_Europe': 5000,
+          'CAPITALS_Asie': 5100,
+          'CAPITALS_Afrique': 5600,
+          'CAPITALS_Amériques': 5200,
+          'CAPITALS_Océanie': 2400
+          // scoreCaps:end soloMinTime
+        };
+      }
+
+      function validResult(data) {
+        return inRange(data.score, soloCaps().get(data.gameType + '_' + data.difficulty, -1))
+          && (data.get('elapsedTime', null) == null
+              || (inRange(data.elapsedTime, 1000000000)
+                  && data.elapsedTime >= soloMinTime().get(data.gameType + '_' + data.difficulty, 0)));
+      }
+
       function validScore(data) {
         return data.keys().hasOnly(['name', 'uid', 'score', 'difficulty', 'elapsedTime', 'gameType', 'continent'])
           && data.keys().hasAll(['name', 'score', 'difficulty', 'gameType'])
           && validName(data.name)
           && validOwner(data)
-          && inRange(data.score, 1000000)
           && validLabel(data.difficulty)
           && validLabel(data.gameType)
-          && (data.get('elapsedTime', null) == null || inRange(data.elapsedTime, 1000000000))
+          && validResult(data)
           && (data.get('continent', null) == null || validLabel(data.continent));
       }
 
@@ -268,7 +354,99 @@ service cloud.firestore {
     }
 
     // Ascension scores: { name, uid?, gameType, presetName, globalTimeMs, globalScore, totalFound, totalSkipped, phaseStats, date }
+    // The preset fixes the countries asked (found + skipped can't exceed them), hence the best score and the
+    // shortest time. phaseStats holds one entry per phase, with the phase's own count as its limit.
     match /ascension_scores/{scoreId} {
+      function ascensionCaps() {
+        return {
+          // scoreCaps:begin ascensionCaps
+          'Découverte': 69,
+          'Progressif': 153,
+          'Challenge': 136,
+          'Hardcore': 237
+          // scoreCaps:end ascensionCaps
+        };
+      }
+
+      function ascensionTotals() {
+        return {
+          // scoreCaps:begin ascensionTotals
+          'Découverte': 16,
+          'Progressif': 31,
+          'Challenge': 23,
+          'Hardcore': 35
+          // scoreCaps:end ascensionTotals
+        };
+      }
+
+      function ascensionPhases() {
+        return {
+          // scoreCaps:begin ascensionPhases
+          'Découverte': 3,
+          'Progressif': 4,
+          'Challenge': 4,
+          'Hardcore': 4
+          // scoreCaps:end ascensionPhases
+        };
+      }
+
+      function ascensionPhaseCounts() {
+        return {
+          // scoreCaps:begin ascensionPhaseCounts
+          'Découverte_0': 10,
+          'Découverte_1': 5,
+          'Découverte_2': 1,
+          'Progressif_0': 15,
+          'Progressif_1': 10,
+          'Progressif_2': 5,
+          'Progressif_3': 1,
+          'Challenge_0': 7,
+          'Challenge_1': 7,
+          'Challenge_2': 7,
+          'Challenge_3': 2,
+          'Hardcore_0': 5,
+          'Hardcore_1': 10,
+          'Hardcore_2': 15,
+          'Hardcore_3': 5
+          // scoreCaps:end ascensionPhaseCounts
+        };
+      }
+
+      function ascensionMinTime() {
+        return {
+          // scoreCaps:begin ascensionMinTime
+          'Découverte': 1600,
+          'Progressif': 3100,
+          'Challenge': 2300,
+          'Hardcore': 3500
+          // scoreCaps:end ascensionMinTime
+        };
+      }
+
+      function validPhase(phases, index, count) {
+        return phases.size() <= index
+          || (phases[index] is map
+              && phases[index].keys().hasOnly(['difficulty', 'count', 'found', 'skipped', 'timeMs'])
+              && inRange(phases[index].get('count', 0), count)
+              && inRange(phases[index].get('found', 0), count)
+              && inRange(phases[index].get('skipped', 0), count)
+              && inRange(phases[index].get('timeMs', 0), 1000000000));
+      }
+
+      function validAscensionResult(data) {
+        let preset = data.presetName;
+        let counts = ascensionPhaseCounts();
+        return data.gameType in ['PLACEMENT', 'FLAGS', 'CAPITALS']
+          && inRange(data.globalScore, ascensionCaps().get(preset, -1))
+          && inRange(data.totalFound + data.totalSkipped, ascensionTotals().get(preset, -1))
+          && data.globalTimeMs >= ascensionMinTime().get(preset, 1000000000)
+          && data.phaseStats.size() <= ascensionPhases().get(preset, -1)
+          && validPhase(data.phaseStats, 0, counts.get(preset + '_0', -1))
+          && validPhase(data.phaseStats, 1, counts.get(preset + '_1', -1))
+          && validPhase(data.phaseStats, 2, counts.get(preset + '_2', -1))
+          && validPhase(data.phaseStats, 3, counts.get(preset + '_3', -1));
+      }
+
       function validAscension(data) {
         return data.keys().hasOnly(['name', 'uid', 'gameType', 'presetName', 'globalTimeMs', 'globalScore',
                                     'totalFound', 'totalSkipped', 'phaseStats', 'date'])
@@ -277,10 +455,10 @@ service cloud.firestore {
           && validLabel(data.gameType)
           && validLabel(data.presetName)
           && inRange(data.globalTimeMs, 1000000000)
-          && inRange(data.globalScore, 1000000)
           && inRange(data.totalFound, 10000)
           && inRange(data.totalSkipped, 10000)
-          && data.phaseStats is list && data.phaseStats.size() <= 20
+          && data.phaseStats is list
+          && validAscensionResult(data)
           && data.date == request.time;
       }
 
@@ -295,24 +473,75 @@ service cloud.firestore {
     // Daily challenges (all with name and uid?), two shapes:
     //  - Country Ranking: { name, gameType: 'RANKING', dailyKey, score, totalError, attemptsUsed, playerOrder }
     //  - other games:     { name, gameType, dailyKey, attempts, elapsedTime, guesses, hints? } (fewer attempts wins)
+    // A daily is saved once solved, so it took at least one attempt. Limits come from the games: quiz tries and hints,
+    // the guessable names (Border Guess, Country Clue), the countries of a Voyage Voyage chain (whose elapsedTime holds
+    // the wrong guesses), and Country Ranking's 5 countries, 3 tries and 3 points for a perfect first try.
     match /daily_scores/{scoreId} {
+      function dailyAttempts() {
+        return {
+          // scoreCaps:begin dailyAttempts
+          'BORDER_GUESS': 510,
+          'COUNTRY_CLUE': 510,
+          'QUIZ': 5,
+          'VOYAGE_VOYAGE': 262
+          // scoreCaps:end dailyAttempts
+        };
+      }
+
+      function dailyHints() {
+        return {
+          // scoreCaps:begin dailyHints
+          'BORDER_GUESS': 0,
+          'COUNTRY_CLUE': 0,
+          'QUIZ': 3,
+          'VOYAGE_VOYAGE': 3
+          // scoreCaps:end dailyHints
+        };
+      }
+
+      function dailyWrong() {
+        return {
+          // scoreCaps:begin dailyWrong
+          'VOYAGE_VOYAGE': 262
+          // scoreCaps:end dailyWrong
+        };
+      }
+
+      function rankingCaps() {
+        return {
+          // scoreCaps:begin rankingCaps
+          'score': 3,
+          'totalError': 14,
+          'attemptsUsed': 3,
+          'players': 5
+          // scoreCaps:end rankingCaps
+        };
+      }
+
       function validRanking(data) {
+        let caps = rankingCaps();
         return data.gameType == 'RANKING'
           && data.keys().hasOnly(['name', 'uid', 'gameType', 'dailyKey', 'score', 'totalError', 'attemptsUsed', 'playerOrder'])
           && data.keys().hasAll(['name', 'gameType', 'dailyKey', 'score', 'totalError'])
-          && inRange(data.score, 1000000)
-          && inRange(data.totalError, 1000000)
-          && (data.get('attemptsUsed', null) == null || inRange(data.attemptsUsed, 100))
-          && (data.get('playerOrder', null) == null || (data.playerOrder is list && data.playerOrder.size() <= 300));
+          && inRange(data.score, caps['score'])
+          && inRange(data.totalError, caps['totalError'])
+          && (data.score == 0 || data.totalError == 0)
+          && (data.get('attemptsUsed', null) == null
+              || (inRange(data.attemptsUsed, caps['attemptsUsed']) && data.attemptsUsed >= 1))
+          && (data.get('playerOrder', null) == null
+              || (data.playerOrder is list && data.playerOrder.size() <= caps['players']));
       }
 
       function validAttempts(data) {
         return data.gameType != 'RANKING'
           && data.keys().hasOnly(['name', 'uid', 'gameType', 'dailyKey', 'attempts', 'elapsedTime', 'guesses', 'hints'])
           && data.keys().hasAll(['name', 'gameType', 'dailyKey', 'attempts'])
-          && inRange(data.attempts, 1000)
-          && (data.get('elapsedTime', null) == null || inRange(data.elapsedTime, 1000000000))
-          && (data.get('hints', null) == null || inRange(data.hints, 1000));
+          && data.attempts >= 1
+          && inRange(data.attempts, dailyAttempts().get(data.gameType, -1))
+          && (data.get('elapsedTime', null) == null
+              || inRange(data.elapsedTime, dailyWrong().get(data.gameType, 1000000000)))
+          && (data.get('hints', null) == null || inRange(data.hints, dailyHints().get(data.gameType, -1)))
+          && data.get('guesses', []) is list && data.get('guesses', []).size() <= 600;
       }
 
       function validDaily(data) {

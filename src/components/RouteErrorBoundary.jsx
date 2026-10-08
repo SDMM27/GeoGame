@@ -1,4 +1,5 @@
 import React from 'react'
+import * as Sentry from '@sentry/react'
 import { useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import './RouteFallback.css'
@@ -31,8 +32,10 @@ export class ErrorBoundary extends React.Component {
     return { failed: true }
   }
 
-  componentDidCatch(error) {
+  componentDidCatch(error, info) {
     console.error(error)
+    // Caught here, the error never reaches Sentry's global handler (no-op without VITE_SENTRY_DSN)
+    Sentry.captureException(error, { contexts: { react: { componentStack: info?.componentStack } } })
   }
 
   componentDidUpdate(previousProps) {

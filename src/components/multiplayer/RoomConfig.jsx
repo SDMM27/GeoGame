@@ -233,9 +233,9 @@ export function GameEditor({ draft, onChange }) {
 export default function RoomConfig({ onSubmit, submitting }) {
   const { t } = useTranslation()
   const { account } = useAccount()
-  // Signed in: the account's username until the player types another one
+  // Signed in: always the account's username, like their solo scores
   const [typed, setTyped] = useState(null)
-  const pseudo = typed ?? account?.username ?? getSavedPseudo()
+  const pseudo = account?.username ?? typed ?? getSavedPseudo()
   const [mode, setMode] = useState('live')
   // Games already added, then the one being edited (the last game of the room)
   const [games, setGames] = useState([])
@@ -267,6 +267,7 @@ export default function RoomConfig({ onSubmit, submitting }) {
           onChange={e => setTyped(e.target.value)}
           placeholder={t('placeholders.username')}
           maxLength={20}
+          readOnly={Boolean(account?.username)}
           aria-invalid={forbiddenPseudo}
         />
         {forbiddenPseudo && <p className="rc-hint" role="alert">{t('account.errors.username_forbidden')}</p>}

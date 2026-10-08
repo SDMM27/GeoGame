@@ -52,9 +52,9 @@ function useCountdown(startAt: number | null) {
 // `autoJoin`: opened from a friend's invite with an account, so the player joins under their username right away.
 function JoinCard({ room, account, autoJoin }: { room: Room; account: Account | null; autoJoin: boolean }) {
   const { t } = useTranslation()
-  // Signed in: the account's username until the player types another one
+  // Signed in: always the account's username, like their solo scores
   const [typed, setPseudo] = useState<string | null>(null)
-  const pseudo = typed ?? account?.username ?? getSavedPseudo()
+  const pseudo = account?.username ?? typed ?? getSavedPseudo()
   const [joining, setJoining] = useState(false)
   const forbidden = containsProfanity(pseudo)
   const autoJoinedRef = useRef(false)
@@ -77,7 +77,7 @@ function JoinCard({ room, account, autoJoin }: { room: Room; account: Account | 
   return (
     <View style={styles.card}>
       <Text variant="body" color={colors.textMuted}>
-        {t('mobile.multi.join_hint')}
+        {t(account?.username ? 'mobile.multi.join_hint_account' : 'mobile.multi.join_hint')}
       </Text>
       <TextInput
         value={pseudo}
@@ -89,7 +89,8 @@ function JoinCard({ room, account, autoJoin }: { room: Room; account: Account | 
         autoCorrect={false}
         returnKeyType="done"
         onSubmitEditing={() => !forbidden && onJoin()}
-        style={styles.input}
+        editable={!account?.username}
+        style={[styles.input, account?.username ? styles.locked : null]}
       />
       {forbidden && (
         <Text variant="caption" color={colors.danger}>
@@ -493,6 +494,7 @@ const styles = StyleSheet.create({
   },
   waiting: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.md, padding: space.lg },
   countdown: { alignItems: 'center', paddingVertical: space.xl },
+  locked: { opacity: 0.7 },
   input: {
     height: 52,
     borderRadius: radius.md,

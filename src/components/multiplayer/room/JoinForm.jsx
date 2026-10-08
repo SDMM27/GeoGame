@@ -8,9 +8,9 @@ import { joinRoom } from '../../../utils/multiplayerRoom'
 export default function JoinForm({ room, playerId }) {
   const { t } = useTranslation()
   const { account } = useAccount()
-  // Signed in: the account's username until the player types another one
+  // Signed in: always the account's username, like their solo scores
   const [typed, setTyped] = useState(null)
-  const pseudo = typed ?? account?.username ?? getSavedPseudo()
+  const pseudo = account?.username ?? typed ?? getSavedPseudo()
   const [joining, setJoining] = useState(false)
   const forbidden = containsProfanity(pseudo)
 
@@ -34,14 +34,15 @@ export default function JoinForm({ room, playerId }) {
 
   return (
     <form className="mpr-card" onSubmit={onSubmit}>
-      <p className="mpr-muted">{t('mp_room.join_hint')}</p>
+      <p className="mpr-muted">{t(account?.username ? 'mp_room.join_hint_account' : 'mp_room.join_hint')}</p>
       <input
         className="mpr-input"
         placeholder={t('placeholders.username')}
         value={pseudo}
         onChange={(e) => setTyped(e.target.value)}
         maxLength={20}
-        autoFocus
+        readOnly={Boolean(account?.username)}
+        autoFocus={!account?.username}
         aria-invalid={forbidden}
       />
       {forbidden && <p className="mpr-muted" role="alert">{t('account.errors.username_forbidden')}</p>}

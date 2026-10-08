@@ -4,6 +4,7 @@
 .rc-pseudo { margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.4rem; }
 .rc-pseudo label { font-weight: 600; color: #94a3b8; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
 .rc-pseudo input { padding: 0.6rem 0.9rem; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #f1f5f9; font-size: 1rem; }
+.rc-pseudo input[readonly] { opacity: 0.7; cursor: default; }
 .rc-section { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem; }
 .rc-games-title { font-size: 0.85rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin: 0; }
 .rc-hint { margin: 0; font-size: 0.9rem; color: #94a3b8; }

@@ -483,6 +483,7 @@
       "not_enabled": "Account creation is not enabled yet.",
       "username_length": "The username must be 3 to 20 characters.",
       "username_chars": "The username can only contain letters, digits, spaces, \"_\", \"-\" and \".\".",
+      "username_forbidden": "This username isn’t allowed. Please pick another one.",
       "username_taken": "This username is already taken.",
       "generic": "Something went wrong. Try again.",
       "popup_blocked": "The Google window was blocked. Allow pop-ups and try again.",

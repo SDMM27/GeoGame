@@ -5,12 +5,14 @@ import { sortRankingScores } from './rankingScores'
 import { LEADERBOARD_SIZE, ascensionLeaderboard, ascensionQuery, soloLeaderboard, soloQueries } from './leaderboards'
 import { GAME_TYPES } from './gameTypes'
 import { normalizeUsername } from './account'
+import { containsProfanity } from './profanity'
 
 // Every save takes the player as { name, uid? }:
 //  - signed in: uid and the account's username. One entry per account, owned by it (see firestore.rules).
 //  - visitor: a free name, as long as no account owns it.
 // Each save returns { status: 'saved' | 'updated' }, { status: 'blocked', existing } when the player
-// already has a better entry, or { status: 'taken' } when a visitor picks an account's username.
+// already has a better entry, { status: 'taken' } when a visitor picks an account's username, or
+// { status: 'forbidden' } when a visitor's name is offensive (utils/profanity.js).
 
 // A missing time (null) is the worst one.
 function isBetter(newScore, newTime, existingScore, existingTime) {
@@ -32,6 +34,7 @@ async function saveBest(collectionName, player, filters, data, isBetterThan, toE
   const { uid } = player
   // Spaces normalized like usernames, so the rules' check against usernames/ sees the same key.
   const name = uid ? player.name : normalizeUsername(player.name)
+  if (!uid && containsProfanity(name)) return { status: 'forbidden' }
   if (!uid && (await isNameTaken(name))) return { status: 'taken' }
 
   const ref = collection(firestore, collectionName)

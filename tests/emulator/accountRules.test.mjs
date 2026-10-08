@@ -51,6 +51,12 @@ beforeEach(async () => {
 })
 
 describe('claiming a username', () => {
+  it('refuses an explicitly offensive username', async () => {
+    await assertFails(claim(as('bob'), 'bob', 'Connard42'))
+    await assertFails(claim(as('bob'), 'bob', 'ПИДОР'))
+    await assertSucceeds(claim(as('bob'), 'bob', 'Scunthorpe'))
+  })
+
   it('lets a new account claim a username (sign-up, or the first Google sign-in)', async () => {
     await assertSucceeds(claim(as('bob'), 'bob', 'Bob'))
   })

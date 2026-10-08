@@ -27,6 +27,7 @@ import { doc, getDoc, serverTimestamp, Timestamp, writeBatch } from 'firebase/fi
 import { firestore } from '../Firebase'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { GAME_TYPES } from './gameTypes'
+import { containsProfanity } from './profanity'
 import {
   getSeededAscensionOverrides,
   getSeededBorderGuessCountries,
@@ -223,7 +224,11 @@ export function pickNewHost(room, now) {
 // ─── Firestore ─────────────────────────────────────────────────────────────
 
 const roomRef = (code) => doc(firestore, 'rooms', code)
-const roomPlayer = (pseudo, uid) => (uid ? { pseudo, uid, seenAt: serverTimestamp() } : { pseudo, seenAt: serverTimestamp() })
+// Refuses an offensive pseudo (the forms check it first and explain; this is the safety net).
+function roomPlayer(pseudo, uid) {
+  if (containsProfanity(pseudo)) throw new Error('forbidden_name')
+  return uid ? { pseudo, uid, seenAt: serverTimestamp() } : { pseudo, seenAt: serverTimestamp() }
+}
 
 /** A batch that also proves, to firestore.rules, that its writes come from `playerId`. */
 function ownedBatch(code, playerId) {

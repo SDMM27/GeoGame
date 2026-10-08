@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAccount } from '../../../auth'
 import { PSEUDO_STORAGE_KEY, getSavedPseudo } from '../../../utils/account'
+import { containsProfanity } from '../../../utils/profanity'
 import { joinRoom } from '../../../utils/multiplayerRoom'
 
 export default function JoinForm({ room, playerId }) {
@@ -11,11 +12,12 @@ export default function JoinForm({ room, playerId }) {
   const [typed, setTyped] = useState(null)
   const pseudo = typed ?? account?.username ?? getSavedPseudo()
   const [joining, setJoining] = useState(false)
+  const forbidden = containsProfanity(pseudo)
 
   const onSubmit = async (e) => {
     e.preventDefault()
     const name = pseudo.trim()
-    if (!name) return
+    if (!name || forbidden) return
     setJoining(true)
     try {
       try {
@@ -40,8 +42,10 @@ export default function JoinForm({ room, playerId }) {
         onChange={(e) => setTyped(e.target.value)}
         maxLength={20}
         autoFocus
+        aria-invalid={forbidden}
       />
-      <button type="submit" className="mpr-btn" disabled={!pseudo.trim() || joining}>
+      {forbidden && <p className="mpr-muted" role="alert">{t('account.errors.username_forbidden')}</p>}
+      <button type="submit" className="mpr-btn" disabled={!pseudo.trim() || forbidden || joining}>
         {joining ? t('lobby.connecting') : t('mp_room.join')}
       </button>
     </form>

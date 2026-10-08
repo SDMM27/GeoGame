@@ -81,6 +81,15 @@ describe('computed limits', () => {
   })
 })
 
+describe('offensive names', () => {
+  it('refuses the most explicit insults in a visitor name, not names that merely look like them', async () => {
+    for (const name of ['Fuck', 'xXConnardXx', 'Salope', 'ХУЙ', 'Пиздец'])
+      await assertFails(anonymous().collection('scores').add(solos({ name, uid: undefined })))
+    for (const name of ['Scunthorpe', 'Cassandra', 'Dickens', 'Иван'])
+      await assertSucceeds(anonymous().collection('scores').add(solos({ name, uid: undefined })))
+  })
+})
+
 describe('solo scores', () => {
   const modes = solo.rows.map((row) => [`${row.game} ${row.mode}`, row])
 

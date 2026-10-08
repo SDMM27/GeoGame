@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 // functions bound to the game's score, called with { name, uid? }.
 //  - signed-in player with a username: saved on its own, under their account.
 //  - visitor: saved when they submit a name (submit(name)).
-// status: 'idle' | 'saving' | 'saved' | 'updated' | 'blocked' | 'taken' | 'error'
+// status: 'idle' | 'saving' | 'saved' | 'updated' | 'blocked' | 'taken' | 'forbidden' | 'error'
 // (`existing` holds the better entry when blocked). `alreadySaved` starts at 'saved' (daily challenges).
 export function useScoreSave(accountState, save, { enabled = true, alreadySaved = false } = {}) {
   const [state, setState] = useState({ status: alreadySaved ? 'saved' : 'idle', existing: null, name: null })
@@ -53,10 +53,10 @@ export function useScoreSave(accountState, save, { enabled = true, alreadySaved 
   // Signed-in player, after an error.
   const retry = useCallback(() => (account ? run({ name: account.username, uid: account.uid }) : null), [account, run])
 
-  // The visitor edits their name: forget a 'blocked' / 'taken' answer about the previous one.
+  // The visitor edits their name: forget a 'blocked' / 'taken' / 'forbidden' answer about the previous one.
   const clear = useCallback(() => {
     setState((previous) =>
-      previous.status === 'blocked' || previous.status === 'taken' || previous.status === 'error'
+      ['blocked', 'taken', 'forbidden', 'error'].includes(previous.status)
         ? { status: 'idle', existing: null, name: null }
         : previous
     )

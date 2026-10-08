@@ -483,6 +483,7 @@
       "not_enabled": "La création de compte n’est pas encore activée.",
       "username_length": "Le pseudo doit faire entre 3 et 20 caractères.",
       "username_chars": "Le pseudo ne peut contenir que des lettres, chiffres, espaces, « _ », « - » et « . ».",
+      "username_forbidden": "Ce pseudo n’est pas autorisé. Choisis-en un autre.",
       "username_taken": "Ce pseudo est déjà pris.",
       "generic": "Une erreur est survenue. Réessaie.",
       "popup_blocked": "La fenêtre Google a été bloquée. Autorise les pop-ups et réessaie.",

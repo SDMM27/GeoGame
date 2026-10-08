@@ -16,9 +16,16 @@ service cloud.firestore {
       return isNumber(value) && value >= 0 && value <= max;
     }
 
+    // Last line of defense against the most explicit insults in a name (the real filter is src/utils/profanity.js,
+    // on the client). RE2 has no accent or leetspeak normalization, so this only catches plain spellings; it is
+    // case-insensitive and kept short on purpose (one match per name, and no word that sits inside a place or a name).
+    function cleanName(name) {
+      return !name.matches('(?is).*(fuck|nigger|nigga|connard|connasse|salope|putain|encul|pedophile|hitler|bitch|asshole|faggot|whore|хуй|пизд|бляд|мудак|пидор).*');
+    }
+
     // Pseudos are capped at 20 characters in the forms (30 for Country Ranking).
     function validName(name) {
-      return name is string && name.size() > 0 && name.size() <= 30;
+      return name is string && name.size() > 0 && name.size() <= 30 && cleanName(name);
     }
 
     function validLabel(value) {
@@ -35,7 +42,7 @@ service cloud.firestore {
     // 3 to 20 characters, a letter or digit first, then letters, digits, single spaces, _ . -
     // The size is also capped at 60 because the rules may count bytes rather than characters.
     function validUsername(name) {
-      return name is string && name.size() >= 3 && name.size() <= 60
+      return name is string && name.size() >= 3 && name.size() <= 60 && cleanName(name)
         && name.matches('^[\\p{L}\\p{N}](?:[\\p{L}\\p{N}_.-]| [\\p{L}\\p{N}_.-])*$');
     }
 

@@ -135,6 +135,13 @@ describe('creating a room', () => {
     await assertFails(createRoom({ games: manyGames(2), game: manyGames(2)[0] }))
   })
 
+  it('refuses an explicitly offensive pseudo, when creating a room or joining one', async () => {
+    await assertFails(createRoom({ players: { host: { pseudo: 'Fuck you', seenAt: serverTime() } } }))
+    await assertSucceeds(createRoom())
+    await assertFails(joinAs('p2', 'Salope'))
+    await assertSucceeds(joinAs('p3', 'Scunthorpe'))
+  })
+
   it('creates a room whose host has an account', async () => {
     await assertSucceeds(createRoom({ players: { host: { pseudo: 'Hôte', uid: 'some-account-uid', seenAt: serverTime() } } }))
   })

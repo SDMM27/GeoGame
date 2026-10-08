@@ -17,7 +17,16 @@ import {
   DIFFICULTIES,
 } from '@shared/utils/leaderboards'
 import { dayKey } from '@shared/utils/profileStats'
-import { DEFAULT_SURVIVAL_LIVES, SURVIVAL_LIVES, SURVIVAL_ROUND_TYPES, survivalModesKey } from '@shared/utils/survivalConfig'
+import {
+  DEFAULT_SURVIVAL_LIVES,
+  DEFAULT_SURVIVAL_RAMP,
+  DEFAULT_SURVIVAL_TIMER,
+  SURVIVAL_LIVES,
+  SURVIVAL_RAMP_NAMES,
+  SURVIVAL_ROUND_TYPES,
+  SURVIVAL_TIMERS,
+  survivalModesKey,
+} from '@shared/utils/survivalConfig'
 
 import { DailyLeaderboard } from '@/components/game/DailyLeaderboard'
 import { RankingLeaderboard } from '@/components/game/RankingLeaderboard'
@@ -54,6 +63,8 @@ export default function LeaderboardsScreen() {
   const [dailyGame, setDailyGame] = useState<string>(DAILY_GAMES[0].type)
   const [survivalLives, setSurvivalLives] = useState(String(DEFAULT_SURVIVAL_LIVES))
   const [survivalModes, setSurvivalModes] = useState<string>(ALL_SURVIVAL_MODES)
+  const [survivalTimer, setSurvivalTimer] = useState(String(DEFAULT_SURVIVAL_TIMER))
+  const [survivalRamp, setSurvivalRamp] = useState<string>(DEFAULT_SURVIVAL_RAMP)
   const todayKey = useMemo(() => dayKey(), [])
   const [day, setDay] = useState(todayKey)
 
@@ -160,6 +171,21 @@ export default function LeaderboardsScreen() {
             onChange={setSurvivalLives}
           />
           <FilterChips
+            label={t('survival.choose_timer')}
+            options={SURVIVAL_TIMERS.map((seconds: number) => ({
+              value: String(seconds),
+              label: seconds ? t('survival.timer_seconds', { count: seconds }) : t('survival.timer_none'),
+            }))}
+            value={survivalTimer}
+            onChange={setSurvivalTimer}
+          />
+          <FilterChips
+            label={t('survival.choose_ramp')}
+            options={SURVIVAL_RAMP_NAMES.map((name: string) => ({ value: name, label: t(`survival.ramp.${name}`) }))}
+            value={survivalRamp}
+            onChange={setSurvivalRamp}
+          />
+          <FilterChips
             label={t('survival.choose_games')}
             options={[
               { value: ALL_SURVIVAL_MODES, label: t('survival.all_combinations'), icon: 'view-grid-outline' },
@@ -173,7 +199,12 @@ export default function LeaderboardsScreen() {
             onChange={setSurvivalModes}
           />
           <SurvivalLeaderboard
-            filters={{ lives: Number(survivalLives), modes: survivalModes === ALL_SURVIVAL_MODES ? null : survivalModes }}
+            filters={{
+              lives: Number(survivalLives),
+              timer: Number(survivalTimer),
+              ramp: survivalRamp,
+              modes: survivalModes === ALL_SURVIVAL_MODES ? null : survivalModes,
+            }}
             refreshKey={refreshKey}
             onSettled={onSettled}
           />

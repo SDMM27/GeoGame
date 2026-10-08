@@ -111,12 +111,12 @@ export function saveRankingScore({ name, uid, dailyKey, score, totalError, attem
   )
 }
 
-// Survival score: best one per player, set of games (`modes`, see survivalModesKey) and number of lives.
-export function saveSurvivalScore({ name, uid, modes, lives, score, elapsedTime }) {
+// Survival score: best one per player, set of games (`modes`, see survivalModesKey), lives, timer and preset ramp.
+export function saveSurvivalScore({ name, uid, modes, lives, timer, ramp, score, elapsedTime }) {
   return saveBest(
     'survival_scores',
     { name, uid },
-    { modes, lives },
+    { modes, lives, timer, ramp },
     { score, elapsedTime },
     (next, previous) => isBetter(next.score, next.elapsedTime, previous.score, previous.elapsedTime),
     (previous) => ({ score: previous.score, elapsedTime: previous.elapsedTime })
@@ -178,9 +178,10 @@ export async function fetchAscensionScores(filters) {
   return ascensionLeaderboard(scores)
 }
 
-// Survival leaderboard (the best LEADERBOARD_SIZE) of a number of lives, for a set of games or all of them (modes null).
-export async function fetchSurvivalScores({ lives, modes = null }) {
-  const filters = { lives, ...(modes && { modes }) }
+// Survival leaderboard (the best LEADERBOARD_SIZE) of a number of lives, a timer and a preset ramp, for a set of games
+// or all of them (modes null).
+export async function fetchSurvivalScores({ lives, timer, ramp, modes = null }) {
+  const filters = { lives, timer, ramp, ...(modes && { modes }) }
   const scores = await fetchTop('survival_scores', [filters], [['score', 'desc'], ['elapsedTime', 'asc']])
   return sortSurvivalScores(scores).slice(0, LEADERBOARD_SIZE)
 }

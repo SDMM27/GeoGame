@@ -9,7 +9,7 @@ import { ScrollView, StyleSheet, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { containsProfanity } from '@shared/utils/profanity'
-import { parseSurvivalModes } from '@shared/utils/survivalConfig'
+import { matchSurvivalRamp, parseSurvivalModes } from '@shared/utils/survivalConfig'
 import { QUIZ_DIFFICULTIES } from '@shared/utils/quizQuestions'
 
 import { useAccount } from '@/account/auth'
@@ -27,6 +27,8 @@ type SetupConfig = {
   presetName?: string | null
   modes?: string
   lives?: number
+  timer?: number
+  ramp?: Record<string, number>
 }
 
 const COUNTS = ['5', '10', '15'] as const
@@ -58,7 +60,9 @@ export default function CreateRoomSheet() {
   const isSurvival = game.id === 'survival'
 
   const setupLabel = isSurvival
-    ? `${t('survival.lives_count', { count: setup.lives ?? 0 })} · ${parseSurvivalModes(setup.modes)
+    ? `${t('survival.lives_count', { count: setup.lives ?? 0 })} · ⏱ ${
+        setup.timer ? t('survival.timer_seconds', { count: setup.timer }) : t('survival.timer_none')
+      } · ${t(`survival.ramp.${matchSurvivalRamp(setup.ramp) ?? 'custom'}`)} · ${parseSurvivalModes(setup.modes)
         .map((type: string) => t(`survival.round_type.${type}`))
         .join(', ')}`
     : setup.phases
@@ -81,7 +85,7 @@ export default function CreateRoomSheet() {
       presetName: setup.presetName ?? null,
     }
     if (isRounds || isQuiz) roomGame.count = Number(count)
-    if (isSurvival) Object.assign(roomGame, { modes: setup.modes, lives: setup.lives })
+    if (isSurvival) Object.assign(roomGame, { modes: setup.modes, lives: setup.lives, timer: setup.timer ?? 0, ramp: setup.ramp })
     if (isQuiz) Object.assign(roomGame, { quizDifficulty, answerMode })
     setCreating(true)
     setFailed(false)

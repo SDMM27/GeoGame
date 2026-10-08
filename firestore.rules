@@ -344,17 +344,21 @@ service cloud.firestore {
                     resource.data.score, resource.data.get('elapsedTime', null));
     }
 
-    // Survival scores: { name, uid?, modes, lives, score, elapsedTime }, the best one per player, set of games and lives.
+    // Survival scores: { name, uid?, modes, lives, timer, ramp, score, elapsedTime }, the best one per player, set of
+    // games, lives, timer (seconds per round, 0 for none) and difficulty ramp (only the presets are ranked:
+    // SURVIVAL_RAMPS in src/utils/survivalConfig.js).
     // `modes` names the games of the rounds ('FLAGS+QUIZ', see survivalModesKey in src/utils/survivalConfig.js); `score`
     // counts the rounds cleared, at most SURVIVAL_MAX_ROUNDS (300), and a round can't be cleared in less than 300 ms.
     match /survival_scores/{scoreId} {
       function validSurvival(data) {
-        return data.keys().hasOnly(['name', 'uid', 'modes', 'lives', 'score', 'elapsedTime'])
-          && data.keys().hasAll(['name', 'modes', 'lives', 'score', 'elapsedTime'])
+        return data.keys().hasOnly(['name', 'uid', 'modes', 'lives', 'timer', 'ramp', 'score', 'elapsedTime'])
+          && data.keys().hasAll(['name', 'modes', 'lives', 'timer', 'ramp', 'score', 'elapsedTime'])
           && validName(data.name)
           && validOwner(data)
           && validSurvivalModes(data.modes)
           && data.lives in [1, 3, 5, 10]
+          && data.timer in [0, 15, 30, 60]
+          && data.ramp in ['express', 'normal', 'gentle', 'hardcore']
           && data.score is int && data.score >= 1 && data.score <= 300
           && inRange(data.elapsedTime, 1000000000) && data.elapsedTime >= data.score * 300;
       }
@@ -362,7 +366,7 @@ service cloud.firestore {
       allow read: if true;
       allow create: if validSurvival(request.resource.data);
       allow update: if validSurvival(request.resource.data)
-        && sameFields(['name', 'uid', 'modes', 'lives'])
+        && sameFields(['name', 'uid', 'modes', 'lives', 'timer', 'ramp'])
         && isBetter(request.resource.data.score, request.resource.data.elapsedTime,
                     resource.data.score, resource.data.get('elapsedTime', null));
     }
@@ -641,7 +645,14 @@ service cloud.firestore {
     // Games of a survival run, in setup order: 'PLACEMENT+FLAGS+QUIZ' (survivalModesKey in src/utils/survivalConfig.js).
     function validSurvivalModes(modes) {
       return modes is string && modes.size() <= 80
-        && modes.matches('^(PLACEMENT|FLAGS|CAPITALS|BORDER_GUESS|COUNTRY_CLUE|QUIZ)([+](PLACEMENT|FLAGS|CAPITALS|BORDER_GUESS|COUNTRY_CLUE|QUIZ))*$');
+        && modes.matches('^(PLACEMENT|FLAGS|CAPITALS|BORDER_GUESS|QUIZ)([+](PLACEMENT|FLAGS|CAPITALS|BORDER_GUESS|QUIZ))*$');
+    }
+
+    // Survival difficulty ramp: the rounds at each difficulty before Impossible (SURVIVAL_RAMP_MAX at most).
+    function validSurvivalRamp(ramp) {
+      return ramp is map
+        && ramp.keys().hasOnly(['Facile', 'Moyen', 'Difficile'])
+        && inRange(ramp.get('Facile', 0), 50) && inRange(ramp.get('Moyen', 0), 50) && inRange(ramp.get('Difficile', 0), 50);
     }
 
     // Ascension phases: the number of countries per difficulty.
@@ -655,7 +666,7 @@ service cloud.firestore {
     function validRoomGame(game) {
       return game is map
         && game.keys().hasOnly(['id', 'type', 'difficulty', 'continent', 'phases', 'presetName', 'count',
-                                'quizDifficulty', 'answerMode', 'modes', 'lives'])
+                                'quizDifficulty', 'answerMode', 'modes', 'lives', 'timer', 'ramp'])
         && game.id is string && game.id.size() > 0 && game.id.size() <= 60
         && game.type is string && game.type.size() > 0 && game.type.size() <= 60
         && shortOrNull(game.get('difficulty', null)) && shortOrNull(game.get('continent', null))
@@ -664,7 +675,9 @@ service cloud.firestore {
         && (game.get('count', null) == null || (isNumber(game.count) && game.count >= 1 && game.count <= 300))
         && (game.get('phases', null) == null || validPhases(game.phases))
         && (game.get('modes', null) == null || validSurvivalModes(game.modes))
-        && (game.get('lives', null) == null || game.lives in [1, 3, 5, 10]);
+        && (game.get('lives', null) == null || game.lives in [1, 3, 5, 10])
+        && (game.get('timer', null) == null || game.timer in [0, 15, 30, 60])
+        && (game.get('ramp', null) == null || validSurvivalRamp(game.ramp));
     }
 
     // players.{id}: { pseudo, uid?, seenAt? }; seenAt is the heartbeat, always the server time.
@@ -823,14 +836,20 @@ service cloud.firestore {
           && request.resource.data.at == request.time;
       }
 
-      // progress/{playerId}: { gameIndex, found, total, finished, lives?, lastSeen, expiresAt } (lives: survival)
+      // progress/{playerId}: { gameIndex, found, total, finished, lives?, round?, roundAt?, roundDone?, lastSeen, expiresAt }
+      // Survival: the lives left; in a live room, the round being played, when it started (server ms) and whether
+      // the player is done with it (src/utils/survivalSync.js).
       match /progress/{playerId} {
         function validProgress(data) {
-          return data.keys().hasOnly(['gameIndex', 'found', 'total', 'finished', 'lives', 'lastSeen', 'expiresAt'])
+          return data.keys().hasOnly(['gameIndex', 'found', 'total', 'finished', 'lives', 'round', 'roundAt', 'roundDone',
+                                      'lastSeen', 'expiresAt'])
             && data.keys().hasAll(['gameIndex', 'found', 'total', 'finished'])
             && inRange(data.gameIndex, 19) && inRange(data.found, 1000) && inRange(data.total, 1000)
             && data.finished is bool
             && (data.get('lives', null) == null || inRange(data.lives, 10))
+            && (data.get('round', null) == null || inRange(data.round, 300))
+            && (data.get('roundAt', null) == null || inRange(data.roundAt, 10000000000000))
+            && (data.get('roundDone', null) == null || data.roundDone is bool)
             && (data.get('lastSeen', null) == null || data.lastSeen == request.time);
         }
 

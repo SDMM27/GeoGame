@@ -762,7 +762,6 @@
       "FLAGS": "Флаг",
       "CAPITALS": "Столица",
       "BORDER_GUESS": "Границы",
-      "COUNTRY_CLUE": "Country Clue",
       "QUIZ": "Викторина"
     },
     "prompt": {
@@ -770,7 +769,6 @@
       "FLAGS": "Чей это флаг?",
       "CAPITALS": "Какая у неё столица?",
       "BORDER_GUESS": "У какой страны такая форма?",
-      "COUNTRY_CLUE": "Найди загаданную страну",
       "QUIZ": "Вопрос викторины"
     },
     "round": "Раунд {{n}}",
@@ -790,7 +788,6 @@
     "life_lost": "Неверно! −1 жизнь",
     "not_a_country": "Не знаю такой страны.",
     "capital_placeholder": "Название столицы",
-    "clue_hint": "Называй страны: каждая ошибка стоит жизнь, но даёт подсказки.",
     "game_over": "Жизни закончились!",
     "victory": "Ты прошёл все раунды!",
     "rounds_survived": "Пройдено раундов",
@@ -808,6 +805,24 @@
     "progress_lives": "{{lives}} ❤️",
     "eliminated": "Выбыл",
     "best": "Рекорд: {{rounds}}",
-    "missed_answer": "Пропущенный ответ"
+    "missed_answer": "Пропущенный ответ",
+    "choose_timer": "Время на раунд",
+    "timer_none": "Без",
+    "timer_seconds_one": "{{count}} с",
+    "timer_seconds_few": "{{count}} с",
+    "timer_seconds_many": "{{count}} с",
+    "timer_seconds_other": "{{count}} с",
+    "time_up": "Время вышло!",
+    "waiting_players": "Ждём других игроков · {{done}}/{{total}}",
+    "choose_ramp": "Рост сложности",
+    "ramp": {
+      "express": "Экспресс",
+      "normal": "Обычный",
+      "gentle": "Плавный",
+      "hardcore": "Хардкор",
+      "custom": "Свой"
+    },
+    "ramp_summary": "Лёгких раундов: {{facile}}, средних: {{moyen}}, сложных: {{difficile}}, затем «Невозможный».",
+    "ramp_custom_hint": "Свой рост сложности: игра не идёт в рейтинг."
   }
 }

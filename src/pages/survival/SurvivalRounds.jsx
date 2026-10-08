@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next'
 import { GeoJSON, MapContainer, TileLayer } from 'react-leaflet'
 import countries from '../../data/countriesWithDifficulty_FR.json'
 import { BORDER_GUESS_COUNTRIES } from '../../hooks/useBorderGuessState'
-import { COUNTRY_CLUE_COUNTRIES } from '../../hooks/useCountryClueState'
 import { DARK_NOLABELS_TILE_URL } from '../../mapTiles'
 import { getCountryStyle, getFocusCountry } from '../../utils/borderGuessMap'
 import { GAME_TYPES } from '../../utils/gameTypes'
@@ -14,11 +13,8 @@ import { normalize } from '../../utils/normalizeAnswer'
 import { localizeQuestion } from '../../utils/quizQuestions'
 import { matchesWhileTyping } from '../../utils/survival'
 import { FitCountryBounds, GuessHistory } from '../BorderGuessPage'
-import { GuessRow } from '../CountryCluePage'
-import CountryClueMap from '../CountryClueMap'
 import SmallCountryCircles from '../game/SmallCountryCircles'
 import '../BorderGuessPage.css'
-import '../CountryCluePage.css'
 import '../QuizPage.css'
 
 const countryLabel = (country, lang) => getCountryName(country.properties.ISO_A2, lang) || country.properties.ADMIN
@@ -201,7 +197,7 @@ export function TypedRound({ survival, onSubmit }) {
   )
 }
 
-// ─── Border Guess / Country Clue: guess a country, with hints ──────────────
+// ─── Border Guess: one guess from the silhouette ───────────────────────────
 
 function useCountrySuggestions(pool) {
   const { i18n } = useTranslation()
@@ -241,27 +237,6 @@ export function BorderRound({ survival, onSubmit }) {
       </div>
       <AnswerInput survival={survival} placeholder={t('placeholders.country_examples')} onSubmit={onSubmit} suggestions={suggestions} />
       <GuessHistory guesses={guesses} t={t} i18n={i18n} />
-    </div>
-  )
-}
-
-export function ClueRound({ survival, onSubmit }) {
-  const { t, i18n } = useTranslation()
-  const { round, guesses, outcome } = survival
-  const suggestions = useCountrySuggestions(COUNTRY_CLUE_COUNTRIES)
-
-  return (
-    <div className="survival-guess">
-      <p className="survival-hint">{t('survival.clue_hint')}</p>
-      <AnswerInput survival={survival} placeholder={t('placeholders.country_examples')} onSubmit={onSubmit} suggestions={suggestions} />
-      <div className="survival-clue-map">
-        <CountryClueMap guesses={guesses} answerName={round.country.properties.ADMIN} isLost={outcome === 'failed'} />
-      </div>
-      <div className="country-clue-history">
-        {[...guesses].reverse().map((guess, index) => (
-          <GuessRow key={`${guess.value}-${index}`} guess={guess} lang={i18n.language} />
-        ))}
-      </div>
     </div>
   )
 }

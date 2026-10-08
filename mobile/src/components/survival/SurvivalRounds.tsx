@@ -9,27 +9,27 @@ import { StyleSheet, TextInput, View } from 'react-native'
 import Animated, { FadeIn, ZoomIn } from 'react-native-reanimated'
 
 import { BORDER_GUESS_COUNTRIES } from '@shared/hooks/useBorderGuessState'
-import { COUNTRY_CLUE_COUNTRIES } from '@shared/hooks/useCountryClueState'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
 import { getCapitalName, getCountryName } from '@shared/utils/getCountryName'
 import { normalize } from '@shared/utils/normalizeAnswer'
 import { localizeQuestion } from '@shared/utils/quizQuestions'
 import { matchesWhileTyping } from '@shared/utils/survival'
 
-import { BorderGuessRow, ClueGuessCard, type BorderGuess, type ClueGuess } from '@/components/game/GuessCards'
+import { BorderGuessRow, type BorderGuess } from '@/components/game/GuessCards'
 import { GuessInputBar } from '@/components/game/GuessInputBar'
 import { CountrySilhouette } from '@/components/map/CountrySilhouette'
-import { GuessesMap } from '@/components/map/GuessesMap'
 import { WorldMap, type WorldMapHandle } from '@/components/map/WorldMap'
 import { Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
+import { DIFFICULTY_COLORS } from '@/games'
 import { clean } from '@/i18n'
 import { colors, fonts, gameColors, radius, space } from '@/theme'
 
 type Feature = { properties: Record<string, any> }
+// `difficulty`: Facile, Moyen, Difficile or Impossible, rising with the round number
 export type SurvivalRound =
-  | { type: string; country: Feature; question?: undefined }
-  | { type: string; question: { choices: { id: string }[]; correctId: string }; country?: undefined }
+  | { type: string; difficulty: string; country: Feature; question?: undefined }
+  | { type: string; difficulty: string; question: { choices: { id: string }[]; correctId: string }; country?: undefined }
 
 // What useSurvivalState returns (shared JS hook)
 export type Survival = {
@@ -92,7 +92,12 @@ export function PlacementRound({ survival, footer }: { survival: Survival; foote
     <View style={StyleSheet.absoluteFill}>
       <WorldMap ref={mapRef} onCountryPress={(layer) => clickCountry(layer.feature.properties.ADMIN)} />
       <View style={styles.mapPanel}>
-        <Text variant="label">{t('mobile.game.find')}</Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <Text variant="label">{t('mobile.game.find')}</Text>
+          <Text variant="label" color={DIFFICULTY_COLORS[round!.difficulty]}>
+            {t(`difficulties.${round!.difficulty}`)}
+          </Text>
+        </View>
         <Animated.View key={target} entering={FadeIn.duration(220)}>
           <Text variant="title" numberOfLines={2} adjustsFontSizeToFit style={{ marginTop: 2 }}>
             {countryLabel(round!.country!, i18n.language)}
@@ -181,7 +186,7 @@ export function TypedRound({ survival, onSubmit }: { survival: Survival; onSubmi
   )
 }
 
-// ─── Border Guess / Country Clue: guess a country, with hints ──────────────
+// ─── Border Guess: one guess from the silhouette ───────────────────────────
 
 function useSuggestions(pool: Feature[], value: string) {
   const { i18n } = useTranslation()
@@ -195,7 +200,7 @@ function useSuggestions(pool: Feature[], value: string) {
   }, [names, value])
 }
 
-/** The input bar of a guess round: suggestions, give up (−1 life), submit. */
+/** The input bar of a Border Guess round: suggestions, give up (−1 life), submit. */
 export function GuessRoundInput({ survival, pool, onSubmit }: { survival: Survival; pool: Feature[]; onSubmit: (text: string) => string | null }) {
   const { t } = useTranslation()
   const [value, setValue] = useState('')
@@ -220,7 +225,6 @@ export function GuessRoundInput({ survival, pool, onSubmit }: { survival: Surviv
 }
 
 export const BORDER_POOL = BORDER_GUESS_COUNTRIES as Feature[]
-export const CLUE_POOL = COUNTRY_CLUE_COUNTRIES as Feature[]
 
 export function BorderRound({ survival, height }: { survival: Survival; height: number }) {
   const guesses = survival.guesses as BorderGuess[]
@@ -240,28 +244,6 @@ export function BorderRound({ survival, height }: { survival: Survival; height: 
             <BorderGuessRow key={`${guess.value}-${index}`} guess={guess} index={index} latest={index === guesses.length - 1} />
           ))}
       </View>
-    </View>
-  )
-}
-
-export function ClueRound({ survival }: { survival: Survival }) {
-  const { t } = useTranslation()
-  const guesses = survival.guesses as ClueGuess[]
-  const answer: string = survival.round!.country!.properties.ADMIN
-  const mapGuesses = [
-    ...guesses.map((guess) => ({ name: guess.value, correct: guess.isCorrect })),
-    ...(survival.outcome === 'failed' ? [{ name: answer, correct: true }] : []),
-  ]
-  return (
-    <View style={{ gap: space.md }}>
-      {guesses.length === 0 && <Text variant="caption">{t('survival.clue_hint')}</Text>}
-      {mapGuesses.length > 0 && <GuessesMap guesses={mapGuesses} />}
-      {guesses
-        .map((guess, index) => ({ guess, index }))
-        .reverse()
-        .map(({ guess, index }) => (
-          <ClueGuessCard key={`${guess.value}-${index}`} guess={guess} index={index} />
-        ))}
     </View>
   )
 }

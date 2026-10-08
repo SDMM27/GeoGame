@@ -38,7 +38,7 @@ export type SaveConfig =
     }
   | { kind: 'ranking'; dailyKey: string; totalError: number; attemptsUsed: number; playerOrder: string[] }
   // Survival: `score` is the rounds cleared
-  | { kind: 'survival'; modes: string; lives: number; elapsedTime: number }
+  | { kind: 'survival'; modes: string; lives: number; timer: number; ramp: string; elapsedTime: number }
 
 export type ShareConfig = {
   gameType: string

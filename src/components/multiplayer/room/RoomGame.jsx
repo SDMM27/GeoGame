@@ -2,8 +2,10 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { GAME_TYPES } from '../../../utils/gameTypes'
 import { loadSnapshot, snapshotKey } from '../../../utils/multiplayerSnapshot'
+import { serverNow } from '../../../utils/serverTime'
 import { parseSurvivalModes } from '../../../utils/survivalConfig'
-import { getRoomContent, reportProgress, roomScoringMode, submitResult } from '../../../utils/multiplayerRoom'
+import { SURVIVAL_LATE_MS } from '../../../utils/survivalSync'
+import { getRoomContent, progressForGame, reportProgress, roomScoringMode, submitResult } from '../../../utils/multiplayerRoom'
 import { MultiplayerPlacementGame } from '../../../pages/GamePage'
 import { MultiplayerFlagsGame } from '../../../pages/FlagGamePage'
 import { MultiplayerCapitalsGame } from '../../../pages/CapitalsGamePage'
@@ -57,11 +59,12 @@ export default function RoomGame({ room, progress, results, playerId, onDone }) 
       .finally(() => onDone(gameIndex))
   }, [game, room.id, playerId, pseudo, gameIndex, total, onDone])
 
-  // Survival: rounds cleared and lives left as they change, then the rounds cleared as the score
+  // Survival: rounds cleared and lives left as they change (and the round, in a live room), then the rounds
+  // cleared as the score
   const survivalRoom = useMemo(() => ({
-    onProgress: ({ score, lives }) => {
+    onProgress: ({ score, ...state }) => {
       if (doneRef.current) return
-      reportProgress(room.id, playerId, { gameIndex, found: score, total, finished: false, lives }).catch(console.error)
+      reportProgress(room.id, playerId, { gameIndex, found: score, total, finished: false, ...state }).catch(console.error)
     },
     onFinished: ({ score, errors, elapsedTime }) =>
       onGameFinished({ weightedScore: score, countriesSolved: score, attempts: errors, elapsedTime }),
@@ -97,6 +100,17 @@ export default function RoomGame({ room, progress, results, playerId, onDone }) 
   const ownClock = { ...room, startAt: null }
   const snapKey = snapshotKey(room.id, playerId, gameIndex)
   const [survivalSnapshot] = useState(() => (game.type === GAME_TYPES.SURVIVAL ? loadSnapshot(snapKey) : null))
+  // Live room: the players who start the game together play it round by round (late ones play it on their own)
+  const startAt = room.startAt?.toMillis ? room.startAt.toMillis() : null
+  const [synced] = useState(() =>
+    room.mode === 'live' && startAt != null &&
+    (survivalSnapshot ? Boolean(survivalSnapshot.synced) : serverNow() - startAt < SURVIVAL_LATE_MS)
+  )
+  const survivalEntries = useMemo(
+    () => Object.values(progressForGame(progress, gameIndex))
+      .map((entry) => ({ ...entry, lastSeen: entry.lastSeen?.toMillis ? entry.lastSeen.toMillis() : null })),
+    [progress, gameIndex]
+  )
 
   const renderGame = () => {
     switch (game.type) {
@@ -113,10 +127,13 @@ export default function RoomGame({ room, progress, results, playerId, onDone }) 
           <SurvivalGame
             modes={parseSurvivalModes(game.modes)}
             lives={game.lives}
+            timer={game.timer ?? 0}
+            ramp={game.ramp ?? null}
             seed={seed}
             snapshot={survivalSnapshot}
             snapshotKey={snapKey}
             room={survivalRoom}
+            sync={synced ? { startAt, entries: survivalEntries } : null}
           />
         )
       default: return null

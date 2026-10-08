@@ -1,6 +1,5 @@
 // Leaderboard of one daily challenge (fewest attempts, then fastest).
 import { router } from 'expo-router'
-import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
 
@@ -8,6 +7,8 @@ import { formatTime } from '@shared/utils/formatTime'
 import { fetchDailyScores } from '@shared/utils/saveScore'
 
 import { useAccount } from '@/account/auth'
+import { useLeaderboard } from '@/hooks/useLeaderboard'
+import { loadErrorKey } from '@/leaderboards'
 import { colors, radius, space } from '@/theme'
 import { Text } from '../ui'
 import { visibleRows } from './leaderboardRows'
@@ -15,53 +16,41 @@ import { visibleRows } from './leaderboardRows'
 type DailyScore = { name: string; uid?: string; attempts: number; hints?: number; elapsedTime?: number | null }
 
 const MEDALS = ['🥇', '🥈', '🥉']
-const MAX_ROWS = 20
+const DEFAULT_MAX_ROWS = 20
 
 export function DailyLeaderboard({
   gameType,
   dailyKey,
   refreshKey,
+  maxRows = DEFAULT_MAX_ROWS,
+  onSettled,
   formatSecondary = (elapsedTime) => (elapsedTime != null ? formatTime(elapsedTime) : '—'),
 }: {
   gameType: string
   dailyKey: string
   refreshKey?: unknown
+  maxRows?: number
+  onSettled?: () => void
   // Last column; Voyage Voyage stores its error count in elapsedTime.
   formatSecondary?: (elapsedTime: number | null | undefined) => string
 }) {
   const { t } = useTranslation()
   const { account } = useAccount()
-  const [scores, setScores] = useState<DailyScore[] | null>(null)
-  const [failed, setFailed] = useState(false)
-
-  useEffect(() => {
-    let cancelled = false
-    fetchDailyScores(gameType, dailyKey)
-      .then((result: DailyScore[]) => {
-        if (!cancelled) setScores(result)
-      })
-      .catch((error: unknown) => {
-        console.error(error)
-        if (!cancelled) setFailed(true)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [gameType, dailyKey, refreshKey])
+  const { scores, error } = useLeaderboard<DailyScore>(`${gameType}|${dailyKey}`, () => fetchDailyScores(gameType, dailyKey), refreshKey, onSettled)
 
   return (
     <View style={styles.card}>
       <Text variant="bodyStrong">{t('leaderboard.title')}</Text>
-      {failed ? (
+      {error ? (
         <Text variant="caption" color={colors.danger}>
-          {t('mobile.game.load_error')}
+          {t(loadErrorKey(error))}
         </Text>
       ) : !scores ? (
         <ActivityIndicator color={colors.textMuted} style={{ paddingVertical: space.lg }} />
       ) : scores.length === 0 ? (
         <Text variant="caption">{t('leaderboard.no_scores_today')}</Text>
       ) : (
-        visibleRows(scores, account?.uid, MAX_ROWS).map(({ score, index }) => (
+        visibleRows(scores, account?.uid, maxRows).map(({ score, index }) => (
           <View
             key={`${score.name}-${index}`}
             style={[styles.row, index < 3 && styles.rowTop, Boolean(score.uid) && score.uid === account?.uid && styles.rowMine]}>

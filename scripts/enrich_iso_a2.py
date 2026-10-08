@@ -1,9 +1,11 @@
 # ONE-SHOT SCRIPT — do not re-run after aliases have been manually populated.
 # Requires: pip install pycountry
 import json
+from pathlib import Path
 import pycountry
 
-INPUT = 'src/data/countriesWithDifficulty_FR.json'
+ROOT = Path(__file__).resolve().parent.parent  # repo root, whatever the current directory
+INPUT = ROOT / 'src/data/countriesWithDifficulty_FR.json'
 
 with open(INPUT, 'r', encoding='utf-8') as f:
     data = json.load(f)

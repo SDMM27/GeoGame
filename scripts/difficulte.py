@@ -1,4 +1,7 @@
 import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent  # repo root, whatever the current directory
 
 # Liste des pays faciles à trouver
 easy_countries = [
@@ -71,7 +74,7 @@ impossible_countries = ["Aruba",
 "Zone de souveraineté d'Akrotiri","Samoa"]
 
 # Charger le fichier GeoJSON initial
-with open('src/data/countries_FR.json', 'r', encoding='utf-8') as file:
+with open(ROOT / 'src/data/countries_FR.json', 'r', encoding='utf-8') as file:
     geojson_data = json.load(file)
 
 # Créer une copie du fichier GeoJSON initial
@@ -92,7 +95,7 @@ for feature in new_geojson_data['features']:
         feature['properties']['Difficulty'] = 'Difficile'
 
 # Écrire le fichier GeoJSON mis à jour
-with open('src/data/countriesWithDifficulty_FR.json', 'w', encoding='utf-8') as file:
+with open(ROOT / 'src/data/countriesWithDifficulty_FR.json', 'w', encoding='utf-8') as file:
     json.dump(new_geojson_data, file, separators=(',', ':'), indent=2, ensure_ascii=False)
 
 print("Nouveau fichier GeoJSON créé avec succès !")

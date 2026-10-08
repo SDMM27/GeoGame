@@ -1,5 +1,7 @@
 // Profile statistics computed from a player's game history (see gameHistory.js). Pure functions.
+import { dailyKeyAt } from './dailyKey'
 import { GAME_TYPES } from './gameTypes'
+import { serverNow } from './serverTime'
 
 export const DAILY_GAME_TYPES = [
   GAME_TYPES.BORDER_GUESS,
@@ -9,16 +11,9 @@ export const DAILY_GAME_TYPES = [
   GAME_TYPES.QUIZ,
 ]
 
-// Same day boundary as the daily challenges.
-const DAILY_TIME_ZONE = 'Europe/Paris'
-
-export function dayKey(date = new Date()) {
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: DAILY_TIME_ZONE,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(date)
+// Same day as the daily challenges (server time by default).
+export function dayKey(date = new Date(serverNow())) {
+  return dailyKeyAt(date)
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000

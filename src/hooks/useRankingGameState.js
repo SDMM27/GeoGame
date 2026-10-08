@@ -4,8 +4,8 @@ import countries from '../data/countriesWithDifficulty_FR.json'
 import { getCountryAreaKm2, hasCountryGeometry } from '../utils/countryArea'
 import { CRITERIA, CRITERIA_KEYS, buildCountryPool } from '../utils/rankingCriteria'
 import { getRankingAttemptScore } from '../utils/scoringRules'
+import useDailyKey from './useDailyKey'
 
-const DAILY_TIME_ZONE = 'Europe/Paris'
 const DAILY_STORAGE_PREFIX = 'ranking-daily'
 const DAILY_COUNT = 5
 
@@ -44,15 +44,6 @@ function hashString(value) {
     hash = (hash * 31 + value.charCodeAt(i)) >>> 0
   }
   return hash
-}
-
-function getTodayKey() {
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: DAILY_TIME_ZONE,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(new Date())
 }
 
 function seededRandom(seed) {
@@ -130,15 +121,17 @@ export default function useRankingGameState(mode, options = {}) {
   const [attemptNumber, setAttemptNumber] = useState(1)
   const [positionFeedback, setPositionFeedback] = useState(null)
   const [bestTotalError, setBestTotalError] = useState(null)
+  const dailyKey = useDailyKey(mode === 'daily')
 
   // Initialize on mode/countryCount change
   useEffect(() => {
-    if (mode === 'daily') {
-      initDailyRound()
+    if (mode === 'daily' && dailyKey) {
+      initDailyRound(dailyKey)
     } else {
+      // Daily : 'idle' le temps de connaître le jour (heure serveur)
       setCriterion(null)
       setCountries([])
-      setStatus('choosing-category')
+      setStatus(mode === 'daily' ? 'idle' : 'choosing-category')
       setScore(null)
       setTotalError(null)
       setCorrectOrder([])
@@ -147,10 +140,9 @@ export default function useRankingGameState(mode, options = {}) {
       setPositionFeedback(null)
       setBestTotalError(null)
     }
-  }, [mode, countryCount])
+  }, [mode, countryCount, dailyKey])
 
-  function initDailyRound() {
-    const dateKey = getTodayKey()
+  function initDailyRound(dateKey) {
     const saved = readDailyProgress(dateKey)
 
     if (saved) {
@@ -222,11 +214,10 @@ export default function useRankingGameState(mode, options = {}) {
 
   function reorderCountries(newOrder) {
     setCountries(newOrder)
-    if (mode === 'daily') {
-      const dateKey = getTodayKey()
-      const saved = readDailyProgress(dateKey)
+    if (mode === 'daily' && dailyKey) {
+      const saved = readDailyProgress(dailyKey)
       if (saved) {
-        saveDailyProgress(dateKey, {
+        saveDailyProgress(dailyKey, {
           ...saved,
           playerOrder: newOrder.map((c) => c.properties.ISO_A3),
         })
@@ -254,9 +245,8 @@ export default function useRankingGameState(mode, options = {}) {
       setStatus('submitted')
 
       if (mode === 'daily') {
-        const dateKey = getTodayKey()
-        const saved = readDailyProgress(dateKey)
-        saveDailyProgress(dateKey, {
+        const saved = readDailyProgress(dailyKey)
+        saveDailyProgress(dailyKey, {
           ...(saved ?? {}),
           playerOrder: countries.map((c) => c.properties.ISO_A3),
           status: 'submitted',
@@ -275,9 +265,8 @@ export default function useRankingGameState(mode, options = {}) {
       setStatus('submitted')
 
       if (mode === 'daily') {
-        const dateKey = getTodayKey()
-        const saved = readDailyProgress(dateKey)
-        saveDailyProgress(dateKey, {
+        const saved = readDailyProgress(dailyKey)
+        saveDailyProgress(dailyKey, {
           ...(saved ?? {}),
           playerOrder: countries.map((c) => c.properties.ISO_A3),
           status: 'submitted',
@@ -290,9 +279,8 @@ export default function useRankingGameState(mode, options = {}) {
       }
     } else {
       if (mode === 'daily') {
-        const dateKey = getTodayKey()
-        const saved = readDailyProgress(dateKey)
-        saveDailyProgress(dateKey, {
+        const saved = readDailyProgress(dailyKey)
+        saveDailyProgress(dailyKey, {
           ...(saved ?? {}),
           playerOrder: countries.map((c) => c.properties.ISO_A3),
           status: 'playing',
@@ -345,7 +333,7 @@ export default function useRankingGameState(mode, options = {}) {
     attemptNumber,
     positionFeedback,
     retryAttempt,
-    dailyKey: mode === 'daily' ? getTodayKey() : null,
+    dailyKey,
   }
 }
 

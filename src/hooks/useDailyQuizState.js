@@ -3,19 +3,10 @@
 import { useCallback, useEffect, useState } from 'react'
 import { checkFreeAnswer, getDailyQuestion, MAX_HINTS } from '../utils/quizQuestions'
 import { normalize } from '../utils/normalizeAnswer'
+import useDailyKey from './useDailyKey'
 
-const DAILY_TIME_ZONE = 'Europe/Paris'
 const DAILY_STORAGE_PREFIX = 'quiz-daily'
 export const DAILY_MAX_ATTEMPTS = 5
-
-function getTodayKey() {
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: DAILY_TIME_ZONE,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(new Date())
-}
 
 function readProgress(dateKey) {
   try {
@@ -34,8 +25,18 @@ function writeProgress(dateKey, progress) {
   }
 }
 
-function initialState() {
-  const dailyKey = getTodayKey()
+// En attendant l'heure serveur : pas encore de question
+const LOADING_STATE = {
+  dailyKey: null,
+  question: null,
+  guesses: [],
+  hintsUsed: 0,
+  status: 'playing',
+  startedAt: null,
+  elapsedTime: null,
+}
+
+function initialState(dailyKey) {
   const saved = readProgress(dailyKey)
   return {
     dailyKey,
@@ -50,17 +51,22 @@ function initialState() {
 }
 
 export default function useDailyQuizState() {
-  const [state, setState] = useState(initialState)
+  const todayKey = useDailyKey()
+  const [state, setState] = useState(() => (todayKey ? initialState(todayKey) : LOADING_STATE))
   const { dailyKey, question, guesses, hintsUsed, status, startedAt } = state
   const hasStarted = startedAt != null
   const isComplete = status !== 'playing'
 
   useEffect(() => {
-    writeProgress(dailyKey, state)
+    if (todayKey && todayKey !== dailyKey) setState(initialState(todayKey))
+  }, [todayKey, dailyKey])
+
+  useEffect(() => {
+    if (dailyKey) writeProgress(dailyKey, state)
   }, [dailyKey, state])
 
   const start = useCallback(() => {
-    setState((prev) => (prev.startedAt != null ? prev : { ...prev, startedAt: Date.now() }))
+    setState((prev) => (prev.startedAt != null || !prev.question ? prev : { ...prev, startedAt: Date.now() }))
   }, [])
 
   // Renvoie 'duplicate' si la réponse a déjà été proposée, sinon le résultat de la vérification
@@ -93,7 +99,7 @@ export default function useDailyQuizState() {
 
   const giveUp = useCallback(() => {
     setState((prev) => (
-      prev.status !== 'playing' ? prev : { ...prev, status: 'lost', elapsedTime: Date.now() - (prev.startedAt ?? Date.now()) }
+      prev.status !== 'playing' || !prev.question ? prev : { ...prev, status: 'lost', elapsedTime: Date.now() - (prev.startedAt ?? Date.now()) }
     ))
   }, [])
 

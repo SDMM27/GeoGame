@@ -7,8 +7,8 @@ import { checkAnswer, normalize } from '../utils/normalizeAnswer'
 import { hasCountryGeometry, collectCoordinates, getRingAreaKm2, getCountryAreaKm2, getGeographicCenter, EARTH_RADIUS_KM } from '../utils/countryArea'
 import { getCountryName, getAllCountryNames } from '../utils/getCountryName'
 import countryAliases from '../data/countryAliases.json'
+import useDailyKey from './useDailyKey'
 
-const DAILY_TIME_ZONE = 'Europe/Paris'
 const DAILY_STORAGE_PREFIX = 'country-clue-daily'
 
 export const COUNTRY_CLUE_COUNTRIES = countries.features.filter(
@@ -88,15 +88,6 @@ function hashString(value) {
     hash = (hash * 31 + value.charCodeAt(index)) >>> 0
   }
   return hash
-}
-
-function getTodayKey() {
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: DAILY_TIME_ZONE,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(new Date())
 }
 
 function getDailyCountry(dateKey) {
@@ -311,6 +302,7 @@ export default function useCountryClueState(mode, options = {}) {
   const [startedAt, setStartedAt] = useState(null)
   const [elapsedTime, setElapsedTime] = useState(null)
   const initialGuessesUsedRef = useRef(false)
+  const todayKey = useDailyKey(mode === 'daily' && !overrideCountry)
 
   useEffect(() => {
     if (overrideCountry) return
@@ -340,7 +332,17 @@ export default function useCountryClueState(mode, options = {}) {
     if (mode !== 'daily' && mode !== 'infinite') return
 
     if (mode === 'daily') {
-      const todayKey = getTodayKey()
+      if (!todayKey) {
+        // Heure serveur pas encore connue : on attend avant de choisir le pays du jour
+        setDailyKey(null)
+        setCurrentCountry(null)
+        setGuesses([])
+        setStatus('playing')
+        setHasStarted(false)
+        setStartedAt(null)
+        setElapsedTime(null)
+        return
+      }
       const savedProgress = readDailyProgress(todayKey)
       const selectedCountry = getCountryByName(savedProgress?.targetName) ?? getDailyCountry(todayKey)
       const hydratedGuesses = Array.isArray(savedProgress?.guesses)
@@ -372,7 +374,7 @@ export default function useCountryClueState(mode, options = {}) {
     setHasStarted(false)
     setStartedAt(null)
     setElapsedTime(null)
-  }, [mode])
+  }, [mode, todayKey])
 
   useEffect(() => {
     if (overrideCountry) return  // pas de localStorage en multijoueur

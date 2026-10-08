@@ -1,4 +1,5 @@
 ﻿import React, { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { fetchAscensionScores } from '../utils/saveScore'
 import { formatTime } from '../utils/formatTime'
 import { useAccount } from '../auth'
@@ -15,11 +16,13 @@ const ACTIVE_GAMES = [
 ]
 
 export default function AscensionScoreboard({ defaultGame = GAME_TYPES.PLACEMENT }) {
+  const { t } = useTranslation()
   const { account } = useAccount()
   const [scores, setScores] = useState([])
   const [selectedGame, setSelectedGame] = useState(defaultGame)
   const [selectedPreset, setSelectedPreset] = useState(ALL_PRESETS)
   const [loading, setLoading] = useState(true)
+  const [failed, setFailed] = useState(false)
 
   useEffect(() => {
     setSelectedGame(defaultGame)
@@ -29,13 +32,17 @@ export default function AscensionScoreboard({ defaultGame = GAME_TYPES.PLACEMENT
   useEffect(() => {
     let cancelled = false
     setLoading(true)
+    setFailed(false)
     fetchAscensionScores({ game: selectedGame, preset: selectedPreset })
       .then((result) => {
         if (!cancelled) setScores(result)
       })
       .catch((error) => {
         console.error(error)
-        if (!cancelled) setScores([])
+        if (!cancelled) {
+          setScores([])
+          setFailed(true)
+        }
       })
       .finally(() => {
         if (!cancelled) setLoading(false)
@@ -75,6 +82,8 @@ export default function AscensionScoreboard({ defaultGame = GAME_TYPES.PLACEMENT
 
       {loading ? (
         <p className="scoreboard-loading">Chargement...</p>
+      ) : failed ? (
+        <p className="scoreboard-empty">{t('messages.page_load_error')}</p>
       ) : scores.length === 0 ? (
         <p className="scoreboard-empty">Aucun score Ascension pour ce filtre.</p>
       ) : (

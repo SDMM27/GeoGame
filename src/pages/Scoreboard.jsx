@@ -25,6 +25,7 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT, contine
   const [selectedDifficulty, setSelectedDifficulty] = useState(ALL_DIFFICULTIES)
   const [selectedContinent, setSelectedContinent] = useState(ALL_CONTINENTS)
   const [loading, setLoading] = useState(true)
+  const [failed, setFailed] = useState(false)
 
   useEffect(() => {
     setSelectedGame(defaultGame)
@@ -34,13 +35,17 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT, contine
   useEffect(() => {
     let cancelled = false
     setLoading(true)
+    setFailed(false)
     fetchSoloScores({ game: selectedGame, continentMode, difficulty: selectedDifficulty, continent: selectedContinent })
       .then((result) => {
         if (!cancelled) setScores(result)
       })
       .catch((error) => {
         console.error(error)
-        if (!cancelled) setScores([])
+        if (!cancelled) {
+          setScores([])
+          setFailed(true)
+        }
       })
       .finally(() => {
         if (!cancelled) setLoading(false)
@@ -93,6 +98,8 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT, contine
 
       {loading ? (
         <p className="scoreboard-loading">{t('messages.loading')}</p>
+      ) : failed ? (
+        <p className="scoreboard-empty">{t('messages.page_load_error')}</p>
       ) : scores.length === 0 ? (
         <p className="scoreboard-empty">{t('scoreboard.no_ascension_scores')}</p>
       ) : (

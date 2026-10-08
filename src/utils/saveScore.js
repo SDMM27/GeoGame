@@ -12,9 +12,10 @@ import { normalizeUsername } from './account'
 // Each save returns { status: 'saved' | 'updated' }, { status: 'blocked', existing } when the player
 // already has a better entry, or { status: 'taken' } when a visitor picks an account's username.
 
+// A missing time (null) is the worst one.
 function isBetter(newScore, newTime, existingScore, existingTime) {
   if (newScore > existingScore) return true
-  if (newScore === existingScore && newTime < existingTime) return true
+  if (newScore === existingScore && (newTime ?? Infinity) < (existingTime ?? Infinity)) return true
   return false
 }
 
@@ -57,7 +58,7 @@ export function saveScore({ name, uid, score, difficulty, elapsedTime, gameType,
     'scores',
     { name, uid },
     { difficulty, gameType, ...(continent != null && { continent }) },
-    { score, elapsedTime },
+    { score, elapsedTime: elapsedTime ?? null }, // always written, null if missing: orderBy('elapsedTime') skips documents without the key
     (next, previous) => isBetter(next.score, next.elapsedTime, previous.score, previous.elapsedTime),
     (previous) => ({ score: previous.score, elapsedTime: previous.elapsedTime })
   )

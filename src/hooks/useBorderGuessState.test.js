@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { act, renderHook } from '@testing-library/react'
 import { toast } from 'react-toastify'
-import useBorderGuessState from './useBorderGuessState'
+import useBorderGuessState, { ROOM_MAX_ATTEMPTS, roomRoundErrors } from './useBorderGuessState'
 import { FIXTURE_COUNTRIES, byName } from './testUtils/countriesFixture'
 
 const mocks = vi.hoisted(() => ({ navigate: vi.fn(), dailyKey: '2026-10-08' }))
@@ -131,6 +131,39 @@ describe('useBorderGuessState — infini et multijoueur', () => {
     expect(result.current.answerName).toBe('Canada')
     expect(result.current.guesses).toEqual([])
     expect(localStorage.getItem(STORAGE_KEY)).toBeNull()
+  })
+
+  it('ends a multiplayer round once the guesses run out', () => {
+    const { result } = renderHook(() =>
+      useBorderGuessState('daily', { overrideCountry: byName('Japon'), maxAttempts: ROOM_MAX_ATTEMPTS })
+    )
+    expect(result.current.attemptsLeft).toBe(3)
+    guess(result, 'France')
+    guess(result, 'Espagne')
+    expect(result.current.attemptsLeft).toBe(1)
+    expect(result.current.isComplete).toBe(false)
+    guess(result, 'Canada')
+    expect(result.current.isLost).toBe(true)
+    expect(result.current.attemptsLeft).toBe(0)
+    guess(result, 'Japon')
+    expect(result.current.guesses).toHaveLength(3)
+  })
+
+  it('has no guess limit outside multiplayer', () => {
+    const { result } = renderHook(() => useBorderGuessState('infinite', { overrideCountry: byName('Japon') }))
+    ;['France', 'Espagne', 'Canada', 'Brésil'].forEach((name) => guess(result, name))
+    expect(result.current.isComplete).toBe(false)
+    expect(result.current.attemptsLeft).toBeNull()
+  })
+
+  it('counts a country not found (passed or out of guesses) as the most errors a round allows', () => {
+    const wrong = { isCorrect: false }
+    const right = { isCorrect: true }
+    expect(roomRoundErrors([], false)).toBe(ROOM_MAX_ATTEMPTS)
+    expect(roomRoundErrors([wrong], false)).toBe(ROOM_MAX_ATTEMPTS)
+    expect(roomRoundErrors([wrong, wrong, wrong], false)).toBe(ROOM_MAX_ATTEMPTS)
+    expect(roomRoundErrors([right], true)).toBe(0)
+    expect(roomRoundErrors([wrong, wrong, right], true)).toBe(2)
   })
 
   it('goes back home on an unknown mode', () => {

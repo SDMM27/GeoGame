@@ -155,26 +155,49 @@ service cloud.firestore {
       }
     }
 
+    // Friendships (src/utils/friends.js): friendships/{uidA_uidB}, uids sorted, so a pair of accounts has exactly one.
+    // { users: [uidA, uidB], usernames: { uid: username }, requester, status, createdAt, acceptedAt }
+    // The id and the usernames are checked against the accounts: invites trust a friendship to tell who may invite whom.
+    function friendshipOf(a, b) {
+      return a < b ? a + '_' + b : b + '_' + a;
+    }
+
     match /friendships/{id} {
+      function validNewFriendship(data) {
+        return data.keys().hasOnly(['users', 'usernames', 'requester', 'status', 'createdAt'])
+          && data.keys().hasAll(['users', 'usernames', 'requester', 'status', 'createdAt'])
+          && data.users is list && data.users.size() == 2
+          && data.users[0] is string && data.users[1] is string && data.users[0] != data.users[1]
+          && id == friendshipOf(data.users[0], data.users[1])
+          && data.requester == request.auth.uid
+          && request.auth.uid in data.users
+          && data.status == 'pending'
+          && data.createdAt == request.time
+          && data.usernames is map
+          && data.usernames.keys().hasOnly(data.users)
+          && data.usernames.size() == 2
+          && data.usernames[data.users[0]] == get(/databases/$(database)/documents/users/$(data.users[0])).data.username
+          && data.usernames[data.users[1]] == get(/databases/$(database)/documents/users/$(data.users[1])).data.username;
+      }
+
       allow read: if request.auth != null && request.auth.uid in resource.data.users;
-      allow create: if request.auth != null
-        && request.resource.data.requester == request.auth.uid
-        && request.auth.uid in request.resource.data.users
-        && request.resource.data.users.size() == 2
-        && request.resource.data.status == 'pending';
+      allow create: if request.auth != null && validNewFriendship(request.resource.data);
+      // Only the recipient accepts, and nothing else changes.
       allow update: if request.auth != null
         && request.auth.uid in resource.data.users
         && request.auth.uid != resource.data.requester
+        && resource.data.status == 'pending'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'acceptedAt'])
         && request.resource.data.status == 'accepted'
-        && request.resource.data.users == resource.data.users;
+        && request.resource.data.acceptedAt == request.time;
       allow delete: if request.auth != null && request.auth.uid in resource.data.users;
     }
 
     // Room invites between friends (src/utils/invites.js): invites/{room}_{to}
     // { from, fromUsername, to, room, gameId, mode, createdAt }
     match /invites/{id} {
-      function friendshipOf(a, b) {
-        return a < b ? a + '_' + b : b + '_' + a;
+      function isFriendship(friendship, data) {
+        return friendship.status == 'accepted' && data.to in friendship.users && data.from in friendship.users;
       }
 
       function validInvite(data) {
@@ -188,7 +211,7 @@ service cloud.firestore {
           && data.createdAt == request.time
           && data.fromUsername == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.username
           && exists(/databases/$(database)/documents/rooms/$(data.room))
-          && get(/databases/$(database)/documents/friendships/$(friendshipOf(data.from, data.to))).data.status == 'accepted';
+          && isFriendship(get(/databases/$(database)/documents/friendships/$(friendshipOf(data.from, data.to))).data, data);
       }
 
       allow read: if request.auth != null

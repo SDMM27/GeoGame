@@ -655,6 +655,14 @@ describe('_clockSync', () => {
     await assertFails(db.doc('_clockSync/e').set({ t: timestamp(0), expiresAt: timestamp(Date.now() + 600000) }))
   })
 
+  // The client only has its own clock to compute an expiry: a probe without one must work after the cutoff too,
+  // or a device set to another day could never learn the server time (the cleanup goes by t).
+  it('creates a probe without an expiry, holding only the server time', async () => {
+    await assertSucceeds(db.doc('_clockSync/f').set({ t: serverTime() }))
+    await assertFails(db.doc('_clockSync/g').set({ t: timestamp(Date.now() + 24 * 3600000) }))
+    await assertFails(db.doc('_clockSync/h').set({ t: serverTime(), junk: 1 }))
+  })
+
   it('reads the probe, and nobody deletes or updates it', async () => {
     await db.doc('_clockSync/a').set({ t: serverTime(), expiresAt: timestamp(Date.now() + 600000) })
     await assertSucceeds(db.doc('_clockSync/a').get())

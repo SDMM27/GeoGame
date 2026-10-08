@@ -279,7 +279,8 @@
     "time": "Time",
     "hints_used": "Hints used:",
     "no_hints": "none",
-    "attempted_countries": "Countries attempted"
+    "attempted_countries": "Countries attempted",
+    "played_order": "Order played"
   },
   "multiplayer": {
     "title": "Multiplayer"

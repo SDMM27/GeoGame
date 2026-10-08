@@ -875,14 +875,15 @@ service cloud.firestore {
     }
 
     // Server clock calibration (src/utils/serverTime.js): a throwaway document holding only the server time.
-    // Clients never delete it: the daily cleanup (api/cleanup-expired.mjs) does. Required from the cutoff on, as app 1.0.1 doesn't send it.
+    // Clients never delete it: the daily cleanup (api/cleanup-expired.mjs) does, from `t`, which the server sets.
+    // So expiresAt stays optional, even after the cutoff: the client can only compute it from its own clock, and
+    // requiring it would reject the very devices whose clock is wrong (e.g. set to tomorrow for the daily challenge).
     match /_clockSync/{id} {
       allow read: if true;
       allow create: if request.resource.data.keys().hasOnly(['t', 'expiresAt'])
         && request.resource.data.t == request.time
         && (request.resource.data.get('expiresAt', null) == null
-            ? legacyOpen()
-            : expiresWithin(request.resource.data.expiresAt, duration.value(1, 'm'), duration.value(1, 'h')));
+            || expiresWithin(request.resource.data.expiresAt, duration.value(1, 'm'), duration.value(1, 'h')));
     }
   }
 }

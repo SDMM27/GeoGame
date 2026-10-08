@@ -31,6 +31,19 @@
         height: 100%;
         flex: 1;
       }
+      /* No text selection outside the fields, like in a native app. On iPhone a tap held a bit too
+         long selects the word under the finger, and react-native-web then cancels the press: the
+         button does nothing. */
+      #root * {
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+      }
+      #root input,
+      #root textarea {
+        -webkit-user-select: text;
+        user-select: text;
+      }
     </style>
     <script>
       // Like KeyboardAvoidingView on native: when the iPhone keyboard opens, shrink the app to the

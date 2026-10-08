@@ -7,8 +7,8 @@ import { checkAnswer, normalize } from '../utils/normalizeAnswer'
 import { getAllCountryNames, getCountryName } from '../utils/getCountryName'
 import countryAliases from '../data/countryAliases.json'
 import { getGeographicCenter, hasCountryGeometry } from '../utils/countryArea'
+import useDailyKey from './useDailyKey'
 
-const DAILY_TIME_ZONE = 'Europe/Paris'
 const DAILY_STORAGE_PREFIX = 'border-guess-daily'
 
 const BORDER_GUESS_EXCLUDED = new Set([
@@ -130,15 +130,6 @@ function hashString(value) {
   return hash
 }
 
-function getTodayKey() {
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: DAILY_TIME_ZONE,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(new Date())
-}
-
 function getDailyCountry(dateKey) {
   const countryIndex = hashString(`border-guess:${dateKey}`) % BORDER_GUESS_COUNTRIES.length
   return BORDER_GUESS_COUNTRIES[countryIndex]
@@ -246,6 +237,7 @@ export default function useBorderGuessState(mode, options = {}) {
   const [startedAt, setStartedAt] = useState(null)
   const [elapsedTime, setElapsedTime] = useState(null)
   const initialGuessesUsedRef = useRef(false)
+  const todayKey = useDailyKey(mode === 'daily' && !overrideCountry)
 
   useEffect(() => {
     if (overrideCountry) return  // pas de redirect en mode multijoueur
@@ -275,7 +267,17 @@ export default function useBorderGuessState(mode, options = {}) {
     if (mode !== 'daily' && mode !== 'infinite') return
 
     if (mode === 'daily') {
-      const todayKey = getTodayKey()
+      if (!todayKey) {
+        // Heure serveur pas encore connue : on attend avant de choisir le pays du jour
+        setDailyKey(null)
+        setCurrentCountry(null)
+        setGuesses([])
+        setStatus('playing')
+        setHasStarted(false)
+        setStartedAt(null)
+        setElapsedTime(null)
+        return
+      }
       const savedProgress = readDailyProgress(todayKey)
       const selectedCountry = getCountryByName(savedProgress?.targetName) ?? getDailyCountry(todayKey)
 
@@ -302,7 +304,7 @@ export default function useBorderGuessState(mode, options = {}) {
     setHasStarted(false)
     setStartedAt(null)
     setElapsedTime(null)
-  }, [mode])
+  }, [mode, todayKey])
 
   useEffect(() => {
     if (overrideCountry) return  // pas de localStorage en multijoueur

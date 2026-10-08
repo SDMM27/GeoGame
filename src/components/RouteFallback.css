@@ -42,3 +42,45 @@
 .route-fallback__retry:hover {
   background: var(--bg-card-hover);
 }
+
+.route-fallback--error {
+  padding: 24px;
+  text-align: center;
+}
+
+.route-fallback__title {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.6rem;
+  font-weight: 900;
+}
+
+.route-fallback__message {
+  max-width: 420px;
+  margin: 0;
+}
+
+.route-fallback__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.route-fallback__retry {
+  text-decoration: none;
+}
+
+.route-fallback__retry--secondary {
+  background: transparent;
+}
+
+.route-fallback__retry:hover,
+.route-fallback__retry:focus-visible {
+  color: var(--text-primary);
+}
+
+.route-fallback__retry:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}

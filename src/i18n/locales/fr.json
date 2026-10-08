@@ -239,6 +239,16 @@
     "page_load_error": "Impossible de charger la page. Vérifie ta connexion.",
     "reload": "Recharger"
   },
+  "errors": {
+    "title": "Oups, une erreur est survenue",
+    "message": "Vérifie ta connexion, puis recharge la page ou reviens à l'accueil.",
+    "home": "Retour à l'accueil"
+  },
+  "not_found": {
+    "title": "Page introuvable",
+    "message": "Cette page n'existe pas ou a été déplacée.",
+    "home": "Retour à l'accueil"
+  },
   "units": {
     "pt": "pt",
     "pts": "pts",

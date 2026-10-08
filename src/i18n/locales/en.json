@@ -239,6 +239,16 @@
     "page_load_error": "The page could not be loaded. Check your connection.",
     "reload": "Reload"
   },
+  "errors": {
+    "title": "Oops, something went wrong",
+    "message": "Check your connection, then reload the page or go back home.",
+    "home": "Back to home"
+  },
+  "not_found": {
+    "title": "Page not found",
+    "message": "This page does not exist or has been moved.",
+    "home": "Back to home"
+  },
   "units": {
     "pt": "pt",
     "pts": "pts",

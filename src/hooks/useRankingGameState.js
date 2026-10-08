@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { getCountryAreaKm2, hasCountryGeometry } from '../utils/countryArea'
+import { mulberry32 } from '../utils/prng'
 import { CRITERIA, CRITERIA_KEYS, buildCountryPool } from '../utils/rankingCriteria'
 import { getRankingAttemptScore } from '../utils/scoringRules'
 import useDailyKey from './useDailyKey'
@@ -168,7 +169,10 @@ export default function useRankingGameState(mode, options = {}) {
     } else {
       const seed = hashString(`ranking:${dateKey}`)
       const rand = seededRandom(seed)
-      const criterionKey = CRITERIA_KEYS[Math.floor(rand() * CRITERIA_KEYS.length)]
+      // Le premier tirage de seededRandom varie à peine d'un jour à l'autre (même critère tout le mois) :
+      // on l'écarte et le critère est tiré avec mulberry32, qui mélange bien des graines voisines.
+      rand()
+      const criterionKey = CRITERIA_KEYS[Math.floor(mulberry32(seed)() * CRITERIA_KEYS.length)]
       const crit = CRITERIA[criterionKey]
       const pool = buildCountryPool(RANKING_COUNTRIES, crit, areaMap)
       const selected = pickN(pool, DAILY_COUNT, rand)

@@ -14,12 +14,13 @@ function zoomThresholdForSpan(maxSpan) {
 let smallCountriesCache = null
 const getSmallCountries = () => smallCountriesCache ??= (() => {
   const result = []
-  for (const f of countries.features) {
+  for (const [index, f] of countries.features.entries()) {
     try {
       const { maxSpan } = getCountryMetrics(f)
       if (maxSpan >= SMALL_THRESHOLD) continue
       const center = L.geoJSON(f).getBounds().getCenter()
-      result.push({ name: f.properties.ADMIN, lat: center.lat, lng: center.lng, zoomThreshold: zoomThresholdForSpan(maxSpan) })
+      // Two features can share a name (e.g. both halves of Saint-Martin): the position in the dataset keeps the React key unique
+      result.push({ key: `${f.properties.ADMIN}#${index}`, name: f.properties.ADMIN, lat: center.lat, lng: center.lng, zoomThreshold: zoomThresholdForSpan(maxSpan) })
     } catch (_) { /* skip */ }
   }
   return result
@@ -37,7 +38,7 @@ export default function SmallCountryCircles({ onCountryNameClick, foundCountries
     .filter(c => !foundCountriesRef.current.has(c.name) && !shownCountriesRef.current.has(c.name))
     .map(c => (
       <CircleMarker
-        key={c.name}
+        key={c.key}
         center={[c.lat, c.lng]}
         radius={8}
         pathOptions={CIRCLE_DEFAULT}

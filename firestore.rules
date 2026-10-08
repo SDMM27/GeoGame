@@ -194,14 +194,14 @@ service cloud.firestore {
     }
 
     // Room invites between friends (src/utils/invites.js): invites/{room}_{to}
-    // { from, fromUsername, to, room, gameId, mode, createdAt }
+    // { from, fromUsername, to, room, gameId, mode, createdAt, expiresAt? } (expiresAt: TTL, missing from older apps)
     match /invites/{id} {
       function isFriendship(friendship, data) {
         return friendship.status == 'accepted' && data.to in friendship.users && data.from in friendship.users;
       }
 
       function validInvite(data) {
-        return data.keys().hasOnly(['from', 'fromUsername', 'to', 'room', 'gameId', 'mode', 'createdAt'])
+        return data.keys().hasOnly(['from', 'fromUsername', 'to', 'room', 'gameId', 'mode', 'createdAt', 'expiresAt'])
           && data.from == request.auth.uid
           && data.to is string && data.to != data.from
           && data.room is string && data.room.size() == 6
@@ -209,6 +209,7 @@ service cloud.firestore {
           && validLabel(data.gameId)
           && data.mode in ['live', 'challenge']
           && data.createdAt == request.time
+          && (data.get('expiresAt', null) == null || expiresWithin(data.expiresAt, duration.value(1, 'h'), duration.value(1, 'd')))
           && data.fromUsername == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.username
           && exists(/databases/$(database)/documents/rooms/$(data.room))
           && isFriendship(get(/databases/$(database)/documents/friendships/$(friendshipOf(data.from, data.to))).data, data);
@@ -344,29 +345,279 @@ service cloud.firestore {
 
     // ---------- Multiplayer ----------
 
-    // Players have no account (random id stored on the device): any player of a room has to be able
-    // to update it (host transfer, scores, reconfiguration). Rooms can't be deleted.
-    match /rooms/{roomId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
+    // Rooms (src/utils/multiplayerRoom.js). Players have no account: a player is a random id kept on the device
+    // (players.{id}) plus a random secret that the device keeps to itself, stored in rooms/{room}/keys/{id}.
+    // That document can never be read, only compared: every write a player makes goes in a batch that also
+    // sets keys/{id} = { key, at: serverTimestamp }. The key document only accepts that write when `key` matches the
+    // stored secret (or when it is created, as the player joins), and the other rules check getAfter(keys/{id}).at
+    // == request.time: proof, within this very request, that the writer knows the secret of the player they act as.
+    // Nobody else can write as that player; only the host (hostId) changes the games, the status and the launch.
+    // The room's `by` field says which player writes.
+    //
+    // Rooms from before these rules (source 'app', written by app 1.0.1 and the old website) carry no secrets:
+    // they stay open to everyone, with size limits only, until the cutoff below. They can't be created after it.
+    function legacyOpen() {
+      return request.time < timestamp.date(2026, 12, 1);
+    }
 
-      match /progress/{playerId} {
-        allow read: if true;
-        allow write: if true;
+    function validPlayerId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 64 && id.matches('^[A-Za-z0-9_-]+$');
+    }
+
+    // expiresAt, for Firestore's TTL: later than `min` and at most `max` from now. Clients use the lifetime
+    // they want from their own clock, so the bounds leave room for clocks that are off by a day or two.
+    function expiresWithin(value, min, max) {
+      return value is timestamp && value > request.time + min && value <= request.time + max;
+    }
+
+    // Short strings only: a missing or null field is fine.
+    function shortOrNull(value) {
+      return value == null || (value is string && value.size() <= 60);
+    }
+
+    // Ascension phases: the number of countries per difficulty.
+    function validPhases(phases) {
+      return phases is map
+        && phases.keys().hasOnly(['Facile', 'Moyen', 'Difficile', 'Impossible'])
+        && inRange(phases.get('Facile', 0), 1000) && inRange(phases.get('Moyen', 0), 1000)
+        && inRange(phases.get('Difficile', 0), 1000) && inRange(phases.get('Impossible', 0), 1000);
+    }
+
+    function validRoomGame(game) {
+      return game is map
+        && game.keys().hasOnly(['id', 'type', 'difficulty', 'continent', 'phases', 'presetName', 'count',
+                                'quizDifficulty', 'answerMode'])
+        && game.id is string && game.id.size() > 0 && game.id.size() <= 60
+        && game.type is string && game.type.size() > 0 && game.type.size() <= 60
+        && shortOrNull(game.get('difficulty', null)) && shortOrNull(game.get('continent', null))
+        && shortOrNull(game.get('presetName', null)) && shortOrNull(game.get('quizDifficulty', null))
+        && (game.get('answerMode', null) == null || game.answerMode in ['choices', 'free'])
+        && (game.get('count', null) == null || (isNumber(game.count) && game.count >= 1 && game.count <= 300))
+        && (game.get('phases', null) == null || validPhases(game.phases));
+    }
+
+    // players.{id}: { pseudo, uid?, seenAt? }; seenAt is the heartbeat, always the server time.
+    function validRoomPlayer(player) {
+      return player is map
+        && player.keys().hasOnly(['pseudo', 'uid', 'seenAt'])
+        && player.keys().hasAll(['pseudo'])
+        && validName(player.pseudo)
+        && (player.get('uid', null) == null || (player.uid is string && player.uid.size() <= 128))
+        && (player.get('seenAt', null) == null || player.seenAt == request.time);
+    }
+
+    function validStart(startAt) {
+      return startAt is timestamp
+        && startAt > request.time - duration.value(1, 'd') && startAt < request.time + duration.value(1, 'd');
+    }
+
+    match /rooms/{roomId} {
+      function proved(playerId) {
+        let key = /databases/$(database)/documents/rooms/$(roomId)/keys/$(playerId);
+        return getAfter(key).data.at == request.time;
       }
 
-      match /gameResults/{docId} {
+      // The host is gone: no heartbeat for 100 s (clients wait 120 s), or no entry at all.
+      function hostGone(room) {
+        return !(room.hostId in room.players)
+          || (room.players[room.hostId].get('seenAt', null) != null
+              && request.time.toMillis() - room.players[room.hostId].seenAt.toMillis() > 100000);
+      }
+
+      function validNewRoom(data) {
+        return data.keys().hasOnly(['source', 'createdOn', 'hostId', 'mode', 'status', 'games', 'gameIndex', 'game',
+                                    'seed', 'startAt', 'players', 'createdAt', 'expiresAt', 'by'])
+          && data.keys().hasAll(['source', 'createdOn', 'hostId', 'mode', 'status', 'games', 'gameIndex', 'game',
+                                 'seed', 'startAt', 'players', 'createdAt', 'expiresAt', 'by'])
+          && data.source == 'app2'
+          && data.createdOn in ['web', 'app']
+          && validPlayerId(data.hostId)
+          && data.mode in ['live', 'challenge']
+          && data.status == (data.mode == 'live' ? 'lobby' : 'playing')
+          && data.games is list && data.games.size() == 1 && validRoomGame(data.games[0])
+          && data.gameIndex == 0
+          && data.game == data.games[0]
+          && data.seed is int && data.seed >= 0 && data.seed <= 2147483647
+          && data.startAt == null
+          && data.players is map && data.players.size() == 1 && data.players.keys().hasOnly([data.hostId])
+          && validRoomPlayer(data.players[data.hostId])
+          && data.createdAt == request.time
+          && expiresWithin(data.expiresAt, duration.value(1, 'd'), duration.value(10, 'd'))
+          && data.by == data.hostId
+          && proved(data.hostId);
+      }
+
+      // Anyone in the room: joins, heartbeats, renames: only their own entry.
+      function isPlayerUpdate(data, room, changed) {
+        return changed.hasOnly(['by', 'players'])
+          && data.players.size() <= 50
+          && data.players.diff(room.players).affectedKeys().hasOnly([data.by])
+          && validRoomPlayer(data.players[data.by]);
+      }
+
+      // The host only: launches the game, moves on to the next one, adds a game at the end.
+      function isHostUpdate(data, room, changed) {
+        return data.by == room.hostId
+          && (
+            // launch
+            (changed.hasOnly(['by', 'status', 'startAt'])
+              && room.status == 'lobby' && data.status == 'playing' && validStart(data.startAt))
+            // next game (live)
+            || (room.mode == 'live' && changed.hasOnly(['by', 'gameIndex', 'game', 'status', 'startAt'])
+              && data.gameIndex == room.gameIndex + 1 && data.gameIndex < data.games.size()
+              && data.game == data.games[data.gameIndex] && data.status == 'playing' && validStart(data.startAt))
+            // add a game
+            || (changed.hasOnly(['by', 'games'])
+              && data.games.size() == room.games.size() + 1 && data.games.size() <= 20
+              && data.games[0:room.games.size()] == room.games
+              && validRoomGame(data.games[room.games.size()]))
+          );
+      }
+
+      // A player of a lobby whose host went quiet takes the room over.
+      function isTakeOver(data, room, changed) {
+        return changed.hasOnly(['by', 'hostId'])
+          && data.hostId == data.by
+          && room.status == 'lobby'
+          && data.by in room.players
+          && hostGone(room);
+      }
+
+      function validRoomUpdate(data, room) {
+        let changed = data.diff(room).affectedKeys();
+        return changed.hasOnly(['by', 'players', 'hostId', 'games', 'gameIndex', 'game', 'status', 'startAt'])
+          && validPlayerId(data.by) && proved(data.by)
+          && (isPlayerUpdate(data, room, changed) || isHostUpdate(data, room, changed)
+              || isTakeOver(data, room, changed));
+      }
+
+      // Rooms from before the secrets (see legacyOpen): the old fields only, within bounds. The rules have no loops
+      // and run out of expressions past a few games, so a game is only checked when it is added one at a time (or
+      // as the room's `game`); a room an old website created with several games keeps the others unchecked.
+      function validLegacyFields(data) {
+        return data.keys().hasOnly(['source', 'createdOn', 'hostId', 'mode', 'status', 'games', 'gameIndex', 'game',
+                                    'seed', 'startAt', 'players', 'createdAt', 'by'])
+          && validPlayerId(data.hostId)
+          && data.mode in ['live', 'challenge']
+          && data.status in ['lobby', 'playing']
+          && validRoomGame(data.game)
+          && (data.get('games', null) == null || (data.games is list && data.games.size() >= 1 && data.games.size() <= 20))
+          && (data.get('gameIndex', null) == null || (data.gameIndex is int && data.gameIndex >= 0 && data.gameIndex < 20))
+          && (data.startAt == null || validStart(data.startAt))
+          && data.players is map && data.players.size() >= 1 && data.players.size() <= 50;
+      }
+
+      function validLegacyCreate(data) {
+        return validLegacyFields(data)
+          && data.keys().hasAll(['source', 'hostId', 'mode', 'status', 'game', 'seed', 'startAt', 'players', 'createdAt'])
+          && data.source == 'app'
+          && data.get('createdOn', 'web') in ['web', 'app']
+          && data.seed is int && data.seed >= 0 && data.seed <= 2147483647
+          && data.players.size() == 1
+          && data.get('games', [data.game])[0] == data.game
+          && data.createdAt == request.time;
+      }
+
+      function validLegacyUpdate(data, room) {
+        return validLegacyFields(data)
+          && data.diff(room).affectedKeys().hasOnly(['by', 'players', 'hostId', 'games', 'gameIndex', 'game', 'status', 'startAt'])
+          && data.players.diff(room.players).affectedKeys().size() <= 1
+          && (!('games' in data.diff(room).affectedKeys())
+              || (data.games.size() == room.games.size() + 1
+                  && data.games[0:room.games.size()] == room.games
+                  && validRoomGame(data.games[room.games.size()])));
+      }
+
+      // The room is readable by its code, but the rooms can't be listed.
+      allow get: if true;
+      allow create: if roomId.matches('^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{6}$')
+        && (validNewRoom(request.resource.data) || (legacyOpen() && validLegacyCreate(request.resource.data)));
+      allow update: if resource.data.get('source', null) == 'app2'
+        ? validRoomUpdate(request.resource.data, resource.data)
+        : legacyOpen() && validLegacyUpdate(request.resource.data, resource.data);
+
+      // The secrets: written as a player joins, then only ever compared (see above).
+      match /keys/{playerId} {
+        allow create: if validPlayerId(playerId)
+          && request.resource.data.keys().hasOnly(['key', 'at'])
+          && request.resource.data.key is string
+          && request.resource.data.key.size() >= 16 && request.resource.data.key.size() <= 64
+          && request.resource.data.at == request.time
+          && playerId in getAfter(/databases/$(database)/documents/rooms/$(roomId)).data.players
+          && (getAfter(/databases/$(database)/documents/rooms/$(roomId)).data.get('source', null) != 'app2'
+              || !exists(/databases/$(database)/documents/rooms/$(roomId))
+              || !(playerId in get(/databases/$(database)/documents/rooms/$(roomId)).data.players));
+        allow update: if request.resource.data.keys().hasOnly(['key', 'at'])
+          && request.resource.data.key == resource.data.key
+          && request.resource.data.at == request.time;
+      }
+
+      // progress/{playerId}: { gameIndex, found, total, finished, lastSeen, expiresAt }
+      match /progress/{playerId} {
+        function validProgress(data) {
+          return data.keys().hasOnly(['gameIndex', 'found', 'total', 'finished', 'lastSeen', 'expiresAt'])
+            && data.keys().hasAll(['gameIndex', 'found', 'total', 'finished'])
+            && inRange(data.gameIndex, 19) && inRange(data.found, 1000) && inRange(data.total, 1000)
+            && data.finished is bool
+            && (data.get('lastSeen', null) == null || data.lastSeen == request.time);
+        }
+
+        function allowedProgress(data) {
+          let room = get(/databases/$(database)/documents/rooms/$(roomId)).data;
+          return validProgress(data)
+            && (room.get('source', null) == 'app2'
+                ? validPlayerId(playerId) && proved(playerId)
+                    && expiresWithin(data.expiresAt, duration.value(1, 'h'), duration.value(10, 'd'))
+                : legacyOpen() && validPlayerId(playerId)
+                    && (data.get('expiresAt', null) == null
+                        || expiresWithin(data.expiresAt, duration.value(1, 'h'), duration.value(10, 'd'))));
+        }
+
         allow read: if true;
-        allow write: if true;
+        allow create, update: if allowedProgress(request.resource.data);
+      }
+
+      // gameResults/{gameIndex}_{playerId}
+      match /gameResults/{docId} {
+        function validResult(data) {
+          return data.keys().hasOnly(['playerId', 'pseudo', 'gameIndex', 'weightedScore', 'countriesSolved',
+                                      'attempts', 'elapsedTime', 'total', 'finishedAt', 'expiresAt'])
+            && data.keys().hasAll(['playerId', 'pseudo', 'gameIndex', 'weightedScore', 'countriesSolved',
+                                   'attempts', 'elapsedTime', 'total', 'finishedAt'])
+            && validPlayerId(data.playerId) && validName(data.pseudo)
+            && inRange(data.gameIndex, 19)
+            && docId == string(data.gameIndex) + '_' + data.playerId
+            && inRange(data.weightedScore, 1000000000) && inRange(data.countriesSolved, 1000)
+            && inRange(data.attempts, 100000) && inRange(data.elapsedTime, 1000000000)
+            && inRange(data.total, 1000)
+            && data.finishedAt == request.time;
+        }
+
+        function allowedResult(data) {
+          let room = get(/databases/$(database)/documents/rooms/$(roomId)).data;
+          return validResult(data)
+            && (room.get('source', null) == 'app2'
+                ? proved(data.playerId)
+                    && expiresWithin(data.expiresAt, duration.value(1, 'h'), duration.value(10, 'd'))
+                : legacyOpen()
+                    && (data.get('expiresAt', null) == null
+                        || expiresWithin(data.expiresAt, duration.value(1, 'h'), duration.value(10, 'd'))));
+        }
+
+        allow read: if true;
+        allow create, update: if allowedResult(request.resource.data);
       }
     }
 
     // Server clock calibration (src/utils/serverTime.js): a throwaway document holding only the server time.
+    // Nobody deletes it: it expires (TTL on expiresAt). Required from the cutoff on, as app 1.0.1 doesn't send it.
     match /_clockSync/{id} {
       allow read: if true;
-      allow create: if request.resource.data.keys().hasOnly(['t']) && request.resource.data.t == request.time;
-      allow delete: if true;
+      allow create: if request.resource.data.keys().hasOnly(['t', 'expiresAt'])
+        && request.resource.data.t == request.time
+        && (request.resource.data.get('expiresAt', null) == null
+            ? legacyOpen()
+            : expiresWithin(request.resource.data.expiresAt, duration.value(1, 'm'), duration.value(1, 'h')));
     }
   }
 }

@@ -193,6 +193,15 @@ describe('free answer mode', () => {
     expect(checkFreeAnswer(range, 'Alps')).not.toBeNull()
   })
 
+  it('accepts the usual abbreviations of a country name', () => {
+    // Un pays traversé par le Colorado
+    const country = (iso) => ({ id: `country:${iso}`, kind: 'country', value: iso })
+    const colorado = { type: 'feature_country', params: { feature: 'colorado' }, choices: [], accepted: [country('US'), country('MX')] }
+    for (const answer of ['США', 'сша', 'etats-unis', 'États-Unis', 'USA', 'Mexique']) {
+      expect(checkFreeAnswer(colorado, answer), answer).not.toBeNull()
+    }
+  })
+
   it('tolerates typos on long answers', () => {
     const max = GEO_FEATURES.find((f) => f.id === 'mississippi').difficulty
     const q = generate(2000, { max, mode: ANSWER_MODES.FREE, seed: 17 })

@@ -18,6 +18,7 @@ const BORDER_GUESS_EXCLUDED = new Set([
   'Zone non gouvernée de Chypre',
   'Vatican',
   'Base navale américaine de la baie de Guantánamo',
+  'Cosmodrome de Baïkonour',
   'Montserrat',
   'Monaco',
   'Saint-Martin',

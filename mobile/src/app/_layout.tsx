@@ -1,3 +1,4 @@
+import { Sentry } from '@/sentry' // first: also reports errors thrown while the app starts
 import '@/polyfills'
 import '@/emulators'
 import '@/i18n'
@@ -34,6 +35,8 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
   const { t } = useTranslation()
   useEffect(() => {
     console.error(error)
+    // Caught here, the error never reaches Sentry's global handler
+    Sentry.captureException(error)
   }, [error])
   return (
     <ErrorScreen
@@ -55,7 +58,7 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
   )
 }
 
-export default function RootLayout() {
+function RootLayout() {
   const [fontsLoaded] = useFonts({
     BricolageGrotesque_600SemiBold,
     BricolageGrotesque_700Bold,
@@ -117,3 +120,5 @@ export default function RootLayout() {
     </GestureHandlerRootView>
   )
 }
+
+export default Sentry.wrap(RootLayout)

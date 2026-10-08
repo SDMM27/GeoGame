@@ -1,12 +1,13 @@
 // Metro config: lets the app import the website's game logic from ../src
 // and swaps web-only dependencies for mobile shims.
 const path = require('path')
-const { getDefaultConfig } = require('expo/metro-config')
+// getSentryExpoConfig = Expo's default config + debug ids so Sentry can match uploaded source maps.
+const { getSentryExpoConfig } = require('@sentry/react-native/metro')
 
 const projectRoot = __dirname
 const sharedRoot = path.resolve(projectRoot, '../src')
 
-const config = getDefaultConfig(projectRoot)
+const config = getSentryExpoConfig(projectRoot)
 
 config.watchFolders = [sharedRoot]
 // Packages imported by shared files must come from the app's node_modules (React 19),

@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
+    "@sentry/react": "^10.76.1",
     "@vercel/analytics": "^2.0.1",
     "country-flag-icons": "^1.6.15",
     "firebase": "^13.0.0",

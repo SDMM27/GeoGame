@@ -111,12 +111,15 @@ export function saveRankingScore({ name, uid, dailyKey, score, totalError, attem
   )
 }
 
+// A leaderboard row: the document's fields and its id, which reports/ points at (utils/reports.js).
+const withId = (doc) => ({ ...doc.data(), id: doc.id })
+
 // Daily-challenge scores of one day, best first.
 export async function fetchDailyScores(gameType, dailyKey) {
   const snapshot = await getDocs(
     query(collection(firestore, 'daily_scores'), where('gameType', '==', gameType), where('dailyKey', '==', dailyKey))
   )
-  return sortDailyScores(snapshot.docs.map((doc) => doc.data()))
+  return sortDailyScores(snapshot.docs.map(withId))
 }
 
 // Country Ranking scores of one day, best first (the best LEADERBOARD_SIZE).
@@ -131,7 +134,7 @@ export async function fetchRankingScores(dailyKey) {
       limit(LEADERBOARD_SIZE)
     )
   )
-  return sortRankingScores(snapshot.docs.map((doc) => doc.data()))
+  return sortRankingScores(snapshot.docs.map(withId))
 }
 
 // Runs one query per set of equality filters, each in the given leaderboard order (see firestore.indexes.json).
@@ -148,7 +151,7 @@ async function fetchTop(collectionName, filterSets, orderFields) {
       )
     )
   )
-  return results.flatMap((snapshot) => snapshot.docs.map((doc) => doc.data()))
+  return results.flatMap((snapshot) => snapshot.docs.map(withId))
 }
 
 // Solo leaderboard (the best LEADERBOARD_SIZE), for { game, continentMode, difficulty, continent } (see leaderboards.js).

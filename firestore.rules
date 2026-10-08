@@ -847,6 +847,33 @@ service cloud.firestore {
       }
     }
 
+    // Reports of a leaderboard entry (src/utils/reports.js): reports/{reporter}_{collection}_{scoreId}. Create only:
+    // nothing is read, edited or deleted from the apps; the admin reads them in the Firebase console or with
+    // scripts/reports.mjs. One report per reporter and entry (the id; a second one would be an update, refused).
+    // A signed-in reporter is their uid; a visitor is 'v-' + the id kept on their device (a visitor can make up as
+    // many as they want, so this stops accidents and double taps, not a determined spammer). The entry must exist.
+    match /reports/{reportId} {
+      function validReport(data) {
+        return data.keys().hasOnly(['reporter', 'targetCollection', 'targetId', 'targetName', 'reason', 'note', 'createdAt'])
+          && data.keys().hasAll(['reporter', 'targetCollection', 'targetId', 'reason', 'createdAt'])
+          && data.reporter is string
+          && (request.auth != null
+              ? data.reporter == request.auth.uid
+              : data.reporter.matches('^v-[A-Za-z0-9-]{8,64}$'))
+          && data.targetCollection in ['scores', 'ascension_scores', 'daily_scores']
+          && data.targetId is string && data.targetId.matches('^[A-Za-z0-9]{1,64}$')
+          && reportId == data.reporter + '_' + data.targetCollection + '_' + data.targetId
+          && (data.get('targetName', null) == null || (data.targetName is string && data.targetName.size() <= 60))
+          && data.reason in ['offensive_name', 'cheating', 'other']
+          && (data.get('note', null) == null || (data.note is string && data.note.size() <= 200))
+          && data.createdAt == request.time
+          && exists(/databases/$(database)/documents/$(data.targetCollection)/$(data.targetId));
+      }
+
+      allow create: if validReport(request.resource.data);
+      allow read, update, delete: if false;
+    }
+
     // Server clock calibration (src/utils/serverTime.js): a throwaway document holding only the server time.
     // Clients never delete it: the daily cleanup (api/cleanup-expired.mjs) does. Required from the cutoff on, as app 1.0.1 doesn't send it.
     match /_clockSync/{id} {

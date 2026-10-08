@@ -1,0 +1,125 @@
+.report {
+  display: inline-block;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.report__flag {
+  background: none;
+  border: none;
+  padding: 0 2px;
+  font-size: 0.8rem;
+  line-height: 1;
+  color: var(--text-dim);
+  opacity: 0.55;
+  cursor: pointer;
+}
+
+.report__flag:hover,
+.report__flag:focus-visible {
+  color: var(--warning);
+  opacity: 1;
+}
+
+.report__flag--done {
+  color: var(--warning);
+  opacity: 0.9;
+}
+
+.report__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.report__dialog {
+  width: 100%;
+  max-width: 380px;
+  padding: 18px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-card);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+.report__title {
+  margin-bottom: 12px;
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.report__reasons {
+  border: none;
+  margin-bottom: 10px;
+}
+
+.report__legend {
+  margin-bottom: 6px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.report__reason {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  cursor: pointer;
+}
+
+.report__note {
+  width: 100%;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-secondary);
+  color: inherit;
+  font: inherit;
+  resize: vertical;
+}
+
+.report__message {
+  margin-bottom: 4px;
+  color: var(--success);
+}
+
+.report__error {
+  margin-top: 8px;
+  color: var(--danger);
+}
+
+.report__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.report__btn {
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.report__btn--primary {
+  border-color: var(--accent-cyan-border);
+  background: var(--accent-cyan-dim);
+  color: var(--accent-cyan);
+}
+
+.report__btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

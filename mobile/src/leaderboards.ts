@@ -19,6 +19,7 @@ export const loadErrorKey = (error: unknown) => `mobile.leaderboards.error_${loa
 export const isMine = (entry: { uid?: string }, uid: string | undefined) => Boolean(uid) && entry.uid === uid
 
 export type SoloScore = {
+  id?: string
   name: string
   uid?: string
   score: number

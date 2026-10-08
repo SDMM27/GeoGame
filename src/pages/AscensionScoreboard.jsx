@@ -103,7 +103,7 @@ export default function AscensionScoreboard({ defaultGame = GAME_TYPES.PLACEMENT
               <span className="scoreboard-rank">
                 {index < 3 ? MEDAL[index] : `#${index + 1}`}
               </span>
-              <span className="scoreboard-name"><PlayerName entry={score} account={account} /></span>
+              <span className="scoreboard-name"><PlayerName entry={score} account={account} reportIn="ascension_scores" /></span>
               <span className="scoreboard-time scoreboard-time--strong">
                 {score.globalTimeMs != null ? formatTime(score.globalTimeMs) : '—'}
               </span>

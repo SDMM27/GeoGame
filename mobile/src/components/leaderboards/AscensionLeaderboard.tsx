@@ -14,6 +14,7 @@ import { LeaderboardCard, LeaderboardRow } from './LeaderboardParts'
 export type AscensionFilters = { game: string; preset: string }
 
 type AscensionScore = {
+  id?: string
   name: string
   uid?: string
   gameType?: string
@@ -53,6 +54,7 @@ export function AscensionLeaderboard({
             uid={score.uid}
             mine={isMine(score, account?.uid)}
             detail={detail}
+            report={score.id ? { collection: 'ascension_scores', id: score.id } : undefined}
             value={score.globalTimeMs != null ? formatTime(score.globalTimeMs) : '—'}
             secondary={`${score.globalScore ?? 0} ${t('units.pts')}`}
           />

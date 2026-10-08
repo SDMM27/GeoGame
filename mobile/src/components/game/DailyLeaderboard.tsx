@@ -11,9 +11,10 @@ import { useLeaderboard } from '@/hooks/useLeaderboard'
 import { loadErrorKey } from '@/leaderboards'
 import { colors, radius, space } from '@/theme'
 import { Text } from '../ui'
+import { ReportFlag } from '../leaderboards/ReportFlag'
 import { visibleRows } from './leaderboardRows'
 
-type DailyScore = { name: string; uid?: string; attempts: number; hints?: number; elapsedTime?: number | null }
+type DailyScore = { id?: string; name: string; uid?: string; attempts: number; hints?: number; elapsedTime?: number | null }
 
 const MEDALS = ['🥇', '🥈', '🥉']
 const DEFAULT_MAX_ROWS = 20
@@ -70,6 +71,9 @@ export function DailyLeaderboard({
                 </Text>
               )}
             </Text>
+            {score.id && !(score.uid && score.uid === account?.uid) ? (
+              <ReportFlag target={{ collection: 'daily_scores', id: score.id, name: score.name }} />
+            ) : null}
             <Text variant="bodyStrong" style={styles.value}>
               {score.attempts + (score.hints ?? 0)}
             </Text>

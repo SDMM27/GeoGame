@@ -654,6 +654,24 @@
     "subtitle_android": "Télécharge l’APK, puis autorise l’installation quand Android te le demande.",
     "download": "Télécharger"
   },
+  "report": {
+    "button": "Signaler {{name}}",
+    "title": "Signaler {{name}}",
+    "reason": "Motif",
+    "reasons": {
+      "offensive_name": "Pseudo injurieux ou inapproprié",
+      "cheating": "Score truqué ou triche",
+      "other": "Autre"
+    },
+    "note": "Précision (facultatif)",
+    "cancel": "Annuler",
+    "submit": "Signaler",
+    "sending": "Envoi…",
+    "sent": "Merci, le signalement a été envoyé.",
+    "already": "Tu as déjà signalé ce score.",
+    "error": "Le signalement n'a pas pu être envoyé. Réessaie.",
+    "close": "Fermer"
+  },
   "score_save": {
     "saving": "Enregistrement au classement…",
     "saved_as": "Score enregistré au classement sous {{name}} ✓",

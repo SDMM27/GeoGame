@@ -51,6 +51,7 @@ export function SoloLeaderboard({
           mine={isMine(score, account?.uid)}
           detail={soloDetailParts(score, detailOptions).join(' · ')}
           value={`${score.score} ${t('units.pts')}`}
+          report={score.id ? { collection: 'scores', id: score.id } : undefined}
           secondary={score.elapsedTime != null ? formatTime(score.elapsedTime) : '—'}
         />
       ))}

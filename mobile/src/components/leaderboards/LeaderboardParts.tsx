@@ -8,6 +8,7 @@ import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native'
 import { loadErrorKey, rankLabel } from '@/leaderboards'
 import { colors, radius, space } from '@/theme'
 import { Text, Touchable } from '../ui'
+import { ReportFlag, type ReportTarget } from './ReportFlag'
 
 type IconName = ComponentProps<typeof MaterialCommunityIcons>['name']
 
@@ -60,6 +61,7 @@ export function LeaderboardRow({
   detail,
   value,
   secondary,
+  report,
 }: {
   index: number
   name: string
@@ -68,6 +70,8 @@ export function LeaderboardRow({
   detail?: string
   value: string
   secondary?: string
+  // The entry's collection and id, to offer a report (not for the player's own entry)
+  report?: Omit<ReportTarget, 'name'>
 }) {
   const { t } = useTranslation()
   const content = (
@@ -91,6 +95,7 @@ export function LeaderboardRow({
           </Text>
         ) : null}
       </View>
+      {report && !mine ? <ReportFlag target={{ ...report, name }} /> : null}
       <View style={styles.values}>
         <Text variant="bodyStrong" style={styles.value}>
           {value}

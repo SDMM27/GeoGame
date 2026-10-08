@@ -654,6 +654,24 @@
     "subtitle_android": "Download the APK, then allow the install when Android asks.",
     "download": "Download"
   },
+  "report": {
+    "button": "Report {{name}}",
+    "title": "Report {{name}}",
+    "reason": "Reason",
+    "reasons": {
+      "offensive_name": "Offensive or inappropriate name",
+      "cheating": "Fake score or cheating",
+      "other": "Other"
+    },
+    "note": "Details (optional)",
+    "cancel": "Cancel",
+    "submit": "Report",
+    "sending": "Sending…",
+    "sent": "Thanks, your report has been sent.",
+    "already": "You already reported this score.",
+    "error": "The report couldn't be sent. Try again.",
+    "close": "Close"
+  },
   "score_save": {
     "saving": "Saving to the leaderboard…",
     "saved_as": "Score saved to the leaderboard as {{name}} ✓",

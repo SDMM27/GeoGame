@@ -1,6 +1,6 @@
 rules_version = '2';
 
-// Firestore security rules. Copy this file into Firebase console > Firestore > Rules to publish it.
+// Firestore security rules, published with `npm run deploy:rules` (tests first, then firebase deploy: see the README).
 //
 // Leaderboards: nobody may delete a score, and an existing score can only be replaced by a better one
 // for the same player and mode (see src/utils/saveScore.js). A score with a `uid` belongs to that account

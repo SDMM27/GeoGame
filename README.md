@@ -78,17 +78,41 @@ Face aux émulateurs, `FIRESTORE_EMULATOR_HOST` (et `FIREBASE_AUTH_EMULATOR_HOST
   - `node scripts/scoreCaps.mjs --check` échoue si les tables des règles diffèrent ;
   - `node scripts/scoreCaps.mjs --write` les réécrit dans `firestore.rules`.
 - `firestore.indexes.json` : index composites (classements limités aux 100 meilleurs scores).
-- Déploiement des règles et des index :
+- `.firebaserc` : projet Firebase par défaut (`geogame-sdmm`).
+- Déploiement en ligne de commande (une fois `npx firebase login` fait). Chaque script lance d'abord `npm test` puis les tests des règles sur les émulateurs (`npm run test:emulator`), et ne déploie que si tout passe :
 
   ```sh
-  npx firebase deploy --only firestore:rules,firestore:indexes --project geogame-sdmm
+  npm run deploy:indexes     # firestore.indexes.json
+  npm run deploy:rules       # firestore.rules
+  npm run deploy:firestore   # les deux
   ```
+
+  Les tests sur émulateurs demandent Java dans le `PATH` ; sous Windows, avec un JDK Adoptium (Git Bash) :
+
+  ```sh
+  J=$(ls -d "/c/Program Files/Eclipse Adoptium/"*/bin | head -1)
+  JAVA_TOOL_OPTIONS='-Djdk.net.unixdomain.tmpdir=C:Users<toi>jtmp' PATH="$J:$PATH" npm run deploy:rules
+  ```
+
+  (`JAVA_TOOL_OPTIONS` contourne un chemin de socket trop long avec les émulateurs ; adaptez le dossier, qui doit exister.)
+- Ordre de déploiement : **index d'abord, code ensuite**. Un nouveau classement qui demande un index non construit échoue (« The query requires an index »), et un index met quelques minutes à se construire : `npm run deploy:indexes`, attendre que la console Firebase (Firestore > Index) les affiche « Activé », puis déployer le site / l'app. Les règles peuvent partir avant ou avec le code, mais jamais après un code qui écrit ce qu'elles refuseraient encore (l'APK 1.0.1 continue d'écrire avec l'ancien code : les règles restent compatibles avec lui).
+- Pseudos injurieux : le filtre est `src/utils/profanity.js` (liste dans `src/data/bannedWords.json`, français, anglais, russe ; mots à bloquer partout ou seulement comme mot entier pour éviter les faux positifs type « Scunthorpe »). Il est appliqué côté client (comptes, pseudos de visiteur des classements, pseudos de salon) site et app. Les règles n'en ont qu'une version minimale (`cleanName`, quelques insultes explicites en orthographe simple, sans normalisation : RE2 ne sait pas gérer accents ni leetspeak) ; c'est une dernière barrière, pas la protection.
+- Signalements : un joueur (connecté ou visiteur) signale un score depuis le petit drapeau à côté d'un nom des classements (site et app). Cela crée `reports/{auteur}_{collection}_{idDuScore}` (création seule, motif dans une liste fermée, texte de 200 caractères au plus ; un seul signalement par auteur et par score). Personne ne peut les lire côté client. Pour les consulter : console Firebase > Firestore > `reports` (le champ `targetCollection`/`targetId` donne le score ; supprimez le document du score dans sa collection `scores`, `ascension_scores` ou `daily_scores`, puis les signalements), ou `scripts/reports.mjs` :
+
+  ```sh
+  node scripts/reports.mjs                                   # liste les signalements, par score
+  node scripts/reports.mjs --delete-score scores/<id>        # simulation (par défaut)
+  node scripts/reports.mjs --delete-score scores/<id> --apply   # supprime le score et ses signalements, après confirmation
+  node scripts/reports.mjs --dismiss scores/<id> --apply     # supprime seulement les signalements
+  ```
+
+  Identifiants : `--key serviceAccount.json`, ou `FIREBASE_SERVICE_ACCOUNT`, ou les identifiants par défaut de gcloud ; face aux émulateurs, `FIRESTORE_EMULATOR_HOST` suffit.
 
 ## Données géographiques
 
 Le jeu de données complet est `src/data/countriesWithDifficulty_FR.json` (environ 90 Mo) ; il n'entre jamais dans le bundle. `node scripts/build-geo-data.mjs [tolérance en mètres]` le découpe en `src/data/countries.meta.json` (propriétés, chargé avec le site) et `src/data/countries.geo.json` (géométries simplifiées, chargées à la demande). `vite.config.mjs` redirige les imports du jeu complet vers le fichier de propriétés.
 
-Scripts d'enrichissement du jeu complet (rarement utiles) : `scripts/difficulte.py`, `enrich_continent.py`, `enrich_iso_a2.py`, `enrich_population.py` (Python), `add-gdp-data.cjs`, `populate-capitals.js`, `generate-borders.mjs` (Node). Autres : `scripts/seedEmulator.mjs` (deux comptes de test dans les émulateurs) et `scripts/purgeAnonymousScores.mjs` (purge ponctuelle, nécessite une clé de compte de service).
+Scripts d'enrichissement du jeu complet (rarement utiles) : `scripts/difficulte.py`, `enrich_continent.py`, `enrich_iso_a2.py`, `enrich_population.py` (Python), `add-gdp-data.cjs`, `populate-capitals.js`, `generate-borders.mjs` (Node). Autres : `scripts/seedEmulator.mjs` (deux comptes de test dans les émulateurs), `scripts/purgeAnonymousScores.mjs` (purge ponctuelle, nécessite une clé de compte de service) et `scripts/reports.mjs` (signalements, voir Firestore).
 
 ## Émulateurs et tests
 

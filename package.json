@@ -37,7 +37,10 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:emulator": "firebase emulators:exec --project geogame-sdmm --only firestore,auth \"vitest run tests/emulator --no-file-parallelism\"",
-    "emulators": "firebase emulators:start --project geogame-sdmm --only firestore,auth"
+    "emulators": "firebase emulators:start --project geogame-sdmm --only firestore,auth",
+    "deploy:rules": "npm test && npm run test:emulator && firebase deploy --only firestore:rules --project geogame-sdmm",
+    "deploy:indexes": "npm test && npm run test:emulator && firebase deploy --only firestore:indexes --project geogame-sdmm",
+    "deploy:firestore": "npm test && npm run test:emulator && firebase deploy --only firestore:rules,firestore:indexes --project geogame-sdmm"
   },
   "browserslist": {
     "production": [

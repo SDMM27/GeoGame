@@ -25,23 +25,6 @@ export default defineConfig({
       },
     ],
   },
-  // App.js and Firebase.js use JSX syntax but keep .js extension.
-  // Both blocks are needed: esbuild covers the transform pass,
-  // optimizeDeps covers the pre-bundling pass.
-  // These can be removed once App.js is renamed to App.jsx (Task 3).
-  esbuild: {
-    loader: 'jsx',
-    include: /src\/.*\.jsx?$/,
-    // Without an explicit exclude, Vite defaults to /\.js$/ which cancels the include.
-    exclude: [],
-  },
-  optimizeDeps: {
-    esbuildOptions: {
-      loader: {
-        '.js': 'jsx',
-      },
-    },
-  },
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/setupTests.js'],

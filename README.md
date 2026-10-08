@@ -1,5 +1,7 @@
 # GeoGame
 
+[![CI](https://github.com/SDMM27/GeoGame/actions/workflows/ci.yml/badge.svg)](https://github.com/SDMM27/GeoGame/actions/workflows/ci.yml)
+
 Mini-jeux de géographie : trouver un pays sur la carte, quiz, drapeaux, capitales, frontières, classements de pays, mode Ascension, défi quotidien et salons multijoueurs. Le dépôt contient le site, l'application mobile et les fonctions serveur.
 
 - Site : https://geo-game-delta.vercel.app/
@@ -122,9 +124,25 @@ npm run emulators        # émulateurs Firestore (8080) et Auth (9099)
 npm run test:emulator    # tests des règles et de l'API sur les émulateurs
 npm --prefix mobile run typecheck
 npm --prefix mobile run lint
+npm run test:mobile      # tests de l'app (jest-expo), équivalent de `cd mobile && npx jest`
 ```
 
 Les émulateurs Firebase demandent un JDK (Java) installé et accessible dans le `PATH`.
+
+Les tests de l'app (`mobile/src/**/*.test.ts`, config dans `mobile/jest.config.js`) couvrent la logique pure : jeux, classements, salons multijoueurs. Ils reprennent les alias de `metro.config.js` (`@/`, `@shared/` vers `../src`, shims) et le jeu de pays allégé de l'app. Il n'y a volontairement pas de script `test` dans `mobile/package.json` : `@expo/fingerprint` hache les scripts de ce fichier, et en ajouter un changerait la version de runtime du binaire (donc les mises à jour OTA de l'APK installé). Le script `test:mobile` est à la racine pour cette raison. Les tests du site (vitest) ignorent `mobile/`.
+
+## Intégration continue
+
+`.github/workflows/ci.yml` s'exécute sur chaque pull request et sur chaque push vers `dev` et `master` (un nouveau push annule le run en cours sur la même branche). Quatre jobs en parallèle, sans aucun secret :
+
+| Job | Commandes |
+| --- | --- |
+| `site` | `npm ci`, `npm test` |
+| `build` | `npm ci`, `npm run build` (les variables `VITE_*` sont facultatives) |
+| `emulator` | Java 21 (Temurin), `npm ci`, `npm run test:emulator` (émulateurs en cache) |
+| `mobile` | `npm ci` dans `mobile/` (seul : l'app n'a pas besoin des `node_modules` de la racine), `typecheck`, `lint`, `npx jest` |
+
+Node 22 partout. Pour que ces contrôles bloquent réellement un merge, activer dans GitHub (Settings > Branches) une règle de protection de `master` (et `dev`) avec « Require status checks to pass » et les quatre jobs ci-dessus.
 
 ## Build et analyse du bundle
 

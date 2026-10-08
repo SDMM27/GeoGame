@@ -585,6 +585,8 @@ service cloud.firestore {
     //
     // Rooms from before these rules (source 'app', written by app 1.0.1 and the old website) carry no secrets:
     // they stay open to everyone, with size limits only, until the cutoff below. They can't be created after it.
+    // After 2026-12-01, once no 'app' room is left in the database and no app 1.0.1 is in use, every `legacyOpen()` branch,
+    // validLegacy* and the 'app' handling in the clients and tests can go (grep legacyOpen / isRoomFormat).
     function legacyOpen() {
       return request.time < timestamp.date(2026, 12, 1);
     }

@@ -52,6 +52,13 @@ describe('invites', () => {
     await assertSucceeds(as('alice').doc(`invites/${ROOM}_bob`).set(invite()))
   })
 
+  it('accepts an invite that expires (TTL), and refuses an expiry that is too far or in the past', async () => {
+    const inHours = (hours) => firebase.firestore.Timestamp.fromMillis(Date.now() + hours * 3600000)
+    await assertSucceeds(as('alice').doc(`invites/${ROOM}_bob`).set(invite({ expiresAt: inHours(3) })))
+    await assertFails(as('alice').doc(`invites/${ROOM}_bob`).set(invite({ expiresAt: inHours(100) })))
+    await assertFails(as('alice').doc(`invites/${ROOM}_bob`).set(invite({ expiresAt: inHours(-1) })))
+  })
+
   it('works whichever way the friendship id is sorted', async () => {
     await assertSucceeds(as('bob').doc(`invites/${ROOM}_alice`).set(invite({ from: 'bob', fromUsername: 'Bob', to: 'alice' })))
   })

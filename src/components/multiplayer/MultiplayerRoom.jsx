@@ -255,7 +255,7 @@ function GameList({ room, results, playerId }) {
 }
 
 /** Host: adds a game at the end of the room. */
-function AddGame({ room }) {
+function AddGame({ room, playerId }) {
   const { t } = useTranslation()
   const [draft, setDraft] = useState(null)
   const [saving, setSaving] = useState(false)
@@ -270,7 +270,7 @@ function AddGame({ room }) {
   const onAdd = async () => {
     setSaving(true)
     try {
-      await addGame(room, buildRoomGame(draft))
+      await addGame(room, buildRoomGame(draft), playerId)
       setDraft(null)
     } catch (err) {
       console.error(err)
@@ -497,8 +497,8 @@ export default function MultiplayerRoom({ room, progress, gameResults, playerId 
           <Players room={room} playerId={playerId} />
           {isHost ? (
             <>
-              <AddGame room={room} />
-              <button type="button" className="mpr-btn" onClick={() => onLaunch(() => launchRoom(room.id))} disabled={launching}>
+              <AddGame room={room} playerId={playerId} />
+              <button type="button" className="mpr-btn" onClick={() => onLaunch(() => launchRoom(room.id, playerId))} disabled={launching}>
                 ▶ {t('mp_room.launch')}
               </button>
             </>
@@ -535,11 +535,11 @@ export default function MultiplayerRoom({ room, progress, gameResults, playerId 
           )}
           {allPlayed && !hasNextLive && <p className="mpr-finished">✓ {t('mp_room.finished')}</p>}
           {isHost && hasNextLive && (
-            <button type="button" className="mpr-btn" onClick={() => onLaunch(() => launchNextGame(room))} disabled={launching}>
+            <button type="button" className="mpr-btn" onClick={() => onLaunch(() => launchNextGame(room, playerId))} disabled={launching}>
               ▶ {t('mp_room.next_game', { n: current + 2 })} · {gameLabel(games[current + 1], t)}
             </button>
           )}
-          {isHost && <AddGame room={room} />}
+          {isHost && <AddGame room={room} playerId={playerId} />}
           <StandingsCard
             room={room}
             progress={progress}

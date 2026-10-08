@@ -3,7 +3,7 @@
 // Google's popup helpers live in accountGoogle.js: Firebase's React Native build doesn't have them.
 //
 // Firestore:
-//   users/{uid}            { username, createdAt }
+//   users/{uid}            { username, usernameKey, createdAt }
 //   usernames/{lowercase}  { uid, username }   -> one account per username
 import {
   createUserWithEmailAndPassword,
@@ -140,7 +140,8 @@ async function claimUsername(user, name) {
     const claimed = await transaction.get(usernameRef(name))
     if (claimed.exists()) throw new AccountError('username_taken')
     transaction.set(usernameRef(name), { uid: user.uid, username: name })
-    transaction.set(userRef(user.uid), { username: name, createdAt: serverTimestamp() })
+    // usernameKey lets the Firestore rules find the usernames/ document above (their lower() is ASCII only).
+    transaction.set(userRef(user.uid), { username: name, usernameKey: usernameRef(name).id, createdAt: serverTimestamp() })
   })
   await updateProfile(user, { displayName: name })
 }

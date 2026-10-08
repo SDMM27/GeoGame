@@ -11,7 +11,7 @@ import { useFriendships } from '@shared/hooks/usePlayerProfile'
 import useLobbyHost from '@shared/hooks/useLobbyHost'
 import useMultiplayerRoom from '@shared/hooks/useMultiplayerRoom'
 import { dismissInvite, inviteId, sendRoomInvite } from '@shared/utils/invites'
-import { currentGameIndex, nextGameToPlay, roomGames } from '@shared/utils/multiplayerRoom'
+import { currentGameIndex, isRoomFormat, nextGameToPlay, roomGames } from '@shared/utils/multiplayerRoom'
 import { serverNow } from '@shared/utils/serverTime'
 
 import { useAccount, type Account } from '@/account/auth'
@@ -255,7 +255,7 @@ export default function RoomScreen() {
 
   const addGame = () => router.push({ pathname: '/multi/add', params: { code } })
 
-  const notFound = !loading && (error || !room || room.source !== 'app' || !game)
+  const notFound = !loading && (error || !room || !isRoomFormat(room) || !game)
   const counting = isLive && toPlay === current && remaining != null && remaining > 0
 
   const addGameButton = isHost && (

@@ -2,6 +2,8 @@
 import { initializeApp } from "firebase/app";
 // import { getAnalytics } from "firebase/analytics";
 import {getFirestore} from 'firebase/firestore';
+import { startAppCheck } from './appCheck';
+import { APP_CHECK_SITE_KEY } from './appCheckKey';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -19,5 +21,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
+// App Check goes before any other service, so that Firestore and Auth pick its token up (no-op without a site key).
+export const appCheck = startAppCheck(app, APP_CHECK_SITE_KEY);
 // const analytics = getAnalytics(app);
 export const firestore = getFirestore(app);

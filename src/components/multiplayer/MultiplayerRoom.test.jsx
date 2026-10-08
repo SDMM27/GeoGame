@@ -65,6 +65,6 @@ describe('MultiplayerRoom', () => {
     const room = makeRoom({ mode: 'live', status: 'lobby', createdOn: 'web', players: { web: { pseudo: 'Bob' } }, hostId: 'web' })
     render(<MultiplayerRoom room={room} progress={{}} gameResults={{}} playerId="web" />)
     fireEvent.click(screen.getByRole('button', { name: /▶/ }))
-    await waitFor(() => expect(launchRoom).toHaveBeenCalledWith('ABC234'))
+    await waitFor(() => expect(launchRoom).toHaveBeenCalledWith('ABC234', 'web'))
   })
 })

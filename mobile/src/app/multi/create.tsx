@@ -36,9 +36,9 @@ export default function CreateRoomSheet() {
   const [quizDifficulty, setQuizDifficulty] = useState('Moyen')
   const [answerMode, setAnswerMode] = useState<'choices' | 'free'>('choices')
   const { account } = useAccount()
-  // Signed in: always the account's username, like their solo scores
+  // Signed in: the account's username until the player types another one
   const [typed, setPseudo] = useState<string | null>(null)
-  const pseudo = account?.username ?? typed ?? getSavedPseudo()
+  const pseudo = typed ?? account?.username ?? getSavedPseudo()
   const [creating, setCreating] = useState(false)
   const [failed, setFailed] = useState(false)
   const forbidden = containsProfanity(pseudo)
@@ -176,8 +176,7 @@ export default function CreateRoomSheet() {
                 autoCorrect={false}
                 returnKeyType="done"
                 onSubmitEditing={onCreate}
-                editable={!account?.username}
-                style={[styles.input, account?.username ? styles.locked : null]}
+                style={styles.input}
               />
             </>
           )}
@@ -214,7 +213,6 @@ const styles = StyleSheet.create({
   icon: { width: 56, height: 56, borderRadius: radius.lg, alignItems: 'center', justifyContent: 'center' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
   option: { flexBasis: '48%', flexGrow: 1, borderWidth: 1.5, borderColor: colors.border },
-  locked: { opacity: 0.7 },
   input: {
     height: 52,
     borderRadius: radius.md,

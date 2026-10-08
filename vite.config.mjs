@@ -30,6 +30,6 @@ export default defineConfig({
     setupFiles: ['./src/setupTests.js'],
     globals: true,
     // tests/emulator needs the Firebase emulators: npm run test:emulator
-    exclude: ['**/node_modules/**', '**/.worktrees/**', ...(process.env.FIRESTORE_EMULATOR_HOST ? [] : ['tests/emulator/**'])],
+    exclude: ['**/node_modules/**', '**/.worktrees/**', 'mobile/**', ...(process.env.FIRESTORE_EMULATOR_HOST ? [] : ['tests/emulator/**'])],
   },
 })

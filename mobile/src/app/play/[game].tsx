@@ -1,4 +1,4 @@
-// Game setup sheet for Placement / Flags / Capitals: difficulty, continent or Ascension.
+// Game setup sheet for Placement / Flags / Capitals: difficulty, continent or Ascension. Survival has its own.
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useMemo, useState } from 'react'
@@ -13,6 +13,7 @@ import { ASCENSION_PRESETS, matchPreset } from '@shared/utils/ascensionPresets'
 import { CONTINENTS } from '@shared/utils/continents'
 
 import { SheetCloseButton } from '@/components/SheetCloseButton'
+import { SurvivalSetupSheet } from '@/components/survival/SurvivalSetupSheet'
 import { Button, Segmented, Text, Touchable } from '@/components/ui'
 import { DIFFICULTIES, DIFFICULTY_COLORS, getGame } from '@/games'
 import { colors, radius, space } from '@/theme'
@@ -59,7 +60,12 @@ function Stepper({ value, max, onChange, color }: { value: number; max: number; 
   )
 }
 
-export default function GameSetupSheet() {
+export default function GameSheet() {
+  const { game } = useLocalSearchParams<{ game: string }>()
+  return game === 'survival' ? <SurvivalSetupSheet /> : <GameSetupSheet />
+}
+
+function GameSetupSheet() {
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   // `add`: the room the host adds this game to (see multi/add)

@@ -20,6 +20,7 @@ import {
   roomGames,
 } from '@shared/utils/multiplayerRoom'
 import { formatTime } from '@shared/utils/formatTime'
+import { GAME_TYPES } from '@shared/utils/gameTypes'
 
 import { HudPill } from '@/components/game/GameTopBar'
 import { Button, Text } from '@/components/ui'
@@ -31,8 +32,8 @@ export type RoomPlay = {
   // The room as seen by the game being played: its `game`, `gameIndex` and own `seed`
   room: Room & { gameIndex: number }
   content: RoomContent
-  // Countries found / questions answered so far
-  reportFound: (found: number) => void
+  // Countries found / questions answered / survival rounds cleared so far (and the lives left, in survival)
+  reportFound: (found: number, lives?: number) => void
   finish: (result: Omit<GameResult, 'total'>) => void
   // Back to the room screen (standings)
   exit: () => void
@@ -80,8 +81,9 @@ export function RoomGate({ code, children }: { code: string; children: (play: Ro
   const gameKey = `${code}_${gameIndex}`
 
   const reportFound = useCallback(
-    (found: number) => {
-      if (!finishedGames.has(gameKey)) reportProgress(code, { gameIndex, found, total, finished: false }).catch(console.error)
+    (found: number, lives?: number) => {
+      if (finishedGames.has(gameKey)) return
+      reportProgress(code, { gameIndex, found, total, finished: false, ...(lives != null && { lives }) }).catch(console.error)
     },
     [code, gameKey, gameIndex, total]
   )
@@ -147,6 +149,7 @@ function useLiveRoom(code: string) {
 
 export function resultLine(game: Room['game'], result: PlayerResult, t: TFunction) {
   const time = formatTime(result.elapsedTime ?? 0).slice(0, 5)
+  if (game.type === GAME_TYPES.SURVIVAL) return `${t('survival.rounds_count', { count: result.weightedScore ?? 0 })} · ${time}`
   if (scoringMode(game) === 'solved') {
     return `${result.countriesSolved}/${result.total} · ${t('mobile.multi.errors', { count: result.attempts })} · ${time}`
   }
@@ -259,7 +262,11 @@ function GameRows({ room, progress, results, index }: { room: Room; progress: Pr
               {id === playerId ? ` (${t('mobile.multi.you')})` : ''}
             </Text>
             <Text variant="caption">
-              {playing ? `${t('mobile.multi.playing')} · ${playing.found}/${playing.total}` : t('mobile.multi.not_played')}
+              {!playing
+                ? t('mobile.multi.not_played')
+                : game.type === GAME_TYPES.SURVIVAL
+                  ? `${t('mobile.multi.playing')} · ${t('survival.rounds_count', { count: playing.found })} · ${playing.lives ?? game.lives} ❤️`
+                  : `${t('mobile.multi.playing')} · ${playing.found}/${playing.total}`}
             </Text>
           </View>
         )

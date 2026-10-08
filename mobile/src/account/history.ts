@@ -6,7 +6,7 @@ import { auth } from './auth'
 
 export type GameRecord = {
   gameType: string
-  mode: 'standard' | 'ascension' | 'daily' | 'infinite' | 'multi'
+  mode: 'standard' | 'ascension' | 'daily' | 'infinite' | 'multi' | 'survival'
   score?: number | null
   attempts?: number | null
   solved?: boolean

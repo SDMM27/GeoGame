@@ -34,6 +34,7 @@ const PLAYABLE_TYPES = [
   GAME_TYPES.BORDER_GUESS,
   GAME_TYPES.COUNTRY_CLUE,
   GAME_TYPES.QUIZ,
+  GAME_TYPES.SURVIVAL,
 ]
 
 export default function MultiplayerRoom({ room, progress, gameResults, playerId }) {

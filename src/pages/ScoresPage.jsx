@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import NavBar from '../components/NavBar'
 import Scoreboard from './Scoreboard'
 import AscensionScoreboard from './AscensionScoreboard'
+import SurvivalScoreboard from './survival/SurvivalScoreboard'
 import { GAME_TYPES } from '../utils/gameTypes'
 import './scoreboard.css'
 
@@ -13,6 +14,14 @@ export default function ScoresPage() {
   const game = searchParams.get('game') ?? GAME_TYPES.PLACEMENT
   const initialMode = searchParams.get('mode') === 'ascension' ? 'ascension' : 'standard'
   const [mode, setMode] = React.useState(initialMode)
+  if (game === GAME_TYPES.SURVIVAL) {
+    return (
+      <div className="scores-page">
+        <NavBar />
+        <SurvivalScoreboard initialLives={Number(searchParams.get('lives')) || null} initialModes={searchParams.get('modes')} />
+      </div>
+    )
+  }
   return (
     <div className="scores-page">
       <NavBar />

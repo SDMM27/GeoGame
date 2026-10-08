@@ -122,6 +122,11 @@ function getCountryByName(name) {
   return BORDER_GUESS_COUNTRIES.find((country) => country.properties.ADMIN === name) ?? null
 }
 
+/** The Border Guess country a typed name designates (any language), or null. */
+export function findBorderGuessCountry(input) {
+  return COUNTRY_LOOKUP.get(normalize(input.trim())) ?? null
+}
+
 function hashString(value) {
   let hash = 0
   for (let index = 0; index < value.length; index += 1) {
@@ -222,6 +227,21 @@ function getDirectionArrow(direction) {
   }
 
   return arrows[direction] ?? null
+}
+
+/** A guess of `guessedCountry` against `answerName`: distance and direction when wrong. */
+export function buildBorderGuess(guessedCountry, normalizedInput, isCorrect, answerName) {
+  const guessedName = guessedCountry.properties.ADMIN
+  const direction = isCorrect ? null : getDirectionLabel(guessedName, answerName)
+  return {
+    value: guessedName,
+    iso: guessedCountry.properties.ISO_A2 ?? null,
+    normalizedInput,
+    isCorrect,
+    distanceKm: isCorrect ? 0 : getDistanceKm(guessedName, answerName),
+    direction,
+    directionArrow: isCorrect ? null : getDirectionArrow(direction),
+  }
 }
 
 export default function useBorderGuessState(mode, options = {}) {
@@ -369,25 +389,13 @@ export default function useBorderGuessState(mode, options = {}) {
     }
 
     const guessedName = guessedCountry.properties.ADMIN
-    const guessedISO = guessedCountry.properties.ISO_A2 ?? null
     const extraNames = getAllCountryNames(
       currentCountry.properties.ISO_A2,
       answerName,
       currentCountry.properties.aliases ?? []
     )
     const isCorrect = checkAnswer(guessedName, answerName, currentCountry.properties.aliases ?? [], extraNames)
-    const nextGuesses = [
-      ...guesses,
-      {
-        value: guessedName,
-        iso: guessedISO,
-        normalizedInput: normalizedGuess,
-        isCorrect,
-        distanceKm: isCorrect ? 0 : getDistanceKm(guessedName, answerName),
-        direction: isCorrect ? null : getDirectionLabel(guessedName, answerName),
-        directionArrow: isCorrect ? null : getDirectionArrow(getDirectionLabel(guessedName, answerName)),
-      },
-    ]
+    const nextGuesses = [...guesses, buildBorderGuess(guessedCountry, normalizedGuess, isCorrect, answerName)]
 
     setGuesses(nextGuesses)
     setInputValue('')

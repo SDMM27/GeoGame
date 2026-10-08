@@ -36,6 +36,10 @@ export const sortAscensionScores = (scores) =>
     return (b.globalScore ?? 0) - (a.globalScore ?? 0)
   })
 
+// Survival: most rounds first, then the shortest time.
+export const sortSurvivalScores = (scores) =>
+  [...scores].sort((a, b) => b.score - a.score || (a.elapsedTime ?? Infinity) - (b.elapsedTime ?? Infinity))
+
 // Which scores page the filters show: the difficulties (continent scores excluded) or the continents.
 // Returns the equality filters of each query: { difficulty, gameType? }.
 export function soloQueries({ game = ALL_GAMES, continentMode = false, difficulty = ALL_DIFFICULTIES, continent = ALL_CONTINENTS } = {}) {

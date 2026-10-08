@@ -224,7 +224,7 @@ export function ByGameSection({ stats }: { stats: ProfileStats }) {
         {entries.map(([type, gameStats], index) => {
           const game = getGameByType(type)
           if (!game) return null
-          const best = describeBest(gameStats, t)
+          const best = describeBest(gameStats, t, type)
           return (
             <View key={type} style={[styles.listRow, index > 0 && styles.listDivider]}>
               <View style={[styles.gameIcon, { backgroundColor: `${game.color}1F` }]}>

@@ -44,13 +44,13 @@
       "title": "Country Placement",
       "description": "Place the country in the right spot on the map."
     },
-    "lives_mode": {
-      "title": "Lives Mode",
-      "description": "Find as many countries as possible without making mistakes."
-    },
     "quiz": {
       "title": "Geo Quiz",
       "description": "A daily question to challenge your friends, or keep answering questions at the difficulty of your choice."
+    },
+    "survival": {
+      "title": "Survival",
+      "description": "Play rounds of several games in a row: every mistake costs you a life."
     }
   },
   "modes": {
@@ -532,7 +532,8 @@
       "ascension": "Ascension",
       "daily": "Daily",
       "infinite": "Infinite",
-      "multi": "Multiplayer"
+      "multi": "Multiplayer",
+      "survival": "Survival"
     },
     "solved": "Found",
     "failed": "Missed",
@@ -729,5 +730,58 @@
     "n_games": "{{count}} games",
     "next_game": "Launch game {{n}}",
     "waiting_next": "Waiting for the next game…"
+  },
+  "survival": {
+    "choose_games": "Rounds",
+    "choose_lives": "Lives",
+    "pick_one_game": "Pick at least one game.",
+    "round_type": {
+      "PLACEMENT": "Find the country",
+      "FLAGS": "Flag",
+      "CAPITALS": "Capital",
+      "BORDER_GUESS": "Borders",
+      "COUNTRY_CLUE": "Country Clue",
+      "QUIZ": "Quiz"
+    },
+    "prompt": {
+      "PLACEMENT": "Click the country",
+      "FLAGS": "Which country has this flag?",
+      "CAPITALS": "What's its capital?",
+      "BORDER_GUESS": "Which country has this shape?",
+      "COUNTRY_CLUE": "Find the mystery country",
+      "QUIZ": "Quiz question"
+    },
+    "round": "Round {{n}}",
+    "rounds_short": "rounds",
+    "rounds_count_one": "{{count}} round",
+    "rounds_count_other": "{{count}} rounds",
+    "lives_count_one": "{{count}} life",
+    "lives_count_other": "{{count}} lives",
+    "correct": "Well done!",
+    "answer_was": "It was: {{answer}}",
+    "next": "Next →",
+    "give_up": "Skip (−1 ❤️)",
+    "life_lost": "Wrong! −1 life",
+    "not_a_country": "I don't recognise this country.",
+    "capital_placeholder": "Capital name",
+    "clue_hint": "Guess countries: every wrong guess costs a life, but gives you clues.",
+    "game_over": "Out of lives!",
+    "victory": "You survived every round!",
+    "rounds_survived": "Rounds cleared",
+    "time": "Time",
+    "lives_at_start": "Starting lives",
+    "see_leaderboard": "See the Survival leaderboard",
+    "leaderboard_title": "Survival leaderboard",
+    "all_combinations": "All combinations",
+    "all_six": "All 6 games",
+    "no_scores": "No scores for this filter.",
+    "col_player": "Player",
+    "col_rounds": "Rounds",
+    "col_games": "Games",
+    "room_label": "Survival · {{lives}} ❤️",
+    "progress_lives": "{{lives}} ❤️",
+    "eliminated": "Out",
+    "best": "Best: {{rounds}}",
+    "missed_answer": "Missed answer"
   }
 }

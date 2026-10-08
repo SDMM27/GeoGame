@@ -131,11 +131,11 @@ export const GAMES = [
     active: false,
   },
   {
-    id: "lives",
-    icon: "\u26A1",
-    titleKey: "games.lives.title",
-    descKey: "games.lives.description",
-    route: null,
-    active: false,
+    id: GAME_TYPES.SURVIVAL,
+    icon: "\u2764\uFE0F",
+    titleKey: "games.survival.title",
+    descKey: "games.survival.description",
+    route: "/survival",
+    active: true,
   },
 ];

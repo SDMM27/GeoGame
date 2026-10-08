@@ -48,7 +48,7 @@ describe('lookups', () => {
   })
 
   it('keeps solo-only games out of multiplayer', () => {
-    expect(MULTI_GAMES.map((game) => game.id)).toEqual(['placement', 'flags', 'capitals', 'border_guess', 'country_clue', 'quiz'])
+    expect(MULTI_GAMES.map((game) => game.id)).toEqual(['placement', 'flags', 'capitals', 'border_guess', 'country_clue', 'quiz', 'survival'])
     expect(getGame('voyage_voyage')?.multi).toBe(false)
     expect(getGame('ranking')?.multi).toBe(false)
   })

@@ -18,7 +18,8 @@ export type GameDefinition = {
   color: string
   route: string
   // 'setup': difficulty/continent/ascension sheet. 'daily': daily + infinite modes.
-  kind: 'setup' | 'daily'
+  // 'survival': games of the rounds and lives sheet.
+  kind: 'setup' | 'daily' | 'survival'
   // Playable in a multiplayer room
   multi: boolean
 }
@@ -110,6 +111,17 @@ export const GAMES: GameDefinition[] = [
     color: gameColors.quiz,
     route: '/game/quiz',
     kind: 'daily',
+    multi: true,
+  },
+  {
+    id: 'survival',
+    type: GAME_TYPES.SURVIVAL,
+    titleKey: 'games.survival.title',
+    descKey: 'games.survival.description',
+    icon: 'heart-pulse',
+    color: gameColors.survival,
+    route: '/game/survival',
+    kind: 'survival',
     multi: true,
   },
 ]

@@ -11,7 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { buildChallengeUrl } from '@shared/utils/challenge'
 import { formatTime } from '@shared/utils/formatTime'
 import { useScoreSave } from '@shared/hooks/useScoreSave'
-import { saveAscensionScore, saveDailyScore, saveRankingScore, saveScore } from '@shared/utils/saveScore'
+import { saveAscensionScore, saveDailyScore, saveRankingScore, saveScore, saveSurvivalScore } from '@shared/utils/saveScore'
 import { generateShareText } from '@shared/utils/shareScore'
 
 import { useAccount } from '@/account/auth'
@@ -37,6 +37,8 @@ export type SaveConfig =
       formatSecondary?: (elapsedTime: number | null | undefined) => string
     }
   | { kind: 'ranking'; dailyKey: string; totalError: number; attemptsUsed: number; playerOrder: string[] }
+  // Survival: `score` is the rounds cleared
+  | { kind: 'survival'; modes: string; lives: number; elapsedTime: number }
 
 export type ShareConfig = {
   gameType: string
@@ -96,6 +98,8 @@ export function ResultsSheet({ title, score, scoreText, scoreLabel, accent = col
           ? await saveDailyScore({ ...player, ...save })
           : save.kind === 'ranking'
             ? await saveRankingScore({ ...player, score, ...save })
+            : save.kind === 'survival'
+              ? await saveSurvivalScore({ ...player, score, ...save })
             : save.kind === 'ascension'
               ? await saveAscensionScore({ ...player, score, ...save })
               : await saveScore({ ...player, score, ...save })
@@ -127,7 +131,9 @@ export function ResultsSheet({ title, score, scoreText, scoreLabel, accent = col
     const value =
       save?.kind === 'daily'
         ? `${existing.attempts} ${existing.attempts === 1 ? t('units.attempt_one') : t('units.attempt_other')}`
-        : `${existing.score} ${t('units.pts')}`
+        : save?.kind === 'survival'
+          ? t('survival.rounds_count', { count: existing.score ?? 0 })
+          : `${existing.score} ${t('units.pts')}`
     const secondary =
       save?.kind === 'daily' && save.formatSecondary
         ? save.formatSecondary(existing.elapsedTime)

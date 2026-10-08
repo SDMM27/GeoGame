@@ -2,7 +2,7 @@ import { addDoc, collection, doc, getDoc, getDocs, limit, orderBy, query, server
 import { firestore } from '../Firebase'
 import { isBetterDailyScore, sortDailyScores } from './dailyScores'
 import { sortRankingScores } from './rankingScores'
-import { LEADERBOARD_SIZE, ascensionLeaderboard, ascensionQuery, soloLeaderboard, soloQueries } from './leaderboards'
+import { LEADERBOARD_SIZE, ascensionLeaderboard, ascensionQuery, soloLeaderboard, soloQueries, sortSurvivalScores } from './leaderboards'
 import { GAME_TYPES } from './gameTypes'
 import { normalizeUsername } from './account'
 import { containsProfanity } from './profanity'
@@ -111,6 +111,18 @@ export function saveRankingScore({ name, uid, dailyKey, score, totalError, attem
   )
 }
 
+// Survival score: best one per player, set of games (`modes`, see survivalModesKey) and number of lives.
+export function saveSurvivalScore({ name, uid, modes, lives, score, elapsedTime }) {
+  return saveBest(
+    'survival_scores',
+    { name, uid },
+    { modes, lives },
+    { score, elapsedTime },
+    (next, previous) => isBetter(next.score, next.elapsedTime, previous.score, previous.elapsedTime),
+    (previous) => ({ score: previous.score, elapsedTime: previous.elapsedTime })
+  )
+}
+
 // A leaderboard row: the document's fields and its id, which reports/ points at (utils/reports.js).
 const withId = (doc) => ({ ...doc.data(), id: doc.id })
 
@@ -164,4 +176,11 @@ export async function fetchSoloScores(filters) {
 export async function fetchAscensionScores(filters) {
   const scores = await fetchTop('ascension_scores', [ascensionQuery(filters)], [['globalTimeMs', 'asc'], ['globalScore', 'desc']])
   return ascensionLeaderboard(scores)
+}
+
+// Survival leaderboard (the best LEADERBOARD_SIZE) of a number of lives, for a set of games or all of them (modes null).
+export async function fetchSurvivalScores({ lives, modes = null }) {
+  const filters = { lives, ...(modes && { modes }) }
+  const scores = await fetchTop('survival_scores', [filters], [['score', 'desc'], ['elapsedTime', 'asc']])
+  return sortSurvivalScores(scores).slice(0, LEADERBOARD_SIZE)
 }

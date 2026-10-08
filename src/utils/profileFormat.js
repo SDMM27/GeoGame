@@ -1,12 +1,15 @@
 // Labels for a game of the history (see gameHistory.js), shared by the website and the app.
+import { GAME_TYPES } from './gameTypes'
 
 const formatPoints = (score) => (Number.isInteger(score) ? String(score) : score.toFixed(1))
 
-// "Défi du jour", "Classique · Moyen", "Ascension · Progressif", "Multijoueur · AB3K7Z"
+// "Défi du jour", "Classique · Moyen", "Ascension · Progressif", "Multijoueur · AB3K7Z", "Survie · 3 vies"
 export function describeMode(game, t) {
   const mode = t(`profile.modes.${game.mode}`)
   const detail =
-    game.mode === 'multi'
+    game.mode === 'survival'
+      ? game.lives != null ? t('survival.lives_count', { count: game.lives }) : null
+      : game.mode === 'multi'
       ? game.roomCode
       : game.presetName
         ? game.presetName === 'Progressif'
@@ -23,6 +26,7 @@ export function describeMode(game, t) {
 // "42 pts · 30/40", "Trouvé · 3 essais", "Raté", "7/10"
 export function describeResult(game, t) {
   const parts = []
+  if (game.gameType === GAME_TYPES.SURVIVAL) return t('survival.rounds_count', { count: game.score ?? 0 })
   if (game.solved != null && game.attempts != null && game.score == null) {
     parts.push(game.solved ? t('profile.solved') : t('profile.failed'))
     if (game.solved) parts.push(t('profile.attempts_count', { count: game.attempts }))
@@ -35,7 +39,10 @@ export function describeResult(game, t) {
 }
 
 // Best result of a game type for the "by game" list.
-export function describeBest(gameStats, t) {
+export function describeBest(gameStats, t, gameType = null) {
+  if (gameType === GAME_TYPES.SURVIVAL && gameStats.bestScore != null) {
+    return t('survival.best', { rounds: t('survival.rounds_count', { count: gameStats.bestScore }) })
+  }
   if (gameStats.bestAttempts != null && gameStats.bestScore == null) {
     return t('profile.best_attempts', { count: gameStats.bestAttempts })
   }

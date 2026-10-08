@@ -9,6 +9,7 @@ import { ScrollView, StyleSheet, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { containsProfanity } from '@shared/utils/profanity'
+import { parseSurvivalModes } from '@shared/utils/survivalConfig'
 import { QUIZ_DIFFICULTIES } from '@shared/utils/quizQuestions'
 
 import { useAccount } from '@/account/auth'
@@ -18,7 +19,15 @@ import { DIFFICULTY_COLORS, getGame } from '@/games'
 import { addGameToRoom, createRoom, getSavedPseudo, type RoomGame, type RoomMode } from '@/multiplayer/room'
 import { colors, fonts, radius, space } from '@/theme'
 
-type SetupConfig = { difficulty?: string; continent?: string; phases?: Record<string, number>; presetName?: string | null }
+// From the setup sheet: Placement / Flags / Capitals (difficulty, continent or Ascension), Survival (modes and lives)
+type SetupConfig = {
+  difficulty?: string
+  continent?: string
+  phases?: Record<string, number>
+  presetName?: string | null
+  modes?: string
+  lives?: number
+}
 
 const COUNTS = ['5', '10', '15'] as const
 const QUIZ_COUNTS = ['5', '10', '20'] as const
@@ -46,7 +55,13 @@ export default function CreateRoomSheet() {
   const isQuiz = game.id === 'quiz'
   const isRounds = game.id === 'border_guess' || game.id === 'country_clue'
 
-  const setupLabel = setup.phases
+  const isSurvival = game.id === 'survival'
+
+  const setupLabel = isSurvival
+    ? `${t('survival.lives_count', { count: setup.lives ?? 0 })} · ${parseSurvivalModes(setup.modes)
+        .map((type: string) => t(`survival.round_type.${type}`))
+        .join(', ')}`
+    : setup.phases
     ? `${t('mobile.setup.ascension')} · ${setup.presetName === 'Progressif' ? t('presets.progressive') : (setup.presetName ?? t('presets.custom'))}`
     : setup.continent
       ? t(`continents.${setup.continent}`)
@@ -66,6 +81,7 @@ export default function CreateRoomSheet() {
       presetName: setup.presetName ?? null,
     }
     if (isRounds || isQuiz) roomGame.count = Number(count)
+    if (isSurvival) Object.assign(roomGame, { modes: setup.modes, lives: setup.lives })
     if (isQuiz) Object.assign(roomGame, { quizDifficulty, answerMode })
     setCreating(true)
     setFailed(false)

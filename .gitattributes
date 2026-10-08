@@ -19,3 +19,7 @@
 *.zip binary
 *.keystore binary
 *.jks binary
+
+# The app's runtime fingerprint (EAS Update, policy "fingerprint") hashes mobile/.gitignore byte for byte, and
+# app 1.0.1 was built from a CRLF checkout: keep it CRLF on disk everywhere, or OTA updates stop reaching that build.
+mobile/.gitignore text eol=crlf

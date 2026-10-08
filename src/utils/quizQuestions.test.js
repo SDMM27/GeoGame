@@ -208,6 +208,15 @@ describe('free answer mode', () => {
       .find((x) => x.type === 'river_city' && x.accepted[0].value === 'mississippi')
     expect(checkFreeAnswer(q, 'Missisippi')?.match).toBe('typo')
   })
+
+  it('measures the typo tolerance on the name without its generic words', () => {
+    // « mont Kenya » fait 10 lettres, mais seul « Kenya » compte : une faute tolérée, pas deux
+    const q = { type: 'highest_point', choices: [], accepted: [{ id: 'feature:mount_kenya', kind: 'feature', value: 'mount_kenya' }] }
+    expect(checkFreeAnswer(q, 'mont Kenia')?.match).toBe('typo')
+    expect(checkFreeAnswer(q, 'Kenia')?.match).toBe('typo')
+    expect(checkFreeAnswer(q, 'mont konoa')).toBeNull()
+    expect(checkFreeAnswer(q, 'mount konoa')).toBeNull()
+  })
 })
 
 describe('daily question', () => {

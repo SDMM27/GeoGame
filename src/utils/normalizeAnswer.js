@@ -53,11 +53,13 @@ export function typoDistance(a, b, max = Infinity) {
  * @param {string[]} accepted - noms acceptés pour la bonne réponse (cible + alias + traductions)
  * @param {Iterable<string>} [knownAnswers] - toutes les réponses possibles du jeu ; une saisie
  *   aussi proche (ou plus) d'une autre réponse est refusée (ex. « Zambie » pour la Gambie)
- * @param {{ whileTyping?: boolean }} [options] - whileTyping : pendant la frappe, une faute n'est
- *   tolérée que si la saisie est au moins aussi longue que le nom (évite de valider « Gambi »)
+ * @param {{ whileTyping?: boolean, coreOf?: (name: string) => string }} [options]
+ *   whileTyping : pendant la frappe, une faute n'est tolérée que si la saisie est au moins aussi longue que le nom (évite de valider « Gambi »).
+ *   coreOf : partie distinctive d'un nom, sur laquelle se mesure la tolérance (« Kenya » pour
+ *   « le mont Kenya » : sinon « mont konoa », à deux fautes, passerait)
  * @returns {{ match: 'exact' | 'typo', name: string } | null} name = orthographe correcte la plus proche
  */
-export function matchAnswer(input, accepted, knownAnswers = [], { whileTyping = false } = {}) {
+export function matchAnswer(input, accepted, knownAnswers = [], { whileTyping = false, coreOf = (name) => name } = {}) {
   const normalizedInput = normalize(input ?? '')
   if (!normalizedInput) return null
 
@@ -67,7 +69,7 @@ export function matchAnswer(input, accepted, knownAnswers = [], { whileTyping = 
 
   let best = null
   for (const c of candidates) {
-    const tolerance = getTypoTolerance(c.key.length)
+    const tolerance = Math.min(getTypoTolerance(c.key.length), getTypoTolerance(normalize(coreOf(c.name)).length))
     if (tolerance === 0) continue
     if (whileTyping && normalizedInput.length < c.key.length) continue
     const distance = typoDistance(normalizedInput, c.key, tolerance)

@@ -36,7 +36,6 @@ Le site est servi sur http://localhost:5173. Variables d'environnement, à mettr
 | `VITE_RECAPTCHA_ENTERPRISE_KEY` | Clé de site reCAPTCHA Enterprise pour Firebase App Check (`src/appCheckKey.js`). Vide : App Check est désactivé. |
 | `VITE_USE_EMULATORS=1` | Connecte le site aux émulateurs Firebase locaux (Firestore sur `127.0.0.1:8080`) au lieu de la production, et désactive App Check. |
 | `VITE_APP_URL`, `VITE_APK_URL` | Facultatives : adresse de l'app web et de l'APK Android (`src/utils/appLinks.js`). |
-| `VITE_SENTRY_DSN` | DSN du projet Sentry du site (`src/sentry.js`) : les erreurs de production y sont envoyées. Vide : rien n'est envoyé. À définir dans le projet Vercel ; l'environnement et la version viennent de `VITE_VERCEL_ENV` et `VITE_VERCEL_GIT_COMMIT_SHA`, fournies par Vercel. |
 
 Pour ne rien écrire dans la base de production pendant le développement, démarrez les émulateurs (voir plus bas) puis lancez `VITE_USE_EMULATORS=1 npm run dev`.
 
@@ -53,7 +52,6 @@ npm start          # ou npm run android / ios / web
 - Le site et l'app partagent le code de `src/` ; les dépendances importées par ce code sont résolues depuis `mobile/node_modules`.
 - `EXPO_PUBLIC_RECAPTCHA_ENTERPRISE_KEY` : clé reCAPTCHA Enterprise pour App Check sur l'app web. `EXPO_PUBLIC_API_ORIGIN` : adresse de l'API (par défaut le site de production). `EXPO_PUBLIC_FIREBASE_EMULATOR_HOST=localhost` : connexion aux émulateurs.
 - Builds avec EAS Build (`mobile/eas.json`) : profils `development`, `preview` (APK interne) et `production`. Les notifications push Android utilisent `google-services.json` (fichier local ou variable de fichier EAS `GOOGLE_SERVICES_JSON`).
-- Suivi des erreurs : `EXPO_PUBLIC_SENTRY_DSN` (variable d'environnement EAS non secrète, puisqu'elle est intégrée au bundle ; à définir pour les builds **et** les `eas update`) active Sentry (`mobile/src/sentry.ts`), hors développement. L'envoi des source maps est coupé (`SENTRY_DISABLE_AUTO_UPLOAD` dans `mobile/eas.json`) : pour des piles d'appel lisibles, créer les variables EAS secrètes `SENTRY_AUTH_TOKEN`, `SENTRY_ORG` et `SENTRY_PROJECT`, puis retirer `SENTRY_DISABLE_AUTO_UPLOAD` du profil voulu. Sentry ajoute du code natif : il n'arrive qu'avec un nouveau build, pas par mise à jour OTA sur l'APK 1.0.1.
 - Mises à jour OTA (EAS Update, `runtimeVersion` par empreinte) : le canal `preview` reçoit les mises à jour, par exemple `npx eas update --channel preview` depuis `mobile/`.
 - L'app web est exportée par `npx expo export -p web` (voir `mobile/vercel.json`) et déployée comme un projet Vercel distinct dont le dossier racine est `mobile/`.
 - Régénération des données embarquées : `npm run build:countries`, `build:flags` et `build:silhouettes` (dans `mobile/`).

@@ -1,8 +1,17 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { visualizer } from 'rollup-plugin-visualizer'
+
+// ANALYZE=1 npm run build writes dist/stats.html (treemap) and dist/stats.json (raw sizes, gzip)
+const analyze = process.env.ANALYZE
+  ? [
+      visualizer({ filename: 'dist/stats.html', template: 'treemap', gzipSize: true }),
+      visualizer({ filename: 'dist/stats.json', template: 'raw-data', gzipSize: true }),
+    ]
+  : []
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), ...analyze],
   // App.js and Firebase.js use JSX syntax but keep .js extension.
   // Both blocks are needed: esbuild covers the transform pass,
   // optimizeDeps covers the pre-bundling pass.

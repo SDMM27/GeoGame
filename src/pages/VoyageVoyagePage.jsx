@@ -11,7 +11,9 @@ import useVoyageVoyageState from '../hooks/useVoyageVoyageState'
 import DailyForm from './DailyForm'
 import DailyLeaderboard from './DailyLeaderboard'
 import { GAME_TYPES } from '../utils/gameTypes'
-import { useRecordGame } from '../auth'
+import { useAccount, useRecordGame } from '../auth'
+import { useDailyPlayedElsewhere } from '../hooks/useDailyPlayedElsewhere'
+import DailyPlayedElsewhere from '../components/DailyPlayedElsewhere'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { normalize } from '../utils/normalizeAnswer'
 import { getCountryName } from '../utils/getCountryName'
@@ -65,6 +67,12 @@ export default function VoyageVoyagePage() {
     resetGame,
     dailyKey,
   } = useVoyageVoyageState(mode)
+  const elsewhere = useDailyPlayedElsewhere(useAccount(), {
+    gameType: GAME_TYPES.VOYAGE_VOYAGE,
+    dailyKey,
+    started: guessHistory.length > 1 || hintsUsed.length > 0 || isGameOver,
+    enabled: mode === 'daily',
+  })
 
   const hintFeatures = unguessedOptimalPath?.filter(f =>
     revealedISOs.has(f.properties.ISO_A2)
@@ -143,6 +151,19 @@ export default function VoyageVoyagePage() {
         }
       : null
   )
+
+  if (elsewhere.checking || elsewhere.game) {
+    return (
+      <DailyPlayedElsewhere title={t('games.voyage_voyage.title')} game={elsewhere.game}>
+        <DailyLeaderboard
+          gameType={GAME_TYPES.VOYAGE_VOYAGE}
+          dailyKey={dailyKey}
+          columnLabels={{ attempts: 'Étapes', secondary: 'Erreurs' }}
+          secondaryFormatter={n => `${n} ${n === 1 ? t('units.error_one') : t('units.error_other')}`}
+        />
+      </DailyPlayedElsewhere>
+    )
+  }
 
   return (
     <div className="voyage-page">

@@ -1,6 +1,6 @@
 import { addDoc, collection, doc, getDoc, getDocs, limit, orderBy, query, serverTimestamp, setDoc, where } from 'firebase/firestore'
 import { firestore } from '../Firebase'
-import { isBetterDailyScore, sortDailyScores } from './dailyScores'
+import { sortDailyScores } from './dailyScores'
 import { sortRankingScores } from './rankingScores'
 import { LEADERBOARD_SIZE, ascensionLeaderboard, ascensionQuery, soloLeaderboard, soloQueries, sortSurvivalScores } from './leaderboards'
 import { GAME_TYPES } from './gameTypes'
@@ -86,27 +86,30 @@ export function saveAscensionScore({ name, uid, gameType, presetName, timer, sco
   )
 }
 
-// Daily-challenge score: best one per player, game and day.
+// A daily challenge is played once: its first saved score stays, a replay on another device never replaces it
+// (firestore.rules refuses it too).
+const neverReplace = () => false
+
+// Daily-challenge score: one per player, game and day.
 export function saveDailyScore({ name, uid, gameType, dailyKey, attempts, elapsedTime, guesses, hints }) {
   return saveBest(
     'daily_scores',
     { name, uid },
     { gameType, dailyKey },
     { attempts, elapsedTime, guesses, ...(hints != null && { hints }) },
-    isBetterDailyScore,
+    neverReplace,
     (previous) => ({ attempts: previous.attempts, elapsedTime: previous.elapsedTime })
   )
 }
 
-// Country Ranking daily score: higher score first, then the smaller total error.
+// Country Ranking daily score (ranked by higher score, then the smaller total error): one per player and day.
 export function saveRankingScore({ name, uid, dailyKey, score, totalError, attemptsUsed, playerOrder }) {
   return saveBest(
     'daily_scores',
     { name, uid },
     { gameType: GAME_TYPES.RANKING, dailyKey },
     { score, totalError, attemptsUsed, playerOrder },
-    (next, previous) =>
-      next.score > previous.score || (next.score === previous.score && next.totalError < (previous.totalError ?? Infinity)),
+    neverReplace,
     (previous) => previous
   )
 }

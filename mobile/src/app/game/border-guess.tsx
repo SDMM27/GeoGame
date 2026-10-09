@@ -10,10 +10,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import useBorderGuessState, { ROOM_MAX_ATTEMPTS, roomRoundErrors } from '@shared/hooks/useBorderGuessState'
 import { formatTime } from '@shared/utils/formatTime'
+import { useDailyPlayedElsewhere } from '@shared/hooks/useDailyPlayedElsewhere'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
 import { getCountryName } from '@shared/utils/getCountryName'
 
+import { useAccount } from '@/account/auth'
 import { DailyLeaderboard } from '@/components/game/DailyLeaderboard'
+import { DailyPlayedElsewhere } from '@/components/game/DailyPlayedElsewhere'
 import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
 import { BorderGuessRow, type BorderGuess } from '@/components/game/GuessCards'
 import { GuessInputBar } from '@/components/game/GuessInputBar'
@@ -60,6 +63,12 @@ function BorderGuessGame({ mode, play }: { mode: string; play?: RoomPlay }) {
     startedAt,
     elapsedTime,
   } = useBorderGuessState(mode, { overrideCountry: rounds.country, maxAttempts: play ? ROOM_MAX_ATTEMPTS : null })
+  const elsewhere = useDailyPlayedElsewhere(useAccount(), {
+    gameType: GAME_TYPES.BORDER_GUESS,
+    dailyKey,
+    started: hasStarted || guesses.length > 0 || isComplete,
+    enabled: isDaily,
+  })
   useRoundResult(rounds, {
     isCurrent: currentCountry === rounds.country,
     isComplete,
@@ -75,6 +84,14 @@ function BorderGuessGame({ mode, play }: { mode: string; play?: RoomPlay }) {
   const { height: windowHeight } = useWindowDimensions()
   const keyboardVisible = useKeyboardVisible()
   const mapHeight = Math.max(150, Math.round(windowHeight * (keyboardVisible ? 0.22 : 0.32)))
+
+  if (elsewhere.checking || elsewhere.game) {
+    return (
+      <DailyPlayedElsewhere title={t('games.border_guess.title')} game={elsewhere.game} accent={ACCENT}>
+        {dailyKey && <DailyLeaderboard gameType={GAME_TYPES.BORDER_GUESS} dailyKey={dailyKey} />}
+      </DailyPlayedElsewhere>
+    )
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>

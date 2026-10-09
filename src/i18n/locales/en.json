@@ -216,14 +216,14 @@
     "correct_ranking": "Correct ranking",
     "placed_at": "placed #",
     "difference_of": "difference of",
-    "better_score_exists": "You already have a better score saved."
+    "better_score_exists": "You already have a score saved for this challenge."
   },
   "form": {
     "title": "Game over!",
     "ascension_title": "🚀 Ascension complete!",
     "better_score_exists": "This username already has a better score in this difficulty:",
     "use_different_name": "Please save your score under a different name.",
-    "better_daily_score": "This username already has a better score for this puzzle:",
+    "better_daily_score": "This username already has a score saved for this challenge:",
     "use_different_name_daily": "Save under a different name.",
     "score_saved": "Score saved ✓",
     "saving": "Saving...",
@@ -846,5 +846,12 @@
       "title": "Leaderboards — High scores | GeoGame",
       "description": "GeoGame players' high scores for every game, difficulty and continent."
     }
+  },
+  "daily_elsewhere": {
+    "title": "Daily challenge already played",
+    "text": "You already played this daily challenge with your account, on another device.",
+    "your_result": "Your result:",
+    "come_back": "Come back tomorrow for a new challenge!",
+    "checking": "Checking your daily challenge…"
   }
 }

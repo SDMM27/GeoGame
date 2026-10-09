@@ -11,7 +11,9 @@ import CountryClueMap from './CountryClueMap'
 import DailyForm from './DailyForm'
 import DailyLeaderboard from './DailyLeaderboard'
 import { GAME_TYPES } from '../utils/gameTypes'
-import { useRecordGame } from '../auth'
+import { useAccount, useRecordGame } from '../auth'
+import { useDailyPlayedElsewhere } from '../hooks/useDailyPlayedElsewhere'
+import DailyPlayedElsewhere from '../components/DailyPlayedElsewhere'
 import { getCountryName } from '../utils/getCountryName'
 import 'react-toastify/dist/ReactToastify.css'
 import './CountryCluePage.css'
@@ -84,6 +86,12 @@ export default function CountryCluePage() {
     startGame,
     elapsedTime,
   } = useCountryClueState(mode)
+  const elsewhere = useDailyPlayedElsewhere(useAccount(), {
+    gameType: GAME_TYPES.COUNTRY_CLUE,
+    dailyKey,
+    started: hasStarted || guesses.length > 0 || isComplete,
+    enabled: mode === 'daily',
+  })
 
   useRecordGame(
     isComplete && mode === 'daily'
@@ -112,6 +120,14 @@ export default function CountryCluePage() {
     if (event.key === 'Enter') {
       handleSubmit()
     }
+  }
+
+  if (elsewhere.checking || elsewhere.game) {
+    return (
+      <DailyPlayedElsewhere title={title} game={elsewhere.game}>
+        <DailyLeaderboard gameType={GAME_TYPES.COUNTRY_CLUE} dailyKey={dailyKey} />
+      </DailyPlayedElsewhere>
+    )
   }
 
   return (

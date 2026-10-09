@@ -1,0 +1,38 @@
+.daily-elsewhere-page {
+  min-height: 100vh;
+}
+
+.daily-elsewhere {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+.daily-elsewhere__title {
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.daily-elsewhere__checking {
+  margin-top: 24px;
+  color: var(--text-muted);
+}
+
+.daily-elsewhere__result {
+  margin: 0 0 12px;
+  color: var(--text-primary);
+}
+
+.daily-elsewhere__result .failed {
+  color: var(--danger, #f87171);
+}
+
+.daily-elsewhere__home {
+  padding: 10px 18px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  background: transparent;
+  color: var(--text-primary);
+  font-weight: 700;
+  cursor: pointer;
+}

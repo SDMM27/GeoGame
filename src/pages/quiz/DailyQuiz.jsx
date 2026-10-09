@@ -8,7 +8,9 @@ import useDailyQuizState from '../../hooks/useDailyQuizState'
 import DailyForm from '../DailyForm'
 import DailyLeaderboard from '../DailyLeaderboard'
 import { GAME_TYPES } from '../../utils/gameTypes'
-import { useRecordGame } from '../../auth'
+import { useAccount, useRecordGame } from '../../auth'
+import { useDailyPlayedElsewhere } from '../../hooks/useDailyPlayedElsewhere'
+import DailyPlayedElsewhere from '../../components/DailyPlayedElsewhere'
 import { formatTime } from '../../utils/formatTime'
 import { MAX_HINTS, getQuestionHints, localizeQuestion } from '../../utils/quizQuestions'
 import { DIFFICULTY_COLORS } from './constants'
@@ -20,6 +22,11 @@ export default function DailyQuiz() {
     dailyKey, question, guesses, hintsUsed, elapsedTime, hasStarted, isComplete, isSolved, attemptsLeft, canUseHint,
     start, submit, takeHint, giveUp,
   } = useDailyQuizState()
+  const elsewhere = useDailyPlayedElsewhere(useAccount(), {
+    gameType: GAME_TYPES.QUIZ,
+    dailyKey,
+    started: hasStarted || guesses.length > 0 || isComplete,
+  })
   const [inputValue, setInputValue] = useState('')
   const [notice, setNotice] = useState(null)
   const inputRef = useRef(null)
@@ -66,6 +73,14 @@ export default function DailyQuiz() {
     hints: t('quiz.hints_count', { count: hintsUsed }),
     time: elapsedTime != null ? formatTime(elapsedTime) : '—',
   })
+
+  if (elsewhere.checking || elsewhere.game) {
+    return (
+      <DailyPlayedElsewhere title={t('quiz.daily_title')} game={elsewhere.game}>
+        <DailyLeaderboard gameType={GAME_TYPES.QUIZ} dailyKey={dailyKey} guessesTitle={t('quiz.guesses_title')} />
+      </DailyPlayedElsewhere>
+    )
+  }
 
   return (
     <div className="quiz-page">

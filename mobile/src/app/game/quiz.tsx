@@ -12,10 +12,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import useDailyQuizState from '@shared/hooks/useDailyQuizState'
 import useQuizState from '@shared/hooks/useQuizState'
 import { formatTime } from '@shared/utils/formatTime'
+import { useDailyPlayedElsewhere } from '@shared/hooks/useDailyPlayedElsewhere'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
 import { ANSWER_MODES, MAX_HINTS, QUIZ_DIFFICULTIES, getQuestionHints, localizeQuestion } from '@shared/utils/quizQuestions'
 
+import { useAccount } from '@/account/auth'
 import { DailyLeaderboard } from '@/components/game/DailyLeaderboard'
+import { DailyPlayedElsewhere } from '@/components/game/DailyPlayedElsewhere'
 import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
 import { Button, Segmented, Text, Touchable } from '@/components/ui'
@@ -125,6 +128,11 @@ function DailyQuiz() {
     takeHint,
     giveUp,
   } = useDailyQuizState()
+  const elsewhere = useDailyPlayedElsewhere(useAccount(), {
+    gameType: GAME_TYPES.QUIZ,
+    dailyKey,
+    started: hasStarted || guesses.length > 0 || isComplete,
+  })
   const [input, setInput] = useState('')
   const [notice, setNotice] = useState<string | null>(null)
   const [leaderboardVersion, setLeaderboardVersion] = useState(0)
@@ -169,6 +177,14 @@ function DailyQuiz() {
       ]}
     />
   )
+
+  if (elsewhere.checking || elsewhere.game) {
+    return (
+      <DailyPlayedElsewhere title={t('quiz.daily_title')} game={elsewhere.game} accent={ACCENT}>
+        {dailyKey && <DailyLeaderboard gameType={GAME_TYPES.QUIZ} dailyKey={dailyKey} />}
+      </DailyPlayedElsewhere>
+    )
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>

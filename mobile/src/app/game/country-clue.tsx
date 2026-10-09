@@ -11,10 +11,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import useCountryClueState from '@shared/hooks/useCountryClueState'
 import { formatTime } from '@shared/utils/formatTime'
+import { useDailyPlayedElsewhere } from '@shared/hooks/useDailyPlayedElsewhere'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
 import { getCapitalName, getCountryName } from '@shared/utils/getCountryName'
 
+import { useAccount } from '@/account/auth'
 import { DailyLeaderboard } from '@/components/game/DailyLeaderboard'
+import { DailyPlayedElsewhere } from '@/components/game/DailyPlayedElsewhere'
 import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
 import { ClueGuessCard, type ClueGuess } from '@/components/game/GuessCards'
 import { GuessInputBar } from '@/components/game/GuessInputBar'
@@ -80,6 +83,12 @@ function CountryClueGame({ mode, play }: { mode: string; play?: RoomPlay }) {
     startedAt,
     elapsedTime,
   } = useCountryClueState(mode, { overrideCountry: rounds.country })
+  const elsewhere = useDailyPlayedElsewhere(useAccount(), {
+    gameType: GAME_TYPES.COUNTRY_CLUE,
+    dailyKey,
+    started: hasStarted || guesses.length > 0 || isComplete,
+    enabled: isDaily,
+  })
   useRoundResult(rounds, {
     isCurrent: !!rounds.country && currentCountryISO === rounds.country.properties.ISO_A2,
     isComplete,
@@ -106,6 +115,14 @@ function CountryClueGame({ mode, play }: { mode: string; play?: RoomPlay }) {
       <GuessesMap guesses={mapGuesses} />
     </>
   )
+
+  if (elsewhere.checking || elsewhere.game) {
+    return (
+      <DailyPlayedElsewhere title={t('games.country_clue.title')} game={elsewhere.game} accent={ACCENT}>
+        {dailyKey && <DailyLeaderboard gameType={GAME_TYPES.COUNTRY_CLUE} dailyKey={dailyKey} />}
+      </DailyPlayedElsewhere>
+    )
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>

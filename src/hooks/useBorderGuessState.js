@@ -8,6 +8,7 @@ import { getAllCountryNames, getCountryName } from '../utils/getCountryName'
 import countryAliases from '../data/countryAliases.json'
 import { getGeographicCenter, hasCountryGeometry } from '../utils/countryArea'
 import useDailyKey from './useDailyKey'
+import { STABLE_DAILY_PICK_SINCE, pickDaily } from '../utils/dailyPick'
 
 const DAILY_STORAGE_PREFIX = 'border-guess-daily'
 
@@ -146,6 +147,9 @@ function hashString(value) {
 }
 
 function getDailyCountry(dateKey) {
+  if (dateKey >= STABLE_DAILY_PICK_SINCE) {
+    return pickDaily(BORDER_GUESS_COUNTRIES, `border-guess:${dateKey}`, (country) => country.properties.ADMIN)
+  }
   const countryIndex = hashString(`border-guess:${dateKey}`) % BORDER_GUESS_COUNTRIES.length
   return BORDER_GUESS_COUNTRIES[countryIndex]
 }

@@ -588,24 +588,10 @@ service cloud.firestore {
           && (validRanking(data) || validAttempts(data));
       }
 
-      function effectiveAttempts(data) {
-        return data.attempts + data.get('hints', 0);
-      }
-
-      function isBetterDaily(next, prev) {
-        return next.gameType == 'RANKING'
-          ? isBetter(next.score, next.totalError, prev.score, prev.get('totalError', null))
-          : (effectiveAttempts(next) < effectiveAttempts(prev)
-              || (effectiveAttempts(next) == effectiveAttempts(prev)
-                  && isNumber(next.get('elapsedTime', null))
-                  && (!isNumber(prev.get('elapsedTime', null)) || next.elapsedTime < prev.elapsedTime)));
-      }
-
+      // A daily is played once: its saved score is never replaced, so replaying it on another device
+      // (with the answer known) can't improve it.
       allow read: if true;
       allow create: if validDaily(request.resource.data);
-      allow update: if validDaily(request.resource.data)
-        && sameFields(['name', 'uid', 'gameType', 'dailyKey'])
-        && isBetterDaily(request.resource.data, resource.data);
     }
 
     // ---------- Multiplayer ----------

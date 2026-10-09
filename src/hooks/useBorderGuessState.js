@@ -59,11 +59,12 @@ const BORDER_GUESS_EXCLUDED = new Set([
   'Zone de souveraineté de Dhekelia',
   'Bermudes',
   'Saint-Christophe-et-Niévès',
+  'Barbade',
 ])
 
 // Removed from the game after some days' countries were drawn with `hash % length` (see getDailyCountry): those days
 // keep drawing from the list as it was, so their country doesn't change.
-const REMOVED_AFTER_LEGACY_DAILIES = new Set(['Saint-Christophe-et-Niévès'])
+const REMOVED_AFTER_LEGACY_DAILIES = new Set(['Saint-Christophe-et-Niévès', 'Barbade'])
 
 export const BORDER_GUESS_COUNTRIES = countries.features.filter(
   (country) =>

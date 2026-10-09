@@ -3,7 +3,7 @@
 // precomputed in the dataset) and the land borders. Nothing here is made up: a missing value stays null.
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { countryBorders } from '../data/countryBorders'
-import { getCountryAreaKm2, getGeographicCenter } from './countryArea'
+import { collectCoordinates, getCountryAreaKm2, getGeographicCenter, getRingAreaKm2 } from './countryArea'
 import { getCapitalName, getCountryName } from './getCountryName'
 import { normalize } from './normalizeAnswer'
 
@@ -97,6 +97,19 @@ export function searchAtlasCountries(query, lang, limit = 8) {
     .sort((a, b) => a[0] - b[0] || a[1].localeCompare(b[1], lang))
     .slice(0, limit)
     .map(([, , feature]) => feature)
+}
+
+/**
+ * [[south, west], [north, east]] of the country's largest piece of land, to frame it on a map (France without French
+ * Guiana, the United States without Alaska). Null without a geometry.
+ */
+export function mainPartBounds(feature) {
+  const polygons = collectCoordinates(feature?.geometry)
+  if (polygons.length === 0) return null
+  const largest = polygons.reduce((best, polygon) => (getRingAreaKm2(polygon[0]) > getRingAreaKm2(best[0]) ? polygon : best))
+  const lngs = largest[0].map(([lng]) => lng)
+  const lats = largest[0].map(([, lat]) => lat)
+  return [[Math.min(...lats), Math.min(...lngs)], [Math.max(...lats), Math.max(...lngs)]]
 }
 
 /** 1 234 567 → "1,23 Md" / "68 M" / "540 k" style, in `lang`. */

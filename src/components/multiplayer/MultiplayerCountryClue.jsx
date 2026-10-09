@@ -4,6 +4,8 @@ import { ToastContainer } from 'react-toastify'
 import useCountryClueState from '../../hooks/useCountryClueState'
 import CountryClueMap from '../../pages/CountryClueMap'
 import { getGuessGamePoints } from '../../utils/scoringRules'
+import { clueProgress } from '../../utils/clueProgress'
+import ClueProgressBadges from '../ClueProgressBadges'
 import { loadSnapshot, saveSnapshot } from '../../utils/multiplayerSnapshot'
 import 'react-toastify/dist/ReactToastify.css'
 import './MultiplayerCountryClue.css'
@@ -42,6 +44,7 @@ export default function MultiplayerCountryClue({ countries, showGlobe = true, on
     answerName, answerFlag, answerCapital,
     filteredCountrySuggestions, handleSubmit, revealCountry,
   } = useCountryClueState('daily', { overrideCountry: currentCountry, initialGuesses: snap?.currentGuesses ?? null })
+  const progressByGuess = clueProgress(guesses)
 
   const guessesRef = useRef(snap?.currentGuesses ?? [])
   guessesRef.current = guesses
@@ -224,9 +227,9 @@ export default function MultiplayerCountryClue({ countries, showGlobe = true, on
             {guesses.length === 0 ? (
               <p className="mp-cc-empty">Aucune tentative pour l'instant.</p>
             ) : (
-              [...guesses].reverse().map((guess, i) => (
+              guesses.map((guess, i) => ({ guess, i, progress: progressByGuess[i] })).reverse().map(({ guess, i, progress }) => (
                 <article key={i} className={`mp-cc-row ${guess.isCorrect ? 'mp-cc-row--correct' : ''}`}>
-                  <strong className="mp-cc-col-name">{guess.value}</strong>
+                  <strong className="mp-cc-col-name">{guess.value} <ClueProgressBadges progress={progress} /></strong>
                   <span className="mp-cc-col mp-cc-col--neutral">
                     {guess.directionArrow} {guess.distanceKm?.toLocaleString('fr-FR')} km
                   </span>

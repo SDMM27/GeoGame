@@ -179,6 +179,11 @@
     "start_new_game": "Запусти новую страну, чтобы продолжить."
   },
   "country_clue": {
+    "closer": "на {{km}} км ближе",
+    "farther": "на {{km}} км дальше",
+    "same_distance": "То же расстояние",
+    "closest": "Ближе всех",
+    "your_guesses": "Твои попытки",
     "daily_title": "Country Clue: Ежедневный",
     "infinite_title": "Country Clue: Бесконечный",
     "daily_subtitle": "Загадочная страна на сегодня. Головоломка дня.",

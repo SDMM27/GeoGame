@@ -15,10 +15,12 @@ import { useAccount, useRecordGame } from '../auth'
 import { useDailyPlayedElsewhere } from '../hooks/useDailyPlayedElsewhere'
 import DailyPlayedElsewhere from '../components/DailyPlayedElsewhere'
 import { getCountryName } from '../utils/getCountryName'
+import { clueProgress } from '../utils/clueProgress'
+import ClueProgressBadges from '../components/ClueProgressBadges'
 import 'react-toastify/dist/ReactToastify.css'
 import './CountryCluePage.css'
 
-function GuessRow({ guess, lang }) {
+function GuessRow({ guess, lang, progress }) {
   const { t } = useTranslation()
   const displayName =
     guess.isoA2 && lang
@@ -29,6 +31,7 @@ function GuessRow({ guess, lang }) {
     <article className={`country-clue-row${guess.isCorrect ? ' country-clue-row--correct' : ''}`}>
       <div className="country-clue-row-main">
         <strong>{displayName}</strong>
+        <ClueProgressBadges progress={progress} lang={lang} />
       </div>
 
       <div className="country-clue-metric">
@@ -86,6 +89,7 @@ export default function CountryCluePage() {
     startGame,
     elapsedTime,
   } = useCountryClueState(mode)
+  const progressByGuess = clueProgress(guesses)
   const elsewhere = useDailyPlayedElsewhere(useAccount(), {
     gameType: GAME_TYPES.COUNTRY_CLUE,
     dailyKey,
@@ -227,7 +231,10 @@ export default function CountryCluePage() {
               {guesses.length === 0 ? (
                 <p className="country-clue-empty">{t('labels.no_attempts')}</p>
               ) : (
-                [...guesses].reverse().map((guess, index) => <GuessRow key={`${guess.value}-${index}`} guess={guess} lang={lang} />)
+                guesses
+                  .map((guess, index) => ({ guess, index, progress: progressByGuess[index] }))
+                  .reverse()
+                  .map(({ guess, index, progress }) => <GuessRow key={`${guess.value}-${index}`} guess={guess} lang={lang} progress={progress} />)
               )}
             </div>
           </div>

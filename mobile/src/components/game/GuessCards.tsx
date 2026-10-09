@@ -106,7 +106,36 @@ function HintChip({ label, hint, text, detail }: { label: string; hint: Hint; te
   )
 }
 
-export function ClueGuessCard({ guess, index }: { guess: ClueGuess; index: number }) {
+// See the website's utils/clueProgress.js: compared with the previous guess (negative: closer), closest guess
+export type ClueProgress = { deltaKm: number | null; closest: boolean }
+
+function ProgressChips({ progress }: { progress?: ClueProgress }) {
+  const { t, i18n } = useTranslation()
+  if (!progress || (progress.deltaKm == null && !progress.closest)) return null
+  const { deltaKm, closest } = progress
+  const km = deltaKm == null ? '' : Math.abs(deltaKm).toLocaleString(i18n.language)
+  const color = deltaKm == null ? colors.textMuted : deltaKm < 0 ? colors.accent : deltaKm > 0 ? '#60A5FA' : colors.textMuted
+  return (
+    <View style={clueStyles.progress}>
+      {deltaKm != null && (
+        <View style={[clueStyles.progressChip, { backgroundColor: `${color}1F` }]}>
+          <Text variant="caption" color={color} style={{ fontWeight: '700' }}>
+            {deltaKm < 0 ? `🔥 ${t('country_clue.closer', { km })}` : deltaKm > 0 ? `❄️ ${t('country_clue.farther', { km })}` : t('country_clue.same_distance')}
+          </Text>
+        </View>
+      )}
+      {closest && (
+        <View style={[clueStyles.progressChip, { backgroundColor: `${colors.warning}1F` }]}>
+          <Text variant="caption" color={colors.warning} style={{ fontWeight: '700' }}>
+            📍 {t('country_clue.closest')}
+          </Text>
+        </View>
+      )}
+    </View>
+  )
+}
+
+export function ClueGuessCard({ guess, index, progress }: { guess: ClueGuess; index: number; progress?: ClueProgress }) {
   const { t, i18n } = useTranslation()
   const name = (guess.isoA2 && getCountryName(guess.isoA2, i18n.language)) || guess.value
   const flag = getFlag(guess.isoA2)
@@ -138,6 +167,7 @@ export function ClueGuessCard({ guess, index }: { guess: ClueGuess; index: numbe
       </View>
       {!guess.isCorrect && (
         <>
+          <ProgressChips progress={progress} />
           {guess.direction && (
             <Text variant="caption">
               {t('country_clue.metric_direction')} : {t(`mobile.directions.${guess.direction}`)}
@@ -176,6 +206,8 @@ const borderStyles = StyleSheet.create({
 })
 
 const clueStyles = StyleSheet.create({
+  progress: { flexDirection: 'row', flexWrap: 'wrap', gap: space.xs },
+  progressChip: { paddingHorizontal: space.sm, paddingVertical: 2, borderRadius: radius.pill },
   card: {
     gap: space.sm,
     padding: space.md,

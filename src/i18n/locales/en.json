@@ -179,6 +179,11 @@
     "start_new_game": "Start a new country to continue."
   },
   "country_clue": {
+    "closer": "{{km}} km closer",
+    "farther": "{{km}} km farther",
+    "same_distance": "Same distance",
+    "closest": "Closest",
+    "your_guesses": "Your guesses",
     "daily_title": "Daily Country Clue",
     "infinite_title": "Infinite Country Clue",
     "daily_subtitle": "A mystery country to find today. Daily puzzle.",

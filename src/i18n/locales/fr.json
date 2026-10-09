@@ -179,6 +179,11 @@
     "start_new_game": "Lance un nouveau pays pour continuer."
   },
   "country_clue": {
+    "closer": "{{km}} km plus près",
+    "farther": "{{km}} km plus loin",
+    "same_distance": "Même distance",
+    "closest": "Le plus proche",
+    "your_guesses": "Tes propositions",
     "daily_title": "Country Clue Journalier",
     "infinite_title": "Country Clue Infini",
     "daily_subtitle": "Un pays mystère à retrouver aujourd'hui. Puzzle du jour.",

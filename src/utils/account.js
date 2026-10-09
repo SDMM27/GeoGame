@@ -17,15 +17,10 @@ import {
   updateProfile,
 } from 'firebase/auth'
 import {
-  collection,
   doc,
   getDoc,
-  getDocs,
-  query,
   runTransaction,
   serverTimestamp,
-  where,
-  writeBatch,
 } from 'firebase/firestore'
 import { firestore } from '../Firebase'
 import { containsProfanity } from './profanity'
@@ -187,29 +182,25 @@ export function resetPassword(auth, email) {
 }
 
 // Deleting needs a recent sign-in: the password is asked again, or Google's `reauthenticate` (accountGoogle.js).
-export async function deleteAccount(auth, { password, reauthenticate }) {
+// The data goes on the server (api/delete-account): profile, history, friends, leaderboard entries, then the account.
+// `apiOrigin`: '' on the site (same origin), the site's address in the app.
+export async function deleteAccount(auth, { password, reauthenticate, apiOrigin = '' }) {
   const user = auth.currentUser
   if (!user) return
   if (password != null) await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, password))
   else await reauthenticate(user)
-  // Game history and friendships go too (batches are capped at 500 writes).
-  const [games, friendships] = await Promise.all([
-    getDocs(collection(firestore, 'users', user.uid, 'games')),
-    getDocs(query(collection(firestore, 'friendships'), where('users', 'array-contains', user.uid))),
-  ])
-  const refs = [...games.docs, ...friendships.docs].map((item) => item.ref)
-  for (let start = 0; start < refs.length; start += 500) {
-    const batch = writeBatch(firestore)
-    refs.slice(start, start + 500).forEach((ref) => batch.delete(ref))
-    await batch.commit()
+  const response = await fetch(`${apiOrigin}/api/delete-account`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${await user.getIdToken(true)}` },
+  }).catch(() => {
+    throw new AccountError('network')
+  })
+  if (!response.ok) {
+    console.warn('[account] delete-account', response.status)
+    throw new AccountError('generic')
   }
-
-  const profile = await getDoc(userRef(user.uid))
-  const batch = writeBatch(firestore)
-  if (profile.exists()) batch.delete(usernameRef(profile.data().username))
-  batch.delete(userRef(user.uid))
-  await batch.commit()
-  await deleteUser(user)
+  // The account no longer exists: forget the session on this device.
+  await firebaseSignOut(auth).catch(() => {})
 }
 
 const FIREBASE_ERRORS = {

@@ -499,7 +499,7 @@
     "signout": "Se déconnecter",
     "prefill_hint": "Ton pseudo est pré-rempli quand tu enregistres un score ou rejoins une partie.",
     "delete": "Supprimer mon compte",
-    "delete_confirm": "Ton compte et ton pseudo seront supprimés. Entre ton mot de passe pour confirmer.",
+    "delete_confirm": "Ton compte, ton pseudo, ton historique, tes scores dans les classements et tes amis seront supprimés définitivement. Entre ton mot de passe pour confirmer.",
     "delete_button": "Supprimer définitivement",
     "deleted": "Compte supprimé.",
     "cancel": "Annuler",
@@ -525,7 +525,7 @@
     "choose_title": "Choisis ton pseudo",
     "choose_intro": "C’est sous ce nom que tes scores apparaîtront. Il sera réservé à ton compte.",
     "choose_submit": "Valider mon pseudo",
-    "delete_confirm_google": "Ton compte et ton pseudo seront supprimés. Confirme avec Google."
+    "delete_confirm_google": "Ton compte, ton pseudo, ton historique, tes scores dans les classements et tes amis seront supprimés définitivement. Confirme avec Google."
   },
   "profile": {
     "member_since": "Membre depuis {{date}}",
@@ -917,5 +917,13 @@
     "your_result": "Ton résultat :",
     "come_back": "Reviens demain pour un nouveau défi !",
     "checking": "Vérification de ton défi du jour…"
+  },
+  "legal": {
+    "privacy": "Confidentialité",
+    "terms": "Conditions d’utilisation",
+    "legal": "Mentions légales",
+    "delete_account": "Supprimer mon compte",
+    "updated": "Dernière mise à jour : {{date}}",
+    "signup_notice": "En créant un compte, tu acceptes les <terms>conditions d’utilisation</terms> et la <privacy>politique de confidentialité</privacy>. Il faut avoir au moins 13 ans (et l’accord d’un parent avant 15 ans)."
   }
 }

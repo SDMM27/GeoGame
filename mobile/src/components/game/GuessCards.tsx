@@ -205,7 +205,61 @@ const borderStyles = StyleSheet.create({
   hint: { flexDirection: 'row', alignItems: 'center', gap: 6 },
 })
 
+/**
+ * The guesses of a finished game, one short line each: number, flag, name, direction and distance, and the change
+ * from the previous guess (the full cards stay in the game screen).
+ */
+export function ClueGuessSummary({ guesses, progress }: { guesses: ClueGuess[]; progress: ClueProgress[] }) {
+  const { i18n } = useTranslation()
+  return (
+    <View style={clueStyles.summary}>
+      {guesses.map((guess, index) => {
+        const name = (guess.isoA2 && getCountryName(guess.isoA2, i18n.language)) || guess.value
+        const flag = getFlag(guess.isoA2)
+        const delta = progress[index]?.deltaKm
+        const closest = progress[index]?.closest
+        return (
+          <View key={`${guess.value}-${index}`} style={[clueStyles.summaryRow, index > 0 && clueStyles.summaryDivider]}>
+            <Text variant="caption" style={{ width: 18 }}>
+              {index + 1}
+            </Text>
+            {flag && <Image source={flag} contentFit="cover" style={clueStyles.flag} />}
+            <Text variant="body" numberOfLines={1} style={{ flex: 1 }}>
+              {closest ? '📍 ' : ''}
+              {name}
+            </Text>
+            {guess.isCorrect ? (
+              <MaterialCommunityIcons name="check-circle" size={18} color={colors.accent} />
+            ) : (
+              <>
+                {delta != null && delta !== 0 && (
+                  <Text variant="caption" color={delta < 0 ? colors.accent : '#60A5FA'} style={{ fontVariant: ['tabular-nums'] }}>
+                    {delta < 0 ? '−' : '+'}
+                    {Math.abs(delta).toLocaleString(i18n.language)}
+                  </Text>
+                )}
+                <Text variant="bodyStrong" style={{ fontVariant: ['tabular-nums'], minWidth: 84, textAlign: 'right' }}>
+                  {guess.directionArrow} {guess.distanceKm?.toLocaleString(i18n.language)} km
+                </Text>
+              </>
+            )}
+          </View>
+        )
+      })}
+    </View>
+  )
+}
+
 const clueStyles = StyleSheet.create({
+  summary: {
+    borderRadius: radius.md,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: space.md,
+  },
+  summaryRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm, paddingVertical: space.sm },
+  summaryDivider: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },
   progress: { flexDirection: 'row', flexWrap: 'wrap', gap: space.xs },
   progressChip: { paddingHorizontal: space.sm, paddingVertical: 2, borderRadius: radius.pill },
   card: {

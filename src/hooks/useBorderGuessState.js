@@ -58,7 +58,12 @@ const BORDER_GUESS_EXCLUDED = new Set([
   "Zone de souveraineté d'Akrotiri",
   'Zone de souveraineté de Dhekelia',
   'Bermudes',
+  'Saint-Christophe-et-Niévès',
 ])
+
+// Removed from the game after some days' countries were drawn with `hash % length` (see getDailyCountry): those days
+// keep drawing from the list as it was, so their country doesn't change.
+const REMOVED_AFTER_LEGACY_DAILIES = new Set(['Saint-Christophe-et-Niévès'])
 
 export const BORDER_GUESS_COUNTRIES = countries.features.filter(
   (country) =>
@@ -68,6 +73,13 @@ export const BORDER_GUESS_COUNTRIES = countries.features.filter(
 )
 
 export const BORDER_GUESS_COUNTRY_COUNT = BORDER_GUESS_COUNTRIES.length
+
+const LEGACY_DAILY_COUNTRIES = countries.features.filter(
+  (country) =>
+    country?.properties?.ADMIN &&
+    hasCountryGeometry(country) &&
+    (!BORDER_GUESS_EXCLUDED.has(country.properties.ADMIN) || REMOVED_AFTER_LEGACY_DAILIES.has(country.properties.ADMIN))
+)
 
 // Multiplayer: guesses allowed per country. A country not found (passed or out of guesses) counts as this many errors,
 // so passing never ranks better than trying.
@@ -150,8 +162,8 @@ function getDailyCountry(dateKey) {
   if (dateKey >= STABLE_DAILY_PICK_SINCE) {
     return pickDaily(BORDER_GUESS_COUNTRIES, `border-guess:${dateKey}`, (country) => country.properties.ADMIN)
   }
-  const countryIndex = hashString(`border-guess:${dateKey}`) % BORDER_GUESS_COUNTRIES.length
-  return BORDER_GUESS_COUNTRIES[countryIndex]
+  const countryIndex = hashString(`border-guess:${dateKey}`) % LEGACY_DAILY_COUNTRIES.length
+  return LEGACY_DAILY_COUNTRIES[countryIndex]
 }
 
 function buildDailyStorageKey(dateKey) {

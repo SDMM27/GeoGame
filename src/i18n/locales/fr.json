@@ -796,5 +796,55 @@
     },
     "ramp_summary": "{{facile}} manches faciles, {{moyen}} moyennes, {{difficile}} difficiles, puis Impossible.",
     "ramp_custom_hint": "Montée personnalisée : la partie ne compte pas pour le classement."
+  },
+  "seo": {
+    "home": {
+      "title": "GeoGame — Jeux de géographie gratuits : pays, drapeaux, capitales",
+      "description": "Jeux de géographie gratuits en ligne : place les pays sur la carte, reconnais les drapeaux, trouve les capitales, défi du jour, quiz et parties multijoueurs entre amis."
+    },
+    "placement": {
+      "title": "Trouve le Pays — Jeu de carte du monde | GeoGame",
+      "description": "Retrouve chaque pays sur la carte du monde, du niveau facile au mode Hardcore, par continent ou en mode Ascension. Jeu de géographie gratuit avec classement."
+    },
+    "flags": {
+      "title": "Trouve le Drapeau — Quiz des drapeaux du monde | GeoGame",
+      "description": "Reconnais les drapeaux de tous les pays du monde. Choisis ta difficulté ou un continent et grimpe au classement de ce quiz de drapeaux gratuit."
+    },
+    "capitals": {
+      "title": "Trouve la Capitale — Quiz des capitales du monde | GeoGame",
+      "description": "Trouve la capitale de chaque pays à partir de son drapeau et de son nom. Quiz des capitales du monde gratuit, par difficulté ou par continent."
+    },
+    "border_guess": {
+      "title": "BorderGuess — Devine le pays à ses frontières | GeoGame",
+      "description": "Devine un pays uniquement à partir de la forme de ses frontières. Un nouveau défi chaque jour, ou des parties à l'infini."
+    },
+    "country_clue": {
+      "title": "Country Clue — Trouve le pays mystère | GeoGame",
+      "description": "Trouve le pays mystère grâce aux indices de distance, de direction et de surface. Défi du jour et mode infini."
+    },
+    "voyage_voyage": {
+      "title": "Voyage Voyage — Relie deux pays par leurs frontières | GeoGame",
+      "description": "Relie deux pays en traversant leurs frontières communes et trouve le chemin le plus court. Un nouveau voyage chaque jour."
+    },
+    "ranking": {
+      "title": "Country Ranking — Classe les pays | GeoGame",
+      "description": "Classe des pays du plus grand au plus petit selon leur population, leur superficie ou leur PIB. Défi quotidien et mode infini."
+    },
+    "quiz": {
+      "title": "Quiz Géo — Quiz de géographie quotidien | GeoGame",
+      "description": "Une question de géographie par jour pour défier tes amis, ou enchaîne les questions à la difficulté de ton choix."
+    },
+    "survival": {
+      "title": "Survie — Enchaîne les jeux de géographie | GeoGame",
+      "description": "Enchaîne des manches de plusieurs jeux de géographie : chaque erreur te coûte une vie. Jusqu'où iras-tu ?"
+    },
+    "multiplayer": {
+      "title": "Multijoueur — Jeux de géographie entre amis | GeoGame",
+      "description": "Crée un salon et affronte tes amis en direct sur les jeux de géographie : pays, drapeaux, capitales, frontières et plus."
+    },
+    "scores": {
+      "title": "Classements — Meilleurs scores | GeoGame",
+      "description": "Les meilleurs scores des joueurs de GeoGame pour chaque jeu, difficulté et continent."
+    }
   }
 }

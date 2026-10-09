@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { fileURLToPath } from 'node:url'
 import { visualizer } from 'rollup-plugin-visualizer'
+import seo from './scripts/vite-plugin-seo.mjs'
 
 // ANALYZE=1 npm run build writes dist/stats.html (treemap) and dist/stats.json (raw sizes, gzip)
 const analyze = process.env.ANALYZE
@@ -12,7 +13,7 @@ const analyze = process.env.ANALYZE
   : []
 
 export default defineConfig({
-  plugins: [react(), ...analyze],
+  plugins: [react(), seo(), ...analyze],
   define: { __USE_EMULATORS__: JSON.stringify(process.env.VITE_USE_EMULATORS === '1') },
   resolve: {
     alias: [

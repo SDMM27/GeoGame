@@ -10,6 +10,8 @@ import { resolveMode } from '../utils/challenge'
 import useRankingGameState from '../hooks/useRankingGameState'
 import { GAME_TYPES } from '../utils/gameTypes'
 import { useAccount, useRecordGame } from '../auth'
+import { useDailyPlayedElsewhere } from '../hooks/useDailyPlayedElsewhere'
+import { DailyPlayedElsewhereCard } from '../components/DailyPlayedElsewhere'
 import { useScoreSave } from '../hooks/useScoreSave'
 import { saveRankingScore } from '../utils/saveScore'
 import LeaderboardSave from '../components/LeaderboardSave'
@@ -61,6 +63,14 @@ export default function RankingGamePage() {
     positionFeedback,
     retryAttempt,
   } = useRankingGameState(mode, { countryCount })
+  const accountState = useAccount()
+  const elsewhere = useDailyPlayedElsewhere(accountState, {
+    gameType: GAME_TYPES.RANKING,
+    dailyKey,
+    started: status === 'submitted' || attemptNumber > 1 || positionFeedback != null,
+    enabled: mode === 'daily',
+  })
+  const playedElsewhere = elsewhere.checking || elsewhere.game != null
 
   function onDragEnd(result) {
     if (!result.destination) return
@@ -74,7 +84,7 @@ export default function RankingGamePage() {
 
   const rankingSavedKey = dailyKey ? `ranking-saved:${dailyKey}` : null
   const saver = useScoreSave(
-    useAccount(),
+    accountState,
     async (player) => {
       const result = await saveRankingScore({
         ...player,
@@ -194,7 +204,13 @@ export default function RankingGamePage() {
         <CriterionBanner criterion={criterion} t={t} />
 
         {/* === PLAYING === */}
-        {status === 'playing' && (
+        {playedElsewhere && (
+          <DailyPlayedElsewhereCard game={elsewhere.game}>
+            <RankingLeaderboard dailyKey={dailyKey} />
+          </DailyPlayedElsewhereCard>
+        )}
+
+        {status === 'playing' && !playedElsewhere && (
           <>
             <div className="ranking-drag-hint">{t('ranking.drag_hint')}</div>
             <div className="ranking-attempt-counter">

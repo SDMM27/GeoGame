@@ -12,10 +12,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import useRankingGameState from '@shared/hooks/useRankingGameState'
 import { getCountryName } from '@shared/utils/getCountryName'
+import { useDailyPlayedElsewhere } from '@shared/hooks/useDailyPlayedElsewhere'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
 
 import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
+import { useAccount } from '@/account/auth'
 import { RankingLeaderboard } from '@/components/game/RankingLeaderboard'
+import { DailyPlayedElsewhere } from '@/components/game/DailyPlayedElsewhere'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
 import { SortableList } from '@/components/game/SortableList'
 import { type CountryFeature } from '@/components/map/geometry'
@@ -190,12 +193,26 @@ export default function RankingScreen() {
     positionFeedback,
     retryAttempt,
   } = useRankingGameState(isDaily ? 'daily' : 'infinite', { countryCount })
+  const elsewhere = useDailyPlayedElsewhere(useAccount(), {
+    gameType: GAME_TYPES.RANKING,
+    dailyKey,
+    started: status === 'submitted' || attemptNumber > 1 || positionFeedback != null,
+    enabled: isDaily,
+  })
 
   const list = countries as CountryFeature[]
   const feedback = positionFeedback as boolean[] | null
   const crit = criterion as Criterion | null
   const isSubmitted = status === 'submitted'
   const positionsLabel = (count: number) => t('units.position', { count })
+
+  if (elsewhere.checking || elsewhere.game) {
+    return (
+      <DailyPlayedElsewhere title={t('ranking.title')} game={elsewhere.game} accent={ACCENT}>
+        {dailyKey && <RankingLeaderboard dailyKey={dailyKey} />}
+      </DailyPlayedElsewhere>
+    )
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>

@@ -76,6 +76,12 @@ export async function fetchGames(uid, max = HISTORY_LIMIT) {
   return snapshot.docs.map(fromSnapshot)
 }
 
+// The player's game of one daily challenge (null if not played), whatever the device it was played on.
+export async function fetchDailyGame(uid, gameType, dailyKey) {
+  const snapshot = await getDoc(doc(gamesCollection(uid), `daily_${gameType}_${dailyKey}`))
+  return snapshot.exists() ? fromSnapshot(snapshot) : null
+}
+
 // One player's games of a given daily challenge day.
 export async function fetchDailyGames(uid, dailyKey) {
   const snapshot = await getDocs(query(gamesCollection(uid), where('dailyKey', '==', dailyKey)))

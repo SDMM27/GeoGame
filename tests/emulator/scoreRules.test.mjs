@@ -255,13 +255,12 @@ describe('daily scores', () => {
     await assertFails(as('alice').collection('daily_scores').add(ranking({ dailyKey: 'i', playerOrder: new Array(6).fill('A') })))
   })
 
-  it('still replaces a daily with a better one, within the limits', async () => {
+  it('never replaces a saved daily, even with a better one', async () => {
     const ref = await as('alice').collection('daily_scores').add(dailies({ attempts: 6 }))
-    await assertSucceeds(as('alice').doc(ref.path).set(dailies({ attempts: 3 })))
-    await assertFails(as('alice').doc(ref.path).set(dailies({ attempts: 0 })))
-    const best = await as('alice').collection('daily_scores').add(rankings({ dailyKey: 'z', score: 1, attemptsUsed: 3 }))
-    await assertSucceeds(as('alice').doc(best.path).set(rankings({ dailyKey: 'z', score: 3, attemptsUsed: 1 })))
-    await assertFails(as('alice').doc(best.path).set(rankings({ dailyKey: 'z', score: 4, attemptsUsed: 1 })))
+    await assertFails(as('alice').doc(ref.path).set(dailies({ attempts: 3 })))
+    await assertFails(as('alice').doc(ref.path).update({ attempts: 1 }))
+    const ranking = await as('alice').collection('daily_scores').add(rankings({ dailyKey: 'z', score: 1, attemptsUsed: 3 }))
+    await assertFails(as('alice').doc(ranking.path).set(rankings({ dailyKey: 'z', score: 3, attemptsUsed: 1 })))
   })
 })
 

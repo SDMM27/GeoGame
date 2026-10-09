@@ -9,13 +9,3 @@ export function sortDailyScores(scores) {
     return (a.elapsedTime ?? Infinity) - (b.elapsedTime ?? Infinity)
   })
 }
-
-export function isBetterDailyScore(newScore, existing) {
-  const newEff = effectiveAttempts(newScore)
-  const existingEff = effectiveAttempts(existing)
-  if (newEff < existingEff) return true
-  if (newEff === existingEff) {
-    return (newScore.elapsedTime ?? Infinity) < (existing.elapsedTime ?? Infinity)
-  }
-  return false
-}

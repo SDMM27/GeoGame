@@ -11,12 +11,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import countries from '@shared/data/countriesWithDifficulty_FR.json'
 import useVoyageVoyageState from '@shared/hooks/useVoyageVoyageState'
+import { useDailyPlayedElsewhere } from '@shared/hooks/useDailyPlayedElsewhere'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
 import { getAllCountryNames, getCountryName } from '@shared/utils/getCountryName'
 import { normalize } from '@shared/utils/normalizeAnswer'
 
 import { confirmAction } from '@/components/confirm'
+import { useAccount } from '@/account/auth'
 import { DailyLeaderboard } from '@/components/game/DailyLeaderboard'
+import { DailyPlayedElsewhere } from '@/components/game/DailyPlayedElsewhere'
 import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
 import { GuessInputBar } from '@/components/game/GuessInputBar'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
@@ -110,6 +113,12 @@ export default function VoyageScreen() {
     resetGame,
     dailyKey,
   } = useVoyageVoyageState(isDaily ? 'daily' : 'infinite')
+  const elsewhere = useDailyPlayedElsewhere(useAccount(), {
+    gameType: GAME_TYPES.VOYAGE_VOYAGE,
+    dailyKey,
+    started: guessHistory.length > 1 || hintsUsed.length > 0 || isGameOver,
+    enabled: isDaily,
+  })
   const [input, setInput] = useState('')
   // Keep the map compact so the guesses stay on screen, smaller still while typing.
   const { height: windowHeight } = useWindowDimensions()
@@ -171,6 +180,18 @@ export default function VoyageScreen() {
   const resultTitle = isPerfect
     ? t('voyage_voyage.perfect_path')
     : `${t('voyage_voyage.arrived_in')} ${stepsUsed} ${stepsLabel(stepsUsed)}`
+
+  if (elsewhere.checking || elsewhere.game) {
+    return (
+      <DailyPlayedElsewhere title={t('games.voyage_voyage.title')} game={elsewhere.game} accent={ACCENT}>
+        <DailyLeaderboard
+          gameType={GAME_TYPES.VOYAGE_VOYAGE}
+          dailyKey={dailyKey}
+          formatSecondary={(count) => `${count ?? 0} ${errorsLabel(count ?? 0)}`}
+        />
+      </DailyPlayedElsewhere>
+    )
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>

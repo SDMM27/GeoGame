@@ -13,7 +13,9 @@ import { getCountryStyle, getFocusCountry, getViewportSettings } from '../utils/
 import DailyForm from './DailyForm'
 import DailyLeaderboard from './DailyLeaderboard'
 import { GAME_TYPES } from '../utils/gameTypes'
-import { useRecordGame } from '../auth'
+import { useAccount, useRecordGame } from '../auth'
+import { useDailyPlayedElsewhere } from '../hooks/useDailyPlayedElsewhere'
+import DailyPlayedElsewhere from '../components/DailyPlayedElsewhere'
 import 'leaflet/dist/leaflet.css'
 import 'react-toastify/dist/ReactToastify.css'
 import './BorderGuessPage.css'
@@ -91,6 +93,12 @@ export default function BorderGuessPage() {
     startGame,
     elapsedTime,
   } = useBorderGuessState(mode)
+  const elsewhere = useDailyPlayedElsewhere(useAccount(), {
+    gameType: GAME_TYPES.BORDER_GUESS,
+    dailyKey,
+    started: hasStarted || guesses.length > 0 || isComplete,
+    enabled: mode === 'daily',
+  })
 
   useRecordGame(
     isComplete && mode === 'daily'
@@ -118,6 +126,14 @@ export default function BorderGuessPage() {
   }
 
   const displayCountry = currentCountry ? getFocusCountry(currentCountry) : null
+
+  if (elsewhere.checking || elsewhere.game) {
+    return (
+      <DailyPlayedElsewhere title={title} game={elsewhere.game}>
+        <DailyLeaderboard gameType={GAME_TYPES.BORDER_GUESS} dailyKey={dailyKey} />
+      </DailyPlayedElsewhere>
+    )
+  }
 
   return (
     <div className="border-guess-page">

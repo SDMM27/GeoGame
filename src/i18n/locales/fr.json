@@ -216,14 +216,14 @@
     "correct_ranking": "Classement correct",
     "placed_at": "mis #",
     "difference_of": "écart de",
-    "better_score_exists": "Tu as déjà un meilleur score enregistré."
+    "better_score_exists": "Tu as déjà un score enregistré pour ce défi."
   },
   "form": {
     "title": "Partie terminée !",
     "ascension_title": "🚀 Ascension terminée !",
     "better_score_exists": "Ce pseudo a déjà un meilleur score dans cette difficulté :",
     "use_different_name": "Veuillez enregistrer votre score sous un autre nom.",
-    "better_daily_score": "Ce pseudo a déjà un meilleur score pour ce puzzle :",
+    "better_daily_score": "Ce pseudo a déjà un score enregistré pour ce défi :",
     "use_different_name_daily": "Enregistrez sous un autre nom.",
     "score_saved": "Score sauvegardé ✓",
     "saving": "Sauvegarde...",
@@ -846,5 +846,12 @@
       "title": "Classements — Meilleurs scores | GeoGame",
       "description": "Les meilleurs scores des joueurs de GeoGame pour chaque jeu, difficulté et continent."
     }
+  },
+  "daily_elsewhere": {
+    "title": "Défi du jour déjà joué",
+    "text": "Tu as déjà joué ce défi du jour avec ton compte, sur un autre appareil.",
+    "your_result": "Ton résultat :",
+    "come_back": "Reviens demain pour un nouveau défi !",
+    "checking": "Vérification de ton défi du jour…"
   }
 }

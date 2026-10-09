@@ -8,6 +8,7 @@ import { hasCountryGeometry, collectCoordinates, getRingAreaKm2, getCountryAreaK
 import { getCountryName, getAllCountryNames } from '../utils/getCountryName'
 import countryAliases from '../data/countryAliases.json'
 import useDailyKey from './useDailyKey'
+import { STABLE_DAILY_PICK_SINCE, pickDaily } from '../utils/dailyPick'
 
 const DAILY_STORAGE_PREFIX = 'country-clue-daily'
 
@@ -91,6 +92,9 @@ function hashString(value) {
 }
 
 function getDailyCountry(dateKey) {
+  if (dateKey >= STABLE_DAILY_PICK_SINCE) {
+    return pickDaily(COUNTRY_CLUE_COUNTRIES, `country-clue:${dateKey}`, (country) => country.properties.ADMIN)
+  }
   const countryIndex = hashString(`country-clue:${dateKey}`) % COUNTRY_CLUE_COUNTRIES.length
   return COUNTRY_CLUE_COUNTRIES[countryIndex]
 }

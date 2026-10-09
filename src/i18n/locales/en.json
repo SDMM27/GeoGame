@@ -796,5 +796,55 @@
     },
     "ramp_summary": "{{facile}} easy rounds, {{moyen}} medium, {{difficile}} hard, then Impossible.",
     "ramp_custom_hint": "Custom ramp: this game does not count for the leaderboard."
+  },
+  "seo": {
+    "home": {
+      "title": "GeoGame — Free geography games: countries, flags, capitals",
+      "description": "Free online geography games: place countries on the map, recognize flags, find capitals, daily challenges, quizzes and multiplayer games with friends."
+    },
+    "placement": {
+      "title": "Find the Country — World map game | GeoGame",
+      "description": "Find every country on the world map, from easy to Hardcore, by continent or in Ascension mode. Free geography game with leaderboards."
+    },
+    "flags": {
+      "title": "Find the Flag — World flags quiz | GeoGame",
+      "description": "Recognize the flag of every country in the world. Pick a difficulty or a continent and climb the leaderboard of this free flags quiz."
+    },
+    "capitals": {
+      "title": "Find the Capital — World capitals quiz | GeoGame",
+      "description": "Find each country's capital from its flag and name. Free world capitals quiz, by difficulty or by continent."
+    },
+    "border_guess": {
+      "title": "BorderGuess — Guess the country from its borders | GeoGame",
+      "description": "Guess a country only from the shape of its borders. A new challenge every day, or endless games."
+    },
+    "country_clue": {
+      "title": "Country Clue — Find the mystery country | GeoGame",
+      "description": "Find the mystery country using distance, direction and area hints. Daily challenge and endless mode."
+    },
+    "voyage_voyage": {
+      "title": "Voyage Voyage — Connect two countries by their borders | GeoGame",
+      "description": "Connect two countries by crossing their shared borders and find the shortest path. A new journey every day."
+    },
+    "ranking": {
+      "title": "Country Ranking — Rank the countries | GeoGame",
+      "description": "Rank countries from largest to smallest by population, area or GDP. Daily challenge and endless mode."
+    },
+    "quiz": {
+      "title": "Geo Quiz — Daily geography quiz | GeoGame",
+      "description": "One geography question a day to challenge your friends, or keep answering questions at the difficulty of your choice."
+    },
+    "survival": {
+      "title": "Survival — Chain geography games | GeoGame",
+      "description": "Play rounds of several geography games in a row: every mistake costs you a life. How far can you go?"
+    },
+    "multiplayer": {
+      "title": "Multiplayer — Geography games with friends | GeoGame",
+      "description": "Create a room and play live against your friends: countries, flags, capitals, borders and more."
+    },
+    "scores": {
+      "title": "Leaderboards — High scores | GeoGame",
+      "description": "GeoGame players' high scores for every game, difficulty and continent."
+    }
   }
 }

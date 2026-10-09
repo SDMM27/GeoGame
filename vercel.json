@@ -1,5 +1,11 @@
 {
-  "rewrites": [{ "source": "/((?!api/).*)", "destination": "/index.html" }],
+  "rewrites": [
+    {
+      "source": "/:page(game|flag-game|capitals-game|border-guess|country-clue|voyage-voyage|ranking|quiz|survival|multiplayer|scores)",
+      "destination": "/:page/index.html"
+    },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ],
   "crons": [{ "path": "/api/cleanup-expired", "schedule": "0 4 * * *" }],
   "headers": [
     {

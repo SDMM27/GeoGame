@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react"
 import HomePage from "./pages/HomePage";
 import RouteFallback from "./components/RouteFallback";
+import RouteMeta from "./components/RouteMeta";
 import RouteErrorBoundary, { ErrorBoundary } from "./components/RouteErrorBoundary";
 import { loadCountryGeometries } from "./data/countryGeometry";
 
@@ -31,6 +32,7 @@ export default function App() {
   return (
     <ErrorBoundary>
       <Router>
+        <RouteMeta />
         <RouteErrorBoundary>
           <Suspense fallback={<RouteFallback />}>
             <Routes>

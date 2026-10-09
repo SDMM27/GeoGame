@@ -1,6 +1,7 @@
 // A survival run: lives, rounds of the chosen games, then the end screen.
 // Solo (SurvivalPage) or in a multiplayer room (`room`: { onProgress(state), onFinished(result) }).
-// `sync` (live rooms): { startAt, entries }, everyone plays the same round at the same time (useSurvivalSync).
+// `sync` (live rooms): { startAt, entries, playerId }, everyone plays the same round at the same time (useSurvivalSync);
+// the last player left wins once done with the round where the others ran out of lives.
 import React, { useCallback, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
@@ -49,7 +50,7 @@ export default function SurvivalGame({
 }) {
   const { t, i18n } = useTranslation()
   const synced = Boolean(sync)
-  const shared = useSurvivalSync({ enabled: synced, startAt: sync?.startAt ?? 0, timer, entries: sync?.entries ?? NO_ENTRIES })
+  const shared = useSurvivalSync({ enabled: synced, startAt: sync?.startAt ?? 0, timer, entries: sync?.entries ?? NO_ENTRIES, playerId: sync?.playerId })
   const survival = useSurvivalState({
     modes,
     lives,
@@ -62,7 +63,7 @@ export default function SurvivalGame({
     autoAdvance: !synced,
     deadline: shared.deadline,
   })
-  const { round, roundIndex, totalRounds, score, errors, outcome, timedOut, isOver, isWon, elapsedMs, timeLeftMs, submitText, giveUp, next, goTo } = survival
+  const { round, roundIndex, totalRounds, score, errors, outcome, timedOut, isOver, isWon, elapsedMs, timeLeftMs, submitText, giveUp, next, goTo, win } = survival
   const modesKey = survivalModesKey(modes)
   // Only the preset ramps are ranked
   const rampName = matchSurvivalRamp(ramp)
@@ -71,6 +72,13 @@ export default function SurvivalGame({
   useEffect(() => {
     if (synced && shared.round > roundIndex) goTo(shared.round)
   }, [synced, shared.round, roundIndex, goTo])
+
+  // Live room: everyone else is out of lives, the game ends once this round is answered
+  const lastRound = shared.lastSurvivorRound
+  const lastStanding = synced && lastRound != null
+  useEffect(() => {
+    if (lastStanding && (roundIndex > lastRound || (roundIndex === lastRound && outcome))) win()
+  }, [lastStanding, lastRound, roundIndex, outcome, win])
 
   // Feedback of a typed answer or a click (a life lost, a name not recognised...)
   const notify = useCallback((result) => {
@@ -180,7 +188,7 @@ export default function SurvivalGame({
       {isOver && (
         <div className="game-over-overlay">
           <div className="game-over-content survival-over">
-            <h2>{isWon ? t('survival.victory') : t('survival.game_over')}</h2>
+            <h2>{isWon ? t(lastStanding ? 'survival.last_standing' : 'survival.victory') : t('survival.game_over')}</h2>
             {!isWon && round && <p className="survival-muted">{t('survival.answer_was', { answer: roundAnswer(round, i18n.language, t) })}</p>}
             <div className="survival-over-stats">
               <div><strong>{score}</strong><small>{t('survival.rounds_survived')}</small></div>

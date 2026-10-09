@@ -44,6 +44,9 @@ function reducer(state, action) {
         wrongPicks: action.pick != null ? [...state.wrongPicks, action.pick] : state.wrongPicks,
       }
     }
+    // Live room: everyone else is out, this player wins
+    case 'win':
+      return state.over ? state : { ...state, over: true, won: true }
     // To round `index`: the next one once this one is over, or the room's round in a live room
     case 'goto': {
       if (state.over || action.index <= state.index) return state
@@ -203,6 +206,7 @@ export default function useSurvivalState({
 
   const next = useCallback(() => dispatch({ type: 'goto', index: state.index + 1, at: Date.now() }), [state.index])
   const goTo = useCallback((index) => dispatch({ type: 'goto', index, at: Date.now() }), [])
+  const win = useCallback(() => dispatch({ type: 'win' }), [])
 
   return {
     round,
@@ -228,5 +232,6 @@ export default function useSurvivalState({
     giveUp,
     next,
     goTo,
+    win,
   }
 }

@@ -13,6 +13,7 @@ import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Platform } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 import { ErrorScreen } from '@/components/ErrorScreen'
@@ -21,8 +22,19 @@ import { InviteBanner } from '@/components/InviteBanner'
 import { PushNotifications } from '@/components/PushNotifications'
 import { ToastHost } from '@/components/ToastHost'
 import { colors } from '@/theme'
+import { useLaunchUpdate } from '@/updates'
 
 SplashScreen.preventAutoHideAsync()
+
+// Game setup sheets. On Android a sheet lays its content out at its full height, so at 75% the footer with the
+// create button sat below the visible part (empty space above it, and a drag needed to reach it): open them full there.
+const sheetOptions = {
+  presentation: 'formSheet',
+  sheetAllowedDetents: Platform.OS === 'android' ? [1] : [0.75, 1],
+  sheetGrabberVisible: true,
+  sheetCornerRadius: 28,
+  contentStyle: { backgroundColor: colors.surface },
+} as const
 
 const navigationTheme = {
   ...DarkTheme,
@@ -64,11 +76,13 @@ export default function RootLayout() {
     Inter_600SemiBold,
   })
 
-  useEffect(() => {
-    if (fontsLoaded) SplashScreen.hideAsync()
-  }, [fontsLoaded])
+  const updateChecked = useLaunchUpdate()
 
-  if (!fontsLoaded) return null
+  useEffect(() => {
+    if (fontsLoaded && updateChecked) SplashScreen.hideAsync()
+  }, [fontsLoaded, updateChecked])
+
+  if (!fontsLoaded || !updateChecked) return null
 
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.bg }}>
@@ -78,33 +92,15 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" />
           <Stack.Screen
             name="play/[game]"
-            options={{
-              presentation: 'formSheet',
-              sheetAllowedDetents: [0.75, 1],
-              sheetGrabberVisible: true,
-              sheetCornerRadius: 28,
-              contentStyle: { backgroundColor: colors.surface },
-            }}
+            options={sheetOptions}
           />
           <Stack.Screen
             name="multi/create"
-            options={{
-              presentation: 'formSheet',
-              sheetAllowedDetents: [0.75, 1],
-              sheetGrabberVisible: true,
-              sheetCornerRadius: 28,
-              contentStyle: { backgroundColor: colors.surface },
-            }}
+            options={sheetOptions}
           />
           <Stack.Screen
             name="multi/add"
-            options={{
-              presentation: 'formSheet',
-              sheetAllowedDetents: [0.75, 1],
-              sheetGrabberVisible: true,
-              sheetCornerRadius: 28,
-              contentStyle: { backgroundColor: colors.surface },
-            }}
+            options={sheetOptions}
           />
           <Stack.Screen name="multi/[code]" options={{ animation: 'fade_from_bottom' }} />
           <Stack.Screen name="game" options={{ gestureEnabled: false, animation: 'fade_from_bottom' }} />

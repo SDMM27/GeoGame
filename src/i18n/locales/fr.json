@@ -757,6 +757,9 @@
     "waiting_next": "En attente du jeu suivant…"
   },
   "survival": {
+    "last_standing": "🏆 Dernier survivant : tu gagnes !",
+    "ask_flag": "Trouve le PAYS de ce drapeau",
+    "ask_capital": "Trouve la CAPITALE de ce pays",
     "choose_games": "Manches",
     "choose_lives": "Vies",
     "pick_one_game": "Choisis au moins un jeu.",

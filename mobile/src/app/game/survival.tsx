@@ -64,7 +64,7 @@ function parseRamp(value?: string) {
 }
 
 // Live rooms: the room's start and its players' progress, to play round by round
-type Sync = { startAt: number; entries: unknown[] }
+type Sync = { startAt: number; entries: unknown[]; playerId: string }
 
 type RunProps = {
   modes: string[]
@@ -86,7 +86,7 @@ function SurvivalRun({ modes, lives, timer, ramp, seed, snapshot = null, snapKey
   const { height: windowHeight } = useWindowDimensions()
   const keyboardVisible = useKeyboardVisible()
   const synced = Boolean(sync)
-  const shared = useSurvivalSync({ enabled: synced, startAt: sync?.startAt ?? 0, timer, entries: sync?.entries ?? NO_ENTRIES })
+  const shared = useSurvivalSync({ enabled: synced, startAt: sync?.startAt ?? 0, timer, entries: sync?.entries ?? NO_ENTRIES, playerId: sync?.playerId })
   const state = useSurvivalState({
     modes,
     lives,
@@ -105,6 +105,14 @@ function SurvivalRun({ modes, lives, timer, ramp, seed, snapshot = null, snapKey
   useEffect(() => {
     if (synced && shared.round > roundIndex) goTo(shared.round)
   }, [synced, shared.round, roundIndex, goTo])
+
+  // Live room: everyone else is out of lives, the game ends once this round is answered
+  const lastRound = shared.lastSurvivorRound
+  const lastStanding = synced && lastRound != null
+  const { win } = state
+  useEffect(() => {
+    if (lastStanding && (roundIndex > lastRound || (roundIndex === lastRound && outcome))) win()
+  }, [lastStanding, lastRound, roundIndex, outcome, win])
 
   // Feedback of an answer: a life lost, a name that isn't a country, a repeated pick
   const notify = useCallback(
@@ -238,7 +246,7 @@ function SurvivalRun({ modes, lives, timer, ramp, seed, snapshot = null, snapKey
 
       {isOver && (
         <ResultsSheet
-          title={isWon ? t('survival.victory') : t('survival.game_over')}
+          title={isWon ? t(lastStanding ? 'survival.last_standing' : 'survival.victory') : t('survival.game_over')}
           score={score}
           scoreLabel={t('survival.rounds_survived')}
           accent={ACCENT}
@@ -289,8 +297,9 @@ function RoomRun({ play }: { play: RoomPlay }) {
   const { progress } = useMultiplayerRoom(synced ? id : null) as { progress: Record<string, PlayerProgress & { lastSeen?: { toMillis?: () => number } }> }
   const entries = useMemo(
     () =>
-      Object.values(progressForGame(progress, gameIndex) as typeof progress).map((entry) => ({
+      Object.entries(progressForGame(progress, gameIndex) as typeof progress).map(([playerId, entry]) => ({
         ...entry,
+        id: playerId,
         lastSeen: entry.lastSeen?.toMillis ? entry.lastSeen.toMillis() : null,
       })),
     [progress, gameIndex]
@@ -305,7 +314,7 @@ function RoomRun({ play }: { play: RoomPlay }) {
       snapshot={snapshot}
       snapKey={snapKey}
       play={play}
-      sync={synced && startAt != null ? { startAt, entries } : null}
+      sync={synced && startAt != null ? { startAt, entries, playerId: getPlayerId() } : null}
     />
   )
 }

@@ -7,6 +7,7 @@
 // (round: the round they are on, roundAt: when it started, server ms; lastSeen: server time of the write), and every
 // client works out the same schedule from these documents. Round 0 starts with the game (the room's startAt);
 // round k+1 starts REVEAL_MS after the last player finished round k, or after round k's time is up.
+// The game ends for everyone once a single player is left: the others out of lives, they win when done with that round.
 
 // The answer of a round stays on screen this long before the next round
 export const SURVIVAL_REVEAL_MS = 3000
@@ -50,6 +51,17 @@ export function furthestRound(entries) {
         : best,
     null
   )
+}
+
+/**
+ * The round after which `playerId` is the last player left: every other player who played round by round is out
+ * (`finished`), and this is the furthest round they reached. Null while someone else is still in the game, or when
+ * nobody else played in sync. `entries` carry the player's `id`.
+ */
+export function lastSurvivorRound(entries, playerId) {
+  const others = entries.filter((entry) => entry.id !== playerId && entry.round != null)
+  if (others.length === 0 || !others.every((entry) => entry.finished)) return null
+  return Math.max(...others.map((entry) => entry.round))
 }
 
 /** How many of the players in the round are done with it: { done, total }. */

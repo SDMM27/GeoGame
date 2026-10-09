@@ -127,4 +127,13 @@ describe('useSurvivalState', () => {
     expect(resumed.result.current.lives).toBe(2)
     expect(resumed.result.current.score).toBe(1)
   })
+
+  it('ends the run as a win when the room says everyone else is out', () => {
+    const { result } = play({ modes: [FLAGS], lives: 3, seed: 1, autoAdvance: false })
+    act(() => { result.current.submitText('zzzz') })
+    act(() => { result.current.win() })
+    expect(result.current.isOver).toBe(true)
+    expect(result.current.isWon).toBe(true)
+    expect(result.current.lives).toBe(2)
+  })
 })

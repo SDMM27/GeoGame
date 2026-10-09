@@ -107,8 +107,8 @@ export default function RoomGame({ room, progress, results, playerId, onDone }) 
     (survivalSnapshot ? Boolean(survivalSnapshot.synced) : serverNow() - startAt < SURVIVAL_LATE_MS)
   )
   const survivalEntries = useMemo(
-    () => Object.values(progressForGame(progress, gameIndex))
-      .map((entry) => ({ ...entry, lastSeen: entry.lastSeen?.toMillis ? entry.lastSeen.toMillis() : null })),
+    () => Object.entries(progressForGame(progress, gameIndex))
+      .map(([id, entry]) => ({ ...entry, id, lastSeen: entry.lastSeen?.toMillis ? entry.lastSeen.toMillis() : null })),
     [progress, gameIndex]
   )
 
@@ -133,7 +133,7 @@ export default function RoomGame({ room, progress, results, playerId, onDone }) 
             snapshot={survivalSnapshot}
             snapshotKey={snapKey}
             room={survivalRoom}
-            sync={synced ? { startAt, entries: survivalEntries } : null}
+            sync={synced ? { startAt, entries: survivalEntries, playerId } : null}
           />
         )
       default: return null

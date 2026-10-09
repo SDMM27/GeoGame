@@ -154,6 +154,25 @@
   box-shadow: var(--shadow-card);
 }
 
+.survival-ask {
+  margin: 0;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 1.05rem;
+  text-align: center;
+}
+.survival-ask--flag { color: #ff7a6b; background: #ff7a6b1f; border: 1px solid #ff7a6b66; }
+.survival-ask--capital { color: #f5b83d; background: #f5b83d1f; border: 1px solid #f5b83d66; }
+.survival-capital-country {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+.survival-flag.survival-flag--small { max-width: 72px; max-height: 48px; }
+.survival-capital-country .survival-country-name { font-size: 2rem; margin: 0; }
 .survival-country-name {
   font-size: 1.5rem;
   font-weight: 800;

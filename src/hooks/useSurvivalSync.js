@@ -1,13 +1,14 @@
 // src/hooks/useSurvivalSync.js
 // The shared round of a live survival room (see utils/survivalSync.js), for the website and the app.
-// `entries`: the players' progress in this game, with `lastSeen` in server ms. `startAt`: the game's start (server ms).
+// `entries`: the players' progress in this game ({ id, ... }), with `lastSeen` in server ms. `playerId`: this player. `startAt`: the game's start (server ms).
 // Returns the round everyone plays ({ round, startAt }), its time limit on this device's clock (`deadline`, for
-// useSurvivalState) and how many players are done with it (`waiting`).
+// useSurvivalState), how many players are done with it (`waiting`) and, once everyone else is out, the round after
+// which this player is the last one left (`lastSurvivorRound`, see utils/survivalSync.js).
 import { useEffect, useRef, useState } from 'react'
 import { serverNow } from '../utils/serverTime'
-import { furthestRound, nextRoundStart, roundWaiting } from '../utils/survivalSync'
+import { furthestRound, lastSurvivorRound, nextRoundStart, roundWaiting } from '../utils/survivalSync'
 
-export default function useSurvivalSync({ enabled, startAt, timer, entries }) {
+export default function useSurvivalSync({ enabled, startAt, timer, entries, playerId = null }) {
   const [shared, setShared] = useState({ round: 0, startAt })
   const entriesRef = useRef(entries)
   entriesRef.current = entries
@@ -37,5 +38,6 @@ export default function useSurvivalSync({ enabled, startAt, timer, entries }) {
     startAt: shared.startAt,
     deadline: enabled && timerMs > 0 ? shared.startAt + timerMs - offset : null,
     waiting: roundWaiting(entries, shared.round),
+    lastSurvivorRound: enabled ? lastSurvivorRound(entries, playerId) : null,
   }
 }

@@ -757,6 +757,9 @@
     "waiting_next": "Waiting for the next game…"
   },
   "survival": {
+    "last_standing": "🏆 Last one standing: you win!",
+    "ask_flag": "Name the COUNTRY of this flag",
+    "ask_capital": "Name the CAPITAL of this country",
     "choose_games": "Rounds",
     "choose_lives": "Lives",
     "pick_one_game": "Pick at least one game.",

@@ -185,8 +185,18 @@ export function TypedRound({ survival, onSubmit }) {
 
   return (
     <div className="survival-typed">
-      <img src={`/flags/${p.ISO_A2.toLowerCase()}.png`} alt="?" className="survival-flag" />
-      {isCapital && <p className="survival-country-name">{countryLabel(round.country, i18n.language)}</p>}
+      {/* Both rounds show a flag: say plainly which answer is expected */}
+      <p className={`survival-ask survival-ask--${isCapital ? 'capital' : 'flag'}`}>
+        {isCapital ? '🏛️' : '🚩'} {t(isCapital ? 'survival.ask_capital' : 'survival.ask_flag')}
+      </p>
+      {isCapital ? (
+        <div className="survival-capital-country">
+          <img src={`/flags/${p.ISO_A2.toLowerCase()}.png`} alt="" className="survival-flag survival-flag--small" />
+          <p className="survival-country-name">{countryLabel(round.country, i18n.language)}</p>
+        </div>
+      ) : (
+        <img src={`/flags/${p.ISO_A2.toLowerCase()}.png`} alt="?" className="survival-flag" />
+      )}
       <AnswerInput
         survival={survival}
         placeholder={t(isCapital ? 'survival.capital_placeholder' : 'placeholders.country_name')}

@@ -553,3 +553,6 @@
   transform: translateY(-1px);
   box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
 }
+
+.home-atlas-btn { margin-left: 0.75rem; background: linear-gradient(135deg, #2e1f5e, #3b2380); border-color: #7b2ff7; box-shadow: 0 2px 8px rgba(123, 47, 247, 0.25); }
+.home-atlas-btn:hover { background: linear-gradient(135deg, #3b2380, #4c2ca3); box-shadow: 0 4px 14px rgba(123, 47, 247, 0.4); }

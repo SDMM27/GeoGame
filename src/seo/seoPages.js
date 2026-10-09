@@ -18,6 +18,7 @@ export const SEO_PAGES = [
   { path: '/quiz', key: 'quiz', priority: '0.8', changefreq: 'daily' },
   // Without the options chosen on the home page, /survival sends the player back home: not in the sitemap.
   { path: '/survival', key: 'survival', sitemap: false },
+  { path: '/atlas', key: 'atlas', priority: '0.7', changefreq: 'monthly' },
   { path: '/multiplayer', key: 'multiplayer', priority: '0.7', changefreq: 'monthly' },
   { path: '/scores', key: 'scores', priority: '0.6', changefreq: 'daily' },
 ]

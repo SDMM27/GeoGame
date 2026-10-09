@@ -1,4 +1,28 @@
 {
+  "atlas": {
+    "title": "Atlas",
+    "subtitle": "Explore the world map: tap a country to see its profile.",
+    "search_placeholder": "Search a country…",
+    "no_results": "No country found",
+    "capital": "Capital",
+    "continent": "Continent",
+    "population": "Population",
+    "area": "Area",
+    "density": "Density",
+    "gdp": "GDP",
+    "gdp_per_capita": "GDP per capita",
+    "neighbors": "Bordering countries",
+    "no_neighbors": "No land border",
+    "rank": "#{{rank}} of {{total}}",
+    "rank_first": "#1 of {{total}}",
+    "difficulty": "Difficulty in the games",
+    "per_km2": "people/km²",
+    "billion_usd": "${{value}} B",
+    "usd": "${{value}}",
+    "close": "Close",
+    "unknown": "Unknown",
+    "open": "Open the atlas"
+  },
   "continents": {
     "Europe": "Europe",
     "Asie": "Asia",
@@ -834,6 +858,10 @@
     "ramp_custom_hint": "Custom ramp: this game does not count for the leaderboard."
   },
   "seo": {
+    "atlas": {
+      "title": "Interactive world atlas: country profiles | GeoGame",
+      "description": "Explore the world map and discover every country: capital, population, area, GDP and bordering countries."
+    },
     "home": {
       "title": "GeoGame — Free geography games: countries, flags, capitals",
       "description": "Free online geography games: place countries on the map, recognize flags, find capitals, daily challenges, quizzes and multiplayer games with friends."

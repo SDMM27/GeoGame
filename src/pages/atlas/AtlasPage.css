@@ -1,0 +1,65 @@
+.atlas-page { display: flex; flex-direction: column; height: 100vh; height: 100dvh; background: var(--bg-primary); }
+.atlas-body { position: relative; flex: 1; min-height: 0; display: flex; }
+.atlas-map { position: relative; flex: 1; min-width: 0; }
+.atlas-map .leaflet-container { background: var(--bg-primary); }
+
+.atlas-overlay {
+  position: absolute; top: 12px; left: 56px; z-index: 500;
+  display: flex; flex-direction: column; gap: 8px; width: min(320px, calc(100% - 72px));
+}
+.atlas-title { margin: 0; font-size: 1.3rem; color: var(--text-primary); text-shadow: 0 2px 8px #000a; }
+.atlas-hint { margin: 0; font-size: 0.85rem; color: var(--text-secondary, #94a3b8); text-shadow: 0 1px 4px #000a; }
+
+.atlas-search { position: relative; }
+.atlas-search input {
+  width: 100%; box-sizing: border-box; padding: 0.6rem 0.85rem; border-radius: 10px;
+  border: 1px solid #334155; background: #0f172aee; color: var(--text-primary); font-size: 0.95rem;
+}
+.atlas-search-results {
+  list-style: none; margin: 4px 0 0; padding: 4px; border-radius: 10px;
+  background: #0f172af5; border: 1px solid #334155; max-height: 50vh; overflow-y: auto;
+}
+.atlas-search-results li.atlas-muted { padding: 0.5rem; }
+.atlas-search-results button, .atlas-chip {
+  display: flex; align-items: center; gap: 8px; width: 100%; padding: 0.45rem 0.55rem;
+  background: none; border: 0; border-radius: 8px; color: var(--text-primary); cursor: pointer; text-align: left; font-size: 0.9rem;
+}
+.atlas-search-results button:hover { background: #1e293b; }
+.atlas-search-results img, .atlas-chip img { width: 22px; height: 15px; object-fit: cover; border-radius: 2px; }
+
+.atlas-sheet {
+  width: 360px; flex-shrink: 0; overflow-y: auto; box-sizing: border-box; padding: 16px;
+  background: #0f172a; border-left: 1px solid #1e293b; display: flex; flex-direction: column; gap: 16px;
+}
+.atlas-sheet-header { display: flex; align-items: center; gap: 12px; }
+.atlas-sheet-flag { width: 64px; height: 43px; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 8px #0008; }
+.atlas-sheet-title { flex: 1; min-width: 0; }
+.atlas-sheet-title h2 { margin: 0; font-size: 1.35rem; color: var(--text-primary); }
+.atlas-sheet-title span { font-size: 0.85rem; color: #94a3b8; }
+.atlas-sheet-close { background: none; border: 0; color: #94a3b8; font-size: 1.2rem; cursor: pointer; padding: 4px 8px; }
+
+.atlas-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.atlas-fact { display: flex; flex-direction: column; gap: 2px; padding: 10px; border-radius: 10px; background: #1e293b80; border: 1px solid #1e293b; }
+.atlas-fact-label { font-size: 0.75rem; color: #94a3b8; }
+.atlas-fact-value { font-size: 1rem; color: var(--text-primary); }
+.atlas-rank { font-size: 0.72rem; color: #a78bfa; }
+
+.atlas-section h3 { margin: 0 0 8px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; color: #94a3b8; }
+.atlas-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.atlas-chip { width: auto; background: #1e293b; border: 1px solid #334155; border-radius: 999px; padding: 0.3rem 0.65rem; font-size: 0.85rem; }
+.atlas-chip:hover { border-color: #7b2ff7; }
+.atlas-muted { margin: 0; color: #94a3b8; font-size: 0.85rem; }
+.atlas-difficulties { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.atlas-difficulties li { display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--text-primary); }
+
+.atlas-tooltip { background: #0f172a; color: #e2e8f0; border: 1px solid #334155; }
+
+/* Phones: the sheet slides over the bottom of the map */
+@media (max-width: 760px) {
+  .atlas-overlay { left: 52px; top: 10px; width: calc(100% - 64px); }
+  .atlas-title { display: none; }
+  .atlas-sheet {
+    position: absolute; left: 0; right: 0; bottom: 0; width: auto; max-height: 58%; z-index: 600;
+    border-left: 0; border-top: 1px solid #334155; border-radius: 16px 16px 0 0; box-shadow: 0 -8px 24px #000a;
+  }
+}

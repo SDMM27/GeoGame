@@ -158,6 +158,10 @@ const fr = {
     decline: 'Ignorer',
     received_title: 'Invitations',
     channel: 'Invitations à jouer',
+    room_players: 'Ajouter des joueurs de la partie',
+    add_friend: 'Ajouter',
+    accept: 'Accepter',
+    request_sent: 'Demande envoyée',
   },
   install: {
     title: 'Installe GeoGame',
@@ -352,6 +356,10 @@ const en: typeof fr = {
     decline: 'Dismiss',
     received_title: 'Invitations',
     channel: 'Game invites',
+    room_players: 'Add players from this game',
+    add_friend: 'Add',
+    accept: 'Accept',
+    request_sent: 'Request sent',
   },
   install: {
     title: 'Install GeoGame',
@@ -546,6 +554,10 @@ const ru: typeof fr = {
     decline: 'Скрыть',
     received_title: 'Приглашения',
     channel: 'Приглашения в игру',
+    room_players: 'Добавить игроков из этой игры',
+    add_friend: 'Добавить',
+    accept: 'Принять',
+    request_sent: 'Запрос отправлен',
   },
   install: {
     title: 'Установи GeoGame',

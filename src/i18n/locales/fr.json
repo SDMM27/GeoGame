@@ -179,6 +179,11 @@
     "start_new_game": "Lance un nouveau pays pour continuer."
   },
   "country_clue": {
+    "closer": "{{km}} km plus près",
+    "farther": "{{km}} km plus loin",
+    "same_distance": "Même distance",
+    "closest": "Le plus proche",
+    "your_guesses": "Tes propositions",
     "daily_title": "Country Clue Journalier",
     "infinite_title": "Country Clue Infini",
     "daily_subtitle": "Un pays mystère à retrouver aujourd'hui. Puzzle du jour.",
@@ -545,7 +550,27 @@
     "favorite": "Jeu préféré",
     "sign_in_title": "Ton profil de joueur",
     "sign_in_pitch": "Connecte-toi pour garder l’historique de tes parties, suivre tes stats, débloquer des succès et jouer avec tes amis.",
-    "show_less": "Voir moins"
+    "show_less": "Voir moins",
+    "details": {
+      "title": "Détail de la partie",
+      "played_at": "Jouée le",
+      "daily": "Défi du",
+      "result": "Résultat",
+      "score": "Score",
+      "found": "Pays trouvés",
+      "correct": "Bonnes réponses",
+      "attempts": "Essais",
+      "optimal": "Trajet optimal",
+      "errors": "Erreurs",
+      "total_error": "Écart total",
+      "hints": "Indices",
+      "best_streak": "Meilleure série",
+      "lives": "Vies",
+      "time": "Durée",
+      "room": "Salon",
+      "open_room": "Voir le salon",
+      "close": "Fermer"
+    }
   },
   "friends": {
     "title": "Amis",
@@ -686,6 +711,11 @@
     "you": "Toi"
   },
   "mp_room": {
+    "add_players": "Ajouter des joueurs de la partie",
+    "add_friend": "Ajouter en ami",
+    "accept_friend": "Accepter",
+    "request_sent": "Demande envoyée",
+    "retry": "Réessayer",
     "live": "En direct",
     "challenge": "Défi",
     "from_app": "Partie créée sur l'app mobile",
@@ -732,6 +762,12 @@
     "waiting_next": "En attente du jeu suivant…"
   },
   "survival": {
+    "spectating": "Tu regardes ceux qui restent en jeu",
+    "out_round": "éliminé manche {{n}}",
+    "back_to_room": "Retour à la salle",
+    "last_standing": "🏆 Dernier survivant : tu gagnes !",
+    "ask_flag": "Trouve le PAYS de ce drapeau",
+    "ask_capital": "Trouve la CAPITALE de ce pays",
     "choose_games": "Manches",
     "choose_lives": "Vies",
     "pick_one_game": "Choisis au moins un jeu.",

@@ -1,10 +1,11 @@
 // Player profile sections computed from the game history: stats, daily streak, achievements, history, per game.
-import React, { useState } from 'react'
+import React, { useEffect, useId, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { usePlayerProfile } from '../../hooks/usePlayerProfile'
 import { GAME_TYPES } from '../../utils/gameTypes'
-import { describeBest, describeMode, describeResult, formatPlayedAt } from '../../utils/profileFormat'
+import { describeBest, describeDetails, describeMode, describeResult, formatPlayedAt } from '../../utils/profileFormat'
 import { DAILY_GAME_TYPES, formatPlayTime } from '../../utils/profileStats'
 import './ProfileBody.css'
 
@@ -144,20 +145,68 @@ function Achievements({ achievements }) {
 
 function GameRow({ game }) {
   const { t, i18n } = useTranslation()
+  const [open, setOpen] = useState(false)
   const meta = GAME_META[game.gameType]
   if (!meta) return null
   return (
-    <li className="profile-game-row">
-      <span className="profile-game-icon" style={{ background: `${meta.color}1F` }}>{meta.emoji}</span>
-      <div className="profile-game-main">
-        <strong>{t(meta.titleKey)}</strong>
-        <small>{describeMode(game, t)}</small>
-      </div>
-      <div className="profile-game-result">
-        <strong className={game.solved === false ? 'failed' : ''}>{describeResult(game, t)}</strong>
-        <small>{formatPlayedAt(game.playedAt, i18n.language)}</small>
-      </div>
+    <li>
+      <button type="button" className="profile-game-row profile-game-row--button" onClick={() => setOpen(true)}>
+        <span className="profile-game-icon" style={{ background: `${meta.color}1F` }}>{meta.emoji}</span>
+        <div className="profile-game-main">
+          <strong>{t(meta.titleKey)}</strong>
+          <small>{describeMode(game, t)}</small>
+        </div>
+        <div className="profile-game-result">
+          <strong className={game.solved === false ? 'failed' : ''}>{describeResult(game, t)}</strong>
+          <small>{formatPlayedAt(game.playedAt, i18n.language)}</small>
+        </div>
+        <span className="profile-game-chevron" aria-hidden="true">›</span>
+      </button>
+      {open && <GameDetail game={game} meta={meta} onClose={() => setOpen(false)} />}
     </li>
+  )
+}
+
+// Everything recorded for one game of the history, in a dialog.
+function GameDetail({ game, meta, onClose }) {
+  const { t, i18n } = useTranslation()
+  const titleId = useId()
+
+  useEffect(() => {
+    const onKey = (event) => event.key === 'Escape' && onClose()
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
+
+  return createPortal(
+    <div className="profile-detail-backdrop" onClick={onClose}>
+      <div className="profile-detail" role="dialog" aria-modal="true" aria-labelledby={titleId} onClick={(event) => event.stopPropagation()}>
+        <div className="profile-detail-header">
+          <span className="profile-game-icon" style={{ background: `${meta.color}1F` }}>{meta.emoji}</span>
+          <div className="profile-game-main">
+            <strong id={titleId}>{t(meta.titleKey)}</strong>
+            <small>{describeMode(game, t)}</small>
+          </div>
+          <button type="button" className="profile-detail-close" onClick={onClose} aria-label={t('profile.details.close')}>
+            ✕
+          </button>
+        </div>
+        <dl className="profile-detail-rows">
+          {describeDetails(game, t, i18n.language).map((row) => (
+            <div key={row.key}>
+              <dt>{row.label}</dt>
+              <dd className={row.failed ? 'failed' : ''}>{row.value}</dd>
+            </div>
+          ))}
+        </dl>
+        {game.mode === 'multi' && game.roomCode && (
+          <Link to={`/multiplayer/room/${game.roomCode}`} className="profile-detail-action" style={{ borderColor: meta.color, color: meta.color }}>
+            {t('profile.details.open_room')}
+          </Link>
+        )}
+      </div>
+    </div>,
+    document.body
   )
 }
 
@@ -194,7 +243,7 @@ function History({ games }) {
       {games.length === 0 ? (
         <p className="profile-muted">{t('profile.history_empty')}</p>
       ) : (
-        <ul className="profile-list">
+        <ul className="profile-list profile-history">
           {visible.map((game) => (
             <GameRow key={game.id} game={game} />
           ))}

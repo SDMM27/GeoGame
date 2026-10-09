@@ -182,6 +182,7 @@ export default function MultiplayerRoom({ room, progress, gameResults, playerId 
             </button>
           )}
           {isHost && <AddGame room={room} playerId={playerId} />}
+          <Players room={room} playerId={playerId} strangersOnly />
           <StandingsCard
             room={room}
             progress={progress}

@@ -13,13 +13,14 @@ import useCountryClueState from '@shared/hooks/useCountryClueState'
 import { formatTime } from '@shared/utils/formatTime'
 import { useDailyPlayedElsewhere } from '@shared/hooks/useDailyPlayedElsewhere'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
+import { clueProgress } from '@shared/utils/clueProgress'
 import { getCapitalName, getCountryName } from '@shared/utils/getCountryName'
 
 import { useAccount } from '@/account/auth'
 import { DailyLeaderboard } from '@/components/game/DailyLeaderboard'
 import { DailyPlayedElsewhere } from '@/components/game/DailyPlayedElsewhere'
 import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
-import { ClueGuessCard, type ClueGuess } from '@/components/game/GuessCards'
+import { ClueGuessCard, type ClueGuess, type ClueProgress } from '@/components/game/GuessCards'
 import { GuessInputBar } from '@/components/game/GuessInputBar'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
 import { GuessesMap } from '@/components/map/GuessesMap'
@@ -109,6 +110,12 @@ function CountryClueGame({ mode, play }: { mode: string; play?: RoomPlay }) {
     ...(guesses as ClueGuess[]).map((guess) => ({ name: guess.value, correct: guess.isCorrect })),
     ...(isLost ? [{ name: answerName, correct: true }] : []),
   ]
+  const progress: ClueProgress[] = clueProgress(guesses)
+  // Newest first, each with how it compares with the one before it
+  const guessCards = (guesses as ClueGuess[])
+    .map((guess, index) => ({ guess, index }))
+    .reverse()
+    .map(({ guess, index }) => <ClueGuessCard key={`${guess.value}-${index}`} guess={guess} index={index} progress={progress[index]} />)
   const recap = (
     <>
       <AnswerCard iso={currentCountryISO} name={answer} capital={capital} solved={isSolved} />
@@ -173,10 +180,7 @@ function CountryClueGame({ mode, play }: { mode: string; play?: RoomPlay }) {
                     {t('labels.no_attempts')}
                   </Text>
                 )
-              : (guesses as ClueGuess[])
-                  .map((guess, index) => ({ guess, index }))
-                  .reverse()
-                  .map(({ guess, index }) => <ClueGuessCard key={`${guess.value}-${index}`} guess={guess} index={index} />)}
+              : guessCards}
           </View>
         </ScrollView>
 
@@ -260,6 +264,12 @@ function CountryClueGame({ mode, play }: { mode: string; play?: RoomPlay }) {
           onSaved={() => setLeaderboardVersion((version) => version + 1)}
           onHome={() => navigate('/')}>
           {recap}
+          {guesses.length > 0 && (
+            <View style={{ gap: space.sm }}>
+              <Text variant="bodyStrong">{t('country_clue.your_guesses')}</Text>
+              {guessCards}
+            </View>
+          )}
           <DailyLeaderboard gameType={GAME_TYPES.COUNTRY_CLUE} dailyKey={dailyKey} refreshKey={leaderboardVersion} />
         </ResultsSheet>
       )}

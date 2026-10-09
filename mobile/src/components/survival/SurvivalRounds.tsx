@@ -116,6 +116,7 @@ export function TypedRound({ survival, onSubmit }: { survival: Survival; onSubmi
   const { round, isPlaying, giveUp } = survival
   const country = round!.country!
   const isCapital = round!.type === GAME_TYPES.CAPITALS
+  const askColor = isCapital ? gameColors.capitals : gameColors.flags
   const flag = getFlag(country.properties.ISO_A2)
   const [value, setValue] = useState('')
   const inputRef = useRef<TextInput>(null)
@@ -136,18 +137,29 @@ export function TypedRound({ survival, onSubmit }: { survival: Survival; onSubmi
 
   return (
     <View style={{ gap: space.lg }}>
-      {isCapital && (
-        <Text variant="title" numberOfLines={2} adjustsFontSizeToFit style={{ textAlign: 'center' }}>
-          {countryLabel(country, i18n.language)}
+      {/* Both rounds show a flag: say plainly which answer is expected */}
+      <View style={[styles.ask, { borderColor: `${askColor}66`, backgroundColor: `${askColor}1F` }]}>
+        <MaterialCommunityIcons name={isCapital ? 'city-variant-outline' : 'flag-variant'} size={18} color={askColor} />
+        <Text variant="bodyStrong" color={askColor} style={{ flexShrink: 1, textAlign: 'center' }}>
+          {t(isCapital ? 'survival.ask_capital' : 'survival.ask_flag')}
         </Text>
+      </View>
+      {isCapital ? (
+        <Animated.View entering={ZoomIn.springify().damping(16)} style={styles.capitalCountry}>
+          {flag && <Image source={flag} contentFit="contain" style={styles.smallFlag} />}
+          <Text variant="title" numberOfLines={2} adjustsFontSizeToFit style={{ flexShrink: 1, textAlign: 'center' }}>
+            {countryLabel(country, i18n.language)}
+          </Text>
+        </Animated.View>
+      ) : (
+        <Animated.View entering={ZoomIn.springify().damping(16)} style={styles.flagCard}>
+          {flag ? (
+            <Image source={flag} contentFit="contain" style={styles.flag} accessibilityLabel={t(`survival.prompt.${round!.type}`)} />
+          ) : (
+            <MaterialCommunityIcons name="flag-outline" size={64} color={colors.textFaint} />
+          )}
+        </Animated.View>
       )}
-      <Animated.View entering={ZoomIn.springify().damping(16)} style={styles.flagCard}>
-        {flag ? (
-          <Image source={flag} contentFit="contain" style={styles.flag} accessibilityLabel={t(`survival.prompt.${round!.type}`)} />
-        ) : (
-          <MaterialCommunityIcons name="flag-outline" size={64} color={colors.textFaint} />
-        )}
-      </Animated.View>
       <View style={styles.inputRow}>
         <TextInput
           ref={inputRef}
@@ -317,6 +329,18 @@ const styles = StyleSheet.create({
     padding: space.lg,
   },
   flag: { width: '100%', height: '100%' },
+  ask: {
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.sm,
+    paddingVertical: space.sm,
+    paddingHorizontal: space.lg,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+  },
+  capitalCountry: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.md },
+  smallFlag: { width: 64, height: 44 },
   inputRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   input: {
     flex: 1,

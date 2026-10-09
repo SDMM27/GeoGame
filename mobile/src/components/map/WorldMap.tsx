@@ -448,6 +448,9 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
 
   // ---- Gestures ------------------------------------------------------------------
   const start = useSharedValue({ scale: 1, tx: 0, ty: 0, fx: 0, fy: 0 })
+  // Pinch anchor: the view, focal point, gesture scale and finger count it was taken at (see the pinch below)
+  const pinchFrom = useSharedValue({ scale: 1, tx: 0, ty: 0, fx: 0, fy: 0, es: 1, n: 0 })
+  const pinching = useSharedValue(false)
   const minScaleValue = useDerivedValue(() => (viewW.value > 0 ? viewW.value / WORLD_SIZE : 0.3))
   // While the map still glides after a pan, a touch only stops it. Zooming never counts as a tap.
   const glideUntil = useSharedValue(0)
@@ -460,10 +463,13 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
       start.value = { scale: scale.value, tx: tx.value, ty: ty.value, fx: 0, fy: 0 }
     })
     .onUpdate((event) => {
+      if (pinching.value) return
       tx.value = start.value.tx + event.translationX
       ty.value = clampY(start.value.ty + event.translationY, scale.value, viewH.value)
     })
     .onEnd((event) => {
+      // A second finger ends the pan: no glide, it would drag the map away while zooming
+      if (pinching.value) return
       // Light inertia
       const targetX = tx.value + event.velocityX * 0.12
       const targetY = clampY(ty.value + event.velocityY * 0.12, scale.value, viewH.value)
@@ -474,19 +480,41 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
 
   const pinch = Gesture.Pinch()
     .enabled(interactive)
-    .onStart((event) => {
+    .onStart(() => {
       ignoreTap.value = true
-      start.value = { scale: scale.value, tx: tx.value, ty: ty.value, fx: event.focalX, fy: event.focalY }
+      pinching.value = true
+      cancelAnimation(tx)
+      cancelAnimation(ty)
+      glideUntil.value = 0
+      pinchFrom.value = { ...pinchFrom.value, n: 0 }
     })
     .onUpdate((event) => {
-      const s = Math.min(MAX_SCALE, Math.max(minScaleValue.value, start.value.scale * event.scale))
-      const ratio = s / start.value.scale
+      // Anchor on the first update, and again whenever a finger is added or lifted: Android reports a stale focal
+      // point at the start, and the focal point jumps to the remaining finger, which shifted the map.
+      if (event.numberOfPointers !== pinchFrom.value.n) {
+        pinchFrom.value = {
+          scale: scale.value,
+          tx: tx.value,
+          ty: ty.value,
+          fx: event.focalX,
+          fy: event.focalY,
+          es: event.scale || 1,
+          n: event.numberOfPointers,
+        }
+        return
+      }
+      const from = pinchFrom.value
+      const s = Math.min(MAX_SCALE, Math.max(minScaleValue.value, from.scale * (event.scale / from.es)))
+      const ratio = s / from.scale
       scale.value = s
-      tx.value = event.focalX - (start.value.fx - start.value.tx) * ratio
-      ty.value = clampY(event.focalY - (start.value.fy - start.value.ty) * ratio, s, viewH.value)
+      tx.value = event.focalX - (from.fx - from.tx) * ratio
+      ty.value = clampY(event.focalY - (from.fy - from.ty) * ratio, s, viewH.value)
     })
     .onEnd(() => {
       scheduleOnRN(setZoomScale, scale.value)
+    })
+    .onFinalize(() => {
+      pinching.value = false
     })
 
   const tap = Gesture.Tap()

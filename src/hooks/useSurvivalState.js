@@ -1,8 +1,7 @@
 // src/hooks/useSurvivalState.js
 // One survival run, shared by the website and the app (see utils/survival.js).
-// A wrong answer costs a life and the round goes on, except for the quiz and Border Guess where the round ends
-// (one try). Giving up or running out of time costs a life and ends the round. The run ends when no life is left,
-// or when every round is cleared.
+// One try per round: a wrong answer, giving up or running out of time costs one life, shows the answer and moves on
+// to the next round. The run ends when no life is left, or when every round is cleared.
 //
 // Solo and challenge rooms: each round has its own timer and the next one comes on its own. Live rooms
 // (useSurvivalSync): `autoAdvance` false, the shared `deadline` and goTo() come from the room.
@@ -16,9 +15,6 @@ import { buildSurvivalRounds, checkCapitalName, checkCountryName, livesLeft, nor
 // How long the answer stays on screen before the next round (a quiz answer comes with a fact to read).
 const NEXT_DELAY_MS = { correct: 900, failed: 2200 }
 const QUIZ_DELAY_MS = { correct: 2500, failed: 4500 }
-
-// Rounds that end on the first answer, right or wrong
-const ONE_TRY = [GAME_TYPES.QUIZ, GAME_TYPES.BORDER_GUESS]
 
 const freshRound = (at) => ({ guesses: [], wrongPicks: [], outcome: null, timedOut: false, roundStartedAt: at })
 
@@ -38,18 +34,19 @@ function reducer(state, action) {
     case 'timeout': {
       if (state.outcome || state.over) return state
       const errors = state.errors + 1
-      const over = errors >= state.lives
-      const endsRound = over || action.type !== 'wrong' || action.endsRound
       return {
         ...state,
         errors,
-        over,
-        outcome: endsRound ? 'failed' : null,
+        over: errors >= state.lives,
+        outcome: 'failed',
         timedOut: action.type === 'timeout',
         guesses: action.guess ? [...state.guesses, action.guess] : state.guesses,
         wrongPicks: action.pick != null ? [...state.wrongPicks, action.pick] : state.wrongPicks,
       }
     }
+    // Live room: everyone else is out, this player wins
+    case 'win':
+      return state.over ? state : { ...state, over: true, won: true }
     // To round `index`: the next one once this one is over, or the room's round in a live room
     case 'goto': {
       if (state.over || action.index <= state.index) return state
@@ -187,7 +184,7 @@ export default function useSurvivalState({
         const answerName = target.properties.ADMIN
         const right = guessed.properties.ADMIN === answerName
         const guess = buildBorderGuess(guessed, normalize(input.trim()), right, answerName)
-        dispatch({ type: right ? 'right' : 'wrong', guess, endsRound: true })
+        dispatch({ type: right ? 'right' : 'wrong', guess })
         return right ? 'correct' : 'wrong'
       }
       default:
@@ -195,11 +192,11 @@ export default function useSurvivalState({
     }
   }, [playing, round])
 
-  // Quiz: the choice picked (one try per question)
+  // Quiz: the choice picked
   const chooseAnswer = useCallback((choiceId) => {
     if (!playing || round.type !== GAME_TYPES.QUIZ) return null
     const right = choiceId === round.question.correctId
-    dispatch({ type: right ? 'right' : 'wrong', pick: choiceId, endsRound: true })
+    dispatch({ type: right ? 'right' : 'wrong', pick: choiceId })
     return right ? 'correct' : 'wrong'
   }, [playing, round])
 
@@ -209,6 +206,7 @@ export default function useSurvivalState({
 
   const next = useCallback(() => dispatch({ type: 'goto', index: state.index + 1, at: Date.now() }), [state.index])
   const goTo = useCallback((index) => dispatch({ type: 'goto', index, at: Date.now() }), [])
+  const win = useCallback(() => dispatch({ type: 'win' }), [])
 
   return {
     round,
@@ -228,12 +226,14 @@ export default function useSurvivalState({
     elapsedMs,
     // Time left in the round (ms), or null without a time limit
     timeLeftMs: deadline == null ? null : Math.max(0, deadline - Date.now()),
-    oneTry: ONE_TRY.includes(round?.type),
     clickCountry,
     submitText,
     chooseAnswer,
     giveUp,
     next,
     goTo,
+    win,
+    // Every round of the run (a player out of lives keeps following the others' rounds in a live room)
+    rounds,
   }
 }

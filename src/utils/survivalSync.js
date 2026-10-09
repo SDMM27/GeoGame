@@ -7,6 +7,7 @@
 // (round: the round they are on, roundAt: when it started, server ms; lastSeen: server time of the write), and every
 // client works out the same schedule from these documents. Round 0 starts with the game (the room's startAt);
 // round k+1 starts REVEAL_MS after the last player finished round k, or after round k's time is up.
+// The game ends for everyone once a single player is left: the others out of lives, they win when done with that round.
 
 // The answer of a round stays on screen this long before the next round
 export const SURVIVAL_REVEAL_MS = 3000
@@ -50,6 +51,40 @@ export function furthestRound(entries) {
         : best,
     null
   )
+}
+
+/**
+ * The round after which `playerId` is the last player left: every other player who played round by round is out
+ * (`finished`), and this is the furthest round they reached. Null while someone else is still in the game, or when
+ * nobody else played in sync. `entries` carry the player's `id`.
+ */
+export function lastSurvivorRound(entries, playerId) {
+  const others = entries.filter((entry) => entry.id !== playerId && entry.round != null)
+  if (others.length === 0 || !others.every((entry) => entry.finished)) return null
+  return Math.max(...others.map((entry) => entry.round))
+}
+
+/** Whether another player who plays round by round is still in the game (a player out of lives can watch them). */
+export const othersStillIn = (entries, playerId) =>
+  entries.some((entry) => entry.id !== playerId && entry.round != null && !entry.finished)
+
+/**
+ * What a player out of lives sees of round `round`: every player who played round by round, those still in first
+ * (most lives first), then the others by the round they went out on.
+ * [{ id, pseudo, lives, out, outRound, answered }]: `answered`, done with round `round`; `outRound`, 0-based.
+ */
+export function spectatorRows(entries, names, round) {
+  return entries
+    .filter((entry) => entry.round != null)
+    .map((entry) => ({
+      id: entry.id,
+      pseudo: names?.[entry.id] ?? '?',
+      lives: entry.lives ?? 0,
+      out: Boolean(entry.finished),
+      outRound: entry.finished ? entry.round : null,
+      answered: !entry.finished && isRoundDone(entry, round),
+    }))
+    .sort((a, b) => Number(a.out) - Number(b.out) || (a.out ? b.outRound - a.outRound : b.lives - a.lives))
 }
 
 /** How many of the players in the round are done with it: { done, total }. */

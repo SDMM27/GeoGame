@@ -10,6 +10,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useFriendships } from '@shared/hooks/usePlayerProfile'
 import useLobbyHost from '@shared/hooks/useLobbyHost'
 import useMultiplayerRoom from '@shared/hooks/useMultiplayerRoom'
+import { sendFriendRequestTo } from '@shared/utils/friends'
 import { dismissInvite, inviteId, sendRoomInvite } from '@shared/utils/invites'
 import { containsProfanity } from '@shared/utils/profanity'
 import { currentGameIndex, isRoomFormat, nextGameToPlay, roomGames } from '@shared/utils/multiplayerRoom'
@@ -123,15 +124,36 @@ function Players({ room }: { room: Room }) {
 }
 
 type Friend = { id: string; uid: string; username: string }
+type Friendship = Friend & { status: 'friend' | 'incoming' | 'outgoing' }
 
 // Signed-in players invite their friends straight into the room; they get a banner in the app.
+// The room's other players with an account, not friends yet, can be added from here too.
 function InviteFriends({ room, account, color }: { room: Room; account: Account; color: string }) {
   const { t } = useTranslation()
   const friendships = useFriendships(account.uid)
   const [invited, setInvited] = useState<Record<string, 'sending' | 'sent' | 'failed'>>({})
+  const [adding, setAdding] = useState<Record<string, 'sending' | 'failed'>>({})
   const inRoom = new Set(Object.values(room.players).map((player) => player.uid).filter(Boolean))
 
   if (friendships.loading) return null
+
+  const known = new Map<string, Friendship>(friendships.all.map((item: Friendship) => [item.uid, item]))
+  const strangers = [...new Map(
+    Object.values(room.players)
+      .filter((player) => player.uid && player.uid !== account.uid && known.get(player.uid)?.status !== 'friend')
+      .map((player) => [player.uid!, player.pseudo])
+  )]
+
+  const addFriend = async (uid: string) => {
+    setAdding((previous) => ({ ...previous, [uid]: 'sending' }))
+    try {
+      await sendFriendRequestTo({ uid: account.uid, username: account.username }, uid, friendships.all)
+      setAdding(({ [uid]: _done, ...rest }) => rest)
+    } catch (error) {
+      console.warn('[friends]', error)
+      setAdding((previous) => ({ ...previous, [uid]: 'failed' }))
+    }
+  }
 
   const invite = async (friend: Friend) => {
     setInvited((previous) => ({ ...previous, [friend.uid]: 'sending' }))
@@ -181,6 +203,35 @@ function InviteFriends({ room, account, color }: { room: Room; account: Account;
             </View>
           )
         })
+      )}
+      {strangers.length > 0 && (
+        <>
+          <Text variant="label" style={{ marginTop: space.sm }}>
+            {t('mobile.invites.room_players')}
+          </Text>
+          {strangers.map(([uid, pseudo]) => {
+            const status = known.get(uid)?.status
+            return (
+              <View key={uid} style={styles.playerRow}>
+                <Avatar username={pseudo} size={32} />
+                <Text variant="body" numberOfLines={1} style={{ flex: 1 }}>
+                  {pseudo}
+                </Text>
+                {status === 'outgoing' ? (
+                  <Pill label={t('mobile.invites.request_sent')} color={color} icon={<MaterialCommunityIcons name="check" size={14} color={color} />} />
+                ) : (
+                  <Button
+                    label={t(adding[uid] === 'failed' ? 'mobile.invites.retry' : status === 'incoming' ? 'mobile.invites.accept' : 'mobile.invites.add_friend')}
+                    variant="secondary"
+                    onPress={() => addFriend(uid)}
+                    loading={adding[uid] === 'sending'}
+                    style={styles.inviteButton}
+                  />
+                )}
+              </View>
+            )
+          })}
+        </>
       )}
     </View>
   )

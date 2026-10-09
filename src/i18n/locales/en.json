@@ -179,6 +179,11 @@
     "start_new_game": "Start a new country to continue."
   },
   "country_clue": {
+    "closer": "{{km}} km closer",
+    "farther": "{{km}} km farther",
+    "same_distance": "Same distance",
+    "closest": "Closest",
+    "your_guesses": "Your guesses",
     "daily_title": "Daily Country Clue",
     "infinite_title": "Infinite Country Clue",
     "daily_subtitle": "A mystery country to find today. Daily puzzle.",
@@ -545,7 +550,27 @@
     "favorite": "Favorite game",
     "sign_in_title": "Your player profile",
     "sign_in_pitch": "Sign in to keep your game history, follow your stats, unlock achievements and play with your friends.",
-    "show_less": "Show less"
+    "show_less": "Show less",
+    "details": {
+      "title": "Game details",
+      "played_at": "Played on",
+      "daily": "Daily challenge of",
+      "result": "Result",
+      "score": "Score",
+      "found": "Countries found",
+      "correct": "Correct answers",
+      "attempts": "Attempts",
+      "optimal": "Optimal route",
+      "errors": "Mistakes",
+      "total_error": "Total gap",
+      "hints": "Hints",
+      "best_streak": "Best streak",
+      "lives": "Lives",
+      "time": "Time",
+      "room": "Room",
+      "open_room": "Open the room",
+      "close": "Close"
+    }
   },
   "friends": {
     "title": "Friends",
@@ -686,6 +711,11 @@
     "you": "You"
   },
   "mp_room": {
+    "add_players": "Add players from this game",
+    "add_friend": "Add friend",
+    "accept_friend": "Accept",
+    "request_sent": "Request sent",
+    "retry": "Retry",
     "live": "Live",
     "challenge": "Challenge",
     "from_app": "Game created in the mobile app",
@@ -732,6 +762,12 @@
     "waiting_next": "Waiting for the next game…"
   },
   "survival": {
+    "spectating": "Watching the players still in",
+    "out_round": "out in round {{n}}",
+    "back_to_room": "Back to the room",
+    "last_standing": "🏆 Last one standing: you win!",
+    "ask_flag": "Name the COUNTRY of this flag",
+    "ask_capital": "Name the CAPITAL of this country",
     "choose_games": "Rounds",
     "choose_lives": "Lives",
     "pick_one_game": "Pick at least one game.",

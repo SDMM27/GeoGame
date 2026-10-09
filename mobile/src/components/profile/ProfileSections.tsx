@@ -3,13 +3,13 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { router, useFocusEffect } from 'expo-router'
 import { useCallback, useState, type ComponentProps, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ActivityIndicator, StyleSheet, View } from 'react-native'
+import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native'
 
 import { usePlayerProfile } from '@shared/hooks/usePlayerProfile'
-import { describeBest, describeMode, describeResult, formatPlayedAt } from '@shared/utils/profileFormat'
+import { describeBest, describeDetails, describeMode, describeResult, formatPlayedAt } from '@shared/utils/profileFormat'
 import { DAILY_GAME_TYPES, formatPlayTime } from '@shared/utils/profileStats'
 
-import { Text, Touchable } from '@/components/ui'
+import { Button, Text, Touchable } from '@/components/ui'
 import { getGameByType } from '@/games'
 import { colors, fonts, radius, space } from '@/theme'
 
@@ -258,39 +258,89 @@ export function ByGameSection({ stats }: { stats: ProfileStats }) {
 
 export function GameHistoryRow({ game, divider }: { game: HistoryGame; divider?: boolean }) {
   const { t, i18n } = useTranslation()
+  const [open, setOpen] = useState(false)
   const meta = getGameByType(game.gameType)
   if (!meta) return null
-  // A multiplayer game reopens its room, with the results of every player.
-  const roomCode = game.mode === 'multi' && typeof game.roomCode === 'string' ? game.roomCode : null
-  const Row = roomCode ? Touchable : View
   return (
-    <Row
-      {...(roomCode && {
-        accessibilityRole: 'button' as const,
-        onPress: () => router.push({ pathname: '/multi/[code]', params: { code: roomCode } }),
-      })}
-      style={[styles.listRow, divider && styles.listDivider]}>
-      <View style={[styles.gameIcon, { backgroundColor: `${meta.color}1F` }]}>
-        <MaterialCommunityIcons name={meta.icon} size={20} color={meta.color} />
-      </View>
-      <View style={{ flex: 1 }}>
-        <Text variant="bodyStrong" numberOfLines={1}>
-          {t(meta.titleKey)}
-        </Text>
-        <Text variant="caption" numberOfLines={1}>
-          {describeMode(game, t)}
-        </Text>
-      </View>
-      <View style={{ alignItems: 'flex-end', maxWidth: '45%' }}>
-        <Text variant="bodyStrong" numberOfLines={1} style={{ fontSize: 13 }} color={game.solved === false ? colors.danger : colors.text}>
-          {describeResult(game, t)}
-        </Text>
-        <Text variant="caption" style={{ fontSize: 12 }}>
-          {formatPlayedAt(game.playedAt, i18n.language)}
-        </Text>
-      </View>
-      {roomCode && <MaterialCommunityIcons name="chevron-right" size={20} color={colors.textFaint} />}
-    </Row>
+    <>
+      <Touchable
+        accessibilityRole="button"
+        accessibilityLabel={t('profile.details.title')}
+        onPress={() => setOpen(true)}
+        style={[styles.listRow, divider && styles.listDivider]}>
+        <View style={[styles.gameIcon, { backgroundColor: `${meta.color}1F` }]}>
+          <MaterialCommunityIcons name={meta.icon} size={20} color={meta.color} />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text variant="bodyStrong" numberOfLines={1}>
+            {t(meta.titleKey)}
+          </Text>
+          <Text variant="caption" numberOfLines={1}>
+            {describeMode(game, t)}
+          </Text>
+        </View>
+        <View style={{ alignItems: 'flex-end', maxWidth: '45%' }}>
+          <Text variant="bodyStrong" numberOfLines={1} style={{ fontSize: 13 }} color={game.solved === false ? colors.danger : colors.text}>
+            {describeResult(game, t)}
+          </Text>
+          <Text variant="caption" style={{ fontSize: 12 }}>
+            {formatPlayedAt(game.playedAt, i18n.language)}
+          </Text>
+        </View>
+        <MaterialCommunityIcons name="chevron-right" size={20} color={colors.textFaint} />
+      </Touchable>
+      <GameDetailModal game={game} visible={open} onClose={() => setOpen(false)} />
+    </>
+  )
+}
+
+// Everything recorded for one game of the history. A multiplayer game can reopen its room, with every player's results.
+function GameDetailModal({ game, visible, onClose }: { game: HistoryGame; visible: boolean; onClose: () => void }) {
+  const { t, i18n } = useTranslation()
+  const meta = getGameByType(game.gameType)
+  if (!meta) return null
+  const roomCode = game.mode === 'multi' && typeof game.roomCode === 'string' ? game.roomCode : null
+  const rows = describeDetails(game, t, i18n.language) as { key: string; label: string; value: string; failed?: boolean }[]
+  return (
+    <Modal transparent visible={visible} animationType="fade" onRequestClose={onClose}>
+      <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel={t('profile.details.close')}>
+        <Pressable style={styles.sheet} onPress={(event) => event.stopPropagation()}>
+          <View style={styles.sheetHeader}>
+            <View style={[styles.gameIcon, { backgroundColor: `${meta.color}1F` }]}>
+              <MaterialCommunityIcons name={meta.icon} size={20} color={meta.color} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text variant="heading" numberOfLines={1}>
+                {t(meta.titleKey)}
+              </Text>
+              <Text variant="caption" numberOfLines={1}>
+                {describeMode(game, t)}
+              </Text>
+            </View>
+          </View>
+          <ScrollView style={{ flexGrow: 0 }}>
+            {rows.map((row) => (
+              <View key={row.key} style={styles.detailRow}>
+                <Text variant="caption">{row.label}</Text>
+                <Text variant="bodyStrong" style={styles.detailValue} color={row.failed ? colors.danger : colors.text}>
+                  {row.value.charAt(0).toUpperCase() + row.value.slice(1)}
+                </Text>
+              </View>
+            ))}
+          </ScrollView>
+          {roomCode && (
+            <Button
+              label={t('profile.details.open_room')}
+              onPress={() => {
+                onClose()
+                router.push({ pathname: '/multi/[code]', params: { code: roomCode } })
+              }}
+            />
+          )}
+          <Button label={t('profile.details.close')} variant="secondary" onPress={onClose} />
+        </Pressable>
+      </Pressable>
+    </Modal>
   )
 }
 
@@ -387,5 +437,28 @@ const styles = StyleSheet.create({
   list: { borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
   listRow: { flexDirection: 'row', alignItems: 'center', gap: space.md, paddingHorizontal: space.md, paddingVertical: space.md },
   listDivider: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },
+  backdrop: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, backgroundColor: 'rgba(0, 0, 0, 0.6)' },
+  sheet: {
+    width: '100%',
+    maxWidth: 420,
+    maxHeight: '90%',
+    gap: space.sm,
+    padding: space.xl,
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  sheetHeader: { flexDirection: 'row', alignItems: 'center', gap: space.md, marginBottom: space.xs },
+  detailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: space.lg,
+    paddingVertical: space.sm,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.border,
+  },
+  detailValue: { flexShrink: 1, textAlign: 'right', fontSize: 14 },
   gameIcon: { width: 38, height: 38, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },
 })

@@ -45,11 +45,22 @@ export async function fetchPlayer(uid) {
 export async function sendFriendRequest(me, username, known = []) {
   const player = await findPlayer(username)
   if (!player) throw new FriendError('not_found')
+  return requestFriendship(me, player, known)
+}
+
+// Same, for a player met in a multiplayer room (the room only gives their uid: the username comes from their account).
+export async function sendFriendRequestTo(me, uid, known = []) {
+  const player = await fetchPlayer(uid)
+  if (!player) throw new FriendError('not_found')
+  return requestFriendship(me, player, known)
+}
+
+async function requestFriendship(me, player, known) {
   if (player.uid === me.uid) throw new FriendError('self')
   const existing = known.find((item) => item.uid === player.uid)
   if (existing) {
     // They already asked: accepting is what the player means.
-    if (existing.status === 'incoming') return acceptFriendRequest(existing.id)
+    if (existing.status === 'incoming') return acceptFriendRequest(existing.id).then(() => player)
     throw new FriendError(existing.status === 'friend' ? 'already_friends' : 'already_sent')
   }
   await setDoc(doc(firestore, 'friendships', friendshipId(me.uid, player.uid)), {

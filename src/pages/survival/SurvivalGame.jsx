@@ -1,6 +1,8 @@
 // A survival run: lives, rounds of the chosen games, then the end screen.
-// Solo (SurvivalPage) or in a multiplayer room (`room`: { onProgress(state), onFinished(result) }).
-// `sync` (live rooms): { startAt, entries }, everyone plays the same round at the same time (useSurvivalSync).
+// Solo (SurvivalPage) or in a multiplayer room (`room`: { onProgress(state), onFinished(result, { stay }), onExit() }).
+// Live rooms: a player out of lives keeps watching the others (Spectator) until they leave or the game ends.
+// `sync` (live rooms): { startAt, entries, playerId }, everyone plays the same round at the same time (useSurvivalSync);
+// the last player left wins once done with the round where the others ran out of lives.
 import React, { useCallback, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
@@ -15,6 +17,8 @@ import { SURVIVAL_ROUND_ICONS } from '../../components/SurvivalOptions'
 import { DIFFICULTY_COLORS } from '../quiz/constants'
 import SurvivalForm from './SurvivalForm'
 import { BorderRound, PlacementRound, QuizRound, TypedRound, roundAnswer } from './SurvivalRounds'
+import { othersStillIn, spectatorRows } from '../../utils/survivalSync'
+import { localizeQuestion } from '../../utils/quizQuestions'
 import 'react-toastify/dist/ReactToastify.css'
 import './Survival.css'
 
@@ -34,6 +38,47 @@ function Hearts({ lives, maxLives }) {
   )
 }
 
+// Out of lives in a live room: the round the others are playing, who is still in, and the answer once they all answered
+function Spectator({ round, roundIndex, rows, waiting, maxLives, onExit }) {
+  const { t, i18n } = useTranslation()
+  const revealed = waiting.total > 0 && waiting.done === waiting.total
+  const iso = round?.country?.properties?.ISO_A2
+  const showsFlag = iso && (round.type === GAME_TYPES.FLAGS || round.type === GAME_TYPES.CAPITALS)
+  return (
+    <div className="survival-spectator">
+      <p className="survival-spectator-title">👀 {t('survival.spectating')}</p>
+      {round && (
+        <div className="survival-spectator-round">
+          <span className="survival-hud-label">
+            {t('survival.round', { n: roundIndex + 1 })} · {SURVIVAL_ROUND_ICONS[round.type]} {t(`survival.prompt.${round.type}`)}
+          </span>
+          {showsFlag && <img src={`/flags/${iso.toLowerCase()}.png`} alt="" className="survival-flag survival-flag--small" />}
+          {round.type === GAME_TYPES.QUIZ && <strong>{localizeQuestion(round.question, i18n.language, t).prompt}</strong>}
+          <span className={revealed ? 'survival-spectator-answer' : 'survival-muted'}>
+            {revealed ? t('survival.answer_was', { answer: roundAnswer(round, i18n.language, t) }) : t('survival.waiting_players', waiting)}
+          </span>
+        </div>
+      )}
+      <ul className="survival-spectator-list">
+        {rows.map((row) => (
+          <li key={row.id} className={row.out ? 'survival-spectator-row survival-spectator-row--out' : 'survival-spectator-row'}>
+            <span className="survival-spectator-name">{row.pseudo}</span>
+            {row.out ? (
+              <span>💀 {t('survival.out_round', { n: row.outRound + 1 })}</span>
+            ) : (
+              <>
+                <span>{maxLives > 5 ? `❤️ × ${row.lives}` : '❤️'.repeat(row.lives)}</span>
+                <span className="survival-spectator-status">{row.answered ? '✓' : '…'}</span>
+              </>
+            )}
+          </li>
+        ))}
+      </ul>
+      <button className="survival-btn" onClick={onExit}>{t('survival.back_to_room')}</button>
+    </div>
+  )
+}
+
 export default function SurvivalGame({
   modes,
   lives,
@@ -49,7 +94,7 @@ export default function SurvivalGame({
 }) {
   const { t, i18n } = useTranslation()
   const synced = Boolean(sync)
-  const shared = useSurvivalSync({ enabled: synced, startAt: sync?.startAt ?? 0, timer, entries: sync?.entries ?? NO_ENTRIES })
+  const shared = useSurvivalSync({ enabled: synced, startAt: sync?.startAt ?? 0, timer, entries: sync?.entries ?? NO_ENTRIES, playerId: sync?.playerId })
   const survival = useSurvivalState({
     modes,
     lives,
@@ -62,7 +107,7 @@ export default function SurvivalGame({
     autoAdvance: !synced,
     deadline: shared.deadline,
   })
-  const { round, roundIndex, totalRounds, score, errors, outcome, timedOut, isOver, isWon, elapsedMs, timeLeftMs, submitText, giveUp, next, goTo } = survival
+  const { round, roundIndex, totalRounds, score, errors, outcome, timedOut, isOver, isWon, elapsedMs, timeLeftMs, submitText, giveUp, next, goTo, win } = survival
   const modesKey = survivalModesKey(modes)
   // Only the preset ramps are ranked
   const rampName = matchSurvivalRamp(ramp)
@@ -71,6 +116,13 @@ export default function SurvivalGame({
   useEffect(() => {
     if (synced && shared.round > roundIndex) goTo(shared.round)
   }, [synced, shared.round, roundIndex, goTo])
+
+  // Live room: everyone else is out of lives, the game ends once this round is answered
+  const lastRound = shared.lastSurvivorRound
+  const lastStanding = synced && lastRound != null
+  useEffect(() => {
+    if (lastStanding && (roundIndex > lastRound || (roundIndex === lastRound && outcome))) win()
+  }, [lastStanding, lastRound, roundIndex, outcome, win])
 
   // Feedback of a typed answer or a click (a life lost, a name not recognised...)
   const notify = useCallback((result) => {
@@ -101,8 +153,10 @@ export default function SurvivalGame({
 
   const onFinished = room?.onFinished
   useEffect(() => {
-    if (isOver) onFinished?.({ score, errors, elapsedTime: elapsedMs, total: totalRounds })
+    // Live room: the result goes in, and the player stays to watch the others (or see the end) until they leave
+    if (isOver) onFinished?.({ score, errors, elapsedTime: elapsedMs, total: totalRounds }, { stay: synced && Boolean(room?.onExit) })
   }, [isOver]) // eslint-disable-line react-hooks/exhaustive-deps
+  const spectating = synced && isOver && !isWon && othersStillIn(sync.entries, sync.playerId)
 
   useRecordGame(
     isOver && !room
@@ -177,10 +231,26 @@ export default function SurvivalGame({
         )}
       </footer>
 
-      {isOver && (
+      {spectating && (
         <div className="game-over-overlay">
           <div className="game-over-content survival-over">
-            <h2>{isWon ? t('survival.victory') : t('survival.game_over')}</h2>
+            <h2>{t('survival.game_over')}</h2>
+            <Spectator
+              round={survival.rounds[shared.round] ?? null}
+              roundIndex={shared.round}
+              rows={spectatorRows(sync.entries, sync.names, shared.round)}
+              waiting={shared.waiting}
+              maxLives={lives}
+              onExit={room.onExit}
+            />
+          </div>
+        </div>
+      )}
+
+      {isOver && !spectating && (
+        <div className="game-over-overlay">
+          <div className="game-over-content survival-over">
+            <h2>{isWon ? t(lastStanding ? 'survival.last_standing' : 'survival.victory') : t('survival.game_over')}</h2>
             {!isWon && round && <p className="survival-muted">{t('survival.answer_was', { answer: roundAnswer(round, i18n.language, t) })}</p>}
             <div className="survival-over-stats">
               <div><strong>{score}</strong><small>{t('survival.rounds_survived')}</small></div>
@@ -188,7 +258,11 @@ export default function SurvivalGame({
               <div><strong>{lives} ❤️</strong><small>{t('survival.lives_at_start')}</small></div>
             </div>
             {room ? (
-              <p className="survival-muted">{t('game_over.waiting_players')}</p>
+              synced && room.onExit ? (
+                <button className="survival-btn" onClick={room.onExit}>{t('survival.back_to_room')}</button>
+              ) : (
+                <p className="survival-muted">{t('game_over.waiting_players')}</p>
+              )
             ) : (
               <>
                 {rampName ? (

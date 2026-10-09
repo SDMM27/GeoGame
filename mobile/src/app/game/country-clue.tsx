@@ -20,7 +20,7 @@ import { useAccount } from '@/account/auth'
 import { DailyLeaderboard } from '@/components/game/DailyLeaderboard'
 import { DailyPlayedElsewhere } from '@/components/game/DailyPlayedElsewhere'
 import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
-import { ClueGuessCard, type ClueGuess, type ClueProgress } from '@/components/game/GuessCards'
+import { ClueGuessCard, ClueGuessSummary, type ClueGuess, type ClueProgress } from '@/components/game/GuessCards'
 import { GuessInputBar } from '@/components/game/GuessInputBar'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
 import { GuessesMap } from '@/components/map/GuessesMap'
@@ -267,7 +267,7 @@ function CountryClueGame({ mode, play }: { mode: string; play?: RoomPlay }) {
           {guesses.length > 0 && (
             <View style={{ gap: space.sm }}>
               <Text variant="bodyStrong">{t('country_clue.your_guesses')}</Text>
-              {guessCards}
+              <ClueGuessSummary guesses={guesses as ClueGuess[]} progress={progress} />
             </View>
           )}
           <DailyLeaderboard gameType={GAME_TYPES.COUNTRY_CLUE} dailyKey={dailyKey} refreshKey={leaderboardVersion} />

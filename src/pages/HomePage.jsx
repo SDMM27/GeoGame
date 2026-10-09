@@ -29,6 +29,9 @@ export default function HomePage() {
           <button className="home-multiplayer-btn" onClick={() => navigate('/multiplayer')}>
             {t('home.multiplayer_button')}
           </button>
+          <button className="home-multiplayer-btn home-atlas-btn" onClick={() => navigate('/atlas')}>
+            🗺️ {t('atlas.title')}
+          </button>
         </div>
         <div className="games-grid">
           {GAMES.filter((game) => game.active).map((game) => (

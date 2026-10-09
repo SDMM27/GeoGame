@@ -1,4 +1,28 @@
 {
+  "atlas": {
+    "title": "Atlas",
+    "subtitle": "Explore la carte du monde : touche un pays pour voir sa fiche.",
+    "search_placeholder": "Chercher un pays…",
+    "no_results": "Aucun pays trouvé",
+    "capital": "Capitale",
+    "continent": "Continent",
+    "population": "Population",
+    "area": "Superficie",
+    "density": "Densité",
+    "gdp": "PIB",
+    "gdp_per_capita": "PIB par habitant",
+    "neighbors": "Pays frontaliers",
+    "no_neighbors": "Aucune frontière terrestre",
+    "rank": "{{rank}}ᵉ sur {{total}}",
+    "rank_first": "1ᵉʳ sur {{total}}",
+    "difficulty": "Difficulté dans les jeux",
+    "per_km2": "hab./km²",
+    "billion_usd": "{{value}} Md $",
+    "usd": "{{value}} $",
+    "close": "Fermer",
+    "unknown": "Non renseigné",
+    "open": "Ouvrir l’atlas"
+  },
   "continents": {
     "Europe": "Europe",
     "Asie": "Asie",
@@ -834,6 +858,10 @@
     "ramp_custom_hint": "Montée personnalisée : la partie ne compte pas pour le classement."
   },
   "seo": {
+    "atlas": {
+      "title": "Atlas du monde interactif : fiches pays | GeoGame",
+      "description": "Explore la carte du monde et découvre chaque pays : capitale, population, superficie, PIB et pays frontaliers."
+    },
     "home": {
       "title": "GeoGame — Jeux de géographie gratuits : pays, drapeaux, capitales",
       "description": "Jeux de géographie gratuits en ligne : place les pays sur la carte, reconnais les drapeaux, trouve les capitales, défi du jour, quiz et parties multijoueurs entre amis."

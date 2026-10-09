@@ -1,7 +1,7 @@
 {
   "rewrites": [
     {
-      "source": "/:page(game|flag-game|capitals-game|border-guess|country-clue|voyage-voyage|ranking|quiz|survival|multiplayer|scores)",
+      "source": "/:page(game|flag-game|capitals-game|border-guess|country-clue|voyage-voyage|ranking|quiz|survival|atlas|multiplayer|scores)",
       "destination": "/:page/index.html"
     },
     { "source": "/((?!api/).*)", "destination": "/index.html" }

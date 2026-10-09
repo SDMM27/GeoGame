@@ -39,7 +39,8 @@ export default function RoomGame({ room, progress, results, playerId, onDone }) 
 
   const onCountryFound = useCallback(() => reportFound(foundRef.current + 1), [reportFound])
 
-  const onGameFinished = useCallback(({ weightedScore, countriesSolved, attempts, elapsedTime }) => {
+  // `stay`: the result is sent but the game stays on screen (survival: watch the others), until onDone is called
+  const onGameFinished = useCallback(({ weightedScore, countriesSolved, attempts, elapsedTime }, { stay = false } = {}) => {
     if (doneRef.current) return
     doneRef.current = true
     // Same result as the app: Border Guess / Country Clue score the countries found
@@ -56,7 +57,7 @@ export default function RoomGame({ room, progress, results, playerId, onDone }) 
       reportProgress(room.id, playerId, { gameIndex, found: solved, total, finished: true }),
     ])
       .catch(console.error)
-      .finally(() => onDone(gameIndex))
+      .finally(() => { if (!stay) onDone(gameIndex) })
   }, [game, room.id, playerId, pseudo, gameIndex, total, onDone])
 
   // Survival: rounds cleared and lives left as they change (and the round, in a live room), then the rounds
@@ -66,9 +67,10 @@ export default function RoomGame({ room, progress, results, playerId, onDone }) 
       if (doneRef.current) return
       reportProgress(room.id, playerId, { gameIndex, found: score, total, finished: false, ...state }).catch(console.error)
     },
-    onFinished: ({ score, errors, elapsedTime }) =>
-      onGameFinished({ weightedScore: score, countriesSolved: score, attempts: errors, elapsedTime }),
-  }), [room.id, playerId, gameIndex, total, onGameFinished])
+    onFinished: ({ score, errors, elapsedTime }, options) =>
+      onGameFinished({ weightedScore: score, countriesSolved: score, attempts: errors, elapsedTime }, options),
+    onExit: () => onDone(gameIndex),
+  }), [room.id, playerId, gameIndex, total, onGameFinished, onDone])
 
   const quizRoom = useMemo(() => ({
     seed,
@@ -112,6 +114,11 @@ export default function RoomGame({ room, progress, results, playerId, onDone }) 
     [progress, gameIndex]
   )
 
+  const playerNames = useMemo(
+    () => Object.fromEntries(Object.entries(room.players ?? {}).map(([id, player]) => [id, player.pseudo])),
+    [room.players]
+  )
+
   const renderGame = () => {
     switch (game.type) {
       case GAME_TYPES.PLACEMENT: return <MultiplayerPlacementGame {...setupProps} />
@@ -133,7 +140,7 @@ export default function RoomGame({ room, progress, results, playerId, onDone }) 
             snapshot={survivalSnapshot}
             snapshotKey={snapKey}
             room={survivalRoom}
-            sync={synced ? { startAt, entries: survivalEntries, playerId } : null}
+            sync={synced ? { startAt, entries: survivalEntries, playerId, names: playerNames } : null}
           />
         )
       default: return null

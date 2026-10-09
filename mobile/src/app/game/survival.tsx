@@ -2,6 +2,7 @@
 // Game rules come from the website hooks (useSurvivalState, and useSurvivalSync for the round by round play of
 // live rooms); each round is drawn in components/survival/SurvivalRounds.
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
+import { Image } from 'expo-image'
 import { useLocalSearchParams } from 'expo-router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -28,7 +29,8 @@ import {
   parseSurvivalModes,
   survivalModesKey,
 } from '@shared/utils/survivalConfig'
-import { SURVIVAL_LATE_MS } from '@shared/utils/survivalSync'
+import { localizeQuestion } from '@shared/utils/quizQuestions'
+import { SURVIVAL_LATE_MS, othersStillIn, spectatorRows } from '@shared/utils/survivalSync'
 
 import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
@@ -46,6 +48,7 @@ import { Button, Text } from '@/components/ui'
 import { DIFFICULTY_COLORS, getGameByType } from '@/games'
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible'
 import { RoomGate, RoomHudPill, Standings, type RoomPlay } from '@/multiplayer/RoomPlay'
+import { getFlag } from '@/flags'
 import { getPlayerId, type PlayerProgress } from '@/multiplayer/room'
 import { navigate } from '@/shims/react-router-dom'
 import { toast } from '@/shims/react-toastify'
@@ -64,7 +67,60 @@ function parseRamp(value?: string) {
 }
 
 // Live rooms: the room's start and its players' progress, to play round by round
-type Sync = { startAt: number; entries: unknown[]; playerId: string }
+type Sync = { startAt: number; entries: unknown[]; playerId: string; names: Record<string, string> }
+
+type SpectatorRow = { id: string; pseudo: string; lives: number; out: boolean; outRound: number | null; answered: boolean }
+
+// Out of lives in a live room: the round the others are playing, who is still in, and the answer once they all answered
+function Spectator({ round, roundIndex, rows, waiting, maxLives }: {
+  round: any
+  roundIndex: number
+  rows: SpectatorRow[]
+  waiting: { done: number; total: number }
+  maxLives: number
+}) {
+  const { t, i18n } = useTranslation()
+  const revealed = waiting.total > 0 && waiting.done === waiting.total
+  const iso: string | undefined = round?.country?.properties?.ISO_A2
+  const flag = iso && (round.type === GAME_TYPES.FLAGS || round.type === GAME_TYPES.CAPITALS) ? getFlag(iso) : null
+  const roundGame = round ? getGameByType(round.type) : null
+  return (
+    <View style={styles.spectator}>
+      <Text variant="label">👀 {t('survival.spectating')}</Text>
+      {round && (
+        <View style={{ alignItems: 'center', gap: space.sm }}>
+          <Text variant="bodyStrong" color={roundGame?.color}>
+            {t('survival.round', { n: roundIndex + 1 })} · {t(`survival.prompt.${round.type}`)}
+          </Text>
+          {flag && <Image source={flag} contentFit="contain" style={{ width: 96, height: 64 }} />}
+          {round.type === GAME_TYPES.QUIZ && (
+            <Text variant="body" style={{ textAlign: 'center' }}>{localizeQuestion(round.question, i18n.language, t).prompt}</Text>
+          )}
+          <Text variant={revealed ? 'bodyStrong' : 'caption'} color={revealed ? colors.accent : undefined} style={{ textAlign: 'center' }}>
+            {revealed ? t('survival.answer_was', { answer: roundAnswer(round, i18n.language, t) }) : t('survival.waiting_players', waiting)}
+          </Text>
+        </View>
+      )}
+      {rows.map((row) => (
+        <View key={row.id} style={[styles.spectatorRow, row.out && { opacity: 0.5 }]}>
+          <Text variant="bodyStrong" numberOfLines={1} style={{ flex: 1 }}>{row.pseudo}</Text>
+          {row.out ? (
+            <Text variant="caption">💀 {t('survival.out_round', { n: (row.outRound ?? 0) + 1 })}</Text>
+          ) : (
+            <>
+              <Text variant="body">{maxLives > 5 ? `❤️ × ${row.lives}` : '❤️'.repeat(row.lives)}</Text>
+              <MaterialCommunityIcons
+                name={row.answered ? 'check-circle' : 'dots-horizontal-circle-outline'}
+                size={18}
+                color={row.answered ? colors.accent : colors.textMuted}
+              />
+            </>
+          )}
+        </View>
+      ))}
+    </View>
+  )
+}
 
 type RunProps = {
   modes: string[]
@@ -110,6 +166,8 @@ function SurvivalRun({ modes, lives, timer, ramp, seed, snapshot = null, snapKey
   const lastRound = shared.lastSurvivorRound
   const lastStanding = synced && lastRound != null
   const { win } = state
+  // Out of lives while others are still in: watch them from the results sheet
+  const spectating = synced && isOver && !isWon && othersStillIn(sync!.entries, sync!.playerId)
   useEffect(() => {
     if (lastStanding && (roundIndex > lastRound || (roundIndex === lastRound && outcome))) win()
   }, [lastStanding, lastRound, roundIndex, outcome, win])
@@ -268,6 +326,15 @@ function SurvivalRun({ modes, lives, timer, ramp, seed, snapshot = null, snapKey
           onReplay={onReplay}
           onHome={play?.exit ?? (() => navigate('/'))}
           homeLabel={play ? t('mobile.multi.back_to_room') : undefined}>
+          {spectating && (
+            <Spectator
+              round={state.rounds[shared.round] ?? null}
+              roundIndex={shared.round}
+              rows={spectatorRows(sync!.entries, sync!.names, shared.round)}
+              waiting={shared.waiting}
+              maxLives={lives}
+            />
+          )}
           {play && <Standings code={play.room.id} gameIndex={play.room.gameIndex} />}
           {!play && !rampName && (
             <Text variant="caption" style={{ textAlign: 'center' }}>
@@ -304,6 +371,10 @@ function RoomRun({ play }: { play: RoomPlay }) {
       })),
     [progress, gameIndex]
   )
+  const names = useMemo(
+    () => Object.fromEntries(Object.entries(play.room.players ?? {}).map(([playerId, player]) => [playerId, player.pseudo])),
+    [play.room.players]
+  )
   return (
     <SurvivalRun
       modes={parseSurvivalModes(game.modes)}
@@ -314,7 +385,7 @@ function RoomRun({ play }: { play: RoomPlay }) {
       snapshot={snapshot}
       snapKey={snapKey}
       play={play}
-      sync={synced && startAt != null ? { startAt, entries, playerId: getPlayerId() } : null}
+      sync={synced && startAt != null ? { startAt, entries, playerId: getPlayerId(), names } : null}
     />
   )
 }
@@ -336,6 +407,15 @@ export default function SurvivalScreen() {
 }
 
 const styles = StyleSheet.create({
+  spectator: {
+    gap: space.sm,
+    padding: space.lg,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+  },
+  spectatorRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm, minHeight: 32 },
   content: { paddingHorizontal: space.xl, paddingBottom: space.xl, gap: space.lg },
   roundHeader: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   outcome: {

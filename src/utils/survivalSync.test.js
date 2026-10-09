@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
+  othersStillIn,
+  spectatorRows,
   lastSurvivorRound,
   SURVIVAL_MAX_WAIT_MS,
   SURVIVAL_REVEAL_MS,
@@ -77,5 +79,30 @@ describe('lastSurvivorRound', () => {
     expect(lastSurvivorRound([me, { id: 'late', finished: true }], 'me')).toBe(null)
     expect(lastSurvivorRound([me], 'me')).toBe(null)
     expect(lastSurvivorRound([{ id: 'a', round: 1, finished: true }], 'me')).toBe(1)
+  })
+})
+
+describe('spectating', () => {
+  const entries = [
+    { id: 'me', round: 2, finished: true, lives: 0 },
+    { id: 'a', round: 4, roundDone: true, finished: false, lives: 1 },
+    { id: 'b', round: 4, roundDone: false, finished: false, lives: 3 },
+    { id: 'c', round: 3, finished: true, lives: 0 },
+    { id: 'late', finished: false, lives: 2 },
+  ]
+  const names = { me: 'Moi', a: 'Ana', b: 'Bob', c: 'Cyd' }
+
+  it('knows when someone else is still in the game', () => {
+    expect(othersStillIn(entries, 'me')).toBe(true)
+    expect(othersStillIn(entries.filter((entry) => entry.id !== 'a' && entry.id !== 'b'), 'me')).toBe(false)
+  })
+
+  it('lists the players still in first, then the others by the round they went out on', () => {
+    expect(spectatorRows(entries, names, 4)).toEqual([
+      { id: 'b', pseudo: 'Bob', lives: 3, out: false, outRound: null, answered: false },
+      { id: 'a', pseudo: 'Ana', lives: 1, out: false, outRound: null, answered: true },
+      { id: 'c', pseudo: 'Cyd', lives: 0, out: true, outRound: 3, answered: false },
+      { id: 'me', pseudo: 'Moi', lives: 0, out: true, outRound: 2, answered: false },
+    ])
   })
 })

@@ -757,6 +757,9 @@
     "waiting_next": "En attente du jeu suivant…"
   },
   "survival": {
+    "spectating": "Tu regardes ceux qui restent en jeu",
+    "out_round": "éliminé manche {{n}}",
+    "back_to_room": "Retour à la salle",
     "last_standing": "🏆 Dernier survivant : tu gagnes !",
     "ask_flag": "Trouve le PAYS de ce drapeau",
     "ask_capital": "Trouve la CAPITALE de ce pays",

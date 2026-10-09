@@ -757,6 +757,9 @@
     "waiting_next": "Waiting for the next game…"
   },
   "survival": {
+    "spectating": "Watching the players still in",
+    "out_round": "out in round {{n}}",
+    "back_to_room": "Back to the room",
     "last_standing": "🏆 Last one standing: you win!",
     "ask_flag": "Name the COUNTRY of this flag",
     "ask_capital": "Name the CAPITAL of this country",

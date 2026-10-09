@@ -233,5 +233,7 @@ export default function useSurvivalState({
     next,
     goTo,
     win,
+    // Every round of the run (a player out of lives keeps following the others' rounds in a live room)
+    rounds,
   }
 }

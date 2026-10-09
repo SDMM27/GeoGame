@@ -64,6 +64,29 @@ export function lastSurvivorRound(entries, playerId) {
   return Math.max(...others.map((entry) => entry.round))
 }
 
+/** Whether another player who plays round by round is still in the game (a player out of lives can watch them). */
+export const othersStillIn = (entries, playerId) =>
+  entries.some((entry) => entry.id !== playerId && entry.round != null && !entry.finished)
+
+/**
+ * What a player out of lives sees of round `round`: every player who played round by round, those still in first
+ * (most lives first), then the others by the round they went out on.
+ * [{ id, pseudo, lives, out, outRound, answered }]: `answered`, done with round `round`; `outRound`, 0-based.
+ */
+export function spectatorRows(entries, names, round) {
+  return entries
+    .filter((entry) => entry.round != null)
+    .map((entry) => ({
+      id: entry.id,
+      pseudo: names?.[entry.id] ?? '?',
+      lives: entry.lives ?? 0,
+      out: Boolean(entry.finished),
+      outRound: entry.finished ? entry.round : null,
+      answered: !entry.finished && isRoundDone(entry, round),
+    }))
+    .sort((a, b) => Number(a.out) - Number(b.out) || (a.out ? b.outRound - a.outRound : b.lives - a.lives))
+}
+
 /** How many of the players in the round are done with it: { done, total }. */
 export function roundWaiting(entries, round) {
   const players = playersInRound(entries, round)

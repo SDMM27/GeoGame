@@ -426,3 +426,14 @@
     min-height: 55vh;
   }
 }
+
+/* Out of lives in a live room: watching the players still in */
+.survival-spectator { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+.survival-spectator-title { margin: 0; font-weight: 700; color: var(--text-secondary, #94a3b8); }
+.survival-spectator-round { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.survival-spectator-answer { font-weight: 700; color: #4ade80; }
+.survival-spectator-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; text-align: left; }
+.survival-spectator-row { display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 8px; background: #ffffff0d; }
+.survival-spectator-row--out { opacity: 0.55; }
+.survival-spectator-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.survival-spectator-status { width: 1.2rem; text-align: center; }

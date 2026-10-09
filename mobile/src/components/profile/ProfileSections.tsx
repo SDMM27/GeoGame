@@ -1,6 +1,6 @@
 // Building blocks of a player profile: stats, daily streak, achievements, per-game records and history.
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
-import { useFocusEffect } from 'expo-router'
+import { router, useFocusEffect } from 'expo-router'
 import { useCallback, useState, type ComponentProps, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
@@ -260,8 +260,16 @@ export function GameHistoryRow({ game, divider }: { game: HistoryGame; divider?:
   const { t, i18n } = useTranslation()
   const meta = getGameByType(game.gameType)
   if (!meta) return null
+  // A multiplayer game reopens its room, with the results of every player.
+  const roomCode = game.mode === 'multi' && typeof game.roomCode === 'string' ? game.roomCode : null
+  const Row = roomCode ? Touchable : View
   return (
-    <View style={[styles.listRow, divider && styles.listDivider]}>
+    <Row
+      {...(roomCode && {
+        accessibilityRole: 'button' as const,
+        onPress: () => router.push({ pathname: '/multi/[code]', params: { code: roomCode } }),
+      })}
+      style={[styles.listRow, divider && styles.listDivider]}>
       <View style={[styles.gameIcon, { backgroundColor: `${meta.color}1F` }]}>
         <MaterialCommunityIcons name={meta.icon} size={20} color={meta.color} />
       </View>
@@ -281,7 +289,8 @@ export function GameHistoryRow({ game, divider }: { game: HistoryGame; divider?:
           {formatPlayedAt(game.playedAt, i18n.language)}
         </Text>
       </View>
-    </View>
+      {roomCode && <MaterialCommunityIcons name="chevron-right" size={20} color={colors.textFaint} />}
+    </Row>
   )
 }
 

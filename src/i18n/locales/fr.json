@@ -706,6 +706,11 @@
     "you": "Toi"
   },
   "mp_room": {
+    "add_players": "Ajouter des joueurs de la partie",
+    "add_friend": "Ajouter en ami",
+    "accept_friend": "Accepter",
+    "request_sent": "Demande envoyée",
+    "retry": "Réessayer",
     "live": "En direct",
     "challenge": "Défi",
     "from_app": "Partie créée sur l'app mobile",

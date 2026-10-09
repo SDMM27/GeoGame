@@ -706,6 +706,11 @@
     "you": "You"
   },
   "mp_room": {
+    "add_players": "Add players from this game",
+    "add_friend": "Add friend",
+    "accept_friend": "Accept",
+    "request_sent": "Request sent",
+    "retry": "Retry",
     "live": "Live",
     "challenge": "Challenge",
     "from_app": "Game created in the mobile app",

@@ -545,7 +545,27 @@
     "favorite": "Jeu préféré",
     "sign_in_title": "Ton profil de joueur",
     "sign_in_pitch": "Connecte-toi pour garder l’historique de tes parties, suivre tes stats, débloquer des succès et jouer avec tes amis.",
-    "show_less": "Voir moins"
+    "show_less": "Voir moins",
+    "details": {
+      "title": "Détail de la partie",
+      "played_at": "Jouée le",
+      "daily": "Défi du",
+      "result": "Résultat",
+      "score": "Score",
+      "found": "Pays trouvés",
+      "correct": "Bonnes réponses",
+      "attempts": "Essais",
+      "optimal": "Trajet optimal",
+      "errors": "Erreurs",
+      "total_error": "Écart total",
+      "hints": "Indices",
+      "best_streak": "Meilleure série",
+      "lives": "Vies",
+      "time": "Durée",
+      "room": "Salon",
+      "open_room": "Voir le salon",
+      "close": "Fermer"
+    }
   },
   "friends": {
     "title": "Amis",

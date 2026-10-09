@@ -49,6 +49,16 @@ describe('ProfileView', () => {
     expect(screen.getByText('Oiseau de nuit')).toBeInTheDocument()
   })
 
+  it('opens the details of a past game', () => {
+    renderView()
+    fireEvent.click(screen.getByText('120 pts · 30/40'))
+    const dialog = screen.getByRole('dialog')
+    expect(dialog).toHaveTextContent('Pays trouvés30/40 (75 %)')
+    expect(dialog).toHaveTextContent('Durée01:30.000')
+    fireEvent.click(screen.getByLabelText('Fermer'))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
   it('explains an empty history', () => {
     renderView([])
     expect(screen.getByText(/Aucune partie enregistrée/)).toBeInTheDocument()

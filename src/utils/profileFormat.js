@@ -1,4 +1,5 @@
 // Labels for a game of the history (see gameHistory.js), shared by the website and the app.
+import { formatTime } from './formatTime'
 import { GAME_TYPES } from './gameTypes'
 
 const formatPoints = (score) => (Number.isInteger(score) ? String(score) : score.toFixed(1))
@@ -62,4 +63,40 @@ export function formatPlayedAt(playedAt, language) {
     month: 'short',
     ...(date.getFullYear() !== today.getFullYear() && { year: 'numeric' }),
   })
+}
+
+// Every field recorded for one game, as { key, label, value } rows for its detail sheet.
+export function describeDetails(game, t, language) {
+  const rows = []
+  const add = (key, value, extra) => {
+    if (value != null && value !== '') rows.push({ key, label: t(`profile.details.${key}`), value: String(value), ...extra })
+  }
+  const playedAt = new Date(game.playedAt)
+  add('played_at', playedAt.toLocaleString(language, { dateStyle: 'full', timeStyle: 'short' }))
+  if (game.mode === 'daily' && game.dailyKey) {
+    add('daily', new Date(`${game.dailyKey}T00:00:00Z`).toLocaleDateString(language, { dateStyle: 'long', timeZone: 'UTC' }))
+  }
+  if (game.solved != null) add('result', game.solved ? t('profile.solved') : t('profile.failed'), { failed: !game.solved })
+  if (game.score != null) {
+    add(
+      'score',
+      game.gameType === GAME_TYPES.SURVIVAL
+        ? t('survival.rounds_count', { count: game.score })
+        : `${formatPoints(game.score)} ${t('units.pts')}`
+    )
+  }
+  const ratio = (part, whole) =>
+    whole > 0 ? `${part}/${whole} (${new Intl.NumberFormat(language, { style: 'percent' }).format(part / whole)})` : null
+  if (game.found != null) add('found', ratio(game.found, game.total))
+  if (game.correct != null) add('correct', ratio(game.correct, game.answered))
+  add('attempts', game.attempts)
+  add('optimal', game.optimal)
+  add('errors', game.errors)
+  add('total_error', game.totalError)
+  add('hints', game.hints)
+  add('best_streak', game.bestStreak)
+  add('lives', game.lives)
+  if (game.elapsedTime > 0) add('time', formatTime(game.elapsedTime))
+  if (game.mode === 'multi') add('room', game.roomCode)
+  return rows
 }

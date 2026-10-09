@@ -545,7 +545,27 @@
     "favorite": "Favorite game",
     "sign_in_title": "Your player profile",
     "sign_in_pitch": "Sign in to keep your game history, follow your stats, unlock achievements and play with your friends.",
-    "show_less": "Show less"
+    "show_less": "Show less",
+    "details": {
+      "title": "Game details",
+      "played_at": "Played on",
+      "daily": "Daily challenge of",
+      "result": "Result",
+      "score": "Score",
+      "found": "Countries found",
+      "correct": "Correct answers",
+      "attempts": "Attempts",
+      "optimal": "Optimal route",
+      "errors": "Mistakes",
+      "total_error": "Total gap",
+      "hints": "Hints",
+      "best_streak": "Best streak",
+      "lives": "Lives",
+      "time": "Time",
+      "room": "Room",
+      "open_room": "Open the room",
+      "close": "Close"
+    }
   },
   "friends": {
     "title": "Friends",

@@ -129,6 +129,19 @@ export default function HomeScreen() {
           <GameRow key={game.id} game={game} index={index} />
         ))}
       </View>
+
+      <View style={{ paddingHorizontal: space.lg, marginTop: space.xxl }}>
+        <Touchable accessibilityRole="button" onPress={() => router.push('/atlas')} style={styles.gameRow}>
+          <View style={[styles.gameIcon, { backgroundColor: `${colors.highlight}22` }]}>
+            <MaterialCommunityIcons name="earth" size={28} color={colors.highlight} />
+          </View>
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text variant="bodyStrong">{t('atlas.title')}</Text>
+            <Text variant="caption">{t('atlas.subtitle')}</Text>
+          </View>
+          <MaterialCommunityIcons name="chevron-right" size={22} color={colors.textFaint} />
+        </Touchable>
+      </View>
     </ScrollView>
   )
 }

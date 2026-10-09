@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ATLAS_COUNTRIES, findAtlasCountry, getCountryInfo, searchAtlasCountries } from './countryInfo'
+import { ATLAS_COUNTRIES, findAtlasCountry, getCountryInfo, mainPartBounds, searchAtlasCountries } from './countryInfo'
 
 describe('getCountryInfo', () => {
   it('gathers what the data says about a country', () => {
@@ -31,5 +31,14 @@ describe('searchAtlasCountries', () => {
     expect(searchAtlasCountries('allem', 'fr')[0].properties.ADMIN).toBe('Allemagne')
     expect(searchAtlasCountries('germ', 'fr')[0].properties.ADMIN).toBe('Allemagne')
     expect(searchAtlasCountries('', 'fr')).toEqual([])
+  })
+})
+
+describe('mainPartBounds', () => {
+  it('frames the largest piece of land only', () => {
+    const square = (lng, lat, size) => [[[lng, lat], [lng + size, lat], [lng + size, lat + size], [lng, lat + size], [lng, lat]]]
+    const feature = { geometry: { type: 'MultiPolygon', coordinates: [square(-5, 42, 8), square(-54, 2, 1)] } }
+    expect(mainPartBounds(feature)).toEqual([[42, -5], [50, 3]])
+    expect(mainPartBounds({ geometry: null })).toBe(null)
   })
 })

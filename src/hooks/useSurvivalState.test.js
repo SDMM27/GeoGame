@@ -19,18 +19,33 @@ beforeEach(() => {
 afterEach(() => vi.useRealTimers())
 
 describe('useSurvivalState', () => {
-  it('costs a life per wrong answer and keeps the round going', () => {
+  it('costs one life per wrong answer, shows the answer, then moves on to the next round', () => {
     const { result } = play({ modes: [FLAGS], lives: 3, seed: 1 })
-    const answer = result.current.round.country.properties.ADMIN
     act(() => { result.current.submitText('zzzz') })
     expect(result.current.lives).toBe(2)
+    expect(result.current.outcome).toBe('failed')
+    // The round is over: no second try, no second life lost
+    expect(result.current.submitText('yyyy')).toBe(null)
+    expect(result.current.lives).toBe(2)
+    act(() => { vi.advanceTimersByTime(2500) })
+    expect(result.current.roundIndex).toBe(1)
     expect(result.current.outcome).toBe(null)
-    act(() => { result.current.submitText(answer) })
+    act(() => { result.current.submitText(result.current.round.country.properties.ADMIN) })
     expect(result.current.score).toBe(1)
     expect(result.current.outcome).toBe('correct')
     act(() => { vi.advanceTimersByTime(1000) })
-    expect(result.current.roundIndex).toBe(1)
-    expect(result.current.outcome).toBe(null)
+    expect(result.current.roundIndex).toBe(2)
+  })
+
+  it('ends a Placement round on the first wrong country', () => {
+    const { result } = play({ modes: [PLACEMENT], lives: 3, seed: 5 })
+    const answer = result.current.round.country.properties.ADMIN
+    const wrong = answer === 'France' ? 'Spain' : 'France'
+    act(() => { result.current.clickCountry(wrong) })
+    expect(result.current.lives).toBe(2)
+    expect(result.current.outcome).toBe('failed')
+    expect(result.current.clickCountry(answer)).toBe(null)
+    expect(result.current.lives).toBe(2)
   })
 
   it('ends the run on the last life', () => {
@@ -47,7 +62,7 @@ describe('useSurvivalState', () => {
     expect(result.current.score).toBe(0)
   })
 
-  it('gives Border Guess one try, and ignores names that are not countries', () => {
+  it('ignores Border Guess names that are not countries', () => {
     const { result } = play({ modes: [BORDER_GUESS], lives: 3, seed: 2 })
     const answer = result.current.round.country.properties.ADMIN
     expect(result.current.submitText('pas un pays')).toBe('unknown')
@@ -98,28 +113,17 @@ describe('useSurvivalState', () => {
     expect(result.current.wrongPicks).toEqual([wrongId])
   })
 
-  it('checks the country clicked on the map', () => {
-    const { result } = play({ modes: [PLACEMENT], lives: 3, seed: 5 })
-    const answer = result.current.round.country.properties.ADMIN
-    act(() => { result.current.clickCountry('Nowhere') })
-    let again
-    act(() => { again = result.current.clickCountry('Nowhere') })
-    expect(again).toBe('repeat')
-    expect(result.current.lives).toBe(2)
-    act(() => { result.current.clickCountry(answer) })
-    expect(result.current.score).toBe(1)
-  })
-
   it('saves and resumes a multiplayer run', () => {
     const key = 'mp_snap_TEST_p_0'
     const { result, unmount } = play({ modes: [FLAGS], lives: 3, seed: 1, snapshotKey: key })
     act(() => { result.current.submitText('zzzz') })
+    act(() => { vi.advanceTimersByTime(2500) })
     act(() => { result.current.submitText(result.current.round.country.properties.ADMIN) })
     const snapshot = loadSnapshot(key)
-    expect(snapshot).toMatchObject({ index: 1, errors: 1, score: 1 })
+    expect(snapshot).toMatchObject({ index: 2, errors: 1, score: 1 })
     unmount()
     const resumed = play({ modes: [FLAGS], lives: 3, seed: 1, snapshot, snapshotKey: key })
-    expect(resumed.result.current.roundIndex).toBe(1)
+    expect(resumed.result.current.roundIndex).toBe(2)
     expect(resumed.result.current.lives).toBe(2)
     expect(resumed.result.current.score).toBe(1)
   })

@@ -90,15 +90,18 @@ describe('cleanupExpired', () => {
     await db.doc('_clockSync/new').set({ t: ts(NOW - 1000) })
     await db.doc('invitePushes/OLD_bob').set({ at: NOW - PUSH_BOOKKEEPING_MAX_AGE_MS - 1000 })
     await db.doc('invitePushes/NEW_bob').set({ at: NOW - 1000 })
+    await db.doc('friendPushes/alice_bob_request').set({ at: NOW - PUSH_BOOKKEEPING_MAX_AGE_MS - 1000 })
+    await db.doc('friendPushes/alice_carol_request').set({ at: NOW - 1000 })
     await db.doc('invitePushLimits/alice').set({ start: NOW - PUSH_BOOKKEEPING_MAX_AGE_MS - 1000, count: 3 })
     await db.doc('invitePushLimits/carol').set({ start: NOW - 1000, count: 3 })
 
     const deleted = await cleanupExpired({ db, now: NOW })
 
-    expect(deleted).toEqual({ rooms: 0, invites: 1, _clockSync: 1, invitePushes: 1, invitePushLimits: 1 })
+    expect(deleted).toEqual({ rooms: 0, invites: 1, _clockSync: 1, invitePushes: 1, friendPushes: 1, invitePushLimits: 1 })
     expect(await exists('invites/NEW_bob')).toBe(true)
     expect(await exists('_clockSync/new')).toBe(true)
     expect(await exists('invitePushes/NEW_bob')).toBe(true)
+    expect(await exists('friendPushes/alice_carol_request')).toBe(true)
     expect(await exists('invitePushLimits/carol')).toBe(true)
   })
 

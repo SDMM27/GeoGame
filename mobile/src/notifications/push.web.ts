@@ -1,6 +1,7 @@
-// Web app: invite notifications through Web Push and the service worker (public/sw.js). On iPhone they need the app
-// added to the home screen (iOS 16.4+), and the permission can only be asked from a tap: see useWebPushPermission.
-// The pushes themselves are sent by api/invite-push (website), see src/utils/invites.js.
+// Web app: push notifications (invites, friend requests) through Web Push and the service worker (public/sw.js). On
+// iPhone they need the app added to the home screen (iOS 16.4+), and the permission can only be asked from a tap: see
+// useWebPushPermission.
+// The pushes themselves are sent by the website's API (api/invite-push, api/friend-push), see push.ts.
 import { deleteDoc, doc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -62,7 +63,7 @@ export async function forgetDevice() {
 }
 
 // Keeps the subscription registered once the permission is granted (asking for it takes a tap, see below).
-export function usePushNotifications(uid: string | null | undefined, _hasFriends: boolean) {
+export function usePushNotifications(uid: string | null | undefined) {
   useEffect(() => {
     if (!uid) return
     registerDevice(uid).catch((error) => console.warn('[push]', error?.code, error))

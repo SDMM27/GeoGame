@@ -23,7 +23,7 @@ import { auth, useAccount, type Account } from '@/account/auth'
 import { reauthenticateWithGoogle, signInWithGoogle } from '@/account/google'
 import { Avatar, ProfileBody, SectionTitle } from '@/components/profile/ProfileSections'
 import { Button, Pill, Segmented, Text, Touchable } from '@/components/ui'
-import { forgetDevice } from '@/notifications/push'
+import { forgetDevice, useWebPushPermission } from '@/notifications/push'
 import { colors, fonts, radius, space } from '@/theme'
 
 // This device stops receiving the account's invite notifications.
@@ -285,6 +285,8 @@ function AccountSettings({ account }: { account: Account }) {
         />
       </View>
 
+      <WebPushCard uid={account.uid} />
+
       {deleting ? (
         <View style={styles.card}>
           <Text variant="caption">{t(account.hasPassword ? 'account.delete_confirm' : 'account.delete_confirm_google')}</Text>
@@ -318,6 +320,32 @@ function AccountSettings({ account }: { account: Account }) {
             {t('account.delete')}
           </Text>
         </Touchable>
+      )}
+    </View>
+  )
+}
+
+// Web app only: Safari asks for the notification permission only from a tap, so the player turns them on here.
+function WebPushCard({ uid }: { uid: string }) {
+  const { t } = useTranslation()
+  const { state, enable } = useWebPushPermission(uid)
+  const [enabling, setEnabling] = useState(false)
+  if (state === 'unsupported') return null
+  return (
+    <View style={styles.card}>
+      <Text variant="bodyStrong">{t('mobile.invites.push_title')}</Text>
+      <Text variant="caption">{t(`mobile.invites.push_${state}`)}</Text>
+      {state === 'default' && (
+        <Button
+          label={t('mobile.invites.push_enable')}
+          variant="secondary"
+          loading={enabling}
+          onPress={() => {
+            setEnabling(true)
+            enable().finally(() => setEnabling(false))
+          }}
+          icon={<MaterialCommunityIcons name="bell-ring-outline" size={20} color={colors.text} />}
+        />
       )}
     </View>
   )

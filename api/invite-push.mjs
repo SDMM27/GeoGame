@@ -1,10 +1,12 @@
 // POST /api/invite-push  { inviteId }  with  Authorization: Bearer <Firebase ID token of the inviter>
 // Env: FIREBASE_SERVICE_ACCOUNT (the service account key JSON), EXPO_ACCESS_TOKEN (optional, if Expo's
-// enhanced push security is on). Against the emulators, FIRESTORE_EMULATOR_HOST / FIREBASE_AUTH_EMULATOR_HOST
+// enhanced push security is on), VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY / VAPID_SUBJECT (Web Push to the web app, optional:
+// `npx web-push generate-vapid-keys`; the public key is also EXPO_PUBLIC_VAPID_PUBLIC_KEY in the web app). Against the emulators, FIRESTORE_EMULATOR_HOST / FIREBASE_AUTH_EMULATOR_HOST
 // replace the key.
 import { cert, getApps, initializeApp } from 'firebase-admin/app'
 import { getAuth } from 'firebase-admin/auth'
 import { getFirestore } from 'firebase-admin/firestore'
+import webPush from 'web-push'
 
 import { sendInvitePush } from './_lib/invitePush.mjs'
 
@@ -12,6 +14,13 @@ function adminApp() {
   if (getApps().length) return getApps()[0]
   if (process.env.FIRESTORE_EMULATOR_HOST) return initializeApp({ projectId: process.env.GCLOUD_PROJECT ?? 'geogame-sdmm' })
   return initializeApp({ credential: cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)) })
+}
+
+function webPushClient() {
+  const { VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT } = process.env
+  if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) return null
+  webPush.setVapidDetails(VAPID_SUBJECT || 'https://geo-game-delta.vercel.app', VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)
+  return webPush
 }
 
 export default async function handler(req, res) {
@@ -31,6 +40,7 @@ export default async function handler(req, res) {
       idToken: req.headers.authorization?.replace(/^Bearer /, ''),
       inviteId: body.inviteId,
       accessToken: process.env.EXPO_ACCESS_TOKEN,
+      webPush: webPushClient(),
     })
     return res.status(status).json(result)
   } catch (error) {

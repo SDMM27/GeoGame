@@ -208,6 +208,20 @@ describe('push tokens keep their own rules', () => {
     await assertSucceeds(as('alice').doc('users/alice/pushTokens/ExponentPushToken[abc]').delete())
   })
 
+  it('accepts a Web Push subscription from the web app, and nothing else under it', async () => {
+    const web = (subscription, platform = 'web') => ({ token: 'abc123', lang: 'fr', platform, subscription, updatedAt: now() })
+    const subscription = { endpoint: 'https://web.push.apple.com/abc', keys: { p256dh: 'key', auth: 'secret' } }
+    const doc = (uid = 'alice') => as(uid).doc('users/alice/pushTokens/abc123')
+    await assertSucceeds(doc().set(web(subscription)))
+    await assertFails(doc('mallory').set(web(subscription)))
+    await assertFails(doc().set(web(subscription, 'ios')))
+    const { subscription: _, ...withoutSubscription } = web(subscription)
+    await assertFails(doc().set(withoutSubscription))
+    await assertFails(doc().set(web({ ...subscription, endpoint: 'http://web.push.apple.com/abc' })))
+    await assertFails(doc().set(web({ ...subscription, extra: 1 })))
+    await assertFails(doc().set(web({ ...subscription, keys: { ...subscription.keys, extra: 'x' } })))
+  })
+
   it("refuses writing another account's tokens, or unknown fields", async () => {
     await assertFails(as('mallory').doc('users/alice/pushTokens/ExponentPushToken[abc]').set(token()))
     await assertFails(as('alice').doc('users/alice/pushTokens/ExponentPushToken[abc]').set({ ...token(), extra: 1 }))

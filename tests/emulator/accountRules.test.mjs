@@ -222,6 +222,14 @@ describe('push tokens keep their own rules', () => {
     await assertFails(doc().set(web({ ...subscription, keys: { ...subscription.keys, extra: 'x' } })))
   })
 
+  it('lets the owner turn the daily reminder off on a device, as a boolean only', async () => {
+    const ref = as('alice').doc('users/alice/pushTokens/ExponentPushToken[abc]')
+    await assertSucceeds(ref.set(token()))
+    await assertSucceeds(ref.update({ dailyReminder: false }))
+    await assertFails(ref.update({ dailyReminder: 'no' }))
+    await assertFails(as('mallory').doc('users/alice/pushTokens/ExponentPushToken[abc]').update({ dailyReminder: true }))
+  })
+
   it("refuses writing another account's tokens, or unknown fields", async () => {
     await assertFails(as('mallory').doc('users/alice/pushTokens/ExponentPushToken[abc]').set(token()))
     await assertFails(as('alice').doc('users/alice/pushTokens/ExponentPushToken[abc]').set({ ...token(), extra: 1 }))

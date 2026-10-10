@@ -1,5 +1,6 @@
-// Service worker of the web app: shows the room invites pushed by api/invite-push (Web Push), and opens the room
-// when one is tapped. On iPhone this only works once the app is added to the home screen (iOS 16.4+).
+// Service worker of the web app: shows the notifications pushed by the website's API (Web Push: room invites, friend
+// requests, daily reminder), and opens the right screen when one is tapped. On iPhone this only works once the app is added to the
+// home screen (iOS 16.4+).
 self.addEventListener('install', () => self.skipWaiting())
 self.addEventListener('activate', (event) => event.waitUntil(self.clients.claim()))
 
@@ -16,17 +17,25 @@ self.addEventListener('push', (event) => {
       body: message.body || '',
       icon: '/icon-192.png',
       badge: '/icon-192.png',
-      // One notification per invite: inviting again replaces it.
-      tag: data.inviteId || undefined,
+      // One notification per invite, friend or day: a newer one replaces it.
+      tag: data.inviteId || (data.uid && `${data.type}-${data.uid}`) || data.type || undefined,
       data,
     })
   )
 })
 
+// Same screens as the app opens for a tapped notification (mobile/src/notifications/push.ts).
+function screenFor(data) {
+  if (data.type === 'invite' && data.room) return `/multi/${encodeURIComponent(data.room)}?invited=1`
+  if (data.type === 'friend_request') return '/friends'
+  if (data.type === 'friend_accepted' && data.uid) return `/player/${encodeURIComponent(data.uid)}`
+  // 'daily': the home screen and its daily challenges
+  return '/'
+}
+
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
-  const data = event.notification.data || {}
-  const path = data.type === 'invite' && data.room ? `/multi/${encodeURIComponent(data.room)}?invited=1` : '/'
+  const path = screenFor(event.notification.data || {})
   const url = new URL(path, self.location.origin).href
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windows) => {

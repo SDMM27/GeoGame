@@ -1,73 +1,76 @@
-// Push notifications for room invites: registers this device under the account, and opens the room when one is tapped.
-// The pushes themselves are sent by api/invite-push (website), see src/utils/invites.js.
+// Push notifications (room invites, friend requests, daily challenge reminder): registers this device under the account, and opens the right
+// screen when one is tapped. The pushes themselves are sent by the website's API: api/invite-push (src/utils/invites.js),
+// api/friend-push (src/utils/friends.js) and api/daily-reminder (once a day).
 import Constants from 'expo-constants'
 import * as Device from 'expo-device'
 import * as Notifications from 'expo-notifications'
 import { router } from 'expo-router'
-import { deleteDoc, doc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { useEffect } from 'react'
 import { Platform } from 'react-native'
 
-import { firestore } from '@shared/Firebase'
 import i18n from '@shared/i18n'
 
-const CHANNEL_ID = 'invites'
+import { saveDevice } from './device'
 
-// In the foreground the in-app banner (InviteBanner) already shows the invite.
+export { forgetDevice, useDailyReminder } from './device'
+
+// Android channels, one per kind, so each can be muted on its own in the system settings.
+const CHANNELS = { invites: 'mobile.invites.channel', friends: 'mobile.invites.friends_channel', daily: 'mobile.invites.daily_channel' }
+
+type PushData = { type?: string; room?: string; uid?: string }
+
+// In the foreground the in-app banner (InviteBanner) already shows an invite, and the daily reminder is pointless;
+// friend requests still show up.
 Notifications.setNotificationHandler({
-  handleNotification: async () => ({ shouldShowBanner: false, shouldShowList: false, shouldPlaySound: false, shouldSetBadge: false }),
+  handleNotification: async (notification) => {
+    const type = (notification.request.content.data as PushData | undefined)?.type
+    const show = type === 'friend_request' || type === 'friend_accepted'
+    return { shouldShowBanner: show, shouldShowList: show, shouldPlaySound: show, shouldSetBadge: false }
+  },
 })
 
-// Expo push token registered for the signed-in account, removed again on sign-out.
-let registered: { uid: string; token: string } | null = null
-
-// `ask`: show the permission prompt if it hasn't been answered yet (only once the player has friends to be invited by).
-async function registerDevice(uid: string, ask: boolean) {
+// Shows the permission prompt if it hasn't been answered yet: friend requests can come in from the first day.
+async function registerDevice(uid: string) {
   if (!Device.isDevice) return
   if (Platform.OS === 'android') {
     // Android 13+ only shows the permission prompt once a channel exists.
-    await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
-      name: i18n.t('mobile.invites.channel'),
-      importance: Notifications.AndroidImportance.HIGH,
-    })
+    for (const [id, name] of Object.entries(CHANNELS)) {
+      await Notifications.setNotificationChannelAsync(id, { name: i18n.t(name), importance: Notifications.AndroidImportance.HIGH })
+    }
   }
   let permission = await Notifications.getPermissionsAsync()
-  if (!permission.granted && ask && permission.canAskAgain) permission = await Notifications.requestPermissionsAsync()
+  if (!permission.granted && permission.canAskAgain) permission = await Notifications.requestPermissionsAsync()
   if (!permission.granted) return
 
   const projectId = Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId
   const { data: token } = await Notifications.getExpoPushTokenAsync({ projectId })
-  await setDoc(doc(firestore, 'users', uid, 'pushTokens', token), {
-    token,
-    lang: i18n.language?.slice(0, 2) || 'fr',
-    platform: Platform.OS,
-    updatedAt: serverTimestamp(),
-  })
-  registered = { uid, token }
+  await saveDevice(uid, token, { lang: i18n.language?.slice(0, 2) || 'fr', platform: Platform.OS })
 }
 
-// Call before signing out, while the account may still delete its own documents.
-export async function forgetDevice() {
-  if (!registered) return
-  const { uid, token } = registered
-  registered = null
-  await deleteDoc(doc(firestore, 'users', uid, 'pushTokens', token)).catch((error) => console.warn('[push]', error?.code, error))
-}
-
-export function usePushNotifications(uid: string | null | undefined, hasFriends: boolean) {
+export function usePushNotifications(uid: string | null | undefined) {
   useEffect(() => {
     if (!uid) return
-    registerDevice(uid, hasFriends).catch((error) => console.warn('[push]', error?.code, error))
-  }, [uid, hasFriends])
+    registerDevice(uid).catch((error) => console.warn('[push]', error?.code, error))
+  }, [uid])
 
-  // Tapped invite (app in the background or closed): straight into the room.
+  // Tapped notification (app in the background or closed): straight to the room, the requests, or the new friend.
   const response = Notifications.useLastNotificationResponse()
   useEffect(() => {
     if (!response || response.actionIdentifier !== Notifications.DEFAULT_ACTION_IDENTIFIER) return
-    const data = response.notification.request.content.data as { type?: string; room?: string } | undefined
-    if (data?.type !== 'invite' || !data.room) return
-    Notifications.clearLastNotificationResponseAsync()
-    router.push({ pathname: '/multi/[code]', params: { code: data.room, invited: '1' } })
+    const data = response.notification.request.content.data as PushData | undefined
+    if (data?.type === 'invite' && data.room) {
+      Notifications.clearLastNotificationResponseAsync()
+      router.push({ pathname: '/multi/[code]', params: { code: data.room, invited: '1' } })
+    } else if (data?.type === 'friend_request') {
+      Notifications.clearLastNotificationResponseAsync()
+      router.push('/friends')
+    } else if (data?.type === 'friend_accepted' && data.uid) {
+      Notifications.clearLastNotificationResponseAsync()
+      router.push({ pathname: '/player/[uid]', params: { uid: data.uid } })
+    } else if (data?.type === 'daily') {
+      Notifications.clearLastNotificationResponseAsync()
+      router.navigate('/')
+    }
   }, [response])
 }
 

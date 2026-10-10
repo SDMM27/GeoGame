@@ -3,10 +3,9 @@ import { router } from 'expo-router'
 import { useEffect, useState } from 'react'
 
 import { dismissInvite, watchInvites } from '@shared/utils/invites'
+import { requestPush } from '@shared/utils/pushApi'
 
-import { auth } from '@/account/auth'
 import type { GameId } from '@/games'
-import { API_ORIGIN } from '@/links'
 import type { RoomMode } from '@/multiplayer/room'
 
 export type Invite = { id: string; from: string; fromUsername: string; room: string; gameId: GameId; mode: RoomMode; at: number }
@@ -24,18 +23,8 @@ export function useInvites(uid: string | null | undefined): Invite[] {
 }
 
 // Asks the website to send the friend a push notification for this invite (best effort: the invite works without it).
-export async function notifyInvite(id: string) {
-  try {
-    const idToken = await auth.currentUser?.getIdToken()
-    if (!idToken) return
-    await fetch(`${API_ORIGIN}/api/invite-push`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${idToken}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ inviteId: id }),
-    })
-  } catch (error) {
-    console.warn('[push]', error)
-  }
+export function notifyInvite(id: string) {
+  return requestPush('invite-push', { inviteId: id })
 }
 
 // Opens the room and joins it straight away under the account's username.

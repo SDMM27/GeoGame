@@ -1,16 +1,16 @@
-// Web app: invite notifications through Web Push and the service worker (public/sw.js). On iPhone they need the app
-// added to the home screen (iOS 16.4+), and the permission can only be asked from a tap: see useWebPushPermission.
-// The pushes themselves are sent by api/invite-push (website), see src/utils/invites.js.
-import { deleteDoc, doc, serverTimestamp, setDoc } from 'firebase/firestore'
+// Web app: push notifications (invites, friend requests, daily reminder) through Web Push and the service worker (public/sw.js). On
+// iPhone they need the app added to the home screen (iOS 16.4+), and the permission can only be asked from a tap: see
+// useWebPushPermission.
+// The pushes themselves are sent by the website's API, see push.ts.
 import { useCallback, useEffect, useState } from 'react'
 
-import { firestore } from '@shared/Firebase'
 import i18n from '@shared/i18n'
 
-const VAPID_PUBLIC_KEY = process.env.EXPO_PUBLIC_VAPID_PUBLIC_KEY ?? ''
+import { saveDevice } from './device'
 
-// Web Push subscription registered for the signed-in account, removed again on sign-out.
-let registered: { uid: string; token: string } | null = null
+export { forgetDevice, useDailyReminder } from './device'
+
+const VAPID_PUBLIC_KEY = process.env.EXPO_PUBLIC_VAPID_PUBLIC_KEY ?? ''
 
 function supported() {
   return (
@@ -43,26 +43,15 @@ async function registerDevice(uid: string) {
   const { endpoint, keys } = subscription.toJSON()
   if (!endpoint || !keys?.p256dh || !keys?.auth) return
   const token = await endpointId(endpoint)
-  await setDoc(doc(firestore, 'users', uid, 'pushTokens', token), {
-    token,
+  await saveDevice(uid, token, {
     lang: i18n.language?.slice(0, 2) || 'fr',
     platform: 'web',
     subscription: { endpoint, keys: { p256dh: keys.p256dh, auth: keys.auth } },
-    updatedAt: serverTimestamp(),
   })
-  registered = { uid, token }
-}
-
-// Call before signing out, while the account may still delete its own documents.
-export async function forgetDevice() {
-  if (!registered) return
-  const { uid, token } = registered
-  registered = null
-  await deleteDoc(doc(firestore, 'users', uid, 'pushTokens', token)).catch((error) => console.warn('[push]', error?.code, error))
 }
 
 // Keeps the subscription registered once the permission is granted (asking for it takes a tap, see below).
-export function usePushNotifications(uid: string | null | undefined, _hasFriends: boolean) {
+export function usePushNotifications(uid: string | null | undefined) {
   useEffect(() => {
     if (!uid) return
     registerDevice(uid).catch((error) => console.warn('[push]', error?.code, error))

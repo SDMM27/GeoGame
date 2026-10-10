@@ -15,6 +15,7 @@ import {
 } from 'firebase/firestore'
 import { firestore } from '../Firebase'
 import { normalizeUsername } from './account'
+import { requestPush } from './pushApi'
 
 class FriendError extends Error {
   constructor(code) {
@@ -70,11 +71,18 @@ async function requestFriendship(me, player, known) {
     status: 'pending',
     createdAt: serverTimestamp(),
   })
+  notifyFriend(friendshipId(me.uid, player.uid))
   return player
 }
 
-export function acceptFriendRequest(id) {
-  return updateDoc(doc(firestore, 'friendships', id), { status: 'accepted', acceptedAt: serverTimestamp() })
+export async function acceptFriendRequest(id) {
+  await updateDoc(doc(firestore, 'friendships', id), { status: 'accepted', acceptedAt: serverTimestamp() })
+  notifyFriend(id)
+}
+
+// Push notification to the other player (api/friend-push), not awaited: the request or the answer is already saved.
+function notifyFriend(id) {
+  requestPush('friend-push', { friendshipId: id })
 }
 
 // Declines a request, cancels one sent, or removes a friend.

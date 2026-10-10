@@ -6,7 +6,10 @@
     },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
-  "crons": [{ "path": "/api/cleanup-expired", "schedule": "0 4 * * *" }],
+  "crons": [
+    { "path": "/api/cleanup-expired", "schedule": "0 4 * * *" },
+    { "path": "/api/daily-reminder", "schedule": "0 16 * * *" }
+  ],
   "headers": [
     {
       "source": "/(.*)",

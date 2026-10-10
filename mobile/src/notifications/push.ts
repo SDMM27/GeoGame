@@ -1,32 +1,33 @@
-// Push notifications (room invites, friend requests): registers this device under the account, and opens the right
-// screen when one is tapped. The pushes themselves are sent by the website's API: api/invite-push (src/utils/invites.js)
-// and api/friend-push (src/utils/friends.js).
+// Push notifications (room invites, friend requests, daily challenge reminder): registers this device under the account, and opens the right
+// screen when one is tapped. The pushes themselves are sent by the website's API: api/invite-push (src/utils/invites.js),
+// api/friend-push (src/utils/friends.js) and api/daily-reminder (once a day).
 import Constants from 'expo-constants'
 import * as Device from 'expo-device'
 import * as Notifications from 'expo-notifications'
 import { router } from 'expo-router'
-import { deleteDoc, doc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { useEffect } from 'react'
 import { Platform } from 'react-native'
 
-import { firestore } from '@shared/Firebase'
 import i18n from '@shared/i18n'
 
+import { saveDevice } from './device'
+
+export { forgetDevice, useDailyReminder } from './device'
+
 // Android channels, one per kind, so each can be muted on its own in the system settings.
-const CHANNELS = { invites: 'mobile.invites.channel', friends: 'mobile.invites.friends_channel' }
+const CHANNELS = { invites: 'mobile.invites.channel', friends: 'mobile.invites.friends_channel', daily: 'mobile.invites.daily_channel' }
 
 type PushData = { type?: string; room?: string; uid?: string }
 
-// In the foreground the in-app banner (InviteBanner) already shows an invite; friend requests still show up.
+// In the foreground the in-app banner (InviteBanner) already shows an invite, and the daily reminder is pointless;
+// friend requests still show up.
 Notifications.setNotificationHandler({
   handleNotification: async (notification) => {
-    const show = (notification.request.content.data as PushData | undefined)?.type !== 'invite'
+    const type = (notification.request.content.data as PushData | undefined)?.type
+    const show = type === 'friend_request' || type === 'friend_accepted'
     return { shouldShowBanner: show, shouldShowList: show, shouldPlaySound: show, shouldSetBadge: false }
   },
 })
-
-// Expo push token registered for the signed-in account, removed again on sign-out.
-let registered: { uid: string; token: string } | null = null
 
 // Shows the permission prompt if it hasn't been answered yet: friend requests can come in from the first day.
 async function registerDevice(uid: string) {
@@ -43,21 +44,7 @@ async function registerDevice(uid: string) {
 
   const projectId = Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId
   const { data: token } = await Notifications.getExpoPushTokenAsync({ projectId })
-  await setDoc(doc(firestore, 'users', uid, 'pushTokens', token), {
-    token,
-    lang: i18n.language?.slice(0, 2) || 'fr',
-    platform: Platform.OS,
-    updatedAt: serverTimestamp(),
-  })
-  registered = { uid, token }
-}
-
-// Call before signing out, while the account may still delete its own documents.
-export async function forgetDevice() {
-  if (!registered) return
-  const { uid, token } = registered
-  registered = null
-  await deleteDoc(doc(firestore, 'users', uid, 'pushTokens', token)).catch((error) => console.warn('[push]', error?.code, error))
+  await saveDevice(uid, token, { lang: i18n.language?.slice(0, 2) || 'fr', platform: Platform.OS })
 }
 
 export function usePushNotifications(uid: string | null | undefined) {
@@ -80,6 +67,9 @@ export function usePushNotifications(uid: string | null | undefined) {
     } else if (data?.type === 'friend_accepted' && data.uid) {
       Notifications.clearLastNotificationResponseAsync()
       router.push({ pathname: '/player/[uid]', params: { uid: data.uid } })
+    } else if (data?.type === 'daily') {
+      Notifications.clearLastNotificationResponseAsync()
+      router.navigate('/')
     }
   }, [response])
 }

@@ -1,5 +1,5 @@
 // Service worker of the web app: shows the notifications pushed by the website's API (Web Push: room invites, friend
-// requests), and opens the right screen when one is tapped. On iPhone this only works once the app is added to the
+// requests, daily reminder), and opens the right screen when one is tapped. On iPhone this only works once the app is added to the
 // home screen (iOS 16.4+).
 self.addEventListener('install', () => self.skipWaiting())
 self.addEventListener('activate', (event) => event.waitUntil(self.clients.claim()))
@@ -17,8 +17,8 @@ self.addEventListener('push', (event) => {
       body: message.body || '',
       icon: '/icon-192.png',
       badge: '/icon-192.png',
-      // One notification per invite or friend: a newer one replaces it.
-      tag: data.inviteId || (data.uid && `${data.type}-${data.uid}`) || undefined,
+      // One notification per invite, friend or day: a newer one replaces it.
+      tag: data.inviteId || (data.uid && `${data.type}-${data.uid}`) || data.type || undefined,
       data,
     })
   )
@@ -29,6 +29,7 @@ function screenFor(data) {
   if (data.type === 'invite' && data.room) return `/multi/${encodeURIComponent(data.room)}?invited=1`
   if (data.type === 'friend_request') return '/friends'
   if (data.type === 'friend_accepted' && data.uid) return `/player/${encodeURIComponent(data.uid)}`
+  // 'daily': the home screen and its daily challenges
   return '/'
 }
 

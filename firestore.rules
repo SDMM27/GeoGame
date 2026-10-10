@@ -167,8 +167,10 @@ service cloud.firestore {
       match /pushTokens/{token} {
         allow read, delete: if request.auth != null && request.auth.uid == uid;
         allow create, update: if request.auth != null && request.auth.uid == uid
-          && request.resource.data.keys().hasOnly(['token', 'lang', 'platform', 'updatedAt', 'subscription'])
+          && request.resource.data.keys().hasOnly(['token', 'lang', 'platform', 'updatedAt', 'subscription', 'dailyReminder'])
           && request.resource.data.token == token
+          // Daily challenge reminder (api/daily-reminder): on unless turned off on this device.
+          && (!('dailyReminder' in request.resource.data) || request.resource.data.dailyReminder is bool)
           && request.resource.data.lang is string && request.resource.data.lang.size() <= 10
           && (request.resource.data.platform in ['ios', 'android'] && !('subscription' in request.resource.data)
             // Web app on the home screen: a Web Push subscription, sent to by api/invite-push.

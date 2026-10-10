@@ -35,14 +35,18 @@ export function countSenderPush(transaction, limitRef, limit, now) {
 
 // `message(lang)`: { body, data } in the device's language. `webPush`: the web-push module with its VAPID details set,
 // or null when they aren't configured (web devices skipped). Returns the { status, body } HTTP reply.
-export async function pushToAccount({ db, uid, message, channelId, fetchImpl = fetch, accessToken, webPush = null }) {
+export async function pushToAccount({ db, uid, ...options }) {
   const devices = await db.collection(`users/${uid}/pushTokens`).get()
-  if (devices.empty) return reply(200, { sent: 0 })
+  return pushToDevices({ devices: devices.docs, ...options })
+}
 
+// Same, to some devices only (pushTokens document snapshots).
+export async function pushToDevices({ devices, message, channelId, fetchImpl = fetch, accessToken, webPush = null }) {
+  if (!devices.length) return reply(200, { sent: 0 })
   const isWeb = (device) => device.data().platform === 'web'
   const [expoSent, webSent] = await Promise.all([
-    sendExpo(devices.docs.filter((device) => !isWeb(device)), message, channelId, fetchImpl, accessToken),
-    sendWeb(devices.docs.filter(isWeb), message, webPush),
+    sendExpo(devices.filter((device) => !isWeb(device)), message, channelId, fetchImpl, accessToken),
+    sendWeb(devices.filter(isWeb), message, webPush),
   ])
   if (expoSent == null && webSent === 0) return reply(502, { error: 'push_failed' })
   return reply(200, { sent: (expoSent ?? 0) + webSent })

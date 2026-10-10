@@ -3,7 +3,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, View, type TextInputProps } from 'react-native'
+import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Switch, TextInput, View, type TextInputProps } from 'react-native'
 import Animated, { FadeIn } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -23,7 +23,7 @@ import { auth, useAccount, type Account } from '@/account/auth'
 import { reauthenticateWithGoogle, signInWithGoogle } from '@/account/google'
 import { Avatar, ProfileBody, SectionTitle } from '@/components/profile/ProfileSections'
 import { Button, Pill, Segmented, Text, Touchable } from '@/components/ui'
-import { forgetDevice, useWebPushPermission } from '@/notifications/push'
+import { forgetDevice, useDailyReminder, useWebPushPermission } from '@/notifications/push'
 import { colors, fonts, radius, space } from '@/theme'
 
 // This device stops receiving the account's invite notifications.
@@ -285,7 +285,7 @@ function AccountSettings({ account }: { account: Account }) {
         />
       </View>
 
-      <WebPushCard uid={account.uid} />
+      <NotificationsCard uid={account.uid} />
 
       {deleting ? (
         <View style={styles.card}>
@@ -325,16 +325,19 @@ function AccountSettings({ account }: { account: Account }) {
   )
 }
 
-// Web app only: Safari asks for the notification permission only from a tap, so the player turns them on here.
-function WebPushCard({ uid }: { uid: string }) {
+// Notifications of this device. The web app turns them on here, since Safari asks for the permission only from a tap;
+// the daily challenge reminder can be turned off once they're on (the app asks for the permission by itself).
+function NotificationsCard({ uid }: { uid: string }) {
   const { t } = useTranslation()
   const { state, enable } = useWebPushPermission(uid)
+  const daily = useDailyReminder()
   const [enabling, setEnabling] = useState(false)
-  if (state === 'unsupported') return null
+  const web = state !== 'unsupported'
+  if (!web && daily.enabled === null) return null
   return (
     <View style={styles.card}>
       <Text variant="bodyStrong">{t('mobile.invites.push_title')}</Text>
-      <Text variant="caption">{t(`mobile.invites.push_${state}`)}</Text>
+      {web && <Text variant="caption">{t(`mobile.invites.push_${state}`)}</Text>}
       {state === 'default' && (
         <Button
           label={t('mobile.invites.push_enable')}
@@ -346,6 +349,20 @@ function WebPushCard({ uid }: { uid: string }) {
           }}
           icon={<MaterialCommunityIcons name="bell-ring-outline" size={20} color={colors.text} />}
         />
+      )}
+      {daily.enabled !== null && (
+        <View style={styles.switchRow}>
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text variant="body">{t('mobile.invites.daily_reminder')}</Text>
+            <Text variant="caption">{t('mobile.invites.daily_reminder_hint')}</Text>
+          </View>
+          <Switch
+            value={daily.enabled}
+            onValueChange={daily.setEnabled}
+            trackColor={{ false: colors.surfaceHigh, true: colors.accent }}
+            accessibilityLabel={t('mobile.invites.daily_reminder')}
+          />
+        </View>
       )}
     </View>
   )
@@ -429,6 +446,7 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
+  switchRow: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   card: { gap: space.lg, padding: space.lg, borderRadius: radius.xl, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   input: {
     height: 52,

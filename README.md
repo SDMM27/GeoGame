@@ -65,6 +65,7 @@ Fonctions serverless Vercel déployées avec le site.
 | `POST /api/invite-push` | Envoie la notification push d'une invitation à un salon (jeton Firebase de l'invitant requis). |
 | `POST /api/friend-push` | Envoie la notification push d'une demande d'ami envoyée ou acceptée (jeton Firebase de celui qui vient d'agir requis). |
 | `GET /api/cleanup-expired` | Supprime les salons, invitations et sondes expirés. Appelée chaque jour à 4 h par Vercel Cron (`vercel.json`). |
+| `GET /api/daily-reminder` | Rappelle les défis du jour aux joueurs connectés qui n'en ont fait aucun (désactivable par appareil dans le profil). Appelée chaque jour à 16 h UTC par Vercel Cron (`vercel.json`). |
 
 Variables d'environnement du projet Vercel du site :
 

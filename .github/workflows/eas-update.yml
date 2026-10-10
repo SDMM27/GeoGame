@@ -1,0 +1,47 @@
+name: EAS Update
+
+# Publishes an over-the-air update of the app (EAS Update) from GitHub, without a local build: Actions tab →
+# "EAS Update" → Run workflow, then choose the branch to publish. Needs the EXPO_TOKEN repository secret
+# (expo.dev → Account settings → Access tokens).
+on:
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: Update channel (preview for the installed APKs, production for the store builds)
+        required: true
+        default: preview
+        type: choice
+        options: [preview, production]
+      message:
+        description: Update message
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  update:
+    name: Publish the update
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      - run: npm ci
+      # The EAS environment of the same name provides the EXPO_PUBLIC_* variables, as when run locally.
+      - run: eas update --channel "$CHANNEL" --environment "$CHANNEL" --message "$MESSAGE" --non-interactive
+        env:
+          CHANNEL: ${{ inputs.channel }}
+          MESSAGE: ${{ inputs.message }}

@@ -52,7 +52,7 @@ npm start          # ou npm run android / ios / web
 - Le site et l'app partagent le code de `src/` ; les dépendances importées par ce code sont résolues depuis `mobile/node_modules`.
 - `EXPO_PUBLIC_RECAPTCHA_ENTERPRISE_KEY` : clé reCAPTCHA Enterprise pour App Check sur l'app web. `EXPO_PUBLIC_API_ORIGIN` : adresse de l'API (par défaut le site de production). `EXPO_PUBLIC_VAPID_PUBLIC_KEY` : la même clé publique que `VAPID_PUBLIC_KEY`, active les notifications de l'app web. `EXPO_PUBLIC_FIREBASE_EMULATOR_HOST=localhost` : connexion aux émulateurs.
 - Builds avec EAS Build (`mobile/eas.json`) : profils `development`, `preview` (APK interne) et `production`. Les notifications push Android utilisent `google-services.json` (fichier local ou variable de fichier EAS `GOOGLE_SERVICES_JSON`).
-- Mises à jour OTA (EAS Update, `runtimeVersion` par empreinte) : le canal `preview` reçoit les mises à jour, par exemple `npx eas update --channel preview` depuis `mobile/`.
+- Mises à jour OTA (EAS Update, `runtimeVersion` par empreinte) : le canal `preview` reçoit les mises à jour, par exemple `npx eas-cli@latest update --channel preview` depuis `mobile/`, ou depuis GitHub : onglet Actions → « EAS Update » → Run workflow (secret `EXPO_TOKEN` requis).
 - L'app web est exportée par `npx expo export -p web` (voir `mobile/vercel.json`) et déployée comme un projet Vercel distinct dont le dossier racine est `mobile/`.
 - Régénération des données embarquées : `npm run build:countries`, `build:flags` et `build:silhouettes` (dans `mobile/`).
 

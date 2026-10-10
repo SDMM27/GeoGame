@@ -32,6 +32,16 @@ service cloud.firestore {
       return value is string && value.size() > 0 && value.size() <= 60;
     }
 
+    // { endpoint, keys: { p256dh, auth } } from PushSubscription.toJSON(); the API checks the endpoint's host again.
+    function isWebPushSubscription(subscription) {
+      return subscription is map && subscription.keys().hasOnly(['endpoint', 'keys'])
+        && subscription.endpoint is string && subscription.endpoint.size() <= 1000
+        && subscription.endpoint.matches('https://.*')
+        && subscription['keys'] is map && subscription['keys'].keys().hasOnly(['p256dh', 'auth'])
+        && subscription['keys'].p256dh is string && subscription['keys'].p256dh.size() <= 200
+        && subscription['keys'].auth is string && subscription['keys'].auth.size() <= 100;
+    }
+
     // A visitor's name as saveScore.js sends it (normalizeUsername): no space at either end, no double space,
     // and no whitespace other than a single plain space. Otherwise "Alice " would slip past the usernames/ check.
     function visitorName(name) {
@@ -157,10 +167,12 @@ service cloud.firestore {
       match /pushTokens/{token} {
         allow read, delete: if request.auth != null && request.auth.uid == uid;
         allow create, update: if request.auth != null && request.auth.uid == uid
-          && request.resource.data.keys().hasOnly(['token', 'lang', 'platform', 'updatedAt'])
+          && request.resource.data.keys().hasOnly(['token', 'lang', 'platform', 'updatedAt', 'subscription'])
           && request.resource.data.token == token
           && request.resource.data.lang is string && request.resource.data.lang.size() <= 10
-          && request.resource.data.platform in ['ios', 'android'];
+          && (request.resource.data.platform in ['ios', 'android'] && !('subscription' in request.resource.data)
+            // Web app on the home screen: a Web Push subscription, sent to by api/invite-push.
+            || request.resource.data.platform == 'web' && isWebPushSubscription(request.resource.data.subscription));
       }
     }
 

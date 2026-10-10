@@ -50,7 +50,7 @@ npm start          # ou npm run android / ios / web
 ```
 
 - Le site et l'app partagent le code de `src/` ; les dépendances importées par ce code sont résolues depuis `mobile/node_modules`.
-- `EXPO_PUBLIC_RECAPTCHA_ENTERPRISE_KEY` : clé reCAPTCHA Enterprise pour App Check sur l'app web. `EXPO_PUBLIC_API_ORIGIN` : adresse de l'API (par défaut le site de production). `EXPO_PUBLIC_FIREBASE_EMULATOR_HOST=localhost` : connexion aux émulateurs.
+- `EXPO_PUBLIC_RECAPTCHA_ENTERPRISE_KEY` : clé reCAPTCHA Enterprise pour App Check sur l'app web. `EXPO_PUBLIC_API_ORIGIN` : adresse de l'API (par défaut le site de production). `EXPO_PUBLIC_VAPID_PUBLIC_KEY` : la même clé publique que `VAPID_PUBLIC_KEY`, active les notifications de l'app web. `EXPO_PUBLIC_FIREBASE_EMULATOR_HOST=localhost` : connexion aux émulateurs.
 - Builds avec EAS Build (`mobile/eas.json`) : profils `development`, `preview` (APK interne) et `production`. Les notifications push Android utilisent `google-services.json` (fichier local ou variable de fichier EAS `GOOGLE_SERVICES_JSON`).
 - Mises à jour OTA (EAS Update, `runtimeVersion` par empreinte) : le canal `preview` reçoit les mises à jour, par exemple `npx eas update --channel preview` depuis `mobile/`.
 - L'app web est exportée par `npx expo export -p web` (voir `mobile/vercel.json`) et déployée comme un projet Vercel distinct dont le dossier racine est `mobile/`.
@@ -69,6 +69,7 @@ Variables d'environnement du projet Vercel du site :
 
 - `FIREBASE_SERVICE_ACCOUNT` : contenu JSON de la clé de compte de service Firebase.
 - `EXPO_ACCESS_TOKEN` : facultatif, si la sécurité renforcée des push Expo est activée.
+- `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` : clés Web Push (`npx web-push generate-vapid-keys`), pour les notifications de l'app web installée sur l'écran d'accueil (iPhone : iOS 16.4+, sans App Store). `VAPID_SUBJECT` : facultatif, `mailto:` ou URL de contact (par défaut le site).
 - `CRON_SECRET` : chaîne aléatoire longue ; Vercel l'envoie en `Authorization: Bearer` à la tâche cron.
 
 Face aux émulateurs, `FIRESTORE_EMULATOR_HOST` (et `FIREBASE_AUTH_EMULATOR_HOST` pour `invite-push`) remplacent la clé. Ne commitez jamais de clé de compte de service.

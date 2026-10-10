@@ -6,7 +6,7 @@ import { Timestamp, getFirestore } from 'firebase-admin/firestore'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import handler from '../../api/invite-push.mjs'
-import { EXPO_PUSH_URL, RESEND_DELAY_MS, SENDER_PUSH_LIMIT, SENDER_WINDOW_MS, inviteMessage, sendInvitePush } from '../../api/_lib/invitePush.mjs'
+import { EXPO_PUSH_URL, RESEND_DELAY_MS, SENDER_PUSH_LIMIT, SENDER_WINDOW_MS, inviteMessage, isWebPushEndpoint, sendInvitePush } from '../../api/_lib/invitePush.mjs'
 
 const PROJECT = 'geogame-sdmm'
 const ROOM = 'ABC234'
@@ -158,9 +158,71 @@ describe('sendInvitePush', () => {
     expect(fetchImpl).not.toHaveBeenCalled()
   })
 
+  describe('web app on the home screen (Web Push)', () => {
+    const subscription = (endpoint) => ({ endpoint, keys: { p256dh: 'p256dh-key', auth: 'auth-key' } })
+    const APPLE = 'https://web.push.apple.com/QGbob-iphone'
+    const GONE = 'https://fcm.googleapis.com/fcm/send/bob-old'
+
+    beforeEach(async () => {
+      for (const token of BOB_TOKENS) await db.doc(`users/bob/pushTokens/${token}`).delete()
+      await db.doc('users/bob/pushTokens/web1').set({ token: 'web1', lang: 'fr', platform: 'web', subscription: subscription(APPLE) })
+      await db.doc('users/bob/pushTokens/web2').set({ token: 'web2', lang: 'en', platform: 'web', subscription: subscription(GONE) })
+      await db.doc('users/bob/pushTokens/web3').set({ token: 'web3', lang: 'en', platform: 'web', subscription: subscription('https://evil.example/x') })
+    })
+
+    // Fake push service: the old subscription expired.
+    const fakeWebPush = () => ({
+      sendNotification: vi.fn(async (target) => {
+        if (target.endpoint === GONE) throw Object.assign(new Error('gone'), { statusCode: 410 })
+        return { statusCode: 201 }
+      }),
+    })
+
+    it('pushes to the browsers, in their language, and only to known push services', async () => {
+      const webPush = fakeWebPush()
+      const fetchImpl = fakeExpo()
+      expect(await send({ idToken: tokens.alice, fetchImpl, webPush })).toEqual({ status: 200, body: { sent: 1 } })
+      expect(fetchImpl).not.toHaveBeenCalled()
+      expect(webPush.sendNotification).toHaveBeenCalledTimes(2)
+      const [target, payload] = webPush.sendNotification.mock.calls.find(([target]) => target.endpoint === APPLE)
+      expect(target).toEqual(subscription(APPLE))
+      expect(JSON.parse(payload)).toEqual({
+        title: 'GeoGame',
+        body: 'Alice t’invite à jouer à Trouve le Drapeau',
+        data: { type: 'invite', room: ROOM, inviteId: INVITE },
+      })
+    })
+
+    it('forgets the subscriptions the browser dropped', async () => {
+      await send({ idToken: tokens.alice, fetchImpl: fakeExpo(), webPush: fakeWebPush() })
+      const left = await db.collection('users/bob/pushTokens').get()
+      expect(left.docs.map((doc) => doc.id).sort()).toEqual(['web1', 'web3'])
+    })
+
+    it('skips the web devices without VAPID keys, and still reaches the app', async () => {
+      await db.doc(`users/bob/pushTokens/${BOB_TOKENS[0]}`).set({ token: BOB_TOKENS[0], lang: 'fr', platform: 'android' })
+      const fetchImpl = fakeExpo()
+      expect(await send({ idToken: tokens.alice, fetchImpl })).toEqual({ status: 200, body: { sent: 1 } })
+      expect(JSON.parse(fetchImpl.mock.calls[0][1].body).map((message) => message.to)).toEqual([BOB_TOKENS[0]])
+    })
+  })
+
   it('reports a failure of the push service', async () => {
     const fetchImpl = vi.fn(async () => ({ ok: false, json: async () => ({}) }))
     expect((await send({ idToken: tokens.alice, fetchImpl })).status).toBe(502)
+  })
+})
+
+describe('isWebPushEndpoint', () => {
+  it('accepts the browsers’ push services only', () => {
+    expect(isWebPushEndpoint('https://web.push.apple.com/abc')).toBe(true)
+    expect(isWebPushEndpoint('https://fcm.googleapis.com/fcm/send/abc')).toBe(true)
+    expect(isWebPushEndpoint('https://updates.push.services.mozilla.com/wpush/v2/abc')).toBe(true)
+    expect(isWebPushEndpoint('https://db5p.notify.windows.com/w/?token=abc')).toBe(true)
+    expect(isWebPushEndpoint('http://web.push.apple.com/abc')).toBe(false)
+    expect(isWebPushEndpoint('https://web.push.apple.com.evil.example/abc')).toBe(false)
+    expect(isWebPushEndpoint('https://localhost:8080/')).toBe(false)
+    expect(isWebPushEndpoint(undefined)).toBe(false)
   })
 })
 

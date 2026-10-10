@@ -70,3 +70,10 @@ export function usePushNotifications(uid: string | null | undefined, hasFriends:
     router.push({ pathname: '/multi/[code]', params: { code: data.room, invited: '1' } })
   }, [response])
 }
+
+export type WebPushState = 'unsupported' | 'default' | 'granted' | 'denied'
+
+// Web only (push.web.ts): the app asks for the permission itself, see registerDevice.
+export function useWebPushPermission(_uid: string | null | undefined) {
+  return { state: 'unsupported' as WebPushState, enable: async () => {} }
+}

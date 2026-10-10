@@ -1,9 +1,14 @@
 name: EAS Update
 
-# Publishes an over-the-air update of the app (EAS Update) from GitHub, without a local build: Actions tab →
-# "EAS Update" → Run workflow, then choose the branch to publish. Needs the EXPO_TOKEN repository secret
-# (expo.dev → Account settings → Access tokens).
+# Publishes an over-the-air update of the app (EAS Update) from GitHub, without a local build:
+#  - automatically to the preview channel after each merge on master that changes the app (mobile/) or the code it
+#    shares with the website (src/);
+#  - by hand from the Actions tab → "EAS Update" → Run workflow, choosing the branch and the channel.
+# Needs the EXPO_TOKEN repository secret (expo.dev → Account settings → Access tokens).
 on:
+  push:
+    branches: [master]
+    paths: ['mobile/**', 'src/**', '!src/**/*.test.js', '!mobile/**/*.test.ts', '!mobile/**/*.test.tsx', '!mobile/README.md']
   workflow_dispatch:
     inputs:
       channel:
@@ -19,6 +24,11 @@ on:
 
 permissions:
   contents: read
+
+# Two merges in a row: the second update waits for the first instead of racing it.
+concurrency:
+  group: eas-update
+  cancel-in-progress: false
 
 jobs:
   update:
@@ -43,5 +53,6 @@ jobs:
       # The EAS environment of the same name provides the EXPO_PUBLIC_* variables, as when run locally.
       - run: eas update --channel "$CHANNEL" --environment "$CHANNEL" --message "$MESSAGE" --non-interactive
         env:
-          CHANNEL: ${{ inputs.channel }}
-          MESSAGE: ${{ inputs.message }}
+          # After a merge there are no inputs: preview channel, and the merge's commit message.
+          CHANNEL: ${{ inputs.channel || 'preview' }}
+          MESSAGE: ${{ inputs.message || github.event.head_commit.message }}

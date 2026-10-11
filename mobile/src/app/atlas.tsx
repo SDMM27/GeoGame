@@ -5,8 +5,8 @@ import { Image } from 'expo-image'
 import { router } from 'expo-router'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, TextInput, View, useWindowDimensions } from 'react-native'
-import Animated, { FadeIn, SlideInDown } from 'react-native-reanimated'
+import { Platform, ScrollView, StyleSheet, TextInput, View, useWindowDimensions } from 'react-native'
+import Animated, { FadeIn, FadeInDown, SlideInDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import {
@@ -80,7 +80,10 @@ function CountrySheet({ info, onSelect, onClose, maxHeight }: { info: Info; onSe
   ).filter(([, , level]) => level)
 
   return (
-    <Animated.View entering={SlideInDown.springify().damping(20)} style={[styles.sheet, { maxHeight }]}>
+    // No spring on Android, where it made the sheet bounce many times: a short fade and slide instead.
+    <Animated.View
+      entering={Platform.OS === 'android' ? FadeInDown.duration(220) : SlideInDown.springify().damping(20)}
+      style={[styles.sheet, { maxHeight }]}>
       <ScrollView contentContainerStyle={{ padding: space.lg, gap: space.lg, paddingBottom: insets.bottom + space.lg }}>
         <View style={styles.sheetHeader}>
           {flag && <Image source={flag} contentFit="cover" style={styles.flag} />}

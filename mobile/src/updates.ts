@@ -10,8 +10,22 @@ const CHECK_TIMEOUT_MS = 4000
 const DOWNLOAD_TIMEOUT_MS = 12000
 // Back from the background after this long: look again (the player isn't in the middle of something).
 const RESUME_AFTER_MS = 15 * 60 * 1000
+// While the app stays open (or comes back sooner), an update is only downloaded, at most this often, and
+// UpdateBanner offers to restart on it.
+const BACKGROUND_CHECK_EVERY_MS = 10 * 60 * 1000
 
-const enabled = Updates.isEnabled && !__DEV__
+export const updatesEnabled = Updates.isEnabled && !__DEV__
+
+let lastBackgroundCheck = Date.now()
+
+/** Downloads a new update without restarting: Updates.useUpdates() then reports it as pending. */
+function downloadUpdate() {
+  if (Date.now() - lastBackgroundCheck < BACKGROUND_CHECK_EVERY_MS) return
+  lastBackgroundCheck = Date.now()
+  Updates.checkForUpdateAsync()
+    .then((check) => (check.isAvailable ? Updates.fetchUpdateAsync() : null))
+    .catch((error) => console.warn('[updates]', error))
+}
 
 /** Downloads a new update if there is one and restarts on it, unless the deadline has passed. */
 async function applyUpdate(deadline: { expired: boolean; extend: () => void }) {
@@ -45,10 +59,10 @@ function withDeadline(onExpire: () => void) {
 
 /** False while the launch update check runs (keep the splash screen up), then true. */
 export function useLaunchUpdate(): boolean {
-  const [ready, setReady] = useState(!enabled)
+  const [ready, setReady] = useState(!updatesEnabled)
 
   useEffect(() => {
-    if (!enabled) return undefined
+    if (!updatesEnabled) return undefined
     const deadline = withDeadline(() => setReady(true))
     applyUpdate(deadline)
       .catch((error) => console.warn('[updates]', error))
@@ -63,9 +77,13 @@ export function useLaunchUpdate(): boolean {
         applyUpdate(resume)
           .catch((error) => console.warn('[updates]', error))
           .finally(resume.done)
-      }
+      } else if (state === 'active') downloadUpdate()
     })
-    return () => subscription.remove()
+    const interval = setInterval(() => AppState.currentState === 'active' && downloadUpdate(), BACKGROUND_CHECK_EVERY_MS)
+    return () => {
+      subscription.remove()
+      clearInterval(interval)
+    }
   }, [])
 
   return ready

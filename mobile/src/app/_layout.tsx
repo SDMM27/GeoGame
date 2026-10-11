@@ -21,6 +21,7 @@ import { InstallHint } from '@/components/InstallHint'
 import { InviteBanner } from '@/components/InviteBanner'
 import { PushNotifications } from '@/components/PushNotifications'
 import { ToastHost } from '@/components/ToastHost'
+import { UpdateBanner } from '@/components/UpdateBanner'
 import { colors } from '@/theme'
 import { useLaunchUpdate } from '@/updates'
 
@@ -106,6 +107,7 @@ export default function RootLayout() {
           <Stack.Screen name="game" options={{ gestureEnabled: false, animation: 'fade_from_bottom' }} />
         </Stack>
         <InstallHint />
+        <UpdateBanner />
         <InviteBanner />
         <PushNotifications />
         <ToastHost />

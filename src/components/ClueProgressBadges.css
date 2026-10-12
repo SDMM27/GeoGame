@@ -1,6 +1,6 @@
 /* Closer / farther than the previous guess, closest guess */
 .country-clue-progress { display: inline-block; align-self: flex-start; padding: 0.1rem 0.45rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
-.country-clue-progress--closer { color: #4ade80; background: #4ade801f; }
+.country-clue-progress--closer { color: var(--success); background: rgba(61, 220, 151, 0.12); }
 .country-clue-progress--farther { color: #60a5fa; background: #60a5fa1f; }
-.country-clue-progress--same { color: #94a3b8; background: #94a3b81f; }
-.country-clue-progress--best { color: #fbbf24; background: #fbbf241f; }
+.country-clue-progress--same { color: var(--text-muted); background: #94a3b81f; }
+.country-clue-progress--best { color: var(--warning); background: rgba(245, 184, 61, 0.12); }

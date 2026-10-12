@@ -24,7 +24,7 @@
 }
 
 .daily-elsewhere__result .failed {
-  color: var(--danger, #f87171);
+  color: var(--danger);
 }
 
 .daily-elsewhere__home {

@@ -31,9 +31,15 @@
     "Océanie": "Oceania"
   },
   "home": {
-    "title": "Choose your game",
     "subtitle": "Explore - Discover - Travel",
-    "multiplayer_button": "🎮 Play multiplayer →"
+    "greeting": "Ready to travel?",
+    "daily_title": "Daily challenges",
+    "daily_subtitle": "New ones every day at midnight",
+    "games_title": "Games",
+    "games_subtitle": "Pick a difficulty or a continent",
+    "daily": "Daily",
+    "infinite": "Infinite",
+    "multi": "Play multiplayer"
   },
   "games": {
     "placement": {
@@ -312,7 +318,13 @@
     "played_order": "Order played"
   },
   "multiplayer": {
-    "title": "Multiplayer"
+    "title": "Multiplayer",
+    "subtitle": "Challenge your friends on the game of your choice",
+    "join_title": "Join a game",
+    "code_placeholder": "CODE",
+    "create_title": "Create a game",
+    "create_subtitle": "Pick a game, then invite your friends with the code",
+    "recent_title": "Recent games"
   },
   "lobby": {
     "connecting": "Connecting..."
@@ -477,7 +489,6 @@
     }
   },
   "account": {
-    "nav": "Account",
     "title": "My account",
     "signin_tab": "Sign in",
     "signup_tab": "Sign up",
@@ -925,5 +936,25 @@
     "delete_account": "Delete my account",
     "updated": "Last updated: {{date}}",
     "signup_notice": "By creating an account, you accept the <terms>terms of use</terms> and the <privacy>privacy policy</privacy>. You must be at least 13 (and have a parent’s agreement under 15)."
+  },
+  "invites": {
+    "title": "Invite friends",
+    "invite": "Invite",
+    "sent": "Invited",
+    "joined": "In the game",
+    "retry": "Retry",
+    "no_friends": "Add friends from your account to invite them directly.",
+    "sign_in": "Sign in to invite your friends directly.",
+    "banner": "{{username}} invites you to play {{game}}",
+    "later": "Later",
+    "decline": "Dismiss",
+    "received_title": "Invitations"
+  },
+  "nav": {
+    "play": "Play",
+    "multiplayer": "Multi",
+    "leaderboards": "Rankings",
+    "profile": "Profile",
+    "main": "Main navigation"
   }
 }

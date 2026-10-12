@@ -23,7 +23,7 @@
 
 .share-pseudo-input:focus {
   outline: none;
-  border-color: var(--accent-cyan, #22d3ee);
+  border-color: var(--accent);
 }
 
 .share-score-btn {

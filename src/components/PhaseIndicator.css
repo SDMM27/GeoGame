@@ -4,8 +4,8 @@
   top: 8px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--bg-secondary, #1e293b);
-  border: 1px solid var(--border, #334155);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 6px 14px;
   z-index: 900;
@@ -26,12 +26,12 @@
 }
 
 .phase-indicator-count {
-  color: var(--text-muted, #94a3b8);
+  color: var(--text-muted);
 }
 
 .phase-indicator-track {
   height: 3px;
-  background: var(--border, #334155);
+  background: var(--border);
   border-radius: 2px;
   overflow: hidden;
 }

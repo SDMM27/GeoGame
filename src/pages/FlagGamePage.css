@@ -31,20 +31,20 @@
   height: auto;
   border-radius: 8px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
-  border: 1px solid var(--border-color, #334155);
+  border: 1px solid var(--border-color);
 }
 
 .flag-placeholder {
   width: 320px;
   height: 213px;
-  background: var(--bg-secondary, #1e293b);
+  background: var(--bg-secondary);
   border-radius: 8px;
-  border: 1px dashed #334155;
+  border: 1px dashed var(--border-color);
 }
 
 .flag-revealed-name {
   font-size: 1.4rem;
-  color: #ff4d4d;
+  color: var(--danger);
   font-weight: 700;
   letter-spacing: 0.05em;
   text-align: center;
@@ -64,18 +64,18 @@
 
 .flag-input {
   flex: 1;
-  background: var(--bg-secondary, #1e293b);
-  border: 1px solid #334155;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   padding: 0.65rem 1rem;
-  color: var(--text-primary, #e2e8f0);
+  color: var(--text-primary);
   font-size: 1rem;
   outline: none;
   transition: border-color 0.15s;
 }
 
 .flag-input:focus {
-  border-color: #7b2ff7;
+  border-color: var(--accent-purple);
 }
 
 .flag-input:disabled {
@@ -84,7 +84,7 @@
 }
 
 .flag-submit-btn {
-  background: #7b2ff7;
+  background: var(--accent-purple);
   border: none;
   border-radius: 6px;
   padding: 0.65rem 1.2rem;
@@ -132,7 +132,7 @@
     bottom: max(8px, env(safe-area-inset-bottom));
     padding: 0.75rem;
     border-radius: 18px;
-    background: rgba(15, 15, 26, 0.94);
+    background: rgba(11, 16, 32, 0.94);
     backdrop-filter: blur(12px);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
   }

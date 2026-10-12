@@ -31,9 +31,15 @@
     "Océanie": "Océanie"
   },
   "home": {
-    "title": "Choisissez votre jeu",
     "subtitle": "Explore - Découvre - Voyage",
-    "multiplayer_button": "🎮 Jouer en multijoueur →"
+    "greeting": "Prêt à voyager ?",
+    "daily_title": "Défis du jour",
+    "daily_subtitle": "Nouveaux chaque jour à minuit",
+    "games_title": "Jeux",
+    "games_subtitle": "Choisis ta difficulté ou ton continent",
+    "daily": "Défi du jour",
+    "infinite": "Infini",
+    "multi": "Jouer en multijoueur"
   },
   "games": {
     "placement": {
@@ -312,7 +318,13 @@
     "played_order": "Classement joué"
   },
   "multiplayer": {
-    "title": "Multijoueur"
+    "title": "Multijoueur",
+    "subtitle": "Défie tes amis sur le jeu de ton choix",
+    "join_title": "Rejoindre une partie",
+    "code_placeholder": "CODE",
+    "create_title": "Créer une partie",
+    "create_subtitle": "Choisis un jeu, puis invite tes amis avec le code",
+    "recent_title": "Parties récentes"
   },
   "lobby": {
     "connecting": "Connexion..."
@@ -477,7 +489,6 @@
     }
   },
   "account": {
-    "nav": "Compte",
     "title": "Mon compte",
     "signin_tab": "Connexion",
     "signup_tab": "Inscription",
@@ -925,5 +936,25 @@
     "delete_account": "Supprimer mon compte",
     "updated": "Dernière mise à jour : {{date}}",
     "signup_notice": "En créant un compte, tu acceptes les <terms>conditions d’utilisation</terms> et la <privacy>politique de confidentialité</privacy>. Il faut avoir au moins 13 ans (et l’accord d’un parent avant 15 ans)."
+  },
+  "invites": {
+    "title": "Inviter des amis",
+    "invite": "Inviter",
+    "sent": "Invité",
+    "joined": "Dans la partie",
+    "retry": "Réessayer",
+    "no_friends": "Ajoute des amis depuis ton compte pour les inviter directement.",
+    "sign_in": "Connecte-toi pour inviter tes amis directement.",
+    "banner": "{{username}} t’invite à jouer à {{game}}",
+    "later": "Plus tard",
+    "decline": "Ignorer",
+    "received_title": "Invitations"
+  },
+  "nav": {
+    "play": "Jouer",
+    "multiplayer": "Multi",
+    "leaderboards": "Classements",
+    "profile": "Profil",
+    "main": "Navigation principale"
   }
 }

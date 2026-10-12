@@ -1,8 +1,12 @@
 // src/components/multiplayer/MultiplayerRoom.test.jsx
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render as renderUi, screen, fireEvent, waitFor } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import MultiplayerRoom from './MultiplayerRoom'
 import { joinRoom, launchRoom } from '../../utils/multiplayerRoom'
+
+// The room uses router links and the search params (invite links).
+const render = (ui) => renderUi(<MemoryRouter>{ui}</MemoryRouter>)
 
 vi.mock('../../auth', () => ({ useAccount: () => ({ account: null }) }))
 vi.mock('../../utils/multiplayerRoom', async (importOriginal) => ({

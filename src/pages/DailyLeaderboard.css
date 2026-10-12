@@ -23,8 +23,8 @@
 .daily-form__blocked {
   margin-bottom: 14px;
   padding: 10px 14px;
-  background: rgba(251, 191, 36, 0.08);
-  border: 1px solid rgba(251, 191, 36, 0.3);
+  background: rgba(245, 184, 61, 0.08);
+  border: 1px solid rgba(245, 184, 61, 0.3);
   border-radius: var(--radius-md, 8px);
   font-size: 0.85rem;
   color: var(--text-primary);
@@ -47,7 +47,7 @@
   width: 100%;
   box-sizing: border-box;
   padding: 10px 14px;
-  background: var(--bg-secondary, #0d1b2a);
+  background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md, 8px);
   color: var(--text-primary);
@@ -58,7 +58,7 @@
 .daily-form__submit {
   width: 100%;
   padding: 10px;
-  background: var(--accent-cyan, #00d4ff);
+  background: var(--accent);
   color: #000;
   border: none;
   border-radius: var(--radius-md, 8px);
@@ -109,7 +109,7 @@
   display: grid;
   grid-template-columns: 40px 1fr 80px 90px;
   padding: 10px 12px;
-  background: var(--bg-secondary, #0d1b2a);
+  background: var(--bg-secondary);
   cursor: pointer;
   user-select: none;
   align-items: center;
@@ -121,8 +121,8 @@
 }
 
 .daily-lb__row--top .daily-lb__row-main {
-  background: rgba(0, 212, 255, 0.07);
-  border: 1px solid rgba(0, 212, 255, 0.15);
+  background: rgba(61, 220, 151, 0.07);
+  border: 1px solid rgba(61, 220, 151, 0.15);
 }
 
 .daily-lb__rank {
@@ -146,7 +146,7 @@
 
 .daily-lb__attempts-detail {
   font-size: 0.75em;
-  color: #64748b;
+  color: var(--text-muted);
   margin-left: 3px;
 }
 
@@ -180,7 +180,7 @@
 }
 
 .daily-lb__guess-item--correct {
-  color: #4ade80;
+  color: var(--success);
   font-weight: 700;
 }
 
@@ -200,7 +200,7 @@
   width: 100%;
   padding: 16px;
   margin-top: 8px;
-  background: var(--accent-cyan, #00d4ff);
+  background: var(--accent);
   color: #000;
   border: none;
   border-radius: var(--radius-lg);
@@ -237,7 +237,7 @@
 
 .daily-lb__day-btn {
   padding: 5px 12px;
-  background: var(--bg-secondary, #0d1b2a);
+  background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md, 8px);
   color: var(--text-muted);
@@ -253,9 +253,9 @@
 }
 
 .daily-lb__day-btn--active {
-  background: rgba(0, 212, 255, 0.12);
-  border-color: rgba(0, 212, 255, 0.4);
-  color: var(--accent-cyan, #00d4ff);
+  background: rgba(61, 220, 151, 0.12);
+  border-color: rgba(61, 220, 151, 0.4);
+  color: var(--accent);
 }
 
 .daily-lb__history-toggle {
@@ -283,7 +283,7 @@
 
 .daily-lb__date-picker {
   padding: 5px 10px;
-  background: var(--bg-secondary, #0d1b2a);
+  background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md, 8px);
   color: var(--text-primary);

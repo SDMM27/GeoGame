@@ -10,6 +10,7 @@ import { matchKnownAnswer } from '../utils/answerLexicon'
 import { buildPhaseSequence } from '../utils/ascensionPresets'
 import { saveSnapshot } from '../utils/multiplayerSnapshot'
 import { getCountryName, getAllCountryNames, getAllCapitalNames } from '../utils/getCountryName'
+import { MAP_COLORS } from '../utils/mapColors'
 
 // Which country property name holds the difficulty for each game type
 const DIFFICULTY_PROP = {
@@ -332,7 +333,7 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
     const feat3err = countries.features.find(c => c.properties.ADMIN === name)
     const iso3err = feat3err?.properties.ISO_A2
     toast.error(t('toasts.location_reveal', { name: getCountryName(iso3err, i18n.language) || name }), { containerId: 'topRightToast' })
-    setStyleForCountry(name, { fillColor: '#ff4d4d', weight: 2, fillOpacity: 0.5 })
+    setStyleForCountry(name, { fillColor: MAP_COLORS.wrong, weight: 2, fillOpacity: 0.5 })
     shownCountriesRef.current.add(name)
     if (geoJsonRef.current) {
       const layer = geoJsonRef.current.getLayers().find(l => l.feature.properties.ADMIN === name)
@@ -348,7 +349,7 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
     const layer = event.target
     const name = layer.feature.properties.ADMIN
     if (foundCountriesRef.current.has(name) || shownCountriesRef.current.has(name)) return
-    layer.setStyle({ fillColor: '#7b2ff7', weight: 2, fillOpacity: 0.4 })
+    layer.setStyle({ fillColor: MAP_COLORS.hover, weight: 2, fillOpacity: 0.4 })
   }, [])
 
   const onCountryMouseOut = useCallback((event) => {
@@ -370,7 +371,7 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
         toast.success(t('toasts.found_country', { name: getCountryName(isoPlacement, i18n.language) || targetCountryRef.current }), { containerId: 'topRightToast' })
         incrementScore(diff, consecutiveErrorsRef.current)
       }
-      setStyleForCountry(clickedName, { fillColor: '#4ade80', weight: 2, fillOpacity: 0.5 })
+      setStyleForCountry(clickedName, { fillColor: MAP_COLORS.right, weight: 2, fillOpacity: 0.5 })
       shownCountriesRef.current.delete(clickedName)
       foundCountriesRef.current.add(clickedName)
       advanceGame(!wasSkipped, consecutiveErrorsRef.current)
@@ -402,7 +403,7 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
     setClickOnSeeCountry(true)
     clickOnSeeCountryRef.current = true
     const name = targetCountryRef.current
-    setStyleForCountry(name, { fillColor: '#ff4d4d', weight: 2, fillOpacity: 0.5 })
+    setStyleForCountry(name, { fillColor: MAP_COLORS.wrong, weight: 2, fillOpacity: 0.5 })
     shownCountriesRef.current.add(name)
     if (geoJsonRef.current) {
       const layer = geoJsonRef.current.getLayers().find(l => l.feature.properties.ADMIN === name)

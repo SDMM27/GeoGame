@@ -86,7 +86,7 @@ function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, s
         <div className="hud-main">
           <div className="hud-row">
             <div className="hud-cell">
-              <span className="hud-value" style={{ color: 'var(--accent-cyan)' }}>{score}</span>
+              <span className="hud-value" style={{ color: 'var(--accent)' }}>{score}</span>
               <span className="hud-label">{t('game_hud.score')}</span>
             </div>
             <div className="hud-cell hud-cell--target">
@@ -94,7 +94,7 @@ function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, s
               <span className="hud-target-name">?</span>
             </div>
             <div className="hud-cell">
-              <span className="hud-value" style={{ color: 'var(--accent-cyan)' }}>{displayTimer}</span>
+              <span className="hud-value" style={{ color: 'var(--accent)' }}>{displayTimer}</span>
               <span className="hud-label">{t('game_hud.time')}</span>
             </div>
           </div>

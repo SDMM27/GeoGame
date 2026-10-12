@@ -16,8 +16,9 @@ import ShareScoreButton from '../../components/ShareScoreButton'
 import SmallCountryCircles from './SmallCountryCircles'
 import RightClickDrag from './RightClickDrag'
 import { getShiftedFeatures } from './shiftedFeatures'
+import { MAP_COLORS } from '../../utils/mapColors'
 
-const GEO_STYLE = { fillColor: 'transparent', color: '#94a3b8', fillOpacity: 1, weight: 1 }
+const GEO_STYLE = { fillColor: 'transparent', color: MAP_COLORS.stroke, fillOpacity: 1, weight: 1 }
 
 export default function PlacementGameLayout({ difficulty, isTraining, isAscension, presetName, state, onGameFinished = null, continent }) {
   const { t, i18n } = useTranslation()
@@ -81,7 +82,7 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
         <div className="hud-main">
           <div className="hud-row">
             <div className="hud-cell">
-              <span className="hud-value" style={{ color: 'var(--accent-cyan)' }}>{score}</span>
+              <span className="hud-value" style={{ color: 'var(--accent)' }}>{score}</span>
               <span className="hud-label">{t('game_hud.score')}</span>
             </div>
             <div className="hud-cell hud-cell--target">
@@ -89,7 +90,7 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
               <span className="hud-target-name">{getCountryName(targetCountryISO, i18n.language) || targetCountry}</span>
             </div>
             <div className="hud-cell">
-              <span className="hud-value" style={{ color: 'var(--accent-cyan)' }}>{displayTimer}</span>
+              <span className="hud-value" style={{ color: 'var(--accent)' }}>{displayTimer}</span>
               <span className="hud-label">{t('game_hud.time')}</span>
             </div>
           </div>

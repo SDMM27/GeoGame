@@ -1,38 +1,31 @@
+/* Main navigation: top bar on wide screens, bottom tab bar on phones (like the app). */
 .navbar {
   position: relative;
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 0;
+  gap: 1rem;
+  padding: 0.6rem 2rem;
   border-bottom: 1px solid var(--border-color);
-}
-
-.navbar-logo {
-  font-size: 1.6rem;
-  font-weight: 900;
-  letter-spacing: 4px;
-  color: var(--accent-cyan);
-  cursor: pointer;
-  user-select: none;
-  text-decoration: none;
-  margin-left: 2rem;
-}
-
-.navbar-logo-accent {
-  color: var(--accent-purple);
+  background: var(--bg-primary);
 }
 
 .navbar-logo {
   display: flex;
   align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: var(--text-primary);
+  user-select: none;
+}
+
+.navbar-logo:hover {
+  color: var(--text-primary);
 }
 
 .navbar-logo-img {
-  height: 76px;
+  height: 40px;
   width: auto;
   display: block;
-  filter: drop-shadow(0 0 10px rgba(124, 58, 237, 0.45));
   transition: transform 0.2s;
 }
 
@@ -40,101 +33,151 @@
   transform: scale(1.05);
 }
 
-@media (max-width: 600px) {
-  .navbar-logo-img {
-    height: 60px;
-  }
+.navbar-logo-name {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
 }
 
-.navbar-mp-link { color: #00d4ff; text-decoration: none; font-weight: 600; font-size: 0.9rem; margin-left: auto; }
-.navbar-mp-link:hover { text-decoration: underline; }
+.navbar-tabs {
+  display: flex;
+  gap: 0.25rem;
+  margin: 0 auto;
+}
+
+.navbar-tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: color 0.15s, background 0.15s;
+}
+
+.navbar-tab:hover {
+  color: var(--text-primary);
+  background: var(--bg-card);
+}
+
+.navbar-tab.active {
+  color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.navbar-tab-label {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navbar-signed-in {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--success);
+}
 
 .navbar-lang-group {
   display: flex;
-  gap: 0;
-  margin-right: 2rem;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-pill);
   padding: 3px;
 }
 
 .navbar-lang-btn {
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.55);
-  border-radius: 5px;
-  padding: 5px 12px;
-  font-size: 0.78rem;
+  color: var(--text-muted);
+  border-radius: var(--radius-pill);
+  padding: 4px 10px;
+  font-size: 0.75rem;
   font-weight: 700;
   cursor: pointer;
   transition: color 0.15s, background 0.15s;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.5px;
 }
 
 .navbar-lang-btn:hover {
-  color: rgba(255, 255, 255, 0.85);
-  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
 }
 
-.navbar-lang-btn.active {
-  background: var(--accent-cyan);
-  color: #0a0a1a;
-}
-
+.navbar-lang-btn.active,
 .navbar-lang-btn.active:hover {
-  background: var(--accent-cyan);
-  color: #0a0a1a;
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
-@media (max-width: 600px) {
-  .navbar-lang-group {
-    margin-right: 0.5rem;
+/* Phones: the tabs become the app's bottom tab bar */
+@media (max-width: 720px) {
+  .navbar {
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
   }
-  .navbar-lang-btn {
-    padding: 4px 9px;
-    font-size: 0.72rem;
+
+  .navbar-logo-img {
+    height: 34px;
   }
-}
 
-.navbar-account {
-  margin-left: auto;
-  margin-right: 1rem;
-  padding: 6px 14px;
-  border: 1px solid var(--accent-cyan-border);
-  border-radius: var(--radius-pill);
-  color: var(--accent-cyan);
-  font-weight: 700;
-  font-size: 0.85rem;
-  text-decoration: none;
-  white-space: nowrap;
-  max-width: 180px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: background 0.15s;
-}
+  .navbar-logo-name {
+    font-size: 1.2rem;
+  }
 
-.navbar-account:hover {
-  background: var(--accent-cyan-dim);
-  color: var(--accent-cyan);
-}
+  .navbar-tabs {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    margin: 0;
+    gap: 0;
+    padding: 0.3rem 0.25rem calc(0.3rem + env(safe-area-inset-bottom));
+    background: var(--bg-primary);
+    border-top: 1px solid var(--border-color);
+  }
 
-.navbar-account.signed-in::before {
-  content: '';
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  margin-right: 7px;
-  border-radius: 50%;
-  background: var(--success);
-  vertical-align: middle;
-}
+  /* A game page, or a room while its game is played */
+  .navbar-tabs--in-game,
+  body:has(.mp-game-view) .navbar-tabs {
+    display: none;
+  }
 
-@media (max-width: 600px) {
-  .navbar-account {
-    margin-right: 0.5rem;
-    padding: 4px 10px;
-    font-size: 0.75rem;
-    max-width: 110px;
+  .navbar-tab {
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0.35rem 0.25rem;
+    font-size: 0.7rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .navbar-tab:hover,
+  .navbar-tab.active {
+    background: none;
+  }
+
+  .navbar-tab-label {
+    max-width: 100%;
+  }
+
+  .navbar-signed-in {
+    position: absolute;
+    top: 0.35rem;
+    left: calc(50% + 8px);
+  }
+
+  /* Room under the pages for the tab bar */
+  body:has(.navbar-tabs:not(.navbar-tabs--in-game)):not(:has(.mp-game-view)) {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+  }
+
+  body:has(.navbar-tabs:not(.navbar-tabs--in-game)):not(:has(.mp-game-view)) #root {
+    min-height: calc(100dvh - 64px - env(safe-area-inset-bottom));
   }
 }

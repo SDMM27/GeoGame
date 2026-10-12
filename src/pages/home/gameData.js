@@ -55,9 +55,13 @@ export function buildPresetPhases(name) {
   return { ...preset.phases };
 }
 
+// Like the app (mobile/src/games.ts): `kind` 'daily' games have a daily challenge and an infinite mode, 'setup' and
+// 'survival' games open their settings first. `multiId`: the game's id in multiplayer rooms (null: not playable there).
 export const GAMES = [
   {
     id: GAME_TYPES.PLACEMENT,
+    kind: "setup",
+    multiId: "placement",
     icon: "\u{1F30D}",
     titleKey: "games.placement.title",
     descKey: "games.placement.description",
@@ -66,6 +70,8 @@ export const GAMES = [
   },
   {
     id: GAME_TYPES.FLAGS,
+    kind: "setup",
+    multiId: "flags",
     icon: "\u{1F6A9}",
     titleKey: "games.flags.title",
     descKey: "games.flags.description",
@@ -74,6 +80,8 @@ export const GAMES = [
   },
   {
     id: GAME_TYPES.CAPITALS,
+    kind: "setup",
+    multiId: "capitals",
     icon: "\u{1F3DB}\uFE0F",
     titleKey: "games.capitals.title",
     descKey: "games.capitals.description",
@@ -82,6 +90,8 @@ export const GAMES = [
   },
   {
     id: GAME_TYPES.BORDER_GUESS,
+    kind: "daily",
+    multiId: "border_guess",
     icon: "\u{1F9ED}",
     titleKey: "games.border_guess.title",
     descKey: "games.border_guess.description",
@@ -90,6 +100,8 @@ export const GAMES = [
   },
   {
     id: GAME_TYPES.COUNTRY_CLUE,
+    kind: "daily",
+    multiId: "country_clue",
     icon: "\u{1F50E}",
     titleKey: "games.country_clue.title",
     descKey: "games.country_clue.description",
@@ -98,6 +110,8 @@ export const GAMES = [
   },
   {
     id: GAME_TYPES.VOYAGE_VOYAGE,
+    kind: "daily",
+    multiId: null,
     icon: "✈️",
     titleKey: "games.voyage_voyage.title",
     descKey: "games.voyage_voyage.description",
@@ -107,6 +121,8 @@ export const GAMES = [
   },
   {
     id: "ranking",
+    kind: "daily",
+    multiId: null,
     icon: "🏆",
     titleKey: "games.ranking.title",
     descKey: "games.ranking.description",
@@ -116,6 +132,8 @@ export const GAMES = [
   },
   {
     id: GAME_TYPES.QUIZ,
+    kind: "daily",
+    multiId: "quiz",
     icon: "🧠",
     titleKey: "games.quiz.title",
     descKey: "games.quiz.description",
@@ -132,6 +150,8 @@ export const GAMES = [
   },
   {
     id: GAME_TYPES.SURVIVAL,
+    kind: "survival",
+    multiId: "survival",
     icon: "\u2764\uFE0F",
     titleKey: "games.survival.title",
     descKey: "games.survival.description",

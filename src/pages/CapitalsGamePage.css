@@ -35,13 +35,13 @@
   font-size: 0.7rem;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--text-secondary, #94a3b8);
+  color: var(--text-secondary);
 }
 
 .capitals-country-value {
   font-size: 1.6rem;
   font-weight: 700;
-  color: var(--text-primary, #e2e8f0);
+  color: var(--text-primary);
 }
 
 /* Désactivation des boutons HUD pour cette page */

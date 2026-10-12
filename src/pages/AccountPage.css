@@ -30,7 +30,7 @@
   font-weight: 600;
   cursor: pointer;
 }
-.account-tab.active { background: var(--accent-cyan); color: #0a0a1a; }
+.account-tab.active { background: var(--accent); color: var(--bg-primary); }
 
 .account-intro { color: var(--text-muted); font-size: 0.9rem; margin: 0; }
 .account-legal { color: var(--text-muted); font-size: 0.8rem; margin: 0; }
@@ -47,7 +47,7 @@
   color: var(--text-primary);
   font-size: 1rem;
 }
-.account-form input:focus { outline: none; border-color: var(--accent-cyan); }
+.account-form input:focus { outline: none; border-color: var(--accent); }
 
 .account-error { color: var(--danger); background: var(--danger-dim); border-radius: var(--radius-sm); padding: 0.5rem 0.75rem; margin: 0; font-size: 0.9rem; }
 .account-notice { color: var(--success); background: var(--success-dim); border-radius: var(--radius-sm); padding: 0.5rem 0.75rem; margin: 0; font-size: 0.9rem; }
@@ -56,8 +56,8 @@
   padding: 0.7rem 1rem;
   border-radius: var(--radius-md);
   border: none;
-  background: var(--accent-cyan);
-  color: #0a0a1a;
+  background: var(--accent);
+  color: var(--bg-primary);
   font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
@@ -66,7 +66,7 @@
 .account-submit--secondary { background: rgba(255, 255, 255, 0.08); color: var(--text-primary); border: 1px solid var(--border-subtle); }
 .account-submit--danger { background: var(--danger); color: #fff; }
 
-.account-link { background: none; border: none; color: var(--accent-cyan); font-size: 0.9rem; cursor: pointer; padding: 0.25rem; align-self: center; }
+.account-link { background: none; border: none; color: var(--accent); font-size: 0.9rem; cursor: pointer; padding: 0.25rem; align-self: center; }
 .account-link:hover { text-decoration: underline; }
 .account-link--danger { color: var(--danger); margin-top: 0.5rem; }
 

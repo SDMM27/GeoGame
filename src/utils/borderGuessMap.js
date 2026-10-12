@@ -174,8 +174,8 @@ export function getCountryStyle(country) {
   const { maxSpan } = getCountryMetrics(country)
 
   return {
-    fillColor: 'rgba(0, 212, 255, 0.16)',
-    color: '#7dd3fc',
+    fillColor: 'rgba(122, 162, 255, 0.16)',
+    color: '#7AA2FF',
     fillOpacity: maxSpan < 0.35 ? 0.78 : maxSpan < 1 ? 0.68 : 0.55,
     weight: maxSpan < 0.35 ? 5 : maxSpan < 1 ? 4 : maxSpan < 3 ? 3 : 2,
   }

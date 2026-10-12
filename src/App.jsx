@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/react"
 import HomePage from "./pages/HomePage";
 import RouteFallback from "./components/RouteFallback";
 import RouteMeta from "./components/RouteMeta";
+import InviteBanner from "./components/multiplayer/InviteBanner";
 import RouteErrorBoundary, { ErrorBoundary } from "./components/RouteErrorBoundary";
 import { loadCountryGeometries } from "./data/countryGeometry";
 
@@ -35,6 +36,7 @@ export default function App() {
     <ErrorBoundary>
       <Router>
         <RouteMeta />
+        <InviteBanner />
         <RouteErrorBoundary>
           <Suspense fallback={<RouteFallback />}>
             <Routes>

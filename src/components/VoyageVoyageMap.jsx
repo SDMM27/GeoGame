@@ -1,6 +1,7 @@
 import { Fragment, useEffect } from 'react'
 import { MapContainer, GeoJSON, Polyline, CircleMarker, Tooltip, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
+import { MAP_COLORS } from '../utils/mapColors'
 
 function getFeatureBBox(feature) {
   const geom = feature?.geometry
@@ -24,17 +25,20 @@ function getFeatureBBox(feature) {
   }
 }
 
-// color: 'start' | 'green' | 'yellow' | 'red' | 'target' | 'hint'
+// color: 'start' | 'green' | 'yellow' | 'red' | 'target' | 'hint' — same colors as the app (mobile/src/components/map/VoyageMap.tsx)
+const VOYAGE_COLORS = {
+  start: '#5FD4F4',
+  green: MAP_COLORS.right,
+  yellow: MAP_COLORS.missed,
+  red: MAP_COLORS.wrong,
+  target: '#FF9EC7',
+  hint: '#7A84A3',
+}
+
 function getCountryStyle(color) {
-  switch (color) {
-    case 'start':   return { fillColor: '#38bdf8', fillOpacity: 0.75, color: '#0284c7', weight: 2 }
-    case 'green':   return { fillColor: '#4ade80', fillOpacity: 0.75, color: '#15803d', weight: 2 }
-    case 'yellow':  return { fillColor: '#fbbf24', fillOpacity: 0.75, color: '#b45309', weight: 2 }
-    case 'red':     return { fillColor: '#ef4444', fillOpacity: 0.55, color: '#991b1b', weight: 1.5 }
-    case 'target':  return { fillColor: '#f472b6', fillOpacity: 0.75, color: '#be185d', weight: 2 }
-    case 'hint':    return { fillColor: '#94a3b8', fillOpacity: 0.08, color: '#94a3b8', weight: 1.5, dashArray: '5 5' }
-    default:        return { fillColor: '#334155', fillOpacity: 0.1, color: '#475569', weight: 0.5 }
-  }
+  if (color === 'hint') return { fillColor: VOYAGE_COLORS.hint, fillOpacity: 0.08, color: '#EEF1F8', weight: 1.5, dashArray: '5 5' }
+  if (VOYAGE_COLORS[color]) return { fillColor: VOYAGE_COLORS[color], fillOpacity: color === 'red' ? 0.4 : 0.55, color: VOYAGE_COLORS[color], weight: 2 }
+  return { fillColor: '#2A3E66', fillOpacity: 0.1, color: MAP_COLORS.stroke, weight: 0.5 }
 }
 
 function Graticule() {

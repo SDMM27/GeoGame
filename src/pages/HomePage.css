@@ -5,143 +5,239 @@
   flex-direction: column;
 }
 
-/* Main */
+/* Main: the app's home, wider on large screens */
 .home-main {
   flex: 1;
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 28px 24px 48px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 32px 24px;
+  gap: 32px;
 }
 
-/* Hero */
-.home-hero {
-  text-align: center;
-  margin-bottom: 24px;
+.home-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .home-title {
-  font-size: 2.4rem;
-  font-weight: 900;
+  margin: 0;
+  font-size: 2rem;
   color: var(--text-primary);
-  border: none;
-  padding: 0;
-  margin-bottom: 8px;
-  text-shadow: none;
-}
-
-.home-logo {
-  display: block;
-  height: 120px;
-  width: auto;
-  margin: 8px auto 16px;
-  filter: drop-shadow(0 0 18px rgba(124, 58, 237, 0.35));
-}
-
-@media (max-width: 600px) {
-  .home-logo {
-    height: 95px;
-  }
 }
 
 .home-subtitle {
-  font-size: 0.9rem;
+  margin: 0;
+  font-size: 0.85rem;
   color: var(--text-muted);
-  letter-spacing: 3px;
-  text-transform: uppercase;
 }
 
-/* Grid */
-.games-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-  gap: 16px;
-  width: 100%;
-  max-width: 1080px;
-}
-
-/* Tiles */
-.game-tile {
+.home-section {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 20px;
-  border-radius: var(--radius-lg);
-  background: var(--bg-card);
-  border: 1px solid var(--accent-cyan-border);
-  box-shadow: var(--shadow-card);
-  transition: transform 0.2s, box-shadow 0.2s;
+  gap: 14px;
 }
 
-.game-tile:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-card), var(--shadow-glow);
+.home-section-head h2 {
+  margin: 0;
+  font-size: 1.3rem;
 }
 
-.game-tile-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.home-section-head p {
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
 }
 
-.game-tile-icon {
-  font-size: 1.8rem;
+/* Tinted square behind a game's icon, in the game's color */
+.home-icon {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--game, var(--accent)) 14%, transparent);
+  font-size: 1.5rem;
   line-height: 1;
 }
 
-.game-tile-title {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  border: none;
-  padding: 0;
-  margin: 0;
-  text-shadow: none;
+.home-icon--large {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-lg);
+  font-size: 1.7rem;
 }
 
-.game-tile-desc {
+/* Daily challenges: a grid on large screens, a swipeable row on phones */
+.daily-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 14px;
+}
+
+.daily-card {
+  display: flex;
+  flex-direction: column;
+  padding: 18px;
+  border-radius: var(--radius-xl);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  transition: border-color 0.2s;
+}
+
+.daily-card:hover {
+  border-color: color-mix(in srgb, var(--game) 45%, transparent);
+}
+
+.daily-card-title {
+  margin: 14px 0 4px;
+  font-size: 1.2rem;
+}
+
+.daily-card-desc {
   flex: 1;
   margin: 0;
-  font-size: 0.82rem;
-  line-height: 1.5;
+  min-height: 2.6em;
+  font-size: 0.85rem;
+  line-height: 1.35;
   color: var(--text-muted);
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-.game-tile-actions {
+.daily-card-actions {
   display: flex;
-  flex-wrap: wrap;
   gap: 8px;
+  margin-top: 16px;
 }
 
-.game-tile-actions > button {
-  flex: 1 1 auto;
-}
-
-.game-tile-scores {
-  width: 100%;
-  padding: 6px 16px;
-}
-
-.btn-tile-secondary {
+.daily-card-primary {
   flex: 1;
-  padding: 12px;
-  background: transparent;
-  color: var(--accent-cyan);
-  border: 1px solid var(--accent-cyan-border);
+  height: 44px;
+  border: none;
   border-radius: var(--radius-md);
-  font-family: var(--font-main);
-  font-size: 0.95rem;
+  background: var(--game);
+  color: var(--bg-primary);
   font-weight: 700;
-  cursor: pointer;
-  transition: background 0.2s;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  transition: transform 0.1s, filter 0.15s;
 }
 
-.btn-tile-secondary:hover {
-  background: rgba(0, 212, 255, 0.12);
+.daily-card-secondary {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  background: var(--bg-card-hover);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 1.4rem;
+  line-height: 1;
+  transition: border-color 0.15s, transform 0.1s;
+}
+
+.daily-card-primary:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.daily-card-secondary:hover {
+  border-color: var(--game);
+  transform: translateY(-1px);
+}
+
+/* Rows: a game with settings, the Atlas */
+.home-rows {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 12px;
+}
+
+.home-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 16px;
+  text-align: left;
+  border-radius: var(--radius-xl);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  transition: border-color 0.2s, transform 0.1s;
+}
+
+.home-row:hover {
+  border-color: color-mix(in srgb, var(--game) 45%, transparent);
+  transform: translateY(-1px);
+}
+
+.home-row-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.home-row-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.home-row-desc {
+  font-size: 0.85rem;
+  line-height: 1.35;
+  color: var(--text-muted);
+}
+
+.home-row-chevron {
+  flex-shrink: 0;
+  color: var(--text-dim);
+}
+
+@media (max-width: 720px) {
+  .home-main {
+    padding: 20px 16px 32px;
+    gap: 28px;
+  }
+
+  .home-title {
+    font-size: 1.6rem;
+  }
+
+  .daily-row {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    margin: 0 -16px;
+    padding: 0 16px 4px;
+    scrollbar-width: none;
+  }
+
+  .daily-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .daily-card {
+    flex: 0 0 min(300px, 78vw);
+    scroll-snap-align: start;
+    scroll-margin-left: 16px;
+  }
+
+  .home-rows {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Config modal */
@@ -199,7 +295,7 @@
 
 .game-card--active {
   background: var(--bg-card);
-  border: 1px solid var(--accent-cyan-border);
+  border: 1px solid var(--accent-border);
   box-shadow: var(--shadow-card);
 }
 
@@ -287,8 +383,8 @@
 
 .game-mode-tab--active {
   color: var(--text-primary);
-  border-color: var(--accent-cyan-border);
-  background: rgba(0, 212, 255, 0.12);
+  border-color: var(--accent-border);
+  background: rgba(61, 220, 151, 0.12);
 }
 
 .ascension-panel {
@@ -322,8 +418,8 @@
 }
 
 .ascension-preset--active {
-  border-color: var(--accent-cyan-border);
-  background: rgba(0, 212, 255, 0.12);
+  border-color: var(--accent-border);
+  background: rgba(61, 220, 151, 0.12);
 }
 
 .ascension-preset-name {
@@ -418,7 +514,7 @@
 .btn-play {
   flex: 1;
   padding: 12px;
-  background: var(--accent-cyan);
+  background: var(--accent);
   color: var(--bg-primary);
   border: none;
   border-radius: var(--radius-md);
@@ -467,19 +563,8 @@
 }
 
 .nav-scores-btn:hover {
-  color: var(--accent-cyan);
-  border-color: var(--accent-cyan-border);
-}
-
-/* Responsive */
-@media (max-width: 600px) {
-  .games-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .home-main {
-    padding: 24px 16px;
-  }
+  color: var(--accent);
+  border-color: var(--accent-border);
 }
 
 /* Difficulty Grid */
@@ -510,7 +595,7 @@
 
 .difficulty-btn--active {
   border-color: var(--accent-purple);
-  background: rgba(123, 47, 247, 0.12);
+  background: rgba(199, 146, 255, 0.12);
 }
 
 .difficulty-btn--wide {
@@ -528,31 +613,3 @@
   color: var(--text-muted);
   margin-top: 2px;
 }
-
-.home-multiplayer-banner {
-  display: flex;
-  justify-content: center;
-  margin: 0 0 2rem;
-}
-
-.home-multiplayer-btn {
-  background: linear-gradient(135deg, #1e3a5f, #1a4a7a);
-  color: #e0f0ff;
-  border: 1px solid #2563eb;
-  border-radius: 10px;
-  padding: 0.75rem 2rem;
-  font-size: 1.05rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
-}
-
-.home-multiplayer-btn:hover {
-  background: linear-gradient(135deg, #1e4a7a, #1a5aa0);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
-}
-
-.home-atlas-btn { margin-left: 0.75rem; background: linear-gradient(135deg, #2e1f5e, #3b2380); border-color: #7b2ff7; box-shadow: 0 2px 8px rgba(123, 47, 247, 0.25); }
-.home-atlas-btn:hover { background: linear-gradient(135deg, #3b2380, #4c2ca3); box-shadow: 0 4px 14px rgba(123, 47, 247, 0.4); }

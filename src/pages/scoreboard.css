@@ -52,8 +52,8 @@
 
 .scoreboard-mode-tab--active {
   color: var(--text-primary);
-  border-color: var(--accent-cyan-border);
-  background: var(--accent-cyan-dim);
+  border-color: var(--accent-border);
+  background: var(--accent-dim);
 }
 
 .scoreboard-era-tab {
@@ -73,7 +73,7 @@
 }
 
 .scoreboard-era-tab--active {
-  background: var(--accent-cyan);
+  background: var(--accent);
   color: #000;
   font-weight: 700;
 }
@@ -146,7 +146,7 @@
 }
 
 .scoreboard-row--top {
-  border-color: var(--accent-cyan-border);
+  border-color: var(--accent-border);
 }
 
 .scoreboard-rank {
@@ -159,7 +159,7 @@
 }
 
 .scoreboard-score {
-  color: var(--accent-cyan);
+  color: var(--accent);
   font-weight: 700;
 }
 

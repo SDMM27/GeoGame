@@ -1,6 +1,6 @@
 // src/pages/multiplayer/MultiplayerCreatePage.jsx
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import NavBar from '../../components/NavBar'
 import RoomConfig from '../../components/multiplayer/RoomConfig'
 import { useAccount } from '../../auth'
@@ -10,6 +10,7 @@ import './MultiplayerCreatePage.css'
 
 export default function MultiplayerCreatePage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { account } = useAccount()
   const [submitting, setSubmitting] = useState(false)
 
@@ -39,7 +40,7 @@ export default function MultiplayerCreatePage() {
   return (
     <div className="mp-create">
       <NavBar />
-      <RoomConfig onSubmit={handleSubmit} submitting={submitting} />
+      <RoomConfig onSubmit={handleSubmit} submitting={submitting} initialGameId={location.state?.gameId} />
     </div>
   )
 }

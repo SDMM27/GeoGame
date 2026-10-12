@@ -1,8 +1,8 @@
 ﻿.border-guess-page {
   min-height: 100vh;
   background:
-    radial-gradient(circle at top left, rgba(0, 212, 255, 0.12), transparent 28%),
-    radial-gradient(circle at bottom right, rgba(123, 47, 247, 0.12), transparent 24%),
+    radial-gradient(circle at top left, rgba(61, 220, 151, 0.12), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(199, 146, 255, 0.12), transparent 24%),
     var(--bg-primary);
 }
 
@@ -42,7 +42,7 @@
 
 .border-guess-eyebrow {
   margin: 0;
-  color: var(--accent-cyan);
+  color: var(--accent);
   text-transform: uppercase;
   letter-spacing: 2px;
   font-size: 0.72rem;
@@ -95,7 +95,7 @@
   border-radius: 22px;
   overflow: hidden;
   background:
-    linear-gradient(180deg, rgba(125, 211, 252, 0.08), rgba(15, 23, 42, 0.75)),
+    linear-gradient(180deg, rgba(125, 211, 252, 0.08), rgba(11, 16, 32, 0.75)),
     repeating-linear-gradient(
       45deg,
       rgba(255, 255, 255, 0.025),
@@ -183,8 +183,8 @@
 }
 
 .border-guess-suggestion:hover {
-  background: rgba(0, 212, 255, 0.08);
-  border-color: rgba(0, 212, 255, 0.28);
+  background: rgba(61, 220, 151, 0.08);
+  border-color: rgba(61, 220, 151, 0.28);
   transform: translateY(-1px);
 }
 
@@ -217,8 +217,8 @@
 .border-guess-primary {
   margin-top: 10px;
   padding: 13px 16px;
-  background: linear-gradient(135deg, var(--accent-cyan), #7dd3fc);
-  color: #04111f;
+  background: var(--game-border-guess);
+  color: var(--bg-primary);
 }
 
 .border-guess-secondary {
@@ -229,8 +229,8 @@
 }
 
 .border-guess-secondary--warning {
-  border-color: rgba(251, 191, 36, 0.3);
-  color: #fbbf24;
+  border-color: rgba(245, 184, 61, 0.3);
+  color: var(--warning);
 }
 
 .border-guess-action-button {
@@ -273,13 +273,13 @@
   width: 28px;
   height: 28px;
   border-radius: 999px;
-  background: rgba(0, 212, 255, 0.16);
-  border: 1px solid rgba(0, 212, 255, 0.28);
-  color: var(--accent-cyan);
+  background: rgba(61, 220, 151, 0.16);
+  border: 1px solid rgba(61, 220, 151, 0.28);
+  color: var(--accent);
   font-size: 1.15rem;
   font-weight: 900;
   line-height: 1;
-  box-shadow: 0 0 14px rgba(0, 212, 255, 0.18);
+  box-shadow: 0 0 14px rgba(61, 220, 151, 0.18);
   flex: 0 0 auto;
 }
 
@@ -295,12 +295,12 @@
 }
 
 .border-guess-chip--correct {
-  border-color: rgba(74, 222, 128, 0.35);
-  background: rgba(74, 222, 128, 0.12);
+  border-color: rgba(61, 220, 151, 0.35);
+  background: rgba(61, 220, 151, 0.12);
 }
 
 .border-guess-chip--wrong {
-  border-color: rgba(248, 113, 113, 0.24);
+  border-color: rgba(255, 122, 107, 0.24);
 }
 
 .border-guess-empty,
@@ -319,12 +319,12 @@
 
 .border-guess-result--win {
   color: #bbf7d0;
-  border-color: rgba(74, 222, 128, 0.35);
+  border-color: rgba(61, 220, 151, 0.35);
 }
 
 .border-guess-result--lose {
   color: #fecaca;
-  border-color: rgba(248, 113, 113, 0.28);
+  border-color: rgba(255, 122, 107, 0.28);
 }
 
 .border-guess-actions {

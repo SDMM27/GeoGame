@@ -14,20 +14,10 @@ import { getTotalFlagCountries } from '../../hooks/useFlagGameState'
 import { getTotalCapitalCountries } from '../../hooks/useCapitalsGameState'
 import { parseSurvivalModes, survivalModesKey } from '../../utils/survivalConfig'
 import SurvivalOptions, { SURVIVAL_ROUND_ICONS, defaultSurvivalOptions, rampLabel, timerLabel } from '../SurvivalOptions'
+import { ROOM_GAMES, roomGameIcon } from '../../utils/roomGames'
 import './RoomConfig.css'
 
 const DEFAULT_ASCENSION_PRESET = ASCENSION_PRESETS.find(p => p.name === 'Progressif') ?? ASCENSION_PRESETS[1]
-
-// Same games and ids as the app (mobile/src/games.ts)
-export const ROOM_GAMES = [
-  { id: 'placement', type: GAME_TYPES.PLACEMENT, icon: '🌍' },
-  { id: 'flags', type: GAME_TYPES.FLAGS, icon: '🚩' },
-  { id: 'capitals', type: GAME_TYPES.CAPITALS, icon: '🏛️' },
-  { id: 'border_guess', type: GAME_TYPES.BORDER_GUESS, icon: '🧩' },
-  { id: 'country_clue', type: GAME_TYPES.COUNTRY_CLUE, icon: '🧭' },
-  { id: 'quiz', type: GAME_TYPES.QUIZ, icon: '❓' },
-  { id: 'survival', type: GAME_TYPES.SURVIVAL, icon: '❤️' },
-]
 
 const SETUP_TYPES = [GAME_TYPES.PLACEMENT, GAME_TYPES.FLAGS, GAME_TYPES.CAPITALS]
 const DIFFICULTIES = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
@@ -163,7 +153,7 @@ export function buildRoomGame({ gameId, setup, count, quizDifficulty, answerMode
 
 /** "🚩 Trouve le Drapeau · Moyen", "❤️ Survie · 3 ❤️ · ⏱ 30 s · 🎯 Normale · 🚩🧠" */
 export function gameLabel(game, t) {
-  const icon = ROOM_GAMES.find(g => g.id === game.id)?.icon ?? '🎮'
+  const icon = roomGameIcon(game.id)
   if (game.type === GAME_TYPES.SURVIVAL) {
     const rounds = parseSurvivalModes(game.modes).map(type => SURVIVAL_ROUND_ICONS[type]).join('')
     const ramp = game.ramp ? ` · ${rampLabel(game.ramp, t)}` : ''
@@ -248,7 +238,8 @@ export function GameEditor({ draft, onChange }) {
   )
 }
 
-export default function RoomConfig({ onSubmit, submitting }) {
+// `initialGameId`: the game picked before coming here (the multiplayer button of a home card).
+export default function RoomConfig({ onSubmit, submitting, initialGameId }) {
   const { t } = useTranslation()
   const { account } = useAccount()
   // Signed in: the account's username until the player types another one
@@ -257,7 +248,9 @@ export default function RoomConfig({ onSubmit, submitting }) {
   const [mode, setMode] = useState('live')
   // Games already added, then the one being edited (the last game of the room)
   const [games, setGames] = useState([])
-  const [draft, setDraft] = useState(newDraft)
+  const [draft, setDraft] = useState(() =>
+    ROOM_GAMES.some(g => g.id === initialGameId) ? { ...newDraft(), gameId: initialGameId } : newDraft()
+  )
   const forbiddenPseudo = containsProfanity(pseudo)
   const canSubmit = pseudo.trim() && !forbiddenPseudo && draftReady(draft) && !submitting
 

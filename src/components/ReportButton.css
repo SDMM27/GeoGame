@@ -114,9 +114,9 @@
 }
 
 .report__btn--primary {
-  border-color: var(--accent-cyan-border);
-  background: var(--accent-cyan-dim);
-  color: var(--accent-cyan);
+  border-color: var(--accent-border);
+  background: var(--accent-dim);
+  color: var(--accent);
 }
 
 .report__btn:disabled {

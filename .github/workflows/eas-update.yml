@@ -4,7 +4,12 @@ name: EAS Update
 #  - automatically to the preview channel after each merge on master that changes the app (mobile/) or the code it
 #    shares with the website (src/);
 #  - by hand from the Actions tab → "EAS Update" → Run workflow, choosing the branch and the channel.
-# Needs the EXPO_TOKEN repository secret (expo.dev → Account settings → Access tokens).
+# An installed APK only receives the updates made for its native runtime version (the fingerprint of its native code,
+# see runtimeVersion in mobile/app.json). When a change alters it (a native module added or upgraded, a config plugin…),
+# no APK can receive the update: the apk job then builds one and publishes it as the latest release of
+# GeoGame-releases, where the website's download link and the app's "new version" banner point.
+# Needs the repository secrets EXPO_TOKEN (expo.dev → Account settings → Access tokens) and RELEASES_TOKEN (a GitHub
+# fine-grained token with Contents: read and write on SDMM27/GeoGame-releases).
 on:
   push:
     branches: [master]
@@ -25,7 +30,7 @@ on:
 permissions:
   contents: read
 
-# Two merges in a row: the second update waits for the first instead of racing it.
+# Two merges in a row: the second update waits for the first instead of racing it (and never builds the same APK twice).
 concurrency:
   group: eas-update
   cancel-in-progress: false
@@ -35,6 +40,43 @@ jobs:
     name: Publish the update
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: mobile
+    outputs:
+      channel: ${{ steps.publish.outputs.channel }}
+      runtime: ${{ steps.publish.outputs.runtime }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      - run: npm ci
+      # The EAS environment of the same name provides the EXPO_PUBLIC_* variables, as when run locally.
+      - id: publish
+        run: |
+          eas update --channel "$CHANNEL" --environment "$CHANNEL" --message "$MESSAGE" --json > update.json
+          cat update.json
+          echo "channel=$CHANNEL" >> "$GITHUB_OUTPUT"
+          echo "runtime=$(jq -r 'map(select(.platform == "android"))[0].runtimeVersion' update.json)" >> "$GITHUB_OUTPUT"
+        env:
+          # After a merge there are no inputs: preview channel, and the merge's commit message.
+          CHANNEL: ${{ inputs.channel || 'preview' }}
+          MESSAGE: ${{ inputs.message || github.event.head_commit.message }}
+
+  apk:
+    name: Build an APK if the native runtime changed
+    needs: update
+    if: needs.update.outputs.channel == 'preview'
+    runs-on: ubuntu-latest
+    # The build runs on EAS servers and can wait a long time in the free queue.
+    timeout-minutes: 180
     defaults:
       run:
         working-directory: mobile
@@ -49,10 +91,27 @@ jobs:
         with:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
+      # Even listing the builds (below) reads the app config, whose plugins come from node_modules.
       - run: npm ci
-      # The EAS environment of the same name provides the EXPO_PUBLIC_* variables, as when run locally.
-      - run: eas update --channel "$CHANNEL" --environment "$CHANNEL" --message "$MESSAGE" --non-interactive
+      - name: Publish an APK for this runtime on GeoGame-releases, unless the latest release already is one
+        run: |
+          released=$(curl -sSfL https://github.com/SDMM27/GeoGame-releases/releases/latest/download/latest.json | jq -r .runtimeVersion || true)
+          if [ "$released" = "$RUNTIME" ]; then echo "The latest release is already built for runtime $RUNTIME"; exit 0; fi
+          # An APK already built for this runtime (by hand, say) is reused; otherwise one is built on EAS servers.
+          eas build:list --platform android --build-profile preview --runtime-version "$RUNTIME" --status finished --limit 1 --json > build.json
+          if [ "$(jq length build.json)" -eq 0 ]; then
+            eas build --platform android --profile preview --non-interactive --wait --json > build.json
+          fi
+          cat build.json
+          url=$(jq -r '.[0].artifacts.buildUrl' build.json)
+          version=$(jq -r '.[0].appVersion' build.json)
+          runtime=$(jq -r ".[0].runtime.version // .[0].runtimeVersion // \"$RUNTIME\"" build.json)
+          curl -sSfL "$url" -o geogame.apk
+          # Read by the app (useNewerApk in mobile/src/updates.ts) to tell an APK that no update can reach any more.
+          jq -n --arg runtime "$runtime" --arg version "$version" '{runtimeVersion: $runtime, appVersion: $version}' > latest.json
+          gh release create "v$version-${runtime:0:7}" geogame.apk latest.json --repo SDMM27/GeoGame-releases \
+            --title "GeoGame $version (${runtime:0:7})" --notes "$MESSAGE" --latest
         env:
-          # After a merge there are no inputs: preview channel, and the merge's commit message.
-          CHANNEL: ${{ inputs.channel || 'preview' }}
+          RUNTIME: ${{ needs.update.outputs.runtime }}
+          GH_TOKEN: ${{ secrets.RELEASES_TOKEN }}
           MESSAGE: ${{ inputs.message || github.event.head_commit.message }}

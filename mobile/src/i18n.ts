@@ -157,7 +157,7 @@ const fr = {
     errors_label: 'Erreurs',
     leave: 'Quitter',
   },
-  update: { title: 'Nouvelle version disponible', message: 'Relance pour l’installer', restart: 'Relancer', later: 'Plus tard' },
+  update: { title: 'Nouvelle version disponible', message: 'Relance pour l’installer', restart: 'Relancer', later: 'Plus tard', apk_title: 'Nouvelle version de l’app', apk_message: 'Installe-la pour continuer à recevoir les mises à jour', apk_install: 'Installer' },
   invites: {
     title: 'Inviter des amis',
     invite: 'Inviter',
@@ -374,7 +374,7 @@ const en: MobileStrings = {
     errors_label: 'Wrong guesses',
     leave: 'Leave',
   },
-  update: { title: 'New version available', message: 'Restart to install it', restart: 'Restart', later: 'Later' },
+  update: { title: 'New version available', message: 'Restart to install it', restart: 'Restart', later: 'Later', apk_title: 'New app version', apk_message: 'Install it to keep getting updates', apk_install: 'Install' },
   invites: {
     title: 'Invite friends',
     invite: 'Invite',
@@ -589,7 +589,7 @@ const ru: MobileStrings = {
     errors_label: 'Ошибки',
     leave: 'Выйти',
   },
-  update: { title: 'Доступна новая версия', message: 'Перезапусти, чтобы установить', restart: 'Перезапустить', later: 'Позже' },
+  update: { title: 'Доступна новая версия', message: 'Перезапусти, чтобы установить', restart: 'Перезапустить', later: 'Позже', apk_title: 'Новая версия приложения', apk_message: 'Установи её, чтобы получать обновления', apk_install: 'Установить' },
   invites: {
     title: 'Пригласить друзей',
     invite: 'Пригласить',

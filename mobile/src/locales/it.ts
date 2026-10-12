@@ -146,7 +146,7 @@ export const it: MobileStrings = {
     errors_label: 'Errori',
     leave: 'Esci',
   },
-  update: { title: 'Nuova versione disponibile', message: 'Riavvia per installarla', restart: 'Riavvia', later: 'Più tardi' },
+  update: { title: 'Nuova versione disponibile', message: 'Riavvia per installarla', restart: 'Riavvia', later: 'Più tardi', apk_title: 'Nuova versione dell’app', apk_message: 'Installala per continuare a ricevere aggiornamenti', apk_install: 'Installa' },
   invites: {
     title: 'Invita amici',
     invite: 'Invita',

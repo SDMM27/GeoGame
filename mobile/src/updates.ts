@@ -3,7 +3,9 @@
 // and a new one is downloaded and applied right away. Same after a long time in the background.
 import * as Updates from 'expo-updates'
 import { useEffect, useState } from 'react'
-import { AppState } from 'react-native'
+import { AppState, Platform } from 'react-native'
+
+import { LATEST_APK_INFO_URL } from '@/links'
 
 // Past these, the app opens on the version it has (the update, if any, still applies on the next launch).
 const CHECK_TIMEOUT_MS = 4000
@@ -87,4 +89,25 @@ export function useLaunchUpdate(): boolean {
   }, [])
 
   return ready
+}
+
+/**
+ * True when a newer APK than the installed one was published. An APK only receives the updates made for its native
+ * runtime version: once a native module changes, it must be reinstalled, or it stays on its version for good.
+ * Only for the APKs (preview channel); store builds are updated by the store.
+ */
+export function useNewerApk(): boolean {
+  const [newer, setNewer] = useState(false)
+
+  useEffect(() => {
+    if (!updatesEnabled || Platform.OS !== 'android' || Updates.channel !== 'preview') return
+    fetch(LATEST_APK_INFO_URL)
+      .then((response) => (response.ok ? response.json() : null))
+      .then((info: { runtimeVersion?: string } | null) => {
+        if (info?.runtimeVersion && info.runtimeVersion !== Updates.runtimeVersion) setNewer(true)
+      })
+      .catch((error) => console.warn('[updates]', error))
+  }, [])
+
+  return newer
 }

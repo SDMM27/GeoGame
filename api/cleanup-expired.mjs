@@ -1,12 +1,15 @@
 // GET /api/cleanup-expired, called once a day by Vercel Cron (see "crons" in vercel.json) with
-// Authorization: Bearer <CRON_SECRET>. Deletes expired rooms, invites and probes (see _lib/cleanupExpired.mjs).
+// Authorization: Bearer <CRON_SECRET>. Deletes expired rooms, invites and probes (see _lib/cleanupExpired.mjs), and
+// accounts unused for 3 years (deleteInactiveAccounts in _lib/deleteAccount.mjs).
 // Env: CRON_SECRET (any long random string, set in the Vercel project), FIREBASE_SERVICE_ACCOUNT as for
-// api/invite-push. Against the emulators, FIRESTORE_EMULATOR_HOST replaces the key.
+// api/invite-push. Against the emulators, FIRESTORE_EMULATOR_HOST / FIREBASE_AUTH_EMULATOR_HOST replace the key.
 import { cert, getApps, initializeApp } from 'firebase-admin/app'
+import { getAuth } from 'firebase-admin/auth'
 import { getFirestore } from 'firebase-admin/firestore'
 
 import { cleanupExpired } from './_lib/cleanupExpired.mjs'
 import { isCronAuthorized } from './_lib/cronAuth.mjs'
+import { deleteInactiveAccounts } from './_lib/deleteAccount.mjs'
 
 function adminApp() {
   if (getApps().length) return getApps()[0]
@@ -22,7 +25,9 @@ export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'method_not_allowed' })
 
   try {
-    const deleted = await cleanupExpired({ db: getFirestore(adminApp()) })
+    const app = adminApp()
+    const db = getFirestore(app)
+    const deleted = { ...(await cleanupExpired({ db })), ...(await deleteInactiveAccounts({ db, auth: getAuth(app) })) }
     console.log('[cleanup-expired]', deleted)
     return res.status(200).json({ deleted })
   } catch (error) {

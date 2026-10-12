@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import NavBar from "../components/NavBar";
 import AppBanner from "../components/AppBanner";
+import LegalLinks from "../components/LegalLinks";
 import GameTile from "./home/GameTile";
 import GameConfigModal from "./home/GameConfigModal";
 import { GAMES } from "./home/gameData";
@@ -39,6 +40,7 @@ export default function HomePage() {
           ))}
         </div>
       </main>
+      <LegalLinks />
       {configGame && <GameConfigModal game={configGame} onClose={closeConfig} />}
     </div>
   );

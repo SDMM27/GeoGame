@@ -1,8 +1,9 @@
 // Profile tab: sign in or create an account (shared with the website), then the account itself.
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { router } from 'expo-router'
+import { openBrowserAsync } from 'expo-web-browser'
 import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Switch, TextInput, View, type TextInputProps } from 'react-native'
 import Animated, { FadeIn } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -18,9 +19,11 @@ import {
   USERNAME_MAX,
 } from '@shared/utils/account'
 import { useFriendships } from '@shared/hooks/usePlayerProfile'
+import { LEGAL_PATHS } from '@shared/legal/legalInfo'
 
 import { auth, useAccount, type Account } from '@/account/auth'
 import { reauthenticateWithGoogle, signInWithGoogle } from '@/account/google'
+import { API_ORIGIN, legalUrl } from '@/links'
 import { Avatar, ProfileBody, SectionTitle } from '@/components/profile/ProfileSections'
 import { Button, Pill, Segmented, Text, Touchable } from '@/components/ui'
 import { forgetDevice, useDailyReminder, useWebPushPermission } from '@/notifications/push'
@@ -30,6 +33,37 @@ import { colors, fonts, radius, space } from '@/theme'
 const signOutDevice = () => forgetDevice().then(() => signOut(auth))
 
 type Mode = 'signin' | 'signup'
+
+const openLegal = (path: string) => openBrowserAsync(legalUrl(path)).catch(() => {})
+
+// Shown wherever an account gets created (email form, or username choice after a first Google sign-in).
+function SignupNotice() {
+  const link = (path: string) => <Text variant="caption" color={colors.accent} onPress={() => openLegal(path)} />
+  return (
+    <Text variant="caption">
+      <Trans i18nKey="legal.signup_notice" components={{ terms: link(LEGAL_PATHS.terms), privacy: link(LEGAL_PATHS.privacy) }} />
+    </Text>
+  )
+}
+
+// Privacy policy, terms, legal notice and account deletion, on the website.
+function LegalLinks() {
+  const { t } = useTranslation()
+  const pages = [
+    [LEGAL_PATHS.privacy, 'legal.privacy'],
+    [LEGAL_PATHS.terms, 'legal.terms'],
+    [LEGAL_PATHS.legal, 'legal.legal'],
+  ]
+  return (
+    <View style={styles.legalLinks}>
+      {pages.map(([path, key]) => (
+        <Touchable key={path} accessibilityRole="link" onPress={() => openLegal(path)} style={{ padding: space.xs }}>
+          <Text variant="caption">{t(key)}</Text>
+        </Touchable>
+      ))}
+    </View>
+  )
+}
 
 function Field({ label, hint, ...props }: TextInputProps & { label: string; hint?: string }) {
   return (
@@ -183,6 +217,7 @@ function AuthForm() {
 
       {error && <Message kind="error" text={t(`account.errors.${error}`)} />}
       {notice && <Message kind="notice" text={notice} />}
+      {mode === 'signup' && <SignupNotice />}
 
       <Button
         label={t(mode === 'signup' ? 'account.signup' : 'account.signin')}
@@ -238,6 +273,7 @@ function ChooseUsername() {
         onSubmitEditing={() => username.trim() && onSubmit()}
       />
       {error && <Message kind="error" text={t(`account.errors.${error}`)} />}
+      <SignupNotice />
       <Button label={t('account.choose_submit')} onPress={onSubmit} loading={submitting} disabled={!username.trim()} />
       <Touchable accessibilityRole="button" onPress={signOutDevice} style={styles.link}>
         <Text variant="bodyStrong" color={colors.textMuted} style={{ fontSize: 14 }}>
@@ -260,7 +296,8 @@ function AccountSettings({ account }: { account: Account }) {
     setError(null)
     try {
       await forgetDevice()
-      await deleteAccount(auth, account.hasPassword ? { password } : { reauthenticate: reauthenticateWithGoogle })
+      const proof = account.hasPassword ? { password } : { reauthenticate: reauthenticateWithGoogle }
+      await deleteAccount(auth, { ...proof, apiOrigin: API_ORIGIN })
     } catch (err) {
       const key = accountErrorKey(err)
       if (key !== 'cancelled') setError(key)
@@ -440,6 +477,7 @@ export default function ProfileScreen() {
             {!account ? <AuthForm /> : account.needsUsername ? <ChooseUsername /> : <Profile account={account} />}
           </Animated.View>
         )}
+        {!loading && <LegalLinks />}
       </ScrollView>
     </KeyboardAvoidingView>
   )
@@ -465,5 +503,6 @@ const styles = StyleSheet.create({
   dividerLine: { flex: 1, height: StyleSheet.hairlineWidth, backgroundColor: colors.border },
   header: { flexDirection: 'row', alignItems: 'center', gap: space.lg },
   friendsCard: { flexDirection: 'row', alignItems: 'center', gap: space.md, paddingVertical: space.md },
+  legalLinks: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: space.md },
   friendsIcon: { width: 44, height: 44, borderRadius: radius.md, backgroundColor: `${colors.highlight}1F`, alignItems: 'center', justifyContent: 'center' },
 })

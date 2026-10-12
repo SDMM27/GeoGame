@@ -7,12 +7,13 @@ import countries from '../data/countriesWithDifficulty_FR.json'
 import { formatTime } from '../utils/formatTime'
 import { saveSnapshot } from '../utils/multiplayerSnapshot'
 import { getCountryName } from '../utils/getCountryName'
+import { MAP_COLORS } from '../utils/mapColors'
 
 const DIFFICULTIES = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
 
 const COUNTRY_STYLE = {
   fillColor: 'transparent',
-  color: '#94a3b8',
+  color: MAP_COLORS.stroke,
   fillOpacity: 1,
   weight: 1,
 }
@@ -178,7 +179,7 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
       containerId: 'topRightToast',
     })
     const name = targetCountryRef.current
-    setStyleForCountry(name, { fillColor: '#ff4d4d', weight: 2, fillOpacity: 0.5 })
+    setStyleForCountry(name, { fillColor: MAP_COLORS.wrong, weight: 2, fillOpacity: 0.5 })
     shownCountriesRef.current.add(name)
     if (geoJsonRef.current) {
       const layer = geoJsonRef.current.getLayers().find(
@@ -248,7 +249,7 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
     const name = layer.feature.properties.ADMIN
     if (foundCountriesRef.current.has(name)) return
     if (shownCountriesRef.current.has(name)) return
-    layer.setStyle({ fillColor: '#7b2ff7', weight: 2, fillOpacity: 0.4 })
+    layer.setStyle({ fillColor: MAP_COLORS.hover, weight: 2, fillOpacity: 0.4 })
   }
 
   const onCountryMouseOut = (event) => {
@@ -274,7 +275,7 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
         })
         incrementScore(targetDiff, consecutiveErrorsRef.current)
       }
-      setStyleForCountry(clickedName, { fillColor: '#4ade80', weight: 2, fillOpacity: 0.5 })
+      setStyleForCountry(clickedName, { fillColor: MAP_COLORS.right, weight: 2, fillOpacity: 0.5 })
       shownCountriesRef.current.delete(clickedName)
       foundCountriesRef.current.add(clickedName)
       setStats(prev =>
@@ -310,7 +311,7 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
     setClickOnSeeCountry(true)
     clickOnSeeCountryRef.current = true
     const name = targetCountryRef.current
-    setStyleForCountry(name, { fillColor: '#ff4d4d', weight: 2, fillOpacity: 0.5 })
+    setStyleForCountry(name, { fillColor: MAP_COLORS.wrong, weight: 2, fillOpacity: 0.5 })
     shownCountriesRef.current.add(name)
     if (!geoJsonRef.current) return
     const layer = geoJsonRef.current.getLayers().find(

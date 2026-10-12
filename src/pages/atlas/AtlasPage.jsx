@@ -13,11 +13,12 @@ import { getCountryMetrics, getFocusCountry } from '../../utils/borderGuessMap'
 import { ATLAS_COUNTRIES, countryDisplayName, findAtlasCountry, getCountryInfo, searchAtlasCountries } from '../../utils/countryInfo'
 import { getShiftedFeatures } from '../game/shiftedFeatures'
 import CountrySheet from './CountrySheet'
+import { MAP_COLORS } from '../../utils/mapColors'
 import './AtlasPage.css'
 
-const STYLE = { fillColor: '#1e293b', fillOpacity: 0.55, color: '#64748b', weight: 1 }
-const STYLE_HOVER = { fillColor: '#334155', fillOpacity: 0.8, color: '#94a3b8', weight: 1.5 }
-const STYLE_SELECTED = { fillColor: '#7b2ff7', fillOpacity: 0.6, color: '#c4b5fd', weight: 2 }
+const STYLE = { fillColor: '#2A3E66', fillOpacity: 0.55, color: MAP_COLORS.stroke, weight: 1 }
+const STYLE_HOVER = { fillColor: '#34406A', fillOpacity: 0.8, color: MAP_COLORS.hover, weight: 1.5 }
+const STYLE_SELECTED = { fillColor: MAP_COLORS.hover, fillOpacity: 0.6, color: MAP_COLORS.hover, weight: 2 }
 
 // Countries too small to click at low zoom get a dot until the map is zoomed in enough
 const SMALL_SPAN = 0.5
@@ -44,7 +45,7 @@ function SmallCountryDots({ selected, onSelect }) {
         key={dot.key}
         center={dot.center}
         radius={6}
-        pathOptions={dot.admin === selected ? { ...STYLE_SELECTED, fillOpacity: 0.9 } : { fillColor: '#ffffff', fillOpacity: 0.15, color: '#94a3b8', weight: 1.5 }}
+        pathOptions={dot.admin === selected ? { ...STYLE_SELECTED, fillOpacity: 0.9 } : { fillColor: '#ffffff', fillOpacity: 0.15, color: MAP_COLORS.stroke, weight: 1.5 }}
         eventHandlers={{ click: () => onSelect(dot.admin) }}
       />
     ))

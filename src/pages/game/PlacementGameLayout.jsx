@@ -16,8 +16,9 @@ import ShareScoreButton from '../../components/ShareScoreButton'
 import SmallCountryCircles from './SmallCountryCircles'
 import RightClickDrag from './RightClickDrag'
 import { getShiftedFeatures } from './shiftedFeatures'
+import { MAP_COLORS } from '../../utils/mapColors'
 
-const GEO_STYLE = { fillColor: 'transparent', color: '#94a3b8', fillOpacity: 1, weight: 1 }
+const GEO_STYLE = { fillColor: 'transparent', color: MAP_COLORS.stroke, fillOpacity: 1, weight: 1 }
 
 export default function PlacementGameLayout({ difficulty, isTraining, isAscension, presetName, state, onGameFinished = null, continent }) {
   const { t, i18n } = useTranslation()

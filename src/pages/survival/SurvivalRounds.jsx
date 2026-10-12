@@ -14,6 +14,7 @@ import { localizeQuestion } from '../../utils/quizQuestions'
 import { matchesWhileTyping } from '../../utils/survival'
 import { FitCountryBounds, GuessHistory } from '../BorderGuessPage'
 import SmallCountryCircles from '../game/SmallCountryCircles'
+import { MAP_COLORS } from '../../utils/mapColors'
 import '../BorderGuessPage.css'
 import '../QuizPage.css'
 
@@ -32,11 +33,11 @@ export function roundAnswer(round, lang, t) {
 
 // ─── Placement: click the country on the map ──────────────────────────────
 
-const MAP_STYLE = { fillColor: 'transparent', color: '#94a3b8', fillOpacity: 1, weight: 1 }
-const MAP_HOVER = { fillColor: '#7b2ff7', weight: 2, fillOpacity: 0.4 }
-const MAP_WRONG = { fillColor: '#ff4d4d', color: '#fca5a5', weight: 2, fillOpacity: 0.45 }
-const MAP_RIGHT = { fillColor: '#4ade80', color: '#86efac', weight: 2, fillOpacity: 0.6 }
-const MAP_MISSED = { fillColor: '#fbbf24', color: '#fde68a', weight: 2, fillOpacity: 0.6 }
+const MAP_STYLE = { fillColor: 'transparent', color: MAP_COLORS.stroke, fillOpacity: 1, weight: 1 }
+const MAP_HOVER = { fillColor: MAP_COLORS.hover, weight: 2, fillOpacity: 0.4 }
+const MAP_WRONG = { fillColor: MAP_COLORS.wrong, color: MAP_COLORS.wrong, weight: 2, fillOpacity: 0.45 }
+const MAP_RIGHT = { fillColor: MAP_COLORS.right, color: MAP_COLORS.right, weight: 2, fillOpacity: 0.6 }
+const MAP_MISSED = { fillColor: MAP_COLORS.missed, color: MAP_COLORS.missed, weight: 2, fillOpacity: 0.6 }
 
 export function PlacementRound({ survival }) {
   const { i18n } = useTranslation()

@@ -60,9 +60,9 @@
 
 .voyage-regen-btn {
   margin-top: 6px;
-  background: #1e3a5f;
-  color: #60a5fa;
-  border: 1px solid #3b82f6;
+  background: color-mix(in srgb, var(--game-voyage-voyage) 14%, transparent);
+  color: var(--game-voyage-voyage);
+  border: 1px solid color-mix(in srgb, var(--game-voyage-voyage) 45%, transparent);
   padding: 5px 14px;
   border-radius: 20px;
   font-size: 0.78em;
@@ -72,9 +72,9 @@
 }
 
 .voyage-regen-btn:hover {
-  background: #2563eb;
-  color: #fff;
-  border-color: #2563eb;
+  background: var(--game-voyage-voyage);
+  color: var(--bg-primary);
+  border-color: var(--game-voyage-voyage);
 }
 
 /* ───── Modal résultat ───── */
@@ -137,21 +137,22 @@
 
 .voyage-modal-new-game {
   margin-top: 8px;
-  background: #3b82f6;
-  color: #fff;
+  background: var(--game-voyage-voyage);
+  color: var(--bg-primary);
+  font-weight: 700;
   border: none;
   padding: 9px 24px;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   font-size: 0.9em;
   cursor: pointer;
 }
 
-.voyage-modal-new-game:hover { background: #2563eb; }
+.voyage-modal-new-game:hover { background: color-mix(in srgb, var(--game-voyage-voyage) 85%, white); }
 
 .voyage-regen-btn--results {
-  background: #1e3a5f;
-  color: #60a5fa;
-  border-color: #3b82f6;
+  background: color-mix(in srgb, var(--game-voyage-voyage) 14%, transparent);
+  color: var(--game-voyage-voyage);
+  border-color: var(--game-voyage-voyage);
 }
 
 /* ───── Carte ───── */
@@ -205,7 +206,7 @@
 }
 
 /* Couleurs Travle */
-.voyage-chain-badge--start  { background: #0c4a6e; color: #38bdf8; }
+.voyage-chain-badge--start  { background: color-mix(in srgb, var(--game-voyage-voyage) 18%, transparent); color: var(--game-voyage-voyage); }
 .voyage-chain-badge--green  { background: #166534; color: var(--success); }
 .voyage-chain-badge--yellow { background: #78350f; color: var(--warning); }
 .voyage-chain-badge--red          { background: #450a0a; color: var(--danger); text-decoration: line-through; opacity: 0.75; }
@@ -253,7 +254,7 @@
 }
 
 .voyage-input-row input:focus {
-  border-color: #3b82f6;
+  border-color: var(--game-voyage-voyage);
 }
 
 .voyage-input-row input::placeholder {
@@ -261,18 +262,19 @@
 }
 
 .voyage-input-row button {
-  background: #3b82f6;
-  color: #fff;
+  background: var(--game-voyage-voyage);
+  color: var(--bg-primary);
+  font-weight: 700;
   border: none;
   padding: 9px 18px;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   font-size: 0.9em;
   cursor: pointer;
   transition: background 0.15s;
 }
 
 .voyage-input-row button:hover {
-  background: #2563eb;
+  background: color-mix(in srgb, var(--game-voyage-voyage) 85%, white);
 }
 
 /* ───── Barre d'indices ───── */

@@ -4,13 +4,14 @@ import { COUNTRY_CENTER_MAP, getCountryByName } from '../hooks/useCountryClueSta
 import { getCountryMetrics } from '../utils/borderGuessMap'
 import 'leaflet/dist/leaflet.css'
 import { DARK_NOLABELS_TILE_URL } from '../mapTiles'
+import { MAP_COLORS } from '../utils/mapColors'
 
 const SMALL_COUNTRY_THRESHOLD = 1.5
 
-const STYLE_WRONG = { fillColor: '#ef4444', color: '#fca5a5', fillOpacity: 0.65, weight: 2 }
-const STYLE_CORRECT = { fillColor: '#22c55e', color: '#86efac', fillOpacity: 0.72, weight: 2 }
-const CIRCLE_WRONG = { color: '#fca5a5', fillColor: '#ef4444', fillOpacity: 0.95, weight: 3, radius: 11 }
-const CIRCLE_CORRECT = { color: '#86efac', fillColor: '#22c55e', fillOpacity: 0.95, weight: 3, radius: 13 }
+const STYLE_WRONG = { fillColor: MAP_COLORS.wrong, color: MAP_COLORS.wrong, fillOpacity: 0.65, weight: 2 }
+const STYLE_CORRECT = { fillColor: MAP_COLORS.right, color: MAP_COLORS.right, fillOpacity: 0.72, weight: 2 }
+const CIRCLE_WRONG = { color: MAP_COLORS.wrong, fillColor: MAP_COLORS.wrong, fillOpacity: 0.95, weight: 3, radius: 11 }
+const CIRCLE_CORRECT = { color: MAP_COLORS.right, fillColor: MAP_COLORS.right, fillOpacity: 0.95, weight: 3, radius: 13 }
 
 // zoom minimum pour qu'un pays de maxSpan degrés soit visible (~10px sur l'écran)
 function switchZoomForSpan(maxSpan) {

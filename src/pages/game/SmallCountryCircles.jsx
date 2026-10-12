@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { CircleMarker, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import { getCountryMetrics } from '../../utils/borderGuessMap'
+import { MAP_COLORS } from '../../utils/mapColors'
 import countries from '../../data/countriesWithDifficulty_FR.json'
 
 const SMALL_THRESHOLD = 0.5
@@ -26,8 +27,8 @@ const getSmallCountries = () => smallCountriesCache ??= (() => {
   return result
 })()
 
-const CIRCLE_DEFAULT = { fillColor: '#ffffff', fillOpacity: 0.15, color: '#94a3b8', weight: 2 }
-const CIRCLE_HOVER = { fillColor: '#7b2ff7', fillOpacity: 0.5, color: '#7b2ff7', weight: 2 }
+const CIRCLE_DEFAULT = { fillColor: '#ffffff', fillOpacity: 0.15, color: MAP_COLORS.stroke, weight: 2 }
+const CIRCLE_HOVER = { fillColor: MAP_COLORS.hover, fillOpacity: 0.5, color: MAP_COLORS.hover, weight: 2 }
 
 export default function SmallCountryCircles({ onCountryNameClick, foundCountriesRef, shownCountriesRef, stats }) {
   const [zoom, setZoom] = useState(3)

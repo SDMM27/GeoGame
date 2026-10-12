@@ -25,6 +25,7 @@ const AtlasPage = lazyWithGeometries(() => import("./pages/atlas/AtlasPage"));
 const AccountPage = lazy(() => import("./pages/AccountPage"));
 const PlayerPage = lazy(() => import("./pages/PlayerPage"));
 const ScoresPage = lazy(() => import("./pages/ScoresPage"));
+const LegalPage = lazy(() => import("./pages/legal/LegalPage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 const MultiplayerHomePage = lazy(() => import("./pages/multiplayer/MultiplayerHomePage"));
 const MultiplayerCreatePage = lazy(() => import("./pages/multiplayer/MultiplayerCreatePage"));
@@ -56,6 +57,10 @@ export default function App() {
               <Route path="/multiplayer" element={<MultiplayerHomePage />} />
               <Route path="/multiplayer/create" element={<MultiplayerCreatePage />} />
               <Route path="/multiplayer/room/:roomId" element={<MultiplayerRoomPage />} />
+              <Route path="/privacy" element={<LegalPage doc="privacy" />} />
+              <Route path="/terms" element={<LegalPage doc="terms" />} />
+              <Route path="/legal" element={<LegalPage doc="legal" />} />
+              <Route path="/delete-account" element={<LegalPage doc="deleteAccount" />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </Suspense>

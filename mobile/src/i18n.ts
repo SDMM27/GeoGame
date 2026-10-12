@@ -146,6 +146,7 @@ const fr = {
     errors_label: 'Erreurs',
     leave: 'Quitter',
   },
+  update: { title: 'Nouvelle version disponible', message: 'Relance pour l’installer', restart: 'Relancer', later: 'Plus tard' },
   invites: {
     title: 'Inviter des amis',
     invite: 'Inviter',
@@ -353,6 +354,7 @@ const en: typeof fr = {
     errors_label: 'Wrong guesses',
     leave: 'Leave',
   },
+  update: { title: 'New version available', message: 'Restart to install it', restart: 'Restart', later: 'Later' },
   invites: {
     title: 'Invite friends',
     invite: 'Invite',
@@ -560,6 +562,7 @@ const ru: typeof fr = {
     errors_label: 'Ошибки',
     leave: 'Выйти',
   },
+  update: { title: 'Доступна новая версия', message: 'Перезапусти, чтобы установить', restart: 'Перезапустить', later: 'Позже' },
   invites: {
     title: 'Пригласить друзей',
     invite: 'Пригласить',

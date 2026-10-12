@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import NavBar from "../components/NavBar";
 import AppBanner from "../components/AppBanner";
+import LegalLinks from "../components/LegalLinks";
 import GameConfigModal from "./home/GameConfigModal";
 import { DailyCard, HomeRow } from "./home/HomeCards";
 import { gameColor } from "../utils/roomGames";
@@ -71,6 +72,7 @@ export default function HomePage() {
           />
         </section>
       </main>
+      <LegalLinks />
       {configGame && <GameConfigModal game={configGame} onClose={closeConfig} />}
     </div>
   );

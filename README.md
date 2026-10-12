@@ -64,7 +64,8 @@ Fonctions serverless Vercel déployées avec le site.
 | --- | --- |
 | `POST /api/invite-push` | Envoie la notification push d'une invitation à un salon (jeton Firebase de l'invitant requis). |
 | `POST /api/friend-push` | Envoie la notification push d'une demande d'ami envoyée ou acceptée (jeton Firebase de celui qui vient d'agir requis). |
-| `GET /api/cleanup-expired` | Supprime les salons, invitations et sondes expirés. Appelée chaque jour à 4 h par Vercel Cron (`vercel.json`). |
+| `POST /api/delete-account` | Supprime le compte et toutes ses données : profil, historique, jetons push, pseudo, scores des classements, signalements faits ou visant ses scores, amitiés, invitations, puis le compte Firebase Auth (`api/_lib/deleteAccount.mjs`). Jeton Firebase obtenu juste après une reconnexion (5 min au plus). Appelée par `deleteAccount` (`src/utils/account.js`) depuis le site et l'app ; en local avec `npm run dev`, `/api` n'est pas servi. |
+| `GET /api/cleanup-expired` | Supprime les salons, invitations et sondes expirés, et les comptes inutilisés depuis 3 ans (50 par passage au plus, durée annoncée dans la politique de confidentialité). Appelée chaque jour à 4 h par Vercel Cron (`vercel.json`). |
 | `GET /api/daily-reminder` | Rappelle les défis du jour aux joueurs connectés qui n'en ont fait aucun (désactivable par appareil dans le profil). Appelée chaque jour à 16 h UTC par Vercel Cron (`vercel.json`). |
 
 Variables d'environnement du projet Vercel du site :
@@ -112,6 +113,13 @@ Face aux émulateurs, `FIRESTORE_EMULATOR_HOST` (et `FIREBASE_AUTH_EMULATOR_HOST
   ```
 
   Identifiants : `--key serviceAccount.json`, ou `FIREBASE_SERVICE_ACCOUNT`, ou les identifiants par défaut de gcloud ; face aux émulateurs, `FIRESTORE_EMULATOR_HOST` suffit.
+
+## Pages légales et RGPD
+
+- `/privacy` (politique de confidentialité), `/terms` (conditions d'utilisation), `/legal` (mentions légales) et `/delete-account` (suppression de compte, URL à donner à Google Play) : `src/pages/legal/LegalPage.jsx`. Liens en bas de l'accueil et de la page compte, et dans l'onglet Profil de l'app, qui ouvre les pages du site.
+- Textes en fr, en et ru dans `src/legal/documents.js` ; ils décrivent ce que fait le code (données, prestataires, durées). Toute nouvelle donnée collectée ou tout nouveau prestataire doit y être ajouté, en changeant la date `updated` de `src/legal/legalInfo.js`.
+- **À compléter avant publication** : `editor` et `email` dans `src/legal/legalInfo.js`.
+- La police Inter est servie par le site (`@fontsource/inter`) et non par Google Fonts, pour ne pas transmettre l'IP des visiteurs à Google.
 
 ## Données géographiques
 

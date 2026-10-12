@@ -1,5 +1,5 @@
 // src/utils/multiplayerSeed.js
-import { seededShuffle } from './prng'
+import { seededOrder, seededShuffle } from './prng'
 import { GAME_TYPES } from './gameTypes'
 import { BORDER_GUESS_COUNTRIES } from '../hooks/useBorderGuessState'
 import { COUNTRY_CLUE_COUNTRIES } from '../hooks/useCountryClueState'
@@ -79,15 +79,20 @@ export function getSeededAscensionOverrides(phases, gameType, seed, gameIndex) {
   return result
 }
 
-/** BORDER_GUESS — retourne `countryCount` features dans un ordre déterministe */
+const byAdmin = (feature) => feature.properties.ADMIN
+
+/**
+ * BORDER_GUESS — retourne `countryCount` features dans un ordre déterministe.
+ * Ordre par nom (seededOrder) : des joueurs sur deux versions de l'appli, dont la liste de pays diffère, ont les mêmes pays.
+ */
 export function getSeededBorderGuessCountries(countryCount, seed, gameIndex) {
-  const shuffled = seededShuffle(BORDER_GUESS_COUNTRIES, gameSeed(seed, gameIndex))
+  const shuffled = seededOrder(BORDER_GUESS_COUNTRIES, gameSeed(seed, gameIndex), byAdmin)
   return shuffled.slice(0, Math.min(countryCount, shuffled.length))
 }
 
 /** COUNTRY_CLUE — retourne `countryCount` features dans un ordre déterministe */
 export function getSeededCountryClueCountries(countryCount, seed, gameIndex) {
-  const shuffled = seededShuffle(COUNTRY_CLUE_COUNTRIES, gameSeed(seed, gameIndex))
+  const shuffled = seededOrder(COUNTRY_CLUE_COUNTRIES, gameSeed(seed, gameIndex), byAdmin)
   return shuffled.slice(0, Math.min(countryCount, shuffled.length))
 }
 

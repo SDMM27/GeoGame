@@ -10,7 +10,7 @@ import { GAME_TYPES } from './gameTypes'
 import { matchKnownAnswer } from './answerLexicon'
 import { getAllCapitalNames, getAllCountryNames } from './getCountryName'
 import { ANSWER_MODES, generateQuestion } from './quizQuestions'
-import { mulberry32, seededShuffle } from './prng'
+import { mulberry32, seededOrder, seededShuffle } from './prng'
 import { SURVIVAL_MAX_ROUNDS, normalizeSurvivalModes, normalizeSurvivalRamp } from './survivalConfig'
 
 export * from './survivalConfig'
@@ -61,11 +61,19 @@ const tierOf = (feature, type) => {
   return index === -1 ? TIERS.length - 1 : index
 }
 
-/** The countries of a game by difficulty, each shuffled: [Facile[], Moyen[], Difficile[], Impossible[]]. */
+/**
+ * The countries of a game by difficulty, each shuffled: [Facile[], Moyen[], Difficile[], Impossible[]].
+ * Ordered by name rather than by position, so that players of a room on two versions of the app (one where a country
+ * was removed from a game, one where it wasn't) still get the same countries.
+ */
 function countryTiers(type, seed) {
   const features = pool(type)
   return TIERS.map((_, tier) =>
-    seededShuffle(features.filter((feature) => tierOf(feature, type) === tier), (seed + tier * 7919) >>> 0)
+    seededOrder(
+      features.filter((feature) => tierOf(feature, type) === tier),
+      (seed + tier * 7919) >>> 0,
+      (feature) => feature.properties.ADMIN
+    )
   )
 }
 

@@ -62,7 +62,8 @@ function reducer(state, action) {
  * `modes`: the games of the rounds (GAME_TYPES values). `lives`: lives at the start. `seed`: the rounds.
  * `timer`: seconds per round (0: none). `ramp`: how fast the difficulty rises ({ Facile, Moyen, Difficile }, see
  * SURVIVAL_RAMPS). `snapshot` / `snapshotKey` (multiplayer): resume the run after a refresh,
- * and save it as it goes (with `extraSnapshot`). `autoAdvance` false and `deadline` (local ms): see useSurvivalSync.
+ * and save it as it goes (with `extraSnapshot`). `autoAdvance` false, `deadline` (local ms) and `deadlineRound` (the
+ * round that deadline is for): see useSurvivalSync.
  */
 export default function useSurvivalState({
   modes,
@@ -75,6 +76,7 @@ export default function useSurvivalState({
   extraSnapshot = null,
   autoAdvance = true,
   deadline: sharedDeadline = null,
+  deadlineRound = null,
 }) {
   const modesKey = survivalModesKey(modes)
   const rampKey = JSON.stringify(normalizeSurvivalRamp(ramp))
@@ -85,8 +87,11 @@ export default function useSurvivalState({
   const [state, dispatch] = useReducer(reducer, null, () => {
     const index = Math.min(snapshot?.index ?? 0, Math.max(0, rounds.length - 1))
     const errors = snapshot?.errors ?? 0
+    // A round already answered before the refresh stays answered: its life (or point) is already counted
+    const outcome = snapshot?.index === index ? (snapshot.outcome ?? null) : null
     return {
       ...freshRound(Date.now()),
+      outcome,
       lives,
       total: rounds.length,
       index,
@@ -117,13 +122,25 @@ export default function useSurvivalState({
   const round = rounds[state.index] ?? null
   const playing = Boolean(round) && !state.outcome && !state.over
 
-  // Time limit of the round: the room's, or the timer from the round's start
-  const deadline = sharedDeadline ?? (timer > 0 ? state.roundStartedAt + timer * 1000 : null)
+  // One answer per round, even when two come before the next render (a double tap): the second one is ignored
+  // and returns null, so no second "life lost" is shown
+  const answeredRef = useRef(-1)
+  const answer = useCallback((action) => {
+    if (answeredRef.current === state.index) return false
+    answeredRef.current = state.index
+    dispatch(action)
+    return true
+  }, [state.index])
+
+  // Time limit of the round: the room's (only for the round it belongs to: a run resumed after a refresh doesn't
+  // time out on the deadline of a round already gone), or the timer from the round's start
+  const roomDeadline = sharedDeadline != null && (deadlineRound == null || deadlineRound === state.index) ? sharedDeadline : null
+  const deadline = sharedDeadline != null ? roomDeadline : (timer > 0 ? state.roundStartedAt + timer * 1000 : null)
   useEffect(() => {
     if (!playing || deadline == null) return undefined
-    const id = setTimeout(() => dispatch({ type: 'timeout' }), Math.max(0, deadline - Date.now()))
+    const id = setTimeout(() => answer({ type: 'timeout' }), Math.max(0, deadline - Date.now()))
     return () => clearTimeout(id)
-  }, [playing, deadline])
+  }, [playing, deadline, answer])
 
   // Show the answer, then move on
   const isQuiz = round?.type === GAME_TYPES.QUIZ
@@ -143,6 +160,8 @@ export default function useSurvivalState({
       ...extraRef.current,
       savedAt: Date.now(),
       index: state.outcome && autoAdvance ? state.index + 1 : state.index,
+      // Live room: the round stays on screen until the room moves on, keep its answer
+      outcome: autoAdvance ? null : state.outcome,
       errors: state.errors,
       score: state.score,
       elapsedMs: elapsedRef.current,
@@ -156,13 +175,10 @@ export default function useSurvivalState({
   const clickCountry = useCallback((name) => {
     if (!playing || round.type !== GAME_TYPES.PLACEMENT) return null
     if (state.wrongPicks.includes(name)) return 'repeat'
-    if (name === round.country.properties.ADMIN) {
-      dispatch({ type: 'right' })
-      return 'correct'
-    }
-    dispatch({ type: 'wrong', pick: name })
-    return 'wrong'
-  }, [playing, round, state.wrongPicks])
+    const right = name === round.country.properties.ADMIN
+    if (!answer(right ? { type: 'right' } : { type: 'wrong', pick: name })) return null
+    return right ? 'correct' : 'wrong'
+  }, [playing, round, state.wrongPicks, answer])
 
   /**
    * A typed answer. Returns 'correct', 'wrong', 'unknown' (not a country: no life lost)
@@ -175,7 +191,7 @@ export default function useSurvivalState({
       case GAME_TYPES.FLAGS:
       case GAME_TYPES.CAPITALS: {
         const right = round.type === GAME_TYPES.FLAGS ? checkCountryName(target, input) : checkCapitalName(target, input)
-        dispatch({ type: right ? 'right' : 'wrong' })
+        if (!answer({ type: right ? 'right' : 'wrong' })) return null
         return right ? 'correct' : 'wrong'
       }
       case GAME_TYPES.BORDER_GUESS: {
@@ -184,25 +200,25 @@ export default function useSurvivalState({
         const answerName = target.properties.ADMIN
         const right = guessed.properties.ADMIN === answerName
         const guess = buildBorderGuess(guessed, normalize(input.trim()), right, answerName)
-        dispatch({ type: right ? 'right' : 'wrong', guess })
+        if (!answer({ type: right ? 'right' : 'wrong', guess })) return null
         return right ? 'correct' : 'wrong'
       }
       default:
         return null
     }
-  }, [playing, round])
+  }, [playing, round, answer])
 
   // Quiz: the choice picked
   const chooseAnswer = useCallback((choiceId) => {
     if (!playing || round.type !== GAME_TYPES.QUIZ) return null
     const right = choiceId === round.question.correctId
-    dispatch({ type: right ? 'right' : 'wrong', pick: choiceId })
+    if (!answer({ type: right ? 'right' : 'wrong', pick: choiceId })) return null
     return right ? 'correct' : 'wrong'
-  }, [playing, round])
+  }, [playing, round, answer])
 
   const giveUp = useCallback(() => {
-    if (playing) dispatch({ type: 'give_up' })
-  }, [playing])
+    if (playing) answer({ type: 'give_up' })
+  }, [playing, answer])
 
   const next = useCallback(() => dispatch({ type: 'goto', index: state.index + 1, at: Date.now() }), [state.index])
   const goTo = useCallback((index) => dispatch({ type: 'goto', index, at: Date.now() }), [])

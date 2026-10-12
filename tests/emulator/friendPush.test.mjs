@@ -141,6 +141,7 @@ describe('sendFriendPush', () => {
 describe('friendMessage', () => {
   it('speaks the device language, English otherwise', () => {
     expect(friendMessage('request', 'ru', 'Alice')).toBe('Alice хочет добавить тебя в друзья')
-    expect(friendMessage('accepted', 'de', 'Alice')).toBe('Alice accepted your friend request')
+    expect(friendMessage('accepted', 'ja', 'Alice')).toBe('Alice accepted your friend request')
+    expect(friendMessage('accepted', 'de', 'Alice')).toBe('Alice hat deine Freundschaftsanfrage angenommen')
   })
 })

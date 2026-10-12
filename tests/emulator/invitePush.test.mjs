@@ -228,7 +228,8 @@ describe('isWebPushEndpoint', () => {
 
 describe('inviteMessage', () => {
   it('falls back to English for other languages', () => {
-    expect(inviteMessage('de', 'Alice', 'quiz')).toBe('Alice invites you to play Geo Quiz')
+    expect(inviteMessage('ja', 'Alice', 'quiz')).toBe('Alice invites you to play Geo Quiz')
+    expect(inviteMessage('de', 'Alice', 'quiz')).toBe('Alice lädt dich zu Geo-Quiz ein')
   })
 })
 

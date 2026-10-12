@@ -38,7 +38,8 @@ export function BorderGuessRow({ guess, index, latest }: { guess: BorderGuess; i
         {index + 1}
       </Text>
       <MaterialCommunityIcons name={guess.isCorrect ? 'check-circle' : 'close-circle'} size={18} color={color} />
-      <Text variant="bodyStrong" numberOfLines={1} style={{ flex: 1 }}>
+      {/* Name and hint share the width by their own size: a long hint wraps instead of hiding a short name. */}
+      <Text variant="bodyStrong" numberOfLines={1} style={{ flexShrink: 1 }}>
         {name}
       </Text>
       {!guess.isCorrect && guess.distanceKm != null && (
@@ -48,10 +49,24 @@ export function BorderGuessRow({ guess, index, latest }: { guess: BorderGuess; i
               {guess.directionArrow}
             </Text>
           )}
-          <Text variant={latest ? 'bodyStrong' : 'caption'} style={{ fontVariant: ['tabular-nums'] }}>
-            {guess.distanceKm.toLocaleString(i18n.language)} km
-            {guess.direction ? ` · ${t(`mobile.directions.${guess.direction}`)}` : ''}
-          </Text>
+          {latest ? (
+            // Bigger on the latest guess: the direction goes under the distance so the name keeps its room.
+            <View style={{ alignItems: 'flex-end', flexShrink: 1 }}>
+              <Text variant="bodyStrong" style={{ fontVariant: ['tabular-nums'] }}>
+                {guess.distanceKm.toLocaleString(i18n.language)} km
+              </Text>
+              {guess.direction && (
+                <Text variant="caption" numberOfLines={1}>
+                  {t(`mobile.directions.${guess.direction}`)}
+                </Text>
+              )}
+            </View>
+          ) : (
+            <Text variant="caption" style={{ flexShrink: 1, textAlign: 'right', fontVariant: ['tabular-nums'] }}>
+              {guess.distanceKm.toLocaleString(i18n.language)} km
+              {guess.direction ? ` · ${t(`mobile.directions.${guess.direction}`)}` : ''}
+            </Text>
+          )}
         </View>
       )}
     </Animated.View>
@@ -202,7 +217,7 @@ const borderStyles = StyleSheet.create({
     borderColor: colors.border,
   },
   guessLatest: { borderColor: BORDER_ACCENT, backgroundColor: `${BORDER_ACCENT}14` },
-  hint: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  hint: { flexDirection: 'row', alignItems: 'center', gap: 6, flexShrink: 1, marginLeft: 'auto' },
 })
 
 /**

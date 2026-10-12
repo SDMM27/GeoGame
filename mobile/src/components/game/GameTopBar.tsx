@@ -33,6 +33,7 @@ export function GameTopBar({ children, confirmQuit = true, onQuit }: { children?
       message: t('mobile.game.quit_message'),
       confirmLabel: t('mobile.game.quit'),
       cancelLabel: t('mobile.game.cancel'),
+      icon: 'exit-run',
       onConfirm: quit,
     })
   }

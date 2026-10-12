@@ -20,6 +20,7 @@ import { ErrorScreen } from '@/components/ErrorScreen'
 import { InstallHint } from '@/components/InstallHint'
 import { InviteBanner } from '@/components/InviteBanner'
 import { PushNotifications } from '@/components/PushNotifications'
+import { ConfirmHost } from '@/components/ConfirmHost'
 import { ToastHost } from '@/components/ToastHost'
 import { UpdateBanner } from '@/components/UpdateBanner'
 import { colors } from '@/theme'
@@ -110,6 +111,7 @@ export default function RootLayout() {
         <UpdateBanner />
         <InviteBanner />
         <PushNotifications />
+        <ConfirmHost />
         <ToastHost />
       </ThemeProvider>
     </GestureHandlerRootView>

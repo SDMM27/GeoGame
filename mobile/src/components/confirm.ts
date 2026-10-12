@@ -1,27 +1,27 @@
-// Confirmation dialog: native alert, or the browser's confirm() on the web build (Alert does nothing there).
-import { Alert, Platform } from 'react-native'
+// Confirmation dialog, drawn in the app's style by ConfirmHost (mounted once in the root layout).
+import type MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 
-export function confirmAction({
-  title,
-  message,
-  confirmLabel,
-  cancelLabel,
-  destructive = true,
-  onConfirm,
-}: {
+export type ConfirmRequest = {
   title: string
   message?: string
   confirmLabel: string
   cancelLabel: string
   destructive?: boolean
+  icon?: keyof typeof MaterialCommunityIcons.glyphMap
   onConfirm: () => void
-}) {
-  if (Platform.OS === 'web') {
-    if (globalThis.confirm?.(message ? `${title}\n\n${message}` : title)) onConfirm()
-    return
+}
+
+type Listener = (request: ConfirmRequest | null) => void
+
+let listener: Listener | null = null
+
+export function subscribeConfirm(next: Listener) {
+  listener = next
+  return () => {
+    if (listener === next) listener = null
   }
-  Alert.alert(title, message, [
-    { text: cancelLabel, style: 'cancel' },
-    { text: confirmLabel, style: destructive ? 'destructive' : 'default', onPress: onConfirm },
-  ])
+}
+
+export function confirmAction(request: ConfirmRequest) {
+  listener?.({ destructive: true, ...request })
 }

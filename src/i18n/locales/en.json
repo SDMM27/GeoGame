@@ -228,7 +228,33 @@
     "metric_direction": "Direction",
     "metric_hemisphere": "Hemisphere",
     "metric_area": "Area",
-    "metric_population": "Population"
+    "metric_population": "Population",
+    "directions": {
+      "Nord": "North",
+      "Nord-Est": "North-East",
+      "Est": "East",
+      "Sud-Est": "South-East",
+      "Sud": "South",
+      "Sud-Ouest": "South-West",
+      "Ouest": "West",
+      "Nord-Ouest": "North-West",
+      "Tout près": "Very close"
+    },
+    "hint": {
+      "exact": "Exact",
+      "hemisphere_match": "Same",
+      "hemisphere_higher": "Further north",
+      "hemisphere_lower": "Further south",
+      "hemisphere_neutral": "Unknown",
+      "area_match": "Similar",
+      "area_higher": "Bigger",
+      "area_lower": "Smaller",
+      "area_neutral": "Unknown",
+      "population_match": "Similar",
+      "population_higher": "More people",
+      "population_lower": "Fewer people",
+      "population_neutral": "Unknown"
+    }
   },
   "voyage_voyage": {
     "daily_description": "One route per day, the same for all players.",
@@ -255,7 +281,10 @@
     "stage_progress": "Criterion {{done}} / {{count}} done",
     "next_criterion": "Next criterion →",
     "found_at_attempt": "found at attempt {{attempt}}",
-    "not_found": "not found · error {{count}}"
+    "not_found": "not found · error {{count}}",
+    "instruction_population": "Rank from most to least populated",
+    "instruction_area": "Rank from largest to smallest",
+    "instruction_gdp": "Rank from richest to poorest"
   },
   "form": {
     "title": "Game over!",
@@ -298,7 +327,9 @@
     "error_one": "error",
     "error_other": "errors",
     "position_one": "position",
-    "position_other": "positions"
+    "position_other": "positions",
+    "countries_one": "{{count}} country",
+    "countries_other": "{{count}} countries"
   },
   "options": {
     "all_games": "All games",
@@ -308,7 +339,9 @@
   },
   "scoreboard": {
     "title": "Scoreboard",
-    "no_ascension_scores": "No Ascension scores for this filter."
+    "no_ascension_scores": "No Ascension scores for this filter.",
+    "ascension_title": "Ascension scoreboard",
+    "preset": "Preset"
   },
   "leaderboard": {
     "title": "Daily leaderboard",
@@ -798,7 +831,9 @@
     "points": "{{count}} pts",
     "n_games": "{{count}} games",
     "next_game": "Launch game {{n}}",
-    "waiting_next": "Waiting for the next game…"
+    "waiting_next": "Waiting for the next game…",
+    "round_n": "Round {{n}} / {{total}}",
+    "next_round_soon": "Next round in a moment…"
   },
   "survival": {
     "spectating": "Watching the players still in",
@@ -959,6 +994,7 @@
     "multiplayer": "Multi",
     "leaderboards": "Rankings",
     "profile": "Profile",
-    "main": "Main navigation"
+    "main": "Main navigation",
+    "language": "Language"
   }
 }

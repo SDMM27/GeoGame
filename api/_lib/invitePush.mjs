@@ -13,12 +13,20 @@ const LOCALES = {
   fr: require('../../src/i18n/locales/fr.json'),
   en: require('../../src/i18n/locales/en.json'),
   ru: require('../../src/i18n/locales/ru.json'),
+  es: require('../../src/i18n/locales/es.json'),
+  pt: require('../../src/i18n/locales/pt.json'),
+  de: require('../../src/i18n/locales/de.json'),
+  it: require('../../src/i18n/locales/it.json'),
 }
 
 const BODY = {
   fr: '{{username}} t’invite à jouer à {{game}}',
   en: '{{username}} invites you to play {{game}}',
   ru: '{{username}} приглашает тебя сыграть в {{game}}',
+  es: '{{username}} te invita a jugar a {{game}}',
+  pt: '{{username}} convida você para jogar {{game}}',
+  de: '{{username}} lädt dich zu {{game}} ein',
+  it: '{{username}} ti invita a giocare a {{game}}',
 }
 
 // A second push for the same invite (invited again) waits this long.

@@ -394,7 +394,7 @@ export default function VoyageVoyagePage() {
                   guesses={validatedChain.map(f => f.properties.ADMIN)}
                   gameType={GAME_TYPES.VOYAGE_VOYAGE}
                   dailyKey={dailyKey}
-                  statText={`${stepsUsed} ${stepsUsed === 1 ? t('units.step_one') : t('units.step_other')} · ${wrongGuesses.length} ${wrongGuesses.length === 1 ? t('units.error_one') : t('units.error_other')} · ${hintsUsed.length} indice${hintsUsed.length > 1 ? 's' : ''}`}
+                  statText={`${stepsUsed} ${stepsUsed === 1 ? t('units.step_one') : t('units.step_other')} · ${wrongGuesses.length} ${wrongGuesses.length === 1 ? t('units.error_one') : t('units.error_other')} · ${t('quiz.hints_count', { count: hintsUsed.length })}`}
                   hints={hintsUsed.length}
                 />
                 <DailyLeaderboard

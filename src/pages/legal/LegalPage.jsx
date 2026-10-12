@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import NavBar from '../../components/NavBar'
 import LegalLinks from '../../components/LegalLinks'
 import { LEGAL_DOCUMENTS } from '../../legal/documents'
+import { DEFAULT_LANGUAGE } from '../../i18n/languages'
 import { LEGAL_INFO } from '../../legal/legalInfo'
 import { SITE_NAME, SITE_URL } from '../../seo/seoPages'
 import './LegalPage.css'
@@ -48,7 +49,7 @@ function Block({ block }) {
 // Privacy policy, terms, legal notice and account deletion (`doc`: a key of LEGAL_DOCUMENTS[lang]).
 export default function LegalPage({ doc }) {
   const { t, i18n } = useTranslation()
-  const lang = LEGAL_DOCUMENTS[i18n.resolvedLanguage] ? i18n.resolvedLanguage : 'fr'
+  const lang = LEGAL_DOCUMENTS[i18n.resolvedLanguage] ? i18n.resolvedLanguage : DEFAULT_LANGUAGE
   const content = LEGAL_DOCUMENTS[lang][doc]
   const updated = new Date(`${LEGAL_INFO.updated}T12:00:00Z`).toLocaleDateString(lang, { dateStyle: 'long' })
 

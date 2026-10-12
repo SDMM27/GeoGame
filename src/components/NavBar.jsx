@@ -5,11 +5,10 @@ import React from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAccount } from '../auth'
+import { LANGUAGES, toLanguage } from '../i18n/languages'
 import { isGamePath } from '../utils/gamePaths'
 import { LeaderboardIcon, MultiIcon, PlayIcon, ProfileIcon } from './NavIcons'
 import './NavBar.css'
-
-const LANGUAGES = ['fr', 'en', 'ru']
 
 const TABS = [
   { to: '/', labelKey: 'nav.play', Icon: PlayIcon, end: true },
@@ -22,7 +21,7 @@ export default function NavBar() {
   const { t, i18n } = useTranslation()
   const { account } = useAccount()
   const { pathname } = useLocation()
-  const current = LANGUAGES.includes(i18n.language) ? i18n.language : 'fr'
+  const current = toLanguage(i18n.resolvedLanguage ?? i18n.language)
   const inGame = isGamePath(pathname)
 
   return (
@@ -42,18 +41,25 @@ export default function NavBar() {
           </NavLink>
         ))}
       </nav>
-      <div className="navbar-lang-group">
-        {LANGUAGES.map(lang => (
-          <button
-            key={lang}
-            onClick={() => i18n.changeLanguage(lang)}
-            className={`navbar-lang-btn${current === lang ? ' active' : ''}`}
-            aria-pressed={current === lang}
-          >
-            {lang.toUpperCase()}
-          </button>
-        ))}
-      </div>
+      <label className="navbar-lang" title={t('nav.language')}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+        </svg>
+        <span aria-hidden="true">{current.toUpperCase()}</span>
+        <select
+          className="navbar-lang-select"
+          value={current}
+          onChange={(event) => i18n.changeLanguage(event.target.value)}
+          aria-label={t('nav.language')}
+        >
+          {LANGUAGES.map(({ code, label }) => (
+            <option key={code} value={code} lang={code}>
+              {label}
+            </option>
+          ))}
+        </select>
+      </label>
     </header>
   )
 }

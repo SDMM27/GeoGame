@@ -1,5 +1,16 @@
 // App-only strings, merged into the shared i18n instance (../src/i18n) under `mobile.*`.
+// French, English and Russian live here; the other languages in ./locales.
 import i18n from '@shared/i18n'
+import ruShared from '@shared/i18n/locales/ru.json'
+import esShared from '@shared/i18n/locales/es.json'
+import ptShared from '@shared/i18n/locales/pt.json'
+import deShared from '@shared/i18n/locales/de.json'
+import itShared from '@shared/i18n/locales/it.json'
+
+import { de } from './locales/de'
+import { es } from './locales/es'
+import { it } from './locales/it'
+import { pt } from './locales/pt'
 
 const fr = {
   tabs: { play: 'Jouer', multiplayer: 'Multi', leaderboards: 'Classements', profile: 'Profil' },
@@ -209,7 +220,9 @@ const fr = {
   },
 }
 
-const en: typeof fr = {
+export type MobileStrings = typeof fr
+
+const en: MobileStrings = {
   tabs: { play: 'Play', multiplayer: 'Multi', leaderboards: 'Rankings', profile: 'Profile' },
   home: {
     greeting: 'Ready to travel?',
@@ -417,7 +430,7 @@ const en: typeof fr = {
   },
 }
 
-const ru: typeof fr = {
+const ru: MobileStrings = {
   tabs: { play: 'Играть', multiplayer: 'Мульти', leaderboards: 'Рейтинги', profile: 'Профиль' },
   home: {
     greeting: 'Готов к путешествию?',
@@ -625,9 +638,12 @@ const ru: typeof fr = {
   },
 }
 
-i18n.addResourceBundle('fr', 'translation', { mobile: fr }, true, true)
-i18n.addResourceBundle('en', 'translation', { mobile: en }, true, true)
-i18n.addResourceBundle('ru', 'translation', { mobile: ru }, true, true)
+// The website loads its languages other than French and English on demand; the app ships them all.
+const SHARED = { ru: ruShared, es: esShared, pt: ptShared, de: deShared, it: itShared }
+for (const [lang, strings] of Object.entries(SHARED)) i18n.addResourceBundle(lang, 'translation', strings, true, true)
+
+const MOBILE: Record<string, MobileStrings> = { fr, en, es, pt, de, it, ru }
+for (const [lang, strings] of Object.entries(MOBILE)) i18n.addResourceBundle(lang, 'translation', { mobile: strings }, true, true)
 
 // Website labels carry emoji/arrows ("🏆 Scores", "← Accueil"); strip them for native UI.
 export function clean(label: string) {

@@ -29,8 +29,8 @@ function CriterionBanner({ criterion, stageIndex, stageCount, t }) {
         {t('labels.criterion')}
         {stageCount > 1 && ` ${stageIndex + 1} / ${stageCount}`}
       </div>
-      <div className="ranking-criterion-name">{criterion.label}</div>
-      <div className="ranking-criterion-hint">{criterion.consigne}</div>
+      <div className="ranking-criterion-name">{t(`ranking.${criterion.key}`)}</div>
+      <div className="ranking-criterion-hint">{t(`ranking.instruction_${criterion.key}`)}</div>
     </div>
   )
 }
@@ -192,7 +192,7 @@ export default function RankingGamePage() {
         {/* Country count slider — infinite mode only, before choosing category */}
         {mode === 'infinite' && status === 'choosing-category' && (
           <div className="ranking-slider-wrap">
-            <div className="ranking-slider-value">{countryCount} pays</div>
+            <div className="ranking-slider-value">{t('units.countries', { count: countryCount })}</div>
             <input
               type="range"
               min={3}

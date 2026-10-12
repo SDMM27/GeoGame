@@ -1,11 +1,14 @@
 // src/components/multiplayer/MultiplayerBorderGuess.jsx
 import React, { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { GeoJSON, MapContainer, useMap } from 'react-leaflet'
 import { ToastContainer } from 'react-toastify'
 import useBorderGuessState, { ROOM_MAX_ATTEMPTS, roomRoundErrors } from '../../hooks/useBorderGuessState'
 import { getCountryStyle, getFocusCountry, getViewportSettings } from '../../utils/borderGuessMap'
 import { getGuessGamePoints } from '../../utils/scoringRules'
 import { loadSnapshot, saveSnapshot } from '../../utils/multiplayerSnapshot'
+import { getCountryName } from '../../utils/getCountryName'
+import { localeOf } from '../../i18n/languages'
 import 'leaflet/dist/leaflet.css'
 import 'react-toastify/dist/ReactToastify.css'
 import './MultiplayerBorderGuess.css'
@@ -57,6 +60,8 @@ export default function MultiplayerBorderGuess({ countries, onCountryFound, onGa
     initialGuesses: snap?.currentGuesses ?? null,
     maxAttempts: ROOM_MAX_ATTEMPTS,
   })
+  const { t, i18n } = useTranslation()
+  const localizedAnswer = getCountryName(currentCountry?.properties?.ISO_A2, i18n.language) || answerName
 
   const guessesRef = useRef(snap?.currentGuesses ?? [])
   guessesRef.current = guesses
@@ -184,8 +189,8 @@ export default function MultiplayerBorderGuess({ countries, onCountryFound, onGa
   return (
     <div className="mp-border-guess">
       <div className="mp-border-guess-header">
-        <span className="mp-border-guess-round">Manche {roundIndex + 1} / {countries.length}</span>
-        <span className="mp-border-guess-attempts">{guesses.length} / {ROOM_MAX_ATTEMPTS} tentatives</span>
+        <span className="mp-border-guess-round">{t('mp_room.round_n', { n: roundIndex + 1, total: countries.length })}</span>
+        <span className="mp-border-guess-attempts">{guesses.length} / {t('quiz.attempts_count', { count: ROOM_MAX_ATTEMPTS })}</span>
       </div>
 
       <div className="mp-border-guess-layout">
@@ -209,10 +214,10 @@ export default function MultiplayerBorderGuess({ countries, onCountryFound, onGa
           {isComplete ? (
             <div className="mp-border-guess-result">
               <p className={isSolved ? 'mp-bg-solved' : 'mp-bg-lost'}>
-                {isSolved ? `✓ ${answerName}` : `✗ C'était : ${answerName}`}
+                {isSolved ? `✓ ${localizedAnswer}` : `✗ ${t('survival.answer_was', { answer: localizedAnswer })}`}
               </p>
               {roundIndex + 1 < countries.length && (
-                <p className="mp-bg-next">Manche suivante dans un instant...</p>
+                <p className="mp-bg-next">{t('mp_room.next_round_soon')}</p>
               )}
             </div>
           ) : (
@@ -220,7 +225,7 @@ export default function MultiplayerBorderGuess({ countries, onCountryFound, onGa
               <div className="mp-border-guess-input-overlay">
                 <input
                   className="mp-border-guess-input"
-                  placeholder="Nom du pays..."
+                  placeholder={t('placeholders.country_name')}
                   value={inputValue}
                   onChange={e => setInputValue(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter') handleSubmit() }}
@@ -237,8 +242,8 @@ export default function MultiplayerBorderGuess({ countries, onCountryFound, onGa
                 )}
               </div>
               <div className="mp-border-guess-actions">
-                <button className="mp-border-guess-submit" onClick={handleSubmit}>Proposer</button>
-                <button className="mp-border-guess-reveal" onClick={handleReveal}>Révéler</button>
+                <button className="mp-border-guess-submit" onClick={handleSubmit}>{t('buttons.validate')}</button>
+                <button className="mp-border-guess-reveal" onClick={handleReveal}>{t('buttons.reveal')}</button>
               </div>
             </div>
           )}
@@ -248,7 +253,7 @@ export default function MultiplayerBorderGuess({ countries, onCountryFound, onGa
               <div key={i} className={`mp-bg-chip ${guess.isCorrect ? 'mp-bg-chip--correct' : 'mp-bg-chip--wrong'}`}>
                 <span>{guess.value}</span>
                 {!guess.isCorrect && guess.distanceKm != null && (
-                  <small>{guess.directionArrow} {guess.distanceKm.toLocaleString('fr-FR')} km</small>
+                  <small>{guess.directionArrow} {guess.distanceKm.toLocaleString(localeOf(i18n.language))} km</small>
                 )}
               </div>
             ))}

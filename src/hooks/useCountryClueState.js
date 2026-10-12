@@ -6,6 +6,7 @@ import countries from '../data/countriesWithDifficulty_FR.json'
 import { checkAnswer, normalize } from '../utils/normalizeAnswer'
 import { hasCountryGeometry, collectCoordinates, getRingAreaKm2, getCountryAreaKm2, getGeographicCenter, EARTH_RADIUS_KM } from '../utils/countryArea'
 import { getCountryName, getAllCountryNames } from '../utils/getCountryName'
+import { LANGUAGE_CODES, localeOf } from '../i18n/languages'
 import countryAliases from '../data/countryAliases.json'
 import useDailyKey from './useDailyKey'
 import { STABLE_DAILY_PICK_SINCE, pickDaily } from '../utils/dailyPick'
@@ -56,7 +57,7 @@ const COUNTRY_LOOKUP = (() => {
   // Also index EN and RU names so players can type in those languages
   for (const feature of COUNTRY_CLUE_COUNTRIES) {
     const iso = feature.properties.ISO_A2
-    for (const lang of ['en', 'ru']) {
+    for (const lang of LANGUAGE_CODES) {
       const name = getCountryName(iso, lang)
       if (name) {
         const key = normalize(name)
@@ -130,11 +131,13 @@ function getPopulationHint(guessName, targetName) {
     : { label: 'Moins peuplé', arrow: '↓', tone: 'lower' }
 }
 
-function formatPopulation(pop) {
+// Formatted in the player's language (French when it is unknown)
+function formatPopulation(pop, lang) {
   if (!pop) return 'n/a'
-  if (pop >= 1000000) return `${(pop / 1000000).toFixed(1).replace('.', ',')} M`
-  if (pop >= 1000) return `${(pop / 1000).toFixed(0)} k`
-  return pop.toLocaleString('fr-FR')
+  const locale = localeOf(lang, 'fr')
+  if (pop >= 1000000) return `${(pop / 1000000).toLocaleString(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} M`
+  if (pop >= 1000) return `${Math.round(pop / 1000).toLocaleString(locale)} k`
+  return pop.toLocaleString(locale)
 }
 
 function writeDailyProgress(dateKey, progress) {
@@ -250,9 +253,9 @@ function getAreaHint(guessName, targetName) {
     : { label: 'Pays plus petit', arrow: '↓', tone: 'lower' }
 }
 
-function formatArea(areaKm2) {
+function formatArea(areaKm2, lang) {
   if (!areaKm2) return 'n/a'
-  return `${Math.round(areaKm2).toLocaleString('fr-FR')} km²`
+  return `${Math.round(areaKm2).toLocaleString(localeOf(lang, 'fr'))} km²`
 }
 
 function isoToFlag(isoA2) {
@@ -264,7 +267,7 @@ function isoToFlag(isoA2) {
     .join('')
 }
 
-function buildGuessRecord(guessInput, targetName) {
+function buildGuessRecord(guessInput, targetName, lang) {
   const guessedName = guessInput?.value
   const normalizedInput = guessInput?.normalizedInput ?? normalize(guessedName ?? '')
   const isCorrect = Boolean(guessInput?.isCorrect || (guessedName && guessedName === targetName))
@@ -285,11 +288,11 @@ function buildGuessRecord(guessInput, targetName) {
     areaHint: isCorrect
       ? { label: 'Exact', arrow: '◎', tone: 'match' }
       : getAreaHint(guessedName, targetName),
-    areaLabel: formatArea(area),
+    areaLabel: formatArea(area, lang),
     populationHint: isCorrect
       ? { label: 'Exact', arrow: '◎', tone: 'match' }
       : getPopulationHint(guessedName, targetName),
-    populationLabel: formatPopulation(guessedName ? COUNTRY_POPULATION_MAP.get(guessedName) : null),
+    populationLabel: formatPopulation(guessedName ? COUNTRY_POPULATION_MAP.get(guessedName) : null, lang),
   }
 }
 
@@ -351,7 +354,7 @@ export default function useCountryClueState(mode, options = {}) {
       const selectedCountry = getCountryByName(savedProgress?.targetName) ?? getDailyCountry(todayKey)
       const hydratedGuesses = Array.isArray(savedProgress?.guesses)
         ? savedProgress.guesses
-          .map((guess) => buildGuessRecord(guess, selectedCountry.properties.ADMIN))
+          .map((guess) => buildGuessRecord(guess, selectedCountry.properties.ADMIN, i18n.language))
           .filter((guess) => guess.value)
         : []
 
@@ -400,7 +403,7 @@ export default function useCountryClueState(mode, options = {}) {
       const localizedName = getCountryName(country.properties.ISO_A2, lang) || country.properties.ADMIN
       suggestions.add(localizedName)
     })
-    const sortLocale = lang === 'ru' ? 'ru' : lang === 'en' ? 'en' : 'fr'
+    const sortLocale = localeOf(lang, 'fr')
     return [...suggestions].sort((a, b) => a.localeCompare(b, sortLocale))
   }, [i18n.language])
 
@@ -440,7 +443,7 @@ export default function useCountryClueState(mode, options = {}) {
 
     const guessedCountry = COUNTRY_LOOKUP.get(normalizedGuess)
     if (!guessedCountry) {
-      toast.error("Je ne reconnais pas ce pays.", { containerId: 'topRightToast' })
+      toast.error(t('survival.not_a_country'), { containerId: 'topRightToast' })
       return
     }
 
@@ -459,7 +462,8 @@ export default function useCountryClueState(mode, options = {}) {
           normalizedInput: normalizedGuess,
           isCorrect,
         },
-        answerName
+        answerName,
+        i18n.language
       ),
     ]
 

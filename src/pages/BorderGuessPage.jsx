@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom'
 import { GeoJSON, MapContainer, useMap } from 'react-leaflet'
 import { ToastContainer } from 'react-toastify'
 import { getCountryName } from '../utils/getCountryName'
+import { localeOf } from '../i18n/languages'
 import NavBar from '../components/NavBar'
 import ShareScoreButton from '../components/ShareScoreButton'
 import ChallengeBanner from '../components/ChallengeBanner'
@@ -56,8 +57,8 @@ export function GuessHistory({ guesses, t, i18n }) {
                   </span>
                 )}
                 <small>
-                  {guess.distanceKm.toLocaleString('fr-FR')} km
-                  {guess.direction ? ` • ${guess.direction}` : ''}
+                  {guess.distanceKm.toLocaleString(localeOf(i18n.language))} km
+                  {guess.direction ? ` • ${t(`country_clue.directions.${guess.direction}`, guess.direction)}` : ''}
                 </small>
               </div>
             )}

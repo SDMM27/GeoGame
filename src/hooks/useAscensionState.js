@@ -9,7 +9,7 @@ import { GAME_TYPES } from '../utils/gameTypes'
 import { matchKnownAnswer } from '../utils/answerLexicon'
 import { buildPhaseSequence } from '../utils/ascensionPresets'
 import { saveSnapshot } from '../utils/multiplayerSnapshot'
-import { getCountryName, getAllCountryNames, getAllCapitalNames } from '../utils/getCountryName'
+import { getCapitalName, getCountryName, getAllCountryNames, getAllCapitalNames } from '../utils/getCountryName'
 import { MAP_COLORS } from '../utils/mapColors'
 
 // Which country property name holds the difficulty for each game type
@@ -431,7 +431,8 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
     const answer    = isFlags ? props.ADMIN    : props.capital
     const aliases   = isFlags ? (props.aliases ?? []) : (props.capitalAliases ?? [])
     const diffProp  = isFlags ? props.DifficultyFlag  : props.DifficultyCapitals
-    const revLabel  = answer
+    // The answer in the player's language (the dataset's names are French)
+    const revLabel  = (isFlags ? getCountryName(props.ISO_A2, i18n.language) : getCapitalName(props.ISO_A2, i18n.language)) || answer
 
     const accepted = isFlags
       ? getAllCountryNames(props.ISO_A2, answer, aliases)
@@ -439,7 +440,7 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
     if (matchKnownAnswer(inputValue, accepted)) {
       const wasSkipped = clickOnSeeCountryRef.current
       if (!wasSkipped) {
-        toast.success('Bravo ! ' + revLabel + ' !', { containerId: 'topRightToast' })
+        toast.success(t('toasts.found_country', { name: revLabel }), { containerId: 'topRightToast' })
         // FLAGS/CAPITALS are more lenient: 1 error still gives full points (matches useFlagGameState/useCapitalsGameState)
         const adjustedErrors = Math.max(0, consecutiveErrorsRef.current - 1)
         incrementScore(diffProp, adjustedErrors)
@@ -450,10 +451,10 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
       setConsecutiveErrors(n)
       consecutiveErrorsRef.current = n
       if (n >= 3) {
-        toast.error('Dommage ! C\'est ' + revLabel, { containerId: 'topRightToast' })
+        toast.error(`${t('toasts.wrong')} ${t('survival.answer_was', { answer: revLabel })}`, { containerId: 'topRightToast' })
         setRevealedName(revLabel)
       } else {
-        toast.error('Dommage !', { containerId: 'topRightToast' })
+        toast.error(t('toasts.wrong'), { containerId: 'topRightToast' })
       }
       setInputValue('')
     }

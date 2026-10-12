@@ -1,7 +1,7 @@
 # Fiche Play Store
 
 Textes à coller dans Play Console → Croissance → Fiche principale du Play Store.
-Le français est la langue par défaut ; l'anglais s'ajoute dans « Gérer les traductions ».
+Le français est la langue par défaut ; les autres langues (anglais, espagnol, portugais, allemand, italien, russe) s'ajoutent dans « Gérer les traductions ».
 
 Limites de Google : nom 30 caractères, description courte 80, description longue 4 000.
 
@@ -51,7 +51,7 @@ Grimpe dans les classements, suis ton historique, tes séries et tes succès. Le
 ATLAS
 Explore la carte du monde : touche un pays pour voir sa capitale, sa population, sa superficie, son PIB et ses voisins.
 
-Gratuit, sans publicité, en français et en anglais.
+Gratuit, sans publicité, en 7 langues : français, anglais, espagnol, portugais, allemand, italien et russe.
 ```
 
 **Notes de version (première publication)**
@@ -106,13 +106,288 @@ Climb the leaderboards, follow your history, streaks and achievements. An accoun
 ATLAS
 Explore the world map: tap a country to see its capital, population, area, GDP and neighbours.
 
-Free, no ads, in English and French.
+Free, no ads, in 7 languages: English, French, Spanish, Portuguese, German, Italian and Russian.
 ```
 
 **Release notes (first release)**
 
 ```
 First release of GeoGame on Android: daily challenges, games with adjustable difficulty, survival, multiplayer, leaderboards, friends and atlas.
+```
+
+---
+
+## Español (es-ES, à réutiliser pour es-419)
+
+**Nombre de la app** (29/30)
+
+```
+GeoGame – Juegos de geografía
+```
+
+**Descripción breve** (80/80)
+
+```
+Banderas, capitales, fronteras, quiz: la geografía en juegos, solo o con amigos.
+```
+
+**Descripción completa**
+
+```
+GeoGame convierte la geografía en juegos cortos, bonitos y adictivos. Encuentra países en el mapa, adivina una bandera, una capital o un país solo por sus fronteras, y vuelve cada día para nuevos retos.
+
+RETOS DIARIOS
+Nuevos retos cada día a medianoche, los mismos para todos:
+• BorderGuess: adivina un país solo por sus fronteras.
+• Country Clue: encuentra el país con pistas de distancia, dirección, hemisferio, superficie y población.
+• Voyage Voyage: une dos países pasando por sus fronteras comunes, por el camino más corto.
+• Country Ranking: ordena países por población, superficie o PIB.
+• Quiz Geo: una pregunta al día para retar a tus amigos.
+¿Quieres más? Cada juego tiene también un modo infinito.
+
+JUEGOS A TU NIVEL
+• Encuentra el País: coloca todos los países en el mapa del mundo.
+• Encuentra la Bandera: identifica el país por su bandera.
+• Encuentra la Capital: encuentra la capital a partir de la bandera y el nombre del país.
+• Supervivencia: encadena rondas de varios juegos, cada error te cuesta una vida.
+Elige tu dificultad (de Fácil a Hardcore, hasta los 238 países) o juega continente por continente.
+
+JUEGA CON TUS AMIGOS
+Crea una partida, comparte el código y enfrentaos en directo o cuando queráis. Añade amigos, invítalos con un toque y comparad vuestras puntuaciones.
+
+CLASIFICACIONES Y PERFIL
+Sube en las clasificaciones y sigue tu historial, tus rachas y tus logros. La cuenta es opcional: puedes jugar sin registrarte.
+
+ATLAS
+Explora el mapa del mundo: toca un país para ver su capital, población, superficie, PIB y países vecinos.
+
+Gratis, sin publicidad, en 7 idiomas: español, inglés, francés, portugués, alemán, italiano y ruso.
+```
+
+**Novedades (primera versión)**
+
+```
+Primera versión de GeoGame en Android: retos diarios, juegos con dificultad ajustable, supervivencia, multijugador, clasificaciones, amigos y atlas.
+```
+
+---
+
+## Português (pt-BR)
+
+**Nome do app** (28/30)
+
+```
+GeoGame – Jogos de geografia
+```
+
+**Descrição curta** (78/80)
+
+```
+Bandeiras, capitais, fronteiras, quiz: a geografia em jogos, só ou com amigos.
+```
+
+**Descrição completa**
+
+```
+O GeoGame transforma a geografia em jogos curtos, bonitos e viciantes. Encontre países no mapa, adivinhe uma bandeira, uma capital ou um país só pelas fronteiras, e volte todo dia para novos desafios.
+
+DESAFIOS DIÁRIOS
+Novos desafios todo dia à meia-noite, os mesmos para todo mundo:
+• BorderGuess: adivinhe um país só pelas fronteiras.
+• Country Clue: encontre o país com dicas de distância, direção, hemisfério, área e população.
+• Voyage Voyage: ligue dois países passando pelas fronteiras em comum, pelo caminho mais curto.
+• Country Ranking: ordene países por população, área ou PIB.
+• Quiz Geo: uma pergunta por dia para desafiar seus amigos.
+Quer mais? Cada jogo também tem um modo infinito.
+
+JOGOS NO SEU NÍVEL
+• Encontre o País: coloque todos os países no mapa-múndi.
+• Encontre a Bandeira: identifique o país pela bandeira.
+• Encontre a Capital: encontre a capital pela bandeira e pelo nome do país.
+• Sobrevivência: encadeie rodadas de vários jogos, cada erro custa uma vida.
+Escolha a dificuldade (do Fácil ao Hardcore, até os 238 países) ou jogue continente por continente.
+
+JOGUE COM SEUS AMIGOS
+Crie uma partida, compartilhe o código e enfrentem-se ao vivo ou cada um no seu tempo. Adicione amigos, convide-os com um toque e comparem as pontuações.
+
+RANKINGS E PERFIL
+Suba nos rankings e acompanhe seu histórico, suas sequências e suas conquistas. A conta é opcional: dá para jogar sem se cadastrar.
+
+ATLAS
+Explore o mapa-múndi: toque em um país para ver a capital, a população, a área, o PIB e os vizinhos.
+
+Grátis, sem anúncios, em 7 idiomas: português, inglês, francês, espanhol, alemão, italiano e russo.
+```
+
+**Novidades (primeira versão)**
+
+```
+Primeira versão do GeoGame no Android: desafios diários, jogos com dificuldade ajustável, sobrevivência, multijogador, rankings, amigos e atlas.
+```
+
+---
+
+## Deutsch (de-DE)
+
+**App-Name** (26/30)
+
+```
+GeoGame – Geografie-Spiele
+```
+
+**Kurzbeschreibung** (79/80)
+
+```
+Flaggen, Hauptstädte, Grenzen, Quiz: Geografie spielen, solo oder mit Freunden.
+```
+
+**Vollständige Beschreibung**
+
+```
+GeoGame macht Geografie zu kurzen, schönen Spielen mit Suchtfaktor. Finde Länder auf der Karte, errate eine Flagge, eine Hauptstadt oder ein Land nur an seinen Grenzen, und komm jeden Tag für neue Challenges wieder.
+
+TÄGLICHE CHALLENGES
+Jeden Tag um Mitternacht neue Challenges, für alle gleich:
+• BorderGuess: Errate ein Land nur an seinen Grenzen.
+• Country Clue: Finde das Land mit Hinweisen zu Entfernung, Richtung, Hemisphäre, Fläche und Einwohnern.
+• Voyage Voyage: Verbinde zwei Länder über ihre gemeinsamen Grenzen, auf dem kürzesten Weg.
+• Country Ranking: Ordne Länder nach Einwohnern, Fläche oder BIP.
+• Geo-Quiz: eine Frage pro Tag, um deine Freunde herauszufordern.
+Lust auf mehr? Jedes Spiel hat auch einen Endlosmodus.
+
+SPIELE FÜR DEIN NIVEAU
+• Finde das Land: Setze jedes Land auf die Weltkarte.
+• Finde die Flagge: Erkenne das Land an seiner Flagge.
+• Finde die Hauptstadt: Finde die Hauptstadt anhand von Flagge und Ländernamen.
+• Survival: Spiele Runden aus mehreren Spielen am Stück, jeder Fehler kostet ein Leben.
+Wähle deine Schwierigkeit (von Leicht bis Hardcore, bis zu allen 238 Ländern) oder spiele Kontinent für Kontinent.
+
+SPIEL MIT FREUNDEN
+Erstelle ein Spiel, teile den Code und tretet live oder zeitversetzt gegeneinander an. Füge Freunde hinzu, lade sie mit einem Tipp ein und vergleicht eure Punkte.
+
+RANGLISTEN UND PROFIL
+Steig in den Ranglisten auf und verfolge deinen Verlauf, deine Serien und Erfolge. Ein Konto ist freiwillig: Du kannst ohne Anmeldung spielen.
+
+ATLAS
+Erkunde die Weltkarte: Tippe auf ein Land, um Hauptstadt, Einwohner, Fläche, BIP und Nachbarländer zu sehen.
+
+Kostenlos, ohne Werbung, in 7 Sprachen: Deutsch, Englisch, Französisch, Spanisch, Portugiesisch, Italienisch und Russisch.
+```
+
+**Neuerungen (erste Version)**
+
+```
+Erste Version von GeoGame für Android: tägliche Challenges, Spiele mit einstellbarer Schwierigkeit, Survival, Mehrspieler, Ranglisten, Freunde und Atlas.
+```
+
+---
+
+## Italiano (it-IT)
+
+**Nome dell'app** (29/30)
+
+```
+GeoGame – Giochi di geografia
+```
+
+**Descrizione breve** (78/80)
+
+```
+Bandiere, capitali, confini, quiz: la geografia in gioco, da solo o con amici.
+```
+
+**Descrizione completa**
+
+```
+GeoGame trasforma la geografia in giochi brevi, belli e che creano dipendenza. Trova i paesi sulla mappa, indovina una bandiera, una capitale o un paese solo dai suoi confini, e torna ogni giorno per nuove sfide.
+
+SFIDE QUOTIDIANE
+Nuove sfide ogni giorno a mezzanotte, uguali per tutti:
+• BorderGuess: indovina un paese solo dai suoi confini.
+• Country Clue: trova il paese con indizi su distanza, direzione, emisfero, superficie e popolazione.
+• Voyage Voyage: collega due paesi attraverso i confini in comune, con il percorso più breve.
+• Country Ranking: ordina i paesi per popolazione, superficie o PIL.
+• Quiz Geo: una domanda al giorno per sfidare i tuoi amici.
+Ne vuoi ancora? Ogni gioco ha anche una modalità infinita.
+
+GIOCHI AL TUO LIVELLO
+• Trova il Paese: posiziona tutti i paesi sulla mappa del mondo.
+• Trova la Bandiera: riconosci il paese dalla sua bandiera.
+• Trova la Capitale: trova la capitale dalla bandiera e dal nome del paese.
+• Sopravvivenza: gioca round di più giochi di fila, ogni errore costa una vita.
+Scegli la difficoltà (da Facile a Hardcore, fino a tutti i 238 paesi) o gioca continente per continente.
+
+GIOCA CON GLI AMICI
+Crea una partita, condividi il codice e sfidatevi in diretta o quando volete. Aggiungi amici, invitali con un tocco e confrontate i punteggi.
+
+CLASSIFICHE E PROFILO
+Scala le classifiche e segui la tua cronologia, le tue serie e i tuoi traguardi. L'account è facoltativo: puoi giocare senza registrarti.
+
+ATLANTE
+Esplora la mappa del mondo: tocca un paese per vederne capitale, popolazione, superficie, PIL e paesi confinanti.
+
+Gratis, senza pubblicità, in 7 lingue: italiano, inglese, francese, spagnolo, portoghese, tedesco e russo.
+```
+
+**Novità (prima versione)**
+
+```
+Prima versione di GeoGame su Android: sfide quotidiane, giochi con difficoltà regolabile, sopravvivenza, multigiocatore, classifiche, amici e atlante.
+```
+
+---
+
+## Русский (ru-RU)
+
+**Название приложения** (27/30)
+
+```
+GeoGame – Игры по географии
+```
+
+**Краткое описание** (78/80)
+
+```
+Флаги, столицы, границы, викторины: география в играх — одному или с друзьями.
+```
+
+**Полное описание**
+
+```
+GeoGame превращает географию в короткие, красивые и затягивающие игры. Находите страны на карте, угадывайте флаг, столицу или страну только по её границам и возвращайтесь каждый день за новыми заданиями.
+
+ЗАДАНИЯ ДНЯ
+Новые задания каждый день в полночь, одинаковые для всех:
+• BorderGuess: угадайте страну только по её границам.
+• Country Clue: найдите страну по подсказкам о расстоянии, направлении, полушарии, площади и населении.
+• Voyage Voyage: соедините две страны через общие границы кратчайшим путём.
+• Country Ranking: расставьте страны по населению, площади или ВВП.
+• Гео-викторина: один вопрос в день, чтобы бросить вызов друзьям.
+Хотите ещё? У каждой игры есть бесконечный режим.
+
+ИГРЫ ПОД ВАШ УРОВЕНЬ
+• Найди страну: отметьте все страны на карте мира.
+• Найди флаг: узнайте страну по флагу.
+• Найди столицу: назовите столицу по флагу и названию страны.
+• Выживание: проходите раунды разных игр подряд, каждая ошибка стоит жизни.
+Выберите сложность (от лёгкой до Hardcore, вплоть до всех 238 стран) или играйте по континентам.
+
+ИГРАЙТЕ С ДРУЗЬЯМИ
+Создайте игру, поделитесь кодом и соревнуйтесь в реальном времени или когда удобно. Добавляйте друзей, приглашайте их одним касанием и сравнивайте результаты.
+
+РЕЙТИНГИ И ПРОФИЛЬ
+Поднимайтесь в рейтингах, следите за историей игр, сериями и достижениями. Аккаунт не обязателен: играть можно без регистрации.
+
+АТЛАС
+Исследуйте карту мира: нажмите на страну, чтобы увидеть её столицу, население, площадь, ВВП и соседей.
+
+Бесплатно, без рекламы, на 7 языках: русском, английском, французском, испанском, португальском, немецком и итальянском.
+```
+
+**Что нового (первая версия)**
+
+```
+Первая версия GeoGame для Android: задания дня, игры с настраиваемой сложностью, выживание, мультиплеер, рейтинги, друзья и атлас.
 ```
 
 ---
@@ -127,3 +402,4 @@ First release of GeoGame on Android: daily challenges, games with adjustable dif
 
 Pour régénérer l'icône et l'image de présentation : `python store/make_graphics.py`.
 Les captures viennent de la version web de l'app, en format téléphone (360×720 à 3×), sans compte connecté.
+Pour les autres langues, Google reprend les visuels de la langue par défaut tant qu'on n'en ajoute pas : des captures et une image de présentation par langue (`TAGLINES` dans `make_graphics.py`) sont un plus, pas une obligation.

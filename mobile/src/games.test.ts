@@ -1,4 +1,5 @@
 import i18n from '@shared/i18n'
+import { LANGUAGE_CODES } from '@shared/i18n/languages'
 
 import { DIFFICULTIES, DIFFICULTY_COLORS, GAMES, MULTI_GAMES, getGame, getGameByType } from './games'
 import './i18n'
@@ -21,8 +22,8 @@ describe('GAMES', () => {
     for (const game of GAMES) expect(game.route).toMatch(/^\/game\/[a-z-]+$/)
   })
 
-  it('has its title and description translated in the three languages', () => {
-    for (const lng of ['fr', 'en', 'ru']) {
+  it('has its title and description translated in every language', () => {
+    for (const lng of LANGUAGE_CODES) {
       for (const game of GAMES) {
         expect(i18n.exists(game.titleKey, { lng })).toBe(true)
         expect(i18n.exists(game.descKey, { lng })).toBe(true)

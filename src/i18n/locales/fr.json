@@ -228,7 +228,33 @@
     "metric_direction": "Direction",
     "metric_hemisphere": "Hémisphère",
     "metric_area": "Surface",
-    "metric_population": "Population"
+    "metric_population": "Population",
+    "directions": {
+      "Nord": "Nord",
+      "Nord-Est": "Nord-Est",
+      "Est": "Est",
+      "Sud-Est": "Sud-Est",
+      "Sud": "Sud",
+      "Sud-Ouest": "Sud-Ouest",
+      "Ouest": "Ouest",
+      "Nord-Ouest": "Nord-Ouest",
+      "Tout près": "Tout près"
+    },
+    "hint": {
+      "exact": "Exact",
+      "hemisphere_match": "Même",
+      "hemisphere_higher": "Plus au nord",
+      "hemisphere_lower": "Plus au sud",
+      "hemisphere_neutral": "Inconnu",
+      "area_match": "Similaire",
+      "area_higher": "Plus grand",
+      "area_lower": "Plus petit",
+      "area_neutral": "Inconnue",
+      "population_match": "Similaire",
+      "population_higher": "Plus peuplé",
+      "population_lower": "Moins peuplé",
+      "population_neutral": "Inconnue"
+    }
   },
   "voyage_voyage": {
     "daily_description": "Une seule route par jour, identique pour tous les joueurs.",
@@ -255,7 +281,10 @@
     "stage_progress": "Critère {{done}} / {{count}} terminé",
     "next_criterion": "Critère suivant →",
     "found_at_attempt": "trouvé à l'essai {{attempt}}",
-    "not_found": "pas trouvé · erreur {{count}}"
+    "not_found": "pas trouvé · erreur {{count}}",
+    "instruction_population": "Classe du plus peuplé au moins peuplé",
+    "instruction_area": "Classe du plus grand au plus petit",
+    "instruction_gdp": "Classe du plus riche au moins riche"
   },
   "form": {
     "title": "Partie terminée !",
@@ -298,7 +327,9 @@
     "error_one": "erreur",
     "error_other": "erreurs",
     "position_one": "position",
-    "position_other": "positions"
+    "position_other": "positions",
+    "countries_one": "{{count}} pays",
+    "countries_other": "{{count}} pays"
   },
   "options": {
     "all_games": "Tous les jeux",
@@ -308,7 +339,9 @@
   },
   "scoreboard": {
     "title": "Tableau des scores",
-    "no_ascension_scores": "Aucun score Ascension pour ce filtre."
+    "no_ascension_scores": "Aucun score Ascension pour ce filtre.",
+    "ascension_title": "Tableau des scores Ascension",
+    "preset": "Preset"
   },
   "leaderboard": {
     "title": "Classement journalier",
@@ -798,7 +831,9 @@
     "points": "{{count}} pts",
     "n_games": "{{count}} jeux",
     "next_game": "Lancer le jeu {{n}}",
-    "waiting_next": "En attente du jeu suivant…"
+    "waiting_next": "En attente du jeu suivant…",
+    "round_n": "Manche {{n}} / {{total}}",
+    "next_round_soon": "Manche suivante dans un instant…"
   },
   "survival": {
     "spectating": "Tu regardes ceux qui restent en jeu",
@@ -959,6 +994,7 @@
     "multiplayer": "Multi",
     "leaderboards": "Classements",
     "profile": "Profil",
-    "main": "Navigation principale"
+    "main": "Navigation principale",
+    "language": "Langue"
   }
 }

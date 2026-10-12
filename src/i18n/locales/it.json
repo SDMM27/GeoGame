@@ -1,0 +1,1000 @@
+{
+  "atlas": {
+    "title": "Atlante",
+    "subtitle": "Esplora la mappa del mondo: tocca un paese per vedere la sua scheda.",
+    "search_placeholder": "Cerca un paese…",
+    "no_results": "Nessun paese trovato",
+    "capital": "Capitale",
+    "continent": "Continente",
+    "population": "Popolazione",
+    "area": "Superficie",
+    "density": "Densità",
+    "gdp": "PIL",
+    "gdp_per_capita": "PIL pro capite",
+    "neighbors": "Paesi confinanti",
+    "no_neighbors": "Nessun confine terrestre",
+    "rank": "{{rank}}° su {{total}}",
+    "rank_first": "1° su {{total}}",
+    "difficulty": "Difficoltà nei giochi",
+    "per_km2": "ab./km²",
+    "billion_usd": "{{value}} mld $",
+    "usd": "{{value}} $",
+    "close": "Chiudi",
+    "unknown": "Sconosciuto",
+    "open": "Apri l'atlante"
+  },
+  "continents": {
+    "Europe": "Europa",
+    "Asie": "Asia",
+    "Afrique": "Africa",
+    "Amériques": "Americhe",
+    "Océanie": "Oceania"
+  },
+  "home": {
+    "subtitle": "Esplora - Scopri - Viaggia",
+    "greeting": "Pronto a viaggiare?",
+    "daily_title": "Sfide del giorno",
+    "daily_subtitle": "Nuove ogni giorno a mezzanotte",
+    "games_title": "Giochi",
+    "games_subtitle": "Scegli la difficoltà o il continente",
+    "daily": "Sfida del giorno",
+    "infinite": "Infinito",
+    "multi": "Gioca in multigiocatore"
+  },
+  "games": {
+    "placement": {
+      "title": "Trova il Paese",
+      "description": "Trova tutti i paesi della difficoltà scelta."
+    },
+    "flags": {
+      "title": "Trova la Bandiera",
+      "description": "Riconosci il paese dalla sua bandiera."
+    },
+    "capitals": {
+      "title": "Trova la Capitale",
+      "description": "Trova la capitale dalla bandiera e dal nome del paese."
+    },
+    "border_guess": {
+      "title": "BorderGuess",
+      "description": "Indovina un paese solo dai suoi confini."
+    },
+    "country_clue": {
+      "title": "Country Clue",
+      "description": "Trova il paese con indizi su distanza, direzione e superficie."
+    },
+    "voyage_voyage": {
+      "title": "Voyage Voyage",
+      "description": "Collega due paesi passando per i confini in comune. Trova il percorso più breve!"
+    },
+    "ranking": {
+      "title": "Country Ranking",
+      "description": "Ordina i paesi dal più grande al più piccolo secondo un criterio: popolazione, superficie o PIL."
+    },
+    "placement_countries": {
+      "title": "Posiziona il Paese",
+      "description": "Metti il paese nel punto giusto della mappa."
+    },
+    "quiz": {
+      "title": "Quiz Geo",
+      "description": "Una domanda al giorno per sfidare i tuoi amici, oppure una serie di domande alla difficoltà che preferisci."
+    },
+    "survival": {
+      "title": "Sopravvivenza",
+      "description": "Gioca round di più giochi di fila: ogni errore ti costa una vita."
+    }
+  },
+  "modes": {
+    "daily": "Sfida del giorno",
+    "infinite": "Infinito",
+    "standard": "Standard",
+    "ascension": "🚀 Ascesa",
+    "continent": "🌍 Continente"
+  },
+  "buttons": {
+    "play": "Gioca",
+    "training": "Allenamento",
+    "scores": "🏆 Punteggi",
+    "home": "← Home",
+    "reveal": "👁 Rivela",
+    "restart": "↺ Ricomincia",
+    "validate": "Conferma",
+    "see": "👁 Vedi",
+    "start_timer": "Avvia il timer",
+    "return_home": "Torna alla home",
+    "reveal_country": "Rivela il paese",
+    "new_country": "Nuovo paese",
+    "new_game": "Nuova partita",
+    "new_path": "↺ Nuovo percorso",
+    "see_results": "Vedi i risultati",
+    "next_country_hint": "👁 Paese successivo",
+    "all_countries_hint": "🗺 Tutti i paesi",
+    "initials_hint": "🔤 Iniziali",
+    "next_round": "Round successivo",
+    "submit_ranking": "✓ Invia la mia classifica",
+    "save_score": "Salva il punteggio",
+    "create_game": "Crea la partita",
+    "join": "Entra",
+    "hide_history": "Nascondi la cronologia",
+    "show_full_history": "Mostra tutta la cronologia"
+  },
+  "difficulties": {
+    "Facile": "Facile",
+    "Moyen": "Medio",
+    "Difficile": "Difficile",
+    "Impossible": "Impossibile",
+    "Hardcore": "Hardcore",
+    "hardcore_all": "💀 Hardcore - Tutti i paesi",
+    "easy_range": "Facile (3–5)",
+    "medium_range": "Medio (6–12)",
+    "hard_range": "Difficile (13–20)"
+  },
+  "selection": {
+    "by_difficulty": "Per difficoltà",
+    "by_continent": "Per continente"
+  },
+  "presets": {
+    "progressive": "Progressivo",
+    "custom": "Personalizzato"
+  },
+  "labels": {
+    "configuration": "Impostazioni",
+    "total_countries": "paesi in totale",
+    "country": "Paese",
+    "your_country": "Il tuo paese",
+    "your_guess": "La tua risposta",
+    "how_to_read_hints": "Come leggere gli indizi",
+    "no_attempts": "Ancora nessun tentativo.",
+    "attempts": "Tentativi",
+    "found": "Trovati",
+    "missed": "Mancati",
+    "capital": "Capitale:",
+    "new_game": "Nuova partita",
+    "score": "Punteggio:",
+    "time": "Tempo:",
+    "username": "Nome utente",
+    "your_username": "Il tuo nome utente",
+    "phase": "Fase:",
+    "remaining": "rimanenti",
+    "start": "Partenza",
+    "arrival": "Arrivo",
+    "optimal": "ottimale:",
+    "hints": "Indizi:",
+    "criterion": "Criterio",
+    "preset": "Impostazione:",
+    "total_time": "Tempo totale",
+    "all_countries": "Tutti",
+    "game": "Gioco",
+    "total": "Totale",
+    "player": "Giocatore",
+    "countries_found": "Paesi trovati",
+    "you": "(Tu)",
+    "optimal_path": "Percorso ottimale:",
+    "unknown": "Sconosciuto"
+  },
+  "game_hud": {
+    "target_country": "PAESE DA TROVARE",
+    "score": "PUNTI",
+    "time": "TEMPO",
+    "countries": "paesi",
+    "found": "✓ TROVATI",
+    "skipped": "✗ SALTATI",
+    "remaining": "◎ RIMANENTI",
+    "flags": "BANDIERE",
+    "capitals": "CAPITALI"
+  },
+  "controls": {
+    "left_click": "Clic sinistro",
+    "select_country": "Seleziona un paese",
+    "right_click": "Clic destro",
+    "move_map": "Sposta la mappa",
+    "wheel": "Rotellina",
+    "zoom": "Ingrandisci / riduci"
+  },
+  "game_over": {
+    "completed": "✓ Fatto!",
+    "waiting_players": "In attesa degli altri giocatori..."
+  },
+  "borderguess": {
+    "daily_title": "BorderGuess del giorno",
+    "infinite_title": "BorderGuess infinito",
+    "daily_subtitle": "Un paese al giorno, uguale per tutti. Sfida quotidiana.",
+    "infinite_subtitle": "Indovina quante sagome vuoi senza aspettare domani.",
+    "daily_description": "Un paese al giorno, con i progressi salvati su questo dispositivo.",
+    "infinite_description": "Sagome senza limiti, con un paese nuovo a ogni round.",
+    "start_timer_hint": "Avvia il timer per rivelare i confini.",
+    "map_caption": "Guarda solo i confini del paese, poi dai la tua risposta.",
+    "success_message": "Bravo, la risposta giusta era",
+    "answer_was": "La risposta giusta era",
+    "see_tomorrow": "Torna domani per un nuovo paese.",
+    "start_new_game": "Inizia un nuovo paese per continuare."
+  },
+  "country_clue": {
+    "closer": "{{km}} km più vicino",
+    "farther": "{{km}} km più lontano",
+    "same_distance": "Stessa distanza",
+    "closest": "Il più vicino",
+    "your_guesses": "Le tue risposte",
+    "daily_title": "Country Clue del giorno",
+    "infinite_title": "Country Clue infinito",
+    "daily_subtitle": "Un paese misterioso da trovare oggi. Sfida quotidiana.",
+    "infinite_subtitle": "Una versione libera ispirata a Countryle, senza limiti di partite.",
+    "daily_description": "Un paese misterioso al giorno, con i progressi salvati su questo dispositivo.",
+    "infinite_description": "Enigmi sui paesi uno dopo l'altro, senza aspettare domani.",
+    "intro_text": "Ogni risposta rivela la distanza, la direzione, l'emisfero e un riferimento di superficie per aiutarti ad avvicinarti al paese giusto.",
+    "hints_explanation": "La direzione indica il paese cercato. L'emisfero indica la posizione rispetto all'equatore. Superficie e Popolazione indicano se il paese cercato è più grande/piccolo o più/meno popolato.",
+    "correct": "Bravo!",
+    "guess_title": "Indovina il paese",
+    "metric_distance": "Distanza",
+    "metric_direction": "Direzione",
+    "metric_hemisphere": "Emisfero",
+    "metric_area": "Superficie",
+    "metric_population": "Popolazione",
+    "directions": {
+      "Nord": "Nord",
+      "Nord-Est": "Nord-Est",
+      "Est": "Est",
+      "Sud-Est": "Sud-Est",
+      "Sud": "Sud",
+      "Sud-Ouest": "Sud-Ovest",
+      "Ouest": "Ovest",
+      "Nord-Ouest": "Nord-Ovest",
+      "Tout près": "Vicinissimo"
+    },
+    "hint": {
+      "exact": "Esatto",
+      "hemisphere_match": "Lo stesso",
+      "hemisphere_higher": "Più a nord",
+      "hemisphere_lower": "Più a sud",
+      "hemisphere_neutral": "Sconosciuto",
+      "area_match": "Simile",
+      "area_higher": "Più grande",
+      "area_lower": "Più piccolo",
+      "area_neutral": "Sconosciuta",
+      "population_match": "Simile",
+      "population_higher": "Più popolato",
+      "population_lower": "Meno popolato",
+      "population_neutral": "Sconosciuta"
+    }
+  },
+  "voyage_voyage": {
+    "daily_description": "Un percorso al giorno, uguale per tutti i giocatori.",
+    "infinite_description": "Un percorso nuovo a ogni partita, senza limiti.",
+    "confirm_new_path": "Abbandonare questo percorso e generarne uno nuovo?",
+    "perfect_path": "Perfetto! Percorso ottimale trovato",
+    "arrived_in": "Arrivato in"
+  },
+  "ranking": {
+    "title": "Country Ranking",
+    "daily_description": "Ordina 5 paesi secondo ogni criterio del giorno: popolazione, superficie e PIL. 3 tentativi per criterio.",
+    "infinite_description": "Round di classifica uno dopo l'altro, alla difficoltà che preferisci.",
+    "random": "Casuale",
+    "population": "Popolazione",
+    "area": "Superficie",
+    "gdp": "PIL",
+    "drag_hint": "Trascina per riordinare",
+    "choose_category": "Scegli una categoria",
+    "total_error": "Errore totale:",
+    "correct_ranking": "Classifica corretta",
+    "placed_at": "messo in posizione ",
+    "difference_of": "scarto di",
+    "better_score_exists": "Hai già un punteggio salvato per questa sfida.",
+    "stage_progress": "Criterio {{done}} / {{count}} completato",
+    "next_criterion": "Criterio successivo →",
+    "found_at_attempt": "trovato al tentativo {{attempt}}",
+    "not_found": "non trovato · errore {{count}}",
+    "instruction_population": "Ordina dal più al meno popolato",
+    "instruction_area": "Ordina dal più grande al più piccolo",
+    "instruction_gdp": "Ordina dal più ricco al meno ricco"
+  },
+  "form": {
+    "title": "Partita finita!",
+    "ascension_title": "🚀 Ascesa completata!",
+    "better_score_exists": "Questo nome ha già un punteggio migliore in questa difficoltà:",
+    "use_different_name": "Salva il tuo punteggio con un altro nome.",
+    "better_daily_score": "Questo nome ha già un punteggio salvato per questa sfida:",
+    "use_different_name_daily": "Salvalo con un altro nome.",
+    "score_saved": "Punteggio salvato ✓",
+    "saving": "Salvataggio...",
+    "better_ascension_time": "Questo nome ha già un tempo migliore:",
+    "training_mode_not_saved": "Modalità allenamento: punteggio non salvato",
+    "custom_config_not_saved": "Impostazioni personalizzate: punteggio non salvato"
+  },
+  "messages": {
+    "please_enter_username": "Inserisci un nome utente",
+    "score_saved": "Punteggio salvato!",
+    "save_error": "Errore durante il salvataggio.",
+    "loading": "Caricamento...",
+    "page_load_error": "Impossibile caricare la pagina. Controlla la connessione.",
+    "reload": "Ricarica"
+  },
+  "errors": {
+    "title": "Ops, qualcosa è andato storto",
+    "message": "Controlla la connessione, poi ricarica la pagina o torna alla home.",
+    "home": "Torna alla home"
+  },
+  "not_found": {
+    "title": "Pagina non trovata",
+    "message": "Questa pagina non esiste o è stata spostata.",
+    "home": "Torna alla home"
+  },
+  "units": {
+    "pt": "pt",
+    "pts": "pt",
+    "attempt_one": "tentativo",
+    "attempt_other": "tentativi",
+    "step_one": "tappa",
+    "step_other": "tappe",
+    "error_one": "errore",
+    "error_other": "errori",
+    "position_one": "posizione",
+    "position_other": "posizioni",
+    "countries_one": "{{count}} paese",
+    "countries_other": "{{count}} paesi"
+  },
+  "options": {
+    "all_games": "Tutti i giochi",
+    "all_presets": "Tutte le impostazioni",
+    "all_continents": "Tutti i continenti",
+    "all_scores": "Tutti i punteggi"
+  },
+  "scoreboard": {
+    "title": "Punteggi",
+    "no_ascension_scores": "Nessun punteggio Ascesa per questo filtro.",
+    "ascension_title": "Punteggi Ascesa",
+    "preset": "Impostazione"
+  },
+  "leaderboard": {
+    "title": "Classifica del giorno",
+    "final_title": "🏆 Risultati finali",
+    "no_scores_today": "Nessun punteggio per questo giorno.",
+    "attempts": "Tentativi",
+    "time": "Tempo",
+    "hints_used": "Indizi usati:",
+    "no_hints": "nessuno",
+    "attempted_countries": "Paesi proposti",
+    "played_order": "Ordine giocato"
+  },
+  "multiplayer": {
+    "title": "Multigiocatore",
+    "subtitle": "Sfida i tuoi amici al gioco che preferisci",
+    "join_title": "Entra in una partita",
+    "code_placeholder": "CODICE",
+    "create_title": "Crea una partita",
+    "create_subtitle": "Scegli un gioco e invita i tuoi amici con il codice",
+    "recent_title": "Partite recenti"
+  },
+  "lobby": {
+    "connecting": "Connessione..."
+  },
+  "config": {
+    "title": "Imposta la partita",
+    "creating": "Creazione...",
+    "typing_tolerance_note": "⚠️ Nei giochi in cui si scrive (bandiere, capitali), la prima esitazione per paese è tollerata e non influisce sul punteggio: gli errori di battitura capitano!"
+  },
+  "stats": {
+    "first_try": "🎯 Al primo colpo",
+    "stumbles": "🔄 Esitazioni",
+    "not_found": "❌ Non trovati"
+  },
+  "placeholders": {
+    "country_name": "Scrivi il nome del paese...",
+    "capital_name": "Scrivi la capitale...",
+    "country_examples": "es. Giappone, Brasile, Marocco...",
+    "country_examples_clue": "es. Canada, Giappone, Marocco...",
+    "username": "Il tuo nome utente...",
+    "room_code": "Codice (es. AB3K7Z)",
+    "enter_country_on_path": "Scrivi un paese del percorso…"
+  },
+  "aria": {
+    "progress_phase": "Avanzamento della fase"
+  },
+  "toasts": {
+    "correct": "Bravo!",
+    "wrong": "Sbagliato!",
+    "found_country": "Bravo! {{name}}!",
+    "typo_accepted": "Accettato! Si scrive «{{name}}»",
+    "location_reveal": "Sbagliato! {{name}} era qui",
+    "all_countries_found": "Bravo! Hai trovato tutti i paesi!",
+    "all_flags_found": "Bravo! Hai trovato tutte le bandiere!",
+    "all_capitals_found": "Bravo! Hai trovato tutte le capitali!",
+    "already_proposed": "Hai già proposto questo paese.",
+    "country_was": "Bravo! Era {{name}}",
+    "hint_updated": "Indizio aggiornato",
+    "ascension_phase_done": "Fase superata! Bravo!",
+    "ascension_failed": "Sbagliato! Partita finita."
+  },
+  "share": {
+    "copy_button": "📋 Copia il risultato",
+    "copied": "✓ Risultato copiato!",
+    "pseudo_placeholder": "Il tuo nome (facoltativo)",
+    "anonymous": "Anonimo",
+    "played_by": "giocato da",
+    "can_you_beat": "Sai fare di meglio?",
+    "score_attempts": "TENTATIVI",
+    "details_found_attempts": "Trovato in {{count}} tentativo/i",
+    "details_not_found_attempts": "Non trovato ({{count}} tentativo/i)",
+    "details_ranking_error": "Errore totale: {{count}} posizione/i",
+    "details_flags_timer": "{{found}}/{{total}} bandiere trovate · {{time}}",
+    "details_placement_timer": "{{found}}/{{total}} paesi posizionati · {{time}}",
+    "details_capitals_timer": "{{found}}/{{total}} capitali trovate · {{time}}",
+    "details_voyage": "{{steps}} tappa/e · ottimale: {{optimal}}"
+  },
+  "challenge": {
+    "button": "🔗 Sfida un amico",
+    "link_copied": "✓ Link della sfida copiato!",
+    "share_cta": "🎯 Ti sfido! Batti il mio punteggio:",
+    "a_friend": "Un amico",
+    "banner_title": "🎯 {{name}} ti sfida sul gioco di oggi!",
+    "their_score": "Punteggio di {{name}}: {{score}}",
+    "your_score": "Il tuo punteggio: {{score}}",
+    "your_turn": "tocca a te!",
+    "result_win": "🏆 Hai battuto {{name}}!",
+    "result_lose": "😅 {{name}} resta davanti… Rivincita domani?",
+    "result_tie": "🤝 Pareggio perfetto con {{name}}!",
+    "stale": "Questa sfida è del {{day}}: il gioco di oggi è cambiato da allora, quindi il confronto non è possibile.",
+    "attempts_one": "{{count}} tentativo",
+    "attempts_other": "{{count}} tentativi",
+    "not_found": "paese non trovato",
+    "points": "{{score}} pt"
+  },
+  "quiz": {
+    "pick_difficulty": "Scegli la difficoltà",
+    "pick_difficulty_hint": "Tutte le domande saranno di questa difficoltà. Puoi fermarti quando vuoi.",
+    "score": "Punteggio",
+    "correct_answers": "Risposte esatte",
+    "streak": "Serie",
+    "best_streak": "Serie migliore",
+    "correct": "✓ Esatto!",
+    "wrong": "✗ Risposta sbagliata",
+    "next": "Domanda successiva →",
+    "quit": "Basta",
+    "summary_title": "Partita finita",
+    "change_difficulty": "Cambia difficoltà",
+    "share_label": "PUNTI",
+    "share_details": "{{correct}}/{{answered}} risposte esatte · serie migliore {{streak}}",
+    "questions": {
+      "feature_country_one": "{{feature}}: in quale paese?",
+      "island_country_one": "{{feature}}: a quale paese appartiene?",
+      "feature_country_many": "{{feature}}: in quale di questi paesi?",
+      "feature_country_many_free": "{{feature}}: indica uno dei paesi",
+      "river_country_one": "In quale paese scorre {{feature}}?",
+      "river_country_many": "In quale di questi paesi scorre {{feature}}?",
+      "river_country_many_free": "Indica un paese in cui scorre {{feature}}",
+      "country_river": "{{country}}: quale fiume attraversa questo paese?",
+      "country_mountain": "{{country}}: quale vetta si trova in questo paese?",
+      "country_range": "{{country}}: quale catena montuosa si trova in questo paese?",
+      "country_lake": "{{country}}: quale lago o mare interno si trova in questo paese?",
+      "country_desert": "{{country}}: quale deserto si estende in questo paese?",
+      "country_waterfall": "{{country}}: quale cascata si trova in questo paese?",
+      "country_island": "{{country}}: quale isola appartiene a questo paese?",
+      "feature_continent": "{{feature}}: in quale continente?",
+      "river_mouth": "Dove sfocia {{feature}}?",
+      "river_city": "Quale fiume attraversa la città di {{city}}?",
+      "mountain_range": "{{feature}}: in quale catena montuosa si trova?",
+      "highest_point": "{{country}}: qual è il punto più alto di questo paese?",
+      "mountain_height": "Quale vetta raggiunge i {{height}} m ({{countries}})?",
+      "range_highest": "{{feature}}: qual è la vetta più alta?",
+      "longest_river": "Quale di questi fiumi è il più lungo?",
+      "highest_mountain": "Quale di queste vette è la più alta?",
+      "neighbor": "Quale di questi paesi ha un confine terrestre con questo paese: {{country}}?",
+      "not_neighbor": "Quale di questi paesi NON ha un confine terrestre con questo paese: {{country}}?",
+      "neighbor_free": "Indica un paese che ha un confine terrestre con questo paese: {{country}}"
+    },
+    "pick_mode": "Formato della risposta",
+    "modes": {
+      "choices": "Scelta multipla",
+      "choices_hint": "4 opzioni, solo una è giusta",
+      "free": "Risposta libera",
+      "free_hint": "Scrivi tu la risposta"
+    },
+    "input_placeholder": "La tua risposta…",
+    "dont_know": "Non lo so",
+    "typo_accepted": "Errore di battitura accettato: {{name}}",
+    "answer_was": "Risposta: {{answer}}",
+    "accepted_answers": "Risposte possibili: {{answer}}",
+    "daily_title": "Domanda del giorno",
+    "daily_rules": "Una sola domanda, uguale per tutti oggi. Nessuna opzione: scrivi tu la risposta. Hai {{attempts}} tentativi e fino a {{hints}} indizi, ma ogni indizio conta come un tentativo in classifica. La domanda appare quando avvii il timer.",
+    "attempts_left": "Tentativi rimasti",
+    "attempts_used": "Tentativi",
+    "hints_label": "Indizi",
+    "hint_n": "Indizio {{n}}",
+    "hint_button": "💡 Indizio ({{used}}/{{max}})",
+    "hint_cost": "Ogni indizio riduce i punti di questa domanda",
+    "give_up": "Mi arrendo",
+    "already_tried": "Hai già provato questa risposta.",
+    "daily_won": "✓ Trovato in {{attempts}}!",
+    "daily_lost": "✗ Non trovato stavolta",
+    "daily_come_back": "Torna domani per una nuova domanda.",
+    "daily_stat": "{{attempts}} · {{hints}} — {{time}}",
+    "attempts_count_one": "{{count}} tentativo",
+    "attempts_count_other": "{{count}} tentativi",
+    "hints_count_one": "{{count}} indizio",
+    "hints_count_other": "{{count}} indizi",
+    "guesses_title": "Risposte provate",
+    "play_infinite": "Modalità infinita",
+    "hints": {
+      "continent": "È un paese di questo continente: {{continent}}",
+      "height": "La sua vetta è alta {{height}} m",
+      "river_length": "È lungo {{length}} km",
+      "located_in": "Si trova in: {{countries}}",
+      "one_of": "Una delle risposte:",
+      "letters_one": "{{count}} lettera",
+      "letters_other": "{{count}} lettere",
+      "digits_one": "È un numero di {{count}} cifra",
+      "digits_other": "È un numero di {{count}} cifre",
+      "between": "Tra {{min}} e {{max}}"
+    }
+  },
+  "account": {
+    "title": "Il mio account",
+    "signin_tab": "Accedi",
+    "signup_tab": "Registrati",
+    "signin_intro": "Accedi per avere il tuo nome utente sul sito e nell'app.",
+    "signup_intro": "Crea il tuo account per riservare il tuo nome utente.",
+    "email": "Email",
+    "password": "Password",
+    "username": "Nome utente",
+    "email_placeholder": "tu@esempio.com",
+    "password_placeholder": "Almeno 6 caratteri",
+    "username_placeholder": "Il tuo nome utente",
+    "username_hint": "Da 3 a 20 caratteri",
+    "signin": "Accedi",
+    "signup": "Crea il mio account",
+    "forgot": "Password dimenticata?",
+    "reset_sent": "Abbiamo inviato un'email a {{email}} per scegliere una nuova password.",
+    "welcome": "Benvenuto, {{username}}!",
+    "signed_in_as": "Accesso effettuato come",
+    "signout": "Esci",
+    "prefill_hint": "Il tuo nome utente viene inserito quando salvi un punteggio o entri in una partita.",
+    "delete": "Elimina il mio account",
+    "delete_confirm": "Il tuo account, il tuo nome utente, la cronologia, i punteggi in classifica e gli amici verranno eliminati per sempre. Inserisci la password per confermare.",
+    "delete_button": "Elimina definitivamente",
+    "deleted": "Account eliminato.",
+    "cancel": "Annulla",
+    "errors": {
+      "invalid_email": "Indirizzo email non valido.",
+      "email_in_use": "Esiste già un account con questa email.",
+      "weak_password": "La password deve avere almeno 6 caratteri.",
+      "wrong_credentials": "Email o password errate.",
+      "too_many_requests": "Troppi tentativi. Riprova tra qualche minuto.",
+      "network": "Nessuna connessione. Controlla la rete.",
+      "not_enabled": "La creazione degli account non è ancora attiva.",
+      "username_length": "Il nome utente deve avere da 3 a 20 caratteri.",
+      "username_chars": "Il nome utente può contenere solo lettere, cifre, spazi, \"_\", \"-\" e \".\".",
+      "username_forbidden": "Questo nome utente non è consentito. Scegline un altro.",
+      "username_taken": "Questo nome utente è già in uso.",
+      "generic": "Qualcosa è andato storto. Riprova.",
+      "popup_blocked": "La finestra di Google è stata bloccata. Consenti i pop-up e riprova.",
+      "different_provider": "Questa email è già usata con un altro metodo di accesso.",
+      "cancelled": "Accesso annullato."
+    },
+    "google": "Continua con Google",
+    "or": "oppure",
+    "choose_title": "Scegli il tuo nome utente",
+    "choose_intro": "I tuoi punteggi appariranno con questo nome. Sarà riservato al tuo account.",
+    "choose_submit": "Conferma il mio nome utente",
+    "delete_confirm_google": "Il tuo account, il tuo nome utente, la cronologia, i punteggi in classifica e gli amici verranno eliminati per sempre. Conferma con Google."
+  },
+  "profile": {
+    "member_since": "Membro dal {{date}}",
+    "stats_title": "Statistiche",
+    "games": "Partite",
+    "play_time": "Tempo di gioco",
+    "countries": "Paesi trovati",
+    "days": "Giorni giocati",
+    "streak_title": "Serie di sfide del giorno",
+    "streak_current": "Serie attuale",
+    "streak_best": "Record",
+    "days_count_one": "{{count}} giorno",
+    "days_count_other": "{{count}} giorni",
+    "streak_hint": "Fai almeno una sfida del giorno ogni giorno per mantenere la serie.",
+    "today_title": "Sfide di oggi",
+    "today_done": "{{done}}/{{total}}",
+    "by_game_title": "Per gioco",
+    "games_count_one": "{{count}} partita",
+    "games_count_other": "{{count}} partite",
+    "best_score": "Record {{score}} pt",
+    "best_attempts_one": "Record: {{count}} tentativo",
+    "best_attempts_other": "Record: {{count}} tentativi",
+    "wins": "{{wins}}/{{dailies}} sfide risolte",
+    "achievements_title": "Traguardi",
+    "achievements_count": "{{unlocked}}/{{total}}",
+    "history_title": "Partite recenti",
+    "history_all": "Vedi tutto",
+    "history_full_title": "Cronologia",
+    "history_empty": "Ancora nessuna partita salvata. Gioca dopo aver effettuato l'accesso e appariranno qui.",
+    "all_games": "Tutti i giochi",
+    "modes": {
+      "standard": "Classico",
+      "ascension": "Ascesa",
+      "daily": "Sfida del giorno",
+      "infinite": "Infinito",
+      "multi": "Multigiocatore",
+      "survival": "Sopravvivenza"
+    },
+    "solved": "Trovato",
+    "failed": "Mancato",
+    "attempts_count_one": "{{count}} tentativo",
+    "attempts_count_other": "{{count}} tentativi",
+    "load_error": "Impossibile caricare il profilo. Controlla la connessione.",
+    "not_found": "Giocatore non trovato.",
+    "settings_title": "Account",
+    "favorite": "Gioco preferito",
+    "sign_in_title": "Il tuo profilo giocatore",
+    "sign_in_pitch": "Accedi per conservare la cronologia delle partite, seguire le tue statistiche, sbloccare traguardi e giocare con i tuoi amici.",
+    "show_less": "Mostra meno",
+    "details": {
+      "title": "Dettagli della partita",
+      "played_at": "Giocata il",
+      "daily": "Sfida del giorno del",
+      "result": "Risultato",
+      "score": "Punteggio",
+      "found": "Paesi trovati",
+      "correct": "Risposte esatte",
+      "attempts": "Tentativi",
+      "optimal": "Percorso ottimale",
+      "errors": "Errori",
+      "total_error": "Scarto totale",
+      "hints": "Indizi",
+      "best_streak": "Serie migliore",
+      "lives": "Vite",
+      "time": "Tempo",
+      "room": "Stanza",
+      "open_room": "Apri la stanza",
+      "close": "Chiudi"
+    }
+  },
+  "friends": {
+    "title": "Amici",
+    "count_one": "{{count}} amico",
+    "count_other": "{{count}} amici",
+    "add_title": "Aggiungi un amico",
+    "add_placeholder": "Nome utente del tuo amico",
+    "add": "Aggiungi",
+    "sent": "Richiesta inviata a {{username}}!",
+    "now_friends": "Tu e {{username}} ora siete amici!",
+    "requests_title": "Richieste ricevute",
+    "outgoing_title": "Richieste inviate",
+    "accept": "Accetta",
+    "decline": "Rifiuta",
+    "cancel": "Annulla",
+    "remove": "Rimuovi dagli amici",
+    "remove_confirm": "Rimuovere {{username}} dai tuoi amici?",
+    "empty": "Non hai ancora amici. Aggiungili con il loro nome utente!",
+    "today_title": "Le sfide del giorno dei tuoi amici",
+    "today_none": "Non ha ancora giocato oggi",
+    "add_friend": "Aggiungi come amico",
+    "request_sent": "Richiesta inviata",
+    "is_friend": "Amico",
+    "accept_request": "Accetta la sua richiesta",
+    "see_all": "Gestisci i miei amici",
+    "pending_badge_one": "{{count}} richiesta",
+    "pending_badge_other": "{{count}} richieste",
+    "errors": {
+      "not_found": "Nessun giocatore con questo nome utente.",
+      "self": "Sei tu!",
+      "already_friends": "Siete già amici.",
+      "already_sent": "Richiesta già inviata.",
+      "network": "Nessuna connessione. Controlla la rete.",
+      "generic": "Qualcosa è andato storto. Riprova."
+    }
+  },
+  "achievements": {
+    "first_game": {
+      "title": "Primi passi",
+      "desc": "Finisci la tua prima partita"
+    },
+    "games_50": {
+      "title": "Habitué",
+      "desc": "Gioca 50 partite"
+    },
+    "games_250": {
+      "title": "Dipendente",
+      "desc": "Gioca 250 partite"
+    },
+    "all_games": {
+      "title": "Tuttofare",
+      "desc": "Gioca a tutti i giochi"
+    },
+    "streak_3": {
+      "title": "In forma",
+      "desc": "3 giorni di fila di sfide del giorno"
+    },
+    "streak_7": {
+      "title": "Settimana perfetta",
+      "desc": "7 giorni di fila di sfide del giorno"
+    },
+    "streak_30": {
+      "title": "Inarrestabile",
+      "desc": "30 giorni di fila di sfide del giorno"
+    },
+    "daily_sweep": {
+      "title": "En plein",
+      "desc": "Fai tutte le sfide del giorno nello stesso giorno"
+    },
+    "first_try": {
+      "title": "Al primo colpo",
+      "desc": "Risolvi una sfida del giorno al primo tentativo"
+    },
+    "explorer": {
+      "title": "Esploratore",
+      "desc": "Trova 500 paesi in totale"
+    },
+    "globetrotter": {
+      "title": "Giramondo",
+      "desc": "Trova 5.000 paesi in totale"
+    },
+    "hardcore": {
+      "title": "Senza rete",
+      "desc": "Finisci una partita in Hardcore"
+    },
+    "ascension": {
+      "title": "Vetta",
+      "desc": "Finisci una partita in modalità Ascesa"
+    },
+    "multiplayer": {
+      "title": "Spirito di squadra",
+      "desc": "Gioca una partita multigiocatore"
+    },
+    "friend": {
+      "title": "Socievole",
+      "desc": "Aggiungi il tuo primo amico"
+    },
+    "night_owl": {
+      "title": "Nottambulo",
+      "desc": "Gioca tra mezzanotte e le 5 del mattino"
+    }
+  },
+  "app_banner": {
+    "title": "GeoGame in app",
+    "subtitle": "A schermo intero, con un'icona nella schermata Home. Si installa da Safari.",
+    "open": "Apri",
+    "close": "Chiudi",
+    "subtitle_android": "Scarica l'APK e consenti l'installazione quando Android lo chiede.",
+    "download": "Scarica"
+  },
+  "report": {
+    "button": "Segnala {{name}}",
+    "title": "Segnala {{name}}",
+    "reason": "Motivo",
+    "reasons": {
+      "offensive_name": "Nome offensivo o inappropriato",
+      "cheating": "Punteggio falso o imbroglio",
+      "other": "Altro"
+    },
+    "note": "Dettagli (facoltativo)",
+    "cancel": "Annulla",
+    "submit": "Segnala",
+    "sending": "Invio…",
+    "sent": "Grazie, la tua segnalazione è stata inviata.",
+    "already": "Hai già segnalato questo punteggio.",
+    "error": "Impossibile inviare la segnalazione. Riprova.",
+    "close": "Chiudi"
+  },
+  "score_save": {
+    "saving": "Salvataggio in classifica…",
+    "saved_as": "Punteggio salvato in classifica come {{name}} ✓",
+    "updated_as": "Nuovo record salvato come {{name}} ✓",
+    "record_kept": "Il tuo record è ancora migliore: {{record}}",
+    "taken": "Questo nome utente appartiene a un account. Accedi per usarlo o scegline un altro.",
+    "sign_in_hint": "Accedi per salvare i tuoi punteggi nel tuo account.",
+    "sign_in": "Accedi",
+    "retry": "Riprova",
+    "you": "Tu"
+  },
+  "mp_room": {
+    "add_players": "Aggiungi i giocatori di questa partita",
+    "add_friend": "Aggiungi amico",
+    "accept_friend": "Accetta",
+    "request_sent": "Richiesta inviata",
+    "retry": "Riprova",
+    "live": "In diretta",
+    "challenge": "Sfida",
+    "from_app": "Partita creata nell'app",
+    "code": "Codice della partita",
+    "join_hint": "Scegli il tuo nome utente per entrare nella partita.",
+    "join": "Entra",
+    "players": "Giocatori · {{count}}",
+    "you": "tu",
+    "host": "Host",
+    "waiting_host": "In attesa che l'host avvii la partita…",
+    "starting_in": "Inizio tra",
+    "late_hint": "La partita è già iniziata, ma puoi ancora giocarla.",
+    "challenge_play_hint": "Gioca quando vuoi: tutti hanno gli stessi paesi.",
+    "play": "Gioca",
+    "standings": "Classifica",
+    "playing": "Sta giocando",
+    "not_played": "Non ha ancora giocato",
+    "no_players": "Nessuno ha ancora giocato.",
+    "errors": "{{count}} errori",
+    "question": "Domanda {{n}} / {{total}}",
+    "see_results": "Vedi i risultati",
+    "finished": "Partita finita!",
+    "unsupported": "Questo gioco non si può ancora giocare sul sito.",
+    "launch": "Avvia la partita",
+    "copy_link": "Copia il link",
+    "link_copied": "Link copiato",
+    "not_found": "Partita non trovata. Controlla il codice: le partite vecchie non sono più disponibili.",
+    "live_hint": "Tutti iniziano insieme quando l'host avvia la partita. Avanzamento in diretta.",
+    "challenge_hint": "Ognuno gioca quando vuole con il codice; la classifica si riempie man mano.",
+    "difficulty": "Difficoltà",
+    "answer_mode": "Risposte",
+    "countries_count": "Numero di paesi",
+    "questions_count": "Numero di domande",
+    "games": "Giochi",
+    "remove_game": "Rimuovi questo gioco",
+    "game_n": "Gioco {{n}}",
+    "add_another": "Aggiungi un altro gioco",
+    "add_game": "Aggiungi un gioco",
+    "cancel": "Annulla",
+    "overall": "Generale",
+    "points": "{{count}} pt",
+    "n_games": "{{count}} giochi",
+    "next_game": "Avvia il gioco {{n}}",
+    "waiting_next": "In attesa del prossimo gioco…",
+    "round_n": "Round {{n}} / {{total}}",
+    "next_round_soon": "Il prossimo round tra un attimo…"
+  },
+  "survival": {
+    "spectating": "Stai guardando i giocatori ancora in gara",
+    "out_round": "eliminato al round {{n}}",
+    "back_to_room": "Torna alla stanza",
+    "last_standing": "🏆 Ultimo sopravvissuto: hai vinto!",
+    "ask_flag": "Indica il PAESE di questa bandiera",
+    "ask_capital": "Indica la CAPITALE di questo paese",
+    "choose_games": "Round",
+    "choose_lives": "Vite",
+    "pick_one_game": "Scegli almeno un gioco.",
+    "round_type": {
+      "PLACEMENT": "Trova il paese",
+      "FLAGS": "Bandiera",
+      "CAPITALS": "Capitale",
+      "BORDER_GUESS": "Confini",
+      "QUIZ": "Quiz"
+    },
+    "prompt": {
+      "PLACEMENT": "Clicca sul paese",
+      "FLAGS": "Di quale paese è questa bandiera?",
+      "CAPITALS": "Qual è la sua capitale?",
+      "BORDER_GUESS": "Quale paese ha questa forma?",
+      "QUIZ": "Domanda del quiz"
+    },
+    "round": "Round {{n}}",
+    "rounds_short": "round",
+    "rounds_count_one": "{{count}} round",
+    "rounds_count_other": "{{count}} round",
+    "lives_count_one": "{{count}} vita",
+    "lives_count_other": "{{count}} vite",
+    "correct": "Bravo!",
+    "answer_was": "Era: {{answer}}",
+    "next": "Avanti →",
+    "give_up": "Salta (−1 ❤️)",
+    "life_lost": "Sbagliato! −1 vita",
+    "not_a_country": "Non riconosco questo paese.",
+    "capital_placeholder": "Nome della capitale",
+    "game_over": "Vite finite!",
+    "victory": "Sei sopravvissuto a tutti i round!",
+    "rounds_survived": "Round superati",
+    "time": "Tempo",
+    "lives_at_start": "Vite iniziali",
+    "see_leaderboard": "Vedi la classifica Sopravvivenza",
+    "leaderboard_title": "Classifica Sopravvivenza",
+    "all_combinations": "Tutte le combinazioni",
+    "all_six": "Tutti e 6 i giochi",
+    "no_scores": "Nessun punteggio per questo filtro.",
+    "col_player": "Giocatore",
+    "col_rounds": "Round",
+    "col_games": "Giochi",
+    "room_label": "Sopravvivenza · {{lives}} ❤️",
+    "progress_lives": "{{lives}} ❤️",
+    "eliminated": "Eliminato",
+    "best": "Record: {{rounds}}",
+    "missed_answer": "Risposta mancata",
+    "choose_timer": "Tempo per round",
+    "timer_none": "Nessuno",
+    "timer_seconds_one": "{{count}} s",
+    "timer_seconds_other": "{{count}} s",
+    "time_up": "Tempo scaduto!",
+    "waiting_players": "In attesa degli altri giocatori · {{done}}/{{total}}",
+    "choose_ramp": "Progressione della difficoltà",
+    "ramp": {
+      "express": "Express",
+      "normal": "Normale",
+      "gentle": "Graduale",
+      "hardcore": "Hardcore",
+      "custom": "Personalizzata"
+    },
+    "ramp_summary": "{{facile}} round facili, {{moyen}} medi, {{difficile}} difficili, poi Impossibile.",
+    "ramp_custom_hint": "Progressione personalizzata: questa partita non conta per la classifica."
+  },
+  "seo": {
+    "atlas": {
+      "title": "Atlante interattivo del mondo: schede dei paesi | GeoGame",
+      "description": "Esplora la mappa del mondo e scopri ogni paese: capitale, popolazione, superficie, PIL e paesi confinanti."
+    },
+    "home": {
+      "title": "GeoGame — Giochi di geografia gratis: paesi, bandiere, capitali",
+      "description": "Giochi di geografia gratis online: posiziona i paesi sulla mappa, riconosci le bandiere, trova le capitali, sfide quotidiane, quiz e partite multigiocatore con gli amici."
+    },
+    "placement": {
+      "title": "Trova il Paese — Gioco della mappa del mondo | GeoGame",
+      "description": "Trova ogni paese sulla mappa del mondo, da Facile a Hardcore, per continente o in modalità Ascesa. Gioco di geografia gratis con classifiche."
+    },
+    "flags": {
+      "title": "Trova la Bandiera — Quiz sulle bandiere del mondo | GeoGame",
+      "description": "Riconosci la bandiera di ogni paese del mondo. Scegli una difficoltà o un continente e scala la classifica di questo quiz gratuito sulle bandiere."
+    },
+    "capitals": {
+      "title": "Trova la Capitale — Quiz sulle capitali del mondo | GeoGame",
+      "description": "Trova la capitale di ogni paese dalla sua bandiera e dal suo nome. Quiz gratuito sulle capitali del mondo, per difficoltà o per continente."
+    },
+    "border_guess": {
+      "title": "BorderGuess — Indovina il paese dai confini | GeoGame",
+      "description": "Indovina un paese solo dalla forma dei suoi confini. Una nuova sfida ogni giorno, o partite senza fine."
+    },
+    "country_clue": {
+      "title": "Country Clue — Trova il paese misterioso | GeoGame",
+      "description": "Trova il paese misterioso con indizi su distanza, direzione e superficie. Sfida quotidiana e modalità infinita."
+    },
+    "voyage_voyage": {
+      "title": "Voyage Voyage — Collega due paesi attraverso i confini | GeoGame",
+      "description": "Collega due paesi attraversando i confini in comune e trova il percorso più breve. Un nuovo viaggio ogni giorno."
+    },
+    "ranking": {
+      "title": "Country Ranking — Ordina i paesi | GeoGame",
+      "description": "Ordina i paesi dal più grande al più piccolo per popolazione, superficie o PIL. Sfida quotidiana e modalità infinita."
+    },
+    "quiz": {
+      "title": "Quiz Geo — Quiz di geografia quotidiano | GeoGame",
+      "description": "Una domanda di geografia al giorno per sfidare i tuoi amici, oppure una serie di domande alla difficoltà che preferisci."
+    },
+    "survival": {
+      "title": "Sopravvivenza — Giochi di geografia in sequenza | GeoGame",
+      "description": "Gioca round di più giochi di geografia di fila: ogni errore ti costa una vita. Fin dove arriverai?"
+    },
+    "multiplayer": {
+      "title": "Multigiocatore — Giochi di geografia con gli amici | GeoGame",
+      "description": "Crea una stanza e gioca in diretta contro i tuoi amici: paesi, bandiere, capitali, confini e altro ancora."
+    },
+    "scores": {
+      "title": "Classifiche — Migliori punteggi | GeoGame",
+      "description": "I migliori punteggi dei giocatori di GeoGame per ogni gioco, difficoltà e continente."
+    }
+  },
+  "daily_elsewhere": {
+    "title": "Sfida del giorno già giocata",
+    "text": "Hai già giocato questa sfida del giorno con il tuo account, su un altro dispositivo.",
+    "your_result": "Il tuo risultato:",
+    "come_back": "Torna domani per una nuova sfida!",
+    "checking": "Verifica della tua sfida del giorno…"
+  },
+  "legal": {
+    "privacy": "Privacy",
+    "terms": "Condizioni d'uso",
+    "legal": "Note legali",
+    "delete_account": "Elimina il mio account",
+    "updated": "Ultimo aggiornamento: {{date}}",
+    "signup_notice": "Creando un account accetti le <terms>condizioni d'uso</terms> e l'<privacy>informativa sulla privacy</privacy>. Devi avere almeno 13 anni (e il consenso di un genitore se hai meno di 15 anni)."
+  },
+  "invites": {
+    "title": "Invita amici",
+    "invite": "Invita",
+    "sent": "Invitato",
+    "joined": "In partita",
+    "retry": "Riprova",
+    "no_friends": "Aggiungi amici dal tuo account per invitarli direttamente.",
+    "sign_in": "Accedi per invitare direttamente i tuoi amici.",
+    "banner": "{{username}} ti invita a giocare a {{game}}",
+    "later": "Più tardi",
+    "decline": "Ignora",
+    "received_title": "Inviti"
+  },
+  "nav": {
+    "play": "Gioca",
+    "multiplayer": "Multi",
+    "leaderboards": "Classifiche",
+    "profile": "Profilo",
+    "main": "Navigazione principale",
+    "language": "Lingua"
+  }
+}

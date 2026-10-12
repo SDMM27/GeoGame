@@ -198,7 +198,7 @@ export async function exportShareCard(data) {
   const blob = await generateShareCard(data)
   const file = new File([blob], 'geogame-score.png', { type: 'image/png' })
   if (navigator.canShare?.({ files: [file] })) {
-    await navigator.share({ files: [file], title: 'Mon score GeoGame' })
+    await navigator.share({ files: [file], title: 'GeoGame' })
   } else {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')

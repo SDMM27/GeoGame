@@ -3,7 +3,12 @@ import curated from '../data/quizQuestions.json'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import fr from '../i18n/locales/fr.json'
 import en from '../i18n/locales/en.json'
+import es from '../i18n/locales/es.json'
+import pt from '../i18n/locales/pt.json'
+import de from '../i18n/locales/de.json'
+import itLocale from '../i18n/locales/it.json'
 import ru from '../i18n/locales/ru.json'
+import { LANGUAGE_CODES } from '../i18n/languages'
 import { GEO_FEATURES, MOUTHS } from '../data/geoFeatures'
 import {
   ANSWER_MODES,
@@ -19,8 +24,8 @@ import {
 } from './quizQuestions'
 import { mulberry32 } from './prng'
 
-const LOCALES = { fr, en, ru }
-const LANGS = ['fr', 'en', 'ru']
+const LOCALES = { fr, en, es, pt, de, it: itLocale, ru }
+const LANGS = LANGUAGE_CODES
 
 // Traduction réelle, pour vérifier aussi que chaque clé de question existe
 const makeT = (lang) => (key, params = {}) => {
@@ -213,7 +218,9 @@ describe('free answer mode', () => {
     // « mont Kenya » fait 10 lettres, mais seul « Kenya » compte : une faute tolérée, pas deux
     const q = { type: 'highest_point', choices: [], accepted: [{ id: 'feature:mount_kenya', kind: 'feature', value: 'mount_kenya' }] }
     expect(checkFreeAnswer(q, 'mont Kenia')?.match).toBe('typo')
-    expect(checkFreeAnswer(q, 'Kenia')?.match).toBe('typo')
+    expect(checkFreeAnswer(q, 'Kanya')?.match).toBe('typo')
+    // « Kenia » est le nom espagnol et allemand
+    expect(checkFreeAnswer(q, 'Kenia')?.match).toBe('exact')
     expect(checkFreeAnswer(q, 'mont konoa')).toBeNull()
     expect(checkFreeAnswer(q, 'mount konoa')).toBeNull()
   })

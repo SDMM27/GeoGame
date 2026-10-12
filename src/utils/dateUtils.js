@@ -1,8 +1,14 @@
 // src/utils/dateUtils.js
+import { localeOf, toLanguage } from '../i18n/languages'
+
+const TODAY = { fr: "Aujourd'hui", en: 'Today', es: 'Hoy', pt: 'Hoje', de: 'Heute', it: 'Oggi', ru: 'Сегодня' }
+const YESTERDAY = { fr: 'Hier', en: 'Yesterday', es: 'Ayer', pt: 'Ontem', de: 'Gestern', it: 'Ieri', ru: 'Вчера' }
+
 export function getLast7Days(todayKey, lang = 'fr') {
-  const locale = lang === 'ru' ? 'ru-RU' : lang === 'en' ? 'en-US' : 'fr-FR'
-  const todayLabel = lang === 'ru' ? 'Сегодня' : lang === 'en' ? 'Today' : "Aujourd'hui"
-  const yesterdayLabel = lang === 'ru' ? 'Вчера' : lang === 'en' ? 'Yesterday' : 'Hier'
+  const code = toLanguage(lang, 'fr')
+  const locale = localeOf(code)
+  const todayLabel = TODAY[code]
+  const yesterdayLabel = YESTERDAY[code]
 
   const [y, m, d] = todayKey.split('-').map(Number)
   const baseDate = new Date(y, m - 1, d)

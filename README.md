@@ -11,7 +11,7 @@ Mini-jeux de géographie : trouver un pays sur la carte, quiz, drapeaux, capital
 
 | Dossier | Rôle |
 | --- | --- |
-| `src/` | Site : Vite + React 18, React Router, i18next (fr, en, ru), Leaflet. La logique de jeu (`src/hooks`, `src/utils`) est aussi utilisée par l'app mobile. |
+| `src/` | Site : Vite + React 18, React Router, i18next (fr, en, es, pt, de, it, ru : liste dans `src/i18n/languages.js`, fr et en dans le bundle, les autres chargées à la demande), Leaflet. La logique de jeu (`src/hooks`, `src/utils`) est aussi utilisée par l'app mobile. |
 | `api/` | Fonctions Vercel (`firebase-admin`) : `invite-push.mjs`, `cleanup-expired.mjs`, helpers dans `api/_lib/`. |
 | `mobile/` | Application Expo SDK 57 (Expo Router, `mobile/src/app`). Réutilise `../src` via des shims Metro (`mobile/metro.config.js`, `mobile/src/shims/`, alias `@shared`). |
 | `firestore.rules`, `firestore.indexes.json`, `firebase.json` | Règles, index et émulateurs Firebase (projet `geogame-sdmm`). |
@@ -102,7 +102,7 @@ Face aux émulateurs, `FIRESTORE_EMULATOR_HOST` (et `FIREBASE_AUTH_EMULATOR_HOST
 
   (`JAVA_TOOL_OPTIONS` contourne un chemin de socket trop long avec les émulateurs ; adaptez le dossier, qui doit exister.)
 - Ordre de déploiement : **index d'abord, code ensuite**. Un nouveau classement qui demande un index non construit échoue (« The query requires an index »), et un index met quelques minutes à se construire : `npm run deploy:indexes`, attendre que la console Firebase (Firestore > Index) les affiche « Activé », puis déployer le site / l'app. Les règles peuvent partir avant ou avec le code, mais jamais après un code qui écrit ce qu'elles refuseraient encore (l'APK 1.0.1 continue d'écrire avec l'ancien code : les règles restent compatibles avec lui).
-- Pseudos injurieux : le filtre est `src/utils/profanity.js` (liste dans `src/data/bannedWords.json`, français, anglais, russe ; mots à bloquer partout ou seulement comme mot entier pour éviter les faux positifs type « Scunthorpe »). Il est appliqué côté client (comptes, pseudos de visiteur des classements, pseudos de salon) site et app. Les règles n'en ont qu'une version minimale (`cleanName`, quelques insultes explicites en orthographe simple, sans normalisation : RE2 ne sait pas gérer accents ni leetspeak) ; c'est une dernière barrière, pas la protection.
+- Pseudos injurieux : le filtre est `src/utils/profanity.js` (liste dans `src/data/bannedWords.json`, une liste par langue du jeu ; mots à bloquer partout ou seulement comme mot entier pour éviter les faux positifs type « Scunthorpe »). Il est appliqué côté client (comptes, pseudos de visiteur des classements, pseudos de salon) site et app. Les règles n'en ont qu'une version minimale (`cleanName`, quelques insultes explicites en orthographe simple, sans normalisation : RE2 ne sait pas gérer accents ni leetspeak) ; c'est une dernière barrière, pas la protection.
 - Signalements : un joueur (connecté ou visiteur) signale un score depuis le petit drapeau à côté d'un nom des classements (site et app). Cela crée `reports/{auteur}_{collection}_{idDuScore}` (création seule, motif dans une liste fermée, texte de 200 caractères au plus ; un seul signalement par auteur et par score). Personne ne peut les lire côté client. Pour les consulter : console Firebase > Firestore > `reports` (le champ `targetCollection`/`targetId` donne le score ; supprimez le document du score dans sa collection `scores`, `ascension_scores` ou `daily_scores`, puis les signalements), ou `scripts/reports.mjs` :
 
   ```sh
@@ -117,7 +117,7 @@ Face aux émulateurs, `FIRESTORE_EMULATOR_HOST` (et `FIREBASE_AUTH_EMULATOR_HOST
 ## Pages légales et RGPD
 
 - `/privacy` (politique de confidentialité), `/terms` (conditions d'utilisation), `/legal` (mentions légales) et `/delete-account` (suppression de compte, URL à donner à Google Play) : `src/pages/legal/LegalPage.jsx`. Liens en bas de l'accueil et de la page compte, et dans l'onglet Profil de l'app, qui ouvre les pages du site.
-- Textes en fr, en et ru dans `src/legal/documents.js` ; ils décrivent ce que fait le code (données, prestataires, durées). Toute nouvelle donnée collectée ou tout nouveau prestataire doit y être ajouté, en changeant la date `updated` de `src/legal/legalInfo.js`.
+- Textes en fr, en et ru dans `src/legal/documents.js`, en es, pt, de et it dans `src/legal/translations/` ; ils décrivent ce que fait le code (données, prestataires, durées). Toute nouvelle donnée collectée ou tout nouveau prestataire doit y être ajouté, en changeant la date `updated` de `src/legal/legalInfo.js`.
 - **À compléter avant publication** : `editor` et `email` dans `src/legal/legalInfo.js`.
 - La police Inter est servie par le site (`@fontsource/inter`) et non par Google Fonts, pour ne pas transmettre l'IP des visiteurs à Google.
 

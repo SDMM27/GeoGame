@@ -12,9 +12,9 @@ import './scoreboard.css'
 
 const MEDAL = ['\uD83E\uDD47', '\uD83E\uDD48', '\uD83E\uDD49']
 const ACTIVE_GAMES = [
-  { id: GAME_TYPES.PLACEMENT, label: 'Trouve le Pays' },
-  { id: GAME_TYPES.FLAGS, label: 'Trouve le Drapeau' },
-  { id: GAME_TYPES.CAPITALS, label: 'Trouve la Capitale' },
+  { id: GAME_TYPES.PLACEMENT, labelKey: 'games.placement.title' },
+  { id: GAME_TYPES.FLAGS, labelKey: 'games.flags.title' },
+  { id: GAME_TYPES.CAPITALS, labelKey: 'games.capitals.title' },
 ]
 
 export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT, continentMode = false }) {
@@ -66,7 +66,7 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT, contine
           onChange={(event) => setSelectedGame(event.target.value)}
         >
           {ACTIVE_GAMES.map((game) => (
-            <option key={game.id} value={game.id}>{game.label}</option>
+            <option key={game.id} value={game.id}>{t(game.labelKey)}</option>
           ))}
           <option value="AllGames">{t('options.all_games')}</option>
         </select>
@@ -78,7 +78,7 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT, contine
             onChange={(event) => setSelectedContinent(event.target.value)}
           >
             {CONTINENTS.map(({ name }) => (
-              <option key={name} value={name}>{name}</option>
+              <option key={name} value={name}>{t(`continents.${name}`, name)}</option>
             ))}
             <option value={ALL_CONTINENTS}>{t('options.all_continents')}</option>
           </select>
@@ -89,7 +89,7 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT, contine
             onChange={(event) => setSelectedDifficulty(event.target.value)}
           >
             {DIFFICULTIES.map((difficulty) => (
-              <option key={difficulty} value={difficulty}>{difficulty}</option>
+              <option key={difficulty} value={difficulty}>{t(`difficulties.${difficulty}`, difficulty)}</option>
             ))}
             <option value={ALL_DIFFICULTIES}>{t('options.all_scores')}</option>
           </select>
@@ -106,10 +106,10 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT, contine
         <div className="scoreboard-table">
           <div className="scoreboard-header">
             <span>#</span>
-            <span>Joueur</span>
-            <span>Score</span>
-            <span>Temps</span>
-            <span>Difficulté</span>
+            <span>{t('labels.player')}</span>
+            <span>{t('profile.details.score')}</span>
+            <span>{t('leaderboard.time')}</span>
+            <span>{t('mp_room.difficulty')}</span>
           </div>
           {scores.map((score, index) => (
             <div
@@ -120,12 +120,14 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT, contine
                 {index < 3 ? MEDAL[index] : `#${index + 1}`}
               </span>
               <span className="scoreboard-name"><PlayerName entry={score} account={account} reportIn="scores" /></span>
-              <span className="scoreboard-score">{score.score} pts</span>
+              <span className="scoreboard-score">{score.score} {t('units.pts')}</span>
               <span className="scoreboard-time">
                 {score.elapsedTime != null ? formatTime(score.elapsedTime) : '—'}
               </span>
               <span className="scoreboard-difficulty">
-                {score.continent ? `${score.difficulty} · ${score.continent}` : score.difficulty}
+                {score.continent
+                  ? `${t(`difficulties.${score.difficulty}`, score.difficulty)} · ${t(`continents.${score.continent}`, score.continent)}`
+                  : t(`difficulties.${score.difficulty}`, score.difficulty)}
               </span>
             </div>
           ))}

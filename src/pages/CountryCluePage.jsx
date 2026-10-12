@@ -15,10 +15,15 @@ import { useAccount, useRecordGame } from '../auth'
 import { useDailyPlayedElsewhere } from '../hooks/useDailyPlayedElsewhere'
 import DailyPlayedElsewhere from '../components/DailyPlayedElsewhere'
 import { getCountryName } from '../utils/getCountryName'
+import { localeOf } from '../i18n/languages'
 import { clueProgress } from '../utils/clueProgress'
 import ClueProgressBadges from '../components/ClueProgressBadges'
 import 'react-toastify/dist/ReactToastify.css'
 import './CountryCluePage.css'
+
+// The hook's labels are French: show the one of the tone instead, as the app does
+const hintLabel = (t, metric, guess, hint) =>
+  guess.isCorrect ? t('country_clue.hint.exact') : t(`country_clue.hint.${metric}_${hint.tone}`, hint.label)
 
 function GuessRow({ guess, lang, progress }) {
   const { t } = useTranslation()
@@ -36,28 +41,28 @@ function GuessRow({ guess, lang, progress }) {
 
       <div className="country-clue-metric">
         <span className="country-clue-metric-label">{t('country_clue.metric_distance')}</span>
-        <strong>{guess.distanceKm?.toLocaleString('fr-FR')} km</strong>
+        <strong>{guess.distanceKm?.toLocaleString(localeOf(lang))} km</strong>
       </div>
 
       <div className="country-clue-metric">
         <span className="country-clue-metric-label">{t('country_clue.metric_direction')}</span>
-        <strong>{guess.directionArrow} {guess.direction}</strong>
+        <strong>{guess.directionArrow} {t(`country_clue.directions.${guess.direction}`, guess.direction)}</strong>
       </div>
 
       <div className={`country-clue-metric country-clue-metric--${guess.hemisphereHint.tone}`}>
         <span className="country-clue-metric-label">{t('country_clue.metric_hemisphere')}</span>
-        <strong>{guess.hemisphereHint.arrow} {guess.hemisphereHint.label}</strong>
+        <strong>{guess.hemisphereHint.arrow} {hintLabel(t, 'hemisphere', guess, guess.hemisphereHint)}</strong>
       </div>
 
       <div className={`country-clue-metric country-clue-metric--${guess.areaHint.tone}`}>
         <span className="country-clue-metric-label">{t('country_clue.metric_area')}</span>
-        <strong>{guess.areaHint.arrow} {guess.areaHint.label}</strong>
+        <strong>{guess.areaHint.arrow} {hintLabel(t, 'area', guess, guess.areaHint)}</strong>
         <small>{guess.areaLabel}</small>
       </div>
 
       <div className={`country-clue-metric country-clue-metric--${guess.populationHint.tone}`}>
         <span className="country-clue-metric-label">{t('country_clue.metric_population')}</span>
-        <strong>{guess.populationHint.arrow} {guess.populationHint.label}</strong>
+        <strong>{guess.populationHint.arrow} {hintLabel(t, 'population', guess, guess.populationHint)}</strong>
         <small>{guess.populationLabel}</small>
       </div>
     </article>

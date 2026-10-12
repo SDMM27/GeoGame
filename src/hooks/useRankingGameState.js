@@ -1,6 +1,7 @@
 // src/hooks/useRankingGameState.js
 import { useEffect, useMemo, useState } from 'react'
 import countries from '../data/countriesWithDifficulty_FR.json'
+import i18n from '../i18n'
 import { getCountryAreaKm2, hasCountryGeometry } from '../utils/countryArea'
 import { mulberry32 } from '../utils/prng'
 import { CRITERIA, CRITERIA_KEYS, buildCountryPool } from '../utils/rankingCriteria'
@@ -108,7 +109,7 @@ function buildValuesMap(countryList, criterion, areaMap) {
   return new Map(
     countryList.map((country) => {
       const val = criterion.compute(country, areaMap)
-      return [country.properties.ISO_A3, val != null ? criterion.format(val) : '—']
+      return [country.properties.ISO_A3, val != null ? criterion.format(val, i18n.language) : '—']
     })
   )
 }

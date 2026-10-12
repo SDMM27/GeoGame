@@ -10,9 +10,9 @@ import { ALL_PRESETS } from '../utils/leaderboards'
 
 const MEDAL = ['\uD83E\uDD47', '\uD83E\uDD48', '\uD83E\uDD49']
 const ACTIVE_GAMES = [
-  { id: GAME_TYPES.PLACEMENT, label: 'Trouve le Pays' },
-  { id: GAME_TYPES.FLAGS, label: 'Trouve le Drapeau' },
-  { id: GAME_TYPES.CAPITALS, label: 'Trouve la Capitale' },
+  { id: GAME_TYPES.PLACEMENT, labelKey: 'games.placement.title' },
+  { id: GAME_TYPES.FLAGS, labelKey: 'games.flags.title' },
+  { id: GAME_TYPES.CAPITALS, labelKey: 'games.capitals.title' },
 ]
 
 export default function AscensionScoreboard({ defaultGame = GAME_TYPES.PLACEMENT }) {
@@ -54,7 +54,7 @@ export default function AscensionScoreboard({ defaultGame = GAME_TYPES.PLACEMENT
 
   return (
     <div className="scoreboard">
-      <h1 className="scoreboard-title">Tableau des scores Ascension</h1>
+      <h1 className="scoreboard-title">{t('scoreboard.ascension_title')}</h1>
 
       <div className="scoreboard-filters">
         <select
@@ -63,9 +63,9 @@ export default function AscensionScoreboard({ defaultGame = GAME_TYPES.PLACEMENT
           onChange={(event) => setSelectedGame(event.target.value)}
         >
           {ACTIVE_GAMES.map((game) => (
-            <option key={game.id} value={game.id}>{game.label}</option>
+            <option key={game.id} value={game.id}>{t(game.labelKey)}</option>
           ))}
-          <option value="AllGames">Tous les jeux</option>
+          <option value="AllGames">{t('options.all_games')}</option>
         </select>
 
         <select
@@ -76,24 +76,24 @@ export default function AscensionScoreboard({ defaultGame = GAME_TYPES.PLACEMENT
           {ASCENSION_PRESETS.map((preset) => (
             <option key={preset.name} value={preset.name}>{preset.icon} {preset.name}</option>
           ))}
-          <option value={ALL_PRESETS}>Tous les presets</option>
+          <option value={ALL_PRESETS}>{t('options.all_presets')}</option>
         </select>
       </div>
 
       {loading ? (
-        <p className="scoreboard-loading">Chargement...</p>
+        <p className="scoreboard-loading">{t('messages.loading')}</p>
       ) : failed ? (
         <p className="scoreboard-empty">{t('messages.page_load_error')}</p>
       ) : scores.length === 0 ? (
-        <p className="scoreboard-empty">Aucun score Ascension pour ce filtre.</p>
+        <p className="scoreboard-empty">{t('scoreboard.no_ascension_scores')}</p>
       ) : (
         <div className="scoreboard-table">
           <div className="scoreboard-header scoreboard-header--ascension">
             <span>#</span>
-            <span>Joueur</span>
-            <span>Temps</span>
-            <span>Score</span>
-            <span>Preset</span>
+            <span>{t('labels.player')}</span>
+            <span>{t('leaderboard.time')}</span>
+            <span>{t('profile.details.score')}</span>
+            <span>{t('scoreboard.preset')}</span>
           </div>
           {scores.map((score, index) => (
             <div
@@ -107,7 +107,7 @@ export default function AscensionScoreboard({ defaultGame = GAME_TYPES.PLACEMENT
               <span className="scoreboard-time scoreboard-time--strong">
                 {score.globalTimeMs != null ? formatTime(score.globalTimeMs) : '—'}
               </span>
-              <span className="scoreboard-score">{score.globalScore ?? 0} pts</span>
+              <span className="scoreboard-score">{score.globalScore ?? 0} {t('units.pts')}</span>
               <span className="scoreboard-preset">{score.presetName}</span>
             </div>
           ))}

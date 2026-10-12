@@ -3,6 +3,7 @@ import { containsProfanity } from './profanity'
 import { getCountryName } from './getCountryName'
 import capitalNames from '../data/capitalNames.json'
 import meta from '../data/countries.meta.json'
+import { LANGUAGE_CODES } from '../i18n/languages'
 
 describe('containsProfanity: offensive names', () => {
   it.each([
@@ -16,6 +17,7 @@ describe('containsProfanity: offensive names', () => {
     ['Cyrillic look-alikes in Latin words', ['сonnard', 'fuсk', 'ѕhit', 'cоnnard', 'nаzi', 'Bіtch']],
     ['Latin look-alikes in Russian words', ['пиdор', 'хуй'.replace('х', 'x'), 'cyка'.replace('c', 'с'), 'пидоp', 'мyдак', 'xуй']],
     ['Russian in Latin letters', ['pidor', 'Blyat', 'suka', 'mudak', 'xuy', 'pizdec', 'ebat', 'zaebal']],
+    ['Spanish, Portuguese, German and Italian', ['gilipollas', 'Hijo_de_puta', 'puta', 'caralho', 'porra', 'Arschloch', 'hurensohn', 'Scheiße', 'vaffanculo', 'stronzo', 'cazzo']],
     ['hate and sexual terms', ['nigger', 'Faggot', 'rapist', 'пидорас', 'heil hitler', 'sieg_heil', 'whitepower', 'niquer', 'ntm', 'fdp']],
   ])('%s', (_label, names) => {
     names.forEach((name) => expect(containsProfanity(name), name).toBe(true))
@@ -32,10 +34,11 @@ describe('containsProfanity: legitimate names', () => {
     )
   })
 
-  it('does not flag common French, English and Russian names', () => {
+  it('does not flag common names in every language of the game', () => {
     ;['Sacha_27', 'Jean-Éric G.', 'Marie Curie', 'Alexandre', 'Léa', 'Kévin', 'Chloé', 'Thomas', 'Lucas', 'Emma', 'John Smith', 'Peter',
       'Иван', 'Александр', 'Дмитрий', 'Анастасия', 'Сергей', 'Ольга', 'Хусейн', 'Мудрый', 'Сукачёв', 'Любовь', 'Оксана', 'Артём', 'Ёжик',
-      'Хуан', 'Скипидар', 'Ebert', 'Pidgeon', 'Mudge', 'Sucre'].forEach((name) => expect(containsProfanity(name), name).toBe(false))
+      'Хуан', 'Скипидар', 'Ebert', 'Pidgeon', 'Mudge', 'Sucre',
+      'José', 'María', 'João', 'Conceição', 'Jürgen', 'Müller', 'Giuseppe', 'Francesca', 'Concha', 'Puttgarden', 'Fickert'].forEach((name) => expect(containsProfanity(name), name).toBe(false))
   })
 
   it('does not flag any country or capital of the game', () => {
@@ -43,9 +46,9 @@ describe('containsProfanity: legitimate names', () => {
     for (const feature of meta.features) {
       const { ISO_A2: iso, ADMIN, capital, aliases = [], capitalAliases = [] } = feature.properties
       names.push(ADMIN, capital, ...aliases, ...capitalAliases)
-      for (const lang of ['fr', 'en', 'ru']) names.push(getCountryName(iso, lang))
+      for (const lang of LANGUAGE_CODES) names.push(getCountryName(iso, lang))
     }
-    for (const entry of Object.values(capitalNames)) names.push(entry.en, entry.ru)
+    for (const entry of Object.values(capitalNames)) names.push(...Object.values(entry))
     const unique = [...new Set(names.filter(Boolean))]
     expect(unique.length).toBeGreaterThan(500)
     expect(unique.filter((name) => containsProfanity(name))).toEqual([])

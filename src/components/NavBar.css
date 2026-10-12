@@ -83,35 +83,41 @@
   background: var(--success);
 }
 
-.navbar-lang-group {
+/* Language picker: a native select (7 languages), drawn as a pill with the current code */
+.navbar-lang {
+  position: relative;
   display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  padding: 0 10px;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-pill);
-  padding: 3px;
-}
-
-.navbar-lang-btn {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  border-radius: var(--radius-pill);
-  padding: 4px 10px;
+  color: var(--text-primary);
   font-size: 0.75rem;
   font-weight: 700;
-  cursor: pointer;
-  transition: color 0.15s, background 0.15s;
   letter-spacing: 0.5px;
+  transition: border-color 0.15s;
 }
 
-.navbar-lang-btn:hover {
-  color: var(--text-primary);
+.navbar-lang:hover,
+.navbar-lang:focus-within {
+  border-color: var(--accent);
 }
 
-.navbar-lang-btn.active,
-.navbar-lang-btn.active:hover {
-  background: var(--accent);
-  color: var(--on-accent);
+.navbar-lang svg {
+  color: var(--text-muted);
+}
+
+/* The select covers the pill, invisible: the browser's own list opens on click or tap */
+.navbar-lang-select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+  font-size: 16px;
 }
 
 /* Phones: the tabs become the app's bottom tab bar */

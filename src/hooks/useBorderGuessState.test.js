@@ -71,7 +71,7 @@ describe('useBorderGuessState — défi du jour', () => {
   it('rejects unknown countries and repeated guesses', () => {
     const { result } = renderHook(() => useBorderGuessState('daily'))
     guess(result, 'Atlantide')
-    expect(toast.error).toHaveBeenCalledWith('Je ne reconnais pas ce pays.', expect.anything())
+    expect(toast.error).toHaveBeenCalledWith('survival.not_a_country', expect.anything())
     const wrong = otherThan(result.current.answerName)
     guess(result, wrong)
     guess(result, ` ${wrong.toLowerCase()} `)

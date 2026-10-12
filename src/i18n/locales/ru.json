@@ -228,7 +228,33 @@
     "metric_direction": "Направление",
     "metric_hemisphere": "Полушарие",
     "metric_area": "Площадь",
-    "metric_population": "Население"
+    "metric_population": "Население",
+    "directions": {
+      "Nord": "Север",
+      "Nord-Est": "Северо-восток",
+      "Est": "Восток",
+      "Sud-Est": "Юго-восток",
+      "Sud": "Юг",
+      "Sud-Ouest": "Юго-запад",
+      "Ouest": "Запад",
+      "Nord-Ouest": "Северо-запад",
+      "Tout près": "Совсем рядом"
+    },
+    "hint": {
+      "exact": "Точно",
+      "hemisphere_match": "То же",
+      "hemisphere_higher": "Севернее",
+      "hemisphere_lower": "Южнее",
+      "hemisphere_neutral": "Неизвестно",
+      "area_match": "Похожая",
+      "area_higher": "Больше",
+      "area_lower": "Меньше",
+      "area_neutral": "Неизвестно",
+      "population_match": "Похожее",
+      "population_higher": "Больше людей",
+      "population_lower": "Меньше людей",
+      "population_neutral": "Неизвестно"
+    }
   },
   "voyage_voyage": {
     "daily_description": "Один маршрут в день, одинаковый для всех игроков.",
@@ -255,7 +281,10 @@
     "stage_progress": "Критерий {{done}} / {{count}} пройден",
     "next_criterion": "Следующий критерий →",
     "found_at_attempt": "найдено с {{attempt}}-й попытки",
-    "not_found": "не найдено · ошибка {{count}}"
+    "not_found": "не найдено · ошибка {{count}}",
+    "instruction_population": "От самой населённой к наименее населённой",
+    "instruction_area": "От самой большой к самой маленькой",
+    "instruction_gdp": "От самой богатой к самой бедной"
   },
   "form": {
     "title": "Игра завершена!",
@@ -298,7 +327,11 @@
     "error_one": "ошибка",
     "error_other": "ошибок",
     "position_one": "позиция",
-    "position_other": "позиций"
+    "position_other": "позиций",
+    "countries_one": "{{count}} страна",
+    "countries_few": "{{count}} страны",
+    "countries_many": "{{count}} стран",
+    "countries_other": "{{count}} страны"
   },
   "options": {
     "all_games": "Все игры",
@@ -308,7 +341,9 @@
   },
   "scoreboard": {
     "title": "Таблица результатов",
-    "no_ascension_scores": "Нет результатов Восхождения для этого фильтра."
+    "no_ascension_scores": "Нет результатов Восхождения для этого фильтра.",
+    "ascension_title": "Таблица результатов Восхождения",
+    "preset": "Пресет"
   },
   "leaderboard": {
     "title": "Ежедневный рейтинг",
@@ -820,7 +855,9 @@
     "points": "{{count}} очк.",
     "n_games": "Игр: {{count}}",
     "next_game": "Запустить игру {{n}}",
-    "waiting_next": "Ожидание следующей игры…"
+    "waiting_next": "Ожидание следующей игры…",
+    "round_n": "Раунд {{n}} / {{total}}",
+    "next_round_soon": "Следующий раунд через мгновение…"
   },
   "survival": {
     "spectating": "Ты наблюдаешь за оставшимися игроками",
@@ -987,6 +1024,7 @@
     "multiplayer": "Мульти",
     "leaderboards": "Рейтинги",
     "profile": "Профиль",
-    "main": "Главное меню"
+    "main": "Главное меню",
+    "language": "Язык"
   }
 }

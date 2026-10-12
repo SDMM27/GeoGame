@@ -108,7 +108,7 @@ export default function ActiveGameCard({ game }) {
                     <span className="difficulty-btn-name" style={{ color: difficultyOption.color }}>
                       {difficultyOption.name === "Hardcore" ? t('difficulties.hardcore_all') : t(`difficulties.${difficultyOption.name}`)}
                     </span>
-                    <span className="difficulty-btn-count">{difficultyOption.count} pays</span>
+                    <span className="difficulty-btn-count">{t('units.countries', { count: difficultyOption.count })}</span>
                   </button>
                 ))}
               </div>
@@ -122,7 +122,7 @@ export default function ActiveGameCard({ game }) {
                     onDoubleClick={() => handlePlay(false, null, cont.name)}
                   >
                     <span className="difficulty-btn-name" style={{ color: cont.color }}>{t(`continents.${cont.name}`)}</span>
-                    <span className="difficulty-btn-count">{cont.count} pays</span>
+                    <span className="difficulty-btn-count">{t('units.countries', { count: cont.count })}</span>
                   </button>
                 ))}
               </div>
@@ -139,7 +139,7 @@ export default function ActiveGameCard({ game }) {
                 >
                   <span className="ascension-preset-name">{preset.icon} {preset.name === "Progressif" ? t('presets.progressive') : preset.name}</span>
                   <span className="ascension-preset-count">
-                    {Object.values(preset.phases).reduce((sum, count) => sum + count, 0)} pays
+                    {t('units.countries', { count: Object.values(preset.phases).reduce((sum, count) => sum + count, 0) })}
                   </span>
                 </button>
               ))}

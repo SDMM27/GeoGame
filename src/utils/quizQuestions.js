@@ -13,6 +13,7 @@ import { getCountryName, getAllCountryNames } from './getCountryName'
 import { CONTINENTS } from './continents'
 import { matchAnswer } from './normalizeAnswer'
 import { mulberry32 } from './prng'
+import { LANGUAGE_CODES, localeOf } from '../i18n/languages'
 
 export const QUIZ_DIFFICULTIES = ['Facile', 'Moyen', 'Difficile', 'Impossible']
 
@@ -29,7 +30,7 @@ export function getQuizPoints(difficulty, hintsUsed = 0) {
 
 export const ANSWER_MODES = { CHOICES: 'choices', FREE: 'free' }
 
-const LANGS = ['fr', 'en', 'ru']
+const LANGS = LANGUAGE_CODES
 
 // Part des questions écrites à la main ; le reste est généré
 const CURATED_RATIO = 0.2
@@ -69,15 +70,18 @@ const TEMPLATES = {
 
 // Noms acceptés en réponse libre pour chaque continent, toutes langues confondues
 const CONTINENT_ANSWERS = {
-  Europe: ['Europe', 'Европа'],
-  Asie: ['Asie', 'Asia', 'Азия'],
-  Afrique: ['Afrique', 'Africa', 'Африка'],
+  Europe: ['Europe', 'Европа', 'Europa'],
+  Asie: ['Asie', 'Asia', 'Азия', 'Ásia', 'Asien'],
+  Afrique: ['Afrique', 'Africa', 'Африка', 'África', 'Afrika'],
   Amériques: [
     'Amériques', 'Amérique', 'Amérique du Nord', 'Amérique du Sud', 'Amérique centrale',
     'Americas', 'America', 'North America', 'South America', 'Central America',
     'Америка', 'Северная Америка', 'Южная Америка', 'Центральная Америка',
+    'América', 'Américas', 'América del Norte', 'América del Sur', 'Centroamérica', 'América Central',
+    'América do Norte', 'América do Sul', 'Amerika', 'Nordamerika', 'Südamerika', 'Mittelamerika',
+    'Americhe', 'America del Nord', 'America del Sud', 'America centrale',
   ],
-  Océanie: ['Océanie', 'Oceania', 'Океания'],
+  Océanie: ['Océanie', 'Oceania', 'Океания', 'Oceanía', 'Ozeanien'],
 }
 
 export function getAllowedDifficulties(maxDifficulty) {
@@ -587,7 +591,7 @@ function capitalize(text) {
 }
 
 function localizeText(text, lang) {
-  return text?.[lang] ?? text?.fr ?? ''
+  return text?.[lang] ?? text?.en ?? text?.fr ?? ''
 }
 
 function countryLabel(iso, lang) {
@@ -608,8 +612,6 @@ function choiceLabel(choice, lang, t) {
   }
 }
 
-const LOCALES = { fr: 'fr-FR', en: 'en-US', ru: 'ru-RU' }
-
 export function localizeQuestion(question, lang, t) {
   const { params } = question
   let prompt
@@ -621,7 +623,7 @@ export function localizeQuestion(question, lang, t) {
       country: params.country ? countryLabel(params.country, lang) : '',
       countries: params.countries ? params.countries.map((iso) => countryLabel(iso, lang)).join(' / ') : '',
       city: params.city ? localizeText(params.city, lang) : '',
-      height: params.height ? params.height.toLocaleString(LOCALES[lang] ?? 'fr-FR') : '',
+      height: params.height ? params.height.toLocaleString(localeOf(lang, 'fr')) : '',
     }))
   }
   const choices = question.choices.map((c) => ({ id: c.id, label: choiceLabel(c, lang, t) }))
@@ -639,6 +641,9 @@ export function localizeQuestion(question, lang, t) {
 // ─── Indices ───────────────────────────────────────────────────────────────
 
 export const MAX_HINTS = 3
+
+// Article en tête d'un nom (« le Nil », « the Nile », « el Nilo », « der Nil », « il Nilo »…)
+const ARTICLE_RE = /^(?:(?:les?|la|the|el|los|las|o|os|a|as|der|die|das|il|lo|gli|i)\s+|l['’])(?=\p{L})/iu
 
 // Lettres masquées : `reveal(index)` décide, pour chaque mot, quelles lettres montrer
 function maskAnswer(label, reveal) {
@@ -661,10 +666,10 @@ function contextHint(question, choice, lang, t) {
   const f = FEATURE_BY_ID.get(choice.value)
   if (!f) return null
   if (f.type === 'mountain' && f.height && question.type !== 'mountain_height') {
-    return t('quiz.hints.height', { height: f.height.toLocaleString(LOCALES[lang] ?? 'fr-FR') })
+    return t('quiz.hints.height', { height: f.height.toLocaleString(localeOf(lang, 'fr')) })
   }
   if (f.type === 'river' && f.length) {
-    return t('quiz.hints.river_length', { length: f.length.toLocaleString(LOCALES[lang] ?? 'fr-FR') })
+    return t('quiz.hints.river_length', { length: f.length.toLocaleString(localeOf(lang, 'fr')) })
   }
   // Inutile de rappeler le pays quand la question le donne déjà
   if (!params.country && f.countries.length) {
@@ -681,7 +686,7 @@ export function getQuestionHints(question, lang, t) {
   const target = question.choices.find((c) => c.id === question.correctId) ?? question.accepted[0]
   if (!target) return []
   // L'article n'aide pas à deviner et brouillerait les lettres masquées
-  const label = choiceLabel(target, lang, t).replace(/^(?:(?:les?|la|the)\s+|l['’])(?=\p{L})/iu, '')
+  const label = choiceLabel(target, lang, t).replace(ARTICLE_RE, '')
   if (/^\d+$/.test(label)) {
     // Fourchettes décentrées : leur milieu ne doit pas donner la réponse
     const n = Number(label)
@@ -712,10 +717,19 @@ const GENERIC_PREFIXES = [
   'golfe ', 'gulf ', 'baie ', 'bay ', 'canal ', 'désert ', 'chutes ', 'chaîne ', 'cordillère ',
   'fleuve ', 'île ', 'îles ', 'terre ',
   'озеро ', 'гора ', 'море ', 'пустыня ', 'водопад ', 'водопады ', 'остров ', 'пик ', 'вулкан ',
+  // es, pt, it
+  'el ', 'los ', 'las ', 'o ', 'os ', 'a ', 'as ', 'il ', 'lo ', 'gli ', 'i ', 'del ', 'do ', 'da ', 'dos ', 'das ', 'di ',
+  'río ', 'rio ', 'fiume ', 'lago ', 'monte ', 'montes ', 'monti ', 'mar ', 'mare ', 'océano ', 'oceano ', 'golfo ',
+  'bahía ', 'baía ', 'baia ', 'canal ', 'canale ', 'desierto ', 'deserto ', 'cataratas ', 'cascate ', 'cascata ',
+  'isla ', 'islas ', 'ilha ', 'ilhas ', 'isola ', 'isole ', 'cordillera ', 'cordilheira ', 'catena ', 'sierra ', 'serra ',
+  'pico ', 'picco ', 'volcán ', 'vulcão ', 'vulcano ',
+  // de
+  'der ', 'die ', 'das ', 'den ', 'see ', 'berg ', 'golf ', 'wüste ', 'insel ',
 ]
 const GENERIC_SUFFIXES = [
   ' river', ' desert', ' mountains', ' range', ' falls', ' island', ' islands', ' lake', ' sea', ' ocean',
   ' залив', ' море', ' озеро', ' горы', ' хребет', ' океан',
+  ' fluss', ' gebirge', ' wasserfälle', ' wasserfall', ' wüste', ' inseln', ' insel',
 ]
 
 function shortForms(name) {

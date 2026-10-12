@@ -10,40 +10,71 @@
       "vatefairefoutre", "vatefairencule", "vatenencule", "violeur", "zgeg", "nikatamere"
     ],
     "en": [
-      "fuck", "motherfucker", "shit", "bullshit", "shithead", "bitch", "bastard", "asshole", "arsehole", "dickhead",
-      "cocksucker", "cocksuck", "pussy", "wanker", "bollocks", "blowjob", "handjob", "jerkoff", "cumshot",
-      "dildo", "molest", "pedophile", "paedophile", "nigger", "nigga", "faggot", "whore", "shemale", "wetback",
-      "towelhead", "raghead", "killyourself", "neonazi", "hitler", "heilhitler", "siegheil", "goebbels", "himmler",
-      "whitepower", "whitepride", "swastika", "gasthejews", "pornhub", "xvideos"
+      "fuck", "motherfucker", "shit", "bullshit", "shithead", "bitch", "bastard", "asshole", "arsehole",
+      "dickhead", "cocksucker", "cocksuck", "pussy", "wanker", "bollocks", "blowjob", "handjob", "jerkoff",
+      "cumshot", "dildo", "molest", "pedophile", "paedophile", "nigger", "nigga", "faggot", "whore", "shemale",
+      "wetback", "towelhead", "raghead", "killyourself", "neonazi", "hitler", "heilhitler", "siegheil", "goebbels",
+      "himmler", "whitepower", "whitepride", "swastika", "gasthejews", "pornhub", "xvideos"
     ],
     "ru": [
-      "хуй", "хуев", "хуес", "хуел", "хуя", "похуй", "нахуй", "пизд", "ебан", "ебат", "ебал", "ебну", "ебуч", "еблан", "ебло", "уебок", "уебан",
-      "заеб", "наеб", "долбоеб", "долбаеб", "блят", "бляд", "мудак", "мудил", "мудозвон", "пидор", "пидарас", "пидарок", "пидр", "педик",
-      "гандон", "гондон", "залуп", "шлюх", "шалав", "говно", "говн", "дерьмо", "мандавош", "дебил", "ублюд", "сволоч",
-      "сучар", "сучк", "хуесос", "нацист", "гитлер", "зигхайль", "сигхайль",
-      "blyad", "blyat", "pizd", "pidor", "pidaras", "pidr", "xuy", "khuy", "nahuy", "pohuy", "ebat", "ebal", "ebany", "mudak",
-      "mudil", "gandon", "gondon", "zaebal", "zaebis", "xuesos", "dolboeb", "dolbaeb", "pizdec"
+      "хуй", "хуев", "хуес", "хуел", "хуя", "похуй", "нахуй", "пизд", "ебан", "ебат", "ебал", "ебну", "ебуч",
+      "еблан", "ебло", "уебок", "уебан", "заеб", "наеб", "долбоеб", "долбаеб", "блят", "бляд", "мудак", "мудил",
+      "мудозвон", "пидор", "пидарас", "пидарок", "пидр", "педик", "гандон", "гондон", "залуп", "шлюх", "шалав",
+      "говно", "говн", "дерьмо", "мандавош", "дебил", "ублюд", "сволоч", "сучар", "сучк", "хуесос", "нацист",
+      "гитлер", "зигхайль", "сигхайль", "blyad", "blyat", "pizd", "pidor", "pidaras", "pidr", "xuy", "khuy",
+      "nahuy", "pohuy", "ebat", "ebal", "ebany", "mudak", "mudil", "gandon", "gondon", "zaebal", "zaebis",
+      "xuesos", "dolboeb", "dolbaeb", "pizdec"
+    ],
+    "es": [
+      "gilipollas", "hijodeputa", "hijoputa", "malparido", "maricon", "cabron", "pendejo", "chingada",
+      "chingatumadre", "mierda", "culero", "mamahuevo", "follar", "putamadre", "comemierda", "soplapollas",
+      "sudaca"
+    ],
+    "pt": [
+      "caralho", "filhodaputa", "filhadaputa", "arrombado", "buceta", "punheta", "xoxota", "fodase", "vaisefoder",
+      "cuzao", "desgracado", "vaitomarnocu"
+    ],
+    "de": [
+      "arschloch", "wichser", "hurensohn", "fotze", "schlampe", "missgeburt", "drecksau", "scheisse", "scheiße",
+      "ficken", "schwuchtel", "kanake", "judensau", "untermensch"
+    ],
+    "it": [
+      "vaffanculo", "fanculo", "stronzo", "stronza", "coglione", "minchia", "puttana", "porcodio", "porcoddio",
+      "diocane", "frocio", "ricchione", "zoccola", "mignotta", "pompino", "sborra", "inculare", "culattone"
     ]
   },
   "word": {
     "fr": [
-      "merde", "pute", "putes", "bite", "zob", "chatte", "chier", "nique", "niquer", "ntm", "fdp", "pede", "pedo", "tarlouse",
-      "nazi", "nazis", "negre", "negres", "negro", "bicot", "bicots", "fiotte", "branle", "baise", "foutre",
-      "bordel", "cul", "nibard", "nibards", "chiasse", "salopard", "salopes", "viol", "violer", "sexe", "porno",
-      "enculees", "pouffe", "pouffiasses", "kkk", "nsdap"
+      "merde", "pute", "putes", "bite", "zob", "chatte", "chier", "nique", "niquer", "ntm", "fdp", "pede", "pedo",
+      "tarlouse", "nazi", "nazis", "negre", "negres", "negro", "bicot", "bicots", "fiotte", "branle", "baise",
+      "foutre", "bordel", "cul", "nibard", "nibards", "chiasse", "salopard", "salopes", "viol", "violer", "sexe",
+      "porno", "enculees", "pouffe", "pouffiasses", "kkk", "nsdap"
     ],
     "en": [
-      "ass", "asses", "arse", "dick", "dicks", "cock", "cocks", "cunt", "cunts", "twat", "wank", "prick", "slut", "sluts",
-      "cum", "anal", "anus", "penis", "vagina", "boner", "horny", "porn", "porno", "sex", "milf", "hentai", "boob",
-      "boobs", "tits", "titty", "rape", "raped", "rapist", "fag", "fags", "dyke", "tranny", "retard", "retarded",
-      "spastic", "spic", "chink", "gook", "coon", "wop", "paki", "beaner", "negro", "nazi", "nazis", "kkk", "kys",
-      "fck", "fuk", "bitches", "shite", "jizz"
+      "ass", "asses", "arse", "dick", "dicks", "cock", "cocks", "cunt", "cunts", "twat", "wank", "prick", "slut",
+      "sluts", "cum", "anal", "anus", "penis", "vagina", "boner", "horny", "porn", "porno", "sex", "milf",
+      "hentai", "boob", "boobs", "tits", "titty", "rape", "raped", "rapist", "fag", "fags", "dyke", "tranny",
+      "retard", "retarded", "spastic", "spic", "chink", "gook", "coon", "wop", "paki", "beaner", "negro", "nazi",
+      "nazis", "kkk", "kys", "fck", "fuk", "bitches", "shite", "jizz"
     ],
     "ru": [
-      "сука", "суки", "сучка", "жопа", "жопу", "жопы", "хер", "херня", "манда", "даун", "чмо", "урод", "тварь", "мразь", "мразота",
-      "падла", "гнида", "хач", "чурка", "чурки", "жид", "жиды", "нацик", "нацисты", "пидоры", "пидар", "ссыкло", "дрочила", "дрочить",
-      "ебать", "ебаться", "ебись", "бляха", "лох", "лошара", "гомик", "гомосек",
-      "suka", "pidar", "zhopa", "jopa", "chmo", "padla", "gnida", "churka", "zhid", "dolbayob"
+      "сука", "суки", "сучка", "жопа", "жопу", "жопы", "хер", "херня", "манда", "даун", "чмо", "урод", "тварь",
+      "мразь", "мразота", "падла", "гнида", "хач", "чурка", "чурки", "жид", "жиды", "нацик", "нацисты", "пидоры",
+      "пидар", "ссыкло", "дрочила", "дрочить", "ебать", "ебаться", "ебись", "бляха", "лох", "лошара", "гомик",
+      "гомосек", "suka", "pidar", "zhopa", "jopa", "chmo", "padla", "gnida", "churka", "zhid", "dolbayob"
+    ],
+    "es": [
+      "puta", "puto", "putas", "putos", "zorra", "polla", "verga", "joder", "culo", "pajero", "marica", "perra",
+      "coño"
+    ],
+    "pt": [
+      "porra", "puta", "puto", "vadia", "viado", "merda", "bosta", "foder", "foda", "otario", "babaca", "piroca"
+    ],
+    "de": [
+      "fick", "arsch", "penner", "spast", "spasti", "mongo", "neger", "nutte", "pimmel", "titten", "hure", "kacke"
+    ],
+    "it": [
+      "culo", "figa", "cazzo", "cazzi", "merda", "bastardo", "troione", "negro"
     ]
   },
   "digits": ["1488"]

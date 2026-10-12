@@ -5,6 +5,7 @@ import { toast } from 'react-toastify'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { checkAnswer, normalize } from '../utils/normalizeAnswer'
 import { getAllCountryNames, getCountryName } from '../utils/getCountryName'
+import { LANGUAGE_CODES, localeOf } from '../i18n/languages'
 import countryAliases from '../data/countryAliases.json'
 import { getGeographicCenter, hasCountryGeometry } from '../utils/countryArea'
 import useDailyKey from './useDailyKey'
@@ -120,7 +121,7 @@ const COUNTRY_LOOKUP = (() => {
   // Extend with EN and RU names so users can type in those languages
   for (const feature of BORDER_GUESS_COUNTRIES) {
     const iso = feature.properties.ISO_A2
-    for (const lang of ['en', 'ru']) {
+    for (const lang of LANGUAGE_CODES) {
       const name = getCountryName(iso, lang)
       if (name) {
         const key = normalize(name)
@@ -374,7 +375,7 @@ export default function useBorderGuessState(mode, options = {}) {
       const localizedName = getCountryName(country.properties.ISO_A2, lang) || country.properties.ADMIN
       suggestions.add(localizedName)
     })
-    const sortLocale = lang === 'ru' ? 'ru' : lang === 'en' ? 'en' : 'fr'
+    const sortLocale = localeOf(lang, 'fr')
     return [...suggestions].sort((a, b) => a.localeCompare(b, sortLocale))
   }, [i18n.language])
 
@@ -412,7 +413,7 @@ export default function useBorderGuessState(mode, options = {}) {
 
     const guessedCountry = COUNTRY_LOOKUP.get(normalizedGuess)
     if (!guessedCountry) {
-      toast.error("Je ne reconnais pas ce pays.", { containerId: 'topRightToast' })
+      toast.error(t('survival.not_a_country'), { containerId: 'topRightToast' })
       return
     }
 

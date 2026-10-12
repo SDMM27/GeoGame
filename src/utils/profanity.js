@@ -1,4 +1,5 @@
-// Filter for offensive usernames (French, English, Russian), shared by the website and the app.
+// Filter for offensive usernames (French, English, Spanish, Portuguese, German, Italian, Russian), shared by the
+// website and the app.
 // Pure functions, no DOM: containsProfanity(name) is true when the name should be refused.
 //
 // The word list is src/data/bannedWords.json. Two kinds of words, to avoid Scunthorpe-style false positives:

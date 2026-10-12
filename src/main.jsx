@@ -10,14 +10,18 @@ import '@fontsource/inter/900.css'
 import '@fontsource/bricolage-grotesque/600.css'
 import '@fontsource/bricolage-grotesque/700.css'
 import './index.css'
-import './i18n/index.js'
+import { i18nReady } from './i18n/index.js'
 import App from './App'
 import { redirectIphoneToApp } from './utils/appLinks'
 
+// Rendered once the player's language is loaded (only languages other than French and English take a request).
+// A failed load still renders: missing strings fall back to English.
 if (!redirectIphoneToApp()) {
-  ReactDOM.createRoot(document.getElementById('root')).render(
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
-  )
+  const render = () =>
+    ReactDOM.createRoot(document.getElementById('root')).render(
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    )
+  i18nReady.then(render, render)
 }

@@ -54,14 +54,14 @@ export default function AscensionForm({ score, timer, stats, phaseStats, gameTyp
               <th style={{ textAlign: 'left', padding: '3px 0' }}>{t('labels.phase')}</th>
               <th style={{ textAlign: 'center' }}>{t('labels.found')}</th>
               <th style={{ textAlign: 'center' }}>{t('game_hud.skipped')}</th>
-              <th style={{ textAlign: 'right' }}>Temps</th>
+              <th style={{ textAlign: 'right' }}>{t('leaderboard.time')}</th>
             </tr>
           </thead>
           <tbody>
             {phaseStats.map((ps, i) => (
               <tr key={i} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
                 <td style={{ color: DIFFICULTY_COLORS[ps.difficulty] ?? '#e2e8f0', padding: '4px 0' }}>
-                  {ps.difficulty}
+                  {t(`difficulties.${ps.difficulty}`, ps.difficulty)}
                 </td>
                 <td style={{ textAlign: 'center', color: '#e2e8f0' }}>{ps.found}/{ps.count}</td>
                 <td style={{ textAlign: 'center', color: 'var(--text-muted)' }}>{ps.skipped}</td>

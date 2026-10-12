@@ -1,5 +1,6 @@
 // src/pages/RankingLeaderboard.jsx
 import React, { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { collection, getDocs, query, where } from 'firebase/firestore'
 import { firestore } from '../Firebase'
 import { GAME_TYPES } from '../utils/gameTypes'
@@ -14,6 +15,7 @@ import './RankingLeaderboard.css'
 const MEDAL = ['🥇', '🥈', '🥉']
 
 function AccordionRow({ score, index, account }) {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
 
   return (
@@ -25,17 +27,15 @@ function AccordionRow({ score, index, account }) {
         <span className="daily-lb__name">
           <PlayerName entry={score} account={account} reportIn="daily_scores" />
         </span>
-        <span className="ranking-lb__score">{score.score} pts</span>
-        <span className="ranking-lb__error">{score.totalError} pos.</span>
+        <span className="ranking-lb__score">{score.score} {t('units.pts')}</span>
+        <span className="ranking-lb__error">{score.totalError} {t('units.position', { count: score.totalError })}</span>
         <span className="ranking-lb__attempts">
-          {score.attemptsUsed != null
-            ? `${score.attemptsUsed} essai${score.attemptsUsed !== 1 ? 's' : ''}`
-            : '—'}
+          {score.attemptsUsed != null ? t('quiz.attempts_count', { count: score.attemptsUsed }) : '—'}
         </span>
       </div>
       {open && Array.isArray(score.playerOrder) && score.playerOrder.length > 0 && (
         <div className="daily-lb__accordion">
-          <p className="daily-lb__accordion-title">Classement joué</p>
+          <p className="daily-lb__accordion-title">{t('leaderboard.played_order')}</p>
           <ol className="daily-lb__guess-list">
             {score.playerOrder.map((country, i) => (
               <li key={`${country}-${i}`} className="daily-lb__guess-item">
@@ -50,6 +50,7 @@ function AccordionRow({ score, index, account }) {
 }
 
 export default function RankingLeaderboard({ dailyKey }) {
+  const { t, i18n } = useTranslation()
   const { account } = useAccount()
   const refreshKey = useLeaderboardRefresh()
   const [selectedDate, setSelectedDate] = useState(dailyKey ?? '')
@@ -57,7 +58,7 @@ export default function RankingLeaderboard({ dailyKey }) {
   const [loading, setLoading] = useState(true)
   const [showPicker, setShowPicker] = useState(false)
 
-  const days = useMemo(() => (dailyKey ? getLast7Days(dailyKey) : []), [dailyKey])
+  const days = useMemo(() => (dailyKey ? getLast7Days(dailyKey, i18n.language) : []), [dailyKey, i18n.language])
 
   useEffect(() => {
     const fetchScores = async () => {
@@ -82,7 +83,7 @@ export default function RankingLeaderboard({ dailyKey }) {
 
   return (
     <div className="daily-lb ranking-lb">
-      <h2 className="daily-lb__title">Classement journalier</h2>
+      <h2 className="daily-lb__title">{t('leaderboard.title')}</h2>
 
       <div className="daily-lb__date-nav">
         {days.map(({ key, label }) => (
@@ -101,7 +102,7 @@ export default function RankingLeaderboard({ dailyKey }) {
           className="daily-lb__history-link"
           onClick={() => setShowPicker((prev) => !prev)}
         >
-          {showPicker ? "Masquer l'historique" : "Voir tout l'historique"}
+          {showPicker ? t('buttons.hide_history') : t('buttons.show_full_history')}
         </button>
         {showPicker && (
           <input
@@ -115,17 +116,17 @@ export default function RankingLeaderboard({ dailyKey }) {
       </div>
 
       {loading ? (
-        <p className="daily-lb__loading">Chargement...</p>
+        <p className="daily-lb__loading">{t('messages.loading')}</p>
       ) : scores.length === 0 ? (
-        <p className="daily-lb__empty">Aucun score pour ce jour.</p>
+        <p className="daily-lb__empty">{t('leaderboard.no_scores_today')}</p>
       ) : (
         <>
           <div className="daily-lb__header">
             <span>#</span>
-            <span>Joueur</span>
-            <span className="ranking-lb__score">Score</span>
-            <span className="ranking-lb__error">Erreur</span>
-            <span className="ranking-lb__attempts">Essais</span>
+            <span>{t('labels.player')}</span>
+            <span className="ranking-lb__score">{t('profile.details.score')}</span>
+            <span className="ranking-lb__error">{t('profile.details.total_error')}</span>
+            <span className="ranking-lb__attempts">{t('labels.attempts')}</span>
           </div>
           {scores.map((score, index) => (
             <AccordionRow

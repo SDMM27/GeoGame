@@ -196,6 +196,13 @@ export const de: MobileStrings = {
     error_network: 'Laden fehlgeschlagen. Prüfe deine Verbindung.',
     error_other: 'Laden fehlgeschlagen. Prüfe deine Verbindung.',
   },
+  whats_new: {
+    title: "Neuigkeiten",
+    languages_title: "GeoGame spricht jetzt 7 Sprachen",
+    languages_body: "Spanisch, Portugiesisch, Deutsch und Italienisch kommen zu Französisch, Englisch und Russisch dazu. Länder, Hauptstädte und das Quiz sind übersetzt, und deine Antworten werden in all diesen Sprachen akzeptiert.",
+    pick_language: "Wähle deine Sprache",
+    ok: "Los geht's!",
+  },
   common: {
     coming_soon: 'Demnächst',
     back: 'Zurück',

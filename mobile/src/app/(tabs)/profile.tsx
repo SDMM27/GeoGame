@@ -86,7 +86,7 @@ function Message({ text, kind }: { text: string; kind: 'error' | 'notice' }) {
   )
 }
 
-// Only where Google sign-in is available (web for now, see account/google.ts).
+// Only where Google sign-in is available (web and Android builds, see account/google.ts).
 function GoogleButton({ onError }: { onError: (key: string | null) => void }) {
   const { t } = useTranslation()
   const [pending, setPending] = useState(false)

@@ -17,6 +17,7 @@ import useLobbyHost from '../../hooks/useLobbyHost'
 import { gameLabel } from './RoomConfig'
 import AddGame from './room/AddGame'
 import GameList from './room/GameList'
+import InviteFriends from './room/InviteFriends'
 import JoinForm from './room/JoinForm'
 import Players from './room/Players'
 import RoomGame from './room/RoomGame'
@@ -137,6 +138,7 @@ export default function MultiplayerRoom({ room, progress, gameResults, playerId 
       ) : room.status === 'lobby' ? (
         <>
           <Players room={room} playerId={playerId} />
+          <InviteFriends room={room} />
           {isHost ? (
             <>
               <AddGame room={room} playerId={playerId} />
@@ -182,6 +184,7 @@ export default function MultiplayerRoom({ room, progress, gameResults, playerId 
             </button>
           )}
           {isHost && <AddGame room={room} playerId={playerId} />}
+          {room.mode === 'challenge' && <InviteFriends room={room} />}
           <Players room={room} playerId={playerId} strangersOnly />
           <StandingsCard
             room={room}

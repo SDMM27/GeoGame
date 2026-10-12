@@ -917,5 +917,18 @@
     "your_result": "Ton résultat :",
     "come_back": "Reviens demain pour un nouveau défi !",
     "checking": "Vérification de ton défi du jour…"
+  },
+  "invites": {
+    "title": "Inviter des amis",
+    "invite": "Inviter",
+    "sent": "Invité",
+    "joined": "Dans la partie",
+    "retry": "Réessayer",
+    "no_friends": "Ajoute des amis depuis ton compte pour les inviter directement.",
+    "sign_in": "Connecte-toi pour inviter tes amis directement.",
+    "banner": "{{username}} t’invite à jouer à {{game}}",
+    "later": "Plus tard",
+    "decline": "Ignorer",
+    "received_title": "Invitations"
   }
 }

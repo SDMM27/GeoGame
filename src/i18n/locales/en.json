@@ -917,5 +917,18 @@
     "your_result": "Your result:",
     "come_back": "Come back tomorrow for a new challenge!",
     "checking": "Checking your daily challenge…"
+  },
+  "invites": {
+    "title": "Invite friends",
+    "invite": "Invite",
+    "sent": "Invited",
+    "joined": "In the game",
+    "retry": "Retry",
+    "no_friends": "Add friends from your account to invite them directly.",
+    "sign_in": "Sign in to invite your friends directly.",
+    "banner": "{{username}} invites you to play {{game}}",
+    "later": "Later",
+    "decline": "Dismiss",
+    "received_title": "Invitations"
   }
 }

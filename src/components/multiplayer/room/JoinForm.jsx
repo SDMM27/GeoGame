@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAccount } from '../../../auth'
 import { PSEUDO_STORAGE_KEY, getSavedPseudo } from '../../../utils/account'
@@ -13,11 +14,12 @@ export default function JoinForm({ room, playerId }) {
   const pseudo = typed ?? account?.username ?? getSavedPseudo()
   const [joining, setJoining] = useState(false)
   const forbidden = containsProfanity(pseudo)
+  // Opened from a friend's invite with an account: joins under the username right away.
+  const [searchParams] = useSearchParams()
+  const autoJoin = searchParams.get('invited') === '1' && Boolean(account?.username)
+  const autoJoinedRef = useRef(false)
 
-  const onSubmit = async (e) => {
-    e.preventDefault()
-    const name = pseudo.trim()
-    if (!name || forbidden) return
+  const join = async (name) => {
     setJoining(true)
     try {
       try {
@@ -31,6 +33,21 @@ export default function JoinForm({ room, playerId }) {
       setJoining(false)
     }
   }
+
+  const onSubmit = (e) => {
+    e.preventDefault()
+    const name = pseudo.trim()
+    if (name && !forbidden) join(name)
+  }
+
+  useEffect(() => {
+    if (!autoJoin || autoJoinedRef.current) return
+    autoJoinedRef.current = true
+    join(account.username)
+  })
+
+  // A failed automatic join falls back to the form.
+  if (autoJoin && (joining || !autoJoinedRef.current)) return <p className="mpr-waiting">{t('lobby.connecting')}</p>
 
   return (
     <form className="mpr-card" onSubmit={onSubmit}>

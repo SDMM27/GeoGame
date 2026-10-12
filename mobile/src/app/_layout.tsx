@@ -23,6 +23,7 @@ import { PushNotifications } from '@/components/PushNotifications'
 import { ConfirmHost } from '@/components/ConfirmHost'
 import { ToastHost } from '@/components/ToastHost'
 import { UpdateBanner } from '@/components/UpdateBanner'
+import { WhatsNew } from '@/components/WhatsNew'
 import { colors } from '@/theme'
 import { useLaunchUpdate } from '@/updates'
 
@@ -109,6 +110,7 @@ export default function RootLayout() {
         </Stack>
         <InstallHint />
         <UpdateBanner />
+        <WhatsNew />
         <InviteBanner />
         <PushNotifications />
         <ConfirmHost />

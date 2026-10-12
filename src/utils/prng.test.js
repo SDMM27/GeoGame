@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { mulberry32, seededShuffle } from './prng'
+import { mulberry32, seededOrder, seededShuffle } from './prng'
 
 describe('mulberry32', () => {
   it('produces deterministic output for the same seed', () => {
@@ -46,5 +46,27 @@ describe('seededShuffle', () => {
     const arr = [1, 2, 3, 4, 5]
     seededShuffle(arr, 1)
     expect(arr).toEqual([1, 2, 3, 4, 5])
+  })
+})
+const names = Array.from({ length: 200 }, (_, i) => `pays-${i}`)
+const order = (list, seed) => seededOrder(list, seed, (name) => name)
+
+describe('seededOrder', () => {
+  it('gives the same order for the same seed, another for another seed', () => {
+    expect(order(names, 42)).toEqual(order(names, 42))
+    expect(order(names, 43)).not.toEqual(order(names, 42))
+  })
+
+  it('keeps every element without mutating the list', () => {
+    const copy = [...names]
+    expect([...order(names, 7)].sort()).toEqual([...names].sort())
+    expect(names).toEqual(copy)
+  })
+
+  it('keeps the order of the others when an element is removed (two versions of the app)', () => {
+    const full = order(names, 99)
+    const removed = new Set(['pays-3', 'pays-150'])
+    const shorter = order(names.filter((name) => !removed.has(name)), 99)
+    expect(shorter).toEqual(full.filter((name) => !removed.has(name)))
   })
 })

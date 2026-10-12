@@ -154,6 +154,7 @@ function SurvivalRun({ modes, lives, timer, ramp, seed, snapshot = null, snapKey
     extraSnapshot: { synced },
     autoAdvance: !synced,
     deadline: shared.deadline,
+    deadlineRound: shared.round,
   })
   const { round, roundIndex, totalRounds, score, errors, outcome, timedOut, isOver, isWon, elapsedMs, timeLeftMs, next, goTo } = state
 

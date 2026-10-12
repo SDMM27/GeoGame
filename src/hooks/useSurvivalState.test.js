@@ -136,4 +136,42 @@ describe('useSurvivalState', () => {
     expect(result.current.isWon).toBe(true)
     expect(result.current.lives).toBe(2)
   })
+  it('ignores a second click that comes before the next render (a double tap): one life, one "life lost"', () => {
+    const { result } = play({ modes: [PLACEMENT], lives: 3, seed: 5 })
+    const answer = result.current.round.country.properties.ADMIN
+    const wrong = answer === 'France' ? 'Spain' : 'France'
+    const other = answer === 'Italy' ? 'Germany' : 'Italy'
+    let first, second
+    act(() => {
+      first = result.current.clickCountry(wrong)
+      second = result.current.clickCountry(other)
+    })
+    expect(first).toBe('wrong')
+    expect(second).toBe(null)
+    expect(result.current.lives).toBe(2)
+  })
+
+  it('resumes a live room on the round already answered without costing another life', () => {
+    const key = 'mp_snap_LIVE_p_0'
+    const { result, unmount } = play({ modes: [FLAGS], lives: 3, seed: 1, snapshotKey: key, autoAdvance: false })
+    act(() => { result.current.submitText('zzzz') })
+    const snapshot = loadSnapshot(key)
+    expect(snapshot).toMatchObject({ index: 0, errors: 1, outcome: 'failed' })
+    unmount()
+    const resumed = play({ modes: [FLAGS], lives: 3, seed: 1, snapshot, snapshotKey: key, autoAdvance: false })
+    expect(resumed.result.current.lives).toBe(2)
+    expect(resumed.result.current.isPlaying).toBe(false)
+    expect(resumed.result.current.submitText('yyyy')).toBe(null)
+    expect(resumed.result.current.lives).toBe(2)
+  })
+
+  it("doesn't time out on the room deadline of another round (a run resumed ahead of the room)", () => {
+    const snapshot = { index: 3, errors: 0, score: 3 }
+    const { result } = play({
+      modes: [FLAGS], lives: 3, seed: 1, snapshot, autoAdvance: false, deadline: Date.now() - 1000, deadlineRound: 0,
+    })
+    act(() => { vi.advanceTimersByTime(100) })
+    expect(result.current.lives).toBe(3)
+    expect(result.current.isPlaying).toBe(true)
+  })
 })

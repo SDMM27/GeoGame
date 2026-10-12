@@ -207,6 +207,13 @@ const fr = {
     error_network: "Chargement impossible. Vérifie ta connexion.",
     error_other: "Chargement impossible. Vérifie ta connexion.",
   },
+  whats_new: {
+    title: "Quoi de neuf ?",
+    languages_title: "GeoGame parle 7 langues",
+    languages_body: "L'espagnol, le portugais, l'allemand et l'italien rejoignent le français, l'anglais et le russe. Les pays, les capitales et le quiz sont traduits, et tes réponses sont acceptées dans toutes ces langues.",
+    pick_language: "Choisis ta langue",
+    ok: "C'est parti !",
+  },
   common: {
     coming_soon: 'Bientôt disponible',
     back: 'Retour',
@@ -417,6 +424,13 @@ const en: MobileStrings = {
     error_network: "Couldn’t load. Check your connection.",
     error_other: "Couldn’t load. Check your connection.",
   },
+  whats_new: {
+    title: "What's new",
+    languages_title: "GeoGame now speaks 7 languages",
+    languages_body: "Spanish, Portuguese, German and Italian join French, English and Russian. Countries, capitals and the quiz are translated, and your answers are accepted in all of them.",
+    pick_language: "Pick your language",
+    ok: "Let's go!",
+  },
   common: {
     coming_soon: 'Coming soon',
     back: 'Back',
@@ -624,6 +638,13 @@ const ru: MobileStrings = {
     error_index: "Этот рейтинг пока недоступен: он ещё настраивается. Попробуй позже.",
     error_network: "Не удалось загрузить. Проверь подключение.",
     error_other: "Не удалось загрузить. Проверь подключение.",
+  },
+  whats_new: {
+    title: "Что нового",
+    languages_title: "GeoGame теперь говорит на 7 языках",
+    languages_body: "К французскому, английскому и русскому добавились испанский, португальский, немецкий и итальянский. Страны, столицы и викторина переведены, а ответы принимаются на любом из этих языков.",
+    pick_language: "Выбери язык",
+    ok: "Поехали!",
   },
   common: {
     coming_soon: 'Скоро',

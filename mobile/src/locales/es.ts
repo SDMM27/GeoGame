@@ -196,6 +196,13 @@ export const es: MobileStrings = {
     error_network: 'No se pudo cargar. Comprueba tu conexión.',
     error_other: 'No se pudo cargar. Comprueba tu conexión.',
   },
+  whats_new: {
+    title: "Novedades",
+    languages_title: "GeoGame ya habla 7 idiomas",
+    languages_body: "El español, el portugués, el alemán y el italiano se suman al francés, el inglés y el ruso. Los países, las capitales y el quiz están traducidos, y tus respuestas se aceptan en todos estos idiomas.",
+    pick_language: "Elige tu idioma",
+    ok: "¡Vamos!",
+  },
   common: {
     coming_soon: 'Próximamente',
     back: 'Volver',

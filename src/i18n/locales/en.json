@@ -499,7 +499,7 @@
     "signout": "Sign out",
     "prefill_hint": "Your username is filled in when you save a score or join a game.",
     "delete": "Delete my account",
-    "delete_confirm": "Your account and username will be deleted. Enter your password to confirm.",
+    "delete_confirm": "Your account, username, history, leaderboard scores and friends will be permanently deleted. Enter your password to confirm.",
     "delete_button": "Delete for good",
     "deleted": "Account deleted.",
     "cancel": "Cancel",
@@ -525,7 +525,7 @@
     "choose_title": "Choose your username",
     "choose_intro": "Your scores will show under this name. It will be reserved for your account.",
     "choose_submit": "Confirm my username",
-    "delete_confirm_google": "Your account and username will be deleted. Confirm with Google."
+    "delete_confirm_google": "Your account, username, history, leaderboard scores and friends will be permanently deleted. Confirm with Google."
   },
   "profile": {
     "member_since": "Member since {{date}}",
@@ -917,5 +917,13 @@
     "your_result": "Your result:",
     "come_back": "Come back tomorrow for a new challenge!",
     "checking": "Checking your daily challenge…"
+  },
+  "legal": {
+    "privacy": "Privacy",
+    "terms": "Terms of use",
+    "legal": "Legal notice",
+    "delete_account": "Delete my account",
+    "updated": "Last updated: {{date}}",
+    "signup_notice": "By creating an account, you accept the <terms>terms of use</terms> and the <privacy>privacy policy</privacy>. You must be at least 13 (and have a parent’s agreement under 15)."
   }
 }

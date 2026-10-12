@@ -1,0 +1,50 @@
+.legal-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+}
+
+.legal-main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2.5rem 1rem 3rem;
+  line-height: 1.6;
+}
+
+.legal-title {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 900;
+}
+
+.legal-updated {
+  margin: 0.25rem 0 1.5rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.legal-section h2 {
+  margin: 2rem 0 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.legal-main p {
+  margin: 0 0 0.75rem;
+}
+
+.legal-main ul {
+  margin: 0 0 0.75rem;
+  padding-left: 1.25rem;
+}
+
+.legal-main li {
+  margin-bottom: 0.35rem;
+}
+
+.legal-main a {
+  color: var(--accent-cyan);
+  overflow-wrap: anywhere;
+}

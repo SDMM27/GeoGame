@@ -1,6 +1,9 @@
 import React, { useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
+import { Trans, useTranslation } from 'react-i18next'
 import NavBar from '../components/NavBar'
+import LegalLinks from '../components/LegalLinks'
+import { LEGAL_PATHS } from '../legal/legalInfo'
 import { auth, useAccount } from '../auth'
 import {
   accountErrorKey,
@@ -152,6 +155,7 @@ function AuthForm() {
         {error && <p className="account-error">{t(`account.errors.${error}`)}</p>}
         {notice && <p className="account-notice">{notice}</p>}
 
+        {mode === 'signup' && <SignupNotice />}
         <button type="submit" className="account-submit" disabled={submitting}>
           {t(mode === 'signup' ? 'account.signup' : 'account.signin')}
         </button>
@@ -162,6 +166,18 @@ function AuthForm() {
         )}
       </form>
     </div>
+  )
+}
+
+// Shown wherever an account gets created (email form, or username choice after a first Google sign-in).
+function SignupNotice() {
+  return (
+    <p className="account-legal">
+      <Trans
+        i18nKey="legal.signup_notice"
+        components={{ terms: <Link to={LEGAL_PATHS.terms} />, privacy: <Link to={LEGAL_PATHS.privacy} /> }}
+      />
+    </p>
   )
 }
 
@@ -207,6 +223,7 @@ function ChooseUsername() {
           <small>{t('account.username_hint')}</small>
         </label>
         {error && <p className="account-error">{t(`account.errors.${error}`)}</p>}
+        <SignupNotice />
         <button type="submit" className="account-submit" disabled={submitting}>
           {t('account.choose_submit')}
         </button>
@@ -323,6 +340,7 @@ export default function AccountPage() {
         )}
         {loading ? null : !account ? <AuthForm /> : account.needsUsername ? <ChooseUsername /> : <Profile account={account} />}
       </main>
+      <LegalLinks />
     </div>
   )
 }

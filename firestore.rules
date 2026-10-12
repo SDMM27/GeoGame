@@ -525,7 +525,8 @@ service cloud.firestore {
     //  - other games:     { name, gameType, dailyKey, attempts, elapsedTime, guesses, hints? } (fewer attempts wins)
     // A daily is saved once solved, so it took at least one attempt. Limits come from the games: quiz tries and hints,
     // the guessable names (Border Guess, Country Clue), the countries of a Voyage Voyage chain (whose elapsedTime holds
-    // the wrong guesses), and Country Ranking's 5 countries, 3 tries and 3 points for a perfect first try.
+    // the wrong guesses), and Country Ranking's 5 countries ranked by each of the 3 criteria, with 3 tries and
+    // 3 points for a perfect first try per criterion (entries from before the criteria stages: a single one).
     match /daily_scores/{scoreId} {
       function dailyAttempts() {
         return {
@@ -560,9 +561,10 @@ service cloud.firestore {
       function rankingCaps() {
         return {
           // scoreCaps:begin rankingCaps
-          'score': 3,
-          'totalError': 14,
-          'attemptsUsed': 3,
+          'score': 9,
+          'totalError': 40,
+          'attemptsUsed': 9,
+          'scoreAndAttempts': 12,
           'players': 5
           // scoreCaps:end rankingCaps
         };
@@ -575,9 +577,9 @@ service cloud.firestore {
           && data.keys().hasAll(['name', 'gameType', 'dailyKey', 'score', 'totalError'])
           && inRange(data.score, caps['score'])
           && inRange(data.totalError, caps['totalError'])
-          && (data.score == 0 || data.totalError == 0)
           && (data.get('attemptsUsed', null) == null
-              || (inRange(data.attemptsUsed, caps['attemptsUsed']) && data.attemptsUsed >= 1))
+              || (inRange(data.attemptsUsed, caps['attemptsUsed']) && data.attemptsUsed >= 1
+                  && data.score + data.attemptsUsed <= caps['scoreAndAttempts']))
           && (data.get('playerOrder', null) == null
               || (data.playerOrder is list && data.playerOrder.size() <= caps['players']));
       }

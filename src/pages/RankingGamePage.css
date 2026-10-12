@@ -267,48 +267,42 @@
   margin-top: 4px;
 }
 
-/* ── Error chips ── */
-.ranking-error-chips {
+/* ── Daily: points of each criterion ── */
+.ranking-stage-summary {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  justify-content: center;
-  margin-top: 12px;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 16px;
 }
 
-.ranking-error-chip {
-  padding: 3px 8px;
-  border-radius: 999px;
-  font-size: 0.72rem;
+.ranking-stage-summary-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.ranking-stage-summary-name {
   font-weight: 700;
-  max-width: 120px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+}
+
+.ranking-stage-summary-detail {
+  flex: 1;
+  min-width: 0;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.ranking-stage-summary-points {
+  font-weight: 800;
+  color: var(--warning);
   white-space: nowrap;
 }
 
-.ranking-error-chip--zero {
-  background: rgba(0, 200, 120, 0.15);
-  color: var(--success);
-  border: 1px solid rgba(0, 200, 120, 0.35);
-}
-
-.ranking-error-chip--low {
-  background: rgba(220, 80, 80, 0.10);
-  color: #e07070;
-  border: 1px solid rgba(220, 80, 80, 0.25);
-}
-
-.ranking-error-chip--mid {
-  background: rgba(220, 60, 60, 0.18);
-  color: #e05050;
-  border: 1px solid rgba(220, 60, 60, 0.40);
-}
-
-.ranking-error-chip--high {
-  background: rgba(210, 30, 30, 0.25);
-  color: var(--danger);
-  border: 1px solid rgba(210, 30, 30, 0.55);
+.ranking-results-title:not(:first-child) {
+  margin-top: 20px;
 }
 
 /* ── Results list ── */

@@ -240,17 +240,23 @@ describe('daily scores', () => {
     await assertFails(as('alice').collection('daily_scores').add(dailies({ gameType: 'Cheat' })))
   })
 
-  it('accepts a Country Ranking up to the perfect first try, and no better', async () => {
+  it('accepts a Country Ranking up to perfect first tries on every criterion, and no better', async () => {
     const ranking = (overrides) => rankings(overrides)
-    await assertSucceeds(as('alice').collection('daily_scores').add(ranking({ score: 3, attemptsUsed: 1 })))
-    await assertSucceeds(anonymous().collection('daily_scores').add(ranking({ name: 'Zoe', uid: undefined, dailyKey: 'a', score: 1, attemptsUsed: 3 })))
-    // failed: no point, the best total error of the three tries (12 is the worst order of 5 countries)
-    await assertSucceeds(as('alice').collection('daily_scores').add(ranking({ dailyKey: 'b', score: 0, totalError: 12, attemptsUsed: 3 })))
-    await assertFails(as('alice').collection('daily_scores').add(ranking({ dailyKey: 'c', score: 4 })))
+    const orders = ['Population : A > B > C > D > E', 'PIB : B > A > C > D > E', 'Superficie : E > D > C > B > A']
+    // 3 criteria, each found at the first try
+    await assertSucceeds(as('alice').collection('daily_scores').add(ranking({ score: 9, attemptsUsed: 3, playerOrder: orders })))
+    // found at the 2nd and 3rd tries, one criterion failed (its best total error counts)
+    await assertSucceeds(anonymous().collection('daily_scores').add(ranking({ name: 'Zoe', uid: undefined, dailyKey: 'a', score: 3, totalError: 4, attemptsUsed: 8, playerOrder: orders })))
+    // all failed: no point, 12 is the worst order of 5 countries, on each criterion
+    await assertSucceeds(as('alice').collection('daily_scores').add(ranking({ dailyKey: 'b', score: 0, totalError: 36, attemptsUsed: 9 })))
+    // saved before the criteria stages: one criterion, the 5 countries
+    await assertSucceeds(as('alice').collection('daily_scores').add(ranking({ dailyKey: 'j', score: 3, attemptsUsed: 1 })))
+    await assertFails(as('alice').collection('daily_scores').add(ranking({ dailyKey: 'c', score: 10, attemptsUsed: 1 })))
     await assertFails(as('alice').collection('daily_scores').add(ranking({ dailyKey: 'd', score: 1000000 })))
-    await assertFails(as('alice').collection('daily_scores').add(ranking({ dailyKey: 'e', score: 3, totalError: 6 })))
+    // more points than the attempts allow: 9 points take exactly 3 attempts
+    await assertFails(as('alice').collection('daily_scores').add(ranking({ dailyKey: 'e', score: 9, attemptsUsed: 4 })))
     await assertFails(as('alice').collection('daily_scores').add(ranking({ dailyKey: 'f', score: 0, totalError: daily.ranking.totalError + 1 })))
-    await assertFails(as('alice').collection('daily_scores').add(ranking({ dailyKey: 'g', attemptsUsed: 4 })))
+    await assertFails(as('alice').collection('daily_scores').add(ranking({ dailyKey: 'g', score: 0, attemptsUsed: 10 })))
     await assertFails(as('alice').collection('daily_scores').add(ranking({ dailyKey: 'h', attemptsUsed: 0 })))
     await assertFails(as('alice').collection('daily_scores').add(ranking({ dailyKey: 'i', playerOrder: new Array(6).fill('A') })))
   })

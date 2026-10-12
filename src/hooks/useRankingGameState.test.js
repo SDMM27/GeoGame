@@ -1,8 +1,37 @@
 import { describe, it, expect } from 'vitest'
-import { computeTotalError, computePositionFeedback, pickCriterionKey } from './useRankingGameState'
-import { CRITERIA_KEYS } from '../utils/rankingCriteria'
+import { computeTotalError, computePositionFeedback, pickCriterionKey, sumStages, describePlayedOrders } from './useRankingGameState'
+import { CRITERIA, CRITERIA_KEYS } from '../utils/rankingCriteria'
 
 const c = (iso) => ({ properties: { ISO_A3: iso } })
+
+describe('sumStages', () => {
+  it('adds up the points, best errors and attempts of every criterion', () => {
+    const stages = [
+      { score: 3, totalError: 0, attempts: 1 },
+      { score: 0, totalError: 4, attempts: 3 },
+      { score: 2, totalError: 0, attempts: 2 },
+    ]
+    expect(sumStages(stages)).toEqual({ score: 5, totalError: 4, attempts: 6 })
+  })
+
+  it('is zero before any stage', () => {
+    expect(sumStages([])).toEqual({ score: 0, totalError: 0, attempts: 0 })
+  })
+})
+
+describe('describePlayedOrders', () => {
+  it('gives one line per criterion with the played order', () => {
+    const country = (name) => ({ properties: { ADMIN: name } })
+    const stages = [
+      { criterion: CRITERIA.population, playerOrder: [country('France'), country('Spain')] },
+      { criterion: CRITERIA.gdp, playerOrder: [country('Spain'), country('France')] },
+    ]
+    expect(describePlayedOrders(stages, (key) => key.toUpperCase())).toEqual([
+      'POPULATION : France > Spain',
+      'GDP : Spain > France',
+    ])
+  })
+})
 
 describe('computeTotalError', () => {
   it('returns 0 for a perfect ordering', () => {

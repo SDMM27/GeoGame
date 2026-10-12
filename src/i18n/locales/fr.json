@@ -239,7 +239,7 @@
   },
   "ranking": {
     "title": "Country Ranking",
-    "daily_description": "Classe 6 pays selon le critère du jour. Un seul essai par jour.",
+    "daily_description": "Classe 5 pays selon chaque critère du jour : population, superficie et PIB. 3 essais par critère.",
     "infinite_description": "Enchaîne des rounds de classement avec difficulté au choix.",
     "random": "Aléatoire",
     "population": "Population",
@@ -251,7 +251,11 @@
     "correct_ranking": "Classement correct",
     "placed_at": "mis #",
     "difference_of": "écart de",
-    "better_score_exists": "Tu as déjà un score enregistré pour ce défi."
+    "better_score_exists": "Tu as déjà un score enregistré pour ce défi.",
+    "stage_progress": "Critère {{done}} / {{count}} terminé",
+    "next_criterion": "Critère suivant →",
+    "found_at_attempt": "trouvé à l'essai {{attempt}}",
+    "not_found": "pas trouvé · erreur {{count}}"
   },
   "form": {
     "title": "Partie terminée !",

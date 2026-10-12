@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url'
 import { SCORE_TABLE, getRankingAttemptScore } from '../src/utils/scoringRules.js'
 import { ASCENSION_PRESETS, buildPhaseSequence } from '../src/utils/ascensionPresets.js'
 import { CONTINENTS } from '../src/utils/continents.js'
+import { CRITERIA_KEYS } from '../src/utils/rankingCriteria.js'
 
 const root = new URL('../', import.meta.url)
 const read = (path) => readFileSync(new URL(path, root), 'utf8')
@@ -95,7 +96,9 @@ function dailyLimits() {
   const hintKinds = constantFrom('src/hooks/useVoyageVoyageState.js', /useState\(\[\]\)\s*\/\/\s*(.+)/, 'voyage hints')
     .split('|').length
   const rankingCount = Number(constantFrom('src/hooks/useRankingGameState.js', /const DAILY_COUNT = (\d+)/, 'ranking count'))
-  const rankingTries = Number(constantFrom('src/hooks/useRankingGameState.js', /attemptNumber >= (\d+)/, 'ranking tries'))
+  const rankingTries = Number(constantFrom('src/hooks/useRankingGameState.js', /const MAX_ATTEMPTS = (\d+)/, 'ranking tries'))
+  // The daily ranks the same countries by every criterion, one stage each, and adds up the stages.
+  const rankingStages = CRITERIA_KEYS.length
   // Sum of |position - right position| over n items is at most floor(n * n / 2) (the reversed list).
   const worstError = Math.floor((rankingCount * rankingCount) / 2)
 
@@ -105,12 +108,16 @@ function dailyLimits() {
     // Voyage Voyage stores its wrong guesses in elapsedTime (a count, not a time)
     voyageWrong: { VOYAGE_VOYAGE: voyageCountries },
     ranking: {
-      score: getRankingAttemptScore(1),
-      totalError: withMargin(worstError),
-      attemptsUsed: rankingTries,
-      players: rankingCount,
+      score: rankingStages * getRankingAttemptScore(1),
+      totalError: withMargin(rankingStages * worstError),
+      attemptsUsed: rankingStages * rankingTries,
+      // A stage found at attempt a scores getRankingAttemptScore(a) = 4 - a, a failed one 0 in 3 attempts:
+      // score + attempts is at most 4 per stage.
+      scoreAndAttempts: rankingStages * (getRankingAttemptScore(1) + 1),
+      // One line per stage (describePlayedOrders); entries saved before the stages hold the 5 countries.
+      players: Math.max(rankingCount, rankingStages),
     },
-    sources: { quizAttempts, quizHints, guessable, voyageCountries, hintKinds, rankingCount, rankingTries, worstError },
+    sources: { quizAttempts, quizHints, guessable, voyageCountries, hintKinds, rankingCount, rankingTries, rankingStages, worstError },
   }
 }
 
@@ -168,10 +175,11 @@ function print({ solo, ascension, daily }) {
     'VOYAGE_VOYAGE steps <=': { value: daily.attempts.VOYAGE_VOYAGE, from: 'countries with an ISO code, plus margin' },
     'VOYAGE_VOYAGE hints <=': { value: daily.hints.VOYAGE_VOYAGE, from: 'kinds of hint (useVoyageVoyageState)' },
     'VOYAGE_VOYAGE wrong guesses (elapsedTime) <=': { value: daily.voyageWrong.VOYAGE_VOYAGE, from: 'countries with an ISO code, plus margin' },
-    'RANKING score <=': { value: daily.ranking.score, from: 'getRankingAttemptScore(1)' },
-    'RANKING totalError <=': { value: daily.ranking.totalError, from: `floor(${daily.sources.rankingCount}^2 / 2) = ${daily.sources.worstError}, plus margin` },
-    'RANKING attemptsUsed <=': { value: daily.ranking.attemptsUsed, from: 'attempt limit (useRankingGameState)' },
-    'RANKING playerOrder length <=': { value: daily.ranking.players, from: 'DAILY_COUNT (useRankingGameState)' },
+    'RANKING score <=': { value: daily.ranking.score, from: `${daily.sources.rankingStages} criteria x getRankingAttemptScore(1)` },
+    'RANKING totalError <=': { value: daily.ranking.totalError, from: `${daily.sources.rankingStages} x floor(${daily.sources.rankingCount}^2 / 2) = ${daily.sources.rankingStages * daily.sources.worstError}, plus margin` },
+    'RANKING attemptsUsed <=': { value: daily.ranking.attemptsUsed, from: `${daily.sources.rankingStages} criteria x MAX_ATTEMPTS (useRankingGameState)` },
+    'RANKING score + attemptsUsed <=': { value: daily.ranking.scoreAndAttempts, from: 'getRankingAttemptScore(1) + 1 per criterion' },
+    'RANKING playerOrder length <=': { value: daily.ranking.players, from: 'DAILY_COUNT, or one line per criterion' },
     'daily attempts >=': { value: 1, from: 'a daily is saved once solved: at least one guess or step' },
   })
 }

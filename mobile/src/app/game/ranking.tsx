@@ -1,5 +1,5 @@
-// "Country Ranking": order countries by population, area or GDP, in up to 3 attempts.
-// Daily (shared set) or infinite (category and country count of your choice).
+// "Country Ranking": order countries by population, area or GDP, in up to 3 attempts per criterion.
+// Daily (the same countries ranked by every criterion in turn) or infinite (category and country count of your choice).
 // Game rules come from the website hook (useRankingGameState).
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { Image } from 'expo-image'
@@ -10,7 +10,7 @@ import { ScrollView, StyleSheet, View } from 'react-native'
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import useRankingGameState from '@shared/hooks/useRankingGameState'
+import useRankingGameState, { describePlayedOrders } from '@shared/hooks/useRankingGameState'
 import { getCountryName } from '@shared/utils/getCountryName'
 import { useDailyPlayedElsewhere } from '@shared/hooks/useDailyPlayedElsewhere'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
@@ -32,12 +32,20 @@ import { colors, gameColors, radius, space } from '@/theme'
 const ACCENT = gameColors.ranking
 const ROW_HEIGHT = 54
 const ROW_GAP = space.sm
-const MAX_ATTEMPTS = 3
 const MIN_COUNT = 3
 const MAX_COUNT = 20
 
 type IconName = keyof typeof MaterialCommunityIcons.glyphMap
 type Criterion = { key: 'population' | 'area' | 'gdp' }
+type StageResult = {
+  criterion: Criterion
+  score: number
+  totalError: number
+  attempts: number
+  playerOrder: CountryFeature[]
+  correctOrder: CountryFeature[]
+  values: Map<string, string>
+}
 
 const CATEGORIES: { key: Criterion['key'] | null; icon: IconName }[] = [
   { key: null, icon: 'dice-5-outline' },
@@ -85,11 +93,21 @@ function CountryRow({
   )
 }
 
-function CorrectRanking({ correctOrder, countries, values }: { correctOrder: CountryFeature[]; countries: CountryFeature[]; values: Map<string, string> }) {
+function CorrectRanking({
+  correctOrder,
+  countries,
+  values,
+  title,
+}: {
+  correctOrder: CountryFeature[]
+  countries: CountryFeature[]
+  values: Map<string, string>
+  title?: string
+}) {
   const { t, i18n } = useTranslation()
   return (
     <View style={styles.card}>
-      <Text variant="label">{t('ranking.correct_ranking')}</Text>
+      <Text variant="label">{title ?? t('ranking.correct_ranking')}</Text>
       {correctOrder.map((country, index) => {
         const playerIndex = countries.findIndex((c) => keyOf(c) === keyOf(country))
         const correct = playerIndex === index
@@ -116,6 +134,30 @@ function CorrectRanking({ correctOrder, countries, values }: { correctOrder: Cou
           </Animated.View>
         )
       })}
+    </View>
+  )
+}
+
+// Daily: the points of each criterion.
+function StageSummary({ stages }: { stages: StageResult[] }) {
+  const { t } = useTranslation()
+  return (
+    <View style={styles.card}>
+      {stages.map((stage) => (
+        <View key={stage.criterion.key} style={styles.summaryRow}>
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <Text variant="bodyStrong">{t(`ranking.${stage.criterion.key}`)}</Text>
+            <Text variant="caption" numberOfLines={1}>
+              {stage.score > 0
+                ? t('ranking.found_at_attempt', { attempt: stage.attempts })
+                : t('ranking.not_found', { count: stage.totalError })}
+            </Text>
+          </View>
+          <Text variant="bodyStrong" color={stage.score > 0 ? ACCENT : colors.warning}>
+            {stage.score} {t('units.pts')}
+          </Text>
+        </View>
+      ))}
     </View>
   )
 }
@@ -184,12 +226,19 @@ export default function RankingScreen() {
     status,
     score,
     totalError,
+    attemptsUsed,
     correctOrder,
+    stageScore,
+    stageResults,
+    stageIndex,
+    stageCount,
+    nextStage,
     handleSubmit,
     startNextRound,
     startInfiniteRound,
     dailyKey,
     attemptNumber,
+    maxAttempts,
     positionFeedback,
     retryAttempt,
   } = useRankingGameState(isDaily ? 'daily' : 'infinite', { countryCount })
@@ -204,6 +253,7 @@ export default function RankingScreen() {
   const feedback = positionFeedback as boolean[] | null
   const crit = criterion as Criterion | null
   const isSubmitted = status === 'submitted'
+  const stages = stageResults as StageResult[]
   const positionsLabel = (count: number) => t('units.position', { count })
 
   if (elsewhere.checking || elsewhere.game) {
@@ -227,7 +277,10 @@ export default function RankingScreen() {
 
         {crit && (
           <Animated.View entering={FadeIn.duration(200)} style={styles.criterion}>
-            <Text variant="label">{t('labels.criterion')}</Text>
+            <Text variant="label">
+              {t('labels.criterion')}
+              {stageCount > 1 ? ` ${stageIndex + 1} / ${stageCount}` : ''}
+            </Text>
             <Text variant="title" color={ACCENT}>
               {t(`ranking.${crit.key}`)}
             </Text>
@@ -260,7 +313,7 @@ export default function RankingScreen() {
 
             {feedback ? (
               <Button
-                label={t('mobile.ranking.retry', { attempt: attemptNumber + 1, max: MAX_ATTEMPTS })}
+                label={t('mobile.ranking.retry', { attempt: attemptNumber + 1, max: maxAttempts })}
                 color={ACCENT}
                 onPress={retryAttempt}
                 icon={<MaterialCommunityIcons name="replay" size={20} color={colors.onAccent} />}
@@ -274,6 +327,28 @@ export default function RankingScreen() {
               />
             )}
           </>
+        )}
+
+        {status === 'stage-done' && stages.length > 0 && (
+          <Animated.View entering={FadeIn.duration(220)} style={{ gap: space.md }}>
+            <View style={[styles.card, { alignItems: 'center' }]}>
+              <Text variant="hero" color={stageScore ? ACCENT : colors.warning}>
+                +{stageScore} {t('units.pts')}
+              </Text>
+              <Text variant="caption">{t('ranking.stage_progress', { done: stages.length, count: stageCount })}</Text>
+            </View>
+            <CorrectRanking
+              correctOrder={stages[stages.length - 1].correctOrder}
+              countries={stages[stages.length - 1].playerOrder}
+              values={stages[stages.length - 1].values}
+            />
+            <Button
+              label={clean(t('ranking.next_criterion'))}
+              color={ACCENT}
+              onPress={nextStage}
+              icon={<MaterialCommunityIcons name="arrow-right" size={20} color={colors.onAccent} />}
+            />
+          </Animated.View>
         )}
 
         {isSubmitted && !isDaily && (
@@ -299,7 +374,7 @@ export default function RankingScreen() {
 
       {!(isSubmitted && isDaily) && (
         <GameTopBar confirmQuit={false}>
-          {status === 'playing' && <HudPill icon="target" label={`${attemptNumber} / ${MAX_ATTEMPTS}`} color={ACCENT} />}
+          {status === 'playing' && <HudPill icon="target" label={`${attemptNumber} / ${maxAttempts}`} color={ACCENT} />}
         </GameTopBar>
       )}
 
@@ -310,7 +385,7 @@ export default function RankingScreen() {
           scoreLabel={t('units.pts')}
           accent={score > 0 ? ACCENT : colors.warning}
           stats={[
-            { label: t('mobile.ranking.attempts'), value: `${attemptNumber} / ${MAX_ATTEMPTS}` },
+            { label: t('mobile.ranking.attempts'), value: `${attemptsUsed} / ${stageCount * maxAttempts}` },
             { label: clean(t('ranking.total_error')).replace(/\s*:$/, ''), value: `${totalError}`, color: totalError ? colors.warning : colors.accent },
           ]}
           record={{
@@ -319,15 +394,15 @@ export default function RankingScreen() {
             dailyKey,
             score,
             solved: score > 0,
-            attempts: attemptNumber,
+            attempts: attemptsUsed,
             totalError,
           }}
           save={{
             kind: 'ranking',
             dailyKey,
             totalError,
-            attemptsUsed: attemptNumber,
-            playerOrder: list.map((country) => country.properties.ADMIN),
+            attemptsUsed,
+            playerOrder: describePlayedOrders(stageResults, (key: string) => t(`ranking.${key}`)),
           }}
           share={{
             gameType: 'RANKING',
@@ -337,7 +412,16 @@ export default function RankingScreen() {
           }}
           onSaved={() => setLeaderboardVersion((version) => version + 1)}
           onHome={() => navigate('/')}>
-          <CorrectRanking correctOrder={correctOrder} countries={list} values={countryValues} />
+          <StageSummary stages={stages} />
+          {stages.map((stage) => (
+            <CorrectRanking
+              key={stage.criterion.key}
+              correctOrder={stage.correctOrder}
+              countries={stage.playerOrder}
+              values={stage.values}
+              title={`${t('ranking.correct_ranking')} · ${t(`ranking.${stage.criterion.key}`)}`}
+            />
+          ))}
           <RankingLeaderboard dailyKey={dailyKey} refreshKey={leaderboardVersion} />
         </ResultsSheet>
       )}
@@ -369,6 +453,7 @@ const styles = StyleSheet.create({
   },
   rowIndex: { width: 24, textAlign: 'center' },
   flag: { width: 30, height: 20, borderRadius: 3 },
+  summaryRow: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   resultRow: { flexDirection: 'row', alignItems: 'center', gap: space.md, paddingVertical: 6 },
   card: {
     gap: space.md,

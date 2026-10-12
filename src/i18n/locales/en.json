@@ -239,7 +239,7 @@
   },
   "ranking": {
     "title": "Country Ranking",
-    "daily_description": "Rank 6 countries by today's criterion. One attempt per day.",
+    "daily_description": "Rank 5 countries by each of today's criteria: population, area and GDP. 3 attempts per criterion.",
     "infinite_description": "Chain ranking rounds with difficulty of your choice.",
     "random": "Random",
     "population": "Population",
@@ -251,7 +251,11 @@
     "correct_ranking": "Correct ranking",
     "placed_at": "placed #",
     "difference_of": "difference of",
-    "better_score_exists": "You already have a score saved for this challenge."
+    "better_score_exists": "You already have a score saved for this challenge.",
+    "stage_progress": "Criterion {{done}} / {{count}} done",
+    "next_criterion": "Next criterion →",
+    "found_at_attempt": "found at attempt {{attempt}}",
+    "not_found": "not found · error {{count}}"
   },
   "form": {
     "title": "Game over!",

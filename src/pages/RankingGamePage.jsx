@@ -7,7 +7,7 @@ import RankingLeaderboard from './RankingLeaderboard'
 import ShareScoreButton from '../components/ShareScoreButton'
 import ChallengeBanner from '../components/ChallengeBanner'
 import { resolveMode } from '../utils/challenge'
-import useRankingGameState from '../hooks/useRankingGameState'
+import useRankingGameState, { describePlayedOrders } from '../hooks/useRankingGameState'
 import { GAME_TYPES } from '../utils/gameTypes'
 import { useAccount, useRecordGame } from '../auth'
 import { useDailyPlayedElsewhere } from '../hooks/useDailyPlayedElsewhere'
@@ -21,14 +21,62 @@ import './RankingGamePage.css'
 const FLAG_URL = (iso2) =>
   iso2 ? `https://flagcdn.com/w40/${iso2.toLowerCase()}.png` : null
 
-function CriterionBanner({ criterion, t }) {
+function CriterionBanner({ criterion, stageIndex, stageCount, t }) {
   if (!criterion) return null
   return (
     <div className="ranking-criterion">
-      <div className="ranking-criterion-label">{t('labels.criterion')}</div>
+      <div className="ranking-criterion-label">
+        {t('labels.criterion')}
+        {stageCount > 1 && ` ${stageIndex + 1} / ${stageCount}`}
+      </div>
       <div className="ranking-criterion-name">{criterion.label}</div>
       <div className="ranking-criterion-hint">{criterion.consigne}</div>
     </div>
+  )
+}
+
+// The right order of one stage, with the player's positions and the values.
+function CorrectRanking({ stage, title, t, language }) {
+  return (
+    <>
+      <div className="ranking-results-title">{title}</div>
+      {stage.correctOrder.map((country, index) => {
+        const playerIdx = stage.playerOrder.findIndex(
+          (c) => c.properties.ISO_A3 === country.properties.ISO_A3
+        )
+        const isCorrect = playerIdx === index
+        const formattedVal = stage.values.get(country.properties.ISO_A3) ?? '—'
+
+        return (
+          <div
+            key={country.properties.ISO_A3}
+            className={`ranking-result-row${isCorrect ? ' ranking-result-row--correct' : ' ranking-result-row--wrong'}`}
+          >
+            <span className={`ranking-result-index${isCorrect ? ' ranking-result-index--correct' : ' ranking-result-index--wrong'}`}>
+              {index + 1}
+            </span>
+            {FLAG_URL(country.properties.ISO_A2) && (
+              <img
+                src={FLAG_URL(country.properties.ISO_A2)}
+                alt=""
+                className="ranking-result-flag"
+                onError={(e) => { e.target.style.display = 'none' }}
+              />
+            )}
+            <span className="ranking-result-country">{getCountryName(country.properties.ISO_A2, language) || country.properties.ADMIN}</span>
+            <div className="ranking-result-meta">
+              <div className="ranking-result-value">{formattedVal}</div>
+              {isCorrect
+                ? <span className="ranking-result-status--correct">✓ correct</span>
+                : <span className="ranking-result-status--wrong">
+                    {t('ranking.placed_at')}{playerIdx + 1} ({t('ranking.difference_of')} {Math.abs(playerIdx - index)})
+                  </span>
+              }
+            </div>
+          </div>
+        )
+      })}
+    </>
   )
 }
 
@@ -49,17 +97,23 @@ export default function RankingGamePage() {
   const {
     criterion,
     countries,
-    countryValues,
     reorderCountries,
     status,
     score,
     totalError,
-    correctOrder,
+    attemptsUsed,
+    maxScore,
+    stageScore,
+    stageResults,
+    stageIndex,
+    stageCount,
+    nextStage,
     handleSubmit,
     startNextRound,
     startInfiniteRound,
     dailyKey,
     attemptNumber,
+    maxAttempts,
     positionFeedback,
     retryAttempt,
   } = useRankingGameState(mode, { countryCount })
@@ -91,8 +145,8 @@ export default function RankingGamePage() {
         dailyKey,
         score,
         totalError,
-        attemptsUsed: attemptNumber,
-        playerOrder: countries.map((c) => c.properties.ADMIN),
+        attemptsUsed,
+        playerOrder: describePlayedOrders(stageResults, (key) => t(`ranking.${key}`)),
       })
       if (rankingSavedKey && (result.status === 'saved' || result.status === 'updated')) {
         localStorage.setItem(rankingSavedKey, '1')
@@ -104,31 +158,9 @@ export default function RankingGamePage() {
 
   useRecordGame(
     isSubmitted && mode === 'daily' && dailyKey
-      ? { gameType: GAME_TYPES.RANKING, mode: 'daily', dailyKey, score, solved: score > 0, attempts: attemptNumber, totalError }
+      ? { gameType: GAME_TYPES.RANKING, mode: 'daily', dailyKey, score, solved: score > 0, attempts: attemptsUsed, totalError }
       : null
   )
-
-  const errorChips = isSubmitted
-    ? correctOrder
-        .map((country, correctIdx) => {
-          const playerIdx = countries.findIndex(
-            (c) => c.properties.ISO_A3 === country.properties.ISO_A3
-          )
-          return {
-            iso: country.properties.ISO_A3,
-            name: country.properties.ADMIN,
-            error: Math.abs(playerIdx - correctIdx),
-          }
-        })
-        .sort((a, b) => b.error - a.error)
-    : []
-
-  function chipClass(error) {
-    if (error === 0) return 'ranking-error-chip--zero'
-    if (error === 1) return 'ranking-error-chip--low'
-    if (error <= 3) return 'ranking-error-chip--mid'
-    return 'ranking-error-chip--high'
-  }
 
   return (
     <div className="ranking-game-page">
@@ -201,7 +233,9 @@ export default function RankingGamePage() {
         )}
 
         {/* Criterion banner */}
-        <CriterionBanner criterion={criterion} t={t} />
+        {!(isSubmitted && stageCount > 1) && (
+          <CriterionBanner criterion={criterion} stageIndex={stageIndex} stageCount={stageCount} t={t} />
+        )}
 
         {/* === PLAYING === */}
         {playedElsewhere && (
@@ -214,7 +248,7 @@ export default function RankingGamePage() {
           <>
             <div className="ranking-drag-hint">{t('ranking.drag_hint')}</div>
             <div className="ranking-attempt-counter">
-              Essai {attemptNumber} / 3
+              Essai {attemptNumber} / {maxAttempts}
             </div>
 
             {!positionFeedback ? (
@@ -285,10 +319,33 @@ export default function RankingGamePage() {
                 </div>
 
                 <button className="ranking-submit-btn" onClick={retryAttempt}>
-                  ↺ Réessayer — Essai {attemptNumber + 1} / 3
+                  ↺ Réessayer — Essai {attemptNumber + 1} / {maxAttempts}
                 </button>
               </>
             )}
+          </>
+        )}
+
+        {/* === STAGE DONE (daily, before the next criterion) === */}
+        {status === 'stage-done' && stageResults.length > 0 && (
+          <>
+            <div className="ranking-score">
+              <div className="ranking-score-value">
+                +{stageScore} pt{stageScore !== 1 ? 's' : ''}
+              </div>
+              <div className="ranking-score-sub">
+                {t('ranking.stage_progress', { done: stageResults.length, count: stageCount })}
+              </div>
+            </div>
+            <CorrectRanking
+              stage={stageResults[stageResults.length - 1]}
+              title={t('ranking.correct_ranking')}
+              t={t}
+              language={i18n.language}
+            />
+            <button className="ranking-submit-btn" onClick={nextStage}>
+              {t('ranking.next_criterion')}
+            </button>
           </>
         )}
 
@@ -298,12 +355,27 @@ export default function RankingGamePage() {
             {/* Score */}
             <div className="ranking-score">
               <div className="ranking-score-value">
-                {score} pt{score !== 1 ? 's' : ''}
+                {score} / {maxScore} pts
               </div>
               <div className="ranking-score-sub">
                 {t('ranking.total_error')} {totalError} position{totalError !== 1 ? 's' : ''}
               </div>
             </div>
+            {stageResults.length > 1 && (
+              <div className="ranking-stage-summary">
+                {stageResults.map((stage) => (
+                  <div key={stage.criterion.key} className="ranking-stage-summary-row">
+                    <span className="ranking-stage-summary-name">{t(`ranking.${stage.criterion.key}`)}</span>
+                    <span className="ranking-stage-summary-detail">
+                      {stage.score > 0
+                        ? t('ranking.found_at_attempt', { attempt: stage.attempts })
+                        : t('ranking.not_found', { count: stage.totalError })}
+                    </span>
+                    <span className="ranking-stage-summary-points">{stage.score} pt{stage.score !== 1 ? 's' : ''}</span>
+                  </div>
+                ))}
+              </div>
+            )}
             <ShareScoreButton
               score={score}
               gameType="RANKING"
@@ -312,44 +384,18 @@ export default function RankingGamePage() {
               challenge={mode === 'daily' ? { route: '/ranking', dailyKey } : null}
             />
 
-            {/* Correct ranking revealed */}
-            <div className="ranking-results-title">{t('ranking.correct_ranking')}</div>
-            {correctOrder.map((country, index) => {
-              const playerIdx = countries.findIndex(
-                (c) => c.properties.ISO_A3 === country.properties.ISO_A3
-              )
-              const isCorrect = playerIdx === index
-              const formattedVal = countryValues.get(country.properties.ISO_A3) ?? '—'
-
-              return (
-                <div
-                  key={country.properties.ISO_A3}
-                  className={`ranking-result-row${isCorrect ? ' ranking-result-row--correct' : ' ranking-result-row--wrong'}`}
-                >
-                  <span className={`ranking-result-index${isCorrect ? ' ranking-result-index--correct' : ' ranking-result-index--wrong'}`}>
-                    {index + 1}
-                  </span>
-                  {FLAG_URL(country.properties.ISO_A2) && (
-                    <img
-                      src={FLAG_URL(country.properties.ISO_A2)}
-                      alt=""
-                      className="ranking-result-flag"
-                      onError={(e) => { e.target.style.display = 'none' }}
-                    />
-                  )}
-                  <span className="ranking-result-country">{getCountryName(country.properties.ISO_A2, i18n.language) || country.properties.ADMIN}</span>
-                  <div className="ranking-result-meta">
-                    <div className="ranking-result-value">{formattedVal}</div>
-                    {isCorrect
-                      ? <span className="ranking-result-status--correct">✓ correct</span>
-                      : <span className="ranking-result-status--wrong">
-                          {t('ranking.placed_at')}{playerIdx + 1} ({t('ranking.difference_of')} {Math.abs(playerIdx - index)})
-                        </span>
-                    }
-                  </div>
-                </div>
-              )
-            })}
+            {/* Correct rankings revealed */}
+            {stageResults.map((stage) => (
+              <CorrectRanking
+                key={stage.criterion.key}
+                stage={stage}
+                title={stageResults.length > 1
+                  ? `${t('ranking.correct_ranking')} · ${t(`ranking.${stage.criterion.key}`)}`
+                  : t('ranking.correct_ranking')}
+                t={t}
+                language={i18n.language}
+              />
+            ))}
 
             {/* Daily leaderboard submission */}
             {mode === 'daily' && (

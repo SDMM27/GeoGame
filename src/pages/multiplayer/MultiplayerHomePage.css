@@ -1,15 +1,68 @@
-/* src/pages/multiplayer/MultiplayerHomePage.css */
-.mp-home { min-height: 100vh; background: var(--bg-dark); color: var(--text-primary); }
-.mp-home-main { max-width: 600px; margin: 0 auto; padding: 3rem 1rem; }
-.mp-home-title { font-size: 2rem; font-weight: 700; margin-bottom: 2rem; text-align: center; }
-.mp-home-cards { display: flex; flex-direction: column; gap: 1rem; }
-.mp-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; display: flex; flex-direction: column; align-items: center; gap: 0.75rem; cursor: pointer; transition: border-color 0.2s; }
-.mp-card:hover { border-color: var(--accent); }
-.mp-card--create { text-align: center; }
-.mp-card-icon { font-size: 2rem; }
-.mp-card-label { font-size: 1.1rem; font-weight: 600; }
-.mp-join-form { display: flex; gap: 0.5rem; width: 100%; }
-.mp-join-input { flex: 1; padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--bg-primary); color: var(--text-primary); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.15em; }
-.mp-join-btn { padding: 0.5rem 1rem; border-radius: 8px; background: var(--accent); color: var(--bg-primary); font-weight: 600; border: none; cursor: pointer; }
+/* src/pages/multiplayer/MultiplayerHomePage.css — the app's Multi tab */
+.mp-home { min-height: 100vh; background: var(--bg-primary); color: var(--text-primary); }
+.mp-home-main { max-width: 720px; margin: 0 auto; padding: 28px 24px 48px; display: flex; flex-direction: column; gap: 28px; }
+.mp-home-header p { margin: 2px 0 0; color: var(--text-muted); font-size: 0.9rem; }
+.mp-home-title { margin: 0; font-size: 2rem; }
+.mp-home h2 { margin: 0; font-size: 1.3rem; }
+
+.mp-section { display: flex; flex-direction: column; gap: 12px; }
+.mp-section-head p { margin: 2px 0 0; color: var(--text-muted); font-size: 0.85rem; }
+
+/* Join with a code */
+.mp-join-card { display: flex; flex-direction: column; gap: 12px; padding: 18px; border-radius: var(--radius-xl); background: var(--bg-card); border: 1px solid var(--border-color); }
+.mp-join-form { display: flex; gap: 8px; }
+.mp-join-input {
+  flex: 1;
+  min-width: 0;
+  height: 52px;
+  padding: 0 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+.mp-join-input::placeholder { color: var(--text-dim); }
+.mp-join-input:focus { outline: none; border-color: var(--accent); }
+.mp-join-btn { padding: 0 20px; border-radius: var(--radius-md); background: var(--accent); color: var(--on-accent); font-weight: 700; border: none; cursor: pointer; }
 .mp-join-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-.mp-home-invites { margin-bottom: 1.5rem; }
+
+/* Game and recent room rows */
+.mp-rows { display: flex; flex-direction: column; gap: 10px; }
+.mp-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px;
+  text-align: left;
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  transition: border-color 0.2s, transform 0.1s;
+}
+.mp-row:hover { border-color: color-mix(in srgb, var(--game) 45%, transparent); transform: translateY(-1px); }
+.mp-row-icon {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--game) 14%, transparent);
+  font-size: 1.3rem;
+}
+.mp-row-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.mp-row-title { flex: 1; font-weight: 600; }
+.mp-row-desc { font-size: 0.8rem; color: var(--text-muted); }
+.mp-row-end { color: var(--text-dim); display: grid; }
+.mp-row-code { font-weight: 700; letter-spacing: 2px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+@media (max-width: 720px) {
+  .mp-home-main { padding: 20px 16px 32px; gap: 24px; }
+  .mp-home-title { font-size: 1.6rem; }
+}

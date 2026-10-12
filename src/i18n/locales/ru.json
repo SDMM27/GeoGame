@@ -318,7 +318,13 @@
     "played_order": "Сыгранный порядок"
   },
   "multiplayer": {
-    "title": "Мультиплеер"
+    "title": "Мультиплеер",
+    "subtitle": "Соревнуйся с друзьями в любой игре",
+    "join_title": "Присоединиться к игре",
+    "code_placeholder": "КОД",
+    "create_title": "Создать игру",
+    "create_subtitle": "Выбери игру и пригласи друзей по коду",
+    "recent_title": "Недавние игры"
   },
   "lobby": {
     "connecting": "Подключение..."

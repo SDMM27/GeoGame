@@ -318,7 +318,13 @@
     "played_order": "Order played"
   },
   "multiplayer": {
-    "title": "Multiplayer"
+    "title": "Multiplayer",
+    "subtitle": "Challenge your friends on the game of your choice",
+    "join_title": "Join a game",
+    "code_placeholder": "CODE",
+    "create_title": "Create a game",
+    "create_subtitle": "Pick a game, then invite your friends with the code",
+    "recent_title": "Recent games"
   },
   "lobby": {
     "connecting": "Connecting..."

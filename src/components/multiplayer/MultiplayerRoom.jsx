@@ -14,6 +14,8 @@ import {
   roomGames,
 } from '../../utils/multiplayerRoom'
 import useLobbyHost from '../../hooks/useLobbyHost'
+import { rememberRoom } from '../../utils/recentRooms'
+import { gameColor } from '../../utils/roomGames'
 import { gameLabel } from './RoomConfig'
 import AddGame from './room/AddGame'
 import GameList from './room/GameList'
@@ -61,6 +63,11 @@ export default function MultiplayerRoom({ room, progress, gameResults, playerId 
   const isHost = room.hostId === playerId
   const toPlay = joined ? nextGameToPlay(room, known, playerId) : null
   const playable = (index) => PLAYABLE_TYPES.includes(games[index]?.type)
+  // Listed in the Multi page's recent games once joined
+  useEffect(() => {
+    if (joined) rememberRoom({ id: room.id, mode: room.mode, game: games[0] })
+  }, [joined, room.id]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const onDone = useCallback((index) => {
     setDoneHere((previous) => [...previous, index])
     setPlayingIndex(null)
@@ -114,7 +121,8 @@ export default function MultiplayerRoom({ room, progress, gameResults, playerId 
   }
 
   return (
-    <div className="mpr">
+    // The room takes the color of its current game, like in the app
+    <div className="mpr" style={{ '--game': gameColor(games[current]?.id ?? 'placement') }}>
       <header className="mpr-header">
         <span className="mpr-label">
           {t('multiplayer.title')} · {t(room.mode === 'live' ? 'mp_room.live' : 'mp_room.challenge')}

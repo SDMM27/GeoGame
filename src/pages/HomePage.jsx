@@ -5,7 +5,8 @@ import { useTranslation } from "react-i18next";
 import NavBar from "../components/NavBar";
 import AppBanner from "../components/AppBanner";
 import GameConfigModal from "./home/GameConfigModal";
-import { DailyCard, HomeRow, gameColor } from "./home/HomeCards";
+import { DailyCard, HomeRow } from "./home/HomeCards";
+import { gameColor } from "../utils/roomGames";
 import { GAMES } from "./home/gameData";
 import "./HomePage.css";
 

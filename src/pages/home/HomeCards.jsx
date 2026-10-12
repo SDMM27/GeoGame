@@ -3,9 +3,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MultiIcon } from "../../components/NavIcons";
-
-// The game's own color, as in the app (--game-placement, --game-border-guess... in styles/theme.css)
-export const gameColor = (id) => `var(--game-${id.toLowerCase().replace(/_/g, "-")})`;
+import { gameColor } from "../../utils/roomGames";
 
 const Chevron = () => (
   <svg className="home-row-chevron" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

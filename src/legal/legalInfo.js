@@ -4,7 +4,7 @@
 // provided the host (Vercel) has their identity: then `editor` stays generic, but `email` must still work.
 export const LEGAL_INFO = {
   editor: 'DON Sacha',
-  email: 'donsacha27@gmail.com',
+  email: 'appgeogame@gmail.com',
   // Date of the last change to the texts in documents.js (YYYY-MM-DD).
   updated: '2026-10-12',
 }

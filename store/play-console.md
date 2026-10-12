@@ -9,7 +9,7 @@ Adresses utiles :
 - Politique de confidentialité : https://geo-game-delta.vercel.app/privacy
 - Suppression du compte : https://geo-game-delta.vercel.app/delete-account
 - Site web : https://geo-game-delta.vercel.app
-- E-mail de contact : celui de `src/legal/legalInfo.js`
+- E-mail de contact : appgeogame@gmail.com (celui de `src/legal/legalInfo.js`)
 
 ---
 

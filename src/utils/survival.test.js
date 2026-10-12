@@ -68,9 +68,10 @@ describe('buildSurvivalRounds', () => {
     const rounds = buildSurvivalRounds(ALL, 8, 70, gentle)
     rounds.forEach((round, index) => {
       const expected = TIERS.indexOf(survivalDifficulty(index, gentle))
-      // A quiz without a new question at that difficulty asks an easier one
-      if (round.type === QUIZ) expect(TIERS.indexOf(round.difficulty)).toBeLessThanOrEqual(expected)
-      else expect(round.difficulty).toBe(survivalDifficulty(index, gentle))
+      // A game without a new country (or question) at that difficulty asks an easier one: Border Guess has only a
+      // few Impossible countries left once the tiny ones are removed
+      expect(TIERS.indexOf(round.difficulty)).toBeLessThanOrEqual(expected)
+      if (round.type !== QUIZ && round.type !== BORDER_GUESS) expect(round.difficulty).toBe(survivalDifficulty(index, gentle))
     })
   })
 

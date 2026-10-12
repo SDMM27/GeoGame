@@ -63,3 +63,7 @@
     border-left: 0; border-top: 1px solid var(--border-color); border-radius: 16px 16px 0 0; box-shadow: 0 -8px 24px #000a;
   }
 }
+/* Phones: the map ends above the bottom tab bar (see NavBar.css) */
+@media (max-width: 720px) {
+  .atlas-page { height: calc(100dvh - 64px - env(safe-area-inset-bottom)); }
+}

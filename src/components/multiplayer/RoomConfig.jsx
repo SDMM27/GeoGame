@@ -238,7 +238,8 @@ export function GameEditor({ draft, onChange }) {
   )
 }
 
-export default function RoomConfig({ onSubmit, submitting }) {
+// `initialGameId`: the game picked before coming here (the multiplayer button of a home card).
+export default function RoomConfig({ onSubmit, submitting, initialGameId }) {
   const { t } = useTranslation()
   const { account } = useAccount()
   // Signed in: the account's username until the player types another one
@@ -247,7 +248,9 @@ export default function RoomConfig({ onSubmit, submitting }) {
   const [mode, setMode] = useState('live')
   // Games already added, then the one being edited (the last game of the room)
   const [games, setGames] = useState([])
-  const [draft, setDraft] = useState(newDraft)
+  const [draft, setDraft] = useState(() =>
+    ROOM_GAMES.some(g => g.id === initialGameId) ? { ...newDraft(), gameId: initialGameId } : newDraft()
+  )
   const forbiddenPseudo = containsProfanity(pseudo)
   const canSubmit = pseudo.trim() && !forbiddenPseudo && draftReady(draft) && !submitting
 

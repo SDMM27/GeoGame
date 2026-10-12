@@ -31,9 +31,15 @@
     "Océanie": "Oceania"
   },
   "home": {
-    "title": "Choose your game",
     "subtitle": "Explore - Discover - Travel",
-    "multiplayer_button": "🎮 Play multiplayer →"
+    "greeting": "Ready to travel?",
+    "daily_title": "Daily challenges",
+    "daily_subtitle": "New ones every day at midnight",
+    "games_title": "Games",
+    "games_subtitle": "Pick a difficulty or a continent",
+    "daily": "Daily",
+    "infinite": "Infinite",
+    "multi": "Play multiplayer"
   },
   "games": {
     "placement": {
@@ -477,7 +483,6 @@
     }
   },
   "account": {
-    "nav": "Account",
     "title": "My account",
     "signin_tab": "Sign in",
     "signup_tab": "Sign up",
@@ -930,5 +935,12 @@
     "later": "Later",
     "decline": "Dismiss",
     "received_title": "Invitations"
+  },
+  "nav": {
+    "play": "Play",
+    "multiplayer": "Multi",
+    "leaderboards": "Rankings",
+    "profile": "Profile",
+    "main": "Main navigation"
   }
 }

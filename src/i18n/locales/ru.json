@@ -31,9 +31,15 @@
     "Océanie": "Океания"
   },
   "home": {
-    "title": "Выберите игру",
     "subtitle": "Исследуй - Открывай - Путешествуй",
-    "multiplayer_button": "🎮 Играть вместе →"
+    "greeting": "Готов к путешествию?",
+    "daily_title": "Задания дня",
+    "daily_subtitle": "Новые каждый день в полночь",
+    "games_title": "Игры",
+    "games_subtitle": "Выбери сложность или континент",
+    "daily": "Задание дня",
+    "infinite": "Бесконечно",
+    "multi": "Играть с друзьями"
   },
   "games": {
     "placement": {
@@ -487,7 +493,6 @@
     }
   },
   "account": {
-    "nav": "Аккаунт",
     "title": "Мой аккаунт",
     "signin_tab": "Вход",
     "signup_tab": "Регистрация",
@@ -958,5 +963,12 @@
     "later": "Позже",
     "decline": "Скрыть",
     "received_title": "Приглашения"
+  },
+  "nav": {
+    "play": "Играть",
+    "multiplayer": "Мульти",
+    "leaderboards": "Рейтинги",
+    "profile": "Профиль",
+    "main": "Главное меню"
   }
 }

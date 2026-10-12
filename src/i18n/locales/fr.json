@@ -31,9 +31,15 @@
     "Océanie": "Océanie"
   },
   "home": {
-    "title": "Choisissez votre jeu",
     "subtitle": "Explore - Découvre - Voyage",
-    "multiplayer_button": "🎮 Jouer en multijoueur →"
+    "greeting": "Prêt à voyager ?",
+    "daily_title": "Défis du jour",
+    "daily_subtitle": "Nouveaux chaque jour à minuit",
+    "games_title": "Jeux",
+    "games_subtitle": "Choisis ta difficulté ou ton continent",
+    "daily": "Défi du jour",
+    "infinite": "Infini",
+    "multi": "Jouer en multijoueur"
   },
   "games": {
     "placement": {
@@ -477,7 +483,6 @@
     }
   },
   "account": {
-    "nav": "Compte",
     "title": "Mon compte",
     "signin_tab": "Connexion",
     "signup_tab": "Inscription",
@@ -930,5 +935,12 @@
     "later": "Plus tard",
     "decline": "Ignorer",
     "received_title": "Invitations"
+  },
+  "nav": {
+    "play": "Jouer",
+    "multiplayer": "Multi",
+    "leaderboards": "Classements",
+    "profile": "Profil",
+    "main": "Navigation principale"
   }
 }

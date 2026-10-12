@@ -4,11 +4,9 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAccount } from '../../auth'
 import useInvites, { acceptInvite } from '../../hooks/useInvites'
+import { isGamePath } from '../../utils/gamePaths'
 import { roomGameIcon } from '../../utils/roomGames'
 import './Invites.css'
-
-// Game pages: never interrupt a game.
-const GAME_PATHS = ['/game', '/flag-game', '/capitals-game', '/border-guess', '/country-clue', '/voyage-voyage', '/ranking', '/quiz', '/survival']
 
 export function InviteRow({ invite, onJoin, onClose, closeLabel }) {
   const { t } = useTranslation()
@@ -38,8 +36,8 @@ export default function InviteBanner() {
   // Invites already shown (or closed) on this page load: the banner only announces new ones.
   const [seen, setSeen] = useState(() => new Set())
 
-  // The Multi page lists the invites; a room page may be in a game.
-  const hidden = GAME_PATHS.includes(pathname) || pathname.startsWith('/multiplayer')
+  // Never interrupt a game. The Multi page lists the invites; a room page may be in a game.
+  const hidden = isGamePath(pathname) || pathname.startsWith('/multiplayer')
   const invite = invites.find((item) => !seen.has(`${item.id}:${item.at}`))
   if (hidden || !invite) return null
 

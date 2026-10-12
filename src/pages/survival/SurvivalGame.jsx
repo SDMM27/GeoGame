@@ -106,6 +106,7 @@ export default function SurvivalGame({
     extraSnapshot: { synced },
     autoAdvance: !synced,
     deadline: shared.deadline,
+    deadlineRound: shared.round,
   })
   const { round, roundIndex, totalRounds, score, errors, outcome, timedOut, isOver, isWon, elapsedMs, timeLeftMs, submitText, giveUp, next, goTo, win } = survival
   const modesKey = survivalModesKey(modes)

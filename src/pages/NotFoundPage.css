@@ -20,7 +20,7 @@
   font-size: 5rem;
   font-weight: 900;
   line-height: 1;
-  color: var(--accent-cyan);
+  color: var(--accent);
   text-shadow: var(--shadow-glow);
 }
 
@@ -39,8 +39,8 @@
 .not-found__home {
   padding: 10px 24px;
   border-radius: var(--radius-pill);
-  border: 1px solid var(--accent-cyan-border);
-  background: var(--accent-cyan-dim);
+  border: 1px solid var(--accent-border);
+  background: var(--accent-dim);
   color: var(--text-primary);
   text-decoration: none;
   transition: background 0.15s;
@@ -52,6 +52,6 @@
 }
 
 .not-found__home:focus-visible {
-  outline: 2px solid var(--accent-cyan);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }

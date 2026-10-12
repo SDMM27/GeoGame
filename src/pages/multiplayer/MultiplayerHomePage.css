@@ -1,15 +1,15 @@
 /* src/pages/multiplayer/MultiplayerHomePage.css */
-.mp-home { min-height: 100vh; background: var(--bg-dark, #0f172a); color: #f1f5f9; }
+.mp-home { min-height: 100vh; background: var(--bg-dark); color: var(--text-primary); }
 .mp-home-main { max-width: 600px; margin: 0 auto; padding: 3rem 1rem; }
 .mp-home-title { font-size: 2rem; font-weight: 700; margin-bottom: 2rem; text-align: center; }
 .mp-home-cards { display: flex; flex-direction: column; gap: 1rem; }
-.mp-card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 1.5rem; display: flex; flex-direction: column; align-items: center; gap: 0.75rem; cursor: pointer; transition: border-color 0.2s; }
-.mp-card:hover { border-color: #00d4ff; }
+.mp-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; display: flex; flex-direction: column; align-items: center; gap: 0.75rem; cursor: pointer; transition: border-color 0.2s; }
+.mp-card:hover { border-color: var(--accent); }
 .mp-card--create { text-align: center; }
 .mp-card-icon { font-size: 2rem; }
 .mp-card-label { font-size: 1.1rem; font-weight: 600; }
 .mp-join-form { display: flex; gap: 0.5rem; width: 100%; }
-.mp-join-input { flex: 1; padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: #f1f5f9; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.15em; }
-.mp-join-btn { padding: 0.5rem 1rem; border-radius: 8px; background: #00d4ff; color: #0f172a; font-weight: 600; border: none; cursor: pointer; }
+.mp-join-input { flex: 1; padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--bg-primary); color: var(--text-primary); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.15em; }
+.mp-join-btn { padding: 0.5rem 1rem; border-radius: 8px; background: var(--accent); color: var(--bg-primary); font-weight: 600; border: none; cursor: pointer; }
 .mp-join-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .mp-home-invites { margin-bottom: 1.5rem; }

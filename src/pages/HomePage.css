@@ -68,14 +68,15 @@
   padding: 20px;
   border-radius: var(--radius-lg);
   background: var(--bg-card);
-  border: 1px solid var(--accent-cyan-border);
+  border: 1px solid var(--border-color);
   box-shadow: var(--shadow-card);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
 
 .game-tile:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-card), var(--shadow-glow);
+  border-color: color-mix(in srgb, var(--game, var(--accent)) 45%, transparent);
+  box-shadow: var(--shadow-card), 0 0 20px color-mix(in srgb, var(--game, var(--accent)) 15%, transparent);
 }
 
 .game-tile-head {
@@ -85,12 +86,20 @@
 }
 
 .game-tile-icon {
-  font-size: 1.8rem;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--game, var(--accent)) 14%, transparent);
+  font-size: 1.4rem;
   line-height: 1;
 }
 
 .game-tile-title {
-  font-size: 1.05rem;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--text-primary);
   border: none;
@@ -121,6 +130,16 @@
   flex: 1 1 auto;
 }
 
+.game-tile .btn-play {
+  background: var(--game, var(--accent));
+  color: var(--bg-primary);
+}
+
+.game-tile .btn-tile-secondary {
+  color: var(--game, var(--accent));
+  border-color: color-mix(in srgb, var(--game, var(--accent)) 40%, transparent);
+}
+
 .game-tile-scores {
   width: 100%;
   padding: 6px 16px;
@@ -130,8 +149,8 @@
   flex: 1;
   padding: 12px;
   background: transparent;
-  color: var(--accent-cyan);
-  border: 1px solid var(--accent-cyan-border);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
   border-radius: var(--radius-md);
   font-family: var(--font-main);
   font-size: 0.95rem;
@@ -141,7 +160,7 @@
 }
 
 .btn-tile-secondary:hover {
-  background: rgba(0, 212, 255, 0.12);
+  background: rgba(61, 220, 151, 0.12);
 }
 
 /* Config modal */
@@ -199,7 +218,7 @@
 
 .game-card--active {
   background: var(--bg-card);
-  border: 1px solid var(--accent-cyan-border);
+  border: 1px solid var(--accent-border);
   box-shadow: var(--shadow-card);
 }
 
@@ -287,8 +306,8 @@
 
 .game-mode-tab--active {
   color: var(--text-primary);
-  border-color: var(--accent-cyan-border);
-  background: rgba(0, 212, 255, 0.12);
+  border-color: var(--accent-border);
+  background: rgba(61, 220, 151, 0.12);
 }
 
 .ascension-panel {
@@ -322,8 +341,8 @@
 }
 
 .ascension-preset--active {
-  border-color: var(--accent-cyan-border);
-  background: rgba(0, 212, 255, 0.12);
+  border-color: var(--accent-border);
+  background: rgba(61, 220, 151, 0.12);
 }
 
 .ascension-preset-name {
@@ -418,7 +437,7 @@
 .btn-play {
   flex: 1;
   padding: 12px;
-  background: var(--accent-cyan);
+  background: var(--accent);
   color: var(--bg-primary);
   border: none;
   border-radius: var(--radius-md);
@@ -467,8 +486,8 @@
 }
 
 .nav-scores-btn:hover {
-  color: var(--accent-cyan);
-  border-color: var(--accent-cyan-border);
+  color: var(--accent);
+  border-color: var(--accent-border);
 }
 
 /* Responsive */
@@ -510,7 +529,7 @@
 
 .difficulty-btn--active {
   border-color: var(--accent-purple);
-  background: rgba(123, 47, 247, 0.12);
+  background: rgba(199, 146, 255, 0.12);
 }
 
 .difficulty-btn--wide {
@@ -536,23 +555,21 @@
 }
 
 .home-multiplayer-btn {
-  background: linear-gradient(135deg, #1e3a5f, #1a4a7a);
-  color: #e0f0ff;
-  border: 1px solid #2563eb;
-  border-radius: 10px;
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
   padding: 0.75rem 2rem;
   font-size: 1.05rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+  transition: border-color 0.15s, transform 0.1s;
 }
 
 .home-multiplayer-btn:hover {
-  background: linear-gradient(135deg, #1e4a7a, #1a5aa0);
+  border-color: var(--accent);
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
 }
 
-.home-atlas-btn { margin-left: 0.75rem; background: linear-gradient(135deg, #2e1f5e, #3b2380); border-color: #7b2ff7; box-shadow: 0 2px 8px rgba(123, 47, 247, 0.25); }
-.home-atlas-btn:hover { background: linear-gradient(135deg, #3b2380, #4c2ca3); box-shadow: 0 4px 14px rgba(123, 47, 247, 0.4); }
+.home-atlas-btn { margin-left: 0.75rem; }
+.home-atlas-btn:hover { border-color: var(--highlight); }

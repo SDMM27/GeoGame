@@ -9,13 +9,13 @@
   color: var(--text-primary);
   font-size: 0.95rem;
 }
-.friends-add input:focus { outline: none; border-color: var(--accent-cyan); }
+.friends-add input:focus { outline: none; border-color: var(--accent); }
 .friends-add button {
   padding: 0.6rem 1.1rem;
   border-radius: var(--radius-sm);
   border: none;
-  background: var(--accent-cyan);
-  color: #0a0a1a;
+  background: var(--accent);
+  color: var(--bg-primary);
   font-weight: 700;
   cursor: pointer;
 }
@@ -26,7 +26,7 @@
 .friends-row + .friends-row { border-top: 1px solid var(--border-subtle); }
 .friends-who { flex: 1; min-width: 0; display: flex; align-items: center; gap: 0.7rem; color: var(--text-primary); text-decoration: none; font-weight: 600; }
 .friends-who span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.friends-who:hover span { color: var(--accent-cyan); }
+.friends-who:hover span { color: var(--accent); }
 
 .friends-btn {
   padding: 0.35rem 0.8rem;
@@ -40,7 +40,7 @@
   white-space: nowrap;
 }
 .friends-btn:hover { border-color: rgba(255, 255, 255, 0.3); }
-.friends-btn--primary { background: var(--accent-cyan); border-color: var(--accent-cyan); color: #0a0a1a; }
+.friends-btn--primary { background: var(--accent); border-color: var(--accent); color: var(--bg-primary); }
 .friends-btn--icon { width: 30px; height: 30px; padding: 0; color: var(--text-muted); }
 .friends-btn--danger { color: var(--danger); }
 

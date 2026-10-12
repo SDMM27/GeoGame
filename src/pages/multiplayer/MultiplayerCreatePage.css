@@ -1,2 +1,2 @@
 /* src/pages/multiplayer/MultiplayerCreatePage.css */
-.mp-create { min-height: 100vh; background: var(--bg-dark, #0f172a); }
+.mp-create { min-height: 100vh; background: var(--bg-dark); }

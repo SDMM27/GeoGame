@@ -67,7 +67,7 @@
 .profile-daily-chip i {
   position: absolute; top: -5px; right: -5px;
   width: 16px; height: 16px; border-radius: 50%;
-  background: var(--success); color: #0a0a1a;
+  background: var(--success); color: var(--bg-primary);
   font-size: 0.6rem; font-style: normal; font-weight: 900;
   display: flex; align-items: center; justify-content: center;
 }
@@ -80,7 +80,7 @@
 .profile-section-title { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 .profile-section-title h2 { font-size: 1.2rem; font-weight: 700; margin: 0; }
 
-.profile-link { background: none; border: none; color: var(--accent-cyan); font-weight: 600; font-size: 0.9rem; cursor: pointer; padding: 0.25rem; align-self: center; }
+.profile-link { background: none; border: none; color: var(--accent); font-weight: 600; font-size: 0.9rem; cursor: pointer; padding: 0.25rem; align-self: center; }
 .profile-link:hover { text-decoration: underline; }
 
 .profile-achievements { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; }
@@ -92,7 +92,7 @@
   padding: 0.8rem;
   opacity: 0.5;
 }
-.profile-achievement.unlocked { opacity: 1; border-color: rgba(251, 191, 36, 0.35); }
+.profile-achievement.unlocked { opacity: 1; border-color: rgba(245, 184, 61, 0.35); }
 .profile-achievement-emoji { font-size: 1.5rem; filter: grayscale(1); }
 .profile-achievement.unlocked .profile-achievement-emoji { filter: none; }
 .profile-achievement strong { font-size: 0.9rem; }
@@ -106,7 +106,7 @@
   border: 1px solid var(--border-subtle); border-radius: var(--radius-pill);
   padding: 0.3rem 0.8rem; font-size: 0.82rem; font-weight: 600; cursor: pointer;
 }
-.profile-filters button.active { color: var(--text-primary); border-color: var(--accent-cyan); background: var(--accent-cyan-dim); }
+.profile-filters button.active { color: var(--text-primary); border-color: var(--accent); background: var(--accent-dim); }
 
 .profile-list {
   list-style: none; margin: 0; padding: 0;

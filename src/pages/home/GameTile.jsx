@@ -12,13 +12,16 @@ const DAILY_INFINITE_GAMES = new Set([
   GAME_TYPES.QUIZ,
 ]);
 
+// The game's own color, as in the app (--game-placement, --game-border-guess... in styles/theme.css)
+const gameColor = (id) => `var(--game-${id.toLowerCase().replace(/_/g, "-")})`;
+
 export default function GameTile({ game, onConfigure }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const isDailyInfinite = DAILY_INFINITE_GAMES.has(game.id);
 
   return (
-    <div className="game-tile">
+    <div className="game-tile" style={{ "--game": gameColor(game.id) }}>
       <div className="game-tile-head">
         <span className="game-tile-icon">{game.icon}</span>
         <h2 className="game-tile-title">{t(game.titleKey)}</h2>

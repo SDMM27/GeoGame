@@ -4,8 +4,8 @@
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
-  background: var(--bg-primary, #0f172a);
-  color: #e2e8f0;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   font-family: inherit;
 }
 
@@ -15,8 +15,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 14px 20px;
-  background: #1e293b;
-  border-bottom: 1px solid #334155;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
   gap: 12px;
 }
 
@@ -41,13 +41,13 @@
 
 .voyage-country small {
   font-size: 0.68em;
-  color: #64748b;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
-.voyage-start span { color: #4ade80; }
-.voyage-target span { color: #f59e0b; }
+.voyage-start span { color: var(--success); }
+.voyage-target span { color: var(--warning); }
 
 .voyage-stats {
   display: flex;
@@ -55,7 +55,7 @@
   align-items: center;
   gap: 4px;
   font-size: 0.8em;
-  color: #94a3b8;
+  color: var(--text-muted);
 }
 
 .voyage-regen-btn {
@@ -92,8 +92,8 @@
 
 .voyage-modal {
   position: relative;
-  background: #1e293b;
-  border: 1px solid #334155;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 28px 24px 24px;
   width: min(640px, 100%);
@@ -112,28 +112,28 @@
   right: 14px;
   background: none;
   border: none;
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 1.1em;
   cursor: pointer;
   line-height: 1;
   padding: 4px;
 }
 
-.voyage-modal-close:hover { color: #e2e8f0; }
+.voyage-modal-close:hover { color: var(--text-primary); }
 
 .voyage-modal-title {
   margin: 0;
   font-size: 0.95em;
-  color: #cbd5e1;
+  color: var(--text-primary);
 }
 
 .voyage-modal-sub {
   margin: 0;
   font-size: 0.88em;
-  color: #94a3b8;
+  color: var(--text-muted);
 }
 
-.voyage-modal-sub strong { color: #f59e0b; }
+.voyage-modal-sub strong { color: var(--warning); }
 
 .voyage-modal-new-game {
   margin-top: 8px;
@@ -162,9 +162,9 @@
 
 /* Labels sur la carte */
 .voyage-map-label {
-  background: rgba(15, 23, 42, 0.85) !important;
-  border: 1px solid #475569 !important;
-  color: #e2e8f0 !important;
+  background: rgba(11, 16, 32, 0.85) !important;
+  border: 1px solid var(--border-strong) !important;
+  color: var(--text-primary) !important;
   font-size: 0.72em !important;
   padding: 2px 6px !important;
   border-radius: 4px !important;
@@ -179,13 +179,13 @@
   flex-wrap: wrap;
   gap: 4px;
   padding: 10px 16px;
-  background: #0f172a;
-  border-top: 1px solid #1e293b;
+  background: var(--bg-primary);
+  border-top: 1px solid var(--bg-card);
   min-height: 44px;
 }
 
 .voyage-chain-sep {
-  color: #334155;
+  color: var(--border-color);
   font-size: 1em;
 }
 
@@ -206,11 +206,11 @@
 
 /* Couleurs Travle */
 .voyage-chain-badge--start  { background: #0c4a6e; color: #38bdf8; }
-.voyage-chain-badge--green  { background: #166534; color: #4ade80; }
-.voyage-chain-badge--yellow { background: #78350f; color: #fbbf24; }
-.voyage-chain-badge--red          { background: #450a0a; color: #f87171; text-decoration: line-through; opacity: 0.75; }
-.voyage-chain-badge--missed       { background: #1e293b; color: #64748b; border: 1px solid #334155; }
-.voyage-chain-badge--hint-initial { background: #1e293b; color: #94a3b8; border: 1px dashed #475569; font-weight: 700; min-width: 24px; justify-content: center; }
+.voyage-chain-badge--green  { background: #166534; color: var(--success); }
+.voyage-chain-badge--yellow { background: #78350f; color: var(--warning); }
+.voyage-chain-badge--red          { background: #450a0a; color: var(--danger); text-decoration: line-through; opacity: 0.75; }
+.voyage-chain-badge--missed       { background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border-color); }
+.voyage-chain-badge--hint-initial { background: var(--bg-card); color: var(--text-muted); border: 1px dashed var(--border-strong); font-weight: 700; min-width: 24px; justify-content: center; }
 
 /* Bloc des erreurs séparé visuellement */
 .voyage-chain-wrongs {
@@ -219,13 +219,13 @@
   gap: 4px;
   margin-left: 12px;
   padding-left: 12px;
-  border-left: 1px solid #334155;
+  border-left: 1px solid var(--border-color);
 }
 
 .voyage-chain-empty {
-  background: #1e293b;
-  border: 1px dashed #475569;
-  color: #64748b;
+  background: var(--bg-card);
+  border: 1px dashed var(--border-strong);
+  color: var(--text-muted);
   padding: 3px 10px;
   border-radius: 12px;
   font-size: 0.8em;
@@ -236,15 +236,15 @@
   display: flex;
   gap: 8px;
   padding: 12px 16px;
-  background: #1e293b;
-  border-top: 1px solid #334155;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-color);
 }
 
 .voyage-input-row input {
   flex: 1;
-  background: #0f172a;
-  border: 1px solid #334155;
-  color: #e2e8f0;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
   padding: 9px 12px;
   border-radius: 6px;
   font-size: 0.9em;
@@ -257,7 +257,7 @@
 }
 
 .voyage-input-row input::placeholder {
-  color: #475569;
+  color: var(--border-strong);
 }
 
 .voyage-input-row button {
@@ -281,14 +281,14 @@
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background: #0f172a;
-  border-top: 1px solid #1e293b;
+  background: var(--bg-primary);
+  border-top: 1px solid var(--bg-card);
   flex-wrap: wrap;
 }
 
 .voyage-hints-label {
   font-size: 0.75em;
-  color: #475569;
+  color: var(--border-strong);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   flex-shrink: 0;
@@ -298,9 +298,9 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #1e293b;
-  color: #cbd5e1;
-  border: 1px solid #334155;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
   padding: 5px 12px;
   border-radius: 20px;
   font-size: 0.8em;
@@ -309,9 +309,9 @@
 }
 
 .voyage-hint-btn:hover:not(:disabled) {
-  background: #334155;
-  border-color: #94a3b8;
-  color: #f1f5f9;
+  background: var(--border-color);
+  border-color: var(--text-muted);
+  color: var(--text-primary);
 }
 
 .voyage-hint-btn:disabled,
@@ -328,8 +328,8 @@
 /* ───── Wrapper input + suggestions ───── */
 .voyage-input-wrapper {
   position: relative;
-  background: #1e293b;
-  border-top: 1px solid #334155;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-color);
 }
 
 /* ───── Liste d'autocomplétion ───── */
@@ -341,8 +341,8 @@
   margin: 0;
   padding: 4px 0;
   list-style: none;
-  background: #1e293b;
-  border: 1px solid #334155;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-bottom: none;
   border-radius: 8px 8px 0 0;
   max-height: 280px;
@@ -357,14 +357,14 @@
   padding: 9px 14px;
   cursor: pointer;
   font-size: 0.88em;
-  color: #cbd5e1;
+  color: var(--text-primary);
   transition: background 0.1s;
 }
 
 .voyage-suggestions li:hover,
 .voyage-suggestions li.active {
-  background: #334155;
-  color: #f1f5f9;
+  background: var(--border-color);
+  color: var(--text-primary);
 }
 
 .voyage-suggestions li img {
@@ -375,7 +375,7 @@
 
 /* ───── Résultat (dans la modal) ───── */
 .voyage-result-perfect {
-  color: #4ade80;
+  color: var(--success);
   font-weight: 700;
   font-size: 1.05em;
   margin: 0;
@@ -384,12 +384,12 @@
 .voyage-optimal {
   width: 100%;
   padding-top: 10px;
-  border-top: 1px solid #334155;
+  border-top: 1px solid var(--border-color);
 }
 
 .voyage-optimal-label {
   font-size: 0.78em;
-  color: #64748b;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   display: block;

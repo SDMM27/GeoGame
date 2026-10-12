@@ -4,7 +4,7 @@
 }
 
 .player-name__link:hover {
-  color: var(--accent-cyan);
+  color: var(--accent);
   text-decoration: underline;
 }
 
@@ -15,8 +15,8 @@
   border-radius: 10px;
   font-size: 0.7rem;
   font-weight: 600;
-  background: rgba(0, 212, 255, 0.2);
-  color: var(--accent-cyan);
+  background: rgba(61, 220, 151, 0.2);
+  color: var(--accent);
   vertical-align: middle;
   letter-spacing: 0.03em;
 }
@@ -24,6 +24,6 @@
 /* The signed-in player's own entries, in every leaderboard. */
 .scoreboard-row.leaderboard-row--mine,
 .daily-lb__row.leaderboard-row--mine .daily-lb__row-main {
-  background: rgba(0, 212, 255, 0.13);
-  border: 1px solid rgba(0, 212, 255, 0.35);
+  background: rgba(61, 220, 151, 0.13);
+  border: 1px solid rgba(61, 220, 151, 0.35);
 }

@@ -15,6 +15,7 @@ import { localizeQuestion } from '../../utils/quizQuestions'
 import { matchesWhileTyping } from '../../utils/survival'
 import { FitCountryBounds, GuessHistory } from '../BorderGuessPage'
 import SmallCountryCircles from '../game/SmallCountryCircles'
+import { getShiftedFeatures } from '../game/shiftedFeatures'
 import { HOVER_STYLE, MAP_COLORS } from '../../utils/mapColors'
 import '../BorderGuessPage.css'
 import '../QuizPage.css'
@@ -45,6 +46,8 @@ export function PlacementRound({ survival }) {
   const [map, setMap] = useState(null)
   const [renderer] = useState(createAppFillRenderer)
   const geoJsonRef = useRef(null)
+  const geoJsonRefLeft = useRef(null)
+  const geoJsonRefRight = useRef(null)
   const target = round.country.properties.ADMIN
   // SmallCountryCircles hides the tiny countries already played: none here, the wrong ones stay clickable
   const foundRef = useRef(new Set())
@@ -60,7 +63,9 @@ export function PlacementRound({ survival }) {
   }
 
   useEffect(() => {
-    geoJsonRef.current?.getLayers().forEach((layer) => layer.setStyle(styleOf(layer.feature.properties.ADMIN)))
+    ;[geoJsonRef, geoJsonRefLeft, geoJsonRefRight].forEach((ref) => {
+      ref.current?.getLayers().forEach((layer) => layer.setStyle(styleOf(layer.feature.properties.ADMIN)))
+    })
   }, [wrongPicks, outcome, target]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // A new country: back to the world view. A missed one: show where it was.
@@ -95,19 +100,26 @@ export function PlacementRound({ survival }) {
         }}
       >
         <LandLayer />
-        <GeoJSON
-          ref={geoJsonRef}
-          data={countries.features}
-          style={(feature) => styleOf(feature.properties.ADMIN)}
-          onEachFeature={(feature, layer) => {
-            const name = feature.properties.ADMIN
-            layer.on({
-              click: () => stateRef.current.clickCountry(name),
-              mouseover: () => { if (styleOf(name) === MAP_STYLE) layer.setStyle(HOVER_STYLE) },
-              mouseout: () => layer.setStyle(styleOf(name)),
-            })
-          }}
-        />
+        {[
+          ['left', geoJsonRefLeft, getShiftedFeatures().left],
+          ['main', geoJsonRef, countries.features],
+          ['right', geoJsonRefRight, getShiftedFeatures().right],
+        ].map(([key, ref, data]) => (
+          <GeoJSON
+            key={key}
+            ref={ref}
+            data={data}
+            style={(feature) => styleOf(feature.properties.ADMIN)}
+            onEachFeature={(feature, layer) => {
+              const name = feature.properties.ADMIN
+              layer.on({
+                click: () => stateRef.current.clickCountry(name),
+                mouseover: () => { if (styleOf(name) === MAP_STYLE) layer.setStyle(HOVER_STYLE) },
+                mouseout: () => layer.setStyle(styleOf(name)),
+              })
+            }}
+          />
+        ))}
         <SmallCountryCircles
           onCountryNameClick={(name) => stateRef.current.clickCountry(name)}
           foundCountriesRef={foundRef}

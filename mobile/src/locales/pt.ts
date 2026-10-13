@@ -147,6 +147,15 @@ export const pt: MobileStrings = {
     leave: 'Sair',
   },
   update: { title: 'Nova versão disponível', message: 'Reinicie para instalar', restart: 'Reiniciar', later: 'Mais tarde', apk_title: 'Nova versão do app', apk_message: 'Instale para continuar recebendo atualizações', apk_install: 'Instalar' },
+  nudge: {
+    title: 'Desafie um amigo',
+    hint: 'Ele recebe uma notificação para vir te vencer.',
+    sent: 'Enviado!',
+    unreachable: '{{username}} não pode receber notificações',
+    already_sent: 'Já desafiado hoje',
+    error: 'Não foi possível enviar. Tente de novo.',
+    rate_limited: 'Desafios demais enviados, tente mais tarde.',
+  },
   invites: {
     title: 'Convidar amigos',
     invite: 'Convidar',

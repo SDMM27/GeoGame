@@ -4,8 +4,8 @@
 //                 deleted with their subcollections (progress, gameResults, keys)
 //   invites       created over INVITE_MAX_AGE_MS ago (the app drops them after 3 hours anyway)
 //   _clockSync    server time probes (src/utils/serverTime.js) over CLOCK_MAX_AGE_MS old
-//   invitePushes, invitePushLimits, friendPushes   server-only push bookkeeping (api/_lib/invitePush.mjs,
-//                 friendPush.mjs), in milliseconds
+//   invitePushes, invitePushLimits, friendPushes, dailyNudges   server-only push bookkeeping (api/_lib/invitePush.mjs,
+//                 friendPush.mjs, dailyNudge.mjs), in milliseconds
 import { Timestamp } from 'firebase-admin/firestore'
 
 const HOUR = 60 * 60 * 1000
@@ -51,6 +51,10 @@ export async function cleanupExpired({ db, now = Date.now() }) {
     ),
     friendPushes: await drain(
       db.collection('friendPushes').where('at', '<', now - PUSH_BOOKKEEPING_MAX_AGE_MS),
+      deleteDoc
+    ),
+    dailyNudges: await drain(
+      db.collection('dailyNudges').where('at', '<', now - PUSH_BOOKKEEPING_MAX_AGE_MS),
       deleteDoc
     ),
     invitePushLimits: await drain(

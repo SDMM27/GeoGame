@@ -1,4 +1,4 @@
-// Web app: push notifications (invites, friend requests, daily reminder) through Web Push and the service worker (public/sw.js). On
+// Web app: push notifications (invites, friend requests, daily reminder, friends' daily nudges) through Web Push and the service worker (public/sw.js). On
 // iPhone they need the app added to the home screen (iOS 16.4+), and the permission can only be asked from a tap: see
 // useWebPushPermission.
 // The pushes themselves are sent by the website's API, see push.ts.

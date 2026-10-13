@@ -63,6 +63,7 @@ Fonctions serverless Vercel déployées avec le site.
 | --- | --- |
 | `POST /api/invite-push` | Envoie la notification push d'une invitation à un salon (jeton Firebase de l'invitant requis). |
 | `POST /api/friend-push` | Envoie la notification push d'une demande d'ami envoyée ou acceptée (jeton Firebase de celui qui vient d'agir requis). |
+| `POST /api/daily-nudge` | Envoie à un ami la notification « viens me battre » après un défi du jour terminé (jeton Firebase requis ; l'expéditeur doit être ami avec lui et avoir joué ce défi aujourd'hui ; une fois par jeu, par ami et par jour). |
 | `POST /api/delete-account` | Supprime le compte et toutes ses données : profil, historique, jetons push, pseudo, scores des classements, signalements faits ou visant ses scores, amitiés, invitations, puis le compte Firebase Auth (`api/_lib/deleteAccount.mjs`). Jeton Firebase obtenu juste après une reconnexion (5 min au plus). Appelée par `deleteAccount` (`src/utils/account.js`) depuis le site et l'app ; en local avec `npm run dev`, `/api` n'est pas servi. |
 | `GET /api/cleanup-expired` | Supprime les salons, invitations et sondes expirés, et les comptes inutilisés depuis 3 ans (50 par passage au plus, durée annoncée dans la politique de confidentialité). Appelée chaque jour à 4 h par Vercel Cron (`vercel.json`). |
 | `GET /api/daily-reminder` | Rappelle les défis du jour aux joueurs connectés qui n'en ont fait aucun (désactivable par appareil dans le profil). Appelée chaque jour à 16 h UTC par Vercel Cron (`vercel.json`). |

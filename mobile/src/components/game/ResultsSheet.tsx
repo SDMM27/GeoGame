@@ -19,6 +19,7 @@ import { useRecordGame, type GameRecord } from '@/account/history'
 import { SITE_ORIGIN } from '@/links'
 import { colors, fonts, radius, space } from '@/theme'
 import { Button, Text } from '../ui'
+import { NudgeFriends } from './NudgeFriends'
 
 const PSEUDO_KEY = 'geogame_pseudo'
 
@@ -272,6 +273,12 @@ export function ResultsSheet({ title, score, scoreText, scoreLabel, accent = col
                   )}
                 </>
               )}
+            </Animated.View>
+          )}
+
+          {share?.challenge && (
+            <Animated.View entering={FadeInDown.delay(280).springify()}>
+              <NudgeFriends gameType={share.gameType} />
             </Animated.View>
           )}
 

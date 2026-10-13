@@ -3,6 +3,7 @@
   gap: 3px;
   margin-left: 6px;
   vertical-align: middle;
+  flex-shrink: 0;
 }
 
 .badge-strip__chip {
@@ -11,10 +12,46 @@
   justify-content: center;
   width: 20px;
   height: 20px;
+  padding: 0;
   border-radius: 50%;
   font-size: 11px;
   line-height: 1;
   border: 1.5px solid var(--tier);
   background: color-mix(in srgb, var(--tier) 18%, transparent);
-  cursor: help;
+  cursor: pointer;
 }
+
+/* The challenge behind a badge, shown on hover / tap (positioned from the chip in BadgeStrip.jsx) */
+.badge-card {
+  position: fixed;
+  z-index: 1000;
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  padding: 0.65rem 0.75rem;
+  border-radius: 12px;
+  border: 1.5px solid var(--tier);
+  background: var(--bg-card, #151a2b);
+  color: var(--text-primary);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+  text-align: left;
+  font-size: 0.85rem;
+  line-height: 1.3;
+}
+
+.badge-card__emoji {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  background: color-mix(in srgb, var(--tier) 20%, transparent);
+}
+
+.badge-card__body { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+.badge-card__tier { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--tier); }
+.badge-card__desc { color: var(--text-muted); }

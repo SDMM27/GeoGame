@@ -14,7 +14,7 @@ import MultiplayerBorderGuess from '../MultiplayerBorderGuess'
 import MultiplayerCountryClue from '../MultiplayerCountryClue'
 import SurvivalGame from '../../../pages/survival/SurvivalGame'
 import { gameLabel } from '../RoomConfig'
-import { Standings } from './Standings'
+import { Standings, SurvivalStrip } from './Standings'
 
 export default function RoomGame({ room, progress, results, playerId, onDone }) {
   const { t } = useTranslation()
@@ -149,6 +149,9 @@ export default function RoomGame({ room, progress, results, playerId, onDone }) 
 
   return (
     <div className="mp-game-view">
+      {game.type === GAME_TYPES.SURVIVAL && (
+        <SurvivalStrip room={room} progress={progress} results={results} playerId={playerId} index={gameIndex} />
+      )}
       <div className={`mp-game-content${game.type === GAME_TYPES.QUIZ || game.type === GAME_TYPES.SURVIVAL ? ' mpr-scroll' : ''}`}>
         {renderGame()}
       </div>

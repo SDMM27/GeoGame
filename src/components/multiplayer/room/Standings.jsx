@@ -31,13 +31,32 @@ function resultLine(game, result, t) {
   return `${Math.round(result.weightedScore)} ${t('units.pts')} · ${time}`
 }
 
-// A player still in the game: countries found, or rounds cleared and lives left (survival).
-function liveLine(game, entry, t) {
+// Lives left as hearts (a lost one is a black heart), capped at the lives the game started with.
+export function Hearts({ left, max }) {
+  const total = Math.max(max, left)
+  return (
+    <span className="mpr-hearts" aria-label={`${left} ❤️`}>
+      {Array.from({ length: total }, (_, i) => (i < left ? '❤️' : '🖤')).join('')}
+    </span>
+  )
+}
+
+// A player still in the game: countries found, or (survival) lives left and rounds cleared.
+function LiveProgress({ game, entry, t }) {
   if (game.type === GAME_TYPES.SURVIVAL) {
-    return `${t('mp_room.playing')} · ${t('survival.rounds_count', { count: entry.found ?? 0 })} · ${entry.lives ?? game.lives} ❤️`
+    return (
+      <span className="mpr-live">
+        <Hearts left={entry.lives ?? game.lives} max={game.lives} />
+        <span>{t('survival.rounds_count', { count: entry.found ?? 0 })}</span>
+      </span>
+    )
   }
   return `${t('mp_room.playing')} · ${entry.found ?? 0}/${entry.total ?? '?'}`
 }
+
+// Survival: the players furthest ahead first (most rounds, then most lives).
+const bySurvivalProgress = (live) => ([a], [b]) =>
+  (live[b]?.found ?? -1) - (live[a]?.found ?? -1) || (live[b]?.lives ?? 0) - (live[a]?.lives ?? 0)
 
 /** Standings of game `index`: results, then the players still playing it or who did not play it yet. */
 export function Standings({ room, progress, results, playerId, index }) {
@@ -48,6 +67,7 @@ export function Standings({ room, progress, results, playerId, index }) {
   const badges = useRoomBadges(room)
   const finishedIds = new Set(ranked.map((result) => result.playerId))
   const others = Object.entries(room.players).filter(([id]) => !finishedIds.has(id))
+  if (game.type === GAME_TYPES.SURVIVAL) others.sort(bySurvivalProgress(live))
 
   return (
     <ul className="mpr-list">
@@ -74,7 +94,7 @@ export function Standings({ room, progress, results, playerId, index }) {
           </span>
           <BadgeStrip badges={badges[id]} />
           <span className="mpr-score">
-            {live[id] ? liveLine(game, live[id], t) : t('mp_room.not_played')}
+            {live[id] ? <LiveProgress game={game} entry={live[id]} t={t} /> : t('mp_room.not_played')}
           </span>
         </li>
       ))}
@@ -138,5 +158,33 @@ export function StandingsCard({ room, progress, results, playerId, defaultTab })
       )}
       {Object.keys(room.players).length === 0 && <p className="mpr-muted">{t('mp_room.no_players')}</p>}
     </div>
+  )
+}
+
+/** Survival on a phone, where the sidebar is hidden: one chip per player with their lives and rounds cleared. */
+export function SurvivalStrip({ room, progress, results, playerId, index }) {
+  const { t } = useTranslation()
+  const game = roomGames(room)[index]
+  const live = progressForGame(progress, index)
+  const done = new Set(resultsForGame(results, index).map((result) => result.playerId))
+  const players = Object.entries(room.players)
+    .filter(([id]) => live[id] || done.has(id))
+    .sort(bySurvivalProgress(live))
+  if (players.length < 2) return null
+
+  return (
+    <ul className="mpr-strip" aria-label={t('mp_room.standings')}>
+      {players.map(([id, player]) => {
+        const entry = live[id]
+        const out = done.has(id) || (entry?.finished ?? false)
+        return (
+          <li key={id} className={`mpr-strip__chip${id === playerId ? ' mpr-strip__chip--me' : ''}${out ? ' mpr-strip__chip--out' : ''}`}>
+            <span className="mpr-strip__name">{player.pseudo}</span>
+            <Hearts left={out ? 0 : entry?.lives ?? game.lives} max={game.lives} />
+            <span className="mpr-strip__rounds">{entry?.found ?? 0}</span>
+          </li>
+        )
+      })}
+    </ul>
   )
 }

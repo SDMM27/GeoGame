@@ -1,14 +1,25 @@
 import React, { useState } from 'react'
 import { CircleMarker, useMapEvents } from 'react-leaflet'
-import L from 'leaflet'
-import { getCountryMetrics } from '../../utils/borderGuessMap'
 import { MAP_COLORS } from '../../utils/mapColors'
 import countries from '../../data/countriesWithDifficulty_FR.json'
 
-const SMALL_THRESHOLD = 0.5
+// A country gets a dot when its biggest piece of land is too small to click on the world map (about 2.5 degrees:
+// 10px at the default zoom). The whole country's span is not used: an archipelago spread over the Pacific is huge,
+// yet every one of its islands is a speck.
+const SMALL_THRESHOLD = 2.5
 
+// The dot goes away once the biggest piece is about 28px wide
 function zoomThresholdForSpan(maxSpan) {
-  return Math.ceil(Math.log2(14 / Math.max(maxSpan, 0.01)))
+  return Math.ceil(Math.log2(28 / Math.max(maxSpan, 0.01)))
+}
+
+// Bounding box of a ring, over the dateline when the ring crosses it
+function ringBox(ring) {
+  let lngs = ring.map((c) => c[0])
+  if (Math.max(...lngs) - Math.min(...lngs) > 180) lngs = lngs.map((l) => (l < 0 ? l + 360 : l))
+  const lats = ring.map((c) => c[1])
+  const west = Math.min(...lngs), east = Math.max(...lngs), south = Math.min(...lats), north = Math.max(...lats)
+  return { span: Math.max(east - west, north - south), lat: (south + north) / 2, lng: (((west + east) / 2 + 540) % 360) - 180 }
 }
 
 // Computed on first use: the geometries are loaded after this module is evaluated
@@ -17,11 +28,12 @@ const getSmallCountries = () => smallCountriesCache ??= (() => {
   const result = []
   for (const [index, f] of countries.features.entries()) {
     try {
-      const { maxSpan } = getCountryMetrics(f)
-      if (maxSpan >= SMALL_THRESHOLD) continue
-      const center = L.geoJSON(f).getBounds().getCenter()
+      const { type, coordinates } = f.geometry
+      const polygons = type === 'Polygon' ? [coordinates] : coordinates
+      const biggest = polygons.map((poly) => ringBox(poly[0])).reduce((a, c) => (c.span > a.span ? c : a))
+      if (biggest.span >= SMALL_THRESHOLD) continue
       // Two features can share a name (e.g. both halves of Saint-Martin): the position in the dataset keeps the React key unique
-      result.push({ key: `${f.properties.ADMIN}#${index}`, name: f.properties.ADMIN, lat: center.lat, lng: center.lng, zoomThreshold: zoomThresholdForSpan(maxSpan) })
+      result.push({ key: `${f.properties.ADMIN}#${index}`, name: f.properties.ADMIN, lat: biggest.lat, lng: biggest.lng, zoomThreshold: zoomThresholdForSpan(biggest.span) })
     } catch (_) { /* skip */ }
   }
   return result

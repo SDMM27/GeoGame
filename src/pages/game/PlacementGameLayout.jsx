@@ -15,7 +15,6 @@ import Form from '../form'
 import AscensionForm from '../AscensionForm'
 import ShareScoreButton from '../../components/ShareScoreButton'
 import SmallCountryCircles from './SmallCountryCircles'
-import RightClickDrag from './RightClickDrag'
 import { getShiftedFeatures } from './shiftedFeatures'
 import { MAP_COLORS } from '../../utils/mapColors'
 
@@ -138,7 +137,6 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
 
       <div className="controls-hint">
         <div className="controls-hint-row"><span className="controls-key">{t('controls.left_click')}</span><span className="controls-desc">{t('controls.select_country')}</span></div>
-        <div className="controls-hint-row"><span className="controls-key">{t('controls.right_click')}</span><span className="controls-desc">{t('controls.move_map')}</span></div>
         <div className="controls-hint-row"><span className="controls-key">{t('controls.wheel')}</span><span className="controls-desc">{t('controls.zoom')}</span></div>
       </div>
 
@@ -193,7 +191,7 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
       <MapContainer
         className="map-night" renderer={renderer}
         center={[20, 0]} zoom={3} zoomSnap={0.25} scrollWheelZoom zoomControl={false}
-        dragging={false} doubleClickZoom={false} attributionControl={false}
+        doubleClickZoom={false} attributionControl={false}
         style={{ width: '100%', height: '100vh' }}
         whenReady={({ target }) => {
           setMapRef(target)
@@ -231,7 +229,6 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
             stats={stats}
           />
         )}
-        <RightClickDrag />
       </MapContainer>
     </div>
   )

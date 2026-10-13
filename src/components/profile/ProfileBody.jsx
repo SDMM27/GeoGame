@@ -4,9 +4,12 @@ import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { usePlayerProfile } from '../../hooks/usePlayerProfile'
+import { TIER_COLORS } from '../../utils/achievements'
+import { badgeSummary, readBadges } from '../../utils/badges'
 import { GAME_TYPES } from '../../utils/gameTypes'
 import { describeBest, describeDetails, describeMode, describeResult, formatPlayedAt } from '../../utils/profileFormat'
 import { DAILY_GAME_TYPES, formatPlayTime } from '../../utils/profileStats'
+import BadgeStrip from './BadgeStrip'
 import './ProfileBody.css'
 
 export const GAME_META = {
@@ -117,15 +120,23 @@ function Achievements({ achievements }) {
   return (
     <section className="profile-section">
       <div className="profile-section-title">
-        <h2>{t('profile.achievements_title')}</h2>
+        <h2>
+          {t('profile.achievements_title')}
+          <BadgeStrip badges={readBadges({ badges: badgeSummary(achievements) })} />
+        </h2>
         <span className="profile-muted">{t('profile.achievements_count', { unlocked, total: achievements.length })}</span>
       </div>
       <div className="profile-achievements">
         {visible.map((achievement) => (
-          <div key={achievement.id} className={`profile-achievement${achievement.unlocked ? ' unlocked' : ''}`}>
+          <div
+            key={achievement.id}
+            className={`profile-achievement${achievement.unlocked ? ' unlocked' : ''}`}
+            style={{ '--tier': TIER_COLORS[achievement.tier] }}
+          >
             <span className="profile-achievement-emoji">{achievement.emoji}</span>
             <strong>{t(`achievements.${achievement.id}.title`)}</strong>
             <small>{t(`achievements.${achievement.id}.desc`)}</small>
+            <em className="profile-achievement-tier">{t(`achievements.tiers.${achievement.tier}`)}</em>
             {!achievement.unlocked && achievement.target > 1 && (
               <div className="profile-progress" title={`${achievement.progress}/${achievement.target}`}>
                 <span style={{ width: `${(achievement.progress / achievement.target) * 100}%` }} />
@@ -290,9 +301,9 @@ function ByGame({ stats }) {
   )
 }
 
-export default function ProfileBody({ uid, friendsCount }) {
+export default function ProfileBody({ uid, friendsCount, own = false }) {
   const { t } = useTranslation()
-  const { loading, error, games, stats, achievements } = usePlayerProfile(uid, { friendsCount })
+  const { loading, error, games, stats, achievements } = usePlayerProfile(uid, { friendsCount, own })
 
   if (loading) return <p className="profile-muted profile-center">…</p>
   if (error) return <p className="profile-muted">{t('profile.load_error')}</p>

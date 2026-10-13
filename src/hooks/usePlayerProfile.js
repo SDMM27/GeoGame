@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { computeAchievements } from '../utils/achievements'
+import { syncBadges } from '../utils/badges'
 import { fetchDailyGames, fetchGames } from '../utils/gameHistory'
 import { computeStats, dayKey } from '../utils/profileStats'
 import { watchFriendships } from '../utils/friends'
 
 // A player's history with its stats and achievements. `reload` fetches it again (e.g. on focus).
-export function usePlayerProfile(uid, { friendsCount } = {}) {
+// `own`: the signed-in player's profile, which keeps their public badges (utils/badges.js) up to date.
+export function usePlayerProfile(uid, { friendsCount, own = false } = {}) {
   const [state, setState] = useState({ loading: true, error: false, games: [] })
 
   const reload = useCallback(() => {
@@ -28,6 +30,11 @@ export function usePlayerProfile(uid, { friendsCount } = {}) {
     () => computeAchievements({ stats, games: state.games, friendsCount }),
     [stats, state.games, friendsCount]
   )
+
+  const loaded = !state.loading && !state.error
+  useEffect(() => {
+    if (own && loaded && uid) syncBadges(uid, achievements)
+  }, [own, loaded, uid, achievements])
 
   return { ...state, stats, achievements, reload }
 }

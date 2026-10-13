@@ -744,6 +744,112 @@
     "night_owl": {
       "title": "Oiseau de nuit",
       "desc": "Joue entre minuit et 5 h"
+    },
+    "games_10": {
+      "title": "Mise en jambes",
+      "desc": "Termine 10 parties"
+    },
+    "games_100": {
+      "title": "Centurion",
+      "desc": "Joue 100 parties"
+    },
+    "marathon": {
+      "title": "Marathonien",
+      "desc": "Joue 10 parties en une journée"
+    },
+    "early_bird": {
+      "title": "Lève-tôt",
+      "desc": "Joue entre 5 h et 7 h du matin"
+    },
+    "sweep_7": {
+      "title": "Roi du quotidien",
+      "desc": "Fais tous les défis du jour sur 7 jours différents"
+    },
+    "daily_wins_25": {
+      "title": "Assidu",
+      "desc": "Réussis 25 défis du jour"
+    },
+    "daily_wins_100": {
+      "title": "Légende du jour",
+      "desc": "Réussis 100 défis du jour"
+    },
+    "sharp_5": {
+      "title": "Tireur d'élite",
+      "desc": "Trouve 5 défis du jour au premier essai"
+    },
+    "perfect_ranking": {
+      "title": "Classement parfait",
+      "desc": "Classe les pays sans aucune erreur dans le défi du jour"
+    },
+    "no_hint": {
+      "title": "Sans filet",
+      "desc": "Réussis 10 quiz du jour sans indice"
+    },
+    "continent_trotter": {
+      "title": "Tour des continents",
+      "desc": "Joue sur les 5 continents"
+    },
+    "cartographer": {
+      "title": "Cartographe",
+      "desc": "Place 300 pays sur la carte"
+    },
+    "vexillologist": {
+      "title": "Vexillologue",
+      "desc": "Reconnais 300 drapeaux"
+    },
+    "capital_expert": {
+      "title": "Capitale en main",
+      "desc": "Trouve 300 capitales"
+    },
+    "perfect_run": {
+      "title": "Sans faute",
+      "desc": "Trouve tous les pays d'une partie"
+    },
+    "master": {
+      "title": "Maître géographe",
+      "desc": "Trouve tous les pays d'une partie en Difficile ou plus"
+    },
+    "quiz_flawless": {
+      "title": "Quiz sans faute",
+      "desc": "Réponds juste à 10 questions de quiz sans te tromper"
+    },
+    "quiz_streak_10": {
+      "title": "Sur une lancée",
+      "desc": "10 bonnes réponses d'affilée au quiz"
+    },
+    "quiz_streak_25": {
+      "title": "Cerveau en feu",
+      "desc": "25 bonnes réponses d'affilée au quiz"
+    },
+    "survival_10": {
+      "title": "Survivant",
+      "desc": "Tiens 10 manches en Survie"
+    },
+    "survival_25": {
+      "title": "Increvable",
+      "desc": "Tiens 25 manches en Survie"
+    },
+    "survival_50": {
+      "title": "Immortel",
+      "desc": "Tiens 50 manches en Survie"
+    },
+    "survival_one_life": {
+      "title": "Une seule vie",
+      "desc": "Tiens 15 manches en Survie avec une seule vie"
+    },
+    "multi_5": {
+      "title": "Joueur de salon",
+      "desc": "Joue 5 parties multijoueur"
+    },
+    "multi_25": {
+      "title": "Âme du salon",
+      "desc": "Joue 25 parties multijoueur"
+    },
+    "tiers": {
+      "bronze": "Bronze",
+      "silver": "Argent",
+      "gold": "Or",
+      "legend": "Légende"
     }
   },
   "app_banner": {

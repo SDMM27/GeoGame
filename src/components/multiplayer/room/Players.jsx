@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAccount } from '../../../auth'
+import { useBadges } from '../../../hooks/useBadges'
 import { useFriendships } from '../../../hooks/usePlayerProfile'
+import BadgeStrip from '../../profile/BadgeStrip'
 import { sendFriendRequestTo } from '../../../utils/friends'
 
 // Friend request to a room player who has an account and isn't a friend yet (accepts theirs if they asked first).
@@ -35,6 +37,7 @@ export default function Players({ room, playerId, strangersOnly = false }) {
   const { t } = useTranslation()
   const { account } = useAccount()
   const friendships = useFriendships(account?.username ? account.uid : null)
+  const badges = useBadges(Object.values(room.players).map((player) => player.uid))
   const canAdd = (player) => Boolean(account?.username && player.uid && player.uid !== account.uid && !friendships.loading)
   const players = Object.entries(room.players).filter(
     ([, player], index, all) =>
@@ -55,6 +58,7 @@ export default function Players({ room, playerId, strangersOnly = false }) {
               {player.pseudo}
               {id === playerId && ` (${t('mp_room.you')})`}
             </span>
+            <BadgeStrip badges={badges[player.uid]} />
             {id === room.hostId && <span className="mpr-badge">{t('mp_room.host')}</span>}
             {canAdd(player) && <AddFriendButton account={account} friendships={friendships} uid={player.uid} />}
           </li>

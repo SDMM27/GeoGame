@@ -744,6 +744,112 @@
     "night_owl": {
       "title": "Nachteule",
       "desc": "Spiele zwischen Mitternacht und 5 Uhr"
+    },
+    "games_10": {
+      "title": "Aufwärmen",
+      "desc": "Beende 10 Spiele"
+    },
+    "games_100": {
+      "title": "Zenturio",
+      "desc": "Spiele 100 Spiele"
+    },
+    "marathon": {
+      "title": "Marathonspieler",
+      "desc": "Spiele 10 Spiele an einem Tag"
+    },
+    "early_bird": {
+      "title": "Frühaufsteher",
+      "desc": "Spiele zwischen 5 und 7 Uhr morgens"
+    },
+    "sweep_7": {
+      "title": "König des Alltags",
+      "desc": "Schaffe alle Tageschallenges an 7 verschiedenen Tagen"
+    },
+    "daily_wins_25": {
+      "title": "Stammspieler",
+      "desc": "Meistere 25 Tageschallenges"
+    },
+    "daily_wins_100": {
+      "title": "Legende des Tages",
+      "desc": "Meistere 100 Tageschallenges"
+    },
+    "sharp_5": {
+      "title": "Scharfschütze",
+      "desc": "Löse 5 Tageschallenges im ersten Versuch"
+    },
+    "perfect_ranking": {
+      "title": "Perfektes Ranking",
+      "desc": "Ordne die Länder in der Tageschallenge ohne einen Fehler"
+    },
+    "no_hint": {
+      "title": "Ohne Netz",
+      "desc": "Löse 10 Tages-Quizze ohne Hinweis"
+    },
+    "continent_trotter": {
+      "title": "Kontinent-Hopper",
+      "desc": "Spiele auf allen 5 Kontinenten"
+    },
+    "cartographer": {
+      "title": "Kartograf",
+      "desc": "Platziere 300 Länder auf der Karte"
+    },
+    "vexillologist": {
+      "title": "Vexillologe",
+      "desc": "Erkenne 300 Flaggen"
+    },
+    "capital_expert": {
+      "title": "Hauptstadt-Experte",
+      "desc": "Finde 300 Hauptstädte"
+    },
+    "perfect_run": {
+      "title": "Fehlerfrei",
+      "desc": "Finde alle Länder eines Spiels"
+    },
+    "master": {
+      "title": "Meistergeograf",
+      "desc": "Finde alle Länder eines Spiels auf Schwer oder höher"
+    },
+    "quiz_flawless": {
+      "title": "Fehlerfreies Quiz",
+      "desc": "Beantworte 10 Quizfragen in Folge ohne Fehler"
+    },
+    "quiz_streak_10": {
+      "title": "Auf Siegeskurs",
+      "desc": "10 richtige Quizantworten in Folge"
+    },
+    "quiz_streak_25": {
+      "title": "Gehirn in Flammen",
+      "desc": "25 richtige Quizantworten in Folge"
+    },
+    "survival_10": {
+      "title": "Überlebender",
+      "desc": "Halte 10 Runden im Überlebensmodus durch"
+    },
+    "survival_25": {
+      "title": "Unverwüstlich",
+      "desc": "Halte 25 Runden im Überlebensmodus durch"
+    },
+    "survival_50": {
+      "title": "Unsterblich",
+      "desc": "Halte 50 Runden im Überlebensmodus durch"
+    },
+    "survival_one_life": {
+      "title": "Nur ein Leben",
+      "desc": "Halte 15 Runden im Überlebensmodus mit nur einem Leben durch"
+    },
+    "multi_5": {
+      "title": "Raum-Stammgast",
+      "desc": "Spiele 5 Mehrspielerpartien"
+    },
+    "multi_25": {
+      "title": "Seele des Raums",
+      "desc": "Spiele 25 Mehrspielerpartien"
+    },
+    "tiers": {
+      "bronze": "Bronze",
+      "silver": "Silber",
+      "gold": "Gold",
+      "legend": "Legende"
     }
   },
   "app_banner": {

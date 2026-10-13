@@ -173,6 +173,39 @@ describe('changing a username', () => {
   })
 })
 
+describe('public badges', () => {
+  const badges = { top: ['streak_30', 'games_100'], count: 7 }
+
+  it('lets an account publish its own badges, and anyone read them', async () => {
+    await assertSucceeds(as('alice').doc('users/alice').update({ badges }))
+    await assertSucceeds(as('alice').doc('users/alice').update({ badges: { top: [], count: 0 } }))
+    await assertSucceeds(anonymous().doc('users/alice').get())
+  })
+
+  it("refuses someone else's badges, and a visitor's", async () => {
+    await assertFails(as('mallory').doc('users/alice').update({ badges }))
+    await assertFails(anonymous().doc('users/alice').update({ badges }))
+  })
+
+  it('refuses changing anything else along with the badges', async () => {
+    await assertFails(as('alice').doc('users/alice').update({ badges, username: 'Bob' }))
+    await assertFails(as('alice').doc('users/alice').update({ badges, admin: true }))
+  })
+
+  it('refuses malformed badges', async () => {
+    const update = (value) => as('alice').doc('users/alice').update({ badges: value })
+    await assertFails(update({ top: ['a', 'b', 'c', 'd'], count: 4 }))
+    await assertFails(update({ top: [1], count: 1 }))
+    await assertFails(update({ top: ['x'.repeat(41)], count: 1 }))
+    await assertFails(update({ top: ['a'], count: -1 }))
+    await assertFails(update({ top: ['a'], count: 201 }))
+    await assertFails(update({ top: ['a'], count: 1.5 }))
+    await assertFails(update({ top: ['a'], count: 1, extra: true }))
+    await assertFails(update({ top: 'a', count: 1 }))
+    await assertFails(update('streak_30'))
+  })
+})
+
 describe('deleting an account', () => {
   const deleteBoth = (uid) => {
     const db = as(uid)

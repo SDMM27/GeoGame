@@ -744,6 +744,112 @@
     "night_owl": {
       "title": "Nottambulo",
       "desc": "Gioca tra mezzanotte e le 5 del mattino"
+    },
+    "games_10": {
+      "title": "Riscaldamento",
+      "desc": "Termina 10 partite"
+    },
+    "games_100": {
+      "title": "Centurione",
+      "desc": "Gioca 100 partite"
+    },
+    "marathon": {
+      "title": "Maratoneta",
+      "desc": "Gioca 10 partite in un giorno"
+    },
+    "early_bird": {
+      "title": "Mattiniero",
+      "desc": "Gioca tra le 5 e le 7 del mattino"
+    },
+    "sweep_7": {
+      "title": "Re del quotidiano",
+      "desc": "Completa tutte le sfide giornaliere in 7 giorni diversi"
+    },
+    "daily_wins_25": {
+      "title": "Assiduo",
+      "desc": "Supera 25 sfide giornaliere"
+    },
+    "daily_wins_100": {
+      "title": "Leggenda del giorno",
+      "desc": "Supera 100 sfide giornaliere"
+    },
+    "sharp_5": {
+      "title": "Cecchino",
+      "desc": "Risolvi 5 sfide giornaliere al primo tentativo"
+    },
+    "perfect_ranking": {
+      "title": "Classifica perfetta",
+      "desc": "Ordina i paesi senza alcun errore nella sfida giornaliera"
+    },
+    "no_hint": {
+      "title": "Senza rete",
+      "desc": "Supera 10 quiz giornalieri senza indizi"
+    },
+    "continent_trotter": {
+      "title": "Giro dei continenti",
+      "desc": "Gioca su tutti i 5 continenti"
+    },
+    "cartographer": {
+      "title": "Cartografo",
+      "desc": "Posiziona 300 paesi sulla mappa"
+    },
+    "vexillologist": {
+      "title": "Vessillologo",
+      "desc": "Riconosci 300 bandiere"
+    },
+    "capital_expert": {
+      "title": "Esperto di capitali",
+      "desc": "Trova 300 capitali"
+    },
+    "perfect_run": {
+      "title": "Senza errori",
+      "desc": "Trova tutti i paesi di una partita"
+    },
+    "master": {
+      "title": "Maestro geografo",
+      "desc": "Trova tutti i paesi di una partita in Difficile o più"
+    },
+    "quiz_flawless": {
+      "title": "Quiz perfetto",
+      "desc": "Rispondi a 10 domande del quiz di fila senza sbagliare"
+    },
+    "quiz_streak_10": {
+      "title": "In serie",
+      "desc": "10 risposte corrette di fila nel quiz"
+    },
+    "quiz_streak_25": {
+      "title": "Cervello in fiamme",
+      "desc": "25 risposte corrette di fila nel quiz"
+    },
+    "survival_10": {
+      "title": "Sopravvissuto",
+      "desc": "Resisti per 10 round in Sopravvivenza"
+    },
+    "survival_25": {
+      "title": "Indistruttibile",
+      "desc": "Resisti per 25 round in Sopravvivenza"
+    },
+    "survival_50": {
+      "title": "Immortale",
+      "desc": "Resisti per 50 round in Sopravvivenza"
+    },
+    "survival_one_life": {
+      "title": "Una sola vita",
+      "desc": "Resisti per 15 round in Sopravvivenza con una sola vita"
+    },
+    "multi_5": {
+      "title": "Habitué delle stanze",
+      "desc": "Gioca 5 partite multigiocatore"
+    },
+    "multi_25": {
+      "title": "Anima della stanza",
+      "desc": "Gioca 25 partite multigiocatore"
+    },
+    "tiers": {
+      "bronze": "Bronzo",
+      "silver": "Argento",
+      "gold": "Oro",
+      "legend": "Leggenda"
     }
   },
   "app_banner": {

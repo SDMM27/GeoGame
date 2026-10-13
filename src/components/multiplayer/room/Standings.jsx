@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useBadges } from '../../../hooks/useBadges'
+import BadgeStrip from '../../profile/BadgeStrip'
 import { formatTime } from '../../../utils/formatTime'
 import { GAME_TYPES } from '../../../utils/gameTypes'
 import {
@@ -12,6 +14,13 @@ import {
 } from '../../../utils/multiplayerRoom'
 
 const MEDALS = ['🥇', '🥈', '🥉']
+
+// The badges of the room's players, by player id.
+function useRoomBadges(room) {
+  const players = Object.entries(room.players)
+  const byUid = useBadges(players.map(([, player]) => player.uid))
+  return Object.fromEntries(players.map(([id, player]) => [id, byUid[player.uid]]))
+}
 
 function resultLine(game, result, t) {
   const time = formatTime(result.elapsedTime ?? 0).slice(0, 5)
@@ -36,6 +45,7 @@ export function Standings({ room, progress, results, playerId, index }) {
   const game = roomGames(room)[index]
   const ranked = rankRoomResults(game, resultsForGame(results, index))
   const live = progressForGame(progress, index)
+  const badges = useRoomBadges(room)
   const finishedIds = new Set(ranked.map((result) => result.playerId))
   const others = Object.entries(room.players).filter(([id]) => !finishedIds.has(id))
 
@@ -51,6 +61,7 @@ export function Standings({ room, progress, results, playerId, index }) {
             {result.pseudo}
             {result.playerId === playerId && ` (${t('mp_room.you')})`}
           </span>
+          <BadgeStrip badges={badges[result.playerId]} />
           <span className="mpr-score">{resultLine(game, result, t)}</span>
         </li>
       ))}
@@ -61,6 +72,7 @@ export function Standings({ room, progress, results, playerId, index }) {
             {player.pseudo}
             {id === playerId && ` (${t('mp_room.you')})`}
           </span>
+          <BadgeStrip badges={badges[id]} />
           <span className="mpr-score">
             {live[id] ? liveLine(game, live[id], t) : t('mp_room.not_played')}
           </span>
@@ -74,6 +86,7 @@ export function Standings({ room, progress, results, playerId, index }) {
 function OverallStandings({ room, results, playerId }) {
   const { t } = useTranslation()
   const total = roomGames(room).length
+  const badges = useRoomBadges(room)
   return (
     <ul className="mpr-list">
       {overallStandings(room, results).map((entry, i) => (
@@ -86,6 +99,7 @@ function OverallStandings({ room, results, playerId }) {
             {entry.pseudo}
             {entry.playerId === playerId && ` (${t('mp_room.you')})`}
           </span>
+          <BadgeStrip badges={badges[entry.playerId]} />
           <span className="mpr-score">
             {t('mp_room.points', { count: entry.points })} · {entry.played}/{total}
           </span>

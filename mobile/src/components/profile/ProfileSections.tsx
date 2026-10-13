@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native'
 
 import { usePlayerProfile } from '@shared/hooks/usePlayerProfile'
+import { TIER_COLORS } from '@shared/utils/achievements'
 import { describeBest, describeDetails, describeMode, describeResult, formatPlayedAt } from '@shared/utils/profileFormat'
 import { DAILY_GAME_TYPES, formatPlayTime } from '@shared/utils/profileStats'
 
@@ -41,7 +42,7 @@ export type ProfileStats = {
   byGame: Record<string, GameStats>
 }
 
-export type Achievement = { id: string; icon: IconName; target: number; progress: number; unlocked: boolean }
+export type Achievement = { id: string; tier: string; icon: IconName; target: number; progress: number; unlocked: boolean }
 
 const AVATAR_COLORS = ['#3DDC97', '#7AA2FF', '#FF7A6B', '#F5B83D', '#C792FF', '#5FD4F4', '#FF9EC7', '#B4E05A']
 
@@ -181,15 +182,21 @@ export function AchievementsSection({ achievements }: { achievements: Achievemen
       />
       <View style={styles.grid}>
         {visible.map((achievement) => (
-          <View key={achievement.id} style={[styles.achievement, !achievement.unlocked && { opacity: 0.55 }]}>
-            <View style={[styles.achievementIcon, { backgroundColor: achievement.unlocked ? `${colors.warning}26` : colors.surfaceHigh }]}>
-              <MaterialCommunityIcons name={achievement.icon} size={22} color={achievement.unlocked ? colors.warning : colors.textFaint} />
+          <View
+            key={achievement.id}
+            style={[styles.achievement, achievement.unlocked ? { borderColor: `${TIER_COLORS[achievement.tier]}88` } : { opacity: 0.55 }]}
+          >
+            <View style={[styles.achievementIcon, { backgroundColor: achievement.unlocked ? `${TIER_COLORS[achievement.tier]}26` : colors.surfaceHigh }]}>
+              <MaterialCommunityIcons name={achievement.icon} size={22} color={achievement.unlocked ? TIER_COLORS[achievement.tier] : colors.textFaint} />
             </View>
             <Text variant="bodyStrong" numberOfLines={1} style={{ fontSize: 14 }}>
               {t(`achievements.${achievement.id}.title`)}
             </Text>
             <Text variant="caption" numberOfLines={2} style={{ fontSize: 12, lineHeight: 16 }}>
               {t(`achievements.${achievement.id}.desc`)}
+            </Text>
+            <Text variant="caption" color={TIER_COLORS[achievement.tier]} style={{ fontSize: 10, textTransform: 'uppercase', fontWeight: '700' }}>
+              {t(`achievements.tiers.${achievement.tier}`)}
             </Text>
             {!achievement.unlocked && achievement.target > 1 && (
               <View style={{ gap: 3 }}>
@@ -355,9 +362,20 @@ export function HistoryList({ games }: { games: HistoryGame[] }) {
 }
 
 // Everything computed from a player's history. Reloads when the screen comes back into focus.
-export function ProfileBody({ uid, friendsCount, onSeeHistory }: { uid: string; friendsCount?: number; onSeeHistory: () => void }) {
+export function ProfileBody({
+  uid,
+  friendsCount,
+  own,
+  onSeeHistory,
+}: {
+  uid: string
+  friendsCount?: number
+  /** The signed-in player's profile: it keeps their public badges up to date. */
+  own?: boolean
+  onSeeHistory: () => void
+}) {
   const { t } = useTranslation()
-  const profile = usePlayerProfile(uid, { friendsCount })
+  const profile = usePlayerProfile(uid, { friendsCount, own })
   const { reload } = profile
   useFocusEffect(useCallback(() => reload(), [reload]))
 

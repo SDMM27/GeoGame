@@ -18,6 +18,7 @@ import { serverNow } from '@shared/utils/serverTime'
 
 import { useAccount, type Account } from '@/account/auth'
 import { SITE_ORIGIN } from '@/links'
+import { BadgeStrip, useRoomBadges } from '@/components/profile/BadgeStrip'
 import { Avatar } from '@/components/profile/ProfileSections'
 import { Button, Pill, Text, Touchable } from '@/components/ui'
 import { getGame } from '@/games'
@@ -106,6 +107,7 @@ function Players({ room }: { room: Room }) {
   const { t } = useTranslation()
   const playerId = getPlayerId()
   const players = Object.entries(room.players)
+  const badges = useRoomBadges(room.players)
   return (
     <View style={styles.card}>
       <Text variant="bodyStrong">{t('mobile.multi.players', { count: players.length })}</Text>
@@ -116,6 +118,7 @@ function Players({ room }: { room: Room }) {
             {player.pseudo}
             {id === playerId ? ` (${t('mobile.multi.you')})` : ''}
           </Text>
+          <BadgeStrip badges={badges[id]} />
           {id === room.hostId && <Pill label={t('mobile.multi.host')} color={colors.warning} />}
         </Animated.View>
       ))}

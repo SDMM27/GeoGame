@@ -317,7 +317,7 @@ function Profile({ account }) {
         </div>
       </header>
       <FriendsPanel account={account} friendships={friendships} />
-      <ProfileBody uid={account.uid} friendsCount={friendships.loading ? undefined : friendships.friends.length} />
+      <ProfileBody uid={account.uid} own friendsCount={friendships.loading ? undefined : friendships.friends.length} />
       <AccountSettings account={account} />
     </>
   )

@@ -44,10 +44,12 @@ const ALICE = [
   'reports/bob_scores_s1', 'reports/alice_scores_s2',
   'friendships/alice_bob', 'invites/ROOM01_alice', 'invites/ROOM02_bob', 'invitePushLimits/alice',
   'dailyReminderPushes/alice', 'friendPushes/alice_bob_request', 'friendPushes/alice_bob_accepted',
+  'dailyNudges/alice_bob_QUIZ', 'dailyNudges/bob_alice_QUIZ',
 ]
 const OTHERS = [
   'users/bob', 'usernames/bob', 'users/bob/games/g1', 'scores/s2', 'daily_scores/s1', 'reports/carol_daily_scores_s1',
   'reports/carol_scores_s2', 'friendships/bob_carol', 'invites/ROOM03_carol', 'dailyReminderPushes/bob', 'friendPushes/bob_carol_request',
+  'dailyNudges/bob_carol_QUIZ',
 ]
 
 async function seed() {
@@ -71,6 +73,9 @@ async function seed() {
     'friendPushes/alice_bob_accepted': { at: 0 },
     'dailyReminderPushes/bob': { day: '2026-10-12' },
     'friendPushes/bob_carol_request': { at: 0 },
+    'dailyNudges/alice_bob_QUIZ': { from: 'alice', to: 'bob', at: 0 },
+    'dailyNudges/bob_alice_QUIZ': { from: 'bob', to: 'alice', at: 0 },
+    'dailyNudges/bob_carol_QUIZ': { from: 'bob', to: 'carol', at: 0 },
     'users/bob': { username: 'Bob', usernameKey: 'bob' },
     'usernames/bob': { uid: 'bob', username: 'Bob' },
     'users/bob/games/g1': { gameType: 'FLAGS', mode: 'standard' },

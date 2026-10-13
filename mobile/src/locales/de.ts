@@ -147,6 +147,15 @@ export const de: MobileStrings = {
     leave: 'Verlassen',
   },
   update: { title: 'Neue Version verfügbar', message: 'Neu starten, um sie zu installieren', restart: 'Neu starten', later: 'Später', apk_title: 'Neue App-Version', apk_message: 'Installiere sie, um weiter Updates zu erhalten', apk_install: 'Installieren' },
+  nudge: {
+    title: 'Fordere einen Freund heraus',
+    hint: 'Er bekommt eine Benachrichtigung, um dich zu schlagen.',
+    sent: 'Gesendet!',
+    unreachable: '{{username}} kann keine Benachrichtigungen erhalten',
+    already_sent: 'Heute schon herausgefordert',
+    error: 'Senden fehlgeschlagen. Versuche es erneut.',
+    rate_limited: 'Zu viele Herausforderungen, versuche es später erneut.',
+  },
   invites: {
     title: 'Freunde einladen',
     invite: 'Einladen',

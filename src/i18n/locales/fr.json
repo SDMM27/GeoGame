@@ -902,6 +902,7 @@
       "express": "Express",
       "normal": "Normale",
       "gentle": "Douce",
+      "expert": "Expert",
       "hardcore": "Hardcore",
       "custom": "Personnalisée"
     },

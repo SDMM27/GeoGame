@@ -26,6 +26,7 @@ export const SURVIVAL_RAMPS = {
   express: { Facile: 3, Moyen: 4, Difficile: 5 },
   normal: { Facile: 5, Moyen: 7, Difficile: 8 },
   gentle: { Facile: 10, Moyen: 15, Difficile: 20 },
+  expert: { Facile: 0, Moyen: 0, Difficile: 15 },
   hardcore: { Facile: 0, Moyen: 0, Difficile: 0 },
 }
 export const SURVIVAL_RAMP_NAMES = Object.keys(SURVIVAL_RAMPS)

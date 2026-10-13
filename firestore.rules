@@ -372,7 +372,7 @@ service cloud.firestore {
           && validSurvivalModes(data.modes)
           && data.lives in [1, 3, 5, 10]
           && data.timer in [0, 15, 30, 60]
-          && data.ramp in ['express', 'normal', 'gentle', 'hardcore']
+          && data.ramp in ['express', 'normal', 'gentle', 'expert', 'hardcore']
           && data.score is int && data.score >= 1 && data.score <= 300
           && inRange(data.elapsedTime, 1000000000) && data.elapsedTime >= data.score * 300;
       }

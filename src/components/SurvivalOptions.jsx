@@ -26,7 +26,7 @@ export const SURVIVAL_ROUND_ICONS = {
   QUIZ: '🧠',
 }
 
-export const SURVIVAL_RAMP_ICONS = { express: '⚡', normal: '🎯', gentle: '🌱', hardcore: '💀', custom: '🛠️' }
+export const SURVIVAL_RAMP_ICONS = { express: '⚡', normal: '🎯', gentle: '🌱', expert: '🔥', hardcore: '💀', custom: '🛠️' }
 
 /** Settings of a new run: every game, the default lives, timer and ramp. */
 export const defaultSurvivalOptions = () => ({

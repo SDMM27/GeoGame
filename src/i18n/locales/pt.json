@@ -399,6 +399,7 @@
     "all_capitals_found": "Parabéns! Você encontrou todas as capitais!",
     "already_proposed": "Você já tentou este país.",
     "country_was": "Muito bem! Era {{name}}",
+    "answer_reveal": "A resposta era {{name}}",
     "hint_updated": "Dica atualizada",
     "ascension_phase_done": "Fase concluída! Muito bem!",
     "ascension_failed": "Errado! Fim de jogo."

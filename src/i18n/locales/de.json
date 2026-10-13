@@ -399,6 +399,7 @@
     "all_capitals_found": "Bravo! Du hast alle Hauptstädte gefunden!",
     "already_proposed": "Dieses Land hast du schon getippt.",
     "country_was": "Gut gemacht! Es war {{name}}",
+    "answer_reveal": "Die Antwort war {{name}}",
     "hint_updated": "Hinweis aktualisiert",
     "ascension_phase_done": "Phase geschafft! Gut gemacht!",
     "ascension_failed": "Falsch! Spiel vorbei."

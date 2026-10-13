@@ -399,6 +399,7 @@
     "all_capitals_found": "Well done! You found all capitals!",
     "already_proposed": "You already proposed this country.",
     "country_was": "Well done! It was {{name}}",
+    "answer_reveal": "The answer was {{name}}",
     "hint_updated": "Hint updated",
     "ascension_phase_done": "Phase done! Well done!",
     "ascension_failed": "Wrong! Game over."

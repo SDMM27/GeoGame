@@ -399,6 +399,7 @@
     "all_capitals_found": "¡Bravo! ¡Has encontrado todas las capitales!",
     "already_proposed": "Ya has propuesto este país.",
     "country_was": "¡Bien hecho! Era {{name}}",
+    "answer_reveal": "La respuesta era {{name}}",
     "hint_updated": "Pista actualizada",
     "ascension_phase_done": "¡Fase superada! ¡Bien hecho!",
     "ascension_failed": "¡Incorrecto! Partida terminada."

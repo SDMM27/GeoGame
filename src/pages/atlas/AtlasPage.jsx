@@ -17,7 +17,8 @@ import { MAP_COLORS } from '../../utils/mapColors'
 import './AtlasPage.css'
 
 const STYLE = { fillColor: '#2A3E66', fillOpacity: 0.55, color: MAP_COLORS.stroke, weight: 1 }
-const STYLE_HOVER = { fillColor: '#34406A', fillOpacity: 0.8, color: MAP_COLORS.hover, weight: 1.5 }
+// Hover: a lighter fill and a light outline; the selected country keeps the stronger blue fill
+const STYLE_HOVER = { fillColor: MAP_COLORS.hover, fillOpacity: 0.5, color: MAP_COLORS.hoverStroke, weight: 2 }
 const STYLE_SELECTED = { fillColor: MAP_COLORS.hover, fillOpacity: 0.6, color: MAP_COLORS.hover, weight: 2 }
 
 // Countries too small to click at low zoom get a dot until the map is zoomed in enough

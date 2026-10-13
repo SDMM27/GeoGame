@@ -27,9 +27,17 @@ export function FitCountryBounds({ country }) {
   useEffect(() => {
     if (!country) return
     const { bounds, zoom, padding } = getViewportSettings(country)
-    if (bounds.isValid()) {
-      map.fitBounds(bounds, { padding, maxZoom: zoom, animate: false })
+    if (!bounds.isValid()) return
+    const fit = () => {
+      // A full-screen map needs more room around the silhouette than the small frame on phones.
+      const { x, y } = map.getSize()
+      const roomy = Math.min(x, y) > 600
+      map.fitBounds(bounds, { padding: roomy ? padding.map((p) => Math.max(p, 48)) : padding, maxZoom: zoom, animate: false })
     }
+    fit()
+    // The map fills the screen on desktop: keep the silhouette centered when the window is resized.
+    map.on('resize', fit)
+    return () => map.off('resize', fit)
   }, [country, map])
 
   return null

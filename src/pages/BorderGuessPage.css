@@ -317,6 +317,11 @@
   border: 1px solid var(--border-subtle);
 }
 
+/* Nothing to say until the round ends. */
+.border-guess-result:empty {
+  display: none;
+}
+
 .border-guess-result--win {
   color: #bbf7d0;
   border-color: rgba(61, 220, 151, 0.35);
@@ -371,5 +376,123 @@
 
   .border-guess-stats {
     flex-direction: column;
+  }
+}
+
+/* ── Desktop: the silhouette fills the screen, the game sits in a column on the right ── */
+@media (min-width: 1024px) {
+  .border-guess-page {
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .border-guess-main {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 400px;
+    grid-template-rows: auto auto minmax(0, 1fr);
+  }
+
+  .border-guess-layout {
+    display: contents;
+  }
+
+  /* The right column: challenge banner (daily), title, then the game itself. */
+  .border-guess-main > .challenge-banner {
+    grid-column: 2;
+    grid-row: 1;
+    margin: 16px 16px 0;
+  }
+
+  .border-guess-panel--hero,
+  .border-guess-panel--side {
+    grid-column: 2;
+    border-radius: 0;
+    border-width: 0 0 0 1px;
+    box-shadow: none;
+  }
+
+  .border-guess-panel--hero {
+    grid-row: 2;
+    margin: 0;
+    padding: 20px 20px 8px;
+    align-items: flex-start;
+  }
+
+  .border-guess-panel--hero h1 {
+    margin: 4px 0 6px;
+    font-size: 1.6rem;
+  }
+
+  .border-guess-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .border-guess-stat {
+    min-width: 72px;
+    padding: 10px 12px;
+  }
+
+  .border-guess-stat-value {
+    font-size: 1.25rem;
+  }
+
+  .border-guess-panel--side {
+    grid-row: 3;
+    padding: 12px 20px 20px;
+    overflow-y: auto;
+  }
+
+  /* The map: edge to edge, on the app's ocean. */
+  .border-guess-panel--map {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    position: relative;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: var(--map-ocean);
+  }
+
+  .border-guess-map-frame {
+    height: 100%;
+    border: 0;
+    border-radius: 0;
+    background:
+      radial-gradient(circle at center, rgba(122, 162, 255, 0.08), transparent 65%),
+      var(--map-ocean);
+  }
+
+  .border-guess-map-frame .daily-map-placeholder {
+    background: transparent;
+    border-radius: 0;
+  }
+
+  /* New country on its own row, the two smaller actions below it. */
+  .border-guess-actions {
+    flex-wrap: wrap;
+  }
+
+  .border-guess-actions > .border-guess-primary {
+    order: -1;
+    flex-basis: 100%;
+  }
+
+  .border-guess-map-caption {
+    position: absolute;
+    left: 24px;
+    bottom: 20px;
+    margin: 0;
+    z-index: 500;
+    pointer-events: none;
   }
 }

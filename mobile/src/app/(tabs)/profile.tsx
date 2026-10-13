@@ -445,6 +445,7 @@ function Profile({ account }: { account: Account }) {
       <FriendsCard count={friendships.friends.length} pending={friendships.incoming.length} />
       <ProfileBody
         uid={account.uid}
+        own
         friendsCount={friendships.loading ? undefined : friendships.friends.length}
         onSeeHistory={() => router.push({ pathname: '/history', params: { uid: account.uid } })}
       />

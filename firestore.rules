@@ -111,8 +111,24 @@ service cloud.firestore {
         && !existsAfter(/databases/$(database)/documents/users/$(request.auth.uid));
     }
 
+    // users/{uid}.badges (src/utils/badges.js): the achievement ids of a player's best badges, shown to the other
+    // players in a room or on a profile. The player computes it themselves, so it is only a courtesy.
+    function validBadges(badges) {
+      return badges is map
+        && badges.keys().hasOnly(['top', 'count'])
+        && badges.keys().hasAll(['top', 'count'])
+        && badges.top is list && badges.top.size() <= 3
+        && (badges.top.size() < 1 || badges.top[0] is string && badges.top[0].size() <= 40)
+        && (badges.top.size() < 2 || badges.top[1] is string && badges.top[1].size() <= 40)
+        && (badges.top.size() < 3 || badges.top[2] is string && badges.top[2].size() <= 40)
+        && badges.count is int && badges.count >= 0 && badges.count <= 200;
+    }
+
     match /users/{uid} {
       allow read: if true;
+      allow update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['badges'])
+        && validBadges(request.resource.data.badges);
       allow create: if request.auth != null && request.auth.uid == uid
         && request.resource.data.keys().hasOnly(['username', 'usernameKey', 'createdAt'])
         && request.resource.data.createdAt == request.time

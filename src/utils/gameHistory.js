@@ -46,21 +46,24 @@ function withoutEmptyFields(record) {
   )
 }
 
+// Resolves with the account's uid once the game is saved, null otherwise.
 export async function recordGame(auth, record) {
   try {
     const user = await currentUser(auth)
-    if (!user) return
+    if (!user) return null
     const data = { ...withoutEmptyFields(record), playedAt: serverTimestamp() }
     if (record.mode === 'daily' && record.dailyKey) {
       const ref = doc(gamesCollection(user.uid), `daily_${record.gameType}_${record.dailyKey}`)
-      if ((await getDoc(ref)).exists()) return
+      if ((await getDoc(ref)).exists()) return null
       await setDoc(ref, data)
     } else {
       await addDoc(gamesCollection(user.uid), data)
     }
+    return user.uid
   } catch (error) {
     // History is a bonus: never break the end of a game for it.
     console.warn('[history]', error?.code, error)
+    return null
   }
 }
 

@@ -744,6 +744,112 @@
     "night_owl": {
       "title": "Night owl",
       "desc": "Play between midnight and 5 am"
+    },
+    "games_10": {
+      "title": "Warming up",
+      "desc": "Finish 10 games"
+    },
+    "games_100": {
+      "title": "Centurion",
+      "desc": "Play 100 games"
+    },
+    "marathon": {
+      "title": "Marathon runner",
+      "desc": "Play 10 games in one day"
+    },
+    "early_bird": {
+      "title": "Early bird",
+      "desc": "Play between 5 am and 7 am"
+    },
+    "sweep_7": {
+      "title": "Daily king",
+      "desc": "Complete every daily challenge on 7 different days"
+    },
+    "daily_wins_25": {
+      "title": "Regular",
+      "desc": "Succeed at 25 daily challenges"
+    },
+    "daily_wins_100": {
+      "title": "Daily legend",
+      "desc": "Succeed at 100 daily challenges"
+    },
+    "sharp_5": {
+      "title": "Sharpshooter",
+      "desc": "Solve 5 daily challenges on the first try"
+    },
+    "perfect_ranking": {
+      "title": "Perfect ranking",
+      "desc": "Rank the countries with no error in the daily challenge"
+    },
+    "no_hint": {
+      "title": "No safety net",
+      "desc": "Solve 10 daily quizzes without a hint"
+    },
+    "continent_trotter": {
+      "title": "Continent hopper",
+      "desc": "Play on all 5 continents"
+    },
+    "cartographer": {
+      "title": "Cartographer",
+      "desc": "Place 300 countries on the map"
+    },
+    "vexillologist": {
+      "title": "Vexillologist",
+      "desc": "Recognize 300 flags"
+    },
+    "capital_expert": {
+      "title": "Capital expert",
+      "desc": "Find 300 capitals"
+    },
+    "perfect_run": {
+      "title": "Flawless",
+      "desc": "Find every country of a game"
+    },
+    "master": {
+      "title": "Master geographer",
+      "desc": "Find every country of a game on Hard or above"
+    },
+    "quiz_flawless": {
+      "title": "Flawless quiz",
+      "desc": "Answer 10 quiz questions in a row without a mistake"
+    },
+    "quiz_streak_10": {
+      "title": "On a roll",
+      "desc": "10 correct quiz answers in a row"
+    },
+    "quiz_streak_25": {
+      "title": "Brain on fire",
+      "desc": "25 correct quiz answers in a row"
+    },
+    "survival_10": {
+      "title": "Survivor",
+      "desc": "Last 10 rounds in Survival"
+    },
+    "survival_25": {
+      "title": "Unbreakable",
+      "desc": "Last 25 rounds in Survival"
+    },
+    "survival_50": {
+      "title": "Immortal",
+      "desc": "Last 50 rounds in Survival"
+    },
+    "survival_one_life": {
+      "title": "One life only",
+      "desc": "Last 15 rounds in Survival with a single life"
+    },
+    "multi_5": {
+      "title": "Room regular",
+      "desc": "Play 5 multiplayer games"
+    },
+    "multi_25": {
+      "title": "Soul of the room",
+      "desc": "Play 25 multiplayer games"
+    },
+    "tiers": {
+      "bronze": "Bronze",
+      "silver": "Silver",
+      "gold": "Gold",
+      "legend": "Legend"
     }
   },
   "app_banner": {

@@ -744,6 +744,112 @@
     "night_owl": {
       "title": "Coruja",
       "desc": "Jogue entre meia-noite e 5 da manhã"
+    },
+    "games_10": {
+      "title": "Aquecendo",
+      "desc": "Termine 10 partidas"
+    },
+    "games_100": {
+      "title": "Centurião",
+      "desc": "Jogue 100 partidas"
+    },
+    "marathon": {
+      "title": "Maratonista",
+      "desc": "Jogue 10 partidas em um dia"
+    },
+    "early_bird": {
+      "title": "Madrugador",
+      "desc": "Jogue entre 5h e 7h da manhã"
+    },
+    "sweep_7": {
+      "title": "Rei do dia a dia",
+      "desc": "Complete todos os desafios diários em 7 dias diferentes"
+    },
+    "daily_wins_25": {
+      "title": "Dedicado",
+      "desc": "Vença 25 desafios diários"
+    },
+    "daily_wins_100": {
+      "title": "Lenda diária",
+      "desc": "Vença 100 desafios diários"
+    },
+    "sharp_5": {
+      "title": "Atirador de elite",
+      "desc": "Acerte 5 desafios diários de primeira"
+    },
+    "perfect_ranking": {
+      "title": "Ranking perfeito",
+      "desc": "Ordene os países sem nenhum erro no desafio diário"
+    },
+    "no_hint": {
+      "title": "Sem rede de proteção",
+      "desc": "Vença 10 quizzes diários sem dicas"
+    },
+    "continent_trotter": {
+      "title": "Volta aos continentes",
+      "desc": "Jogue nos 5 continentes"
+    },
+    "cartographer": {
+      "title": "Cartógrafo",
+      "desc": "Posicione 300 países no mapa"
+    },
+    "vexillologist": {
+      "title": "Vexilólogo",
+      "desc": "Reconheça 300 bandeiras"
+    },
+    "capital_expert": {
+      "title": "Especialista em capitais",
+      "desc": "Encontre 300 capitais"
+    },
+    "perfect_run": {
+      "title": "Sem erros",
+      "desc": "Encontre todos os países de uma partida"
+    },
+    "master": {
+      "title": "Mestre geógrafo",
+      "desc": "Encontre todos os países de uma partida em Difícil ou mais"
+    },
+    "quiz_flawless": {
+      "title": "Quiz perfeito",
+      "desc": "Responda 10 perguntas do quiz seguidas sem errar"
+    },
+    "quiz_streak_10": {
+      "title": "Embalado",
+      "desc": "10 respostas certas seguidas no quiz"
+    },
+    "quiz_streak_25": {
+      "title": "Cérebro em chamas",
+      "desc": "25 respostas certas seguidas no quiz"
+    },
+    "survival_10": {
+      "title": "Sobrevivente",
+      "desc": "Aguente 10 rodadas no modo Sobrevivência"
+    },
+    "survival_25": {
+      "title": "Indestrutível",
+      "desc": "Aguente 25 rodadas no modo Sobrevivência"
+    },
+    "survival_50": {
+      "title": "Imortal",
+      "desc": "Aguente 50 rodadas no modo Sobrevivência"
+    },
+    "survival_one_life": {
+      "title": "Uma vida só",
+      "desc": "Aguente 15 rodadas no modo Sobrevivência com uma única vida"
+    },
+    "multi_5": {
+      "title": "Frequentador de salas",
+      "desc": "Jogue 5 partidas multijogador"
+    },
+    "multi_25": {
+      "title": "Alma da sala",
+      "desc": "Jogue 25 partidas multijogador"
+    },
+    "tiers": {
+      "bronze": "Bronze",
+      "silver": "Prata",
+      "gold": "Ouro",
+      "legend": "Lenda"
     }
   },
   "app_banner": {

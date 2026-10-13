@@ -23,6 +23,7 @@ import { formatTime } from '@shared/utils/formatTime'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
 
 import { HudPill } from '@/components/game/GameTopBar'
+import { BadgeStrip, useRoomBadges } from '@/components/profile/BadgeStrip'
 import { Button, Text } from '@/components/ui'
 import { colors, radius, space } from '@/theme'
 import { getRoomContent, rankRoomResults, scoringMode, type RoomContent } from './content'
@@ -210,6 +211,7 @@ function OverallRows({ room, results }: { room: Room; results: PlayerResult[] })
   const playerId = getPlayerId()
   const total = roomGames(room).length
   const standings: { playerId: string; pseudo: string; points: number; played: number; rank: number }[] = overallStandings(room, results)
+  const badges = useRoomBadges(room.players)
   if (standings.length === 0) return <Text variant="caption">{t('mobile.multi.no_players')}</Text>
   return (
     <>
@@ -224,6 +226,7 @@ function OverallRows({ room, results }: { room: Room; results: PlayerResult[] })
               {entry.pseudo}
               {me ? ` (${t('mobile.multi.you')})` : ''}
             </Text>
+            <BadgeStrip badges={badges[entry.playerId]} />
             <Text variant="caption" style={{ fontVariant: ['tabular-nums'] }}>
               {t('mp_room.points', { count: entry.points })} · {entry.played}/{total}
             </Text>
@@ -240,6 +243,7 @@ function GameRows({ room, progress, results, index }: { room: Room; progress: Pr
   const game: Room['game'] = roomGames(room)[index]
   const ranked = rankRoomResults(game, resultsForGame(results, index))
   const live: Progress = progressForGame(progress, index)
+  const badges = useRoomBadges(room.players)
   const finishedIds = new Set(ranked.map((result) => result.playerId))
   const others = Object.entries(room.players).filter(([id]) => !finishedIds.has(id))
 
@@ -256,6 +260,7 @@ function GameRows({ room, progress, results, index }: { room: Room; progress: Pr
               {result.pseudo}
               {me ? ` (${t('mobile.multi.you')})` : ''}
             </Text>
+            <BadgeStrip badges={badges[result.playerId]} />
             <Text variant="caption" style={{ fontVariant: ['tabular-nums'] }}>
               {resultLine(game, result, t)}
             </Text>
@@ -271,6 +276,7 @@ function GameRows({ room, progress, results, index }: { room: Room; progress: Pr
               {player.pseudo}
               {id === playerId ? ` (${t('mobile.multi.you')})` : ''}
             </Text>
+            <BadgeStrip badges={badges[id]} />
             <Text variant="caption">
               {!playing
                 ? t('mobile.multi.not_played')

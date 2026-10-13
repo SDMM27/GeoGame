@@ -92,7 +92,8 @@
   padding: 0.8rem;
   opacity: 0.5;
 }
-.profile-achievement.unlocked { opacity: 1; border-color: rgba(245, 184, 61, 0.35); }
+.profile-achievement.unlocked { opacity: 1; border-color: color-mix(in srgb, var(--tier) 55%, transparent); }
+.profile-achievement-tier { font-style: normal; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--tier); margin-top: 0.15rem; }
 .profile-achievement-emoji { font-size: 1.5rem; filter: grayscale(1); }
 .profile-achievement.unlocked .profile-achievement-emoji { filter: none; }
 .profile-achievement strong { font-size: 0.9rem; }

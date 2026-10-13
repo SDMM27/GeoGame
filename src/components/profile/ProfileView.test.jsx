@@ -6,7 +6,7 @@ import { ProfileView } from './ProfileBody'
 import { computeStats, dayKey } from '../../utils/profileStats'
 import { computeAchievements } from '../../utils/achievements'
 
-// Midi plutôt que l'heure réelle : lancé entre minuit et 5 h, le test débloquerait « Oiseau de nuit »
+// Midi plutôt que l'heure réelle : lancé entre minuit et 5 h, le test débloquerait « Oiseau de nuit » (et « Lève-tôt » entre 5 h et 7 h)
 const now = new Date().setHours(12, 0, 0, 0)
 const today = dayKey()
 
@@ -44,9 +44,9 @@ describe('ProfileView', () => {
   it('lists unlocked achievements first and can show them all', () => {
     renderView()
     expect(screen.getByText('Premier pas')).toBeInTheDocument()
-    expect(screen.queryByText('Oiseau de nuit')).not.toBeInTheDocument()
+    expect(screen.queryByText('Âme du salon')).not.toBeInTheDocument()
     fireEvent.click(screen.getAllByText('Tout voir')[0])
-    expect(screen.getByText('Oiseau de nuit')).toBeInTheDocument()
+    expect(screen.getByText('Âme du salon')).toBeInTheDocument()
   })
 
   it('opens the details of a past game', () => {

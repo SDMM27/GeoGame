@@ -1,0 +1,100 @@
+import { describe, expect, it, vi } from 'vitest'
+import { ACHIEVEMENTS, TIERS, computeAchievements } from './achievements'
+import { BADGES_SHOWN, badgeSummary, readBadges } from './badges'
+import { computeStats } from './profileStats'
+
+vi.mock('../Firebase', () => ({ firestore: {} }))
+vi.mock('firebase/firestore', () => ({ doc: vi.fn(), getDoc: vi.fn(), updateDoc: vi.fn() }))
+vi.mock('./gameHistory', () => ({ fetchGames: vi.fn() }))
+
+const NOW = Date.parse('2026-10-13T12:00:00Z')
+const game = (overrides) => ({ id: String(Math.random()), gameType: 'PLACEMENT', mode: 'standard', playedAt: NOW, ...overrides })
+const unlockedIds = (games, friendsCount) =>
+  computeAchievements({ stats: computeStats(games, '2026-10-13'), games, friendsCount })
+    .filter((achievement) => achievement.unlocked)
+    .map((achievement) => achievement.id)
+
+describe('achievements', () => {
+  it('have unique ids, a known tier and a reachable target', () => {
+    expect(new Set(ACHIEVEMENTS.map((achievement) => achievement.id)).size).toBe(ACHIEVEMENTS.length)
+    for (const achievement of ACHIEVEMENTS) {
+      expect(TIERS).toContain(achievement.tier)
+      expect(achievement.target).toBeGreaterThan(0)
+      expect(achievement.emoji).toBeTruthy()
+      expect(achievement.icon).toBeTruthy()
+    }
+  })
+
+  it('unlock nothing without games', () => {
+    expect(unlockedIds([])).toEqual([])
+  })
+
+  it('unlock the survival ones from the rounds survived', () => {
+    const run = (score, lives) => game({ gameType: 'SURVIVAL', mode: 'survival', score, lives })
+    expect(unlockedIds([run(12, 3)])).toEqual(expect.arrayContaining(['survival_10']))
+    expect(unlockedIds([run(12, 3)])).not.toContain('survival_25')
+    expect(unlockedIds([run(30, 3)])).not.toContain('survival_one_life')
+    expect(unlockedIds([run(30, 1)])).toEqual(expect.arrayContaining(['survival_25', 'survival_one_life']))
+  })
+
+  it('unlock the quiz ones from a streak or a flawless run', () => {
+    const quiz = (extra) => game({ gameType: 'QUIZ', mode: 'infinite', ...extra })
+    expect(unlockedIds([quiz({ answered: 12, correct: 12, bestStreak: 12 })])).toEqual(
+      expect.arrayContaining(['quiz_flawless', 'quiz_streak_10'])
+    )
+    expect(unlockedIds([quiz({ answered: 12, correct: 11, bestStreak: 9 })])).not.toContain('quiz_flawless')
+    expect(unlockedIds([quiz({ answered: 30, correct: 28, bestStreak: 26 })])).toContain('quiz_streak_25')
+  })
+
+  it('only count a perfect game when every country was found', () => {
+    expect(unlockedIds([game({ found: 20, total: 20, difficulty: 'Moyen' })])).toContain('perfect_run')
+    expect(unlockedIds([game({ found: 20, total: 20, difficulty: 'Moyen' })])).not.toContain('master')
+    expect(unlockedIds([game({ found: 20, total: 20, difficulty: 'Difficile' })])).toContain('master')
+    expect(unlockedIds([game({ found: 19, total: 20, difficulty: 'Difficile' })])).not.toContain('perfect_run')
+    expect(unlockedIds([game({ found: 3, total: 3 })])).not.toContain('perfect_run')
+  })
+
+  it('count the days with every daily challenge done', () => {
+    const types = ['BORDER_GUESS', 'COUNTRY_CLUE', 'VOYAGE_VOYAGE', 'RANKING', 'QUIZ']
+    const day = (dailyKey) => types.map((gameType) => game({ gameType, mode: 'daily', dailyKey, solved: true, attempts: 3 }))
+    const days = ['2026-10-01', '2026-10-02', '2026-10-03', '2026-10-04', '2026-10-05', '2026-10-06']
+    expect(unlockedIds(days.flatMap(day))).not.toContain('sweep_7')
+    expect(unlockedIds([...days, '2026-10-07'].flatMap(day))).toEqual(expect.arrayContaining(['sweep_7', 'daily_sweep']))
+  })
+
+  it('leave the Ranking out of "first try", and check its error for a perfect one', () => {
+    const ranking = game({ gameType: 'RANKING', mode: 'daily', dailyKey: '2026-10-13', solved: true, attempts: 1, totalError: 0 })
+    expect(unlockedIds([ranking])).toContain('perfect_ranking')
+    expect(unlockedIds([ranking])).not.toContain('first_try')
+  })
+
+  it('sort the unlocked ones by tier', () => {
+    const games = Array.from({ length: 12 }, () => game({ gameType: 'SURVIVAL', mode: 'survival', score: 55, lives: 1 }))
+    const unlocked = computeAchievements({ stats: computeStats(games, '2026-10-13'), games }).filter((item) => item.unlocked)
+    const ranks = unlocked.map((item) => TIERS.indexOf(item.tier))
+    expect(ranks).toEqual([...ranks].sort((a, b) => b - a))
+    expect(unlocked[0].tier).toBe('legend')
+  })
+})
+
+describe('badges', () => {
+  const games = Array.from({ length: 12 }, () => game({ gameType: 'SURVIVAL', mode: 'survival', score: 55, lives: 1 }))
+  const achievements = computeAchievements({ stats: computeStats(games, '2026-10-13'), games, friendsCount: 3 })
+
+  it('summarize the best badges, never more than the limit, without "friend"', () => {
+    const summary = badgeSummary(achievements)
+    expect(summary.top).toHaveLength(BADGES_SHOWN)
+    expect(summary.top[0]).toBe('survival_50')
+    expect(summary.count).toBe(achievements.filter((item) => item.unlocked && item.id !== 'friend').length)
+    expect(badgeSummary(computeAchievements({ stats: computeStats([]), games: [], friendsCount: 1 }))).toEqual({ top: [], count: 0 })
+  })
+
+  it('read what a user document holds, ignoring what is unknown or malformed', () => {
+    expect(readBadges(undefined)).toEqual({ top: [], count: 0 })
+    expect(readBadges({ badges: 'x' })).toEqual({ top: [], count: 0 })
+    const read = readBadges({ badges: { top: ['survival_50', 'nope', 'games_10', 'games_50', 'first_game'], count: 4 } })
+    expect(read.top.map((badge) => badge.id)).toEqual(['survival_50', 'games_10', 'games_50'])
+    expect(read.top[0]).toMatchObject({ tier: 'legend', emoji: '🛡️' })
+    expect(read.count).toBe(4)
+  })
+})

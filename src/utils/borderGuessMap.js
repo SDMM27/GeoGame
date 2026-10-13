@@ -133,9 +133,16 @@ export function getFocusCountry(country) {
   const spreadRatio = fullSpan / primarySpan
   const dominanceRatio = totalArea > 0 ? largestArea / totalArea : 1
   const hasDominantMainland = dominanceRatio >= 0.60
+  // A second major island (Hokkaido next to Honshu) means the country is an archipelago: show all of it.
+  const secondArea = polygons.reduce((best, polygon) => {
+    const area = getPolygonArea(polygon?.[0] ?? [])
+    return polygon !== largestPolygon && area > best ? area : best
+  }, 0)
+  const hasMajorIslands = largestArea > 0 && secondArea / largestArea >= 0.35
   const isWidelyDispersed = spreadRatio > 1.35
   const shouldFocusPrimaryPolygon =
     hasDominantMainland &&
+    !hasMajorIslands &&
     (
       (primarySpan < 1.2 && (isWidelyDispersed || fullSpan < 1.2)) ||
       (isWidelyDispersed && spreadRatio > 2.2)

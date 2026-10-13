@@ -75,7 +75,7 @@ function GameSetupSheet() {
 
   const [mode, setMode] = useState<Mode>('standard')
   const [selection, setSelection] = useState<Selection>('difficulty')
-  const [difficulty, setDifficulty] = useState('Moyen')
+  const [difficulty, setDifficulty] = useState('Facile')
   const [continent, setContinent] = useState<string | null>(null)
   const [phases, setPhases] = useState<Phases>(() => ({ ...ASCENSION_PRESETS[1].phases }))
 

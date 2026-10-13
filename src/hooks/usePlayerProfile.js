@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { computeAchievements } from '../utils/achievements'
 import { syncBadges } from '../utils/badges'
-import { fetchDailyGames, fetchGames } from '../utils/gameHistory'
+import { fetchCachedDailyGames, fetchCachedGames, fetchDailyGames, fetchGames } from '../utils/gameHistory'
 import { computeStats, dayKey } from '../utils/profileStats'
 import { watchFriendships } from '../utils/friends'
 
@@ -21,9 +21,24 @@ export function usePlayerProfile(uid, { friendsCount, own = false } = {}) {
   }, [uid])
 
   useEffect(() => {
+    if (!uid) return
+    let fresh = false
     setState({ loading: true, error: false, games: [] })
-    reload()
-  }, [reload])
+    // Last known history first (instant), replaced by the server's answer when it arrives.
+    fetchCachedGames(uid).then((games) => {
+      if (!fresh && games.length > 0) setState({ loading: false, error: false, games })
+    })
+    fetchGames(uid)
+      .then((games) => {
+        fresh = true
+        setState({ loading: false, error: false, games })
+      })
+      .catch((error) => {
+        fresh = true
+        console.warn('[profile]', error?.code, error)
+        setState((previous) => ({ ...previous, loading: false, error: previous.games.length === 0 }))
+      })
+  }, [uid])
 
   const stats = useMemo(() => computeStats(state.games), [state.games])
   const achievements = useMemo(
@@ -71,14 +86,20 @@ export function useFriendsToday(friends) {
     }
     let cancelled = false
     const key = dayKey()
-    Promise.all(
-      uids.split(',').map((uid) =>
-        fetchDailyGames(uid, key)
-          .then((games) => [uid, Object.fromEntries(games.map((game) => [game.gameType, game]))])
-          .catch(() => [uid, {}])
-      )
-    ).then((entries) => {
-      if (!cancelled) setToday(Object.fromEntries(entries))
+    const byType = (games) => Object.fromEntries(games.map((game) => [game.gameType, game]))
+    // Each friend shows as soon as their own answer arrives (cache first, then the server), not when all are in.
+    uids.split(',').forEach((uid) => {
+      let fresh = false
+      const apply = (games) => !cancelled && setToday((previous) => ({ ...previous, [uid]: byType(games) }))
+      fetchCachedDailyGames(uid, key).then((games) => {
+        if (!fresh && games) apply(games)
+      })
+      fetchDailyGames(uid, key)
+        .then((games) => {
+          fresh = true
+          apply(games)
+        })
+        .catch(() => {})
     })
     return () => {
       cancelled = true

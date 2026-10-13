@@ -16,6 +16,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  getDocsFromCache,
   limit,
   orderBy,
   query,
@@ -105,5 +106,25 @@ export function setupGameRecord({ gameType, isTraining, roomCode, isAscension, p
     continent,
     presetName,
     roomCode,
+  }
+}
+
+// Same from the local cache only (instant, may be stale or empty): resolves with [] when nothing is cached.
+export async function fetchCachedGames(uid, max = HISTORY_LIMIT) {
+  try {
+    const snapshot = await getDocsFromCache(query(gamesCollection(uid), orderBy('playedAt', 'desc'), limit(max)))
+    return snapshot.docs.map(fromSnapshot)
+  } catch {
+    return []
+  }
+}
+
+// Same as fetchDailyGames from the local cache only: null when nothing is cached for this player and day.
+export async function fetchCachedDailyGames(uid, dailyKey) {
+  try {
+    const snapshot = await getDocsFromCache(query(gamesCollection(uid), where('dailyKey', '==', dailyKey)))
+    return snapshot.empty ? null : snapshot.docs.map(fromSnapshot).filter((game) => game.mode === 'daily')
+  } catch {
+    return null
   }
 }

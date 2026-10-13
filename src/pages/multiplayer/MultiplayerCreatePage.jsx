@@ -40,7 +40,7 @@ export default function MultiplayerCreatePage() {
   return (
     <div className="mp-create">
       <NavBar />
-      <RoomConfig onSubmit={handleSubmit} submitting={submitting} initialGameId={location.state?.gameId} />
+      <RoomConfig onSubmit={handleSubmit} submitting={submitting} initialGameId={location.state?.gameId} initialConfig={location.state?.config} />
     </div>
   )
 }

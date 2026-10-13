@@ -549,6 +549,29 @@
   background: var(--success-dim);
 }
 
+/* Multiplayer: the app's group button, before Play and Training */
+.btn-multi {
+  flex: none;
+  width: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.btn-multi:hover:not(:disabled) {
+  background: var(--bg-card-hover);
+}
+
+.btn-multi:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 /* Navbar Scores Button */
 .nav-scores-btn {
   background: transparent;

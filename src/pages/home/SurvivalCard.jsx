@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import SurvivalOptions, { defaultSurvivalOptions } from "../../components/SurvivalOptions";
 import { GAME_TYPES } from "../../utils/gameTypes";
+import MultiButton from "./MultiButton";
 
 // Survival setup: the games of the rounds, the lives, the time per round and the difficulty ramp.
 export default function SurvivalCard({ game }) {
@@ -21,6 +22,7 @@ export default function SurvivalCard({ game }) {
           {t('buttons.scores')}
         </button>
         <div className="game-card-buttons">
+          {game.multiId && <MultiButton gameId={game.multiId} config={{ survival: options }} disabled={options.modes.length === 0} />}
           <button
             className="btn-play"
             onClick={() => navigate(game.route, { state: { modes: options.modes, lives: options.lives, timer: options.timer, ramp: options.ramp } })}

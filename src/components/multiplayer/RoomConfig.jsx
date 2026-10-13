@@ -70,12 +70,19 @@ function SetupSettings({ type, setup, onChange }) {
       />
       {setup.mode === 'standard' ? (
         <div className="rc-difficulties">
+          {/* A continent comes from the game's settings on the home page; picking a difficulty replaces it */}
+          {setup.continent && (
+            <button type="button" className="rc-diff-btn active">
+              <span>{t(`continents.${setup.continent}`, setup.continent)}</span>
+              <span className="rc-diff-count">{t('selection.by_continent')}</span>
+            </button>
+          )}
           {DIFFICULTIES.map(d => (
             <button
               key={d}
               type="button"
-              className={`rc-diff-btn${setup.difficulty === d ? ' active' : ''}`}
-              onClick={() => onChange({ ...setup, difficulty: d })}
+              className={`rc-diff-btn${!setup.continent && setup.difficulty === d ? ' active' : ''}`}
+              onClick={() => onChange({ ...setup, difficulty: d, continent: null })}
             >
               <span style={{ color: DIFFICULTY_COLORS[d] }}>
                 {d === 'Hardcore' ? '💀 Hardcore' : t(`difficulties.${d}`)}
@@ -138,8 +145,8 @@ export function buildRoomGame({ gameId, setup, count, quizDifficulty, answerMode
   const game = {
     id: gameId,
     type,
-    difficulty: SETUP_TYPES.includes(type) && !ascension ? setup.difficulty : null,
-    continent: null,
+    difficulty: SETUP_TYPES.includes(type) && !ascension && !setup.continent ? setup.difficulty : null,
+    continent: SETUP_TYPES.includes(type) && !ascension ? (setup.continent ?? null) : null,
     phases: ascension ? setup.phases : null,
     presetName: ascension ? (matchPreset(setup.phases) ?? null) : null,
   }
@@ -238,8 +245,9 @@ export function GameEditor({ draft, onChange }) {
   )
 }
 
-// `initialGameId`: the game picked before coming here (the multiplayer button of a home card).
-export default function RoomConfig({ onSubmit, submitting, initialGameId }) {
+// `initialGameId`: the game picked before coming here (the multiplayer button of a home card), with `initialConfig`
+// the choices made in its settings: { setup } (Placement / Flags / Capitals) or { survival }.
+export default function RoomConfig({ onSubmit, submitting, initialGameId, initialConfig }) {
   const { t } = useTranslation()
   const { account } = useAccount()
   // Signed in: the account's username until the player types another one
@@ -248,9 +256,16 @@ export default function RoomConfig({ onSubmit, submitting, initialGameId }) {
   const [mode, setMode] = useState('live')
   // Games already added, then the one being edited (the last game of the room)
   const [games, setGames] = useState([])
-  const [draft, setDraft] = useState(() =>
-    ROOM_GAMES.some(g => g.id === initialGameId) ? { ...newDraft(), gameId: initialGameId } : newDraft()
-  )
+  const [draft, setDraft] = useState(() => {
+    const fresh = newDraft()
+    if (!ROOM_GAMES.some(g => g.id === initialGameId)) return fresh
+    return {
+      ...fresh,
+      gameId: initialGameId,
+      setup: { ...fresh.setup, ...initialConfig?.setup },
+      survival: initialConfig?.survival ?? fresh.survival,
+    }
+  })
   const forbiddenPseudo = containsProfanity(pseudo)
   const canSubmit = pseudo.trim() && !forbiddenPseudo && draftReady(draft) && !submitting
 

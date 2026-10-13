@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import {getFirestore, connectFirestoreEmulator} from 'firebase/firestore';
+import {getFirestore, initializeFirestore, connectFirestoreEmulator} from 'firebase/firestore';
 import { startAppCheck } from './appCheck';
 import { APP_CHECK_SITE_KEY } from './appCheckKey';
 
@@ -20,5 +20,15 @@ export const app = initializeApp(firebaseConfig);
 // Defined by vite.config.mjs; undefined in the Expo app, which has its own switch (mobile/src/emulators.ts).
 export const USE_EMULATORS = typeof __USE_EMULATORS__ !== 'undefined' && __USE_EMULATORS__;
 export const appCheck = USE_EMULATORS ? null : startAppCheck(app, APP_CHECK_SITE_KEY);
-export const firestore = getFirestore(app);
+// Safari/iOS (and some networks or content blockers) can stall Firestore's default streaming connection for ~10s or
+// more before the SDK falls back by itself: detect it quickly and switch to long polling.
+// initializeFirestore throws if Firestore already exists for this app (hot reload): reuse it then.
+function createFirestore() {
+  try {
+    return initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
+  } catch {
+    return getFirestore(app);
+  }
+}
+export const firestore = createFirestore();
 if (USE_EMULATORS) connectFirestoreEmulator(firestore, '127.0.0.1', 8080);

@@ -64,9 +64,24 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
     mapRef.fitBounds(L.geoJSON(features).getBounds(), { padding: [20, 20], animate: false })
   }, [mapRef, continent])
 
+  // A found or revealed country shows its name under the mouse, to learn from it (the app has no hover)
+  const onMouseOver = useMemo(() => (event) => {
+    onCountryMouseOver(event)
+    const layer = event.target
+    const name = layer.feature.properties.ADMIN
+    if (!foundCountriesRef?.current.has(name) && !shownCountriesRef?.current.has(name)) return
+    if (!layer.getTooltip()) {
+      layer.bindTooltip(
+        () => getCountryName(layer.feature.properties.ISO_A2, i18n.language) || name,
+        { sticky: true, direction: 'top', className: 'map-tooltip' }
+      )
+    }
+    layer.openTooltip(event.latlng)
+  }, [onCountryMouseOver, foundCountriesRef, shownCountriesRef, i18n])
+
   const onEachOffsetFeature = useMemo(() => (feature, layer) => {
-    layer.on({ click: onCountryClick, mouseover: onCountryMouseOver, mouseout: onCountryMouseOut })
-  }, [onCountryClick, onCountryMouseOver, onCountryMouseOut])
+    layer.on({ click: onCountryClick, mouseover: onMouseOver, mouseout: onCountryMouseOut })
+  }, [onCountryClick, onMouseOver, onCountryMouseOut])
 
   const progressPct = stats.total ? (stats.found / stats.total) * 100 : 0
 
@@ -198,7 +213,7 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
           style={GEO_STYLE}
           data={countries.features}
           onEachFeature={(feature, layer) => {
-            layer.on({ click: onCountryClick, mouseover: onCountryMouseOver, mouseout: onCountryMouseOut })
+            layer.on({ click: onCountryClick, mouseover: onMouseOver, mouseout: onCountryMouseOut })
           }}
         />
         <GeoJSON

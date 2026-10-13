@@ -1,4 +1,4 @@
-﻿import React, { useEffect } from 'react'
+﻿import React, { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import { GeoJSON, MapContainer, useMap } from 'react-leaflet'
@@ -6,6 +6,7 @@ import { ToastContainer } from 'react-toastify'
 import { getCountryName } from '../utils/getCountryName'
 import { localeOf } from '../i18n/languages'
 import NavBar from '../components/NavBar'
+import useDesktopAutofocus from '../hooks/useDesktopAutofocus'
 import ShareScoreButton from '../components/ShareScoreButton'
 import ChallengeBanner from '../components/ChallengeBanner'
 import { resolveMode } from '../utils/challenge'
@@ -115,6 +116,9 @@ export default function BorderGuessPage() {
       : null
   )
 
+  const inputRef = useRef(null)
+  useDesktopAutofocus(inputRef, !isComplete && (mode !== 'daily' || hasStarted), `${currentCountryISO}-${guesses.length}`)
+
   const localizedAnswerName = getCountryName(currentCountryISO, i18n.language) || answerName
 
   const title = mode === 'daily' ? t('borderguess.daily_title') : t('borderguess.infinite_title')
@@ -214,6 +218,7 @@ export default function BorderGuessPage() {
               <div className="border-guess-input-overlay">
                 <input
                   id="border-guess-input"
+                  ref={inputRef}
                   className="border-guess-input"
                   type="text"
                   placeholder={t('placeholders.country_examples')}

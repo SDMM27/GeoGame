@@ -158,6 +158,15 @@ const fr = {
     leave: 'Quitter',
   },
   update: { title: 'Nouvelle version disponible', message: 'Relance pour l’installer', restart: 'Relancer', later: 'Plus tard', apk_title: 'Nouvelle version de l’app', apk_message: 'Installe-la pour continuer à recevoir les mises à jour', apk_install: 'Installer' },
+  nudge: {
+    title: 'Défie un ami',
+    hint: 'Il reçoit une notification pour venir te battre.',
+    sent: 'Envoyé !',
+    unreachable: 'Pas de notification possible pour {{username}}',
+    already_sent: 'Déjà défié aujourd’hui',
+    error: 'Envoi impossible. Réessaie.',
+    rate_limited: 'Trop de défis envoyés, réessaie plus tard.',
+  },
   invites: {
     title: 'Inviter des amis',
     invite: 'Inviter',
@@ -375,6 +384,15 @@ const en: MobileStrings = {
     leave: 'Leave',
   },
   update: { title: 'New version available', message: 'Restart to install it', restart: 'Restart', later: 'Later', apk_title: 'New app version', apk_message: 'Install it to keep getting updates', apk_install: 'Install' },
+  nudge: {
+    title: 'Challenge a friend',
+    hint: 'They get a notification to come and beat you.',
+    sent: 'Sent!',
+    unreachable: '{{username}} can’t get notifications',
+    already_sent: 'Already challenged today',
+    error: 'Couldn’t send. Try again.',
+    rate_limited: 'Too many challenges sent, try again later.',
+  },
   invites: {
     title: 'Invite friends',
     invite: 'Invite',
@@ -590,6 +608,15 @@ const ru: MobileStrings = {
     leave: 'Выйти',
   },
   update: { title: 'Доступна новая версия', message: 'Перезапусти, чтобы установить', restart: 'Перезапустить', later: 'Позже', apk_title: 'Новая версия приложения', apk_message: 'Установи её, чтобы получать обновления', apk_install: 'Установить' },
+  nudge: {
+    title: 'Брось вызов другу',
+    hint: 'Он получит уведомление и придёт тебя побеждать.',
+    sent: 'Отправлено!',
+    unreachable: '{{username}} не получает уведомления',
+    already_sent: 'Сегодня уже вызвали',
+    error: 'Не удалось отправить. Попробуй ещё раз.',
+    rate_limited: 'Слишком много вызовов, попробуй позже.',
+  },
   invites: {
     title: 'Пригласить друзей',
     invite: 'Пригласить',

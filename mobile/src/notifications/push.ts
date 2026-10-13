@@ -1,6 +1,6 @@
-// Push notifications (room invites, friend requests, daily challenge reminder): registers this device under the account, and opens the right
+// Push notifications (room invites, friend requests, daily challenge reminder, friends' daily nudges): registers this device under the account, and opens the right
 // screen when one is tapped. The pushes themselves are sent by the website's API: api/invite-push (src/utils/invites.js),
-// api/friend-push (src/utils/friends.js) and api/daily-reminder (once a day).
+// api/friend-push (src/utils/friends.js), api/daily-nudge (src/utils/dailyNudge.js) and api/daily-reminder (once a day).
 import Constants from 'expo-constants'
 import * as Device from 'expo-device'
 import * as Notifications from 'expo-notifications'
@@ -10,6 +10,8 @@ import { Platform } from 'react-native'
 
 import i18n from '@shared/i18n'
 
+import { GAMES } from '@/games'
+
 import { saveDevice } from './device'
 
 export { forgetDevice, useDailyReminder } from './device'
@@ -17,14 +19,14 @@ export { forgetDevice, useDailyReminder } from './device'
 // Android channels, one per kind, so each can be muted on its own in the system settings.
 const CHANNELS = { invites: 'mobile.invites.channel', friends: 'mobile.invites.friends_channel', daily: 'mobile.invites.daily_channel' }
 
-type PushData = { type?: string; room?: string; uid?: string }
+type PushData = { type?: string; room?: string; uid?: string; gameType?: string }
 
 // In the foreground the in-app banner (InviteBanner) already shows an invite, and the daily reminder is pointless;
-// friend requests still show up.
+// friend requests and friends' "come beat me" nudges still show up.
 Notifications.setNotificationHandler({
   handleNotification: async (notification) => {
     const type = (notification.request.content.data as PushData | undefined)?.type
-    const show = type === 'friend_request' || type === 'friend_accepted'
+    const show = type === 'friend_request' || type === 'friend_accepted' || type === 'daily_nudge'
     return { shouldShowBanner: show, shouldShowList: show, shouldPlaySound: show, shouldSetBadge: false }
   },
 })
@@ -67,6 +69,12 @@ export function usePushNotifications(uid: string | null | undefined) {
     } else if (data?.type === 'friend_accepted' && data.uid) {
       Notifications.clearLastNotificationResponseAsync()
       router.push({ pathname: '/player/[uid]', params: { uid: data.uid } })
+    } else if (data?.type === 'daily_nudge') {
+      Notifications.clearLastNotificationResponseAsync()
+      // Straight to the daily challenge the friend finished.
+      const game = GAMES.find((item) => item.kind === 'daily' && item.type === data.gameType)
+      if (game) router.navigate({ pathname: game.route as never, params: { mode: 'daily' } })
+      else router.navigate('/')
     } else if (data?.type === 'daily') {
       Notifications.clearLastNotificationResponseAsync()
       router.navigate('/')

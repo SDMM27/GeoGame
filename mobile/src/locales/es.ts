@@ -147,6 +147,15 @@ export const es: MobileStrings = {
     leave: 'Salir',
   },
   update: { title: 'Nueva versión disponible', message: 'Reinicia para instalarla', restart: 'Reiniciar', later: 'Más tarde', apk_title: 'Nueva versión de la app', apk_message: 'Instálala para seguir recibiendo actualizaciones', apk_install: 'Instalar' },
+  nudge: {
+    title: 'Reta a un amigo',
+    hint: 'Recibe una notificación para venir a ganarte.',
+    sent: '¡Enviado!',
+    unreachable: '{{username}} no puede recibir notificaciones',
+    already_sent: 'Ya retado hoy',
+    error: 'No se pudo enviar. Inténtalo de nuevo.',
+    rate_limited: 'Demasiados retos enviados, inténtalo más tarde.',
+  },
   invites: {
     title: 'Invitar a amigos',
     invite: 'Invitar',

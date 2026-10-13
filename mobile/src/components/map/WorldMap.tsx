@@ -213,6 +213,8 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
   const ty = useSharedValue(0)
   const viewW = useSharedValue(0)
   const viewH = useSharedValue(0)
+  // Same size, readable synchronously from JS: a shared value written in onLayout can still read 0 right after.
+  const viewSize = useRef({ width: 0, height: 0 })
 
   const transform = useDerivedValue(() => [
     { translateX: wrapX(tx.value, scale.value) },
@@ -292,8 +294,7 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
 
   const applyView = useCallback(
     (targetScale: number, centerX: number, centerY: number, options?: ViewOptions) => {
-      const W = viewW.value
-      const H = viewH.value
+      const { width: W, height: H } = viewSize.current
       if (!W || !H) return
       const s = Math.min(MAX_SCALE, Math.max(minScale(), targetScale))
       // Pick the horizontal copy of the target nearest to the current view to avoid long pans
@@ -313,7 +314,7 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
       tx.value = withTiming(nextX, config)
       ty.value = withTiming(nextY, config)
     },
-    [minScale, scale, tx, ty, viewW, viewH]
+    [minScale, scale, tx, ty]
   )
 
   const setView = useCallback(
@@ -334,11 +335,11 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
       const padding = options?.padding ?? 48
       const w = Math.max(1, bottomRight.x - topLeft.x)
       const h = Math.max(1, bottomRight.y - topLeft.y)
-      let s = Math.min((viewW.value - padding * 2) / w, (viewH.value - padding * 2) / h)
+      let s = Math.min((viewSize.current.width - padding * 2) / w, (viewSize.current.height - padding * 2) / h)
       if (options?.maxZoom != null) s = Math.min(s, 2 ** (options.maxZoom - BASE_ZOOM))
       applyView(s, topLeft.x + w / 2, topLeft.y + h / 2, options)
     },
-    [applyView, viewW, viewH]
+    [applyView]
   )
 
   const fitCountries = useCallback(
@@ -359,13 +360,13 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
       if (!Number.isFinite(minX)) return
       const padding = 48
       let s = Math.min(
-        (viewW.value - padding * 2) / Math.max(1, maxX - minX),
-        (viewH.value - padding * 2) / Math.max(1, maxY - minY)
+        (viewSize.current.width - padding * 2) / Math.max(1, maxX - minX),
+        (viewSize.current.height - padding * 2) / Math.max(1, maxY - minY)
       )
       if (options?.maxZoom != null) s = Math.min(s, 2 ** (options.maxZoom - BASE_ZOOM))
       applyView(s, (minX + maxX) / 2, (minY + maxY) / 2, options)
     },
-    [applyView, viewW, viewH]
+    [applyView]
   )
 
   useImperativeHandle(
@@ -397,6 +398,7 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
   const framed = useRef(false)
   const onLayout = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout
+    viewSize.current = { width, height }
     viewW.value = width
     viewH.value = height
     setSize({ width, height })

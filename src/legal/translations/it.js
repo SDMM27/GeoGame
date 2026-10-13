@@ -62,7 +62,6 @@ export default {
               'Vercel Inc.: hosting del sito e delle funzioni server, misurazione del pubblico;',
               "Expo (650 Industries, Inc.): invio delle notifiche e degli aggiornamenti dell'app;",
               'servizi push dei browser (Apple, Google, Mozilla o Microsoft a seconda del dispositivo): invio delle notifiche della web app;',
-              'CARTO: le mappe di sfondo del sito, che riceve il tuo indirizzo IP per fornire le immagini;',
               'Flagpedia (flagcdn.com): alcune immagini delle bandiere del sito.',
             ],
           },
@@ -227,7 +226,6 @@ export default {
         blocks: [
           {
             list: [
-              'Mappe di sfondo: © contributori di [OpenStreetMap](https://www.openstreetmap.org/copyright), © [CARTO](https://carto.com/attributions).',
               'Bandiere: [Flagpedia](https://flagpedia.net).',
               'Carattere Inter: Rasmus Andersson, con licenza SIL Open Font License.',
             ],

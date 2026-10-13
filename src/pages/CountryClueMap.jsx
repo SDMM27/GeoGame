@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from 'react'
-import { MapContainer, TileLayer, GeoJSON, CircleMarker, Tooltip, useMapEvents } from 'react-leaflet'
+import { MapContainer, GeoJSON, CircleMarker, Tooltip, useMapEvents } from 'react-leaflet'
 import { COUNTRY_CENTER_MAP, getCountryByName } from '../hooks/useCountryClueState'
 import { getCountryMetrics } from '../utils/borderGuessMap'
 import 'leaflet/dist/leaflet.css'
-import { DARK_NOLABELS_TILE_URL } from '../mapTiles'
+import LandLayer from '../components/map/LandLayer'
 import { MAP_COLORS } from '../utils/mapColors'
 
 const SMALL_COUNTRY_THRESHOLD = 1.5
@@ -67,6 +67,7 @@ export default function CountryClueMap({ guesses, answerName, isLost }) {
   return (
     <div className="country-clue-map-container">
       <MapContainer
+        className="map-night"
         center={[20, 0]}
         zoom={2}
         minZoom={2}
@@ -74,11 +75,7 @@ export default function CountryClueMap({ guesses, answerName, isLost }) {
         attributionControl={false}
         style={{ height: '100%', width: '100%' }}
       >
-        <TileLayer
-          url={DARK_NOLABELS_TILE_URL}
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          minZoom={2}
-        />
+        <LandLayer borders />
         <ZoomTracker onZoom={setZoom} />
         {LNG_OFFSETS.flatMap(offset =>
           guesses.map((guess) => (

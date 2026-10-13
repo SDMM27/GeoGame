@@ -7,7 +7,7 @@ import countries from '../data/countriesWithDifficulty_FR.json'
 import { formatTime } from '../utils/formatTime'
 import { saveSnapshot } from '../utils/multiplayerSnapshot'
 import { getCountryName } from '../utils/getCountryName'
-import { MAP_COLORS } from '../utils/mapColors'
+import { HOVER_STYLE, MAP_COLORS } from '../utils/mapColors'
 
 const DIFFICULTIES = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
 
@@ -249,7 +249,7 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
     const name = layer.feature.properties.ADMIN
     if (foundCountriesRef.current.has(name)) return
     if (shownCountriesRef.current.has(name)) return
-    layer.setStyle({ fillColor: MAP_COLORS.hover, weight: 2, fillOpacity: 0.4 })
+    layer.setStyle(HOVER_STYLE)
   }
 
   const onCountryMouseOut = (event) => {

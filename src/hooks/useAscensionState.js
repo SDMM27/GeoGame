@@ -10,7 +10,7 @@ import { matchKnownAnswer } from '../utils/answerLexicon'
 import { buildPhaseSequence } from '../utils/ascensionPresets'
 import { saveSnapshot } from '../utils/multiplayerSnapshot'
 import { getCapitalName, getCountryName, getAllCountryNames, getAllCapitalNames } from '../utils/getCountryName'
-import { MAP_COLORS } from '../utils/mapColors'
+import { HOVER_STYLE, MAP_COLORS } from '../utils/mapColors'
 
 // Which country property name holds the difficulty for each game type
 const DIFFICULTY_PROP = {
@@ -349,7 +349,7 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
     const layer = event.target
     const name = layer.feature.properties.ADMIN
     if (foundCountriesRef.current.has(name) || shownCountriesRef.current.has(name)) return
-    layer.setStyle({ fillColor: MAP_COLORS.hover, weight: 2, fillOpacity: 0.4 })
+    layer.setStyle(HOVER_STYLE)
   }, [])
 
   const onCountryMouseOut = useCallback((event) => {

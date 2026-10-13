@@ -8,6 +8,7 @@
   --bg-card:          #141b30;
   --bg-card-hover:    #1b2440;
   --bg-glass:         rgba(11, 16, 32, 0.85);
+  --map-ocean:        #060e1f;
 
   --accent:           #3ddc97;
   --accent-dim:       rgba(61, 220, 151, 0.15);
@@ -207,4 +208,9 @@ select {
 
 [hidden] {
   display: none !important;
+}
+
+/* Game maps: the app's ocean under the filled land (src/components/map/LandLayer.jsx). */
+.leaflet-container.map-night {
+  background: var(--map-ocean);
 }

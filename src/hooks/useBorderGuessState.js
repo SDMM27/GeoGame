@@ -13,6 +13,8 @@ import { STABLE_DAILY_PICK_SINCE, pickDaily } from '../utils/dailyPick'
 
 const DAILY_STORAGE_PREFIX = 'border-guess-daily'
 
+// Frozen list of what was excluded when the legacy daily draw (`hash % length`) was in use: do not edit it, see
+// BORDER_GUESS_REINSTATED to bring a country back.
 const BORDER_GUESS_EXCLUDED = new Set([
   'Glacier de Siachen',
   'Banc Serranilla',
@@ -134,11 +136,52 @@ const REMOVED_AFTER_LEGACY_DAILIES = new Set([
   'Îles Salomon',
 ])
 
+// Excluded countries brought back so the harder tiers have enough to draw from. Islands and microstates with a
+// shape that can be learned; the scattered-dots archipelagos and uninhabited zones stay out.
+const BORDER_GUESS_REINSTATED = new Set([
+  'Îles Salomon',
+  'Samoa',
+  'Tonga',
+  'Sao Tomé-et-Principe',
+  'Barbade',
+  'Sainte-Lucie',
+  'Dominique',
+  'Grenade',
+  'Antigua-et-Barbuda',
+  'Saint-Vincent-et-les Grenadines',
+  'Saint-Christophe-et-Niévès',
+  'Curaçao',
+  'Guam',
+  'Polynésie française',
+  'Îles Caïmans',
+  'Île de Man',
+  'Jersey',
+  'Guernesey',
+  'Aruba',
+  'Bermudes',
+  'Aland',
+  'Îles Féroé',
+  'Cap-Vert',
+  'Comores',
+  'Maurice',
+  'Malte',
+  'Bahreïn',
+  'Singapour',
+  'Andorre',
+  'Liechtenstein',
+  'Saint-Marin',
+  'Hong Kong R.A.S.',
+  'Macao R.A.S.',
+  'Monaco',
+  'Vatican',
+  'Gibraltar',
+])
+
 export const BORDER_GUESS_COUNTRIES = countries.features.filter(
   (country) =>
     country?.properties?.ADMIN &&
     hasCountryGeometry(country) &&
-    !BORDER_GUESS_EXCLUDED.has(country.properties.ADMIN)
+    (!BORDER_GUESS_EXCLUDED.has(country.properties.ADMIN) || BORDER_GUESS_REINSTATED.has(country.properties.ADMIN))
 )
 
 export const BORDER_GUESS_COUNTRY_COUNT = BORDER_GUESS_COUNTRIES.length

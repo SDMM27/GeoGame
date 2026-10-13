@@ -19,6 +19,7 @@ import {
 import {
   doc,
   getDoc,
+  getDocFromCache,
   runTransaction,
   serverTimestamp,
 } from 'firebase/firestore'
@@ -62,6 +63,26 @@ const refreshAccounts = () => refreshListeners.forEach((listener) => listener())
 // While an email sign-up claims its username, the half-created account isn't reported.
 let signingUp = false
 
+const ACCOUNT_KEY = 'geogame_account'
+
+function readRemembered(uid) {
+  try {
+    const saved = JSON.parse(globalThis.localStorage?.getItem(ACCOUNT_KEY) ?? 'null')
+    return saved?.uid === uid && saved.username ? { username: saved.username, createdAt: saved.createdAt ?? null } : null
+  } catch {
+    return null
+  }
+}
+
+function rememberAccount(uid, data) {
+  try {
+    const createdAt = data.createdAt?.toMillis?.() ?? null
+    globalThis.localStorage?.setItem(ACCOUNT_KEY, JSON.stringify({ uid, username: data.username, createdAt }))
+  } catch {
+    // Storage unavailable: the account is just loaded from the network every time.
+  }
+}
+
 // { uid, email, username, createdAt, needsUsername, hasPassword } or null.
 // needsUsername: after a first Google sign-in, the player still has to pick a username.
 async function loadAccount(user) {
@@ -72,7 +93,16 @@ async function loadAccount(user) {
     hasPassword: user.providerData.some((provider) => provider.providerId === 'password'),
   }
   try {
-    const profile = await getDoc(userRef(user.uid))
+    // Without waiting for the network: the profile last seen on this device (or Firestore's cache) shows the page at
+    // once, the server read below refreshes both. Only a first visit, or a new device, waits for the server.
+    const remembered = readRemembered(user.uid)
+    if (remembered) {
+      getDoc(userRef(user.uid)).then((profile) => profile.exists() && rememberAccount(user.uid, profile.data())).catch(() => {})
+      return { ...account, ...remembered, needsUsername: false }
+    }
+    const cached = await getDocFromCache(userRef(user.uid)).catch(() => null)
+    const profile = cached?.exists() ? cached : await getDoc(userRef(user.uid))
+    if (profile.exists()) rememberAccount(user.uid, profile.data())
     return profile.exists()
       ? {
           ...account,

@@ -109,15 +109,41 @@ export function splitFriendships(docs, uid) {
     .sort((a, b) => a.username.localeCompare(b.username))
 }
 
+const RETRY_DELAYS = [1000, 3000, 8000]
+
+// A listener that fails is dead for good: on iOS it often fails once at start (network or token not ready yet),
+// so it is started again a few times instead of showing an empty list until the next visit.
 export function watchFriendships(uid, callback) {
-  return onSnapshot(
-    query(collection(firestore, 'friendships'), where('users', 'array-contains', uid)),
-    (snapshot) => callback(splitFriendships(snapshot.docs.map((item) => ({ id: item.id, ...item.data() })), uid)),
-    (error) => {
-      console.warn('[friends]', error?.code, error)
-      callback([])
-    }
-  )
+  let unsubscribe = null
+  let timer = null
+  let stopped = false
+  let failures = 0
+
+  const start = () => {
+    unsubscribe = onSnapshot(
+      query(collection(firestore, 'friendships'), where('users', 'array-contains', uid)),
+      (snapshot) => {
+        failures = 0
+        callback(splitFriendships(snapshot.docs.map((item) => ({ id: item.id, ...item.data() })), uid))
+      },
+      (error) => {
+        console.warn('[friends]', error?.code, error)
+        if (stopped) return
+        if (failures < RETRY_DELAYS.length) {
+          timer = setTimeout(start, RETRY_DELAYS[failures++])
+        } else {
+          callback([])
+        }
+      }
+    )
+  }
+  start()
+
+  return () => {
+    stopped = true
+    clearTimeout(timer)
+    unsubscribe?.()
+  }
 }
 
 const FRIEND_ERRORS = ['not_found', 'self', 'already_friends', 'already_sent']

@@ -151,3 +151,58 @@
     max-height: 34vh;
   }
 }
+
+/* ── Large screens: a bigger flag and input (also used by Capitals) ── */
+/* The HUD (top) and its buttons (bottom) float over the page: keep the content between them, and give the flag
+   the height that is left. */
+@media (min-width: 1024px) and (min-height: 700px) {
+  .flag-game-main {
+    max-width: 680px;
+    padding-top: 176px;
+    padding-bottom: 90px;
+  }
+
+  .hud-container--with-phase ~ .flag-game-main {
+    padding-top: 224px;
+  }
+
+  .flag-display,
+  .flag-placeholder {
+    --flag-height: clamp(200px, calc(100vh - 450px), 440px);
+    width: auto;
+    max-width: 100%;
+    height: var(--flag-height);
+    border-radius: 12px;
+  }
+
+  .flag-placeholder {
+    aspect-ratio: 3 / 2;
+  }
+
+  .hud-container--with-phase ~ .flag-game-main .flag-display,
+  .hud-container--with-phase ~ .flag-game-main .flag-placeholder {
+    --flag-height: clamp(180px, calc(100vh - 500px), 440px);
+  }
+
+  /* Capitals also shows the country's name: a bit less room for the flag */
+  .capitals-game-main .flag-display,
+  .capitals-game-main .flag-placeholder {
+    --flag-height: clamp(180px, calc(100vh - 540px), 360px);
+  }
+
+  .hud-container--with-phase ~ .capitals-game-main .flag-display,
+  .hud-container--with-phase ~ .capitals-game-main .flag-placeholder {
+    --flag-height: clamp(160px, calc(100vh - 590px), 360px);
+  }
+
+  .flag-input,
+  .flag-submit-btn {
+    padding: 0.9rem 1.2rem;
+    font-size: 1.15rem;
+    border-radius: 10px;
+  }
+
+  .flag-revealed-name {
+    font-size: 1.7rem;
+  }
+}

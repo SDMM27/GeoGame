@@ -432,3 +432,58 @@
   font-weight: 600;
   color: var(--text-muted);
 }
+
+/* ── Large screens: a wider card, bigger question and answers, centered in the height ── */
+@media (min-width: 1024px) and (min-height: 700px) {
+  .quiz-page:not(.quiz-page--room) {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .quiz-page:not(.quiz-page--room) .quiz-main {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-bottom: 10vh;
+  }
+
+  .quiz-main {
+    max-width: 880px;
+  }
+
+  .quiz-card {
+    padding: 36px;
+  }
+
+  .quiz-question {
+    margin: 14px 0 28px;
+    font-size: 1.9rem;
+  }
+
+  .quiz-choices {
+    gap: 14px;
+  }
+
+  .quiz-choice {
+    padding: 22px 20px;
+    font-size: 1.15rem;
+  }
+
+  .quiz-choice-key {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+
+  .quiz-input {
+    padding: 18px 20px;
+    font-size: 1.2rem;
+  }
+
+  .quiz-btn {
+    padding: 13px 24px;
+    font-size: 1rem;
+  }
+}

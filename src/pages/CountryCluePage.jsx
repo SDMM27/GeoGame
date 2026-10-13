@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
@@ -13,6 +13,7 @@ import DailyLeaderboard from './DailyLeaderboard'
 import { GAME_TYPES } from '../utils/gameTypes'
 import { useAccount, useRecordGame } from '../auth'
 import { useDailyPlayedElsewhere } from '../hooks/useDailyPlayedElsewhere'
+import useDesktopAutofocus from '../hooks/useDesktopAutofocus'
 import DailyPlayedElsewhere from '../components/DailyPlayedElsewhere'
 import { getCountryName } from '../utils/getCountryName'
 import { localeOf } from '../i18n/languages'
@@ -108,6 +109,9 @@ export default function CountryCluePage() {
       : null
   )
 
+  const inputRef = useRef(null)
+  useDesktopAutofocus(inputRef, !isComplete && (mode !== 'daily' || hasStarted), `${answerName}-${guesses.length}`)
+
   const lang = i18n.language
   const translatedAnswerName =
     currentCountryISO
@@ -183,6 +187,7 @@ export default function CountryCluePage() {
               <div className="country-clue-input-overlay">
                 <input
                   id="country-clue-input"
+                  ref={inputRef}
                   className="country-clue-input"
                   type="text"
                   placeholder={t('placeholders.country_examples_clue')}

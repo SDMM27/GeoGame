@@ -62,7 +62,6 @@ export default {
               'Vercel Inc.: hospedagem do site e das funções de servidor, medição de audiência;',
               'Expo (650 Industries, Inc.): envio de notificações e atualizações do app;',
               'serviços push dos navegadores (Apple, Google, Mozilla ou Microsoft, conforme o aparelho): envio das notificações do web app;',
-              'CARTO: os mapas de fundo do site, que recebe seu endereço IP para fornecer as imagens;',
               'Flagpedia (flagcdn.com): algumas imagens de bandeiras do site.',
             ],
           },
@@ -227,7 +226,6 @@ export default {
         blocks: [
           {
             list: [
-              'Mapas de fundo: © colaboradores do [OpenStreetMap](https://www.openstreetmap.org/copyright), © [CARTO](https://carto.com/attributions).',
               'Bandeiras: [Flagpedia](https://flagpedia.net).',
               'Fonte Inter: Rasmus Andersson, sob a licença SIL Open Font License.',
             ],

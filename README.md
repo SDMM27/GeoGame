@@ -32,7 +32,6 @@ Le site est servi sur http://localhost:5173. Variables d'environnement, à mettr
 
 | Variable | Rôle |
 | --- | --- |
-| `VITE_CARTO_API_KEY` | Clé des tuiles de carte CARTO (`src/mapTiles.js`). |
 | `VITE_RECAPTCHA_ENTERPRISE_KEY` | Clé de site reCAPTCHA Enterprise pour Firebase App Check (`src/appCheckKey.js`). Vide : App Check est désactivé. |
 | `VITE_USE_EMULATORS=1` | Connecte le site aux émulateurs Firebase locaux (Firestore sur `127.0.0.1:8080`) au lieu de la production, et désactive App Check. |
 | `VITE_APP_URL`, `VITE_APK_URL` | Facultatives : adresse de l'app web et de l'APK Android (`src/utils/appLinks.js`). |

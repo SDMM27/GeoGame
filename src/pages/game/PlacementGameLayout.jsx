@@ -1,13 +1,14 @@
-import React, { useEffect, useMemo, useRef } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet'
+import { MapContainer, GeoJSON } from 'react-leaflet'
 import L from 'leaflet'
 import { ToastContainer } from 'react-toastify'
 import { GAME_TYPES } from '../../utils/gameTypes'
 import { setupGameRecord } from '../../utils/gameHistory'
 import { useRecordGame } from '../../auth'
 import { getCountryName } from '../../utils/getCountryName'
-import { DARK_NOLABELS_TILE_URL } from '../../mapTiles'
+import LandLayer from '../../components/map/LandLayer'
+import { createAppFillRenderer } from '../../components/map/appFillRenderer'
 import PhaseIndicator from '../../components/PhaseIndicator'
 import countries from '../../data/countriesWithDifficulty_FR.json'
 import Form from '../form'
@@ -31,6 +32,7 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
     seeCountry, restartGame, goHome,
     currentPhase, phaseCountRemaining, totalPhaseCount, phaseStats,
   } = state
+  const [renderer] = useState(createAppFillRenderer)
 
   // Multiplayer games (onGameFinished) belong to their room, not to the history.
   useRecordGame(
@@ -62,9 +64,24 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
     mapRef.fitBounds(L.geoJSON(features).getBounds(), { padding: [20, 20], animate: false })
   }, [mapRef, continent])
 
+  // A found or revealed country shows its name under the mouse, to learn from it (the app has no hover)
+  const onMouseOver = useMemo(() => (event) => {
+    onCountryMouseOver(event)
+    const layer = event.target
+    const name = layer.feature.properties.ADMIN
+    if (!foundCountriesRef?.current.has(name) && !shownCountriesRef?.current.has(name)) return
+    if (!layer.getTooltip()) {
+      layer.bindTooltip(
+        () => getCountryName(layer.feature.properties.ISO_A2, i18n.language) || name,
+        { sticky: true, direction: 'top', className: 'map-tooltip' }
+      )
+    }
+    layer.openTooltip(event.latlng)
+  }, [onCountryMouseOver, foundCountriesRef, shownCountriesRef, i18n])
+
   const onEachOffsetFeature = useMemo(() => (feature, layer) => {
-    layer.on({ click: onCountryClick, mouseover: onCountryMouseOver, mouseout: onCountryMouseOut })
-  }, [onCountryClick, onCountryMouseOver, onCountryMouseOut])
+    layer.on({ click: onCountryClick, mouseover: onMouseOver, mouseout: onCountryMouseOut })
+  }, [onCountryClick, onMouseOver, onCountryMouseOut])
 
   const progressPct = stats.total ? (stats.found / stats.total) * 100 : 0
 
@@ -174,20 +191,16 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
       <ToastContainer enableMultiContainer containerId="topRightToast" position="top-right" autoClose={1500} theme="dark" hideProgressBar />
 
       <MapContainer
+        className="map-night" renderer={renderer}
         center={[20, 0]} zoom={3} zoomSnap={0.25} scrollWheelZoom zoomControl={false}
         dragging={false} doubleClickZoom={false} attributionControl={false}
         style={{ width: '100%', height: '100vh' }}
         whenReady={({ target }) => {
           setMapRef(target)
-          target.getContainer().style.background = 'var(--bg-primary)'
           setTimeout(() => target.invalidateSize(), 100)
         }}
       >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url={DARK_NOLABELS_TILE_URL}
-          minZoom={2} maxZoom={20}
-        />
+        <LandLayer />
         <GeoJSON
           key="geojson-left"
           ref={geoJsonRefLeft}
@@ -200,7 +213,7 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
           style={GEO_STYLE}
           data={countries.features}
           onEachFeature={(feature, layer) => {
-            layer.on({ click: onCountryClick, mouseover: onCountryMouseOver, mouseout: onCountryMouseOut })
+            layer.on({ click: onCountryClick, mouseover: onMouseOver, mouseout: onCountryMouseOut })
           }}
         />
         <GeoJSON

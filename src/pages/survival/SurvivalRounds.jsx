@@ -2,10 +2,11 @@
 // answers to useSurvivalState; lives, score and the next round are handled by SurvivalGame.
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { GeoJSON, MapContainer, TileLayer } from 'react-leaflet'
+import { GeoJSON, MapContainer } from 'react-leaflet'
 import countries from '../../data/countriesWithDifficulty_FR.json'
 import { BORDER_GUESS_COUNTRIES } from '../../hooks/useBorderGuessState'
-import { DARK_NOLABELS_TILE_URL } from '../../mapTiles'
+import LandLayer from '../../components/map/LandLayer'
+import { createAppFillRenderer } from '../../components/map/appFillRenderer'
 import { getCountryStyle, getFocusCountry } from '../../utils/borderGuessMap'
 import { GAME_TYPES } from '../../utils/gameTypes'
 import { getCapitalName, getCountryName } from '../../utils/getCountryName'
@@ -14,7 +15,7 @@ import { localizeQuestion } from '../../utils/quizQuestions'
 import { matchesWhileTyping } from '../../utils/survival'
 import { FitCountryBounds, GuessHistory } from '../BorderGuessPage'
 import SmallCountryCircles from '../game/SmallCountryCircles'
-import { MAP_COLORS } from '../../utils/mapColors'
+import { HOVER_STYLE, MAP_COLORS } from '../../utils/mapColors'
 import '../BorderGuessPage.css'
 import '../QuizPage.css'
 
@@ -34,7 +35,6 @@ export function roundAnswer(round, lang, t) {
 // ─── Placement: click the country on the map ──────────────────────────────
 
 const MAP_STYLE = { fillColor: 'transparent', color: MAP_COLORS.stroke, fillOpacity: 1, weight: 1 }
-const MAP_HOVER = { fillColor: MAP_COLORS.hover, weight: 2, fillOpacity: 0.4 }
 const MAP_WRONG = { fillColor: MAP_COLORS.wrong, color: MAP_COLORS.wrong, weight: 2, fillOpacity: 0.45 }
 const MAP_RIGHT = { fillColor: MAP_COLORS.right, color: MAP_COLORS.right, weight: 2, fillOpacity: 0.6 }
 const MAP_MISSED = { fillColor: MAP_COLORS.missed, color: MAP_COLORS.missed, weight: 2, fillOpacity: 0.6 }
@@ -43,6 +43,7 @@ export function PlacementRound({ survival }) {
   const { i18n } = useTranslation()
   const { round, wrongPicks, outcome, clickCountry } = survival
   const [map, setMap] = useState(null)
+  const [renderer] = useState(createAppFillRenderer)
   const geoJsonRef = useRef(null)
   const target = round.country.properties.ADMIN
   // SmallCountryCircles hides the tiny countries already played: none here, the wrong ones stay clickable
@@ -77,6 +78,8 @@ export function PlacementRound({ survival }) {
     <div className="survival-map">
       <div className="survival-target">{countryLabel(round.country, i18n.language)}</div>
       <MapContainer
+        className="map-night"
+        renderer={renderer}
         center={[20, 0]}
         zoom={2.5}
         zoomSnap={0.25}
@@ -88,11 +91,10 @@ export function PlacementRound({ survival }) {
         style={{ position: 'absolute', inset: 0 }}
         whenReady={({ target: leafletMap }) => {
           setMap(leafletMap)
-          leafletMap.getContainer().style.background = 'var(--bg-primary)'
           setTimeout(() => leafletMap.invalidateSize(), 100)
         }}
       >
-        <TileLayer url={DARK_NOLABELS_TILE_URL} minZoom={2} maxZoom={20} />
+        <LandLayer />
         <GeoJSON
           ref={geoJsonRef}
           data={countries.features}
@@ -101,7 +103,7 @@ export function PlacementRound({ survival }) {
             const name = feature.properties.ADMIN
             layer.on({
               click: () => stateRef.current.clickCountry(name),
-              mouseover: () => { if (styleOf(name) === MAP_STYLE) layer.setStyle(MAP_HOVER) },
+              mouseover: () => { if (styleOf(name) === MAP_STYLE) layer.setStyle(HOVER_STYLE) },
               mouseout: () => layer.setStyle(styleOf(name)),
             })
           }}

@@ -68,3 +68,20 @@
     display: none;
   }
 }
+
+/* Large screens: the bigger flag is in FlagGamePage.css; keep the content between the floating HUD and its buttons */
+@media (min-width: 1024px) and (min-height: 700px) {
+  .capitals-game-main {
+    max-width: 680px;
+    padding-top: 176px;
+    padding-bottom: 90px;
+  }
+
+  .hud-container--with-phase ~ .capitals-game-main {
+    padding-top: 224px;
+  }
+
+  .capitals-country-value {
+    font-size: 2rem;
+  }
+}

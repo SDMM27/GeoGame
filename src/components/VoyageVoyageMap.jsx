@@ -132,7 +132,8 @@ export default function VoyageVoyageMap({
 
   return (
     <MapContainer
-      style={{ width: '100%', height: '100%', background: '#0f172a' }}
+      className="map-night"
+      style={{ width: '100%', height: '100%' }}
       center={[20, 0]}
       zoom={2}
       zoomControl={interactive}

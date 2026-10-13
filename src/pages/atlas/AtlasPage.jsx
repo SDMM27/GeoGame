@@ -3,12 +3,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
-import { CircleMarker, GeoJSON, MapContainer, TileLayer, useMapEvents } from 'react-leaflet'
+import { CircleMarker, GeoJSON, MapContainer, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import NavBar from '../../components/NavBar'
 import countries from '../../data/countriesWithDifficulty_FR.json'
-import { DARK_NOLABELS_TILE_URL } from '../../mapTiles'
+import LandLayer from '../../components/map/LandLayer'
 import { getCountryMetrics, getFocusCountry } from '../../utils/borderGuessMap'
 import { ATLAS_COUNTRIES, countryDisplayName, findAtlasCountry, getCountryInfo, searchAtlasCountries } from '../../utils/countryInfo'
 import { getShiftedFeatures } from '../game/shiftedFeatures'
@@ -17,7 +17,8 @@ import { MAP_COLORS } from '../../utils/mapColors'
 import './AtlasPage.css'
 
 const STYLE = { fillColor: '#2A3E66', fillOpacity: 0.55, color: MAP_COLORS.stroke, weight: 1 }
-const STYLE_HOVER = { fillColor: '#34406A', fillOpacity: 0.8, color: MAP_COLORS.hover, weight: 1.5 }
+// Hover: a lighter fill and a light outline; the selected country keeps the stronger blue fill
+const STYLE_HOVER = { fillColor: MAP_COLORS.hover, fillOpacity: 0.5, color: MAP_COLORS.hoverStroke, weight: 2 }
 const STYLE_SELECTED = { fillColor: MAP_COLORS.hover, fillOpacity: 0.6, color: MAP_COLORS.hover, weight: 2 }
 
 // Countries too small to click at low zoom get a dot until the map is zoomed in enough
@@ -156,6 +157,7 @@ export default function AtlasPage() {
       <div className="atlas-body">
         <div className="atlas-map">
           <MapContainer
+            className="map-night"
             center={[25, 10]}
             zoom={2}
             minZoom={2}
@@ -166,7 +168,7 @@ export default function AtlasPage() {
             style={{ width: '100%', height: '100%' }}
             ref={setMap}
           >
-            <TileLayer url={DARK_NOLABELS_TILE_URL} minZoom={2} maxZoom={9} />
+            <LandLayer />
             <GeoJSON data={shifted.left} style={STYLE} onEachFeature={onEachFeature(-1)} />
             <GeoJSON data={countries.features} style={STYLE} onEachFeature={onEachFeature(0)} />
             <GeoJSON data={shifted.right} style={STYLE} onEachFeature={onEachFeature(1)} />

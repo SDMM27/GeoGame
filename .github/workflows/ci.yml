@@ -45,7 +45,7 @@ jobs:
           cache: npm
           cache-dependency-path: package-lock.json
       - run: npm ci
-      # No secret needed: VITE_CARTO_API_KEY and the other VITE_* variables are optional
+      # No secret needed: the VITE_* variables are optional
       - run: npm run build
 
   emulator:

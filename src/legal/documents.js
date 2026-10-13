@@ -72,7 +72,6 @@ const fr = {
               'Vercel Inc. : hébergement du site et des fonctions serveur, mesure d’audience ;',
               'Expo (650 Industries, Inc.) : envoi des notifications et des mises à jour de l’application ;',
               'les services de notification des navigateurs (Apple, Google, Mozilla, Microsoft selon votre appareil) : acheminement des notifications de l’app web ;',
-              'CARTO : fonds de carte du site, qui reçoit votre adresse IP pour afficher les images ;',
               'Flagpedia (flagcdn.com) : certaines images de drapeaux du site.',
             ],
           },
@@ -237,7 +236,6 @@ const fr = {
         blocks: [
           {
             list: [
-              'Fonds de carte : © les contributeurs d’[OpenStreetMap](https://www.openstreetmap.org/copyright), © [CARTO](https://carto.com/attributions).',
               'Drapeaux : [Flagpedia](https://flagpedia.net).',
               'Police Inter : Rasmus Andersson, sous licence SIL Open Font License.',
             ],
@@ -379,7 +377,6 @@ const en = {
               'Vercel Inc.: hosting of the website and server functions, audience measurement;',
               'Expo (650 Industries, Inc.): delivery of notifications and app updates;',
               'browser push services (Apple, Google, Mozilla or Microsoft depending on your device): delivery of the web app’s notifications;',
-              'CARTO: the website’s base maps, which receives your IP address to serve the images;',
               'Flagpedia (flagcdn.com): some flag images on the website.',
             ],
           },
@@ -544,7 +541,6 @@ const en = {
         blocks: [
           {
             list: [
-              'Base maps: © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors, © [CARTO](https://carto.com/attributions).',
               'Flags: [Flagpedia](https://flagpedia.net).',
               'Inter typeface: Rasmus Andersson, under the SIL Open Font License.',
             ],
@@ -684,7 +680,6 @@ const ru = {
               'Vercel Inc.: хостинг сайта и серверных функций, статистика посещений;',
               'Expo (650 Industries, Inc.): доставка уведомлений и обновлений приложения;',
               'службы уведомлений браузеров (Apple, Google, Mozilla или Microsoft, в зависимости от устройства): доставка уведомлений веб-приложения;',
-              'CARTO: картографическая подложка сайта, получает ваш IP-адрес для загрузки изображений;',
               'Flagpedia (flagcdn.com): некоторые изображения флагов на сайте.',
             ],
           },
@@ -849,7 +844,6 @@ const ru = {
         blocks: [
           {
             list: [
-              'Картографическая подложка: © участники [OpenStreetMap](https://www.openstreetmap.org/copyright), © [CARTO](https://carto.com/attributions).',
               'Флаги: [Flagpedia](https://flagpedia.net).',
               'Шрифт Inter: Rasmus Andersson, лицензия SIL Open Font License.',
             ],

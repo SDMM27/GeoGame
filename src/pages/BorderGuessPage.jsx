@@ -1,4 +1,4 @@
-﻿import React, { useEffect } from 'react'
+﻿import React, { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import { GeoJSON, MapContainer, useMap } from 'react-leaflet'
@@ -6,6 +6,7 @@ import { ToastContainer } from 'react-toastify'
 import { getCountryName } from '../utils/getCountryName'
 import { localeOf } from '../i18n/languages'
 import NavBar from '../components/NavBar'
+import useDesktopAutofocus from '../hooks/useDesktopAutofocus'
 import ShareScoreButton from '../components/ShareScoreButton'
 import ChallengeBanner from '../components/ChallengeBanner'
 import { resolveMode } from '../utils/challenge'
@@ -27,9 +28,17 @@ export function FitCountryBounds({ country }) {
   useEffect(() => {
     if (!country) return
     const { bounds, zoom, padding } = getViewportSettings(country)
-    if (bounds.isValid()) {
-      map.fitBounds(bounds, { padding, maxZoom: zoom, animate: false })
+    if (!bounds.isValid()) return
+    const fit = () => {
+      // A full-screen map needs more room around the silhouette than the small frame on phones.
+      const { x, y } = map.getSize()
+      const roomy = Math.min(x, y) > 600
+      map.fitBounds(bounds, { padding: roomy ? padding.map((p) => Math.max(p, 48)) : padding, maxZoom: zoom, animate: false })
     }
+    fit()
+    // The map fills the screen on desktop: keep the silhouette centered when the window is resized.
+    map.on('resize', fit)
+    return () => map.off('resize', fit)
   }, [country, map])
 
   return null
@@ -106,6 +115,9 @@ export default function BorderGuessPage() {
       ? { gameType: GAME_TYPES.BORDER_GUESS, mode: 'daily', dailyKey, solved: isSolved, attempts: guesses.length, elapsedTime }
       : null
   )
+
+  const inputRef = useRef(null)
+  useDesktopAutofocus(inputRef, !isComplete && (mode !== 'daily' || hasStarted), `${currentCountryISO}-${guesses.length}`)
 
   const localizedAnswerName = getCountryName(currentCountryISO, i18n.language) || answerName
 
@@ -206,6 +218,7 @@ export default function BorderGuessPage() {
               <div className="border-guess-input-overlay">
                 <input
                   id="border-guess-input"
+                  ref={inputRef}
                   className="border-guess-input"
                   type="text"
                   placeholder={t('placeholders.country_examples')}

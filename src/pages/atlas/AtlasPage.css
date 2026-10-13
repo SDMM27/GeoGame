@@ -1,7 +1,6 @@
 .atlas-page { display: flex; flex-direction: column; height: 100vh; height: 100dvh; background: var(--bg-primary); }
 .atlas-body { position: relative; flex: 1; min-height: 0; display: flex; }
 .atlas-map { position: relative; flex: 1; min-width: 0; }
-.atlas-map .leaflet-container { background: var(--bg-primary); }
 
 .atlas-overlay {
   position: absolute; top: 12px; left: 56px; z-index: 500;

@@ -62,7 +62,6 @@ export default {
               'Vercel Inc.: Hosting der Website und der Serverfunktionen, Reichweitenmessung;',
               'Expo (650 Industries, Inc.): Zustellung von Benachrichtigungen und App-Updates;',
               'Push-Dienste der Browser (je nach Gerät Apple, Google, Mozilla oder Microsoft): Zustellung der Benachrichtigungen der Web-App;',
-              'CARTO: die Hintergrundkarten der Website; CARTO erhält deine IP-Adresse, um die Bilder auszuliefern;',
               'Flagpedia (flagcdn.com): einige Flaggenbilder der Website.',
             ],
           },
@@ -227,7 +226,6 @@ export default {
         blocks: [
           {
             list: [
-              'Hintergrundkarten: © Mitwirkende von [OpenStreetMap](https://www.openstreetmap.org/copyright), © [CARTO](https://carto.com/attributions).',
               'Flaggen: [Flagpedia](https://flagpedia.net).',
               'Schriftart Inter: Rasmus Andersson, unter der SIL Open Font License.',
             ],

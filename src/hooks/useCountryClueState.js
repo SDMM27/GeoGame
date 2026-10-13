@@ -494,7 +494,7 @@ export default function useCountryClueState(mode, options = {}) {
     if (!currentCountry || isComplete) return
     setStatus('lost')
     setInputValue('')
-    toast.info(t('toasts.country_was', { name: getCountryName(currentCountry.properties.ISO_A2, i18n.language) || answerName }), { containerId: 'topRightToast' })
+    toast.info(t('toasts.answer_reveal', { name: getCountryName(currentCountry.properties.ISO_A2, i18n.language) || answerName }), { containerId: 'topRightToast' })
   }
 
   const goHome = () => navigate('/')

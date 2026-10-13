@@ -8,6 +8,7 @@
   --bg-card:          #141b30;
   --bg-card-hover:    #1b2440;
   --bg-glass:         rgba(11, 16, 32, 0.85);
+  --map-ocean:        #060e1f;
 
   --accent:           #3ddc97;
   --accent-dim:       rgba(61, 220, 151, 0.15);
@@ -207,4 +208,23 @@ select {
 
 [hidden] {
   display: none !important;
+}
+
+/* Game maps: the app's ocean under the filled land (src/components/map/LandLayer.jsx). */
+.leaflet-container.map-night {
+  background: var(--map-ocean);
+}
+
+/* Country name over a game map (Find the Country: found or revealed countries) */
+.leaflet-tooltip.map-tooltip {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  font-family: var(--font-main);
+  font-weight: 600;
+}
+
+.leaflet-tooltip-top.map-tooltip::before {
+  border-top-color: var(--border-color);
 }

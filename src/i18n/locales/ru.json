@@ -401,6 +401,7 @@
     "all_capitals_found": "Отлично! Вы нашли все столицы!",
     "already_proposed": "Ты уже предложил эту страну.",
     "country_was": "Отлично! Это была {{name}}",
+    "answer_reveal": "Правильный ответ: {{name}}",
     "hint_updated": "Подсказка обновлена",
     "ascension_phase_done": "Фаза завершена! Отлично!",
     "ascension_failed": "Неверно! Игра окончена."

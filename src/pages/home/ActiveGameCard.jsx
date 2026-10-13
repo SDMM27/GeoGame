@@ -8,6 +8,7 @@ import {
   getDifficultiesForGame,
   getDifficultyCaps,
 } from "./gameData";
+import MultiButton from "./MultiButton";
 
 export default function ActiveGameCard({ game }) {
   const navigate = useNavigate();
@@ -44,6 +45,14 @@ export default function ActiveGameCard({ game }) {
 
     navigate(game.route, { state: { difficulty: difficultyOverride ?? difficulty, isTraining } });
   };
+
+  // The same choices for a multiplayer room (src/components/multiplayer/RoomConfig.jsx)
+  const multiSetup =
+    mode === "ascension"
+      ? { mode: "ascension", phases: ascensionPhases }
+      : selectionMode === "continent"
+        ? { mode: "standard", continent: selectedContinent }
+        : { mode: "standard", difficulty };
 
   const handlePresetClick = (preset) => {
     const nextPhases = Object.entries(preset.phases).reduce((acc, [name, count]) => {
@@ -183,6 +192,16 @@ export default function ActiveGameCard({ game }) {
           {t('buttons.scores')}
         </button>
         <div className="game-card-buttons">
+          {game.multiId && (
+            <MultiButton
+              gameId={game.multiId}
+              config={{ setup: multiSetup }}
+              disabled={
+                (mode === "ascension" && totalAscensionCountries === 0) ||
+                (mode === "standard" && selectionMode === "continent" && !selectedContinent)
+              }
+            />
+          )}
           <button
             className="btn-play"
             onClick={() => handlePlay(false)}

@@ -146,7 +146,7 @@ export const de: MobileStrings = {
     errors_label: 'Falsche Tipps',
     leave: 'Verlassen',
   },
-  update: { title: 'Neue Version verfügbar', message: 'Neu starten, um sie zu installieren', restart: 'Neu starten', later: 'Später' },
+  update: { title: 'Neue Version verfügbar', message: 'Neu starten, um sie zu installieren', restart: 'Neu starten', later: 'Später', apk_title: 'Neue App-Version', apk_message: 'Installiere sie, um weiter Updates zu erhalten', apk_install: 'Installieren' },
   invites: {
     title: 'Freunde einladen',
     invite: 'Einladen',

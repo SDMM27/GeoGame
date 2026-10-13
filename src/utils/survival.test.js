@@ -61,6 +61,8 @@ describe('buildSurvivalRounds', () => {
       .toEqual(['Facile', 'Facile', 'Moyen', 'Moyen', 'Difficile', 'Difficile', 'Impossible', 'Impossible'])
     expect([0, 2, 3, 6, 7, 11, 12].map((index) => survivalDifficulty(index, SURVIVAL_RAMPS.express)))
       .toEqual(['Facile', 'Facile', 'Moyen', 'Moyen', 'Difficile', 'Difficile', 'Impossible'])
+    expect([0, 14, 15, 99].map((index) => survivalDifficulty(index, SURVIVAL_RAMPS.expert)))
+      .toEqual(['Difficile', 'Difficile', 'Impossible', 'Impossible'])
     expect(survivalDifficulty(0, SURVIVAL_RAMPS.hardcore)).toBe('Impossible')
     // A custom ramp may skip a difficulty
     expect([0, 1, 2, 3].map((index) => survivalDifficulty(index, { Facile: 2, Moyen: 0, Difficile: 1 })))

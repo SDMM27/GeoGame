@@ -34,6 +34,7 @@ const RAMP_ICONS: Record<string, keyof typeof MaterialCommunityIcons.glyphMap> =
   express: 'lightning-bolt',
   normal: 'target',
   gentle: 'sprout',
+  expert: 'fire',
   hardcore: 'skull',
   custom: 'tune-variant',
 }

@@ -14,7 +14,7 @@ export default function ActiveGameCard({ game }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [mode, setMode] = useState("standard");
-  const [difficulty, setDifficulty] = useState("Moyen");
+  const [difficulty, setDifficulty] = useState("Facile");
   const [ascensionPhases, setAscensionPhases] = useState(() => buildPresetPhases("Progressif"));
   const [selectionMode, setSelectionMode] = useState("difficulty");
   const [selectedContinent, setSelectedContinent] = useState(null);

@@ -480,6 +480,14 @@
   /* New country on its own row, the two smaller actions below it. */
   .border-guess-actions {
     flex-wrap: wrap;
+    /* Pinned to the bottom of the column: a long history scrolls behind it, "New country" stays reachable. */
+    position: sticky;
+    bottom: -20px;
+    z-index: 2;
+    margin: auto -20px -20px;
+    padding: 12px 20px 20px;
+    background: var(--bg-card);
+    box-shadow: 0 -10px 14px -8px rgba(0, 0, 0, 0.45);
   }
 
   .border-guess-actions > .border-guess-primary {

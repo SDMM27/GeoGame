@@ -1,6 +1,6 @@
 // The rounds of a survival run, one component per kind of game. Each one only shows the round and sends the
 // answers to useSurvivalState; lives, score and the next round are handled by SurvivalGame.
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { GeoJSON, MapContainer } from 'react-leaflet'
 import countries from '../../data/countriesWithDifficulty_FR.json'
@@ -62,6 +62,9 @@ export function PlacementRound({ survival }) {
     return MAP_STYLE
   }
 
+  // A new style function on every render would make react-leaflet restyle the layers and wipe the hover
+  const featureStyle = useCallback((feature) => styleOf(feature.properties.ADMIN), []) // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     ;[geoJsonRef, geoJsonRefLeft, geoJsonRefRight].forEach((ref) => {
       ref.current?.getLayers().forEach((layer) => layer.setStyle(styleOf(layer.feature.properties.ADMIN)))
@@ -109,7 +112,7 @@ export function PlacementRound({ survival }) {
             key={key}
             ref={ref}
             data={data}
-            style={(feature) => styleOf(feature.properties.ADMIN)}
+            style={featureStyle}
             onEachFeature={(feature, layer) => {
               const name = feature.properties.ADMIN
               layer.on({

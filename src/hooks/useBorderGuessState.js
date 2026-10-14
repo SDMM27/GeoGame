@@ -172,7 +172,6 @@ const BORDER_GUESS_REINSTATED = new Set([
   'Saint-Marin',
   'Hong Kong R.A.S.',
   'Macao R.A.S.',
-  'Vatican',
   'Gibraltar',
 ])
 

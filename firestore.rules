@@ -294,20 +294,20 @@ service cloud.firestore {
           'PLACEMENT_Océanie': 201,
           'FLAGS_Facile': 109,
           'FLAGS_Moyen': 347,
-          'FLAGS_Difficile': 655,
+          'FLAGS_Difficile': 663,
           'FLAGS_Impossible': 466,
-          'FLAGS_Hardcore': 1576,
-          'FLAGS_Europe': 270,
+          'FLAGS_Hardcore': 1583,
+          'FLAGS_Europe': 278,
           'FLAGS_Asie': 325,
           'FLAGS_Afrique': 389,
           'FLAGS_Amériques': 383,
           'FLAGS_Océanie': 211,
           'CAPITALS_Facile': 103,
           'CAPITALS_Moyen': 297,
-          'CAPITALS_Difficile': 732,
+          'CAPITALS_Difficile': 740,
           'CAPITALS_Impossible': 476,
-          'CAPITALS_Hardcore': 1606,
-          'CAPITALS_Europe': 260,
+          'CAPITALS_Hardcore': 1614,
+          'CAPITALS_Europe': 268,
           'CAPITALS_Asie': 330,
           'CAPITALS_Afrique': 400,
           'CAPITALS_Amériques': 407,
@@ -331,20 +331,20 @@ service cloud.firestore {
           'PLACEMENT_Océanie': 2400,
           'FLAGS_Facile': 3300,
           'FLAGS_Moyen': 6300,
-          'FLAGS_Difficile': 8500,
+          'FLAGS_Difficile': 8600,
           'FLAGS_Impossible': 4700,
-          'FLAGS_Hardcore': 22800,
-          'FLAGS_Europe': 5000,
+          'FLAGS_Hardcore': 22900,
+          'FLAGS_Europe': 5100,
           'FLAGS_Asie': 5200,
           'FLAGS_Afrique': 5600,
           'FLAGS_Amériques': 5200,
           'FLAGS_Océanie': 2400,
           'CAPITALS_Facile': 3100,
           'CAPITALS_Moyen': 5400,
-          'CAPITALS_Difficile': 9500,
+          'CAPITALS_Difficile': 9600,
           'CAPITALS_Impossible': 4800,
-          'CAPITALS_Hardcore': 22800,
-          'CAPITALS_Europe': 5000,
+          'CAPITALS_Hardcore': 22900,
+          'CAPITALS_Europe': 5100,
           'CAPITALS_Asie': 5100,
           'CAPITALS_Afrique': 5600,
           'CAPITALS_Amériques': 5200,
@@ -555,7 +555,7 @@ service cloud.firestore {
           'BORDER_GUESS': 510,
           'COUNTRY_CLUE': 510,
           'QUIZ': 5,
-          'VOYAGE_VOYAGE': 262
+          'VOYAGE_VOYAGE': 263
           // scoreCaps:end dailyAttempts
         };
       }
@@ -574,7 +574,7 @@ service cloud.firestore {
       function dailyWrong() {
         return {
           // scoreCaps:begin dailyWrong
-          'VOYAGE_VOYAGE': 262
+          'VOYAGE_VOYAGE': 263
           // scoreCaps:end dailyWrong
         };
       }

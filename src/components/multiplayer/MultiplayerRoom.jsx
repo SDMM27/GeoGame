@@ -14,6 +14,7 @@ import {
   roomGames,
 } from '../../utils/multiplayerRoom'
 import useLobbyHost from '../../hooks/useLobbyHost'
+import { rememberPlayers } from '../../utils/recentPlayers'
 import { rememberRoom } from '../../utils/recentRooms'
 import { gameColor } from '../../utils/roomGames'
 import { gameLabel } from './RoomConfig'
@@ -67,6 +68,11 @@ export default function MultiplayerRoom({ room, progress, gameResults, playerId 
   useEffect(() => {
     if (joined) rememberRoom({ id: room.id, mode: room.mode, game: games[0] })
   }, [joined, room.id]) // eslint-disable-line react-hooks/exhaustive-deps
+  // The accounts met here are suggested as friends later (Friends panel)
+  const accountsKey = Object.values(room.players).map((player) => player.uid).filter(Boolean).sort().join(',')
+  useEffect(() => {
+    if (joined) rememberPlayers(room.players, room.players[playerId]?.uid)
+  }, [joined, accountsKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const onDone = useCallback((index) => {
     setDoneHere((previous) => [...previous, index])

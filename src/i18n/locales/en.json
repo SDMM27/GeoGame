@@ -671,6 +671,29 @@
     "see_all": "Manage my friends",
     "pending_badge_one": "{{count}} request",
     "pending_badge_other": "{{count}} requests",
+    "invite_title": "Invite a friend",
+    "invite_hint": "Send them your link: they can add you in one tap, no username needed.",
+    "invite_share": "Share my link",
+    "invite_copy": "Copy link",
+    "invite_copied": "Link copied!",
+    "invite_message": "Join me on GeoGame and add me as a friend!",
+    "search_none": "No player found.",
+    "search_hint": "Type at least 2 letters to search for a player.",
+    "recent_title": "Recently met in games",
+    "community_link": "Discover the community",
+    "quick_add": "Add {{username}} as a friend",
+    "pending_title": "Invitation from {{username}}",
+    "pending_hint": "You opened their link before signing in. Do you want to add them?",
+    "pending_add": "Add {{username}}",
+    "dismiss": "Dismiss",
+    "add_page": {
+      "intro": "{{username}} invites you to become friends on GeoGame.",
+      "login": "Sign in or create an account to accept.",
+      "login_button": "Sign in",
+      "not_found": "This invitation link is no longer valid.",
+      "own": "This is your own link: send it to a friend!",
+      "view_profile": "View profile"
+    },
     "errors": {
       "not_found": "No player with this username.",
       "self": "That's you!",
@@ -1104,5 +1127,22 @@
     "profile": "Profile",
     "main": "Main navigation",
     "language": "Language"
+  },
+  "community": {
+    "title": "Community",
+    "intro": "Discover other players and add them as friends.",
+    "join_title": "Appear in the community",
+    "join_hint": "Your username and badges will be visible to all players in this list. You can leave it any time.",
+    "join": "Join the community",
+    "listed": "You appear in the community.",
+    "leave": "Leave the list",
+    "members_title": "Latest members",
+    "empty": "Nobody yet: be the first!",
+    "more": "Show more",
+    "need_account": "Create an account to join the community and add players.",
+    "error": "Could not load the community. Try again.",
+    "weekly_title": "Top of the week",
+    "weekly_hint": "Daily challenges of the last 7 days: 1 point per challenge played, plus a podium bonus. Updated every day.",
+    "weekly_empty": "No ranking yet: play the daily challenges!"
   }
 }

@@ -3,7 +3,11 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { router } from 'expo-router'
 import type { ComponentProps, ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useState } from 'react'
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native'
+
+import { useFriendships } from '@shared/hooks/usePlayerProfile'
+import { sendFriendRequestTo } from '@shared/utils/friends'
 
 import { loadErrorKey, rankLabel } from '@/leaderboards'
 import { colors, radius, space } from '@/theme'
@@ -53,11 +57,42 @@ export function FilterChips({
   )
 }
 
+type Me = { uid: string; username: string | null } | null
+
+// "+" next to another player's name: sends them a friend request (or accepts theirs). Gone once you are friends.
+// One shared Firestore listener serves every row (see watchSharedFriendships).
+function QuickAdd({ me, uid, name }: { me: { uid: string; username: string }; uid: string; name: string }) {
+  const { t } = useTranslation()
+  const friendships = useFriendships(me.uid)
+  const [failed, setFailed] = useState(false)
+  if (friendships.loading) return null
+  const status = friendships.all.find((item: { uid: string }) => item.uid === uid)?.status
+  if (status === 'friend') return null
+  if (status === 'outgoing') return <MaterialCommunityIcons name="check" size={18} color={colors.textMuted} style={styles.quickAdd} />
+
+  const add = async () => {
+    try {
+      await sendFriendRequestTo(me, uid, friendships.all)
+      setFailed(false)
+    } catch (error) {
+      console.warn('[friends]', error)
+      setFailed(true)
+    }
+  }
+  const label = t('friends.quick_add', { username: name })
+  return (
+    <Touchable accessibilityRole="button" accessibilityLabel={label} onPress={add} hitSlop={8} style={[styles.quickAdd, failed && { borderColor: colors.danger }]}>
+      <MaterialCommunityIcons name={failed ? 'alert-circle-outline' : 'account-plus-outline'} size={18} color={failed ? colors.danger : colors.textMuted} />
+    </Touchable>
+  )
+}
+
 export function LeaderboardRow({
   index,
   name,
   uid,
   mine,
+  me,
   detail,
   value,
   secondary,
@@ -67,6 +102,8 @@ export function LeaderboardRow({
   name: string
   uid?: string
   mine: boolean
+  // The signed-in account: other players' rows get a quick "add friend" button
+  me?: Me
   detail?: string
   value: string
   secondary?: string
@@ -95,6 +132,7 @@ export function LeaderboardRow({
           </Text>
         ) : null}
       </View>
+      {uid && me?.username && !mine ? <QuickAdd me={{ uid: me.uid, username: me.username }} uid={uid} name={name} /> : null}
       {report && !mine ? <ReportFlag target={{ ...report, name }} /> : null}
       <View style={styles.values}>
         <Text variant="bodyStrong" style={styles.value}>
@@ -161,6 +199,7 @@ export function LeaderboardCard({
 }
 
 const styles = StyleSheet.create({
+  quickAdd: { width: 30, height: 30, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.border },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -7,78 +7,17 @@ import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useFriendships } from '@shared/hooks/usePlayerProfile'
-import { acceptFriendRequest, fetchPlayer, friendErrorKey, removeFriendship, sendFriendRequest } from '@shared/utils/friends'
+import { fetchPlayer } from '@shared/utils/friends'
 
 import { useAccount } from '@/account/auth'
-import { confirmAction } from '@/components/confirm'
+import { FriendAction } from '@/components/profile/FriendAction'
 import { Avatar, ProfileBody } from '@/components/profile/ProfileSections'
 import { ScreenHeader } from '@/components/ScreenHeader'
-import { Button, Text } from '@/components/ui'
+import { Text } from '@/components/ui'
 import { colors, radius, space } from '@/theme'
 
 type Player = { uid: string; username: string; createdAt: number | null }
 type Friendship = { id: string; uid: string; username: string; status: 'friend' | 'incoming' | 'outgoing' }
-
-function FriendAction({ player }: { player: Player }) {
-  const { t } = useTranslation()
-  const { account } = useAccount()
-  const friendships = useFriendships(account?.uid)
-  const [busy, setBusy] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  if (!account?.username || account.uid === player.uid || friendships.loading) return null
-  const me = { uid: account.uid, username: account.username }
-  const link = friendships.all.find((item: Friendship) => item.uid === player.uid) as Friendship | undefined
-
-  const run = async (action: () => Promise<unknown>) => {
-    setBusy(true)
-    setError(null)
-    try {
-      await action()
-    } catch (err) {
-      setError(t(`friends.errors.${friendErrorKey(err)}`))
-    }
-    setBusy(false)
-  }
-
-  return (
-    <View style={{ gap: space.sm }}>
-      {!link && (
-        <Button
-          label={t('friends.add_friend')}
-          loading={busy}
-          onPress={() => run(() => sendFriendRequest(me, player.username, friendships.all))}
-          icon={<MaterialCommunityIcons name="account-plus-outline" size={20} color={colors.onAccent} />}
-        />
-      )}
-      {link?.status === 'incoming' && (
-        <Button label={t('friends.accept_request')} loading={busy} onPress={() => run(() => acceptFriendRequest(link.id))} />
-      )}
-      {link?.status === 'outgoing' && (
-        <Button label={`${t('friends.request_sent')} · ${t('friends.cancel')}`} variant="secondary" loading={busy} onPress={() => run(() => removeFriendship(link.id))} />
-      )}
-      {link?.status === 'friend' && (
-        <Button
-          label={t('friends.remove')}
-          variant="ghost"
-          onPress={() =>
-            confirmAction({
-              title: t('friends.remove_confirm', { username: player.username }),
-              confirmLabel: t('friends.remove'),
-              cancelLabel: t('account.cancel'),
-              onConfirm: () => run(() => removeFriendship(link.id)),
-            })
-          }
-        />
-      )}
-      {error && (
-        <Text variant="caption" color={colors.danger}>
-          {error}
-        </Text>
-      )}
-    </View>
-  )
-}
 
 export default function PlayerScreen() {
   const { t, i18n } = useTranslation()

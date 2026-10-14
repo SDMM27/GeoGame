@@ -34,6 +34,7 @@ export function SurvivalLeaderboard({ filters, refreshKey, onSettled }: { filter
           name={score.name}
           uid={score.uid}
           mine={isMine(score, account?.uid)}
+          me={account}
           detail={filters.modes ? undefined : parseSurvivalModes(score.modes).map((type: string) => t(`survival.round_type.${type}`)).join(', ')}
           report={score.id ? { collection: 'survival_scores', id: score.id } : undefined}
           value={t('survival.rounds_count', { count: score.score })}

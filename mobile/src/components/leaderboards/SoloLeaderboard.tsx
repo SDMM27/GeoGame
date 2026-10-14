@@ -49,6 +49,7 @@ export function SoloLeaderboard({
           name={score.name}
           uid={score.uid}
           mine={isMine(score, account?.uid)}
+          me={account}
           detail={soloDetailParts(score, detailOptions).join(' · ')}
           value={`${score.score} ${t('units.pts')}`}
           report={score.id ? { collection: 'scores', id: score.id } : undefined}

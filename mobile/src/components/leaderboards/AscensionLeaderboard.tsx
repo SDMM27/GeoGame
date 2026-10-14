@@ -53,6 +53,7 @@ export function AscensionLeaderboard({
             name={score.name}
             uid={score.uid}
             mine={isMine(score, account?.uid)}
+            me={account}
             detail={detail}
             report={score.id ? { collection: 'ascension_scores', id: score.id } : undefined}
             value={score.globalTimeMs != null ? formatTime(score.globalTimeMs) : '—'}

@@ -6,15 +6,20 @@ import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
+import { usePlayerSearch, useRecentPlayers } from '@shared/hooks/useCommunity'
 import { useFriendships, useFriendsToday } from '@shared/hooks/usePlayerProfile'
 import { USERNAME_MAX } from '@shared/utils/account'
-import { acceptFriendRequest, friendErrorKey, removeFriendship, sendFriendRequest } from '@shared/utils/friends'
+import { acceptFriendRequest, friendErrorKey, removeFriendship, SEARCH_MIN, sendFriendRequest } from '@shared/utils/friends'
+import { clearPendingInvite, getPendingInvite, inviteUrl } from '@shared/utils/inviteLink'
 
 import { useAccount } from '@/account/auth'
+import { shareInvite } from '@/account/shareInvite'
 import { confirmAction } from '@/components/confirm'
+import { FriendCandidates } from '@/components/profile/FriendCandidates'
 import { Avatar, DailyChips, SectionTitle } from '@/components/profile/ProfileSections'
 import { ScreenHeader } from '@/components/ScreenHeader'
 import { Button, Text, Touchable } from '@/components/ui'
+import { SITE_ORIGIN } from '@/links'
 import { colors, fonts, radius, space } from '@/theme'
 
 type Friendship = { id: string; uid: string; username: string; status: 'friend' | 'incoming' | 'outgoing' }
@@ -30,6 +35,14 @@ export default function FriendsScreen() {
   const [username, setUsername] = useState('')
   const [sending, setSending] = useState(false)
   const [message, setMessage] = useState<{ kind: 'error' | 'notice'; text: string } | null>(null)
+  const [copied, setCopied] = useState(false)
+  const [pending, setPending] = useState<string | null>(getPendingInvite)
+  const search = usePlayerSearch(username)
+  const recent = useRecentPlayers(friendships) as { uid: string; name: string }[]
+  const typed = username.trim().length >= SEARCH_MIN
+  const found = (search.results as { uid: string; username: string }[])
+    .filter((player) => player.uid !== account?.uid)
+    .map((player) => ({ uid: player.uid, name: player.username }))
 
   const onAdd = async () => {
     if (!account?.username || !username.trim()) return
@@ -44,6 +57,29 @@ export default function FriendsScreen() {
       setMessage({ kind: 'error', text: t(`friends.errors.${friendErrorKey(error)}`) })
     }
     setSending(false)
+  }
+
+  const dismissPending = () => {
+    clearPendingInvite()
+    setPending(null)
+  }
+
+  // An invitation link opened before signing in (see app/add/[username].tsx).
+  const onAddPending = async () => {
+    if (!account?.username || !pending) return
+    try {
+      const player = await sendFriendRequest({ uid: account.uid, username: account.username }, pending, friendships.all)
+      setMessage({ kind: 'notice', text: t('friends.sent', { username: player?.username ?? pending }) })
+    } catch (error) {
+      setMessage({ kind: 'error', text: t(`friends.errors.${friendErrorKey(error)}`) })
+    }
+    dismissPending()
+  }
+
+  const onInvite = async () => {
+    if (!account?.username) return
+    const result = await shareInvite({ url: inviteUrl(SITE_ORIGIN, account.username), text: t('friends.invite_message') })
+    setCopied(result === 'copied')
   }
 
   const onRemove = (friend: Friendship) =>
@@ -86,7 +122,52 @@ export default function FriendsScreen() {
               {message.text}
             </Text>
           )}
+          {typed && !search.searching && found.length === 0 && <Text variant="caption">{t('friends.search_none')}</Text>}
+          {account && <FriendCandidates players={found} account={account} friendships={friendships} onMessage={setMessage} />}
         </View>
+
+        {pending && account?.username && (
+          <View style={[styles.card, { borderColor: colors.accent }]}>
+            <Text variant="heading">{t('friends.pending_title', { username: pending })}</Text>
+            <Text variant="caption">{t('friends.pending_hint')}</Text>
+            <View style={{ flexDirection: 'row', gap: space.sm }}>
+              <Button label={t('friends.pending_add', { username: pending })} onPress={onAddPending} style={{ flex: 1 }} />
+              <Button label={t('friends.dismiss')} variant="ghost" onPress={dismissPending} />
+            </View>
+          </View>
+        )}
+
+        {!typed && account && recent.length > 0 && (
+          <View style={{ gap: space.md }}>
+            <SectionTitle title={t('friends.recent_title')} />
+            <FriendCandidates players={recent} account={account} friendships={friendships} onMessage={setMessage} />
+          </View>
+        )}
+
+        {account?.username && (
+          <View style={styles.card}>
+            <Text variant="heading">{t('friends.invite_title')}</Text>
+            <Text variant="caption">{t('friends.invite_hint')}</Text>
+            <Button
+              label={t('friends.invite_share')}
+              onPress={onInvite}
+              icon={<MaterialCommunityIcons name="share-variant-outline" size={20} color={colors.onAccent} />}
+            />
+            {copied && (
+              <Text variant="caption" color={colors.accent}>
+                {t('friends.invite_copied')}
+              </Text>
+            )}
+          </View>
+        )}
+
+        <Touchable accessibilityRole="button" onPress={() => router.push('/community')} style={styles.communityLink}>
+          <MaterialCommunityIcons name="account-group-outline" size={22} color={colors.accent} />
+          <Text variant="bodyStrong" color={colors.accent} style={{ flex: 1 }}>
+            {t('friends.community_link')}
+          </Text>
+          <MaterialCommunityIcons name="chevron-right" size={22} color={colors.accent} />
+        </Touchable>
 
         {friendships.loading ? (
           <ActivityIndicator color={colors.accent} />
@@ -186,6 +267,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bodyMedium,
     fontSize: 16,
   },
+  communityLink: { flexDirection: 'row', alignItems: 'center', gap: space.md, padding: space.lg, borderRadius: radius.xl, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   list: { borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.sm, paddingHorizontal: space.md, paddingVertical: space.md },
   divider: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },

@@ -26,6 +26,7 @@
 //   cd mobile && npm run build:countries && npm run build:silhouettes
 //
 // Usage: node scripts/patch-detailed-geometries.mjs [--max-vertices 100] [--tolerance 50] [--dry-run]
+//        [--only BMU,...] [--provider osm|geoboundaries|geoboundaries,osm]
 //        [--report path.json]   (writes {iso, name, before, after} geometries for the before/after page)
 import { readFileSync, writeFileSync, existsSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
@@ -46,6 +47,9 @@ const maxVertices = Number(option('--max-vertices', 100))
 const tolerance = Number(option('--tolerance', 50))
 const reportPath = option('--report', null)
 const dryRun = args.includes('--dry-run')
+// Redo given territories whatever their vertex count, e.g. `--only BMU --provider osm`
+const only = option('--only', null)?.split(',')
+const providerOrder = option('--provider', 'geoboundaries,osm').split(',')
 
 const AREA_RATIO = [0.5, 2] // accepted newArea / oldArea
 const MAX_CENTER_SHIFT_KM = 40
@@ -232,7 +236,7 @@ const candidates = source.features.filter(
   (feature) =>
     feature.properties.ISO_A3 &&
     feature.properties.ISO_A3 !== '-99' &&
-    countVertices(feature.geometry.coordinates) < maxVertices
+    (only ? only.includes(feature.properties.ISO_A3) : countVertices(feature.geometry.coordinates) < maxVertices)
 )
 console.log(`${candidates.length} candidates under ${maxVertices} vertices`)
 
@@ -247,10 +251,11 @@ for (const feature of candidates) {
   const oldCenter = getGeographicCenter(feature)
   const failures = []
   let done = false
-  for (const [source, fetchOutlineFor] of [
-    ['geoBoundaries', () => fetchOutline(iso3)],
-    ['OSM', () => fetchOsmOutline(feature)],
-  ]) {
+  const providers = {
+    geoboundaries: ['geoBoundaries', () => fetchOutline(iso3)],
+    osm: ['OSM', () => fetchOsmOutline(feature)],
+  }
+  for (const [source, fetchOutlineFor] of providerOrder.map((name) => providers[name])) {
     try {
       const next = simplify(await fetchOutlineFor(), `${iso3}-${source}`)
       const candidate = { type: 'Feature', properties: {}, geometry: next }
@@ -262,7 +267,7 @@ for (const feature of candidates) {
         failures.push(`${line} [rejected]`)
         continue
       }
-      if (after < before * MIN_GAIN) {
+      if (!only && after < before * MIN_GAIN) {
         failures.push(`${line} [not more detailed]`)
         continue
       }

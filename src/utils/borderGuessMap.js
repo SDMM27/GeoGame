@@ -132,9 +132,7 @@ export function getFocusCountry(country) {
 
   const spreadRatio = fullSpan / primarySpan
   const dominanceRatio = totalArea > 0 ? largestArea / totalArea : 1
-  // A compact country (everything fits in ~1 degree) shows all its islands at the same zoom, so only a
-  // clearly dominant mainland lets the others be dropped: Bermuda is a chain of islands, not one block.
-  const hasDominantMainland = dominanceRatio >= (fullSpan < 1.2 ? 0.9 : 0.60)
+  const hasDominantMainland = dominanceRatio >= 0.60
   // A second major island (Hokkaido next to Honshu) means the country is an archipelago: show all of it.
   const secondArea = polygons.reduce((best, polygon) => {
     const area = getPolygonArea(polygon?.[0] ?? [])

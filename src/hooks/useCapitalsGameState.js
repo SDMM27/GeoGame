@@ -25,7 +25,6 @@ export function getTotalCapitalCountries(difficulty) {
   const available = getAvailableDifficulties(difficulty)
   return countries.features.filter(c =>
     available.includes(c.properties.DifficultyCapitals) &&
-    c.properties.ISO_A2 &&
     c.properties.capital
   ).length
 }
@@ -33,7 +32,6 @@ export function getTotalCapitalCountries(difficulty) {
 export function getTotalCapitalCountriesByContinent(continent) {
   return countries.features.filter(c =>
     c.properties.continent === continent &&
-    c.properties.ISO_A2 &&
     c.properties.capital
   ).length
 }
@@ -73,15 +71,13 @@ export default function useCapitalsGameState(difficulty, isTraining, overrideCou
     const filtered = cont
       ? countries.features.filter(c =>
           c.properties.continent === cont &&
-          c.properties.ISO_A2 &&
           c.properties.capital &&
-          !alreadyChosenCountries.includes(c.properties.ADMIN)
+          !alreadyChosenCountries.includes(c.properties.ISO_A2 || c.properties.ADMIN)
         )
       : countries.features.filter(c =>
           getAvailableDifficulties(diff).includes(c.properties.DifficultyCapitals) &&
-          c.properties.ISO_A2 &&
           c.properties.capital &&
-          !alreadyChosenCountries.includes(c.properties.ADMIN)
+          !alreadyChosenCountries.includes(c.properties.ISO_A2 || c.properties.ADMIN)
         )
     if (filtered.length === 0) return null
     return filtered[Math.floor(Math.random() * filtered.length)]
@@ -103,7 +99,7 @@ export default function useCapitalsGameState(difficulty, isTraining, overrideCou
       // Restore state — player refreshed mid-game
       const idx = mpSnapshot.countryIndex
       orderedIndexRef.current = idx
-      for (let i = 0; i < idx; i++) alreadyChosenCountries.push(overrideCountries[i].properties.ADMIN)
+      for (let i = 0; i < idx; i++) alreadyChosenCountries.push(overrideCountries[i].properties.ISO_A2 || overrideCountries[i].properties.ADMIN)
       const restoredStats = {
         found: mpSnapshot.found,
         skipped: mpSnapshot.skipped,
@@ -130,7 +126,7 @@ export default function useCapitalsGameState(difficulty, isTraining, overrideCou
       ? overrideCountries[orderedIndexRef.current++]
       : getRandomCountry(difficulty, continent)
     if (first) {
-      alreadyChosenCountries.push(first.properties.ADMIN)
+      alreadyChosenCountries.push(first.properties.ISO_A2 || first.properties.ADMIN)
       setTargetCountry(first)
       gameStartedRef.current = true
       setGameStarted(true)
@@ -182,7 +178,7 @@ export default function useCapitalsGameState(difficulty, isTraining, overrideCou
       ? (overrideCountries[orderedIndexRef.current++] ?? null)
       : getRandomCountry(difficulty, continent)
     if (next) {
-      alreadyChosenCountries.push(next.properties.ADMIN)
+      alreadyChosenCountries.push(next.properties.ISO_A2 || next.properties.ADMIN)
       setTargetCountry(next)
     }
     setInputValue('')
@@ -316,7 +312,7 @@ export default function useCapitalsGameState(difficulty, isTraining, overrideCou
       setStats({ found: 0, skipped: 0, total, totalErrors: 0 })
       const next = getRandomCountry(difficulty, continent)
       if (next) {
-        alreadyChosenCountries.push(next.properties.ADMIN)
+        alreadyChosenCountries.push(next.properties.ISO_A2 || next.properties.ADMIN)
         setTargetCountry(next)
         setGameStarted(true)
         gameStartedRef.current = true

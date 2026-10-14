@@ -229,6 +229,7 @@ export default {
               'Banderas: [Flagpedia](https://flagpedia.net).',
               'Tipografía Inter: Rasmus Andersson, bajo licencia SIL Open Font License.',
               'Contornos detallados de los territorios pequeños: [geoBoundaries](https://www.geoboundaries.org) (CC BY) y © colaboradores de [OpenStreetMap](https://www.openstreetmap.org/copyright) (ODbL).',
+              'Los contornos procedentes de OpenStreetMap siguen bajo licencia ODbL: están incluidos en los archivos de geometría del sitio y de la aplicación, que cualquiera puede reutilizar según las condiciones de esa licencia.',
             ],
           },
         ],

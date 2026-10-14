@@ -229,6 +229,7 @@ export default {
               'Bandiere: [Flagpedia](https://flagpedia.net).',
               'Carattere Inter: Rasmus Andersson, con licenza SIL Open Font License.',
               'Contorni dettagliati dei piccoli territori: [geoBoundaries](https://www.geoboundaries.org) (CC BY) e © i collaboratori di [OpenStreetMap](https://www.openstreetmap.org/copyright) (ODbL).',
+              'I contorni provenienti da OpenStreetMap restano con licenza ODbL: sono inclusi nei file di geometria del sito e dell’app, che chiunque può riutilizzare alle condizioni di tale licenza.',
             ],
           },
         ],

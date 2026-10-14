@@ -125,6 +125,8 @@ Face aux émulateurs, `FIRESTORE_EMULATOR_HOST` (et `FIREBASE_AUTH_EMULATOR_HOST
 
 Le jeu de données complet est `src/data/countriesWithDifficulty_FR.json` (environ 90 Mo) ; il n'entre jamais dans le bundle. `node scripts/build-geo-data.mjs [tolérance en mètres]` le découpe en `src/data/countries.meta.json` (propriétés, chargé avec le site) et `src/data/countries.geo.json` (géométries simplifiées, chargées à la demande). `vite.config.mjs` redirige les imports du jeu complet vers le fichier de propriétés.
 
+**Origine des contours.** Base Natural Earth 10m (domaine public). Les contours des petits territoires (moins de 100 sommets) sont remplacés par `node scripts/patch-detailed-geometries.mjs`, puis il faut relancer `build-geo-data.mjs` et, dans `mobile/`, `npm run build:countries` et `npm run build:silhouettes`. Sources : [geoBoundaries](https://www.geoboundaries.org) (CC BY) et, en repli, [OpenStreetMap](https://www.openstreetmap.org/copyright) via Overpass (ODbL) pour Jersey, Saint-Pierre-et-Miquelon, Norfolk, Heard et MacDonald, Sainte-Hélène, les Îles Vierges américaines et Pitcairn. Ces géométries OSM restent sous licence ODbL : `countries.geo.json` est servi publiquement par le site, et le crédit figure dans les mentions légales (7 langues).
+
 Scripts d'enrichissement du jeu complet (rarement utiles) : `scripts/difficulte.py`, `enrich_continent.py`, `enrich_iso_a2.py`, `enrich_population.py` (Python), `add-gdp-data.cjs`, `populate-capitals.js`, `generate-borders.mjs` (Node). Autres : `scripts/seedEmulator.mjs` (deux comptes de test dans les émulateurs), `scripts/purgeAnonymousScores.mjs` (purge ponctuelle, nécessite une clé de compte de service) et `scripts/reports.mjs` (signalements, voir Firestore).
 
 ## Émulateurs et tests

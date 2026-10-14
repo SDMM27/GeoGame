@@ -22,7 +22,9 @@
 //
 // Run it again whenever the source dataset changes (scripts/add-gdp-data.cjs, populate-capitals.js...).
 //
-// Usage: node scripts/build-geo-data.mjs [tolerance in metres]
+// Countries under 6 000 km2 use a finer tolerance (100 m by default).
+//
+// Usage: node scripts/build-geo-data.mjs [tolerance in metres] [small-country tolerance in metres]
 import { readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
@@ -33,6 +35,8 @@ import { getCountryAreaKm2, getGeographicCenter } from '../src/utils/countryArea
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const dataDir = join(root, 'src', 'data')
 const tolerance = Number(process.argv[2] ?? 1000)
+const smallTolerance = Number(process.argv[3] ?? 100)
+const SMALL_COUNTRY_KM2 = 6000
 const PRECISION = 0.001 // degrees (~100 m)
 
 const polygonsOf = (geometry) => (geometry.type === 'Polygon' ? [geometry.coordinates] : geometry.coordinates)
@@ -55,30 +59,44 @@ const meta = source.features.map((feature) => {
 // 2. Simplified geometries. Multi-part countries are exploded first so that `keep-shapes` keeps
 // every island, then regrouped by country.
 const tmp = mkdtempSync(join(tmpdir(), 'geogame-geo-'))
-const input = join(tmp, 'in.json')
-const output = join(tmp, 'out.json')
 const originalPolygons = []
-const exploded = {
-  type: 'FeatureCollection',
-  features: source.features.map((feature, index) => {
-    polygonsOf(feature.geometry).forEach((polygon) => originalPolygons.push({ index, polygon }))
-    return { type: 'Feature', properties: { i: index }, geometry: feature.geometry }
-  }),
+const exploded = source.features.map((feature, index) => {
+  polygonsOf(feature.geometry).forEach((polygon) => originalPolygons.push({ index, polygon }))
+  return { type: 'Feature', properties: { i: index, small: meta[index].properties.areaKm2 < SMALL_COUNTRY_KM2 }, geometry: feature.geometry }
+})
+
+// Small countries get a much finer tolerance: at 1 km an island such as Dominica keeps ~20 vertices
+// and turns into a polygon, which makes the border guess unfair.
+const simplifyGroup = (name, features, interval) => {
+  const input = join(tmp, `${name}-in.json`)
+  const output = join(tmp, `${name}-out.json`)
+  writeFileSync(input, JSON.stringify({ type: 'FeatureCollection', features }))
+  execFileSync(
+    process.execPath,
+    [
+      join(root, 'node_modules', 'mapshaper', 'bin', 'mapshaper'),
+      input,
+      '-explode',
+      '-simplify', 'dp', `interval=${interval}`, 'keep-shapes',
+      '-o', output, `precision=${PRECISION}`, 'format=geojson',
+    ],
+    { stdio: 'inherit' }
+  )
+  return JSON.parse(readFileSync(output, 'utf8')).features
 }
-writeFileSync(input, JSON.stringify(exploded))
-execFileSync(
-  process.execPath,
-  [
-    join(root, 'node_modules', 'mapshaper', 'bin', 'mapshaper'),
-    input,
-    '-explode',
-    '-simplify', 'dp', `interval=${tolerance}`, 'keep-shapes',
-    '-o', output, `precision=${PRECISION}`, 'format=geojson',
-  ],
-  { stdio: 'inherit' }
-)
-const simplified = JSON.parse(readFileSync(output, 'utf8')).features
+const bySource = (small) => exploded.filter((feature) => feature.properties.small === small)
+const simplifiedBySource = new Map()
+for (const [name, small, interval] of [['small', true, smallTolerance], ['large', false, tolerance]]) {
+  const features = simplifyGroup(name, bySource(small), interval)
+  features.forEach((feature) => {
+    const list = simplifiedBySource.get(feature.properties.i) ?? []
+    list.push(feature)
+    simplifiedBySource.set(feature.properties.i, list)
+  })
+}
 rmSync(tmp, { recursive: true, force: true })
+// Back to the order of originalPolygons (source order, polygon after polygon)
+const simplified = [...simplifiedBySource.keys()].sort((x, y) => x - y).flatMap((i) => simplifiedBySource.get(i))
 
 if (simplified.length !== originalPolygons.length) {
   throw new Error(`Expected ${originalPolygons.length} polygons, mapshaper returned ${simplified.length}`)
@@ -90,7 +108,7 @@ simplified.forEach((feature, position) => {
   if (feature.properties.i !== index) throw new Error(`Polygon ${position} is out of order`)
   // A ring that collapses to nothing is kept as the original (rounded) polygon
   const result = feature.geometry
-  const kept = result ? polygonsOf(result)[0] : roundPolygon(polygon)
+  const kept = (result && polygonsOf(result)[0]) || roundPolygon(polygon)
   parts[index].push(kept)
 })
 

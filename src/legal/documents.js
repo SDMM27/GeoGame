@@ -238,6 +238,8 @@ const fr = {
             list: [
               'Drapeaux : [Flagpedia](https://flagpedia.net).',
               'Police Inter : Rasmus Andersson, sous licence SIL Open Font License.',
+              'Contours détaillés des petits territoires : [geoBoundaries](https://www.geoboundaries.org) (CC BY) et © les contributeurs d’[OpenStreetMap](https://www.openstreetmap.org/copyright) (ODbL).',
+              'Les contours issus d’OpenStreetMap restent sous licence ODbL : ils sont inclus dans les fichiers de géométrie du site et de l’application, que toute personne peut réutiliser aux conditions de cette licence.',
             ],
           },
         ],
@@ -543,6 +545,8 @@ const en = {
             list: [
               'Flags: [Flagpedia](https://flagpedia.net).',
               'Inter typeface: Rasmus Andersson, under the SIL Open Font License.',
+              'Detailed outlines of small territories: [geoBoundaries](https://www.geoboundaries.org) (CC BY) and © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors (ODbL).',
+              'Outlines taken from OpenStreetMap remain under the ODbL license: they are included in the geometry files of the website and the app, which anyone may reuse under the terms of that license.',
             ],
           },
         ],
@@ -846,6 +850,8 @@ const ru = {
             list: [
               'Флаги: [Flagpedia](https://flagpedia.net).',
               'Шрифт Inter: Rasmus Andersson, лицензия SIL Open Font License.',
+              'Подробные контуры малых территорий: [geoBoundaries](https://www.geoboundaries.org) (CC BY) и © участники [OpenStreetMap](https://www.openstreetmap.org/copyright) (ODbL).',
+              'Контуры, взятые из OpenStreetMap, остаются под лицензией ODbL: они включены в файлы геометрии сайта и приложения, которые каждый может использовать на условиях этой лицензии.',
             ],
           },
         ],

@@ -21,18 +21,27 @@ for (const feature of data.features) {
   feature.properties.areaKm2 = getCountryAreaKm2(feature)
   feature.properties.center = [lng, lat]
 }
-writeFileSync(tmp, JSON.stringify(data))
-
+// Percentage-based simplification reduces the small countries to a handful of vertices (Dominica ends
+// up as a polygon), so they get a fixed tolerance in metres instead.
+const SMALL_COUNTRY_KM2 = 6000
+const SMALL_TOLERANCE_M = 150
+const isSmall = (feature) => feature.properties.areaKm2 < SMALL_COUNTRY_KM2
 mkdirSync(dirname(out), { recursive: true })
-execSync(
-  `npx -y mapshaper "${tmp}" -simplify 15% weighted keep-shapes -o "${out}" precision=0.001 format=geojson`,
-  { stdio: 'inherit' }
-)
+
+function simplifyGroup(features, simplifyArgs) {
+  writeFileSync(tmp, JSON.stringify({ type: 'FeatureCollection', features }))
+  execSync(`npx -y mapshaper "${tmp}" ${simplifyArgs} -o "${out}" precision=0.001 format=geojson`, { stdio: 'inherit' })
+  return JSON.parse(readFileSync(out, 'utf8')).features
+}
+const small = simplifyGroup(data.features.filter(isSmall), `-simplify dp interval=${SMALL_TOLERANCE_M} keep-shapes`)
+const large = simplifyGroup(data.features.filter((feature) => !isSmall(feature)), '-simplify 15% weighted keep-shapes')
 rmSync(tmp)
+// Back to the source order
+const byName = new Map([...small, ...large].map((feature) => [feature.properties.ISO_A3 + feature.properties.ADMIN, feature]))
+const simplified = { type: 'FeatureCollection', features: data.features.map((f) => byName.get(f.properties.ISO_A3 + f.properties.ADMIN)) }
 
 // d3-geo expects clockwise outer rings (RFC 7946 GeoJSON is the opposite):
 // rewind any polygon d3 would read as covering the rest of the globe.
-const simplified = JSON.parse(readFileSync(out, 'utf8'))
 const rewind = (polygon) => {
   if (geoArea({ type: 'Polygon', coordinates: polygon }) > 2 * Math.PI) polygon.forEach((ring) => ring.reverse())
 }

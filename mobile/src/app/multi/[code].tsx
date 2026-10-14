@@ -11,6 +11,7 @@ import { useFriendships } from '@shared/hooks/usePlayerProfile'
 import useLobbyHost from '@shared/hooks/useLobbyHost'
 import useMultiplayerRoom from '@shared/hooks/useMultiplayerRoom'
 import { sendFriendRequestTo } from '@shared/utils/friends'
+import { rememberPlayers } from '@shared/utils/recentPlayers'
 import { dismissInvite, inviteId, sendRoomInvite } from '@shared/utils/invites'
 import { containsProfanity } from '@shared/utils/profanity'
 import { currentGameIndex, isRoomFormat, nextGameToPlay, roomGames } from '@shared/utils/multiplayerRoom'
@@ -284,6 +285,12 @@ export default function RoomScreen() {
   useEffect(() => {
     if (room && joined) rememberRoom(room)
   }, [room, joined])
+
+  // The accounts met here are suggested as friends later (Friends screen)
+  const accountsKey = Object.values(room?.players ?? {}).map((player) => player.uid).filter(Boolean).sort().join(',')
+  useEffect(() => {
+    if (room && joined) rememberPlayers(room.players, account?.uid)
+  }, [joined, accountsKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Opening the room answers any invite to it
   useEffect(() => {

@@ -671,6 +671,29 @@
     "see_all": "Gestisci i miei amici",
     "pending_badge_one": "{{count}} richiesta",
     "pending_badge_other": "{{count}} richieste",
+    "invite_title": "Invita un amico",
+    "invite_hint": "Mandagli il tuo link: ti aggiunge con un tocco, senza conoscere il tuo nome utente.",
+    "invite_share": "Condividi il mio link",
+    "invite_copy": "Copia il link",
+    "invite_copied": "Link copiato!",
+    "invite_message": "Unisciti a me su GeoGame e aggiungimi come amico!",
+    "search_none": "Nessun giocatore trovato.",
+    "search_hint": "Scrivi almeno 2 lettere per cercare un giocatore.",
+    "recent_title": "Incontrati di recente nelle partite",
+    "community_link": "Scopri la community",
+    "quick_add": "Aggiungi {{username}} come amico",
+    "pending_title": "Invito di {{username}}",
+    "pending_hint": "Hai aperto il link prima di accedere. Vuoi aggiungerlo?",
+    "pending_add": "Aggiungi {{username}}",
+    "dismiss": "Ignora",
+    "add_page": {
+      "intro": "{{username}} ti invita a diventare amici su GeoGame.",
+      "login": "Accedi o crea un account per accettare.",
+      "login_button": "Accedi",
+      "not_found": "Questo link di invito non è più valido.",
+      "own": "Questo è il tuo link: mandalo a un amico!",
+      "view_profile": "Vedi profilo"
+    },
     "errors": {
       "not_found": "Nessun giocatore con questo nome utente.",
       "self": "Sei tu!",
@@ -1104,5 +1127,22 @@
     "profile": "Profilo",
     "main": "Navigazione principale",
     "language": "Lingua"
+  },
+  "community": {
+    "title": "Community",
+    "intro": "Scopri altri giocatori e aggiungili come amici.",
+    "join_title": "Comparire nella community",
+    "join_hint": "Il tuo nome utente e i tuoi badge saranno visibili a tutti i giocatori in questo elenco. Puoi uscirne quando vuoi.",
+    "join": "Unisciti alla community",
+    "listed": "Compari nella community.",
+    "leave": "Esci dall'elenco",
+    "members_title": "Ultimi membri",
+    "empty": "Ancora nessuno: sii il primo!",
+    "more": "Mostra altri",
+    "need_account": "Crea un account per unirti alla community e aggiungere giocatori.",
+    "error": "Impossibile caricare la community. Riprova.",
+    "weekly_title": "Top della settimana",
+    "weekly_hint": "Sfide del giorno degli ultimi 7 giorni: 1 punto per sfida giocata, più un bonus per il podio. Aggiornata ogni giorno.",
+    "weekly_empty": "Ancora nessuna classifica: gioca le sfide del giorno!"
   }
 }

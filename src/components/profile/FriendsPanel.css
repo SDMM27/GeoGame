@@ -44,7 +44,29 @@
 .friends-btn--icon { width: 30px; height: 30px; padding: 0; color: var(--text-muted); }
 .friends-btn--danger { color: var(--danger); }
 
+.friends-rank { width: 1.6rem; text-align: center; color: var(--text-muted); font-weight: 800; }
+.friends-detail { color: var(--text-muted); font-size: 0.85rem; font-weight: 600; white-space: nowrap; }
+.friends-state { color: var(--text-muted); font-size: 0.85rem; font-weight: 600; white-space: nowrap; }
+.friends-invite,
+.friends-pending {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.04);
+}
+.friends-invite p,
+.friends-pending p { margin: 0.2rem 0 0; }
+.friends-pending { flex-direction: column; align-items: flex-start; border-color: var(--accent); }
+.friends-pending__actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.friends-community { align-self: flex-start; color: var(--accent); font-weight: 600; text-decoration: none; }
+.friends-community:hover { text-decoration: underline; }
+
 @media (max-width: 600px) {
+  .friends-invite { flex-direction: column; align-items: stretch; }
   .friends-row { flex-wrap: wrap; }
   .friends-row .profile-daily-chips--small { order: 3; width: 100%; padding-left: 46px; }
 }

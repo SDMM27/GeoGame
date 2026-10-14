@@ -671,6 +671,29 @@
     "see_all": "Meine Freunde verwalten",
     "pending_badge_one": "{{count}} Anfrage",
     "pending_badge_other": "{{count}} Anfragen",
+    "invite_title": "Freund einladen",
+    "invite_hint": "Schick deinen Link: Er fügt dich mit einem Tipp hinzu, ganz ohne deinen Namen zu kennen.",
+    "invite_share": "Meinen Link teilen",
+    "invite_copy": "Link kopieren",
+    "invite_copied": "Link kopiert!",
+    "invite_message": "Spiel mit mir GeoGame und füge mich als Freund hinzu!",
+    "search_none": "Kein Spieler gefunden.",
+    "search_hint": "Gib mindestens 2 Buchstaben ein, um einen Spieler zu suchen.",
+    "recent_title": "Zuletzt in Partien getroffen",
+    "community_link": "Community entdecken",
+    "quick_add": "{{username}} als Freund hinzufügen",
+    "pending_title": "Einladung von {{username}}",
+    "pending_hint": "Du hast den Link vor der Anmeldung geöffnet. Möchtest du die Person hinzufügen?",
+    "pending_add": "{{username}} hinzufügen",
+    "dismiss": "Ignorieren",
+    "add_page": {
+      "intro": "{{username}} lädt dich ein, bei GeoGame befreundet zu sein.",
+      "login": "Melde dich an oder erstelle ein Konto, um anzunehmen.",
+      "login_button": "Anmelden",
+      "not_found": "Dieser Einladungslink ist nicht mehr gültig.",
+      "own": "Das ist dein eigener Link: Schick ihn an einen Freund!",
+      "view_profile": "Profil ansehen"
+    },
     "errors": {
       "not_found": "Kein Spieler mit diesem Benutzernamen.",
       "self": "Das bist du!",
@@ -1104,5 +1127,22 @@
     "profile": "Profil",
     "main": "Hauptnavigation",
     "language": "Sprache"
+  },
+  "community": {
+    "title": "Community",
+    "intro": "Entdecke andere Spieler und füge sie als Freunde hinzu.",
+    "join_title": "In der Community erscheinen",
+    "join_hint": "Dein Benutzername und deine Abzeichen sind in dieser Liste für alle Spieler sichtbar. Du kannst sie jederzeit verlassen.",
+    "join": "Der Community beitreten",
+    "listed": "Du erscheinst in der Community.",
+    "leave": "Liste verlassen",
+    "members_title": "Neueste Mitglieder",
+    "empty": "Noch niemand: Sei der Erste!",
+    "more": "Mehr anzeigen",
+    "need_account": "Erstelle ein Konto, um der Community beizutreten und Spieler hinzuzufügen.",
+    "error": "Die Community konnte nicht geladen werden. Versuche es erneut.",
+    "weekly_title": "Top der Woche",
+    "weekly_hint": "Tagesaufgaben der letzten 7 Tage: 1 Punkt pro gespielter Aufgabe plus Bonus für das Podium. Täglich aktualisiert.",
+    "weekly_empty": "Noch keine Rangliste: Spiel die Tagesaufgaben!"
   }
 }

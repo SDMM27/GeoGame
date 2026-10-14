@@ -8,7 +8,8 @@
   ],
   "crons": [
     { "path": "/api/cleanup-expired", "schedule": "0 4 * * *" },
-    { "path": "/api/daily-reminder", "schedule": "0 16 * * *" }
+    { "path": "/api/daily-reminder", "schedule": "0 16 * * *" },
+    { "path": "/api/weekly-top", "schedule": "30 4 * * *" }
   ],
   "headers": [
     {

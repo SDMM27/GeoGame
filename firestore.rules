@@ -129,6 +129,11 @@ service cloud.firestore {
       allow update: if request.auth != null && request.auth.uid == uid
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['badges'])
         && validBadges(request.resource.data.badges);
+      // Community directory (src/utils/community.js): users/{uid}.communityAt is the opt-in. Joining stamps the
+      // server time, leaving removes the field. Nothing else changes with it.
+      allow update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['communityAt'])
+        && (!('communityAt' in request.resource.data) || request.resource.data.communityAt == request.time);
       allow create: if request.auth != null && request.auth.uid == uid
         && request.resource.data.keys().hasOnly(['username', 'usernameKey', 'createdAt'])
         && request.resource.data.createdAt == request.time
@@ -943,6 +948,11 @@ service cloud.firestore {
 
       allow create: if validReport(request.resource.data);
       allow read, update, delete: if false;
+    }
+
+    // Top of the week (api/weekly-top.mjs, written by the server only): shown on the Community page.
+    match /weeklyTop/{id} {
+      allow read: if true;
     }
 
     // Server clock calibration (src/utils/serverTime.js): a throwaway document holding only the server time.

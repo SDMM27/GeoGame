@@ -206,6 +206,43 @@ describe('public badges', () => {
   })
 })
 
+describe('community directory', () => {
+  it('lets an account join with the server time, leave, and anyone list the members', async () => {
+    await assertSucceeds(as('alice').doc('users/alice').update({ communityAt: now() }))
+    await assertSucceeds(anonymous().collection('users').orderBy('communityAt', 'desc').limit(20).get())
+    await assertSucceeds(as('alice').doc('users/alice').update({ communityAt: firebase.firestore.FieldValue.delete() }))
+  })
+
+  it('lets anyone search usernames by prefix', async () => {
+    await assertSucceeds(
+      as('bob').collection('usernames').orderBy(firebase.firestore.FieldPath.documentId()).startAt('al').endAt('al').limit(8).get()
+    )
+  })
+
+  it("refuses someone else's membership, and a visitor's", async () => {
+    await assertFails(as('mallory').doc('users/alice').update({ communityAt: now() }))
+    await assertFails(anonymous().doc('users/alice').update({ communityAt: now() }))
+  })
+
+  it('refuses a made-up date, other values and extra fields', async () => {
+    const update = (data) => as('alice').doc('users/alice').update(data)
+    await assertFails(update({ communityAt: firebase.firestore.Timestamp.fromMillis(Date.now() + 86400000) }))
+    await assertFails(update({ communityAt: true }))
+    await assertFails(update({ communityAt: now(), username: 'Bob' }))
+    await assertFails(update({ communityAt: now(), admin: true }))
+  })
+})
+
+describe('top of the week', () => {
+  it('can be read by anyone but written by no client', async () => {
+    await env.withSecurityRulesDisabled((context) => context.firestore().doc('weeklyTop/current').set({ entries: [] }))
+    await assertSucceeds(anonymous().doc('weeklyTop/current').get())
+    await assertFails(as('alice').doc('weeklyTop/current').set({ entries: [{ uid: 'alice', points: 999 }] }))
+    await assertFails(as('alice').doc('weeklyTop/current').delete())
+    await assertFails(anonymous().doc('weeklyTop/current').set({ entries: [] }))
+  })
+})
+
 describe('deleting an account', () => {
   const deleteBoth = (uid) => {
     const db = as(uid)

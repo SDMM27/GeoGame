@@ -2,9 +2,13 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { usePlayerSearch, useRecentPlayers } from '../../hooks/useCommunity'
 import { useFriendsToday } from '../../hooks/usePlayerProfile'
 import { USERNAME_MAX } from '../../utils/account'
-import { acceptFriendRequest, friendErrorKey, removeFriendship, sendFriendRequest } from '../../utils/friends'
+import { acceptFriendRequest, friendErrorKey, removeFriendship, SEARCH_MIN, sendFriendRequest } from '../../utils/friends'
+import { clearPendingInvite, getPendingInvite, inviteUrl } from '../../utils/inviteLink'
+import { shareInviteLink } from '../../utils/shareInvite'
+import FriendCandidates from './FriendCandidates'
 import { Avatar, DailyChips } from './ProfileBody'
 import './FriendsPanel.css'
 
@@ -17,12 +21,81 @@ function PlayerName({ friend }) {
   )
 }
 
+// A link opened before signing in (see AddFriendPage): offered once the account exists.
+function PendingInvite({ account, friendships, onMessage }) {
+  const { t } = useTranslation()
+  const [username, setUsername] = useState(getPendingInvite)
+  const [busy, setBusy] = useState(false)
+  if (!username) return null
+
+  const dismiss = () => {
+    clearPendingInvite()
+    setUsername(null)
+  }
+  const add = async () => {
+    setBusy(true)
+    try {
+      const player = await sendFriendRequest({ uid: account.uid, username: account.username }, username, friendships.all)
+      onMessage({ kind: 'notice', text: t('friends.sent', { username: player?.username ?? username }) })
+    } catch (error) {
+      onMessage({ kind: 'error', text: t(`friends.errors.${friendErrorKey(error)}`) })
+    }
+    dismiss()
+  }
+
+  return (
+    <div className="friends-pending">
+      <strong>{t('friends.pending_title', { username })}</strong>
+      <p className="profile-muted">{t('friends.pending_hint')}</p>
+      <div className="friends-pending__actions">
+        <button type="button" className="friends-btn friends-btn--primary" disabled={busy} onClick={add}>
+          {t('friends.pending_add', { username })}
+        </button>
+        <button type="button" className="friends-btn" onClick={dismiss}>
+          {t('friends.dismiss')}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// Your own invitation link: whoever opens it can add you without knowing your username.
+function InviteCard({ account }) {
+  const { t } = useTranslation()
+  const [copied, setCopied] = useState(false)
+  const canShare = typeof navigator !== 'undefined' && Boolean(navigator.share)
+  const share = async () => {
+    const result = await shareInviteLink({
+      url: inviteUrl(window.location.origin, account.username),
+      text: t('friends.invite_message'),
+      title: 'GeoGame',
+    })
+    setCopied(result === 'copied')
+  }
+  return (
+    <div className="friends-invite">
+      <div>
+        <strong>{t('friends.invite_title')}</strong>
+        <p className="profile-muted">{t('friends.invite_hint')}</p>
+        {copied && <p className="account-notice">{t('friends.invite_copied')}</p>}
+      </div>
+      <button type="button" className="friends-btn friends-btn--primary" onClick={share}>
+        {t(canShare ? 'friends.invite_share' : 'friends.invite_copy')}
+      </button>
+    </div>
+  )
+}
+
 export default function FriendsPanel({ account, friendships }) {
   const { t } = useTranslation()
   const today = useFriendsToday(friendships.friends)
   const [username, setUsername] = useState('')
   const [sending, setSending] = useState(false)
   const [message, setMessage] = useState(null)
+  const search = usePlayerSearch(username)
+  const recent = useRecentPlayers(friendships)
+  const typed = username.trim().length >= SEARCH_MIN
+  const found = search.results.filter((player) => player.uid !== account.uid).map((player) => ({ uid: player.uid, name: player.username }))
 
   const handleAdd = async (e) => {
     e.preventDefault()
@@ -65,6 +138,22 @@ export default function FriendsPanel({ account, friendships }) {
         <button type="submit" disabled={sending || !username.trim()}>{t('friends.add')}</button>
       </form>
       {message && <p className={message.kind === 'error' ? 'account-error' : 'account-notice'}>{message.text}</p>}
+      {typed && !search.searching && found.length === 0 && <p className="profile-muted">{t('friends.search_none')}</p>}
+      <FriendCandidates players={found} account={account} friendships={friendships} onMessage={setMessage} />
+
+      <PendingInvite account={account} friendships={friendships} onMessage={setMessage} />
+
+      {!typed && recent.length > 0 && (
+        <div className="friends-group">
+          <small className="profile-label">{t('friends.recent_title')}</small>
+          <FriendCandidates players={recent} account={account} friendships={friendships} onMessage={setMessage} />
+        </div>
+      )}
+
+      <InviteCard account={account} />
+      <Link to="/community" className="friends-community">
+        {t('friends.community_link')} →
+      </Link>
 
       {friendships.incoming.length > 0 && (
         <div className="friends-group">

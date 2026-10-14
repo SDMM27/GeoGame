@@ -10,6 +10,39 @@ export const isMine = (entry, account) => Boolean(account?.uid && entry.uid === 
 // Row class for the signed-in player's own entries.
 export const mineClass = (entry, account) => (isMine(entry, account) ? ' leaderboard-row--mine' : '')
 
+// "+" next to another player's name: sends them a friend request (or accepts theirs). Gone once you are friends.
+function QuickAdd({ account, entry }) {
+  const { t } = useTranslation()
+  const friendships = useFriendships(account.uid)
+  const [failed, setFailed] = useState(false)
+  if (friendships.loading) return null
+  const status = friendships.all.find((item) => item.uid === entry.uid)?.status
+  if (status === 'friend') return null
+  if (status === 'outgoing') return <span className="player-name__sent" title={t('friends.request_sent')}>✓</span>
+
+  const add = async (event) => {
+    event.stopPropagation()
+    try {
+      await sendFriendRequestTo({ uid: account.uid, username: account.username }, entry.uid, friendships.all)
+      setFailed(false)
+    } catch (error) {
+      console.warn('[friends]', error?.code, error)
+      setFailed(true)
+    }
+  }
+  return (
+    <button
+      type="button"
+      className={`player-name__add${failed ? ' player-name__add--failed' : ''}`}
+      aria-label={t('friends.quick_add', { username: entry.name })}
+      title={t('friends.quick_add', { username: entry.name })}
+      onClick={add}
+    >
+      {failed ? '!' : '+'}
+    </button>
+  )
+}
+
 // Name of a leaderboard entry: a link to the player's profile when it belongs to an account,
 // with a "you" badge on the signed-in player's own entries. With `reportIn` (the leaderboard's collection, for
 // entries that came with their id), the other players' entries get a discreet report button.

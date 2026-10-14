@@ -5,11 +5,17 @@ import {
   collection,
   deleteDoc,
   doc,
+  documentId,
+  endAt,
   getDoc,
+  getDocs,
+  limit,
   onSnapshot,
+  orderBy,
   query,
   serverTimestamp,
   setDoc,
+  startAt,
   updateDoc,
   where,
 } from 'firebase/firestore'
@@ -32,6 +38,20 @@ export async function findPlayer(username) {
   if (!name) return null
   const snapshot = await getDoc(doc(firestore, 'usernames', name.toLowerCase()))
   return snapshot.exists() ? { uid: snapshot.data().uid, username: snapshot.data().username } : null
+}
+
+export const SEARCH_MIN = 2
+export const SEARCH_RESULTS = 8
+
+// Usernames starting with `prefix` (case-insensitive), as [{ uid, username }]: a handful, to pick one from.
+// The ids of usernames/ are the lowercase usernames, so a range on the id is a prefix search.
+export async function searchPlayers(prefix, max = SEARCH_RESULTS) {
+  const key = normalizeUsername(prefix).toLowerCase()
+  if (key.length < SEARCH_MIN) return []
+  const snapshot = await getDocs(
+    query(collection(firestore, 'usernames'), orderBy(documentId()), startAt(key), endAt(`${key}`), limit(max))
+  )
+  return snapshot.docs.map((item) => ({ uid: item.data().uid, username: item.data().username }))
 }
 
 // { uid, username, createdAt } or null.
@@ -143,6 +163,33 @@ export function watchFriendships(uid, callback) {
     stopped = true
     clearTimeout(timer)
     unsubscribe?.()
+  }
+}
+
+// One listener per account for the whole page, however many components show the friends (a leaderboard has a
+// "+" button on every row): the first subscriber starts it, the last one stops it, and a late one gets the
+// latest list at once.
+const shared = new Map()
+
+export function watchSharedFriendships(uid, callback) {
+  let entry = shared.get(uid)
+  if (!entry) {
+    entry = { callbacks: new Set(), list: null, stop: null }
+    shared.set(uid, entry)
+    const current = entry
+    entry.stop = watchFriendships(uid, (list) => {
+      current.list = list
+      current.callbacks.forEach((notify) => notify(list))
+    })
+  }
+  entry.callbacks.add(callback)
+  if (entry.list) callback(entry.list)
+  return () => {
+    entry.callbacks.delete(callback)
+    if (entry.callbacks.size === 0) {
+      entry.stop()
+      if (shared.get(uid) === entry) shared.delete(uid)
+    }
   }
 }
 

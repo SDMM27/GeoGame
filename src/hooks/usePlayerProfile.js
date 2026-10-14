@@ -3,7 +3,7 @@ import { computeAchievements } from '../utils/achievements'
 import { syncBadges } from '../utils/badges'
 import { fetchCachedDailyGames, fetchCachedGames, fetchDailyGames, fetchGames } from '../utils/gameHistory'
 import { computeStats, dayKey } from '../utils/profileStats'
-import { watchFriendships } from '../utils/friends'
+import { watchSharedFriendships } from '../utils/friends'
 
 // A player's history with its stats and achievements. `reload` fetches it again (e.g. on focus).
 // `own`: the signed-in player's profile, which keeps their public badges (utils/badges.js) up to date.
@@ -60,7 +60,7 @@ export function useFriendships(uid) {
   useEffect(() => {
     setList(null)
     if (!uid) return undefined
-    return watchFriendships(uid, setList)
+    return watchSharedFriendships(uid, setList)
   }, [uid])
   return useMemo(
     () => ({

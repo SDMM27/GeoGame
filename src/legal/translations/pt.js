@@ -228,6 +228,7 @@ export default {
             list: [
               'Bandeiras: [Flagpedia](https://flagpedia.net).',
               'Fonte Inter: Rasmus Andersson, sob a licença SIL Open Font License.',
+              'Contornos detalhados dos pequenos territórios: [geoBoundaries](https://www.geoboundaries.org) (CC BY) e © colaboradores do [OpenStreetMap](https://www.openstreetmap.org/copyright) (ODbL).',
             ],
           },
         ],

@@ -238,6 +238,7 @@ const fr = {
             list: [
               'Drapeaux : [Flagpedia](https://flagpedia.net).',
               'Police Inter : Rasmus Andersson, sous licence SIL Open Font License.',
+              'Contours détaillés des petits territoires : [geoBoundaries](https://www.geoboundaries.org) (CC BY) et © les contributeurs d’[OpenStreetMap](https://www.openstreetmap.org/copyright) (ODbL).',
             ],
           },
         ],
@@ -543,6 +544,7 @@ const en = {
             list: [
               'Flags: [Flagpedia](https://flagpedia.net).',
               'Inter typeface: Rasmus Andersson, under the SIL Open Font License.',
+              'Detailed outlines of small territories: [geoBoundaries](https://www.geoboundaries.org) (CC BY) and © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors (ODbL).',
             ],
           },
         ],
@@ -846,6 +848,7 @@ const ru = {
             list: [
               'Флаги: [Flagpedia](https://flagpedia.net).',
               'Шрифт Inter: Rasmus Andersson, лицензия SIL Open Font License.',
+              'Подробные контуры малых территорий: [geoBoundaries](https://www.geoboundaries.org) (CC BY) и © участники [OpenStreetMap](https://www.openstreetmap.org/copyright) (ODbL).',
             ],
           },
         ],

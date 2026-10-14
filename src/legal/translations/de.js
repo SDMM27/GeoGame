@@ -228,6 +228,7 @@ export default {
             list: [
               'Flaggen: [Flagpedia](https://flagpedia.net).',
               'Schriftart Inter: Rasmus Andersson, unter der SIL Open Font License.',
+              'Detaillierte Umrisse kleiner Gebiete: [geoBoundaries](https://www.geoboundaries.org) (CC BY) und © [OpenStreetMap](https://www.openstreetmap.org/copyright)-Mitwirkende (ODbL).',
             ],
           },
         ],

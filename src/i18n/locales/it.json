@@ -898,6 +898,42 @@
       "title": "Anima della stanza",
       "desc": "Gioca 25 partite multigiocatore"
     },
+    "capital_tour": {
+      "title": "Giro del mondo delle capitali",
+      "desc": "Trova tutte le capitali di una partita in tutte e 5 le difficoltà"
+    },
+    "flag_tour": {
+      "title": "Giro del mondo delle bandiere",
+      "desc": "Riconosci tutte le bandiere di una partita in tutte e 5 le difficoltà"
+    },
+    "placement_tour": {
+      "title": "Giro del mondo del posizionamento",
+      "desc": "Posiziona tutti i paesi di una partita in tutte e 5 le difficoltà"
+    },
+    "capital_impossible": {
+      "title": "Capitali impossibili",
+      "desc": "Trova tutte le capitali di una partita in Impossibile"
+    },
+    "flag_impossible": {
+      "title": "Bandiere impossibili",
+      "desc": "Riconosci tutte le bandiere di una partita in Impossibile"
+    },
+    "placement_impossible": {
+      "title": "Posizionamento impossibile",
+      "desc": "Posiziona tutti i paesi di una partita in Impossibile"
+    },
+    "impossible_trio": {
+      "title": "Trio impossibile",
+      "desc": "Fai una partita perfetta in Impossibile in Posizionamento, Bandiere e Capitali"
+    },
+    "hardcore_trio": {
+      "title": "Trio hardcore",
+      "desc": "Fai una partita perfetta in Hardcore in Posizionamento, Bandiere e Capitali"
+    },
+    "world_champion": {
+      "title": "Campione del mondo",
+      "desc": "Fai una partita perfetta in Posizionamento, Bandiere e Capitali in tutte e 5 le difficoltà"
+    },
     "tiers": {
       "bronze": "Bronzo",
       "silver": "Argento",

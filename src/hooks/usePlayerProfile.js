@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { computeAchievements } from '../utils/achievements'
-import { syncBadges } from '../utils/badges'
+import { fetchChallenges, syncBadges } from '../utils/badges'
 import { fetchCachedDailyGames, fetchCachedGames, fetchDailyGames, fetchGames } from '../utils/gameHistory'
 import { computeStats, dayKey } from '../utils/profileStats'
 import { watchSharedFriendships } from '../utils/friends'
@@ -40,10 +40,22 @@ export function usePlayerProfile(uid, { friendsCount, own = false } = {}) {
       })
   }, [uid])
 
+  // The player's own challenges stay unlocked when their games left the history (users/{uid}.challenges).
+  const [remembered, setRemembered] = useState([])
+  useEffect(() => {
+    setRemembered([])
+    if (!own || !uid) return undefined
+    let cancelled = false
+    fetchChallenges(uid).then((ids) => !cancelled && setRemembered(ids))
+    return () => {
+      cancelled = true
+    }
+  }, [own, uid])
+
   const stats = useMemo(() => computeStats(state.games), [state.games])
   const achievements = useMemo(
-    () => computeAchievements({ stats, games: state.games, friendsCount }),
-    [stats, state.games, friendsCount]
+    () => computeAchievements({ stats, games: state.games, friendsCount, remembered }),
+    [stats, state.games, friendsCount, remembered]
   )
 
   const loaded = !state.loading && !state.error

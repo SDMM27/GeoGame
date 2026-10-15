@@ -206,6 +206,38 @@ describe('public badges', () => {
   })
 })
 
+describe('public challenges', () => {
+  const challenges = ['capital_tour', 'hardcore_trio']
+
+  it('lets an account store its own unlocked challenges, alone or with its badges', async () => {
+    await assertSucceeds(as('alice').doc('users/alice').update({ challenges }))
+    await assertSucceeds(as('alice').doc('users/alice').update({ challenges: [] }))
+    await assertSucceeds(as('alice').doc('users/alice').update({ badges: { top: ['hardcore_trio'], count: 2 }, challenges }))
+    await assertSucceeds(as('alice').doc('users/alice').update({ challenges: ['x'.repeat(40)] }))
+    await assertSucceeds(as('alice').doc('users/alice').update({ challenges: Array.from({ length: 20 }, (_, i) => `c${i}`) }))
+  })
+
+  it("refuses someone else's challenges, and a visitor's", async () => {
+    await assertFails(as('mallory').doc('users/alice').update({ challenges }))
+    await assertFails(anonymous().doc('users/alice').update({ challenges }))
+  })
+
+  it('refuses malformed challenges', async () => {
+    const update = (value) => as('alice').doc('users/alice').update({ challenges: value })
+    await assertFails(update('capital_tour'))
+    await assertFails(update([1]))
+    await assertFails(update(['ok', { id: 'x' }]))
+    await assertFails(update(['x'.repeat(41)]))
+    await assertFails(update(Array.from({ length: 21 }, (_, i) => `c${i}`)))
+    await assertFails(update({ capital_tour: true }))
+  })
+
+  it('refuses changing anything else along with the challenges', async () => {
+    await assertFails(as('alice').doc('users/alice').update({ challenges, username: 'Bob' }))
+    await assertFails(as('alice').doc('users/alice').update({ challenges, admin: true }))
+  })
+})
+
 describe('community directory', () => {
   it('lets an account join with the server time, leave, and anyone list the members', async () => {
     await assertSucceeds(as('alice').doc('users/alice').update({ communityAt: now() }))

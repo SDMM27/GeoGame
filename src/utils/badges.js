@@ -1,11 +1,11 @@
 // Public badges of a player, so that others see their level at a glance (in a room, on a profile).
 // Shared by the website and the app. users/{uid}.badges = { top: [achievement id, up to 3], count }:
 // the highest tiers the player unlocked (see achievements.js). The summary is computed on the player's own
-// device from their history and written there (firestore.rules: only the owner, only `badges`), so it is a
+// device from their history and written there (firestore.rules: only the owner, only `badges` and `challenges`), so it is a
 // courtesy and not proof of anything.
 import { doc, getDoc, updateDoc } from 'firebase/firestore'
 import { firestore } from '../Firebase'
-import { ACHIEVEMENTS, computeAchievements } from './achievements'
+import { ACHIEVEMENTS, computeAchievements, unlockedStickyIds, withRemembered } from './achievements'
 import { fetchGames } from './gameHistory'
 import { computeStats } from './profileStats'
 
@@ -35,18 +35,46 @@ export function readBadges(data) {
 const sameSummary = (a, b) =>
   Array.isArray(b?.top) && a.count === b.count && a.top.length === b.top.length && a.top.every((id, index) => id === b.top[index])
 
-// Writes the summary on the player's own document when it changed.
+export const MAX_CHALLENGES = 20
+
+// users/{uid}.challenges: the sticky achievements (challenges) the player unlocked, kept even when the games that
+// unlocked them leave the capped history. Anything unknown or malformed is dropped.
+export function readChallenges(data) {
+  const raw = data?.challenges
+  return Array.isArray(raw) ? raw.filter((id) => typeof id === 'string' && KNOWN_IDS.has(id)).slice(0, MAX_CHALLENGES) : []
+}
+
+const sameList = (a, b) => Array.isArray(b) && a.length === b.length && a.every((id, index) => id === b[index])
+
+// Writes the badge summary and the unlocked challenges on the player's own document when they changed.
 export async function syncBadges(uid, achievements) {
-  const summary = badgeSummary(achievements)
   try {
     const ref = doc(firestore, 'users', uid)
     const snapshot = await getDoc(ref)
-    if (!snapshot.exists() || sameSummary(summary, snapshot.data().badges)) return
-    await updateDoc(ref, { badges: summary })
-    cache.set(uid, { at: Date.now(), value: readBadges({ badges: summary }) })
+    if (!snapshot.exists()) return
+    const data = snapshot.data()
+    const stored = readChallenges(data)
+    const merged = [...new Set([...stored, ...unlockedStickyIds(achievements)])].slice(0, MAX_CHALLENGES)
+    const summary = badgeSummary(withRemembered(achievements, merged))
+    const changes = {}
+    if (!sameSummary(summary, data.badges)) changes.badges = summary
+    if (!sameList(merged, data.challenges)) changes.challenges = merged
+    if (Object.keys(changes).length === 0) return
+    await updateDoc(ref, changes)
+    if (changes.badges) cache.set(uid, { at: Date.now(), value: readBadges({ badges: summary }) })
   } catch (error) {
     // Badges are a bonus: never get in the way of the profile or of a game.
     console.warn('[badges]', error?.code, error)
+  }
+}
+
+// The challenges the signed-in player unlocked before (empty when they can't be read).
+export async function fetchChallenges(uid) {
+  try {
+    const snapshot = await getDoc(doc(firestore, 'users', uid))
+    return readChallenges(snapshot.data())
+  } catch {
+    return []
   }
 }
 

@@ -92,6 +92,56 @@ describe('achievements', () => {
   })
 })
 
+describe('challenges', () => {
+  const DIFFICULTIES = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
+  const TYPES = ['PLACEMENT', 'FLAGS', 'CAPITALS']
+  const perfect = (gameType, difficulty) => game({ gameType, difficulty, found: 20, total: 20 })
+  const partial = (gameType, difficulty) => game({ gameType, difficulty, found: 19, total: 20 })
+  const all = (gameType) => DIFFICULTIES.map((difficulty) => perfect(gameType, difficulty))
+
+  it('unlock a tour with a perfect game on each of the 5 difficulties', () => {
+    const tours = { CAPITALS: 'capital_tour', FLAGS: 'flag_tour', PLACEMENT: 'placement_tour' }
+    for (const [type, id] of Object.entries(tours)) {
+      expect(unlockedIds(all(type))).toContain(id)
+      expect(unlockedIds([...all(type).slice(1), partial(type, 'Facile')])).not.toContain(id)
+      // Another game type does not count
+      expect(unlockedIds(all(TYPES.find((other) => other !== type)))).not.toContain(id)
+    }
+  })
+
+  it('unlock the Impossible ones from a perfect Impossible game of that type', () => {
+    const ids = { CAPITALS: 'capital_impossible', FLAGS: 'flag_impossible', PLACEMENT: 'placement_impossible' }
+    for (const [type, id] of Object.entries(ids)) {
+      expect(unlockedIds([perfect(type, 'Impossible')])).toContain(id)
+      expect(unlockedIds([partial(type, 'Impossible')])).not.toContain(id)
+      expect(unlockedIds([perfect(type, 'Hardcore')])).not.toContain(id)
+    }
+  })
+
+  it('unlock the trios with a perfect game of each type at the difficulty', () => {
+    const trio = (difficulty) => TYPES.map((type) => perfect(type, difficulty))
+    expect(unlockedIds(trio('Impossible'))).toContain('impossible_trio')
+    expect(unlockedIds(trio('Impossible'))).not.toContain('hardcore_trio')
+    expect(unlockedIds(trio('Hardcore'))).toContain('hardcore_trio')
+    expect(unlockedIds([...trio('Impossible').slice(1), partial('PLACEMENT', 'Impossible')])).not.toContain('impossible_trio')
+    expect(unlockedIds([perfect('FLAGS', 'Hardcore'), perfect('FLAGS', 'Hardcore'), perfect('CAPITALS', 'Hardcore')])).not.toContain('hardcore_trio')
+  })
+
+  it('unlock world champion with every game type and difficulty perfect', () => {
+    const everything = TYPES.flatMap(all)
+    expect(unlockedIds(everything)).toContain('world_champion')
+    expect(unlockedIds(everything.slice(1))).not.toContain('world_champion')
+  })
+
+  it('keep a sticky challenge unlocked from `remembered`, even with an empty history', () => {
+    const list = computeAchievements({ stats: computeStats([]), games: [], remembered: ['world_champion', 'games_250'] })
+    expect(list.find((item) => item.id === 'world_champion')).toMatchObject({ unlocked: true, progress: 15 })
+    // Only sticky achievements are remembered
+    expect(list.find((item) => item.id === 'games_250').unlocked).toBe(false)
+    expect(list[0].id).toBe('world_champion')
+  })
+})
+
 describe('badges', () => {
   const games = Array.from({ length: 12 }, () => game({ gameType: 'SURVIVAL', mode: 'survival', score: 55, lives: 1 }))
   const achievements = computeAchievements({ stats: computeStats(games, '2026-10-13'), games, friendsCount: 3 })

@@ -1,6 +1,7 @@
 // Achievements unlocked from a player's history. Pure functions.
 // Each one reports a progress value against a target; titles are in i18n under `achievements.<id>`.
 // `emoji` is used by the website, `icon` (MaterialCommunityIcons) by the app.
+// `sticky` (challenges): once unlocked it stays unlocked, even when the game left the capped history (see `remembered`).
 // `tier` ranks the badge (see TIERS): a player's best badges are the highest tiers they unlocked (src/utils/badges.js).
 import { GAME_TYPES } from './gameTypes'
 import { DAILY_GAME_TYPES, dailyTypesOn } from './profileStats'
@@ -12,6 +13,9 @@ export const TIER_COLORS = { bronze: '#D08A4E', silver: '#B8C4D6', gold: '#F5B83
 
 export const tierRank = (achievement) => TIERS.indexOf(achievement.tier)
 
+// Same list as DIFFICULTIES in leaderboards.js (not imported: this file stays free of Firebase).
+const CHALLENGE_DIFFICULTIES = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
+const CHALLENGE_GAME_TYPES = [GAME_TYPES.PLACEMENT, GAME_TYPES.FLAGS, GAME_TYPES.CAPITALS]
 const HARD_DIFFICULTIES = ['Difficile', 'Impossible', 'Hardcore']
 
 const isDaily = (game) => game.mode === 'daily'
@@ -21,6 +25,19 @@ const isSetupGame = (game) => game.mode === 'standard' || game.mode === 'ascensi
 const isPerfect = (game) => game.total >= 10 && game.found === game.total
 // Daily game solved on the first guess (the Ranking has no "first try").
 const isFirstTry = (game) => isSolvedDaily(game) && game.attempts === 1 && game.gameType !== GAME_TYPES.RANKING
+
+// "<gameType>|<difficulty>" of every perfect game of the three setup games.
+const perfectPairs = (games) =>
+  new Set(
+    games
+      .filter((game) => CHALLENGE_GAME_TYPES.includes(game.gameType) && CHALLENGE_DIFFICULTIES.includes(game.difficulty) && isPerfect(game))
+      .map((game) => `${game.gameType}|${game.difficulty}`)
+  )
+// Difficulties in which `gameType` has a perfect game.
+const perfectDifficulties = (games, gameType) => CHALLENGE_DIFFICULTIES.filter((difficulty) => perfectPairs(games).has(`${gameType}|${difficulty}`)).length
+// Game types that have a perfect game at `difficulty`.
+const perfectTypes = (games, difficulty) => CHALLENGE_GAME_TYPES.filter((gameType) => perfectPairs(games).has(`${gameType}|${difficulty}`)).length
+const perfectAt = (games, gameType, difficulty) => perfectPairs(games).has(`${gameType}|${difficulty}`) ? 1 : 0
 
 const count = (games, predicate) => games.reduce((sum, game) => sum + (predicate(game) ? 1 : 0), 0)
 const flag = (games, predicate) => (games.some(predicate) ? 1 : 0)
@@ -163,6 +180,25 @@ export const ACHIEVEMENTS = [
   { id: 'multi_5', tier: 'silver', emoji: '🎉', icon: 'account-group', target: 5, value: ({ games }) => count(games, (game) => game.mode === 'multi') },
   { id: 'multi_25', tier: 'gold', emoji: '🥳', icon: 'party-popper', target: 25, value: ({ games }) => count(games, (game) => game.mode === 'multi') },
   { id: 'friend', tier: 'bronze', emoji: '💬', icon: 'account-heart-outline', target: 1, value: ({ friendsCount }) => friendsCount ?? 0 },
+
+  // Challenges (sticky): perfect games across difficulties and game types
+  { id: 'capital_tour', sticky: true, tier: 'gold', emoji: '🏙️', icon: 'city-variant-outline', target: 5, value: ({ games }) => perfectDifficulties(games, GAME_TYPES.CAPITALS) },
+  { id: 'flag_tour', sticky: true, tier: 'gold', emoji: '🎌', icon: 'flag-triangle', target: 5, value: ({ games }) => perfectDifficulties(games, GAME_TYPES.FLAGS) },
+  { id: 'placement_tour', sticky: true, tier: 'gold', emoji: '🧭', icon: 'map-search-outline', target: 5, value: ({ games }) => perfectDifficulties(games, GAME_TYPES.PLACEMENT) },
+  { id: 'capital_impossible', sticky: true, tier: 'legend', emoji: '🏰', icon: 'castle', target: 1, value: ({ games }) => perfectAt(games, GAME_TYPES.CAPITALS, 'Impossible') },
+  { id: 'flag_impossible', sticky: true, tier: 'legend', emoji: '🏴', icon: 'flag-variant', target: 1, value: ({ games }) => perfectAt(games, GAME_TYPES.FLAGS, 'Impossible') },
+  { id: 'placement_impossible', sticky: true, tier: 'legend', emoji: '📌', icon: 'map-marker-check-outline', target: 1, value: ({ games }) => perfectAt(games, GAME_TYPES.PLACEMENT, 'Impossible') },
+  { id: 'impossible_trio', sticky: true, tier: 'gold', emoji: '🔱', icon: 'trident', target: 3, value: ({ games }) => perfectTypes(games, 'Impossible') },
+  { id: 'hardcore_trio', sticky: true, tier: 'legend', emoji: '☠️', icon: 'skull-crossbones-outline', target: 3, value: ({ games }) => perfectTypes(games, 'Hardcore') },
+  {
+    id: 'world_champion',
+    sticky: true,
+    tier: 'legend',
+    emoji: '🌐',
+    icon: 'earth-arrow-right',
+    target: CHALLENGE_GAME_TYPES.length * CHALLENGE_DIFFICULTIES.length,
+    value: ({ games }) => perfectPairs(games).size,
+  },
 ]
 
 // Most games played on a single (local) day.
@@ -197,11 +233,31 @@ const bestDailySweep = (games) =>
 // Days on which every daily challenge (there was that day) was done.
 const sweepDays = (games) => dailyTypesByDay(games).filter(([existing, done]) => done.length >= existing.length).length
 
+// Ids of the sticky achievements (challenges) unlocked in a computeAchievements() list.
+export const unlockedStickyIds = (achievements) => achievements.filter((achievement) => achievement.sticky && achievement.unlocked).map((achievement) => achievement.id)
+
+const sortAchievements = (list) =>
+  list.sort((a, b) => Number(b.unlocked) - Number(a.unlocked) || (a.unlocked ? tierRank(b) - tierRank(a) : 0))
+
+// Marks the sticky achievements whose id is in `remembered` as unlocked, then sorts again.
+export function withRemembered(achievements, remembered = []) {
+  if (!remembered.length) return achievements
+  return sortAchievements(
+    achievements.map((achievement) =>
+      achievement.sticky && !achievement.unlocked && remembered.includes(achievement.id)
+        ? { ...achievement, progress: achievement.target, unlocked: true }
+        : achievement
+    )
+  )
+}
+
 // [{ ...achievement, progress, unlocked }], unlocked first (the highest tiers first), then in list order.
 // Without `friendsCount` (another player's profile: their friends aren't readable), 'friend' is left out.
-export function computeAchievements({ stats, games, friendsCount }) {
-  return ACHIEVEMENTS.filter((achievement) => friendsCount != null || achievement.id !== 'friend').map((achievement) => {
+// `remembered`: ids of the challenges the player unlocked before (users/{uid}.challenges), which stay unlocked.
+export function computeAchievements({ stats, games, friendsCount, remembered = [] }) {
+  const list = ACHIEVEMENTS.filter((achievement) => friendsCount != null || achievement.id !== 'friend').map((achievement) => {
     const progress = Math.min(achievement.value({ stats, games, friendsCount }), achievement.target)
     return { ...achievement, progress, unlocked: progress >= achievement.target }
-  }).sort((a, b) => Number(b.unlocked) - Number(a.unlocked) || (a.unlocked ? tierRank(b) - tierRank(a) : 0))
+  })
+  return withRemembered(sortAchievements(list), remembered)
 }

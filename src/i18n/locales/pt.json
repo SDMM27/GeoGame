@@ -898,6 +898,42 @@
       "title": "Alma da sala",
       "desc": "Jogue 25 partidas multijogador"
     },
+    "capital_tour": {
+      "title": "Volta ao mundo das capitais",
+      "desc": "Encontre todas as capitais de uma partida nas 5 dificuldades"
+    },
+    "flag_tour": {
+      "title": "Volta ao mundo das bandeiras",
+      "desc": "Reconheça todas as bandeiras de uma partida nas 5 dificuldades"
+    },
+    "placement_tour": {
+      "title": "Volta ao mundo da localização",
+      "desc": "Localize todos os países de uma partida nas 5 dificuldades"
+    },
+    "capital_impossible": {
+      "title": "Capitais impossíveis",
+      "desc": "Encontre todas as capitais de uma partida em Impossível"
+    },
+    "flag_impossible": {
+      "title": "Bandeiras impossíveis",
+      "desc": "Reconheça todas as bandeiras de uma partida em Impossível"
+    },
+    "placement_impossible": {
+      "title": "Localização impossível",
+      "desc": "Localize todos os países de uma partida em Impossível"
+    },
+    "impossible_trio": {
+      "title": "Trio impossível",
+      "desc": "Faça uma partida perfeita em Impossível em Localização, Bandeiras e Capitais"
+    },
+    "hardcore_trio": {
+      "title": "Trio hardcore",
+      "desc": "Faça uma partida perfeita em Hardcore em Localização, Bandeiras e Capitais"
+    },
+    "world_champion": {
+      "title": "Campeão do mundo",
+      "desc": "Faça uma partida perfeita em Localização, Bandeiras e Capitais nas 5 dificuldades"
+    },
     "tiers": {
       "bronze": "Bronze",
       "silver": "Prata",

@@ -21,7 +21,9 @@
     "usd": "US$ {{value}}",
     "close": "Fechar",
     "unknown": "Desconhecido",
-    "open": "Abrir o atlas"
+    "open": "Abrir o atlas",
+    "history": "História",
+    "history_quiz": "📜 Testar meus conhecimentos da história"
   },
   "continents": {
     "Europe": "Europa",
@@ -536,6 +538,18 @@
       "digits_one": "É um número de {{count}} algarismo",
       "digits_other": "É um número de {{count}} algarismos",
       "between": "Entre {{min}} e {{max}}"
+    },
+    "pick_theme": "Escolha um tema",
+    "themes": {
+      "geo": "🌍 Geografia",
+      "geo_hint": "Rios, montanhas, países…",
+      "history": "📜 História",
+      "history_hint": "Datas e acontecimentos-chave"
+    },
+    "history": {
+      "title": "Quiz de História",
+      "country_title": "História: {{country}}",
+      "country_hint": "Todas as perguntas sobre este país, da mais fácil à mais difícil."
     }
   },
   "daily_challenge": {

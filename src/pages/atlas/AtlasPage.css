@@ -48,6 +48,11 @@
 .atlas-chip { width: auto; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 999px; padding: 0.3rem 0.65rem; font-size: 0.85rem; }
 .atlas-chip:hover { border-color: var(--accent-purple); }
 .atlas-muted { margin: 0; color: var(--text-muted); font-size: 0.85rem; }
+.atlas-timeline { list-style: none; margin: 0 0 10px; padding: 0 0 0 10px; border-left: 2px solid var(--border-color); display: flex; flex-direction: column; gap: 8px; }
+.atlas-timeline li { display: flex; flex-direction: column; font-size: 0.88rem; color: var(--text-primary); line-height: 1.35; }
+.atlas-timeline strong { color: var(--accent-purple); font-size: 0.8rem; }
+.atlas-quiz-link { display: inline-block; padding: 0.45rem 0.9rem; border-radius: 999px; background: var(--accent); color: var(--bg-primary); font-size: 0.88rem; font-weight: 600; text-decoration: none; }
+.atlas-quiz-link:hover { filter: brightness(1.1); }
 .atlas-difficulties { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .atlas-difficulties li { display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--text-primary); }
 

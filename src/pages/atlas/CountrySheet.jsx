@@ -1,7 +1,10 @@
 // The info sheet of a country in the atlas (see utils/countryInfo.js).
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
+import countryHistory from '../../data/countryHistory.json'
 import { formatCompactNumber, formatNumber } from '../../utils/countryInfo'
+import { HISTORY_COUNTRIES } from '../../utils/quizQuestions'
 
 const DIFFICULTY_COLORS = { Facile: '#4ade80', Moyen: '#fbbf24', Difficile: '#f97316', Impossible: '#ef4444' }
 
@@ -30,6 +33,8 @@ export default function CountrySheet({ info, onSelect, onClose }) {
     ['flags', t('games.flags.title'), info.difficulty.flags],
     ['capitals', t('games.capitals.title'), info.difficulty.capitals],
   ].filter(([, , level]) => level)
+  const timeline = info.iso ? countryHistory[info.iso] ?? [] : []
+  const hasHistoryQuiz = HISTORY_COUNTRIES.includes(info.iso)
 
   return (
     <aside className="atlas-sheet" aria-label={info.name}>
@@ -66,6 +71,27 @@ export default function CountrySheet({ info, onSelect, onClose }) {
           </div>
         )}
       </section>
+
+      {(timeline.length > 0 || hasHistoryQuiz) && (
+        <section className="atlas-section">
+          <h3>{t('atlas.history')}</h3>
+          {timeline.length > 0 && (
+            <ol className="atlas-timeline">
+              {timeline.map((event) => (
+                <li key={event.year}>
+                  <strong>{event.year}</strong>
+                  <span>{event.text[lang] ?? event.text.en}</span>
+                </li>
+              ))}
+            </ol>
+          )}
+          {hasHistoryQuiz && (
+            <Link className="atlas-quiz-link" to={`/quiz?mode=infinite&theme=history&country=${info.iso}`}>
+              {t('atlas.history_quiz')}
+            </Link>
+          )}
+        </section>
+      )}
 
       {games.length > 0 && (
         <section className="atlas-section">

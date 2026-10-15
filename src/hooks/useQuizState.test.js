@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { act, renderHook } from '@testing-library/react'
 import useQuizState from './useQuizState'
-import { ANSWER_MODES, CHOICE_HINTS, MAX_HINTS, generateQuestion } from '../utils/quizQuestions'
+import { ANSWER_MODES, CHOICE_HINTS, MAX_HINTS, QUIZ_THEMES, generateQuestion } from '../utils/quizQuestions'
 import { makeQuestion } from './testUtils/quizFixture'
+import historyQuestions from '../data/historyQuestions.json'
 
 vi.mock('../data/countriesWithDifficulty_FR.json', async () => import('./testUtils/countriesFixture'))
 // Le tirage est remplacé par des questions connues ; la vérification des réponses reste la vraie.
@@ -151,5 +152,25 @@ describe('useQuizState — partie', () => {
     act(() => result.current.backToDifficulty())
     expect(result.current.maxDifficulty).toBeNull()
     expect(result.current.question).toBeNull()
+  })
+})
+
+describe('useQuizState — histoire', () => {
+  it('draws only history questions about the chosen country, then finishes', () => {
+    const { result } = renderHook(() => useQuizState())
+    act(() => result.current.start('Impossible', ANSWER_MODES.CHOICES, { theme: QUIZ_THEMES.HISTORY, country: 'JP' }))
+    expect(result.current.theme).toBe(QUIZ_THEMES.HISTORY)
+    expect(generateQuestion).not.toHaveBeenCalled()
+    const expected = new Set(historyQuestions.filter((q) => q.countries.includes('JP')).map((q) => `history:${q.id}`))
+    const seen = new Set()
+    while (!result.current.isFinished) {
+      expect(expected.has(result.current.question.key), result.current.question.key).toBe(true)
+      seen.add(result.current.question.key)
+      act(() => result.current.answer(result.current.question.correctId))
+      act(() => result.current.next())
+    }
+    expect(seen).toEqual(expected)
+    expect(seen.size).toBe(result.current.stats.answered)
+    expect(result.current.stats.correct).toBe(seen.size)
   })
 })

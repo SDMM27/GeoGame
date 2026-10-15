@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import curated from '../data/quizQuestions.json'
+import historyQuestions from '../data/historyQuestions.json'
+import countryHistory from '../data/countryHistory.json'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import fr from '../i18n/locales/fr.json'
 import en from '../i18n/locales/en.json'
@@ -14,10 +16,12 @@ import {
   ANSWER_MODES,
   QUIZ_DIFFICULTIES,
   checkFreeAnswer,
+  generateHistoryQuestion,
   generateQuestion,
   getAllowedDifficulties,
   getDailyQuestion,
   getQuizPoints,
+  HISTORY_COUNTRIES,
   getQuestionHints,
   localizeQuestion,
   MAX_HINTS,
@@ -146,6 +150,78 @@ describe('curated questions', () => {
         for (const lang of LANGS) expect(text[lang]).toBeTruthy()
       }
     }
+  })
+})
+
+describe('history questions', () => {
+  const drawAll = (difficulty, country, seed = 3) => {
+    const random = mulberry32(seed)
+    const used = new Set()
+    const drawn = []
+    for (let q = generateHistoryQuestion(difficulty, used, random, country); q; q = generateHistoryQuestion(difficulty, used, random, country)) {
+      q.usedKeys.forEach((k) => used.add(k))
+      drawn.push(q)
+    }
+    return drawn
+  }
+
+  it('are complete in every language and tied to existing countries', () => {
+    const isos = new Set(countries.features.map((f) => f.properties.ISO_A2))
+    const ids = new Set()
+    for (const q of historyQuestions) {
+      expect(ids.has(q.id), q.id).toBe(false)
+      ids.add(q.id)
+      expect(QUIZ_DIFFICULTIES).toContain(q.difficulty)
+      expect(q.wrong).toHaveLength(3)
+      expect(q.countries.length).toBeGreaterThan(0)
+      for (const iso of q.countries) expect(isos.has(iso), `${q.id} ${iso}`).toBe(true)
+      for (const text of [q.question, q.answer, q.fact, ...q.wrong]) {
+        for (const lang of LANGS) expect(text[lang], `${q.id} ${lang}`).toBeTruthy()
+      }
+    }
+  })
+
+  it('has a timeline in every language, in chronological order', () => {
+    for (const [iso, events] of Object.entries(countryHistory)) {
+      const years = events.map((e) => Number(e.year))
+      expect(years, iso).toEqual([...years].sort((a, b) => a - b))
+      for (const e of events) for (const lang of LANGS) expect(e.text[lang], `${iso} ${e.year} ${lang}`).toBeTruthy()
+    }
+  })
+
+  it('are never drawn by the geography quiz', () => {
+    for (const q of generate(500, { seed: 21 })) expect(q.key.startsWith('history:')).toBe(false)
+  })
+
+  it('accepts the displayed answer in every language', () => {
+    for (const q of drawAll('Impossible', null)) {
+      for (const lang of LANGS) {
+        const { answer } = localizeQuestion(q, lang, makeT(lang))
+        expect(checkFreeAnswer(q, answer), `${q.key} ${lang} ${answer}`).not.toBeNull()
+      }
+      expect(checkFreeAnswer(q, 'zzzzzz')).toBeNull()
+    }
+  })
+
+  it('draws each question of a country once, easiest first, then stops', () => {
+    for (const country of HISTORY_COUNTRIES) {
+      const drawn = drawAll('Facile', country)
+      expect(drawn).toHaveLength(historyQuestions.filter((q) => q.countries.includes(country)).length)
+      const ranks = drawn.map((q) => QUIZ_DIFFICULTIES.indexOf(q.difficulty))
+      expect(ranks).toEqual([...ranks].sort((a, b) => a - b))
+    }
+  })
+
+  it('never draws a question harder than the chosen difficulty', () => {
+    const drawn = drawAll('Moyen', null)
+    expect(drawn.length).toBe(historyQuestions.filter((q) => ['Facile', 'Moyen'].includes(q.difficulty)).length)
+    // La difficulté choisie passe avant les plus faciles
+    expect(drawn[0].difficulty).toBe('Moyen')
+  })
+
+  it('only offers a country quiz when there are enough questions', () => {
+    expect(HISTORY_COUNTRIES).toEqual(expect.arrayContaining(['FR', 'US', 'JP']))
+    expect(HISTORY_COUNTRIES).not.toContain('BE')
   })
 })
 

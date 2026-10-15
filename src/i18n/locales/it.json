@@ -21,7 +21,9 @@
     "usd": "{{value}} $",
     "close": "Chiudi",
     "unknown": "Sconosciuto",
-    "open": "Apri l'atlante"
+    "open": "Apri l'atlante",
+    "history": "Storia",
+    "history_quiz": "📜 Mettimi alla prova sulla sua storia"
   },
   "continents": {
     "Europe": "Europa",
@@ -536,6 +538,18 @@
       "digits_one": "È un numero di {{count}} cifra",
       "digits_other": "È un numero di {{count}} cifre",
       "between": "Tra {{min}} e {{max}}"
+    },
+    "pick_theme": "Scegli un tema",
+    "themes": {
+      "geo": "🌍 Geografia",
+      "geo_hint": "Fiumi, montagne, paesi…",
+      "history": "📜 Storia",
+      "history_hint": "Date ed eventi chiave"
+    },
+    "history": {
+      "title": "Quiz di Storia",
+      "country_title": "Storia: {{country}}",
+      "country_hint": "Tutte le domande su questo paese, dalla più facile alla più difficile."
     }
   },
   "daily_challenge": {

@@ -1,0 +1,517 @@
+[
+  {
+    "id": "fr_revolution",
+    "difficulty": "Facile",
+    "countries": ["FR"],
+    "question": {"fr":"En quelle année commence la Révolution française, avec la prise de la Bastille ?","en":"In what year did the French Revolution begin, with the storming of the Bastille?","ru":"В каком году началась Великая французская революция со взятия Бастилии?","es":"¿En qué año comenzó la Revolución francesa, con la toma de la Bastilla?","pt":"Em que ano começou a Revolução Francesa, com a tomada da Bastilha?","de":"In welchem Jahr begann die Französische Revolution mit dem Sturm auf die Bastille?","it":"In che anno iniziò la Rivoluzione francese, con la presa della Bastiglia?"},
+    "answer": {"fr":"1789","en":"1789","ru":"1789","es":"1789","pt":"1789","de":"1789","it":"1789"},
+    "wrong": [
+      {"fr":"1815","en":"1815","ru":"1815","es":"1815","pt":"1815","de":"1815","it":"1815"},
+      {"fr":"1848","en":"1848","ru":"1848","es":"1848","pt":"1848","de":"1848","it":"1848"},
+      {"fr":"1769","en":"1769","ru":"1769","es":"1769","pt":"1769","de":"1769","it":"1769"}
+    ],
+    "fact": {"fr":"La Bastille est prise le 14 juillet 1789 : ce jour est devenu la fête nationale française.","en":"The Bastille was stormed on 14 July 1789, a date that became France’s national day.","ru":"Бастилию взяли 14 июля 1789 года — этот день стал национальным праздником Франции.","es":"La Bastilla fue tomada el 14 de julio de 1789, fecha que se convirtió en la fiesta nacional francesa.","pt":"A Bastilha foi tomada em 14 de julho de 1789, data que se tornou a festa nacional francesa.","de":"Die Bastille wurde am 14. Juli 1789 gestürmt – dieser Tag wurde zum französischen Nationalfeiertag.","it":"La Bastiglia fu presa il 14 luglio 1789, giorno diventato la festa nazionale francese."}
+  },
+  {
+    "id": "fr_waterloo",
+    "difficulty": "Facile",
+    "countries": ["FR","BE"],
+    "question": {"fr":"Dans quel pays actuel se trouve Waterloo, lieu de la dernière bataille de Napoléon ?","en":"In which present-day country is Waterloo, site of Napoleon’s last battle?","ru":"В какой современной стране находится Ватерлоо, место последней битвы Наполеона?","es":"¿En qué país actual se encuentra Waterloo, escenario de la última batalla de Napoleón?","pt":"Em que país atual fica Waterloo, local da última batalha de Napoleão?","de":"In welchem heutigen Land liegt Waterloo, der Ort von Napoleons letzter Schlacht?","it":"In quale paese attuale si trova Waterloo, teatro dell’ultima battaglia di Napoleone?"},
+    "answer": {"fr":"La Belgique","en":"Belgium","ru":"Бельгия","es":"Bélgica","pt":"Bélgica","de":"Belgien","it":"Il Belgio"},
+    "wrong": [
+      {"fr":"Les Pays-Bas","en":"The Netherlands","ru":"Нидерланды","es":"Países Bajos","pt":"Países Baixos","de":"Niederlande","it":"I Paesi Bassi"},
+      {"fr":"L’Allemagne","en":"Germany","ru":"Германия","es":"Alemania","pt":"Alemanha","de":"Deutschland","it":"La Germania"},
+      {"fr":"Le Luxembourg","en":"Luxembourg","ru":"Люксембург","es":"Luxemburgo","pt":"Luxemburgo","de":"Luxemburg","it":"Il Lussemburgo"}
+    ],
+    "fact": {"fr":"Le 18 juin 1815, près de Bruxelles, Napoléon est battu par les armées britannique et prussienne.","en":"On 18 June 1815, near Brussels, Napoleon was defeated by the British and Prussian armies.","ru":"18 июня 1815 года под Брюсселем Наполеон потерпел поражение от британской и прусской армий.","es":"El 18 de junio de 1815, cerca de Bruselas, Napoleón fue derrotado por los ejércitos británico y prusiano.","pt":"Em 18 de junho de 1815, perto de Bruxelas, Napoleão foi derrotado pelos exércitos britânico e prussiano.","de":"Am 18. Juni 1815 wurde Napoleon bei Brüssel von der britischen und der preußischen Armee geschlagen.","it":"Il 18 giugno 1815, vicino a Bruxelles, Napoleone fu sconfitto dagli eserciti britannico e prussiano."},
+    "accept": ["Belgique","Belgium","Бельгия","Bélgica","Belgien","Belgio"]
+  },
+  {
+    "id": "fr_joan",
+    "difficulty": "Facile",
+    "countries": ["FR"],
+    "question": {"fr":"Quelle héroïne de la guerre de Cent Ans fait lever le siège d’Orléans en 1429 ?","en":"Which Hundred Years’ War heroine lifted the siege of Orléans in 1429?","ru":"Какая героиня Столетней войны сняла осаду Орлеана в 1429 году?","es":"¿Qué heroína de la guerra de los Cien Años levantó el sitio de Orleans en 1429?","pt":"Que heroína da Guerra dos Cem Anos levantou o cerco de Orléans em 1429?","de":"Welche Heldin des Hundertjährigen Krieges beendete 1429 die Belagerung von Orléans?","it":"Quale eroina della guerra dei Cent’anni liberò Orléans dall’assedio nel 1429?"},
+    "answer": {"fr":"Jeanne d’Arc","en":"Joan of Arc","ru":"Жанна д’Арк","es":"Juana de Arco","pt":"Joana d’Arc","de":"Jeanne d’Arc","it":"Giovanna d’Arco"},
+    "wrong": [
+      {"fr":"Aliénor d’Aquitaine","en":"Eleanor of Aquitaine","ru":"Алиенора Аквитанская","es":"Leonor de Aquitania","pt":"Leonor da Aquitânia","de":"Eleonore von Aquitanien","it":"Eleonora d’Aquitania"},
+      {"fr":"Catherine de Médicis","en":"Catherine de’ Medici","ru":"Екатерина Медичи","es":"Catalina de Médici","pt":"Catarina de Médici","de":"Katharina von Medici","it":"Caterina de’ Medici"},
+      {"fr":"Blanche de Castille","en":"Blanche of Castile","ru":"Бланка Кастильская","es":"Blanca de Castilla","pt":"Branca de Castela","de":"Blanka von Kastilien","it":"Bianca di Castiglia"}
+    ],
+    "fact": {"fr":"Capturée puis jugée, elle est brûlée à Rouen en 1431. Elle est canonisée en 1920.","en":"Captured and tried, she was burned at the stake in Rouen in 1431. She was canonised in 1920.","ru":"Её взяли в плен, осудили и сожгли в Руане в 1431 году. В 1920 году она была канонизирована.","es":"Capturada y juzgada, murió en la hoguera en Ruan en 1431. Fue canonizada en 1920.","pt":"Capturada e julgada, foi queimada em Rouen em 1431. Foi canonizada em 1920.","de":"Gefangen genommen und verurteilt, wurde sie 1431 in Rouen verbrannt. 1920 wurde sie heiliggesprochen.","it":"Catturata e processata, fu arsa sul rogo a Rouen nel 1431. Fu canonizzata nel 1920."},
+    "accept": ["Jeanne","Joan","Жанна","Juana","Joana","Giovanna"]
+  },
+  {
+    "id": "fr_louis14",
+    "difficulty": "Facile",
+    "countries": ["FR"],
+    "question": {"fr":"Quel roi, surnommé le « Roi-Soleil », a fait de Versailles le siège du pouvoir ?","en":"Which king, nicknamed the “Sun King”, made Versailles the seat of power?","ru":"Какой король по прозвищу «Король-Солнце» сделал Версаль центром власти?","es":"¿Qué rey, apodado el «Rey Sol», convirtió Versalles en la sede del poder?","pt":"Que rei, apelidado de «Rei Sol», fez de Versalhes a sede do poder?","de":"Welcher König, genannt der „Sonnenkönig“, machte Versailles zum Sitz der Macht?","it":"Quale re, soprannominato il «Re Sole», fece di Versailles la sede del potere?"},
+    "answer": {"fr":"Louis XIV","en":"Louis XIV","ru":"Людовик XIV","es":"Luis XIV","pt":"Luís XIV","de":"Ludwig XIV.","it":"Luigi XIV"},
+    "wrong": [
+      {"fr":"Louis XVI","en":"Louis XVI","ru":"Людовик XVI","es":"Luis XVI","pt":"Luís XVI","de":"Ludwig XVI.","it":"Luigi XVI"},
+      {"fr":"François Ier","en":"Francis I","ru":"Франциск I","es":"Francisco I","pt":"Francisco I","de":"Franz I.","it":"Francesco I"},
+      {"fr":"Henri IV","en":"Henry IV","ru":"Генрих IV","es":"Enrique IV","pt":"Henrique IV","de":"Heinrich IV.","it":"Enrico IV"}
+    ],
+    "fact": {"fr":"Son règne (1643-1715) dure 72 ans : c’est le plus long de l’histoire de France.","en":"His reign (1643–1715) lasted 72 years, the longest in French history.","ru":"Его правление (1643–1715) длилось 72 года — дольше всех в истории Франции.","es":"Su reinado (1643-1715) duró 72 años, el más largo de la historia de Francia.","pt":"Seu reinado (1643-1715) durou 72 anos, o mais longo da história da França.","de":"Seine Herrschaft (1643–1715) dauerte 72 Jahre – die längste der französischen Geschichte.","it":"Il suo regno (1643-1715) durò 72 anni, il più lungo della storia di Francia."},
+    "accept": ["Louis 14","Luis 14","Luís 14","Ludwig 14","Luigi 14","Людовик 14"]
+  },
+  {
+    "id": "fr_napoleon_crowned",
+    "difficulty": "Moyen",
+    "countries": ["FR"],
+    "question": {"fr":"En quelle année Napoléon Bonaparte est-il sacré empereur des Français ?","en":"In what year was Napoleon Bonaparte crowned Emperor of the French?","ru":"В каком году Наполеон Бонапарт был коронован императором французов?","es":"¿En qué año fue coronado Napoleón Bonaparte emperador de los franceses?","pt":"Em que ano Napoleão Bonaparte foi coroado imperador dos franceses?","de":"In welchem Jahr wurde Napoleon Bonaparte zum Kaiser der Franzosen gekrönt?","it":"In che anno Napoleone Bonaparte fu incoronato imperatore dei francesi?"},
+    "answer": {"fr":"1804","en":"1804","ru":"1804","es":"1804","pt":"1804","de":"1804","it":"1804"},
+    "wrong": [
+      {"fr":"1799","en":"1799","ru":"1799","es":"1799","pt":"1799","de":"1799","it":"1799"},
+      {"fr":"1812","en":"1812","ru":"1812","es":"1812","pt":"1812","de":"1812","it":"1812"},
+      {"fr":"1815","en":"1815","ru":"1815","es":"1815","pt":"1815","de":"1815","it":"1815"}
+    ],
+    "fact": {"fr":"Le sacre a lieu à Notre-Dame de Paris le 2 décembre 1804, en présence du pape Pie VII.","en":"The coronation took place in Notre-Dame de Paris on 2 December 1804, in the presence of Pope Pius VII.","ru":"Коронация прошла в соборе Парижской Богоматери 2 декабря 1804 года в присутствии папы Пия VII.","es":"La coronación tuvo lugar en Notre-Dame de París el 2 de diciembre de 1804, en presencia del papa Pío VII.","pt":"A coroação ocorreu na Notre-Dame de Paris em 2 de dezembro de 1804, na presença do papa Pio VII.","de":"Die Krönung fand am 2. Dezember 1804 in Notre-Dame de Paris statt, in Anwesenheit von Papst Pius VII.","it":"L’incoronazione avvenne a Notre-Dame di Parigi il 2 dicembre 1804, alla presenza di papa Pio VII."}
+  },
+  {
+    "id": "fr_clovis",
+    "difficulty": "Moyen",
+    "countries": ["FR"],
+    "question": {"fr":"Quel roi des Francs est baptisé à Reims à la fin du Ve siècle ?","en":"Which king of the Franks was baptised in Reims at the end of the 5th century?","ru":"Какой король франков крестился в Реймсе в конце V века?","es":"¿Qué rey de los francos fue bautizado en Reims a finales del siglo V?","pt":"Que rei dos francos foi batizado em Reims no fim do século V?","de":"Welcher Frankenkönig wurde Ende des 5. Jahrhunderts in Reims getauft?","it":"Quale re dei Franchi fu battezzato a Reims alla fine del V secolo?"},
+    "answer": {"fr":"Clovis","en":"Clovis","ru":"Хлодвиг","es":"Clodoveo","pt":"Clóvis","de":"Chlodwig","it":"Clodoveo"},
+    "wrong": [
+      {"fr":"Charlemagne","en":"Charlemagne","ru":"Карл Великий","es":"Carlomagno","pt":"Carlos Magno","de":"Karl der Große","it":"Carlo Magno"},
+      {"fr":"Pépin le Bref","en":"Pepin the Short","ru":"Пипин Короткий","es":"Pipino el Breve","pt":"Pepino, o Breve","de":"Pippin der Jüngere","it":"Pipino il Breve"},
+      {"fr":"Charles Martel","en":"Charles Martel","ru":"Карл Мартелл","es":"Carlos Martel","pt":"Carlos Martel","de":"Karl Martell","it":"Carlo Martello"}
+    ],
+    "fact": {"fr":"Son baptême par l’évêque Remi est souvent présenté comme l’acte de naissance symbolique du royaume des Francs.","en":"His baptism by Bishop Remigius is often seen as the symbolic birth of the Frankish kingdom.","ru":"Его крещение епископом Ремигием часто считают символическим рождением Франкского королевства.","es":"Su bautismo por el obispo Remigio se presenta a menudo como el nacimiento simbólico del reino franco.","pt":"Seu batismo pelo bispo Remígio é muitas vezes visto como o nascimento simbólico do reino franco.","de":"Seine Taufe durch Bischof Remigius gilt oft als symbolische Geburtsstunde des Frankenreichs.","it":"Il suo battesimo da parte del vescovo Remigio è spesso considerato la nascita simbolica del regno dei Franchi."}
+  },
+  {
+    "id": "fr_charlemagne",
+    "difficulty": "Moyen",
+    "countries": ["FR","DE","IT"],
+    "question": {"fr":"Qui est couronné empereur à Rome par le pape, le jour de Noël de l’an 800 ?","en":"Who was crowned emperor in Rome by the pope on Christmas Day in the year 800?","ru":"Кто был коронован папой в Риме как император в Рождество 800 года?","es":"¿Quién fue coronado emperador en Roma por el papa el día de Navidad del año 800?","pt":"Quem foi coroado imperador em Roma pelo papa no dia de Natal do ano 800?","de":"Wer wurde am Weihnachtstag des Jahres 800 in Rom vom Papst zum Kaiser gekrönt?","it":"Chi fu incoronato imperatore a Roma dal papa il giorno di Natale dell’anno 800?"},
+    "answer": {"fr":"Charlemagne","en":"Charlemagne","ru":"Карл Великий","es":"Carlomagno","pt":"Carlos Magno","de":"Karl der Große","it":"Carlo Magno"},
+    "wrong": [
+      {"fr":"Clovis","en":"Clovis","ru":"Хлодвиг","es":"Clodoveo","pt":"Clóvis","de":"Chlodwig","it":"Clodoveo"},
+      {"fr":"Hugues Capet","en":"Hugh Capet","ru":"Гуго Капет","es":"Hugo Capeto","pt":"Hugo Capeto","de":"Hugo Capet","it":"Ugo Capeto"},
+      {"fr":"Louis le Pieux","en":"Louis the Pious","ru":"Людовик Благочестивый","es":"Luis el Piadoso","pt":"Luís, o Piedoso","de":"Ludwig der Fromme","it":"Ludovico il Pio"}
+    ],
+    "fact": {"fr":"Couronné par le pape Léon III, Charlemagne règne sur un empire qui s’étend de l’Èbre à l’Elbe.","en":"Crowned by Pope Leo III, Charlemagne ruled an empire stretching from the Ebro to the Elbe.","ru":"Коронованный папой Львом III, Карл Великий правил империей от Эбро до Эльбы.","es":"Coronado por el papa León III, Carlomagno reinó sobre un imperio que iba del Ebro al Elba.","pt":"Coroado pelo papa Leão III, Carlos Magno reinou sobre um império que ia do Ebro ao Elba.","de":"Von Papst Leo III. gekrönt, herrschte Karl der Große über ein Reich vom Ebro bis zur Elbe.","it":"Incoronato da papa Leone III, Carlo Magno regnò su un impero che andava dall’Ebro all’Elba."},
+    "accept": ["Karl der Grosse","Karl"]
+  },
+  {
+    "id": "fr_fifth_republic",
+    "difficulty": "Moyen",
+    "countries": ["FR"],
+    "question": {"fr":"En quelle année la Ve République est-elle fondée en France ?","en":"In what year was France’s Fifth Republic founded?","ru":"В каком году во Франции была основана Пятая республика?","es":"¿En qué año se fundó la Quinta República francesa?","pt":"Em que ano foi fundada a Quinta República francesa?","de":"In welchem Jahr wurde die Fünfte Republik in Frankreich gegründet?","it":"In che anno fu fondata la Quinta Repubblica francese?"},
+    "answer": {"fr":"1958","en":"1958","ru":"1958","es":"1958","pt":"1958","de":"1958","it":"1958"},
+    "wrong": [
+      {"fr":"1945","en":"1945","ru":"1945","es":"1945","pt":"1945","de":"1945","it":"1945"},
+      {"fr":"1946","en":"1946","ru":"1946","es":"1946","pt":"1946","de":"1946","it":"1946"},
+      {"fr":"1962","en":"1962","ru":"1962","es":"1962","pt":"1962","de":"1962","it":"1962"}
+    ],
+    "fact": {"fr":"Sa constitution est adoptée par référendum en septembre 1958 ; Charles de Gaulle en devient le premier président.","en":"Its constitution was adopted by referendum in September 1958; Charles de Gaulle became its first president.","ru":"Её конституция была принята на референдуме в сентябре 1958 года; первым президентом стал Шарль де Голль.","es":"Su constitución se aprobó por referéndum en septiembre de 1958; Charles de Gaulle fue su primer presidente.","pt":"Sua constituição foi aprovada por referendo em setembro de 1958; Charles de Gaulle foi seu primeiro presidente.","de":"Ihre Verfassung wurde im September 1958 per Referendum angenommen; Charles de Gaulle wurde ihr erster Präsident.","it":"La sua costituzione fu approvata con referendum nel settembre 1958; Charles de Gaulle ne fu il primo presidente."}
+  },
+  {
+    "id": "fr_edict_nantes",
+    "difficulty": "Difficile",
+    "countries": ["FR"],
+    "question": {"fr":"Quel édit, signé par Henri IV en 1598, accorde la liberté de culte aux protestants ?","en":"Which edict, signed by Henry IV in 1598, granted freedom of worship to Protestants?","ru":"Какой эдикт, подписанный Генрихом IV в 1598 году, даровал протестантам свободу вероисповедания?","es":"¿Qué edicto, firmado por Enrique IV en 1598, concedió la libertad de culto a los protestantes?","pt":"Que édito, assinado por Henrique IV em 1598, concedeu liberdade de culto aos protestantes?","de":"Welches Edikt, 1598 von Heinrich IV. unterzeichnet, gewährte den Protestanten Religionsfreiheit?","it":"Quale editto, firmato da Enrico IV nel 1598, concesse la libertà di culto ai protestanti?"},
+    "answer": {"fr":"L’édit de Nantes","en":"The Edict of Nantes","ru":"Нантский эдикт","es":"El edicto de Nantes","pt":"O Édito de Nantes","de":"Das Edikt von Nantes","it":"L’editto di Nantes"},
+    "wrong": [
+      {"fr":"L’édit de Fontainebleau","en":"The Edict of Fontainebleau","ru":"Эдикт Фонтенбло","es":"El edicto de Fontainebleau","pt":"O Édito de Fontainebleau","de":"Das Edikt von Fontainebleau","it":"L’editto di Fontainebleau"},
+      {"fr":"L’édit de Villers-Cotterêts","en":"The Edict of Villers-Cotterêts","ru":"Ордонанс Виллер-Котре","es":"El edicto de Villers-Cotterêts","pt":"O Édito de Villers-Cotterêts","de":"Das Edikt von Villers-Cotterêts","it":"L’editto di Villers-Cotterêts"},
+      {"fr":"L’édit de Saint-Germain","en":"The Edict of Saint-Germain","ru":"Сен-Жерменский эдикт","es":"El edicto de Saint-Germain","pt":"O Édito de Saint-Germain","de":"Das Edikt von Saint-Germain","it":"L’editto di Saint-Germain"}
+    ],
+    "fact": {"fr":"Il met fin aux guerres de Religion. Louis XIV le révoque en 1685 par l’édit de Fontainebleau.","en":"It ended the Wars of Religion. Louis XIV revoked it in 1685 with the Edict of Fontainebleau.","ru":"Он положил конец Религиозным войнам. Людовик XIV отменил его в 1685 году эдиктом Фонтенбло.","es":"Puso fin a las guerras de religión. Luis XIV lo revocó en 1685 con el edicto de Fontainebleau.","pt":"Pôs fim às Guerras de Religião. Luís XIV o revogou em 1685 com o Édito de Fontainebleau.","de":"Es beendete die Hugenottenkriege. Ludwig XIV. hob es 1685 mit dem Edikt von Fontainebleau auf.","it":"Pose fine alle guerre di religione. Luigi XIV lo revocò nel 1685 con l’editto di Fontainebleau."},
+    "accept": ["Nantes","Нантский"]
+  },
+  {
+    "id": "fr_women_vote",
+    "difficulty": "Difficile",
+    "countries": ["FR"],
+    "question": {"fr":"En quelle année les Françaises votent-elles pour la première fois ?","en":"In what year did French women vote for the first time?","ru":"В каком году француженки впервые проголосовали?","es":"¿En qué año votaron las francesas por primera vez?","pt":"Em que ano as francesas votaram pela primeira vez?","de":"In welchem Jahr wählten Französinnen zum ersten Mal?","it":"In che anno le donne francesi votarono per la prima volta?"},
+    "answer": {"fr":"1945","en":"1945","ru":"1945","es":"1945","pt":"1945","de":"1945","it":"1945"},
+    "wrong": [
+      {"fr":"1919","en":"1919","ru":"1919","es":"1919","pt":"1919","de":"1919","it":"1919"},
+      {"fr":"1936","en":"1936","ru":"1936","es":"1936","pt":"1936","de":"1936","it":"1936"},
+      {"fr":"1968","en":"1968","ru":"1968","es":"1968","pt":"1968","de":"1968","it":"1968"}
+    ],
+    "fact": {"fr":"Le droit de vote leur est accordé en avril 1944 ; elles l’exercent pour la première fois aux municipales d’avril 1945.","en":"The right to vote was granted in April 1944; women first used it in the municipal elections of April 1945.","ru":"Право голоса было предоставлено в апреле 1944 года; впервые женщины воспользовались им на муниципальных выборах в апреле 1945 года.","es":"El derecho al voto se les concedió en abril de 1944; lo ejercieron por primera vez en las municipales de abril de 1945.","pt":"O direito de voto foi concedido em abril de 1944; elas o exerceram pela primeira vez nas eleições municipais de abril de 1945.","de":"Das Wahlrecht wurde ihnen im April 1944 gewährt; erstmals ausgeübt wurde es bei den Kommunalwahlen im April 1945.","it":"Il diritto di voto fu concesso nell’aprile 1944; lo esercitarono per la prima volta alle elezioni comunali dell’aprile 1945."}
+  },
+  {
+    "id": "fr_algeria",
+    "difficulty": "Difficile",
+    "countries": ["FR","DZ"],
+    "question": {"fr":"En quelle année l’Algérie devient-elle indépendante de la France ?","en":"In what year did Algeria gain independence from France?","ru":"В каком году Алжир получил независимость от Франции?","es":"¿En qué año se independizó Argelia de Francia?","pt":"Em que ano a Argélia se tornou independente da França?","de":"In welchem Jahr wurde Algerien von Frankreich unabhängig?","it":"In che anno l’Algeria ottenne l’indipendenza dalla Francia?"},
+    "answer": {"fr":"1962","en":"1962","ru":"1962","es":"1962","pt":"1962","de":"1962","it":"1962"},
+    "wrong": [
+      {"fr":"1954","en":"1954","ru":"1954","es":"1954","pt":"1954","de":"1954","it":"1954"},
+      {"fr":"1956","en":"1956","ru":"1956","es":"1956","pt":"1956","de":"1956","it":"1956"},
+      {"fr":"1958","en":"1958","ru":"1958","es":"1958","pt":"1958","de":"1958","it":"1958"}
+    ],
+    "fact": {"fr":"Après une guerre commencée en 1954, les accords d’Évian de mars 1962 mènent à l’indépendance, proclamée le 5 juillet 1962.","en":"After a war that began in 1954, the Évian Accords of March 1962 led to independence, proclaimed on 5 July 1962.","ru":"После войны, начавшейся в 1954 году, Эвианские соглашения марта 1962 года привели к независимости, провозглашённой 5 июля 1962 года.","es":"Tras una guerra iniciada en 1954, los acuerdos de Évian de marzo de 1962 llevaron a la independencia, proclamada el 5 de julio de 1962.","pt":"Após uma guerra iniciada em 1954, os Acordos de Évian de março de 1962 levaram à independência, proclamada em 5 de julho de 1962.","de":"Nach einem 1954 begonnenen Krieg führten die Verträge von Évian im März 1962 zur Unabhängigkeit, ausgerufen am 5. Juli 1962.","it":"Dopo una guerra iniziata nel 1954, gli accordi di Évian del marzo 1962 portarono all’indipendenza, proclamata il 5 luglio 1962."}
+  },
+  {
+    "id": "fr_hugues_capet",
+    "difficulty": "Impossible",
+    "countries": ["FR"],
+    "question": {"fr":"Quel roi, élu en 987, fonde la dynastie des Capétiens ?","en":"Which king, elected in 987, founded the Capetian dynasty?","ru":"Какой король, избранный в 987 году, основал династию Капетингов?","es":"¿Qué rey, elegido en 987, fundó la dinastía de los Capetos?","pt":"Que rei, eleito em 987, fundou a dinastia dos Capetos?","de":"Welcher König, 987 gewählt, begründete die Dynastie der Kapetinger?","it":"Quale re, eletto nel 987, fondò la dinastia dei Capetingi?"},
+    "answer": {"fr":"Hugues Capet","en":"Hugh Capet","ru":"Гуго Капет","es":"Hugo Capeto","pt":"Hugo Capeto","de":"Hugo Capet","it":"Ugo Capeto"},
+    "wrong": [
+      {"fr":"Robert le Pieux","en":"Robert the Pious","ru":"Роберт Благочестивый","es":"Roberto el Piadoso","pt":"Roberto, o Piedoso","de":"Robert der Fromme","it":"Roberto il Pio"},
+      {"fr":"Eudes","en":"Odo","ru":"Эд","es":"Odón","pt":"Odo","de":"Odo","it":"Oddone"},
+      {"fr":"Lothaire","en":"Lothair","ru":"Лотарь","es":"Lotario","pt":"Lotário","de":"Lothar","it":"Lotario"}
+    ],
+    "fact": {"fr":"Ses descendants et leurs branches cadettes (Valois, Bourbons, Orléans) régneront sur la France jusqu’en 1848.","en":"His descendants and their cadet branches (Valois, Bourbon, Orléans) ruled France until 1848.","ru":"Его потомки и их младшие ветви (Валуа, Бурбоны, Орлеанские) правили Францией до 1848 года.","es":"Sus descendientes y sus ramas menores (Valois, Borbón, Orleans) reinaron en Francia hasta 1848.","pt":"Seus descendentes e seus ramos mais novos (Valois, Bourbon, Orléans) reinaram na França até 1848.","de":"Seine Nachkommen und deren Nebenlinien (Valois, Bourbonen, Orléans) regierten Frankreich bis 1848.","it":"I suoi discendenti e i loro rami cadetti (Valois, Borbone, Orléans) regnarono sulla Francia fino al 1848."},
+    "accept": ["Capet","Capeto","Капет"]
+  },
+  {
+    "id": "fr_paris_commune",
+    "difficulty": "Impossible",
+    "countries": ["FR"],
+    "question": {"fr":"En quelle année a lieu la Commune de Paris ?","en":"In what year did the Paris Commune take place?","ru":"В каком году существовала Парижская коммуна?","es":"¿En qué año tuvo lugar la Comuna de París?","pt":"Em que ano ocorreu a Comuna de Paris?","de":"In welchem Jahr fand die Pariser Kommune statt?","it":"In che anno ebbe luogo la Comune di Parigi?"},
+    "answer": {"fr":"1871","en":"1871","ru":"1871","es":"1871","pt":"1871","de":"1871","it":"1871"},
+    "wrong": [
+      {"fr":"1830","en":"1830","ru":"1830","es":"1830","pt":"1830","de":"1830","it":"1830"},
+      {"fr":"1848","en":"1848","ru":"1848","es":"1848","pt":"1848","de":"1848","it":"1848"},
+      {"fr":"1870","en":"1870","ru":"1870","es":"1870","pt":"1870","de":"1870","it":"1870"}
+    ],
+    "fact": {"fr":"Cette insurrection dure de mars à mai 1871 et s’achève par la « Semaine sanglante ».","en":"The uprising lasted from March to May 1871 and ended with the “Bloody Week”.","ru":"Восстание длилось с марта по май 1871 года и закончилось «Кровавой неделей».","es":"La insurrección duró de marzo a mayo de 1871 y terminó con la «Semana sangrienta».","pt":"A insurreição durou de março a maio de 1871 e terminou com a «Semana Sangrenta».","de":"Der Aufstand dauerte von März bis Mai 1871 und endete mit der „Blutigen Woche“.","it":"L’insurrezione durò da marzo a maggio 1871 e si concluse con la «Settimana di sangue»."}
+  },
+  {
+    "id": "us_independence",
+    "difficulty": "Facile",
+    "countries": ["US"],
+    "question": {"fr":"En quelle année la Déclaration d’indépendance des États-Unis est-elle adoptée ?","en":"In what year was the United States Declaration of Independence adopted?","ru":"В каком году была принята Декларация независимости США?","es":"¿En qué año se aprobó la Declaración de Independencia de los Estados Unidos?","pt":"Em que ano foi adotada a Declaração de Independência dos Estados Unidos?","de":"In welchem Jahr wurde die Unabhängigkeitserklärung der Vereinigten Staaten verabschiedet?","it":"In che anno fu adottata la Dichiarazione d’indipendenza degli Stati Uniti?"},
+    "answer": {"fr":"1776","en":"1776","ru":"1776","es":"1776","pt":"1776","de":"1776","it":"1776"},
+    "wrong": [
+      {"fr":"1783","en":"1783","ru":"1783","es":"1783","pt":"1783","de":"1783","it":"1783"},
+      {"fr":"1789","en":"1789","ru":"1789","es":"1789","pt":"1789","de":"1789","it":"1789"},
+      {"fr":"1812","en":"1812","ru":"1812","es":"1812","pt":"1812","de":"1812","it":"1812"}
+    ],
+    "fact": {"fr":"Elle est adoptée le 4 juillet 1776, aujourd’hui jour de la fête nationale américaine.","en":"It was adopted on 4 July 1776, now the American national holiday.","ru":"Она была принята 4 июля 1776 года — сегодня это национальный праздник США.","es":"Se aprobó el 4 de julio de 1776, hoy fiesta nacional estadounidense.","pt":"Foi adotada em 4 de julho de 1776, hoje feriado nacional americano.","de":"Sie wurde am 4. Juli 1776 verabschiedet, dem heutigen Nationalfeiertag der USA.","it":"Fu adottata il 4 luglio 1776, oggi festa nazionale americana."}
+  },
+  {
+    "id": "us_washington",
+    "difficulty": "Facile",
+    "countries": ["US"],
+    "question": {"fr":"Qui fut le premier président des États-Unis ?","en":"Who was the first president of the United States?","ru":"Кто был первым президентом США?","es":"¿Quién fue el primer presidente de los Estados Unidos?","pt":"Quem foi o primeiro presidente dos Estados Unidos?","de":"Wer war der erste Präsident der Vereinigten Staaten?","it":"Chi fu il primo presidente degli Stati Uniti?"},
+    "answer": {"fr":"George Washington","en":"George Washington","ru":"Джордж Вашингтон","es":"George Washington","pt":"George Washington","de":"George Washington","it":"George Washington"},
+    "wrong": [
+      {"fr":"Thomas Jefferson","en":"Thomas Jefferson","ru":"Томас Джефферсон","es":"Thomas Jefferson","pt":"Thomas Jefferson","de":"Thomas Jefferson","it":"Thomas Jefferson"},
+      {"fr":"John Adams","en":"John Adams","ru":"Джон Адамс","es":"John Adams","pt":"John Adams","de":"John Adams","it":"John Adams"},
+      {"fr":"Abraham Lincoln","en":"Abraham Lincoln","ru":"Авраам Линкольн","es":"Abraham Lincoln","pt":"Abraham Lincoln","de":"Abraham Lincoln","it":"Abraham Lincoln"}
+    ],
+    "fact": {"fr":"Président de 1789 à 1797, il a donné son nom à la capitale fédérale.","en":"President from 1789 to 1797, he gave his name to the federal capital.","ru":"Он был президентом с 1789 по 1797 год; его именем названа столица страны.","es":"Presidente de 1789 a 1797, dio su nombre a la capital federal.","pt":"Presidente de 1789 a 1797, deu seu nome à capital federal.","de":"Von 1789 bis 1797 Präsident, gab er der Bundeshauptstadt ihren Namen.","it":"Presidente dal 1789 al 1797, diede il suo nome alla capitale federale."},
+    "accept": ["Washington","Вашингтон"]
+  },
+  {
+    "id": "us_pearl_harbor",
+    "difficulty": "Facile",
+    "countries": ["US","JP"],
+    "question": {"fr":"Quelle attaque japonaise de décembre 1941 fait entrer les États-Unis dans la Seconde Guerre mondiale ?","en":"Which Japanese attack in December 1941 brought the United States into World War II?","ru":"Какое японское нападение в декабре 1941 года втянуло США во Вторую мировую войну?","es":"¿Qué ataque japonés de diciembre de 1941 hizo entrar a Estados Unidos en la Segunda Guerra Mundial?","pt":"Que ataque japonês em dezembro de 1941 levou os Estados Unidos a entrar na Segunda Guerra Mundial?","de":"Welcher japanische Angriff im Dezember 1941 führte die USA in den Zweiten Weltkrieg?","it":"Quale attacco giapponese del dicembre 1941 fece entrare gli Stati Uniti nella Seconda guerra mondiale?"},
+    "answer": {"fr":"Pearl Harbor","en":"Pearl Harbor","ru":"Пёрл-Харбор","es":"Pearl Harbor","pt":"Pearl Harbor","de":"Pearl Harbor","it":"Pearl Harbor"},
+    "wrong": [
+      {"fr":"Midway","en":"Midway","ru":"Мидуэй","es":"Midway","pt":"Midway","de":"Midway","it":"Midway"},
+      {"fr":"Guadalcanal","en":"Guadalcanal","ru":"Гуадалканал","es":"Guadalcanal","pt":"Guadalcanal","de":"Guadalcanal","it":"Guadalcanal"},
+      {"fr":"Iwo Jima","en":"Iwo Jima","ru":"Иводзима","es":"Iwo Jima","pt":"Iwo Jima","de":"Iwojima","it":"Iwo Jima"}
+    ],
+    "fact": {"fr":"Le 7 décembre 1941, l’aviation japonaise attaque la base navale américaine de Pearl Harbor, à Hawaï.","en":"On 7 December 1941, Japanese aircraft attacked the US naval base at Pearl Harbor, Hawaii.","ru":"7 декабря 1941 года японская авиация атаковала американскую военно-морскую базу Пёрл-Харбор на Гавайях.","es":"El 7 de diciembre de 1941, la aviación japonesa atacó la base naval estadounidense de Pearl Harbor, en Hawái.","pt":"Em 7 de dezembro de 1941, a aviação japonesa atacou a base naval americana de Pearl Harbor, no Havaí.","de":"Am 7. Dezember 1941 griffen japanische Flugzeuge den US-Marinestützpunkt Pearl Harbor auf Hawaii an.","it":"Il 7 dicembre 1941 l’aviazione giapponese attaccò la base navale americana di Pearl Harbor, alle Hawaii."}
+  },
+  {
+    "id": "us_moon",
+    "difficulty": "Facile",
+    "countries": ["US"],
+    "question": {"fr":"En quelle année un homme marche-t-il pour la première fois sur la Lune ?","en":"In what year did a human first walk on the Moon?","ru":"В каком году человек впервые ступил на Луну?","es":"¿En qué año caminó un ser humano por primera vez sobre la Luna?","pt":"Em que ano um ser humano caminhou pela primeira vez na Lua?","de":"In welchem Jahr betrat zum ersten Mal ein Mensch den Mond?","it":"In che anno un essere umano camminò per la prima volta sulla Luna?"},
+    "answer": {"fr":"1969","en":"1969","ru":"1969","es":"1969","pt":"1969","de":"1969","it":"1969"},
+    "wrong": [
+      {"fr":"1961","en":"1961","ru":"1961","es":"1961","pt":"1961","de":"1961","it":"1961"},
+      {"fr":"1965","en":"1965","ru":"1965","es":"1965","pt":"1965","de":"1965","it":"1965"},
+      {"fr":"1972","en":"1972","ru":"1972","es":"1972","pt":"1972","de":"1972","it":"1972"}
+    ],
+    "fact": {"fr":"En juillet 1969, Neil Armstrong et Buzz Aldrin, de la mission Apollo 11, marchent sur la Lune.","en":"In July 1969, Neil Armstrong and Buzz Aldrin of the Apollo 11 mission walked on the Moon.","ru":"В июле 1969 года Нил Армстронг и Базз Олдрин из миссии «Аполлон-11» прошлись по Луне.","es":"En julio de 1969, Neil Armstrong y Buzz Aldrin, de la misión Apolo 11, caminaron sobre la Luna.","pt":"Em julho de 1969, Neil Armstrong e Buzz Aldrin, da missão Apollo 11, caminharam na Lua.","de":"Im Juli 1969 betraten Neil Armstrong und Buzz Aldrin von der Mission Apollo 11 den Mond.","it":"Nel luglio 1969 Neil Armstrong e Buzz Aldrin, della missione Apollo 11, camminarono sulla Luna."}
+  },
+  {
+    "id": "us_lincoln",
+    "difficulty": "Moyen",
+    "countries": ["US"],
+    "question": {"fr":"Quel président dirige les États-Unis pendant la guerre de Sécession ?","en":"Which president led the United States during the Civil War?","ru":"Какой президент руководил США во время Гражданской войны?","es":"¿Qué presidente dirigió Estados Unidos durante la guerra de Secesión?","pt":"Que presidente governou os Estados Unidos durante a Guerra de Secessão?","de":"Welcher Präsident führte die USA während des Sezessionskriegs?","it":"Quale presidente guidò gli Stati Uniti durante la guerra di secessione?"},
+    "answer": {"fr":"Abraham Lincoln","en":"Abraham Lincoln","ru":"Авраам Линкольн","es":"Abraham Lincoln","pt":"Abraham Lincoln","de":"Abraham Lincoln","it":"Abraham Lincoln"},
+    "wrong": [
+      {"fr":"Ulysses S. Grant","en":"Ulysses S. Grant","ru":"Улисс Грант","es":"Ulysses S. Grant","pt":"Ulysses S. Grant","de":"Ulysses S. Grant","it":"Ulysses S. Grant"},
+      {"fr":"Andrew Jackson","en":"Andrew Jackson","ru":"Эндрю Джексон","es":"Andrew Jackson","pt":"Andrew Jackson","de":"Andrew Jackson","it":"Andrew Jackson"},
+      {"fr":"Theodore Roosevelt","en":"Theodore Roosevelt","ru":"Теодор Рузвельт","es":"Theodore Roosevelt","pt":"Theodore Roosevelt","de":"Theodore Roosevelt","it":"Theodore Roosevelt"}
+    ],
+    "fact": {"fr":"La guerre (1861-1865) se termine par la victoire du Nord ; l’esclavage est aboli par le 13e amendement en 1865.","en":"The war (1861–1865) ended in victory for the North; slavery was abolished by the 13th Amendment in 1865.","ru":"Война (1861–1865) закончилась победой Севера; рабство было отменено 13-й поправкой в 1865 году.","es":"La guerra (1861-1865) terminó con la victoria del Norte; la esclavitud fue abolida por la 13.ª enmienda en 1865.","pt":"A guerra (1861-1865) terminou com a vitória do Norte; a escravidão foi abolida pela 13.ª emenda em 1865.","de":"Der Krieg (1861–1865) endete mit dem Sieg des Nordens; die Sklaverei wurde 1865 durch den 13. Zusatzartikel abgeschafft.","it":"La guerra (1861-1865) si concluse con la vittoria del Nord; la schiavitù fu abolita dal 13º emendamento nel 1865."},
+    "accept": ["Lincoln","Линкольн"]
+  },
+  {
+    "id": "us_louisiana",
+    "difficulty": "Moyen",
+    "countries": ["US","FR"],
+    "question": {"fr":"À quel pays les États-Unis achètent-ils la Louisiane en 1803 ?","en":"From which country did the United States buy Louisiana in 1803?","ru":"У какой страны США купили Луизиану в 1803 году?","es":"¿A qué país compró Estados Unidos la Luisiana en 1803?","pt":"De que país os Estados Unidos compraram a Luisiana em 1803?","de":"Von welchem Land kauften die USA 1803 Louisiana?","it":"Da quale paese gli Stati Uniti acquistarono la Louisiana nel 1803?"},
+    "answer": {"fr":"La France","en":"France","ru":"Франция","es":"Francia","pt":"França","de":"Frankreich","it":"La Francia"},
+    "wrong": [
+      {"fr":"L’Espagne","en":"Spain","ru":"Испания","es":"España","pt":"Espanha","de":"Spanien","it":"La Spagna"},
+      {"fr":"Le Royaume-Uni","en":"The United Kingdom","ru":"Великобритания","es":"Reino Unido","pt":"Reino Unido","de":"Vereinigtes Königreich","it":"Il Regno Unito"},
+      {"fr":"Le Mexique","en":"Mexico","ru":"Мексика","es":"México","pt":"México","de":"Mexiko","it":"Il Messico"}
+    ],
+    "fact": {"fr":"Napoléon cède environ 2 millions de km² pour 15 millions de dollars : la superficie du pays double.","en":"Napoleon sold around 2 million km² for 15 million dollars, doubling the size of the country.","ru":"Наполеон продал около 2 млн км² за 15 миллионов долларов — площадь страны удвоилась.","es":"Napoleón cedió unos 2 millones de km² por 15 millones de dólares: la superficie del país se duplicó.","pt":"Napoleão cedeu cerca de 2 milhões de km² por 15 milhões de dólares: a área do país dobrou.","de":"Napoleon verkaufte rund 2 Millionen km² für 15 Millionen Dollar – die Fläche des Landes verdoppelte sich.","it":"Napoleone cedette circa 2 milioni di km² per 15 milioni di dollari: la superficie del paese raddoppiò."},
+    "accept": ["France","Francia","França","Frankreich","Франция"]
+  },
+  {
+    "id": "us_alaska",
+    "difficulty": "Moyen",
+    "countries": ["US","RU"],
+    "question": {"fr":"À quel pays les États-Unis achètent-ils l’Alaska en 1867 ?","en":"From which country did the United States buy Alaska in 1867?","ru":"У какой страны США купили Аляску в 1867 году?","es":"¿A qué país compró Estados Unidos Alaska en 1867?","pt":"De que país os Estados Unidos compraram o Alasca em 1867?","de":"Von welchem Land kauften die USA 1867 Alaska?","it":"Da quale paese gli Stati Uniti acquistarono l’Alaska nel 1867?"},
+    "answer": {"fr":"La Russie","en":"Russia","ru":"Россия","es":"Rusia","pt":"Rússia","de":"Russland","it":"La Russia"},
+    "wrong": [
+      {"fr":"Le Royaume-Uni","en":"The United Kingdom","ru":"Великобритания","es":"Reino Unido","pt":"Reino Unido","de":"Vereinigtes Königreich","it":"Il Regno Unito"},
+      {"fr":"Le Danemark","en":"Denmark","ru":"Дания","es":"Dinamarca","pt":"Dinamarca","de":"Dänemark","it":"La Danimarca"},
+      {"fr":"L’Espagne","en":"Spain","ru":"Испания","es":"España","pt":"Espanha","de":"Spanien","it":"La Spagna"}
+    ],
+    "fact": {"fr":"L’Empire russe le vend pour 7,2 millions de dollars. L’Alaska devient un État américain en 1959.","en":"The Russian Empire sold it for 7.2 million dollars. Alaska became a US state in 1959.","ru":"Российская империя продала её за 7,2 миллиона долларов. Аляска стала штатом США в 1959 году.","es":"El Imperio ruso lo vendió por 7,2 millones de dólares. Alaska se convirtió en estado en 1959.","pt":"O Império Russo o vendeu por 7,2 milhões de dólares. O Alasca tornou-se um estado americano em 1959.","de":"Das Russische Kaiserreich verkaufte es für 7,2 Millionen Dollar. 1959 wurde Alaska ein US-Bundesstaat.","it":"L’Impero russo la vendette per 7,2 milioni di dollari. L’Alaska divenne uno Stato americano nel 1959."},
+    "accept": ["Russie","Russia","Rusia","Rússia","Russland","Россия"]
+  },
+  {
+    "id": "us_thirteen_colonies",
+    "difficulty": "Moyen",
+    "countries": ["US"],
+    "question": {"fr":"Combien de colonies britanniques ont fondé les États-Unis ?","en":"How many British colonies founded the United States?","ru":"Сколько британских колоний основали США?","es":"¿Cuántas colonias británicas fundaron los Estados Unidos?","pt":"Quantas colônias britânicas fundaram os Estados Unidos?","de":"Wie viele britische Kolonien gründeten die Vereinigten Staaten?","it":"Quante colonie britanniche fondarono gli Stati Uniti?"},
+    "answer": {"fr":"13","en":"13","ru":"13","es":"13","pt":"13","de":"13","it":"13"},
+    "wrong": [
+      {"fr":"10","en":"10","ru":"10","es":"10","pt":"10","de":"10","it":"10"},
+      {"fr":"15","en":"15","ru":"15","es":"15","pt":"15","de":"15","it":"15"},
+      {"fr":"20","en":"20","ru":"20","es":"20","pt":"20","de":"20","it":"20"}
+    ],
+    "fact": {"fr":"Les 13 bandes rouges et blanches du drapeau américain rappellent ces 13 colonies.","en":"The 13 red and white stripes of the American flag recall those 13 colonies.","ru":"13 красных и белых полос на флаге США напоминают об этих 13 колониях.","es":"Las 13 franjas rojas y blancas de la bandera estadounidense recuerdan esas 13 colonias.","pt":"As 13 listras vermelhas e brancas da bandeira americana lembram essas 13 colônias.","de":"Die 13 roten und weißen Streifen der US-Flagge erinnern an diese 13 Kolonien.","it":"Le 13 strisce rosse e bianche della bandiera americana ricordano quelle 13 colonie."}
+  },
+  {
+    "id": "us_mlk",
+    "difficulty": "Difficile",
+    "countries": ["US"],
+    "question": {"fr":"Qui prononce le discours « I Have a Dream » à Washington en 1963 ?","en":"Who delivered the “I Have a Dream” speech in Washington in 1963?","ru":"Кто произнёс речь «У меня есть мечта» в Вашингтоне в 1963 году?","es":"¿Quién pronunció el discurso «I Have a Dream» en Washington en 1963?","pt":"Quem proferiu o discurso «I Have a Dream» em Washington em 1963?","de":"Wer hielt 1963 in Washington die Rede „I Have a Dream“?","it":"Chi pronunciò il discorso «I Have a Dream» a Washington nel 1963?"},
+    "answer": {"fr":"Martin Luther King","en":"Martin Luther King Jr.","ru":"Мартин Лютер Кинг","es":"Martin Luther King","pt":"Martin Luther King","de":"Martin Luther King","it":"Martin Luther King"},
+    "wrong": [
+      {"fr":"Malcolm X","en":"Malcolm X","ru":"Малкольм Икс","es":"Malcolm X","pt":"Malcolm X","de":"Malcolm X","it":"Malcolm X"},
+      {"fr":"John F. Kennedy","en":"John F. Kennedy","ru":"Джон Кеннеди","es":"John F. Kennedy","pt":"John F. Kennedy","de":"John F. Kennedy","it":"John F. Kennedy"},
+      {"fr":"Jesse Jackson","en":"Jesse Jackson","ru":"Джесси Джексон","es":"Jesse Jackson","pt":"Jesse Jackson","de":"Jesse Jackson","it":"Jesse Jackson"}
+    ],
+    "fact": {"fr":"Ce pasteur, figure du mouvement des droits civiques, reçoit le prix Nobel de la paix en 1964.","en":"This minister, a leading figure of the civil rights movement, received the Nobel Peace Prize in 1964.","ru":"Этот пастор, лидер движения за гражданские права, получил Нобелевскую премию мира в 1964 году.","es":"Este pastor, figura del movimiento por los derechos civiles, recibió el Premio Nobel de la Paz en 1964.","pt":"Esse pastor, figura do movimento pelos direitos civis, recebeu o Prêmio Nobel da Paz em 1964.","de":"Der Pastor, eine Leitfigur der Bürgerrechtsbewegung, erhielt 1964 den Friedensnobelpreis.","it":"Questo pastore, figura del movimento per i diritti civili, ricevette il premio Nobel per la pace nel 1964."},
+    "accept": ["Martin Luther King Jr","MLK","Кинг"]
+  },
+  {
+    "id": "us_new_deal",
+    "difficulty": "Difficile",
+    "countries": ["US"],
+    "question": {"fr":"Quel président lance le New Deal pour sortir de la Grande Dépression ?","en":"Which president launched the New Deal to end the Great Depression?","ru":"Какой президент запустил «Новый курс», чтобы вывести страну из Великой депрессии?","es":"¿Qué presidente lanzó el New Deal para salir de la Gran Depresión?","pt":"Que presidente lançou o New Deal para sair da Grande Depressão?","de":"Welcher Präsident startete den New Deal, um die Große Depression zu überwinden?","it":"Quale presidente lanciò il New Deal per uscire dalla Grande depressione?"},
+    "answer": {"fr":"Franklin D. Roosevelt","en":"Franklin D. Roosevelt","ru":"Франклин Рузвельт","es":"Franklin D. Roosevelt","pt":"Franklin D. Roosevelt","de":"Franklin D. Roosevelt","it":"Franklin D. Roosevelt"},
+    "wrong": [
+      {"fr":"Herbert Hoover","en":"Herbert Hoover","ru":"Герберт Гувер","es":"Herbert Hoover","pt":"Herbert Hoover","de":"Herbert Hoover","it":"Herbert Hoover"},
+      {"fr":"Harry Truman","en":"Harry Truman","ru":"Гарри Трумэн","es":"Harry Truman","pt":"Harry Truman","de":"Harry Truman","it":"Harry Truman"},
+      {"fr":"Woodrow Wilson","en":"Woodrow Wilson","ru":"Вудро Вильсон","es":"Woodrow Wilson","pt":"Woodrow Wilson","de":"Woodrow Wilson","it":"Woodrow Wilson"}
+    ],
+    "fact": {"fr":"Élu en 1932, il est le seul président élu quatre fois.","en":"Elected in 1932, he is the only president elected four times.","ru":"Избранный в 1932 году, он единственный президент, избиравшийся четыре раза.","es":"Elegido en 1932, es el único presidente elegido cuatro veces.","pt":"Eleito em 1932, é o único presidente eleito quatro vezes.","de":"1932 gewählt, ist er der einzige Präsident, der viermal gewählt wurde.","it":"Eletto nel 1932, è l’unico presidente eletto quattro volte."},
+    "accept": ["Roosevelt","FDR","Рузвельт"]
+  },
+  {
+    "id": "us_gold_rush",
+    "difficulty": "Difficile",
+    "countries": ["US"],
+    "question": {"fr":"Dans quel État la grande ruée vers l’or commence-t-elle en 1848 ?","en":"In which state did the great gold rush begin in 1848?","ru":"В каком штате в 1848 году началась великая золотая лихорадка?","es":"¿En qué estado comenzó la gran fiebre del oro en 1848?","pt":"Em que estado começou a grande corrida do ouro em 1848?","de":"In welchem Bundesstaat begann 1848 der große Goldrausch?","it":"In quale Stato iniziò la grande corsa all’oro nel 1848?"},
+    "answer": {"fr":"La Californie","en":"California","ru":"Калифорния","es":"California","pt":"Califórnia","de":"Kalifornien","it":"La California"},
+    "wrong": [
+      {"fr":"L’Alaska","en":"Alaska","ru":"Аляска","es":"Alaska","pt":"Alasca","de":"Alaska","it":"L’Alaska"},
+      {"fr":"Le Colorado","en":"Colorado","ru":"Колорадо","es":"Colorado","pt":"Colorado","de":"Colorado","it":"Il Colorado"},
+      {"fr":"Le Nevada","en":"Nevada","ru":"Невада","es":"Nevada","pt":"Nevada","de":"Nevada","it":"Il Nevada"}
+    ],
+    "fact": {"fr":"La découverte d’or à Sutter’s Mill attire des centaines de milliers de chercheurs d’or ; la Californie devient un État dès 1850.","en":"The discovery of gold at Sutter’s Mill drew hundreds of thousands of prospectors; California became a state in 1850.","ru":"Находка золота на лесопилке Саттера привлекла сотни тысяч старателей; Калифорния стала штатом уже в 1850 году.","es":"El hallazgo de oro en Sutter’s Mill atrajo a cientos de miles de buscadores; California se convirtió en estado en 1850.","pt":"A descoberta de ouro em Sutter’s Mill atraiu centenas de milhares de garimpeiros; a Califórnia tornou-se um estado em 1850.","de":"Der Goldfund bei Sutter’s Mill lockte Hunderttausende Goldsucher an; Kalifornien wurde bereits 1850 Bundesstaat.","it":"La scoperta dell’oro a Sutter’s Mill attirò centinaia di migliaia di cercatori; la California divenne uno Stato nel 1850."},
+    "accept": ["Californie","California","Califórnia","Kalifornien","Калифорния"]
+  },
+  {
+    "id": "us_constitution",
+    "difficulty": "Impossible",
+    "countries": ["US"],
+    "question": {"fr":"En quelle année la Constitution des États-Unis est-elle rédigée ?","en":"In what year was the United States Constitution written?","ru":"В каком году была написана Конституция США?","es":"¿En qué año se redactó la Constitución de los Estados Unidos?","pt":"Em que ano foi redigida a Constituição dos Estados Unidos?","de":"In welchem Jahr wurde die Verfassung der Vereinigten Staaten ausgearbeitet?","it":"In che anno fu redatta la Costituzione degli Stati Uniti?"},
+    "answer": {"fr":"1787","en":"1787","ru":"1787","es":"1787","pt":"1787","de":"1787","it":"1787"},
+    "wrong": [
+      {"fr":"1776","en":"1776","ru":"1776","es":"1776","pt":"1776","de":"1776","it":"1776"},
+      {"fr":"1791","en":"1791","ru":"1791","es":"1791","pt":"1791","de":"1791","it":"1791"},
+      {"fr":"1803","en":"1803","ru":"1803","es":"1803","pt":"1803","de":"1803","it":"1803"}
+    ],
+    "fact": {"fr":"Rédigée à Philadelphie, c’est l’une des plus anciennes constitutions nationales écrites encore en vigueur.","en":"Written in Philadelphia, it is one of the oldest written national constitutions still in force.","ru":"Написанная в Филадельфии, она — одна из старейших действующих письменных национальных конституций.","es":"Redactada en Filadelfia, es una de las constituciones nacionales escritas más antiguas aún vigentes.","pt":"Redigida na Filadélfia, é uma das constituições nacionais escritas mais antigas ainda em vigor.","de":"In Philadelphia verfasst, ist sie eine der ältesten geschriebenen nationalen Verfassungen, die noch gelten.","it":"Redatta a Filadelfia, è una delle più antiche costituzioni nazionali scritte ancora in vigore."}
+  },
+  {
+    "id": "us_hawaii",
+    "difficulty": "Impossible",
+    "countries": ["US"],
+    "question": {"fr":"Quel État est le dernier à avoir rejoint les États-Unis, en 1959 ?","en":"Which state was the last to join the United States, in 1959?","ru":"Какой штат последним вошёл в состав США в 1959 году?","es":"¿Qué estado fue el último en unirse a Estados Unidos, en 1959?","pt":"Qual estado foi o último a entrar nos Estados Unidos, em 1959?","de":"Welcher Bundesstaat trat 1959 als letzter den Vereinigten Staaten bei?","it":"Quale Stato fu l’ultimo a entrare negli Stati Uniti, nel 1959?"},
+    "answer": {"fr":"Hawaï","en":"Hawaii","ru":"Гавайи","es":"Hawái","pt":"Havaí","de":"Hawaii","it":"Le Hawaii"},
+    "wrong": [
+      {"fr":"L’Alaska","en":"Alaska","ru":"Аляска","es":"Alaska","pt":"Alasca","de":"Alaska","it":"L’Alaska"},
+      {"fr":"L’Arizona","en":"Arizona","ru":"Аризона","es":"Arizona","pt":"Arizona","de":"Arizona","it":"L’Arizona"},
+      {"fr":"Le Nouveau-Mexique","en":"New Mexico","ru":"Нью-Мексико","es":"Nuevo México","pt":"Novo México","de":"New Mexico","it":"Il Nuovo Messico"}
+    ],
+    "fact": {"fr":"L’Alaska devient le 49e État en janvier 1959, puis Hawaï le 50e en août 1959.","en":"Alaska became the 49th state in January 1959, then Hawaii the 50th in August 1959.","ru":"Аляска стала 49-м штатом в январе 1959 года, а Гавайи — 50-м в августе 1959 года.","es":"Alaska se convirtió en el estado 49 en enero de 1959 y Hawái en el 50 en agosto de 1959.","pt":"O Alasca tornou-se o 49.º estado em janeiro de 1959 e o Havaí o 50.º em agosto de 1959.","de":"Alaska wurde im Januar 1959 der 49. Bundesstaat, Hawaii im August 1959 der 50.","it":"L’Alaska divenne il 49º Stato nel gennaio 1959, poi le Hawaii il 50º nell’agosto 1959."},
+    "accept": ["Hawai","Hawaii","Hawái","Havaí","Гавайи"]
+  },
+  {
+    "id": "jp_hiroshima",
+    "difficulty": "Facile",
+    "countries": ["JP"],
+    "question": {"fr":"Quelle ville japonaise est frappée par la première bombe atomique, le 6 août 1945 ?","en":"Which Japanese city was hit by the first atomic bomb, on 6 August 1945?","ru":"Какой японский город подвергся первой атомной бомбардировке 6 августа 1945 года?","es":"¿Qué ciudad japonesa fue alcanzada por la primera bomba atómica, el 6 de agosto de 1945?","pt":"Que cidade japonesa foi atingida pela primeira bomba atômica, em 6 de agosto de 1945?","de":"Welche japanische Stadt wurde am 6. August 1945 von der ersten Atombombe getroffen?","it":"Quale città giapponese fu colpita dalla prima bomba atomica, il 6 agosto 1945?"},
+    "answer": {"fr":"Hiroshima","en":"Hiroshima","ru":"Хиросима","es":"Hiroshima","pt":"Hiroshima","de":"Hiroshima","it":"Hiroshima"},
+    "wrong": [
+      {"fr":"Nagasaki","en":"Nagasaki","ru":"Нагасаки","es":"Nagasaki","pt":"Nagasaki","de":"Nagasaki","it":"Nagasaki"},
+      {"fr":"Tokyo","en":"Tokyo","ru":"Токио","es":"Tokio","pt":"Tóquio","de":"Tokio","it":"Tokyo"},
+      {"fr":"Osaka","en":"Osaka","ru":"Осака","es":"Osaka","pt":"Osaka","de":"Osaka","it":"Osaka"}
+    ],
+    "fact": {"fr":"Nagasaki est frappée trois jours plus tard ; le Japon annonce sa capitulation le 15 août 1945.","en":"Nagasaki was hit three days later; Japan announced its surrender on 15 August 1945.","ru":"Через три дня бомба была сброшена на Нагасаки; 15 августа 1945 года Япония объявила о капитуляции.","es":"Nagasaki fue atacada tres días después; Japón anunció su rendición el 15 de agosto de 1945.","pt":"Nagasaki foi atingida três dias depois; o Japão anunciou sua rendição em 15 de agosto de 1945.","de":"Drei Tage später wurde Nagasaki getroffen; am 15. August 1945 verkündete Japan seine Kapitulation.","it":"Nagasaki fu colpita tre giorni dopo; il Giappone annunciò la resa il 15 agosto 1945."}
+  },
+  {
+    "id": "jp_samurai",
+    "difficulty": "Facile",
+    "countries": ["JP"],
+    "question": {"fr":"Comment s’appellent les guerriers de la noblesse militaire du Japon féodal ?","en":"What were the warriors of feudal Japan’s military nobility called?","ru":"Как назывались воины военного сословия феодальной Японии?","es":"¿Cómo se llamaban los guerreros de la nobleza militar del Japón feudal?","pt":"Como se chamavam os guerreiros da nobreza militar do Japão feudal?","de":"Wie hießen die Krieger des Militäradels im feudalen Japan?","it":"Come si chiamavano i guerrieri della nobiltà militare del Giappone feudale?"},
+    "answer": {"fr":"Les samouraïs","en":"Samurai","ru":"Самураи","es":"Los samuráis","pt":"Os samurais","de":"Samurai","it":"I samurai"},
+    "wrong": [
+      {"fr":"Les ninjas","en":"Ninjas","ru":"Ниндзя","es":"Los ninjas","pt":"Os ninjas","de":"Ninjas","it":"I ninja"},
+      {"fr":"Les geishas","en":"Geishas","ru":"Гейши","es":"Las geishas","pt":"As gueixas","de":"Geishas","it":"Le geishe"},
+      {"fr":"Les sumotoris","en":"Sumo wrestlers","ru":"Сумоисты","es":"Los luchadores de sumo","pt":"Os lutadores de sumô","de":"Sumoringer","it":"I lottatori di sumo"}
+    ],
+    "fact": {"fr":"Leur statut privilégié est aboli dans les années 1870, au début de l’ère Meiji.","en":"Their privileged status was abolished in the 1870s, early in the Meiji era.","ru":"Их привилегированное положение было упразднено в 1870-х годах, в начале эпохи Мэйдзи.","es":"Su estatus privilegiado fue abolido en la década de 1870, al comienzo de la era Meiji.","pt":"Seu status privilegiado foi abolido na década de 1870, no início da era Meiji.","de":"Ihr privilegierter Stand wurde in den 1870er-Jahren, zu Beginn der Meiji-Zeit, abgeschafft.","it":"Il loro status privilegiato fu abolito negli anni 1870, all’inizio dell’era Meiji."},
+    "accept": ["Samourai","Samourais","Samurai","Samurais","Samuráis","Самурай"]
+  },
+  {
+    "id": "jp_fukushima",
+    "difficulty": "Facile",
+    "countries": ["JP"],
+    "question": {"fr":"En 2011, quelle centrale nucléaire japonaise est gravement endommagée par un tsunami ?","en":"In 2011, which Japanese nuclear power plant was severely damaged by a tsunami?","ru":"Какая японская АЭС была серьёзно повреждена цунами в 2011 году?","es":"En 2011, ¿qué central nuclear japonesa resultó gravemente dañada por un tsunami?","pt":"Em 2011, que usina nuclear japonesa foi gravemente danificada por um tsunami?","de":"Welches japanische Kernkraftwerk wurde 2011 durch einen Tsunami schwer beschädigt?","it":"Nel 2011, quale centrale nucleare giapponese fu gravemente danneggiata da uno tsunami?"},
+    "answer": {"fr":"Fukushima","en":"Fukushima","ru":"Фукусима","es":"Fukushima","pt":"Fukushima","de":"Fukushima","it":"Fukushima"},
+    "wrong": [
+      {"fr":"Tchernobyl","en":"Chernobyl","ru":"Чернобыль","es":"Chernóbil","pt":"Chernobyl","de":"Tschernobyl","it":"Černobyl"},
+      {"fr":"Tokaimura","en":"Tokaimura","ru":"Токаймура","es":"Tokaimura","pt":"Tokaimura","de":"Tokaimura","it":"Tokaimura"},
+      {"fr":"Three Mile Island","en":"Three Mile Island","ru":"Три-Майл-Айленд","es":"Three Mile Island","pt":"Three Mile Island","de":"Three Mile Island","it":"Three Mile Island"}
+    ],
+    "fact": {"fr":"Le 11 mars 2011, un séisme de magnitude 9 provoque un tsunami qui fait plus de 18 000 morts et disparus.","en":"On 11 March 2011, a magnitude 9 earthquake triggered a tsunami that left more than 18,000 dead or missing.","ru":"11 марта 2011 года землетрясение магнитудой 9 вызвало цунами, жертвами которого, вместе с пропавшими без вести, стали более 18 000 человек.","es":"El 11 de marzo de 2011, un terremoto de magnitud 9 provocó un tsunami que dejó más de 18 000 muertos y desaparecidos.","pt":"Em 11 de março de 2011, um terremoto de magnitude 9 provocou um tsunami que deixou mais de 18 000 mortos e desaparecidos.","de":"Am 11. März 2011 löste ein Erdbeben der Stärke 9 einen Tsunami aus, der über 18 000 Tote und Vermisste forderte.","it":"L’11 marzo 2011 un terremoto di magnitudo 9 provocò uno tsunami che causò oltre 18 000 morti e dispersi."}
+  },
+  {
+    "id": "jp_meiji",
+    "difficulty": "Moyen",
+    "countries": ["JP"],
+    "question": {"fr":"Quelle ère, ouverte en 1868, voit le Japon se moderniser à grande vitesse ?","en":"Which era, beginning in 1868, saw Japan modernise at great speed?","ru":"Какая эпоха, начавшаяся в 1868 году, ознаменовалась стремительной модернизацией Японии?","es":"¿Qué era, iniciada en 1868, vio a Japón modernizarse a gran velocidad?","pt":"Que era, iniciada em 1868, viu o Japão se modernizar rapidamente?","de":"In welcher 1868 beginnenden Ära modernisierte sich Japan in rasantem Tempo?","it":"Quale era, iniziata nel 1868, vide il Giappone modernizzarsi a grande velocità?"},
+    "answer": {"fr":"L’ère Meiji","en":"The Meiji era","ru":"Эпоха Мэйдзи","es":"La era Meiji","pt":"A era Meiji","de":"Die Meiji-Zeit","it":"L’era Meiji"},
+    "wrong": [
+      {"fr":"L’ère Edo","en":"The Edo era","ru":"Эпоха Эдо","es":"La era Edo","pt":"A era Edo","de":"Die Edo-Zeit","it":"L’era Edo"},
+      {"fr":"L’ère Showa","en":"The Showa era","ru":"Эпоха Сёва","es":"La era Showa","pt":"A era Showa","de":"Die Showa-Zeit","it":"L’era Showa"},
+      {"fr":"L’ère Heian","en":"The Heian era","ru":"Эпоха Хэйан","es":"La era Heian","pt":"A era Heian","de":"Die Heian-Zeit","it":"L’era Heian"}
+    ],
+    "fact": {"fr":"Le shogunat prend fin, l’empereur retrouve le pouvoir et Edo, rebaptisée Tokyo, devient la capitale.","en":"The shogunate ended, the emperor regained power and Edo, renamed Tokyo, became the capital.","ru":"Сёгунат пал, император вернул себе власть, а Эдо, переименованный в Токио, стал столицей.","es":"El shogunato terminó, el emperador recuperó el poder y Edo, rebautizada Tokio, se convirtió en la capital.","pt":"O xogunato terminou, o imperador recuperou o poder e Edo, rebatizada Tóquio, tornou-se a capital.","de":"Das Shogunat endete, der Kaiser erlangte die Macht zurück und Edo, umbenannt in Tokio, wurde Hauptstadt.","it":"Lo shogunato finì, l’imperatore riprese il potere ed Edo, ribattezzata Tokyo, divenne la capitale."},
+    "accept": ["Meiji","Мэйдзи"]
+  },
+  {
+    "id": "jp_edo",
+    "difficulty": "Moyen",
+    "countries": ["JP"],
+    "question": {"fr":"Quel était l’ancien nom de Tokyo ?","en":"What was the former name of Tokyo?","ru":"Как раньше назывался Токио?","es":"¿Cuál era el antiguo nombre de Tokio?","pt":"Qual era o antigo nome de Tóquio?","de":"Wie hieß Tokio früher?","it":"Qual era l’antico nome di Tokyo?"},
+    "answer": {"fr":"Edo","en":"Edo","ru":"Эдо","es":"Edo","pt":"Edo","de":"Edo","it":"Edo"},
+    "wrong": [
+      {"fr":"Kyoto","en":"Kyoto","ru":"Киото","es":"Kioto","pt":"Quioto","de":"Kyoto","it":"Kyoto"},
+      {"fr":"Nara","en":"Nara","ru":"Нара","es":"Nara","pt":"Nara","de":"Nara","it":"Nara"},
+      {"fr":"Osaka","en":"Osaka","ru":"Осака","es":"Osaka","pt":"Osaka","de":"Osaka","it":"Osaka"}
+    ],
+    "fact": {"fr":"La ville est renommée Tokyo, « la capitale de l’Est », en 1868.","en":"The city was renamed Tokyo, “the eastern capital”, in 1868.","ru":"В 1868 году город переименовали в Токио — «восточная столица».","es":"La ciudad pasó a llamarse Tokio, «la capital del este», en 1868.","pt":"A cidade foi rebatizada Tóquio, «a capital do leste», em 1868.","de":"Die Stadt wurde 1868 in Tokio, „östliche Hauptstadt“, umbenannt.","it":"La città fu ribattezzata Tokyo, «la capitale dell’est», nel 1868."}
+  },
+  {
+    "id": "jp_kyoto",
+    "difficulty": "Moyen",
+    "countries": ["JP"],
+    "question": {"fr":"Quelle ville est la capitale impériale du Japon pendant plus de 1 000 ans ?","en":"Which city was Japan’s imperial capital for over 1,000 years?","ru":"Какой город был императорской столицей Японии более 1000 лет?","es":"¿Qué ciudad fue la capital imperial de Japón durante más de 1000 años?","pt":"Que cidade foi a capital imperial do Japão por mais de 1000 anos?","de":"Welche Stadt war über 1000 Jahre lang Japans Kaiserhauptstadt?","it":"Quale città fu la capitale imperiale del Giappone per oltre 1000 anni?"},
+    "answer": {"fr":"Kyoto","en":"Kyoto","ru":"Киото","es":"Kioto","pt":"Quioto","de":"Kyoto","it":"Kyoto"},
+    "wrong": [
+      {"fr":"Nara","en":"Nara","ru":"Нара","es":"Nara","pt":"Nara","de":"Nara","it":"Nara"},
+      {"fr":"Kamakura","en":"Kamakura","ru":"Камакура","es":"Kamakura","pt":"Kamakura","de":"Kamakura","it":"Kamakura"},
+      {"fr":"Osaka","en":"Osaka","ru":"Осака","es":"Osaka","pt":"Osaka","de":"Osaka","it":"Osaka"}
+    ],
+    "fact": {"fr":"Fondée en 794 sous le nom de Heian-kyō, elle reste la résidence de l’empereur jusqu’en 1868.","en":"Founded in 794 as Heian-kyō, it remained the emperor’s residence until 1868.","ru":"Основанный в 794 году под названием Хэйан-кё, он оставался резиденцией императора до 1868 года.","es":"Fundada en 794 con el nombre de Heian-kyō, fue la residencia del emperador hasta 1868.","pt":"Fundada em 794 com o nome de Heian-kyō, foi a residência do imperador até 1868.","de":"Als Heian-kyō 794 gegründet, blieb sie bis 1868 Sitz des Kaisers.","it":"Fondata nel 794 con il nome di Heian-kyō, rimase la residenza dell’imperatore fino al 1868."},
+    "accept": ["Kyoto","Kioto","Quioto","Киото"]
+  },
+  {
+    "id": "jp_tokyo_1964",
+    "difficulty": "Moyen",
+    "countries": ["JP"],
+    "question": {"fr":"En quelle année Tokyo accueille-t-elle ses premiers Jeux olympiques ?","en":"In what year did Tokyo host its first Olympic Games?","ru":"В каком году Токио впервые принял Олимпийские игры?","es":"¿En qué año acogió Tokio sus primeros Juegos Olímpicos?","pt":"Em que ano Tóquio sediou seus primeiros Jogos Olímpicos?","de":"In welchem Jahr richtete Tokio seine ersten Olympischen Spiele aus?","it":"In che anno Tokyo ospitò i suoi primi Giochi olimpici?"},
+    "answer": {"fr":"1964","en":"1964","ru":"1964","es":"1964","pt":"1964","de":"1964","it":"1964"},
+    "wrong": [
+      {"fr":"1940","en":"1940","ru":"1940","es":"1940","pt":"1940","de":"1940","it":"1940"},
+      {"fr":"1972","en":"1972","ru":"1972","es":"1972","pt":"1972","de":"1972","it":"1972"},
+      {"fr":"1988","en":"1988","ru":"1988","es":"1988","pt":"1988","de":"1988","it":"1988"}
+    ],
+    "fact": {"fr":"Ce sont les premiers Jeux d’été organisés en Asie. Ceux prévus à Tokyo en 1940 avaient été annulés à cause de la guerre.","en":"They were the first Summer Games held in Asia. The Games planned for Tokyo in 1940 had been cancelled because of the war.","ru":"Это были первые летние Игры в Азии. Игры, запланированные в Токио на 1940 год, отменили из-за войны.","es":"Fueron los primeros Juegos de verano celebrados en Asia. Los previstos en Tokio en 1940 se cancelaron por la guerra.","pt":"Foram os primeiros Jogos de verão realizados na Ásia. Os previstos para Tóquio em 1940 foram cancelados por causa da guerra.","de":"Es waren die ersten Sommerspiele in Asien. Die für 1940 in Tokio geplanten Spiele waren wegen des Krieges abgesagt worden.","it":"Furono i primi Giochi estivi organizzati in Asia. Quelli previsti a Tokyo nel 1940 erano stati annullati a causa della guerra."}
+  },
+  {
+    "id": "jp_perry",
+    "difficulty": "Difficile",
+    "countries": ["JP","US"],
+    "question": {"fr":"Quel commodore américain force le Japon à s’ouvrir au commerce en 1853-1854 ?","en":"Which American commodore forced Japan to open up to trade in 1853–1854?","ru":"Какой американский коммодор вынудил Японию открыться для торговли в 1853–1854 годах?","es":"¿Qué comodoro estadounidense obligó a Japón a abrirse al comercio en 1853-1854?","pt":"Que comodoro americano forçou o Japão a se abrir ao comércio em 1853-1854?","de":"Welcher amerikanische Commodore zwang Japan 1853–1854 zur Öffnung für den Handel?","it":"Quale commodoro americano costrinse il Giappone ad aprirsi al commercio nel 1853-1854?"},
+    "answer": {"fr":"Matthew Perry","en":"Matthew Perry","ru":"Мэтью Перри","es":"Matthew Perry","pt":"Matthew Perry","de":"Matthew Perry","it":"Matthew Perry"},
+    "wrong": [
+      {"fr":"Douglas MacArthur","en":"Douglas MacArthur","ru":"Дуглас Макартур","es":"Douglas MacArthur","pt":"Douglas MacArthur","de":"Douglas MacArthur","it":"Douglas MacArthur"},
+      {"fr":"George Dewey","en":"George Dewey","ru":"Джордж Дьюи","es":"George Dewey","pt":"George Dewey","de":"George Dewey","it":"George Dewey"},
+      {"fr":"Chester Nimitz","en":"Chester Nimitz","ru":"Честер Нимиц","es":"Chester Nimitz","pt":"Chester Nimitz","de":"Chester Nimitz","it":"Chester Nimitz"}
+    ],
+    "fact": {"fr":"L’arrivée de ses « navires noirs » met fin à plus de deux siècles d’isolement presque total du Japon.","en":"The arrival of his “black ships” ended more than two centuries of Japan’s near-total isolation.","ru":"Прибытие его «чёрных кораблей» положило конец более чем двухвековой почти полной изоляции Японии.","es":"La llegada de sus «barcos negros» puso fin a más de dos siglos de aislamiento casi total de Japón.","pt":"A chegada de seus «navios negros» pôs fim a mais de dois séculos de isolamento quase total do Japão.","de":"Die Ankunft seiner „Schwarzen Schiffe“ beendete mehr als zwei Jahrhunderte fast völliger Abschottung Japans.","it":"L’arrivo delle sue «navi nere» mise fine a più di due secoli di isolamento quasi totale del Giappone."},
+    "accept": ["Perry","Перри"]
+  },
+  {
+    "id": "jp_tokugawa",
+    "difficulty": "Difficile",
+    "countries": ["JP"],
+    "question": {"fr":"Quel clan dirige le Japon comme shoguns de 1603 à 1867 ?","en":"Which clan ruled Japan as shoguns from 1603 to 1867?","ru":"Какой клан правил Японией как сёгуны с 1603 по 1867 год?","es":"¿Qué clan gobernó Japón como shogunes de 1603 a 1867?","pt":"Que clã governou o Japão como xoguns de 1603 a 1867?","de":"Welcher Clan regierte Japan von 1603 bis 1867 als Shogune?","it":"Quale clan governò il Giappone come shogun dal 1603 al 1867?"},
+    "answer": {"fr":"Les Tokugawa","en":"The Tokugawa","ru":"Токугава","es":"Los Tokugawa","pt":"Os Tokugawa","de":"Die Tokugawa","it":"I Tokugawa"},
+    "wrong": [
+      {"fr":"Les Minamoto","en":"The Minamoto","ru":"Минамото","es":"Los Minamoto","pt":"Os Minamoto","de":"Die Minamoto","it":"I Minamoto"},
+      {"fr":"Les Ashikaga","en":"The Ashikaga","ru":"Асикага","es":"Los Ashikaga","pt":"Os Ashikaga","de":"Die Ashikaga","it":"Gli Ashikaga"},
+      {"fr":"Les Oda","en":"The Oda","ru":"Ода","es":"Los Oda","pt":"Os Oda","de":"Die Oda","it":"Gli Oda"}
+    ],
+    "fact": {"fr":"Fondé par Tokugawa Ieyasu, ce shogunat gouverne depuis Edo, l’actuelle Tokyo.","en":"Founded by Tokugawa Ieyasu, this shogunate ruled from Edo, present-day Tokyo.","ru":"Основанный Токугавой Иэясу, этот сёгунат правил из Эдо — нынешнего Токио.","es":"Fundado por Tokugawa Ieyasu, este shogunato gobernaba desde Edo, la actual Tokio.","pt":"Fundado por Tokugawa Ieyasu, esse xogunato governava a partir de Edo, a atual Tóquio.","de":"Von Tokugawa Ieyasu gegründet, regierte dieses Shogunat von Edo aus, dem heutigen Tokio.","it":"Fondato da Tokugawa Ieyasu, questo shogunato governava da Edo, l’attuale Tokyo."},
+    "accept": ["Tokugawa","Токугава"]
+  },
+  {
+    "id": "jp_hirohito",
+    "difficulty": "Difficile",
+    "countries": ["JP"],
+    "question": {"fr":"Quel empereur règne sur le Japon pendant la Seconde Guerre mondiale ?","en":"Which emperor reigned over Japan during World War II?","ru":"Какой император правил Японией во время Второй мировой войны?","es":"¿Qué emperador reinaba en Japón durante la Segunda Guerra Mundial?","pt":"Que imperador reinava no Japão durante a Segunda Guerra Mundial?","de":"Welcher Kaiser regierte Japan während des Zweiten Weltkriegs?","it":"Quale imperatore regnava sul Giappone durante la Seconda guerra mondiale?"},
+    "answer": {"fr":"Hirohito","en":"Hirohito","ru":"Хирохито","es":"Hirohito","pt":"Hirohito","de":"Hirohito","it":"Hirohito"},
+    "wrong": [
+      {"fr":"Akihito","en":"Akihito","ru":"Акихито","es":"Akihito","pt":"Akihito","de":"Akihito","it":"Akihito"},
+      {"fr":"Mutsuhito","en":"Mutsuhito","ru":"Муцухито","es":"Mutsuhito","pt":"Mutsuhito","de":"Mutsuhito","it":"Mutsuhito"},
+      {"fr":"Yoshihito","en":"Yoshihito","ru":"Ёсихито","es":"Yoshihito","pt":"Yoshihito","de":"Yoshihito","it":"Yoshihito"}
+    ],
+    "fact": {"fr":"Son règne (1926-1989), l’ère Showa, est le plus long de l’histoire du Japon. Il annonce la capitulation à la radio en août 1945.","en":"His reign (1926–1989), the Showa era, is the longest in Japanese history. He announced the surrender on the radio in August 1945.","ru":"Его правление (1926–1989), эпоха Сёва, — самое долгое в истории Японии. В августе 1945 года он объявил о капитуляции по радио.","es":"Su reinado (1926-1989), la era Showa, es el más largo de la historia de Japón. Anunció la rendición por radio en agosto de 1945.","pt":"Seu reinado (1926-1989), a era Showa, é o mais longo da história do Japão. Ele anunciou a rendição pelo rádio em agosto de 1945.","de":"Seine Herrschaft (1926–1989), die Showa-Zeit, ist die längste der japanischen Geschichte. Im August 1945 verkündete er im Radio die Kapitulation.","it":"Il suo regno (1926-1989), l’era Showa, è il più lungo della storia giapponese. Annunciò la resa alla radio nell’agosto 1945."},
+    "accept": ["Showa","Shōwa","Сёва"]
+  },
+  {
+    "id": "jp_russo_war",
+    "difficulty": "Difficile",
+    "countries": ["JP","RU"],
+    "question": {"fr":"Contre quel pays le Japon remporte-t-il la guerre de 1904-1905 ?","en":"Against which country did Japan win the war of 1904–1905?","ru":"Над какой страной Япония одержала победу в войне 1904–1905 годов?","es":"¿Contra qué país ganó Japón la guerra de 1904-1905?","pt":"Contra que país o Japão venceu a guerra de 1904-1905?","de":"Gegen welches Land gewann Japan den Krieg von 1904–1905?","it":"Contro quale paese il Giappone vinse la guerra del 1904-1905?"},
+    "answer": {"fr":"La Russie","en":"Russia","ru":"Россия","es":"Rusia","pt":"Rússia","de":"Russland","it":"La Russia"},
+    "wrong": [
+      {"fr":"La Chine","en":"China","ru":"Китай","es":"China","pt":"China","de":"China","it":"La Cina"},
+      {"fr":"Le Royaume-Uni","en":"The United Kingdom","ru":"Великобритания","es":"Reino Unido","pt":"Reino Unido","de":"Vereinigtes Königreich","it":"Il Regno Unito"},
+      {"fr":"La France","en":"France","ru":"Франция","es":"Francia","pt":"França","de":"Frankreich","it":"La Francia"}
+    ],
+    "fact": {"fr":"La victoire navale de Tsushima, en 1905, est la première d’une puissance asiatique moderne sur une puissance européenne.","en":"The naval victory at Tsushima in 1905 was the first by a modern Asian power over a European one.","ru":"Победа при Цусиме в 1905 году стала первой победой современной азиатской державы над европейской.","es":"La victoria naval de Tsushima, en 1905, fue la primera de una potencia asiática moderna sobre una europea.","pt":"A vitória naval de Tsushima, em 1905, foi a primeira de uma potência asiática moderna sobre uma europeia.","de":"Der Seesieg bei Tsushima 1905 war der erste Sieg einer modernen asiatischen Macht über eine europäische.","it":"La vittoria navale di Tsushima, nel 1905, fu la prima di una potenza asiatica moderna su una europea."},
+    "accept": ["Russie","Russia","Rusia","Rússia","Russland","Россия"]
+  },
+  {
+    "id": "jp_article_9",
+    "difficulty": "Impossible",
+    "countries": ["JP"],
+    "question": {"fr":"Quel est le numéro de l’article de la Constitution japonaise de 1947 par lequel le pays renonce à la guerre ?","en":"What is the number of the article of Japan’s 1947 Constitution in which the country renounces war?","ru":"Под каким номером статья Конституции Японии 1947 года, в которой страна отказывается от войны?","es":"¿Qué número tiene el artículo de la Constitución japonesa de 1947 por el que el país renuncia a la guerra?","pt":"Qual é o número do artigo da Constituição japonesa de 1947 pelo qual o país renuncia à guerra?","de":"Welche Nummer hat der Artikel der japanischen Verfassung von 1947, in dem das Land auf Krieg verzichtet?","it":"Qual è il numero dell’articolo della Costituzione giapponese del 1947 con cui il paese rinuncia alla guerra?"},
+    "answer": {"fr":"9","en":"9","ru":"9","es":"9","pt":"9","de":"9","it":"9"},
+    "wrong": [
+      {"fr":"1","en":"1","ru":"1","es":"1","pt":"1","de":"1","it":"1"},
+      {"fr":"3","en":"3","ru":"3","es":"3","pt":"3","de":"3","it":"3"},
+      {"fr":"12","en":"12","ru":"12","es":"12","pt":"12","de":"12","it":"12"}
+    ],
+    "fact": {"fr":"L’article 9 interdit en principe d’entretenir une armée ; le Japon dispose depuis 1954 de « Forces d’autodéfense ».","en":"Article 9 in principle forbids maintaining armed forces; since 1954 Japan has had “Self-Defense Forces”.","ru":"Статья 9 в принципе запрещает содержать армию; с 1954 года у Японии есть «Силы самообороны».","es":"El artículo 9 prohíbe en principio mantener un ejército; desde 1954 Japón cuenta con «Fuerzas de Autodefensa».","pt":"O artigo 9 proíbe, em princípio, manter forças armadas; desde 1954 o Japão tem «Forças de Autodefesa».","de":"Artikel 9 verbietet grundsätzlich den Unterhalt von Streitkräften; seit 1954 hat Japan „Selbstverteidigungsstreitkräfte“.","it":"L’articolo 9 vieta in linea di principio di mantenere forze armate; dal 1954 il Giappone ha le «Forze di autodifesa»."}
+  }
+]

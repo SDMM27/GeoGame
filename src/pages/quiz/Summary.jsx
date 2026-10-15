@@ -5,11 +5,12 @@ import ShareScoreButton from '../../components/ShareScoreButton'
 import { GAME_TYPES } from '../../utils/gameTypes'
 import { useRecordGame } from '../../auth'
 
-export default function Summary({ stats, maxDifficulty, onRestart, onChangeDifficulty }) {
+// `recordable` : le quiz d'histoire n'est ni enregistré ni partagé, pour ne pas fausser les scores du quiz géo
+export default function Summary({ stats, maxDifficulty, onRestart, onChangeDifficulty, recordable = true }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   useRecordGame(
-    stats.answered > 0
+    recordable && stats.answered > 0
       ? {
           gameType: GAME_TYPES.QUIZ,
           mode: 'infinite',
@@ -29,7 +30,7 @@ export default function Summary({ stats, maxDifficulty, onRestart, onChangeDiffi
         <div><strong>{stats.correct}/{stats.answered}</strong><small>{t('quiz.correct_answers')}</small></div>
         <div><strong>{stats.bestStreak}</strong><small>{t('quiz.best_streak')}</small></div>
       </div>
-      {stats.answered > 0 && (
+      {recordable && stats.answered > 0 && (
         <ShareScoreButton
           score={stats.score}
           gameType={GAME_TYPES.QUIZ}

@@ -21,7 +21,9 @@
     "usd": "{{value}} $",
     "close": "Закрыть",
     "unknown": "Нет данных",
-    "open": "Открыть атлас"
+    "open": "Открыть атлас",
+    "history": "История",
+    "history_quiz": "📜 Проверить знания истории"
   },
   "continents": {
     "Europe": "Европа",
@@ -548,6 +550,18 @@
       "digits_many": "Это {{count}}-значное число",
       "digits_other": "Это {{count}}-значное число",
       "between": "От {{min}} до {{max}}"
+    },
+    "pick_theme": "Выбери тему",
+    "themes": {
+      "geo": "🌍 География",
+      "geo_hint": "Реки, горы, страны…",
+      "history": "📜 История",
+      "history_hint": "Ключевые даты и события"
+    },
+    "history": {
+      "title": "Исторический квиз",
+      "country_title": "История: {{country}}",
+      "country_hint": "Все вопросы об этой стране, от самого лёгкого к самому сложному."
     }
   },
   "daily_challenge": {

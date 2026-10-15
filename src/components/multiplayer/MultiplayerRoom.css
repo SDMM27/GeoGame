@@ -19,7 +19,7 @@
 .mpr-row--me { border-color: rgba(61, 220, 151, 0.4); }
 .mpr-row--waiting { color: var(--text-muted); }
 .mpr-rank { width: 1.75rem; text-align: center; flex-shrink: 0; }
-.mpr-name { flex: 1 1 5rem; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.mpr-name { flex: 1 1 5rem; min-width: 0; overflow-wrap: anywhere; font-weight: 600; }
 .mpr-score { margin-left: auto; font-size: 0.85rem; color: var(--text-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .mpr-live { display: inline-flex; align-items: center; gap: 0.5rem; }
 .mpr-hearts { letter-spacing: 1px; font-size: 0.8rem; }

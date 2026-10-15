@@ -3,7 +3,7 @@
 /* Override grid pour 5 colonnes : rang / joueur / score / erreur / essais */
 .ranking-lb .daily-lb__header,
 .ranking-lb .daily-lb__row-main {
-  grid-template-columns: 40px 1fr 80px 80px 70px;
+  grid-template-columns: 40px minmax(0, 1fr) 80px 80px 70px;
 }
 
 .ranking-lb__score,

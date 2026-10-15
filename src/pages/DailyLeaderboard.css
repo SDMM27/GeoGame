@@ -90,7 +90,7 @@
 
 .daily-lb__header {
   display: grid;
-  grid-template-columns: 40px 1fr 80px 90px;
+  grid-template-columns: 40px minmax(0, 1fr) 80px 90px;
   padding: 6px 12px;
   font-size: 0.78rem;
   font-weight: 700;
@@ -107,7 +107,7 @@
 
 .daily-lb__row-main {
   display: grid;
-  grid-template-columns: 40px 1fr 80px 90px;
+  grid-template-columns: 40px minmax(0, 1fr) 80px 90px;
   padding: 10px 12px;
   background: var(--bg-secondary);
   cursor: pointer;
@@ -131,7 +131,10 @@
   color: var(--text-muted);
 }
 
+/* The whole name is shown, on as many lines as it needs */
 .daily-lb__name {
+  min-width: 0;
+  overflow-wrap: anywhere;
   font-weight: 700;
   color: var(--text-primary);
   font-size: 0.95rem;

@@ -5,6 +5,7 @@ import React from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAccount } from '../auth'
+import { useFriendships } from '../hooks/usePlayerProfile'
 import { LANGUAGES, toLanguage } from '../i18n/languages'
 import { isGamePath } from '../utils/gamePaths'
 import { LeaderboardIcon, MultiIcon, PlayIcon, ProfileIcon } from './NavIcons'
@@ -23,6 +24,8 @@ export default function NavBar() {
   const { pathname } = useLocation()
   const current = toLanguage(i18n.resolvedLanguage ?? i18n.language)
   const inGame = isGamePath(pathname)
+  // Pending friend requests show on the Profile tab, so they are seen from any page
+  const { incoming } = useFriendships(account?.uid ?? null)
 
   return (
     <header className="navbar">
@@ -38,6 +41,11 @@ export default function NavBar() {
               {to === '/account' && account?.username ? account.username : t(labelKey)}
             </span>
             {to === '/account' && account && <span className="navbar-signed-in" aria-hidden="true" />}
+            {to === '/account' && incoming.length > 0 && (
+              <span className="navbar-requests" title={t('friends.requests_title')} aria-label={`${t('friends.requests_title')} (${incoming.length})`}>
+                {incoming.length}
+              </span>
+            )}
           </NavLink>
         ))}
       </nav>

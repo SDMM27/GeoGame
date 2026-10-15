@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import i18n from '../../i18n'
 import { ProfileView } from './ProfileBody'
-import { computeStats, dayKey } from '../../utils/profileStats'
+import { computeStats, dailyTypesOn, dayKey } from '../../utils/profileStats'
 import { computeAchievements } from '../../utils/achievements'
 
 // Midi plutôt que l'heure réelle : lancé entre minuit et 5 h, le test débloquerait « Oiseau de nuit » (et « Lève-tôt » entre 5 h et 7 h)
@@ -34,7 +34,8 @@ describe('ProfileView', () => {
     expect(screen.getByText('Parties').previousSibling).toHaveTextContent('3')
     expect(screen.getByText('Pays trouvés').previousSibling).toHaveTextContent('30')
     expect(screen.getByText('1 jour')).toBeInTheDocument()
-    expect(screen.getByText('2/5')).toBeInTheDocument()
+    // Le nombre de jeux du jour dépend de la date (le Daily Challenge compte à partir du 2026-10-16)
+    expect(screen.getByText(`2/${dailyTypesOn(today).length}`)).toBeInTheDocument()
     expect(screen.getByText('120 pts · 30/40')).toBeInTheDocument()
     expect(screen.getByText('Trouvé · 3 essais')).toBeInTheDocument()
     expect(screen.getByText('Raté')).toBeInTheDocument()

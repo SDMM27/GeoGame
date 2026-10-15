@@ -19,10 +19,14 @@ import {
   searchAtlasCountries,
 } from '@shared/utils/countryInfo'
 
+import countryHistory from '@shared/data/countryHistory.json'
+import { HISTORY_COUNTRIES } from '@shared/utils/quizQuestions'
+
 import { WorldMap, type MapLayer, type WorldMapHandle } from '@/components/map/WorldMap'
-import { Text, Touchable } from '@/components/ui'
+import { Button, Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
 import { DIFFICULTY_COLORS } from '@/games'
+import { clean } from '@/i18n'
 import { colors, radius, space } from '@/theme'
 
 const SELECTED = { fillColor: '#7B2FF7', fillOpacity: 0.65, color: '#C4B5FD', weight: 2 }
@@ -47,6 +51,8 @@ type Info = {
   neighbors: Neighbor[]
   difficulty: { placement: string | null; flags: string | null; capitals: string | null }
 }
+
+type TimelineEvent = { year: string; text: Record<string, string> }
 
 function Fact({ label, value, rank }: { label: string; value: string; rank?: Rank }) {
   const { t } = useTranslation()
@@ -78,6 +84,8 @@ function CountrySheet({ info, onSelect, onClose, maxHeight }: { info: Info; onSe
       ['capitals', t('games.capitals.title'), info.difficulty.capitals],
     ] as const
   ).filter(([, , level]) => level)
+  const timeline = (info.iso ? (countryHistory as Record<string, TimelineEvent[]>)[info.iso] : null) ?? []
+  const hasHistoryQuiz = !!info.iso && (HISTORY_COUNTRIES as string[]).includes(info.iso)
 
   return (
     // No spring on Android, where it made the sheet bounce many times: a short fade and slide instead.
@@ -133,6 +141,31 @@ function CountrySheet({ info, onSelect, onClose, maxHeight }: { info: Info; onSe
             </View>
           )}
         </View>
+
+        {(timeline.length > 0 || hasHistoryQuiz) && (
+          <View style={{ gap: space.sm }}>
+            <Text variant="label">{t('atlas.history')}</Text>
+            {timeline.length > 0 && (
+              <View style={styles.timeline}>
+                {timeline.map((event) => (
+                  <View key={event.year} style={{ gap: 1 }}>
+                    <Text variant="label" color={colors.accent}>
+                      {event.year}
+                    </Text>
+                    <Text variant="body">{event.text[lang] ?? event.text.en}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+            {hasHistoryQuiz && (
+              <Button
+                label={clean(t('atlas.history_quiz'))}
+                variant="secondary"
+                onPress={() => router.push({ pathname: '/game/quiz', params: { mode: 'infinite', theme: 'history', country: info.iso as string } })}
+              />
+            )}
+          </View>
+        )}
 
         {games.length > 0 && (
           <View style={{ gap: space.sm }}>
@@ -317,4 +350,5 @@ const styles = StyleSheet.create({
   },
   chipFlag: { width: 22, height: 15, borderRadius: 2 },
   difficultyRow: { flexDirection: 'row', alignItems: 'center' },
+  timeline: { gap: space.sm, paddingLeft: space.md, borderLeftWidth: 2, borderLeftColor: colors.border },
 })

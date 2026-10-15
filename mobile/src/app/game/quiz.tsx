@@ -2,6 +2,7 @@
 // Daily: one free-answer question with a few attempts and hints. Infinite: practice at a chosen difficulty,
 // multiple choice or free answer. Game rules come from the website hooks (useDailyQuizState, useQuizState).
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
+import { Image } from 'expo-image'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -14,7 +15,16 @@ import useQuizState from '@shared/hooks/useQuizState'
 import { formatTime } from '@shared/utils/formatTime'
 import { useDailyPlayedElsewhere } from '@shared/hooks/useDailyPlayedElsewhere'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
-import { ANSWER_MODES, MAX_HINTS, QUIZ_DIFFICULTIES, getQuestionHints, localizeQuestion } from '@shared/utils/quizQuestions'
+import { getCountryName } from '@shared/utils/getCountryName'
+import {
+  ANSWER_MODES,
+  HISTORY_COUNTRIES,
+  MAX_HINTS,
+  QUIZ_DIFFICULTIES,
+  QUIZ_THEMES,
+  getQuestionHints,
+  localizeQuestion,
+} from '@shared/utils/quizQuestions'
 
 import { useAccount } from '@/account/auth'
 import { DailyLeaderboard } from '@/components/game/DailyLeaderboard'
@@ -22,6 +32,7 @@ import { DailyPlayedElsewhere } from '@/components/game/DailyPlayedElsewhere'
 import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
 import { Button, Segmented, Text, Touchable } from '@/components/ui'
+import { getFlag } from '@/flags'
 import { DIFFICULTY_COLORS } from '@/games'
 import { useElapsed } from '@/hooks/useElapsed'
 import { clean } from '@/i18n'
@@ -33,6 +44,9 @@ const ACCENT = gameColors.quiz
 const MODE_STORAGE_KEY = 'geogame_quiz_mode'
 
 type AnswerMode = 'choices' | 'free'
+type Theme = 'geo' | 'history'
+// Histoire, éventuellement sur un seul pays (depuis l'atlas)
+type Topic = { theme: Theme; country?: string | null }
 type Question = { difficulty: string; correctId: string }
 type Localized = { prompt: string; choices: { id: string; label: string }[]; answer: string; multipleAnswers: boolean; fact: string | null }
 
@@ -347,9 +361,19 @@ function DailyQuiz() {
 
 // ─── Practice (infinite) ───────────────────────────────────────────────────
 
-function DifficultyPicker({ onPick }: { onPick: (difficulty: string, mode: AnswerMode) => void }) {
-  const { t } = useTranslation()
+function DifficultyPicker({
+  onPick,
+  initialTheme,
+  country,
+}: {
+  onPick: (difficulty: string, mode: AnswerMode, topic: Topic) => void
+  initialTheme: Theme
+  country: string | null
+}) {
+  const { t, i18n } = useTranslation()
   const [mode, setMode] = useState<AnswerMode>(loadMode)
+  const [theme, setTheme] = useState<Theme>(initialTheme)
+  const flag = country ? getFlag(country) : null
 
   const changeMode = (next: AnswerMode) => {
     setMode(next)
@@ -358,6 +382,27 @@ function DifficultyPicker({ onPick }: { onPick: (difficulty: string, mode: Answe
 
   return (
     <View style={{ gap: space.lg }}>
+      {country ? (
+        <View style={styles.countryTitle}>
+          {flag && <Image source={flag} contentFit="cover" style={styles.countryFlag} />}
+          <Text variant="heading" style={{ flex: 1 }}>
+            {t('quiz.history.country_title', { country: getCountryName(country, i18n.language) ?? country })}
+          </Text>
+        </View>
+      ) : (
+        <View style={{ gap: space.sm }}>
+          <Text variant="label">{t('quiz.pick_theme')}</Text>
+          <Segmented<Theme>
+            value={theme}
+            onChange={setTheme}
+            options={[
+              { value: 'geo', label: clean(t('quiz.themes.geo')) },
+              { value: 'history', label: clean(t('quiz.themes.history')) },
+            ]}
+          />
+          <Text variant="caption">{t(`quiz.themes.${theme}_hint`)}</Text>
+        </View>
+      )}
       <View style={{ gap: space.sm }}>
         <Text variant="label">{t('quiz.pick_mode')}</Text>
         <Segmented<AnswerMode>
@@ -370,30 +415,47 @@ function DifficultyPicker({ onPick }: { onPick: (difficulty: string, mode: Answe
         />
         <Text variant="caption">{t(`quiz.modes.${mode}_hint`)}</Text>
       </View>
-      <View style={{ gap: space.sm }}>
-        <Text variant="label">{t('quiz.pick_difficulty')}</Text>
-        <Text variant="caption">{t('quiz.pick_difficulty_hint')}</Text>
-        <View style={styles.grid}>
-          {(QUIZ_DIFFICULTIES as string[]).map((difficulty) => (
-            <Touchable key={difficulty} accessibilityRole="button" onPress={() => onPick(difficulty, mode)} style={styles.difficulty}>
-              <Text variant="heading" color={DIFFICULTY_COLORS[difficulty]}>
-                {t(`difficulties.${difficulty}`)}
-              </Text>
-            </Touchable>
-          ))}
+      {country ? (
+        <View style={{ gap: space.sm }}>
+          <Text variant="caption">{t('quiz.history.country_hint')}</Text>
+          <Button label={t('buttons.play')} color={ACCENT} onPress={() => onPick('Impossible', mode, { theme: 'history', country })} />
         </View>
-      </View>
+      ) : (
+        <View style={{ gap: space.sm }}>
+          <Text variant="label">{t('quiz.pick_difficulty')}</Text>
+          <Text variant="caption">{t('quiz.pick_difficulty_hint')}</Text>
+          <View style={styles.grid}>
+            {(QUIZ_DIFFICULTIES as string[]).map((difficulty) => (
+              <Touchable key={difficulty} accessibilityRole="button" onPress={() => onPick(difficulty, mode, { theme })} style={styles.difficulty}>
+                <Text variant="heading" color={DIFFICULTY_COLORS[difficulty]}>
+                  {t(`difficulties.${difficulty}`)}
+                </Text>
+              </Touchable>
+            ))}
+          </View>
+        </View>
+      )}
     </View>
   )
 }
 
 // In a room (`play`): the room's difficulty and answer mode, the same questions for everyone, a fixed number of them.
-function PracticeQuiz({ play }: { play?: RoomPlay }) {
+function PracticeQuiz({
+  play,
+  presetTheme = 'geo',
+  presetCountry = null,
+}: {
+  play?: RoomPlay
+  presetTheme?: Theme
+  presetCountry?: string | null
+}) {
   const { t, i18n } = useTranslation()
   const insets = useSafeAreaInsets()
   const {
     maxDifficulty,
     answerMode,
+    theme,
+    country,
     question,
     selectedId,
     freeResult,
@@ -415,6 +477,8 @@ function PracticeQuiz({ play }: { play?: RoomPlay }) {
     backToDifficulty,
   } = useQuizState({ seed: play?.room.seed })
   const isFree = answerMode === ANSWER_MODES.FREE
+  // Le quiz d'histoire n'est ni enregistré ni partagé, pour ne pas fausser les scores du quiz géo
+  const isHistory = (maxDifficulty ? theme : presetTheme) === QUIZ_THEMES.HISTORY
   const [startedAt] = useState(() => Date.now())
   const questionCount = play?.content.total ?? 0
   const isLastQuestion = !!play && stats.answered >= questionCount
@@ -478,10 +542,16 @@ function PracticeQuiz({ play }: { play?: RoomPlay }) {
             {play
               ? t('mobile.multi.question', { n: Math.min(stats.answered + (isAnswered ? 0 : 1), questionCount), total: questionCount })
               : t('mobile.home.infinite')}{' '}
-            · {t('games.quiz.title')}
+            · {isHistory ? t('quiz.history.title') : t('games.quiz.title')}
           </Text>
 
-          {!maxDifficulty && !play && <DifficultyPicker onPick={(difficulty, mode) => start(difficulty, mode)} />}
+          {!maxDifficulty && !play && (
+            <DifficultyPicker
+              initialTheme={presetTheme}
+              country={presetCountry}
+              onPick={(difficulty, mode, topic) => start(difficulty, mode, topic)}
+            />
+          )}
 
           {maxDifficulty && !isFinished && localized && current && (
             <View style={styles.card}>
@@ -634,7 +704,7 @@ function PracticeQuiz({ play }: { play?: RoomPlay }) {
             { label: t('quiz.best_streak'), value: `${stats.bestStreak}` },
           ]}
           record={
-            stats.answered > 0
+            stats.answered > 0 && !isHistory
               ? {
                   gameType: GAME_TYPES.QUIZ,
                   mode: play ? 'multi' : 'infinite',
@@ -648,7 +718,7 @@ function PracticeQuiz({ play }: { play?: RoomPlay }) {
               : null
           }
           share={
-            stats.answered > 0 && !play
+            stats.answered > 0 && !play && !isHistory
               ? {
                   gameType: GAME_TYPES.QUIZ,
                   difficulty: maxDifficulty,
@@ -657,7 +727,7 @@ function PracticeQuiz({ play }: { play?: RoomPlay }) {
                 }
               : null
           }
-          onReplay={play ? undefined : () => start(maxDifficulty, answerMode)}
+          onReplay={play ? undefined : () => start(maxDifficulty, answerMode, { theme, country })}
           onHome={play?.exit ?? (() => navigate('/'))}
           homeLabel={play ? t('mobile.multi.back_to_room') : undefined}>
           {play ? (
@@ -672,9 +742,12 @@ function PracticeQuiz({ play }: { play?: RoomPlay }) {
 }
 
 export default function QuizScreen() {
-  const { mode = 'daily', room } = useLocalSearchParams<{ mode?: string; room?: string }>()
+  const { mode = 'daily', room, theme, country } = useLocalSearchParams<{ mode?: string; room?: string; theme?: string; country?: string }>()
   if (room) return <RoomGate code={room}>{(play) => <PracticeQuiz play={play} />}</RoomGate>
-  return mode === 'infinite' ? <PracticeQuiz /> : <DailyQuiz />
+  // /game/quiz?mode=infinite&theme=history[&country=FR] : arrivée depuis la fiche d'un pays de l'atlas
+  const presetCountry = country && (HISTORY_COUNTRIES as string[]).includes(country) ? country : null
+  const presetTheme: Theme = presetCountry || theme === QUIZ_THEMES.HISTORY ? 'history' : 'geo'
+  return mode === 'infinite' ? <PracticeQuiz presetTheme={presetTheme} presetCountry={presetCountry} /> : <DailyQuiz />
 }
 
 const styles = StyleSheet.create({
@@ -734,6 +807,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceHigh,
   },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
+  countryTitle: { flexDirection: 'row', alignItems: 'center', gap: space.md },
+  countryFlag: { width: 40, height: 27, borderRadius: 4 },
   difficulty: {
     flexBasis: '48%',
     flexGrow: 1,

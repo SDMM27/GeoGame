@@ -44,7 +44,7 @@
   "games": {
     "daily_challenge": {
       "title": "Desafío del día",
-      "description": "12 preguntas: ubica países, reconoce banderas, nombra capitales. El mismo desafío para todos."
+      "description": "12 preguntas: países, banderas, capitales. El mismo desafío para todos."
     },
     "placement": {
       "title": "Encuentra el País",
@@ -68,11 +68,11 @@
     },
     "voyage_voyage": {
       "title": "Voyage Voyage",
-      "description": "Une dos países pasando por sus fronteras comunes. ¡Encuentra el camino más corto!"
+      "description": "Une dos países por sus fronteras comunes. ¡Encuentra el camino más corto!"
     },
     "ranking": {
       "title": "Country Ranking",
-      "description": "Ordena países de mayor a menor según un criterio: población, superficie o PIB."
+      "description": "Ordena países de mayor a menor: población, superficie o PIB."
     },
     "placement_countries": {
       "title": "Colocar el País",
@@ -80,7 +80,7 @@
     },
     "quiz": {
       "title": "Quiz Geo",
-      "description": "Una pregunta al día para retar a tus amigos, o una serie de preguntas con la dificultad que elijas."
+      "description": "Una pregunta al día para retar a tus amigos, o una serie de preguntas."
     },
     "survival": {
       "title": "Supervivencia",

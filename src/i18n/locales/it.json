@@ -44,7 +44,7 @@
   "games": {
     "daily_challenge": {
       "title": "Sfida del giorno",
-      "description": "12 domande: posiziona i paesi, riconosci le bandiere, indica le capitali. La stessa sfida per tutti."
+      "description": "12 domande: paesi, bandiere, capitali. La stessa sfida per tutti."
     },
     "placement": {
       "title": "Trova il Paese",
@@ -68,11 +68,11 @@
     },
     "voyage_voyage": {
       "title": "Voyage Voyage",
-      "description": "Collega due paesi passando per i confini in comune. Trova il percorso più breve!"
+      "description": "Collega due paesi tramite i confini in comune. Trova il percorso più breve!"
     },
     "ranking": {
       "title": "Country Ranking",
-      "description": "Ordina i paesi dal più grande al più piccolo secondo un criterio: popolazione, superficie o PIL."
+      "description": "Ordina i paesi dal più grande al più piccolo: popolazione, superficie o PIL."
     },
     "placement_countries": {
       "title": "Posiziona il Paese",
@@ -80,7 +80,7 @@
     },
     "quiz": {
       "title": "Quiz Geo",
-      "description": "Una domanda al giorno per sfidare i tuoi amici, oppure una serie di domande alla difficoltà che preferisci."
+      "description": "Una domanda al giorno per sfidare gli amici, oppure una serie di domande."
     },
     "survival": {
       "title": "Sopravvivenza",

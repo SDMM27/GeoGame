@@ -44,7 +44,7 @@
   "games": {
     "daily_challenge": {
       "title": "Tages-Challenge",
-      "description": "12 Fragen: Länder auf der Karte finden, Flaggen erkennen, Hauptstädte nennen. Dieselbe Challenge für alle."
+      "description": "12 Fragen: Länder, Flaggen, Hauptstädte. Dieselbe Challenge für alle."
     },
     "placement": {
       "title": "Finde das Land",
@@ -72,7 +72,7 @@
     },
     "ranking": {
       "title": "Country Ranking",
-      "description": "Ordne Länder vom größten zum kleinsten nach einem Kriterium: Einwohner, Fläche oder BIP."
+      "description": "Ordne Länder vom größten zum kleinsten: Einwohner, Fläche oder BIP."
     },
     "placement_countries": {
       "title": "Länder platzieren",
@@ -80,7 +80,7 @@
     },
     "quiz": {
       "title": "Geo-Quiz",
-      "description": "Eine Frage pro Tag, um deine Freunde herauszufordern, oder Fragen am Stück in der Schwierigkeit deiner Wahl."
+      "description": "Eine Frage pro Tag, um Freunde herauszufordern, oder Fragen am Stück."
     },
     "survival": {
       "title": "Survival",

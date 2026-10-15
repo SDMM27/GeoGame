@@ -44,7 +44,7 @@
   "games": {
     "daily_challenge": {
       "title": "Desafio do dia",
-      "description": "12 perguntas: localize países, reconheça bandeiras, diga capitais. O mesmo desafio para todos."
+      "description": "12 perguntas: países, bandeiras, capitais. O mesmo desafio para todos."
     },
     "placement": {
       "title": "Encontre o País",
@@ -68,7 +68,7 @@
     },
     "voyage_voyage": {
       "title": "Voyage Voyage",
-      "description": "Ligue dois países passando pelas fronteiras em comum. Encontre o caminho mais curto!"
+      "description": "Ligue dois países pelas fronteiras em comum. Encontre o caminho mais curto!"
     },
     "ranking": {
       "title": "Country Ranking",
@@ -80,7 +80,7 @@
     },
     "quiz": {
       "title": "Quiz Geo",
-      "description": "Uma pergunta por dia para desafiar seus amigos, ou uma sequência de perguntas na dificuldade que você quiser."
+      "description": "Uma pergunta por dia para desafiar seus amigos, ou uma sequência delas."
     },
     "survival": {
       "title": "Sobrevivência",

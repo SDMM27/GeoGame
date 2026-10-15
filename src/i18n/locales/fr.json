@@ -44,7 +44,7 @@
   "games": {
     "daily_challenge": {
       "title": "Challenge du jour",
-      "description": "12 questions : place des pays, reconnais des drapeaux, nomme des capitales. Le même défi pour tous."
+      "description": "12 questions du jour : pays, drapeaux, capitales. Le même défi pour tous."
     },
     "placement": {
       "title": "Trouve le Pays",
@@ -68,11 +68,11 @@
     },
     "voyage_voyage": {
       "title": "Voyage Voyage",
-      "description": "Relie deux pays en passant par leurs frontières communes. Trouve le chemin le plus court !"
+      "description": "Relie deux pays par leurs frontières communes. Trouve le chemin le plus court !"
     },
     "ranking": {
       "title": "Country Ranking",
-      "description": "Classe des pays du plus grand au plus petit selon un critère : population, superficie ou PIB."
+      "description": "Classe des pays du plus grand au plus petit : population, superficie ou PIB."
     },
     "placement_countries": {
       "title": "Placement Pays",
@@ -80,7 +80,7 @@
     },
     "quiz": {
       "title": "Quiz Géo",
-      "description": "Une question du jour pour défier tes amis, ou enchaîne les questions à la difficulté de ton choix."
+      "description": "Une question du jour pour défier tes amis, ou enchaîne les questions."
     },
     "survival": {
       "title": "Survie",

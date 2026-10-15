@@ -44,7 +44,7 @@
   "games": {
     "daily_challenge": {
       "title": "Daily Challenge",
-      "description": "12 questions: place countries, recognise flags, name capitals. The same challenge for everyone."
+      "description": "12 daily questions: countries, flags, capitals. The same challenge for everyone."
     },
     "placement": {
       "title": "Find the Country",
@@ -72,7 +72,7 @@
     },
     "ranking": {
       "title": "Country Ranking",
-      "description": "Rank countries from largest to smallest by criterion: population, area or GDP."
+      "description": "Rank countries from largest to smallest: population, area or GDP."
     },
     "placement_countries": {
       "title": "Country Placement",
@@ -80,7 +80,7 @@
     },
     "quiz": {
       "title": "Geo Quiz",
-      "description": "A daily question to challenge your friends, or keep answering questions at the difficulty of your choice."
+      "description": "A daily question to challenge your friends, or keep answering questions."
     },
     "survival": {
       "title": "Survival",

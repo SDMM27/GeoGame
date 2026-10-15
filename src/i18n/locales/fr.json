@@ -554,6 +554,9 @@
   },
   "daily_challenge": {
     "rules": "12 questions, les mêmes pour tout le monde aujourd’hui : place des pays sur la carte, reconnais des drapeaux, nomme des capitales. Un seul essai par question, {{seconds}} s chacune, pas de vies. Ton score est le nombre de bonnes réponses ; le temps total départage les égalités. Tu ne peux jouer qu’une fois par jour.",
+    "level": "Niveau du jour : {{label}} ({{n}}/7)",
+    "levels": {"1": "Très facile", "2": "Facile", "3": "Abordable", "4": "Moyen", "5": "Corsé", "6": "Difficile", "7": "Redoutable"},
+    "week_note": "Du lundi au dimanche, le challenge devient de plus en plus difficile. Dimanche, accroche-toi !",
     "start": "Lancer le challenge",
     "continue": "Reprendre le challenge",
     "resumed_note": "Tu as quitté la page pendant une question : elle compte comme ratée.",

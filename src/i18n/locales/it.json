@@ -554,6 +554,9 @@
   },
   "daily_challenge": {
     "rules": "12 domande, uguali per tutti oggi: trova i paesi sulla mappa, riconosci le bandiere, indica le capitali. Un solo tentativo per domanda, {{seconds}} s ciascuna, niente vite. Il tuo punteggio è il numero di risposte esatte; il tempo totale decide i pareggi. Puoi giocare una sola volta al giorno.",
+    "level": "Livello del giorno: {{label}} ({{n}}/7)",
+    "levels": {"1": "Molto facile", "2": "Facile", "3": "Abbordabile", "4": "Medio", "5": "Impegnativo", "6": "Difficile", "7": "Tremendo"},
+    "week_note": "Dal lunedì alla domenica, la sfida diventa ogni giorno più difficile. La domenica è tremenda!",
     "start": "Inizia la sfida",
     "continue": "Continua la sfida",
     "resumed_note": "Hai lasciato la pagina durante una domanda: conta come sbagliata.",

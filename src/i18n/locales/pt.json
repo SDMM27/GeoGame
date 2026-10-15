@@ -554,6 +554,9 @@
   },
   "daily_challenge": {
     "rules": "12 perguntas, as mesmas para todos hoje: localize países no mapa, reconheça bandeiras, diga capitais. Uma só tentativa por pergunta, {{seconds}} s cada, sem vidas. Sua pontuação é o número de acertos; o tempo total desempata. Você só pode jogar uma vez por dia.",
+    "level": "Nível do dia: {{label}} ({{n}}/7)",
+    "levels": {"1": "Muito fácil", "2": "Fácil", "3": "Acessível", "4": "Médio", "5": "Puxado", "6": "Difícil", "7": "Brutal"},
+    "week_note": "De segunda a domingo, o desafio fica mais difícil a cada dia. Domingo é brutal!",
     "start": "Começar o desafio",
     "continue": "Continuar o desafio",
     "resumed_note": "Você saiu durante uma pergunta: ela conta como errada.",

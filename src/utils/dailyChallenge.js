@@ -9,8 +9,35 @@ export const CHALLENGE_ROUND_TYPES = [GAME_TYPES.PLACEMENT, GAME_TYPES.FLAGS, GA
 export const CHALLENGE_ROUNDS = 12
 // Seconds per round
 export const CHALLENGE_TIMER = 20
-// Rounds at each difficulty (Facile, Moyen, Difficile): 4 + 4 + 4
+// Rounds at each difficulty (Facile, Moyen, Difficile): 4 + 4 + 4. The ramp of the days before WEEKLY_RAMP_SINCE.
 export const CHALLENGE_RAMP = { Facile: 4, Moyen: 4, Difficile: 4 }
+
+// From this day on, the difficulty follows the day of the week, like a puzzle of the day: Monday the easiest, Sunday
+// very hard. The days before keep CHALLENGE_RAMP, so that their rounds (and the runs already played) don't change.
+export const WEEKLY_RAMP_SINCE = '2026-10-19'
+// Rounds at each difficulty from Monday to Sunday; the rounds left after them are Impossible (Saturday 4, Sunday 8)
+export const CHALLENGE_WEEK_RAMPS = [
+  { Facile: 8, Moyen: 4, Difficile: 0 },
+  { Facile: 6, Moyen: 4, Difficile: 2 },
+  { Facile: 4, Moyen: 4, Difficile: 4 },
+  { Facile: 2, Moyen: 4, Difficile: 6 },
+  { Facile: 0, Moyen: 4, Difficile: 8 },
+  { Facile: 0, Moyen: 2, Difficile: 6 },
+  { Facile: 0, Moyen: 0, Difficile: 4 },
+]
+
+/** Level of the day's challenge, 1 (Monday) to 7 (Sunday); null before WEEKLY_RAMP_SINCE or for no day. */
+export function challengeLevel(dailyKey) {
+  if (!dailyKey || dailyKey < WEEKLY_RAMP_SINCE) return null
+  const day = new Date(`${dailyKey}T12:00:00Z`).getUTCDay()
+  return Number.isNaN(day) ? null : ((day + 6) % 7) + 1
+}
+
+/** The difficulty ramp of a day (see survivalDifficulty). */
+export function challengeRamp(dailyKey) {
+  const level = challengeLevel(dailyKey)
+  return level ? CHALLENGE_WEEK_RAMPS[level - 1] : CHALLENGE_RAMP
+}
 
 // Stable 32-bit hash of the day, so that everybody plays the same rounds (and the same on the site and in the app)
 export function challengeSeed(dailyKey) {

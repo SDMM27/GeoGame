@@ -554,6 +554,9 @@
   },
   "daily_challenge": {
     "rules": "12 preguntas, las mismas para todos hoy: ubica países en el mapa, reconoce banderas, nombra capitales. Un solo intento por pregunta, {{seconds}} s cada una, sin vidas. Tu puntuación es el número de aciertos; el tiempo total desempata. Solo puedes jugar una vez al día.",
+    "level": "Nivel del día: {{label}} ({{n}}/7)",
+    "levels": {"1": "Muy fácil", "2": "Fácil", "3": "Asequible", "4": "Medio", "5": "Exigente", "6": "Difícil", "7": "Temible"},
+    "week_note": "De lunes a domingo, el desafío se vuelve cada día más difícil. ¡El domingo es temible!",
     "start": "Empezar el desafío",
     "continue": "Continuar el desafío",
     "resumed_note": "Saliste durante una pregunta: cuenta como fallada.",

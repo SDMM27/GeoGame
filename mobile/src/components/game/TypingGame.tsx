@@ -2,7 +2,7 @@
 // Game rules come from the website hooks (useFlagGameState / useCapitalsGameState / useAscensionState).
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { Image } from 'expo-image'
-import { useEffect, useEffectEvent, useRef } from 'react'
+import { memo, useCallback, useEffect, useEffectEvent, useRef, type Ref } from 'react'
 import { useTranslation } from 'react-i18next'
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, View } from 'react-native'
 import Animated, { FadeIn, FadeInDown, ZoomIn } from 'react-native-reanimated'
@@ -93,6 +93,12 @@ export function TypingGame({
       !isGameOver &&
       matchKnownAnswer(inputValue, config.acceptedAnswers(targetCountry), { whileTyping: true })
   )
+  // Stable identity so AnswerInput skips the timer's re-renders
+  const handleSubmitRef = useRef(handleSubmit)
+  useEffect(() => {
+    handleSubmitRef.current = handleSubmit
+  })
+  const submitAnswer = useCallback(() => handleSubmitRef.current(), [])
   const autoSubmit = useEffectEvent(() => handleSubmit())
   useEffect(() => {
     if (shouldAutoSubmit) autoSubmit()
@@ -211,21 +217,13 @@ export function TypingGame({
 
         {!isGameOver && (
           <View style={[styles.inputBar, { paddingBottom: inputBarPadding }]}>
-            <TextInput
+            <AnswerInput
               ref={inputRef}
               value={inputValue}
               onChangeText={setInputValue}
-              onSubmitEditing={() => handleSubmit()}
-              submitBehavior="submit"
+              onSubmit={submitAnswer}
               placeholder={t(config.placeholderKey)}
-              placeholderTextColor={colors.textFaint}
-              autoCapitalize="words"
-              autoCorrect={false}
-              spellCheck={false}
-              autoComplete="off"
-              returnKeyType="send"
-              editable={!locked}
-              style={[styles.input, locked && { opacity: 0.5 }]}
+              locked={locked}
             />
             <Touchable
               accessibilityRole="button"
@@ -295,6 +293,43 @@ export function TypingGame({
     </View>
   )
 }
+
+// Memoized: the game timer re-renders the screen every 100 ms, and re-rendering a controlled
+// TextInput that often makes Android keyboards drop keystrokes (backspace stops working).
+const AnswerInput = memo(function AnswerInput({
+  ref,
+  value,
+  onChangeText,
+  onSubmit,
+  placeholder,
+  locked,
+}: {
+  ref: Ref<TextInput>
+  value: string
+  onChangeText: (value: string) => void
+  onSubmit: () => void
+  placeholder: string
+  locked: boolean
+}) {
+  return (
+    <TextInput
+      ref={ref}
+      value={value}
+      onChangeText={onChangeText}
+      onSubmitEditing={onSubmit}
+      submitBehavior="submit"
+      placeholder={placeholder}
+      placeholderTextColor={colors.textFaint}
+      autoCapitalize="words"
+      autoCorrect={false}
+      spellCheck={false}
+      autoComplete="off"
+      returnKeyType="send"
+      editable={!locked}
+      style={[styles.input, locked && { opacity: 0.5 }]}
+    />
+  )
+})
 
 const styles = StyleSheet.create({
   content: { paddingHorizontal: space.xl, paddingBottom: space.xl, gap: space.xl },

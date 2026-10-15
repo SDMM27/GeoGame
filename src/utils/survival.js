@@ -79,12 +79,16 @@ function countryTiers(type, seed) {
 
 /**
  * Takes a country of difficulty `tier` from `tiers` (removing it). When there are none left: the next harder ones,
- * then the next easier ones. Null when the game has no country left.
+ * then the next easier ones. Null when the game has no country left. Countries of `used` (a Set of ADMIN names) are skipped.
  */
-function takeCountry(tiers, tier) {
+function takeCountry(tiers, tier, used = null) {
   const order = [...TIERS.keys()].filter((i) => i >= tier).concat([...TIERS.keys()].filter((i) => i < tier).reverse())
   for (const i of order) {
-    if (tiers[i].length) return { country: tiers[i].shift(), difficulty: TIERS[i] }
+    while (tiers[i].length) {
+      const country = tiers[i].shift()
+      // A country already used by another round is dropped for good
+      if (!used?.has(country.properties.ADMIN)) return { country, difficulty: TIERS[i] }
+    }
   }
   return null
 }
@@ -100,8 +104,9 @@ const typeSeed = (seed, type) => {
  * Each cycle plays every chosen game once, in a shuffled order (never the same game twice in a row). The difficulty
  * rises with the round number, whatever the game, as the ramp `steps` says (survivalDifficulty).
  * A game whose countries are all used drops out; the run ends after SURVIVAL_MAX_ROUNDS.
+ * `distinctCountries`: a country used by a round never comes back in another round, whatever the game (Daily Challenge).
  */
-export function buildSurvivalRounds(types, seed, max = SURVIVAL_MAX_ROUNDS, steps = null) {
+export function buildSurvivalRounds(types, seed, max = SURVIVAL_MAX_ROUNDS, steps = null, { distinctCountries = false } = {}) {
   const modes = normalizeSurvivalModes(types)
   if (modes.length === 0) return []
   const tiers = Object.fromEntries(
@@ -109,6 +114,7 @@ export function buildSurvivalRounds(types, seed, max = SURVIVAL_MAX_ROUNDS, step
   )
   const quizRandom = mulberry32(typeSeed(seed, GAME_TYPES.QUIZ))
   const quizKeys = new Set()
+  const usedCountries = distinctCountries ? new Set() : null
   const rounds = []
 
   for (let cycle = 0; rounds.length < max; cycle++) {
@@ -125,8 +131,9 @@ export function buildSurvivalRounds(types, seed, max = SURVIVAL_MAX_ROUNDS, step
         question.usedKeys.forEach((key) => quizKeys.add(key))
         rounds.push({ type, difficulty: question.difficulty, question })
       } else {
-        const taken = takeCountry(tiers[type], TIERS.indexOf(difficulty))
+        const taken = takeCountry(tiers[type], TIERS.indexOf(difficulty), usedCountries)
         if (!taken) continue
+        usedCountries?.add(taken.country.properties.ADMIN)
         rounds.push({ type, ...taken })
       }
       added += 1

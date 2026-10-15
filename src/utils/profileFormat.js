@@ -1,5 +1,6 @@
 // Labels for a game of the history (see gameHistory.js), shared by the website and the app.
 import { formatTime } from './formatTime'
+import { CHALLENGE_ROUNDS } from './dailyChallenge'
 import { GAME_TYPES } from './gameTypes'
 
 const formatPoints = (score) => (Number.isInteger(score) ? String(score) : score.toFixed(1))
@@ -28,6 +29,7 @@ export function describeMode(game, t) {
 export function describeResult(game, t) {
   const parts = []
   if (game.gameType === GAME_TYPES.SURVIVAL) return t('survival.rounds_count', { count: game.score ?? 0 })
+  if (game.gameType === GAME_TYPES.DAILY_CHALLENGE) return `${game.score ?? 0}/${game.total ?? CHALLENGE_ROUNDS}`
   if (game.solved != null && game.attempts != null && game.score == null) {
     parts.push(game.solved ? t('profile.solved') : t('profile.failed'))
     if (game.solved) parts.push(t('profile.attempts_count', { count: game.attempts }))
@@ -41,6 +43,9 @@ export function describeResult(game, t) {
 
 // Best result of a game type for the "by game" list.
 export function describeBest(gameStats, t, gameType = null) {
+  if (gameType === GAME_TYPES.DAILY_CHALLENGE && gameStats.bestScore != null) {
+    return t('profile.best_challenge', { score: `${gameStats.bestScore}/${CHALLENGE_ROUNDS}` })
+  }
   if (gameType === GAME_TYPES.SURVIVAL && gameStats.bestScore != null) {
     return t('survival.best', { rounds: t('survival.rounds_count', { count: gameStats.bestScore }) })
   }
@@ -82,7 +87,9 @@ export function describeDetails(game, t, language) {
       'score',
       game.gameType === GAME_TYPES.SURVIVAL
         ? t('survival.rounds_count', { count: game.score })
-        : `${formatPoints(game.score)} ${t('units.pts')}`
+        : game.gameType === GAME_TYPES.DAILY_CHALLENGE
+          ? `${game.score}/${game.total ?? CHALLENGE_ROUNDS}`
+          : `${formatPoints(game.score)} ${t('units.pts')}`
     )
   }
   const ratio = (part, whole) =>

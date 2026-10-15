@@ -56,6 +56,12 @@ describe('compareToChallenge', () => {
     expect(compareToChallenge('QUIZ', { score: 2, solved: true }, { score: 4, solved: true })).toBe('win')
   })
 
+  it('the Daily Challenge: more right answers wins, a 0 is a score like another', () => {
+    expect(compareToChallenge('DAILY_CHALLENGE', { score: 9, solved: true }, { score: 7, solved: true })).toBe('win')
+    expect(compareToChallenge('DAILY_CHALLENGE', { score: 0, solved: true }, { score: 4, solved: true })).toBe('lose')
+    expect(compareToChallenge('DAILY_CHALLENGE', { score: 6, solved: true }, { score: 6, solved: true })).toBe('tie')
+  })
+
   it('point games: higher score wins', () => {
     expect(compareToChallenge('RANKING', { score: 80 }, { score: 60 })).toBe('win')
     expect(compareToChallenge('VOYAGE_VOYAGE', { score: 6.5 }, { score: 7 })).toBe('lose')

@@ -56,8 +56,20 @@ export function buildPresetPhases(name) {
 }
 
 // Like the app (mobile/src/games.ts): `kind` 'daily' games have a daily challenge and an infinite mode, 'setup' and
-// 'survival' games open their settings first. `multiId`: the game's id in multiplayer rooms (null: not playable there).
+// 'survival' games open their settings first (`dailyOnly`: no infinite mode). `multiId`: the game's id in multiplayer rooms (null: not playable there).
 export const GAMES = [
+  {
+    id: GAME_TYPES.DAILY_CHALLENGE,
+    kind: "daily",
+    // Only a daily challenge: no infinite mode
+    dailyOnly: true,
+    multiId: null,
+    icon: "🎯",
+    titleKey: "games.daily_challenge.title",
+    descKey: "games.daily_challenge.description",
+    route: "/challenge",
+    active: true,
+  },
   {
     id: GAME_TYPES.PLACEMENT,
     kind: "setup",

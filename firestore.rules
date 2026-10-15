@@ -541,8 +541,10 @@ service cloud.firestore {
                     resource.data.globalScore, resource.data.get('globalTimeMs', null));
     }
 
-    // Daily challenges (all with name and uid?), two shapes:
+    // Daily challenges (all with name and uid?), three shapes:
     //  - Country Ranking: { name, gameType: 'RANKING', dailyKey, score, totalError, attemptsUsed, playerOrder }
+    //  - Daily Challenge: { name, gameType: 'DAILY_CHALLENGE', dailyKey, score, elapsedTime, results } (12 rounds, one
+    //                     boolean each, score = right answers, saved even at 0; the shortest time breaks ties)
     //  - other games:     { name, gameType, dailyKey, attempts, elapsedTime, guesses, hints? } (fewer attempts wins)
     // A daily is saved once solved, so it took at least one attempt. Limits come from the games: quiz tries and hints,
     // the guessable names (Border Guess, Country Clue), the countries of a Voyage Voyage chain (whose elapsedTime holds
@@ -605,8 +607,30 @@ service cloud.firestore {
               || (data.playerOrder is list && data.playerOrder.size() <= caps['players']));
       }
 
+      function challengeCaps() {
+        return {
+          // scoreCaps:begin challengeCaps
+          'rounds': 12,
+          'minTime': 1200
+          // scoreCaps:end challengeCaps
+        };
+      }
+
+      function validChallenge(data) {
+        let caps = challengeCaps();
+        return data.gameType == 'DAILY_CHALLENGE'
+          && data.keys().hasOnly(['name', 'uid', 'gameType', 'dailyKey', 'score', 'elapsedTime', 'results'])
+          && data.keys().hasAll(['name', 'gameType', 'dailyKey', 'score', 'elapsedTime', 'results'])
+          && data.score is int
+          && inRange(data.score, caps['rounds'])
+          && inRange(data.elapsedTime, 1000000000) && data.elapsedTime >= caps['minTime']
+          && data.results is list && data.results.size() == caps['rounds']
+          && data.results.hasOnly([true, false])
+          && data.score <= data.results.size();
+      }
+
       function validAttempts(data) {
-        return data.gameType != 'RANKING'
+        return data.gameType != 'RANKING' && data.gameType != 'DAILY_CHALLENGE'
           && data.keys().hasOnly(['name', 'uid', 'gameType', 'dailyKey', 'attempts', 'elapsedTime', 'guesses', 'hints'])
           && data.keys().hasAll(['name', 'gameType', 'dailyKey', 'attempts'])
           && data.attempts >= 1
@@ -622,7 +646,7 @@ service cloud.firestore {
           && validOwner(data)
           && validLabel(data.gameType)
           && validLabel(data.dailyKey)
-          && (validRanking(data) || validAttempts(data));
+          && (validRanking(data) || validChallenge(data) || validAttempts(data));
       }
 
       // A daily is played once: its saved score is never replaced, so replaying it on another device

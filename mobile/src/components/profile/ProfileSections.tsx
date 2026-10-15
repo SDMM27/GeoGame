@@ -8,7 +8,7 @@ import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, View } fro
 import { usePlayerProfile } from '@shared/hooks/usePlayerProfile'
 import { TIER_COLORS } from '@shared/utils/achievements'
 import { describeBest, describeDetails, describeMode, describeResult, formatPlayedAt } from '@shared/utils/profileFormat'
-import { DAILY_GAME_TYPES, formatPlayTime } from '@shared/utils/profileStats'
+import { dailyTypesOn, dayKey, formatPlayTime } from '@shared/utils/profileStats'
 
 import { Button, Text, Touchable } from '@/components/ui'
 import { getGameByType } from '@/games'
@@ -109,7 +109,9 @@ export function StatTiles({ stats }: { stats: ProfileStats }) {
 
 export function StreakCard({ stats }: { stats: ProfileStats }) {
   const { t } = useTranslation()
-  const doneToday = DAILY_GAME_TYPES.filter((type: string) => stats.todayDaily[type]).length
+  // Dailies of today that the app knows
+  const todayTypes = dailyTypesOn(dayKey()).filter((type: string) => getGameByType(type))
+  const doneToday = todayTypes.filter((type: string) => stats.todayDaily[type]).length
   const alive = stats.streak.current > 0
   const [selected, setSelected] = useState<string | null>(null)
   const selectedGame = selected ? stats.todayDaily[selected] : undefined
@@ -134,7 +136,7 @@ export function StreakCard({ stats }: { stats: ProfileStats }) {
       <View style={{ gap: space.sm }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <Text variant="caption">{t('profile.today_title')}</Text>
-          <Text variant="caption">{t('profile.today_done', { done: doneToday, total: DAILY_GAME_TYPES.length })}</Text>
+          <Text variant="caption">{t('profile.today_done', { done: doneToday, total: todayTypes.length })}</Text>
         </View>
         <DailyChips today={stats.todayDaily} onSelect={setSelected} />
       </View>
@@ -157,7 +159,7 @@ export function DailyChips({
   const { t } = useTranslation()
   return (
     <View style={{ flexDirection: 'row', gap: space.sm }}>
-      {DAILY_GAME_TYPES.map((type: string) => {
+      {dailyTypesOn(dayKey()).map((type: string) => {
         const game = getGameByType(type)
         const result = today[type]
         if (!game) return null

@@ -128,6 +128,56 @@ describe('useSurvivalState', () => {
     expect(resumed.result.current.score).toBe(1)
   })
 
+  it('keeps the result of each round, and plays maxRounds rounds of different countries', () => {
+    const { result } = play({ modes: [FLAGS, PLACEMENT], lives: 50, seed: 3, maxRounds: 3, distinctCountries: true })
+    expect(result.current.totalRounds).toBe(3)
+    expect(result.current.results).toEqual([null, null, null])
+    act(() => { result.current.submitText(result.current.round.country.properties.ADMIN) })
+    act(() => { vi.advanceTimersByTime(1000) })
+    act(() => { result.current.giveUp() })
+    expect(result.current.results).toEqual(['correct', 'failed', null])
+    act(() => { vi.advanceTimersByTime(2500) })
+    act(() => { vi.advanceTimersByTime(20000) })
+    expect(result.current.results).toEqual(['correct', 'failed', null])
+    expect(result.current.rounds.map((round) => round.country.properties.ADMIN)).toHaveLength(3)
+  })
+
+  it('saves and restores the results of a multiplayer run', () => {
+    const key = 'mp_snap_RES_p_0'
+    const { result, unmount } = play({ modes: [FLAGS], lives: 5, seed: 1, snapshotKey: key })
+    act(() => { result.current.submitText('zzzz') })
+    act(() => { vi.advanceTimersByTime(2500) })
+    act(() => { result.current.submitText(result.current.round.country.properties.ADMIN) })
+    const snapshot = loadSnapshot(key)
+    expect(snapshot.results.slice(0, 2)).toEqual(['failed', 'correct'])
+    unmount()
+    const resumed = play({ modes: [FLAGS], lives: 5, seed: 1, snapshot, snapshotKey: key })
+    expect(resumed.result.current.results.slice(0, 3)).toEqual(['failed', 'correct', null])
+  })
+
+  it('runs nothing while paused, then starts from the snapshot', () => {
+    const snapshot = { index: 2, errors: 1, score: 1, results: ['failed', 'correct'], elapsedMs: 5000 }
+    const { result, rerender } = renderHook(({ paused }) => useSurvivalState({ modes: [FLAGS], lives: 5, seed: 1, timer: 15, paused, snapshot }), {
+      initialProps: { paused: true },
+    })
+    act(() => { vi.advanceTimersByTime(60000) })
+    expect(result.current.isPlaying).toBe(false)
+    expect(result.current.timeLeftMs).toBe(null)
+    expect(result.current.submitText('zzzz')).toBe(null)
+    // The clock doesn't move
+    expect(result.current.elapsedMs).toBe(5000)
+    rerender({ paused: false })
+    expect(result.current.roundIndex).toBe(2)
+    expect(result.current.score).toBe(1)
+    expect(result.current.results.slice(0, 3)).toEqual(['failed', 'correct', null])
+    expect(result.current.isPlaying).toBe(true)
+    expect(result.current.timeLeftMs).toBe(15000)
+    expect(result.current.elapsedMs).toBe(5000)
+    act(() => { vi.advanceTimersByTime(15000) })
+    expect(result.current.outcome).toBe('failed')
+    expect(result.current.results[2]).toBe('failed')
+  })
+
   it('ends the run as a win when the room says everyone else is out', () => {
     const { result } = play({ modes: [FLAGS], lives: 3, seed: 1, autoAdvance: false })
     act(() => { result.current.submitText('zzzz') })

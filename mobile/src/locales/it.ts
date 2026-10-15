@@ -210,6 +210,8 @@ export const it: MobileStrings = {
     languages_title: "GeoGame ora parla 7 lingue",
     languages_body: "Spagnolo, portoghese, tedesco e italiano si aggiungono a francese, inglese e russo. Paesi, capitali e quiz sono tradotti, e le tue risposte sono accettate in tutte queste lingue.",
     pick_language: "Scegli la tua lingua",
+    challenge_title: "Novità: la Sfida del giorno",
+    challenge_body: "12 domande uguali per tutti: posiziona i paesi sulla mappa, riconosci le bandiere, indica le capitali. Un tentativo al giorno, confronta il tuo punteggio con quello dei tuoi amici.",
     ok: "Andiamo!",
   },
   common: {

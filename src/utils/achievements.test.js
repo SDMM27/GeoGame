@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { ACHIEVEMENTS, TIERS, computeAchievements } from './achievements'
 import { BADGES_SHOWN, badgeSummary, readBadges } from './badges'
-import { computeStats } from './profileStats'
+import { DAILY_GAME_TYPES, computeStats } from './profileStats'
 
 vi.mock('../Firebase', () => ({ firestore: {} }))
 vi.mock('firebase/firestore', () => ({ doc: vi.fn(), getDoc: vi.fn(), updateDoc: vi.fn() }))
@@ -60,6 +60,21 @@ describe('achievements', () => {
     const days = ['2026-10-01', '2026-10-02', '2026-10-03', '2026-10-04', '2026-10-05', '2026-10-06']
     expect(unlockedIds(days.flatMap(day))).not.toContain('sweep_7')
     expect(unlockedIds([...days, '2026-10-07'].flatMap(day))).toEqual(expect.arrayContaining(['sweep_7', 'daily_sweep']))
+  })
+
+  it('count a sweep with the dailies there were that day', () => {
+    const before = ['BORDER_GUESS', 'COUNTRY_CLUE', 'VOYAGE_VOYAGE', 'RANKING', 'QUIZ']
+    const day = (dailyKey, types) => types.map((gameType) => game({ gameType, mode: 'daily', dailyKey, solved: true, attempts: 3 }))
+    const progress = (games) => computeAchievements({ stats: computeStats(games, '2026-10-20'), games }).find((a) => a.id === 'daily_sweep')
+    // A sweep made before the Daily Challenge existed still counts, whatever the number of dailies now
+    expect(progress(day('2026-10-14', before))).toMatchObject({ progress: DAILY_GAME_TYPES.length, unlocked: true })
+    // After it, the five are no longer a sweep
+    expect(progress(day('2026-10-17', before))).toMatchObject({ progress: 5, unlocked: false })
+    expect(progress(day('2026-10-17', [...before, 'DAILY_CHALLENGE']))).toMatchObject({ progress: DAILY_GAME_TYPES.length, unlocked: true })
+    const sweeps = (days) => unlockedIds(days.flatMap(([dailyKey, types]) => day(dailyKey, types)))
+    const old = ['2026-10-10', '2026-10-11', '2026-10-12', '2026-10-13', '2026-10-14', '2026-10-15'].map((d) => [d, before])
+    expect(sweeps([...old, ['2026-10-16', before]])).not.toContain('sweep_7')
+    expect(sweeps([...old, ['2026-10-16', [...before, 'DAILY_CHALLENGE']]])).toContain('sweep_7')
   })
 
   it('leave the Ranking out of "first try", and check its error for a perfect one', () => {

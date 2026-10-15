@@ -8,11 +8,12 @@ import { TIER_COLORS } from '../../utils/achievements'
 import { badgeSummary, readBadges } from '../../utils/badges'
 import { GAME_TYPES } from '../../utils/gameTypes'
 import { describeBest, describeDetails, describeMode, describeResult, formatPlayedAt } from '../../utils/profileFormat'
-import { DAILY_GAME_TYPES, formatPlayTime } from '../../utils/profileStats'
+import { dailyTypesOn, dayKey, formatPlayTime } from '../../utils/profileStats'
 import BadgeStrip from './BadgeStrip'
 import './ProfileBody.css'
 
 export const GAME_META = {
+  [GAME_TYPES.DAILY_CHALLENGE]: { emoji: '🎯', titleKey: 'games.daily_challenge.title', color: '#FF9F45' },
   [GAME_TYPES.PLACEMENT]: { emoji: '🌍', titleKey: 'games.placement.title', color: '#7AA2FF' },
   [GAME_TYPES.FLAGS]: { emoji: '🚩', titleKey: 'games.flags.title', color: '#FF7A6B' },
   [GAME_TYPES.CAPITALS]: { emoji: '🏛️', titleKey: 'games.capitals.title', color: '#F5B83D' },
@@ -45,7 +46,7 @@ export function DailyChips({ today, small = false, onSelect }) {
   const { t } = useTranslation()
   return (
     <div className={`profile-daily-chips${small ? ' profile-daily-chips--small' : ''}`}>
-      {DAILY_GAME_TYPES.map((type) => {
+      {dailyTypesOn(dayKey()).map((type) => {
         const meta = GAME_META[type]
         const result = today[type]
         const props = {
@@ -92,7 +93,8 @@ function StatTiles({ stats }) {
 
 function StreakCard({ stats }) {
   const { t } = useTranslation()
-  const doneToday = DAILY_GAME_TYPES.filter((type) => stats.todayDaily[type]).length
+  const todayTypes = dailyTypesOn(dayKey())
+  const doneToday = todayTypes.filter((type) => stats.todayDaily[type]).length
   const alive = stats.streak.current > 0
   const [selected, setSelected] = useState(null)
   return (
@@ -111,7 +113,7 @@ function StreakCard({ stats }) {
       <div className="profile-streak-today">
         <div className="profile-row-between">
           <small>{t('profile.today_title')}</small>
-          <small>{t('profile.today_done', { done: doneToday, total: DAILY_GAME_TYPES.length })}</small>
+          <small>{t('profile.today_done', { done: doneToday, total: todayTypes.length })}</small>
         </div>
         <DailyChips today={stats.todayDaily} onSelect={setSelected} />
       </div>

@@ -28,6 +28,7 @@ import {
   survivalModesKey,
 } from '@shared/utils/survivalConfig'
 
+import { ChallengeLeaderboard } from '@/components/game/ChallengeLeaderboard'
 import { DailyLeaderboard } from '@/components/game/DailyLeaderboard'
 import { RankingLeaderboard } from '@/components/game/RankingLeaderboard'
 import { AscensionLeaderboard } from '@/components/leaderboards/AscensionLeaderboard'
@@ -220,7 +221,9 @@ export default function LeaderboardsScreen() {
             value={day}
             onChange={setDay}
           />
-          {dailyGame === GAME_TYPES.RANKING ? (
+          {dailyGame === GAME_TYPES.DAILY_CHALLENGE ? (
+            <ChallengeLeaderboard dailyKey={day} refreshKey={refreshKey} maxRows={50} onSettled={onSettled} />
+          ) : dailyGame === GAME_TYPES.RANKING ? (
             <RankingLeaderboard dailyKey={day} refreshKey={refreshKey} maxRows={50} onSettled={onSettled} />
           ) : (
             <DailyLeaderboard

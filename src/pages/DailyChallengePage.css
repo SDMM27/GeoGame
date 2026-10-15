@@ -1,0 +1,131 @@
+/* src/pages/DailyChallengePage.css */
+
+/* HUD: one dot per round, in place of the hearts of a survival run */
+.challenge-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 120px;
+}
+
+.challenge-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--border-color);
+}
+
+.challenge-dot--correct {
+  background: var(--success);
+}
+
+.challenge-dot--failed {
+  background: var(--danger);
+}
+
+.challenge-dot--current {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.challenge-resumed {
+  margin: 0 0 12px;
+  color: var(--warning);
+  font-weight: 600;
+}
+
+/* Result */
+.challenge-result {
+  text-align: center;
+}
+
+.challenge-score {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.challenge-score strong {
+  font-size: clamp(3.2rem, 14vw, 5rem);
+  font-weight: 900;
+  line-height: 1;
+  color: var(--accent);
+}
+
+.challenge-score span {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+.challenge-score-label,
+.challenge-time {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+}
+
+.challenge-time strong {
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.challenge-rounds-title {
+  margin: 24px 0 10px;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.challenge-rounds {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  text-align: left;
+}
+
+.challenge-round {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.challenge-round--correct {
+  border-color: var(--success);
+  background: var(--success-dim);
+}
+
+.challenge-round--failed {
+  border-color: var(--danger);
+  background: var(--danger-dim);
+}
+
+.challenge-round-answer {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.challenge-come-back {
+  margin: 20px 0 0;
+}
+
+@media (max-width: 600px) {
+  .challenge-rounds {
+    grid-template-columns: 1fr;
+  }
+
+  .challenge-dots {
+    max-width: none;
+  }
+}

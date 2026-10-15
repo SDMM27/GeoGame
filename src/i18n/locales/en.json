@@ -42,6 +42,10 @@
     "multi": "Play multiplayer"
   },
   "games": {
+    "daily_challenge": {
+      "title": "Daily Challenge",
+      "description": "12 questions: place countries, recognise flags, name capitals. The same challenge for everyone."
+    },
     "placement": {
       "title": "Find the Country",
       "description": "Find all countries of the chosen difficulty."
@@ -534,6 +538,23 @@
       "between": "Between {{min}} and {{max}}"
     }
   },
+  "daily_challenge": {
+    "rules": "12 questions, the same for everyone today: find countries on the map, name flags and capitals. One try per question, {{seconds}} s each, no lives. Your score is the number of right answers; the total time breaks ties. You can only play once a day.",
+    "start": "Start the challenge",
+    "continue": "Continue the challenge",
+    "resumed_note": "You left during a question: it counts as missed.",
+    "round": "Question {{n}}/{{total}}",
+    "correct_short": "right",
+    "skip": "Skip",
+    "result_title": "Challenge complete!",
+    "score_label": "Right answers",
+    "time_label": "Total time",
+    "rounds_title": "Your 12 questions",
+    "col_score": "Score",
+    "share_label": "RIGHT ANSWERS",
+    "share_time": "Time: {{time}}",
+    "come_back": "Come back tomorrow for a new challenge!"
+  },
   "account": {
     "title": "My account",
     "signin_tab": "Sign in",
@@ -603,6 +624,7 @@
     "games_count_one": "{{count}} game",
     "games_count_other": "{{count}} games",
     "best_score": "Best {{score}} pts",
+    "best_challenge": "Best {{score}}",
     "best_attempts_one": "Best: {{count}} attempt",
     "best_attempts_other": "Best: {{count}} attempts",
     "wins": "{{wins}}/{{dailies}} challenges solved",
@@ -1086,6 +1108,10 @@
     "quiz": {
       "title": "Geo Quiz — Daily geography quiz | GeoGame",
       "description": "One geography question a day to challenge your friends, or keep answering questions at the difficulty of your choice."
+    },
+    "daily_challenge": {
+      "title": "Daily Challenge — 12 geography questions a day | GeoGame",
+      "description": "Every day, the same 12 questions for everyone: find countries on the map, name flags and capitals. Beat your friends and climb the leaderboard."
     },
     "survival": {
       "title": "Survival — Chain geography games | GeoGame",

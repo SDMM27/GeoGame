@@ -102,7 +102,12 @@ function dailyLimits() {
   // Sum of |position - right position| over n items is at most floor(n * n / 2) (the reversed list).
   const worstError = Math.floor((rankingCount * rankingCount) / 2)
 
+  // Daily Challenge: 12 rounds, a point per right answer (src/utils/dailyChallenge.js, which node can't import)
+  const challengeRounds = Number(constantFrom('src/utils/dailyChallenge.js', /export const CHALLENGE_ROUNDS = (\d+)/, 'challenge rounds'))
+
   return {
+    // Rounds (one point each) and the least time for all of them: nobody answers a round faster than MIN_MS_PER_COUNTRY
+    challenge: { rounds: challengeRounds, minTime: challengeRounds * MIN_MS_PER_COUNTRY },
     attempts: { BORDER_GUESS: guessable, COUNTRY_CLUE: guessable, QUIZ: quizAttempts, VOYAGE_VOYAGE: voyageCountries },
     hints: { BORDER_GUESS: 0, COUNTRY_CLUE: 0, QUIZ: quizHints, VOYAGE_VOYAGE: hintKinds },
     // Voyage Voyage stores its wrong guesses in elapsedTime (a count, not a time)
@@ -137,6 +142,7 @@ export function computeLimits() {
     dailyHints: daily.hints,
     dailyWrong: daily.voyageWrong,
     rankingCaps: daily.ranking,
+    challengeCaps: daily.challenge,
   }
   return { maps, solo, ascension, daily }
 }
@@ -180,6 +186,8 @@ function print({ solo, ascension, daily }) {
     'RANKING attemptsUsed <=': { value: daily.ranking.attemptsUsed, from: `${daily.sources.rankingStages} criteria x MAX_ATTEMPTS (useRankingGameState)` },
     'RANKING score + attemptsUsed <=': { value: daily.ranking.scoreAndAttempts, from: 'getRankingAttemptScore(1) + 1 per criterion' },
     'RANKING playerOrder length <=': { value: daily.ranking.players, from: 'DAILY_COUNT, or one line per criterion' },
+    'DAILY_CHALLENGE score / results length <=': { value: daily.challenge.rounds, from: 'CHALLENGE_ROUNDS (dailyChallenge.js)' },
+    'DAILY_CHALLENGE elapsedTime >=': { value: daily.challenge.minTime, from: `${daily.challenge.rounds} rounds x ${MIN_MS_PER_COUNTRY} ms` },
     'daily attempts >=': { value: 1, from: 'a daily is saved once solved: at least one guess or step' },
   })
 }

@@ -4,7 +4,7 @@
 
 export type WhatsNewNote = {
   id: string
-  icon: 'translate'
+  icon: 'translate' | 'target'
   titleKey: string
   bodyKey: string
   /** Offers the language list under the text. */
@@ -18,6 +18,12 @@ export const WHATS_NEW: WhatsNewNote[] = [
     titleKey: 'mobile.whats_new.languages_title',
     bodyKey: 'mobile.whats_new.languages_body',
     languagePicker: true,
+  },
+  {
+    id: '2026-10-new-daily-challenge',
+    icon: 'target',
+    titleKey: 'mobile.whats_new.challenge_title',
+    bodyKey: 'mobile.whats_new.challenge_body',
   },
 ]
 

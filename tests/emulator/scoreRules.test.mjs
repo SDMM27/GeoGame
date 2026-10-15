@@ -53,6 +53,18 @@ const dailies = (overrides = {}) =>
 const rankings = (overrides = {}) =>
   clean({ name: 'Alice', uid: 'alice', gameType: 'RANKING', dailyKey: '2026-10-08', score: 2, totalError: 0, attemptsUsed: 2, playerOrder: ['A', 'B', 'C', 'D', 'E'], ...overrides })
 
+const challenges = (overrides = {}) =>
+  clean({
+    name: 'Alice',
+    uid: 'alice',
+    gameType: 'DAILY_CHALLENGE',
+    dailyKey: '2026-10-16',
+    score: 9,
+    elapsedTime: 95000,
+    results: [true, true, true, false, true, true, true, false, true, true, false, true],
+    ...overrides,
+  })
+
 beforeAll(async () => {
   env = await initializeTestEnvironment({
     projectId: 'geogame-sdmm',
@@ -259,6 +271,48 @@ describe('daily scores', () => {
     await assertFails(as('alice').collection('daily_scores').add(ranking({ dailyKey: 'g', score: 0, attemptsUsed: 10 })))
     await assertFails(as('alice').collection('daily_scores').add(ranking({ dailyKey: 'h', attemptsUsed: 0 })))
     await assertFails(as('alice').collection('daily_scores').add(ranking({ dailyKey: 'i', playerOrder: new Array(6).fill('A') })))
+  })
+
+  it('accepts a Daily Challenge from 0 to 12 right answers, whoever the player is', async () => {
+    const twelve = Array(12).fill(true)
+    await assertSucceeds(as('alice').collection('daily_scores').add(challenges()))
+    await assertSucceeds(as('alice').collection('daily_scores').add(challenges({ dailyKey: 'a', score: 12, results: twelve })))
+    await assertSucceeds(as('alice').collection('daily_scores').add(challenges({ dailyKey: 'b', score: 0, results: Array(12).fill(false) })))
+    await assertSucceeds(anonymous().collection('daily_scores').add(challenges({ name: 'Zoe', uid: undefined })))
+    await assertSucceeds(as('alice').collection('daily_scores').add(challenges({ dailyKey: 'c', elapsedTime: daily.challenge.minTime })))
+  })
+
+  it('refuses a Daily Challenge with an impossible score, results or time', async () => {
+    const add = (overrides) => as('alice').collection('daily_scores').add(challenges(overrides))
+    await assertFails(add({ dailyKey: 'a', score: 13, results: Array(12).fill(true) }))
+    await assertFails(add({ dailyKey: 'b', score: -1 }))
+    await assertFails(add({ dailyKey: 'c', score: 8.5 }))
+    await assertFails(add({ dailyKey: 'd', score: 1000000 }))
+    // not 12 rounds
+    await assertFails(add({ dailyKey: 'e', results: Array(11).fill(true), score: 5 }))
+    await assertFails(add({ dailyKey: 'f', results: Array(13).fill(true), score: 5 }))
+    // not booleans
+    await assertFails(add({ dailyKey: 'g', results: Array(12).fill('correct') }))
+    await assertFails(add({ dailyKey: 'h', results: 'yes' }))
+    // faster than a round can be played, or not a time at all
+    await assertFails(add({ dailyKey: 'i', elapsedTime: daily.challenge.minTime - 1 }))
+    await assertFails(add({ dailyKey: 'j', elapsedTime: 1000000001 }))
+    await assertFails(add({ dailyKey: 'k', elapsedTime: undefined }))
+    await assertFails(add({ dailyKey: 'l', results: undefined }))
+    // keys of another game
+    await assertFails(add({ dailyKey: 'm', attempts: 3 }))
+    await assertFails(add({ dailyKey: 'n', guesses: ['A'] }))
+  })
+
+  it('never replaces a saved Daily Challenge', async () => {
+    const ref = await as('alice').collection('daily_scores').add(challenges({ score: 4 }))
+    await assertFails(as('alice').doc(ref.path).set(challenges({ score: 12, results: Array(12).fill(true) })))
+    await assertFails(as('alice').doc(ref.path).update({ score: 5 }))
+  })
+
+  it('does not take a Daily Challenge for another daily', async () => {
+    // the other games' shape with the challenge's game type
+    await assertFails(as('alice').collection('daily_scores').add(dailies({ gameType: 'DAILY_CHALLENGE' })))
   })
 
   it('never replaces a saved daily, even with a better one', async () => {

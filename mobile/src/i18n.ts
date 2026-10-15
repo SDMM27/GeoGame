@@ -221,6 +221,8 @@ const fr = {
     languages_title: "GeoGame parle 7 langues",
     languages_body: "L'espagnol, le portugais, l'allemand et l'italien rejoignent le français, l'anglais et le russe. Les pays, les capitales et le quiz sont traduits, et tes réponses sont acceptées dans toutes ces langues.",
     pick_language: "Choisis ta langue",
+    challenge_title: "Nouveau : le Challenge du jour",
+    challenge_body: "12 questions identiques pour tout le monde : place des pays, reconnais des drapeaux, nomme des capitales. Une seule tentative par jour, compare ton score à celui de tes amis.",
     ok: "C'est parti !",
   },
   common: {
@@ -447,6 +449,8 @@ const en: MobileStrings = {
     languages_title: "GeoGame now speaks 7 languages",
     languages_body: "Spanish, Portuguese, German and Italian join French, English and Russian. Countries, capitals and the quiz are translated, and your answers are accepted in all of them.",
     pick_language: "Pick your language",
+    challenge_title: "New: the Daily Challenge",
+    challenge_body: "12 questions, the same for everyone: place countries, recognise flags, name capitals. One try a day, then compare your score with your friends.",
     ok: "Let's go!",
   },
   common: {
@@ -671,6 +675,8 @@ const ru: MobileStrings = {
     languages_title: "GeoGame теперь говорит на 7 языках",
     languages_body: "К французскому, английскому и русскому добавились испанский, португальский, немецкий и итальянский. Страны, столицы и викторина переведены, а ответы принимаются на любом из этих языков.",
     pick_language: "Выбери язык",
+    challenge_title: "Новинка: испытание дня",
+    challenge_body: "12 одинаковых для всех вопросов: найди страны на карте, узнай флаги, назови столицы. Одна попытка в день, сравни свой результат с друзьями.",
     ok: "Поехали!",
   },
   common: {

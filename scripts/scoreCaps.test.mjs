@@ -10,6 +10,11 @@ describe('score caps', () => {
     expect({ stale, missing }).toEqual({ stale: [], missing: [] })
   })
 
+  it('give the Daily Challenge its 12 rounds and a minimum time', () => {
+    const { maps } = computeLimits()
+    expect(maps.challengeCaps).toEqual({ rounds: 12, minTime: 1200 })
+  })
+
   it('leave room above the best run and never below it', () => {
     const { solo, ascension } = computeLimits()
     for (const row of [...solo.rows, ...ascension.rows]) expect(row.cap).toBeGreaterThan(row.max)

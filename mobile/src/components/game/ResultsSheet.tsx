@@ -9,9 +9,11 @@ import Animated, { FadeIn, FadeInDown, ZoomIn } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { buildChallengeUrl } from '@shared/utils/challenge'
+import { CHALLENGE_ROUNDS } from '@shared/utils/dailyChallenge'
 import { formatTime } from '@shared/utils/formatTime'
 import { useScoreSave } from '@shared/hooks/useScoreSave'
-import { saveAscensionScore, saveDailyScore, saveRankingScore, saveScore, saveSurvivalScore } from '@shared/utils/saveScore'
+import { saveAscensionScore, saveChallengeScore, saveDailyScore, saveRankingScore, saveScore, saveSurvivalScore } from '@shared/utils/saveScore'
+import { GAME_TYPES } from '@shared/utils/gameTypes'
 import { generateShareText } from '@shared/utils/shareScore'
 
 import { useAccount } from '@/account/auth'
@@ -37,6 +39,8 @@ export type SaveConfig =
       // Shown for an existing better score; defaults to its time
       formatSecondary?: (elapsedTime: number | null | undefined) => string
     }
+  // Daily Challenge: `score` is the right answers, `results` the 12 rounds
+  | { kind: 'challenge'; dailyKey: string; elapsedTime: number; results: boolean[] }
   | { kind: 'ranking'; dailyKey: string; totalError: number; attemptsUsed: number; playerOrder: string[] }
   // Survival: `score` is the rounds cleared
   | { kind: 'survival'; modes: string; lives: number; timer: number; ramp: string; elapsedTime: number }
@@ -46,6 +50,9 @@ export type ShareConfig = {
   difficulty?: string | null
   details?: string
   scoreLabel?: string
+  // The score as the text reads it ("9/12"), and lines under the details (the Daily Challenge's rounds)
+  scoreText?: string
+  grid?: string
   // Daily games: share a link to beat this score (website route, e.g. '/border-guess')
   challenge?: { route: string; dailyKey: string; solved: boolean } | null
 }
@@ -74,9 +81,11 @@ type Props = {
 const dailySavedKey = (save: SaveConfig | null | undefined) =>
   save?.kind === 'daily'
     ? `daily-saved:${save.gameType}:${save.dailyKey}`
-    : save?.kind === 'ranking'
-      ? `ranking-saved:${save.dailyKey}`
-      : null
+    : save?.kind === 'challenge'
+      ? `daily-saved:${GAME_TYPES.DAILY_CHALLENGE}:${save.dailyKey}`
+      : save?.kind === 'ranking'
+        ? `ranking-saved:${save.dailyKey}`
+        : null
 
 export function ResultsSheet({ title, score, scoreText, scoreLabel, accent = colors.accent, stats, save, share, record, onReplay, onHome, homeLabel, onSaved, children }: Props) {
   const { t } = useTranslation()
@@ -97,6 +106,8 @@ export function ResultsSheet({ title, score, scoreText, scoreLabel, accent = col
       const result =
         save.kind === 'daily'
           ? await saveDailyScore({ ...player, ...save })
+          : save.kind === 'challenge'
+            ? await saveChallengeScore({ ...player, ...save, score })
           : save.kind === 'ranking'
             ? await saveRankingScore({ ...player, score, ...save })
             : save.kind === 'survival'
@@ -129,6 +140,9 @@ export function ResultsSheet({ title, score, scoreText, scoreLabel, accent = col
     if (save?.kind === 'ranking') {
       return `${existing.score} ${t('units.pts')} · ${existing.totalError} ${t('units.position', { count: existing.totalError })}`
     }
+    if (save?.kind === 'challenge') {
+      return `${existing.score}/${CHALLENGE_ROUNDS} · ${existing.elapsedTime != null ? formatTime(existing.elapsedTime) : '—'}`
+    }
     const value =
       save?.kind === 'daily'
         ? `${existing.attempts} ${existing.attempts === 1 ? t('units.attempt_one') : t('units.attempt_other')}`
@@ -141,7 +155,7 @@ export function ResultsSheet({ title, score, scoreText, scoreLabel, accent = col
         : formatTime(existing.elapsedTime ?? existing.timeMs ?? 0)
     return `${value} · ${secondary}`
   }
-  const isDaily = save?.kind === 'daily' || save?.kind === 'ranking'
+  const isDaily = save?.kind === 'daily' || save?.kind === 'challenge' || save?.kind === 'ranking'
 
   const onShare = async () => {
     if (!share) return

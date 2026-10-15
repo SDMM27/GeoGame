@@ -2,6 +2,8 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import { compareToChallenge, isAttemptsGame, parseChallenge } from '../utils/challenge'
+import { GAME_TYPES } from '../utils/gameTypes'
+import { CHALLENGE_ROUNDS } from '../utils/dailyChallenge'
 import './ChallengeBanner.css'
 
 // Bandeau affiché quand la page est ouverte depuis un lien de défi.
@@ -16,6 +18,7 @@ export default function ChallengeBanner({ gameType, dailyKey, result }) {
   const isStale = Boolean(challenge.day && dailyKey && challenge.day !== dailyKey)
 
   const formatScore = ({ score, solved }) => {
+    if (gameType === GAME_TYPES.DAILY_CHALLENGE) return `${score}/${CHALLENGE_ROUNDS}`
     if (!isAttemptsGame(gameType)) return t('challenge.points', { score })
     return solved ? t('challenge.attempts', { count: score }) : t('challenge.not_found')
   }

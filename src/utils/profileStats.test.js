@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { computeStats, computeStreaks, formatPlayTime, previousDayKey } from './profileStats'
+import { DAILY_GAME_TYPES, computeStats, computeStreaks, dailyTypesOn, formatPlayTime, previousDayKey } from './profileStats'
 import { computeAchievements } from './achievements'
 import { splitFriendships } from './friends'
 
@@ -7,6 +7,15 @@ describe('previousDayKey', () => {
   it('crosses months and years', () => {
     expect(previousDayKey('2026-03-01')).toBe('2026-02-28')
     expect(previousDayKey('2026-01-01')).toBe('2025-12-31')
+  })
+})
+
+describe('dailyTypesOn', () => {
+  it('lists the dailies there were on a day: the Daily Challenge from its first day', () => {
+    expect(DAILY_GAME_TYPES[0]).toBe('DAILY_CHALLENGE')
+    expect(dailyTypesOn('2026-10-15')).toEqual(DAILY_GAME_TYPES.filter((type) => type !== 'DAILY_CHALLENGE'))
+    expect(dailyTypesOn('2026-10-16')).toEqual(DAILY_GAME_TYPES)
+    expect(dailyTypesOn('2027-01-01')).toEqual(DAILY_GAME_TYPES)
   })
 })
 

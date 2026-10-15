@@ -11,6 +11,7 @@ vi.mock('../i18n', () => {
     'games.country_clue.title': 'Country Clue',
     'games.ranking.title': 'Country Ranking',
     'games.voyage_voyage.title': 'Voyage Voyage',
+    'games.daily_challenge.title': 'Challenge du jour',
     'share.played_by': 'joué par',
     'share.can_you_beat': 'Peux-tu faire mieux ?',
     'share.anonymous': 'Anonyme',
@@ -164,6 +165,15 @@ describe('generateShareText', () => {
   it('includes details line when provided', () => {
     const text = generateShareText({ score: 5, gameType: 'BORDER_GUESS', difficulty: 'Daily', pseudo: 'X', details: 'Trouvé en 2 essais' })
     expect(text).toContain('📊 Trouvé en 2 essais')
+  })
+
+  it('shows the Daily Challenge as x/12 with its grid under the details', () => {
+    const grid = '🗺️✅ 🏳️❌ 🏛️✅ 🗺️✅'
+    const text = generateShareText({ score: 3, gameType: 'DAILY_CHALLENGE', difficulty: 'Daily', pseudo: 'X', scoreText: '3/12', details: '1:23', grid })
+    expect(text).toContain('Challenge du jour')
+    expect(text).toContain('🏆 3/12 | Daily')
+    expect(text.indexOf('📊 1:23')).toBeLessThan(text.indexOf(grid))
+    expect(text).not.toContain('POINTS')
   })
 
   it('omits details line when not provided', () => {

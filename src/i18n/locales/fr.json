@@ -42,6 +42,10 @@
     "multi": "Jouer en multijoueur"
   },
   "games": {
+    "daily_challenge": {
+      "title": "Challenge du jour",
+      "description": "12 questions : place des pays, reconnais des drapeaux, nomme des capitales. Le même défi pour tous."
+    },
     "placement": {
       "title": "Trouve le Pays",
       "description": "Trouve tous les pays de la difficulté choisie."
@@ -534,6 +538,23 @@
       "between": "Entre {{min}} et {{max}}"
     }
   },
+  "daily_challenge": {
+    "rules": "12 questions, les mêmes pour tout le monde aujourd’hui : place des pays sur la carte, reconnais des drapeaux, nomme des capitales. Un seul essai par question, {{seconds}} s chacune, pas de vies. Ton score est le nombre de bonnes réponses ; le temps total départage les égalités. Tu ne peux jouer qu’une fois par jour.",
+    "start": "Lancer le challenge",
+    "continue": "Reprendre le challenge",
+    "resumed_note": "Tu as quitté la page pendant une question : elle compte comme ratée.",
+    "round": "Question {{n}}/{{total}}",
+    "correct_short": "bonnes",
+    "skip": "Passer",
+    "result_title": "Challenge terminé !",
+    "score_label": "Bonnes réponses",
+    "time_label": "Temps total",
+    "rounds_title": "Tes 12 questions",
+    "col_score": "Score",
+    "share_label": "BONNES RÉPONSES",
+    "share_time": "Temps : {{time}}",
+    "come_back": "Reviens demain pour un nouveau challenge !"
+  },
   "account": {
     "title": "Mon compte",
     "signin_tab": "Connexion",
@@ -603,6 +624,7 @@
     "games_count_one": "{{count}} partie",
     "games_count_other": "{{count}} parties",
     "best_score": "Record {{score}} pts",
+    "best_challenge": "Meilleur {{score}}",
     "best_attempts_one": "Meilleur : {{count}} essai",
     "best_attempts_other": "Meilleur : {{count}} essais",
     "wins": "{{wins}}/{{dailies}} défis réussis",
@@ -1086,6 +1108,10 @@
     "quiz": {
       "title": "Quiz Géo — Quiz de géographie quotidien | GeoGame",
       "description": "Une question de géographie par jour pour défier tes amis, ou enchaîne les questions à la difficulté de ton choix."
+    },
+    "daily_challenge": {
+      "title": "Challenge du jour — 12 questions de géographie par jour | GeoGame",
+      "description": "Chaque jour, les mêmes 12 questions pour tous : place des pays sur la carte, reconnais des drapeaux, nomme des capitales. Bats tes amis et grimpe au classement."
     },
     "survival": {
       "title": "Survie — Enchaîne les jeux de géographie | GeoGame",

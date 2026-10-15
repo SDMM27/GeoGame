@@ -1,6 +1,6 @@
 import { addDoc, collection, doc, getDoc, getDocs, limit, orderBy, query, serverTimestamp, setDoc, where } from 'firebase/firestore'
 import { firestore } from '../Firebase'
-import { sortDailyScores } from './dailyScores'
+import { sortChallengeScores, sortDailyScores } from './dailyScores'
 import { sortRankingScores } from './rankingScores'
 import { LEADERBOARD_SIZE, ascensionLeaderboard, ascensionQuery, soloLeaderboard, soloQueries, sortSurvivalScores } from './leaderboards'
 import { GAME_TYPES } from './gameTypes'
@@ -114,6 +114,19 @@ export function saveRankingScore({ name, uid, dailyKey, score, totalError, attem
   )
 }
 
+// Daily Challenge score (right answers out of 12, then the total time): one per player and day, saved even at 0.
+// `results`: one boolean per round, right or not.
+export function saveChallengeScore({ name, uid, dailyKey, score, elapsedTime, results }) {
+  return saveBest(
+    'daily_scores',
+    { name, uid },
+    { gameType: GAME_TYPES.DAILY_CHALLENGE, dailyKey },
+    { score, elapsedTime, results },
+    neverReplace,
+    (previous) => ({ score: previous.score, elapsedTime: previous.elapsedTime })
+  )
+}
+
 // Survival score: best one per player, set of games (`modes`, see survivalModesKey), lives, timer and preset ramp.
 export function saveSurvivalScore({ name, uid, modes, lives, timer, ramp, score, elapsedTime }) {
   return saveBest(
@@ -135,6 +148,18 @@ export async function fetchDailyScores(gameType, dailyKey) {
     query(collection(firestore, 'daily_scores'), where('gameType', '==', gameType), where('dailyKey', '==', dailyKey))
   )
   return sortDailyScores(snapshot.docs.map(withId))
+}
+
+// Daily Challenge scores of one day, best first.
+export async function fetchChallengeScores(dailyKey) {
+  const snapshot = await getDocs(
+    query(
+      collection(firestore, 'daily_scores'),
+      where('gameType', '==', GAME_TYPES.DAILY_CHALLENGE),
+      where('dailyKey', '==', dailyKey)
+    )
+  )
+  return sortChallengeScores(snapshot.docs.map(withId))
 }
 
 // Country Ranking scores of one day, best first (the best LEADERBOARD_SIZE).

@@ -7,7 +7,8 @@ import './ShareScoreButton.css'
 
 // `challenge` ({ route, dailyKey, solved }) : à fournir en mode daily pour afficher
 // le bouton « Défier un ami », qui partage un lien vers le même défi du jour.
-export default function ShareScoreButton({ score, gameType, difficulty, scoreLabel = 'POINTS', details, challenge }) {
+// `scoreText` (« 9/12 ») et `grid` (les manches du Challenge du jour) : voir generateShareText.
+export default function ShareScoreButton({ score, gameType, difficulty, scoreLabel = 'POINTS', scoreText, details, grid, challenge }) {
   const { t } = useTranslation()
   const [pseudo, setPseudo] = useState(() => localStorage.getItem('geogame_pseudo') ?? '')
   const [copied, setCopied] = useState(false)
@@ -16,7 +17,7 @@ export default function ShareScoreButton({ score, gameType, difficulty, scoreLab
   const handleCopy = async () => {
     localStorage.setItem('geogame_pseudo', pseudo)
     try {
-      await copyShareText({ score, gameType, difficulty, pseudo, scoreLabel, details })
+      await copyShareText({ score, gameType, difficulty, pseudo, scoreLabel, scoreText, details, grid })
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch (err) {
@@ -34,7 +35,7 @@ export default function ShareScoreButton({ score, gameType, difficulty, scoreLab
       solved: challenge.solved,
     })
     try {
-      const result = await shareChallenge({ score, gameType, difficulty, pseudo, scoreLabel, details, challengeUrl })
+      const result = await shareChallenge({ score, gameType, difficulty, pseudo, scoreLabel, scoreText, details, grid, challengeUrl })
       if (result === 'copied') {
         setChallengeCopied(true)
         setTimeout(() => setChallengeCopied(false), 2000)

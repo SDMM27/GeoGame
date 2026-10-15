@@ -3,7 +3,7 @@
 // `emoji` is used by the website, `icon` (MaterialCommunityIcons) by the app.
 // `tier` ranks the badge (see TIERS): a player's best badges are the highest tiers they unlocked (src/utils/badges.js).
 import { GAME_TYPES } from './gameTypes'
-import { DAILY_GAME_TYPES } from './profileStats'
+import { DAILY_GAME_TYPES, dailyTypesOn } from './profileStats'
 
 const ALL_GAME_TYPES = Object.values(GAME_TYPES)
 
@@ -176,21 +176,26 @@ function bestGamesInADay(games) {
   return Math.max(0, ...Object.values(perDay))
 }
 
-// Daily challenges done per day.
+// Daily challenges done per day, as [dailies there were that day, done among them].
 function dailyTypesByDay(games) {
   const perDay = {}
   for (const game of games) {
     if (!isDaily(game) || !game.dailyKey) continue
     ;(perDay[game.dailyKey] ??= new Set()).add(game.gameType)
   }
-  return Object.values(perDay)
+  return Object.entries(perDay).map(([day, types]) => {
+    const existing = dailyTypesOn(day)
+    return [existing, existing.filter((type) => types.has(type))]
+  })
 }
 
-// Most daily challenges done on a single day.
-const bestDailySweep = (games) => Math.max(0, ...dailyTypesByDay(games).map((types) => types.size))
+// Most daily challenges done on a single day. A day with every daily of that day done counts as all of today's dailies,
+// so that a sweep made before a daily was added still reaches the target.
+const bestDailySweep = (games) =>
+  Math.max(0, ...dailyTypesByDay(games).map(([existing, done]) => (done.length >= existing.length ? DAILY_GAME_TYPES.length : done.length)))
 
-// Days on which every daily challenge was done.
-const sweepDays = (games) => dailyTypesByDay(games).filter((types) => types.size >= DAILY_GAME_TYPES.length).length
+// Days on which every daily challenge (there was that day) was done.
+const sweepDays = (games) => dailyTypesByDay(games).filter(([existing, done]) => done.length >= existing.length).length
 
 // [{ ...achievement, progress, unlocked }], unlocked first (the highest tiers first), then in list order.
 // Without `friendsCount` (another player's profile: their friends aren't readable), 'friend' is left out.

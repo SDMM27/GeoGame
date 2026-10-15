@@ -122,6 +122,21 @@ describe('buildSurvivalRounds', () => {
   it('has no rounds without a game', () => {
     expect(buildSurvivalRounds([], 1)).toEqual([])
   })
+
+  it('can skip, in every game, a country already used by an earlier round (distinctCountries)', () => {
+    const rounds = buildSurvivalRounds([PLACEMENT, FLAGS, CAPITALS], 21, 60, null, { distinctCountries: true })
+    const names = rounds.map((round) => round.country.properties.ADMIN)
+    expect(rounds).toHaveLength(60)
+    expect(new Set(names).size).toBe(60)
+    // Same rounds as before without the option: a country may come back in another game
+    const free = buildSurvivalRounds([PLACEMENT, FLAGS, CAPITALS], 21, 60).map((round) => round.country.properties.ADMIN)
+    expect(new Set(free).size).toBeLessThan(60)
+  })
+
+  it('keeps the same rounds for a seed with or without distinctCountries when a single game is played', () => {
+    const key = (list) => list.map(roundKey)
+    expect(key(buildSurvivalRounds([FLAGS], 6, 40, null, { distinctCountries: true }))).toEqual(key(buildSurvivalRounds([FLAGS], 6, 40)))
+  })
 })
 
 describe('typed answers', () => {

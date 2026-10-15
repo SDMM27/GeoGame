@@ -42,6 +42,10 @@
     "multi": "Gioca in multigiocatore"
   },
   "games": {
+    "daily_challenge": {
+      "title": "Sfida del giorno",
+      "description": "12 domande: posiziona i paesi, riconosci le bandiere, indica le capitali. La stessa sfida per tutti."
+    },
     "placement": {
       "title": "Trova il Paese",
       "description": "Trova tutti i paesi della difficoltà scelta."
@@ -534,6 +538,23 @@
       "between": "Tra {{min}} e {{max}}"
     }
   },
+  "daily_challenge": {
+    "rules": "12 domande, uguali per tutti oggi: trova i paesi sulla mappa, riconosci le bandiere, indica le capitali. Un solo tentativo per domanda, {{seconds}} s ciascuna, niente vite. Il tuo punteggio è il numero di risposte esatte; il tempo totale decide i pareggi. Puoi giocare una sola volta al giorno.",
+    "start": "Inizia la sfida",
+    "continue": "Continua la sfida",
+    "resumed_note": "Hai lasciato la pagina durante una domanda: conta come sbagliata.",
+    "round": "Domanda {{n}}/{{total}}",
+    "correct_short": "esatte",
+    "skip": "Salta",
+    "result_title": "Sfida completata!",
+    "score_label": "Risposte esatte",
+    "time_label": "Tempo totale",
+    "rounds_title": "Le tue 12 domande",
+    "col_score": "Punteggio",
+    "share_label": "RISPOSTE ESATTE",
+    "share_time": "Tempo: {{time}}",
+    "come_back": "Torna domani per una nuova sfida!"
+  },
   "account": {
     "title": "Il mio account",
     "signin_tab": "Accedi",
@@ -603,6 +624,7 @@
     "games_count_one": "{{count}} partita",
     "games_count_other": "{{count}} partite",
     "best_score": "Record {{score}} pt",
+    "best_challenge": "Migliore {{score}}",
     "best_attempts_one": "Record: {{count}} tentativo",
     "best_attempts_other": "Record: {{count}} tentativi",
     "wins": "{{wins}}/{{dailies}} sfide risolte",
@@ -1086,6 +1108,10 @@
     "quiz": {
       "title": "Quiz Geo — Quiz di geografia quotidiano | GeoGame",
       "description": "Una domanda di geografia al giorno per sfidare i tuoi amici, oppure una serie di domande alla difficoltà che preferisci."
+    },
+    "daily_challenge": {
+      "title": "Sfida del giorno — 12 domande di geografia al giorno | GeoGame",
+      "description": "Ogni giorno le stesse 12 domande per tutti: posiziona i paesi sulla mappa, riconosci le bandiere, indica le capitali. Batti i tuoi amici e scala la classifica."
     },
     "survival": {
       "title": "Sopravvivenza — Giochi di geografia in sequenza | GeoGame",

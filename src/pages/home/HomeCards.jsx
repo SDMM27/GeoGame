@@ -23,15 +23,17 @@ export function DailyCard({ game }) {
         <button type="button" className="daily-card-primary" onClick={() => navigate(game.route, { state: { mode: "daily" } })}>
           📅 {t("home.daily")}
         </button>
-        <button
-          type="button"
-          className="daily-card-secondary"
-          onClick={() => navigate(game.route, { state: { mode: "infinite" } })}
-          aria-label={t("home.infinite")}
-          title={t("home.infinite")}
-        >
-          <span aria-hidden="true">∞</span>
-        </button>
+        {!game.dailyOnly && (
+          <button
+            type="button"
+            className="daily-card-secondary"
+            onClick={() => navigate(game.route, { state: { mode: "infinite" } })}
+            aria-label={t("home.infinite")}
+            title={t("home.infinite")}
+          >
+            <span aria-hidden="true">∞</span>
+          </button>
+        )}
         {game.multiId && (
           <button
             type="button"

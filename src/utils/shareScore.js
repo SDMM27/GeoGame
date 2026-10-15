@@ -10,6 +10,7 @@ export const GAME_LABELS = {
   RANKING: 'Country Ranking',
   VOYAGE_VOYAGE: 'Voyage Voyage',
   QUIZ: 'Quiz Géo',
+  DAILY_CHALLENGE: 'Challenge du jour',
 }
 
 // Maps game type keys → i18n locale paths
@@ -22,6 +23,7 @@ const GAME_TYPE_LOCALE_KEYS = {
   RANKING: 'games.ranking.title',
   VOYAGE_VOYAGE: 'games.voyage_voyage.title',
   QUIZ: 'games.quiz.title',
+  DAILY_CHALLENGE: 'games.daily_challenge.title',
 }
 
 function getGameLabel(gameType) {
@@ -213,7 +215,9 @@ export async function exportShareCard(data) {
 
 const SITE_URL = 'https://geo-game-delta.vercel.app'
 
-export function generateShareText({ score, gameType, difficulty, pseudo, scoreLabel = 'POINTS', details, challengeUrl, siteUrl }) {
+// `scoreText`: the score as it reads in the text when "<score> <scoreLabel>" doesn't ("9/12"). `grid`: lines under the details
+// (the Daily Challenge's rounds).
+export function generateShareText({ score, gameType, difficulty, pseudo, scoreLabel = 'POINTS', scoreText, details, grid, challengeUrl, siteUrl }) {
   const label = getGameLabel(gameType)
   const displayPseudo = pseudo?.trim() || t('share.anonymous', 'Anonyme')
   const playedBy = t('share.played_by', 'joué par')
@@ -224,9 +228,10 @@ export function generateShareText({ score, gameType, difficulty, pseudo, scoreLa
 
   const lines = [
     `🌍 GeoGame — ${label}`,
-    `🏆 ${Math.round(score ?? 0)} ${scoreLabel} | ${translatedDiff ?? ''}`.trimEnd().replace(/\|$/, '').trim(),
+    `🏆 ${scoreText ?? `${Math.round(score ?? 0)} ${scoreLabel}`} | ${translatedDiff ?? ''}`.trimEnd().replace(/\|$/, '').trim(),
   ]
   if (details) lines.push(`📊 ${details}`)
+  if (grid) lines.push(grid)
   lines.push(`${playedBy} ${displayPseudo}`)
   lines.push('')
   if (challengeUrl) {

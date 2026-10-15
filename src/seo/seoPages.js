@@ -11,6 +11,7 @@ export const SEO_PAGES = [
   { path: '/game', key: 'placement', priority: '0.9', changefreq: 'monthly' },
   { path: '/flag-game', key: 'flags', priority: '0.9', changefreq: 'monthly' },
   { path: '/capitals-game', key: 'capitals', priority: '0.9', changefreq: 'monthly' },
+  { path: '/challenge', key: 'daily_challenge', priority: '0.9', changefreq: 'daily' },
   { path: '/border-guess', key: 'border_guess', priority: '0.8', changefreq: 'daily' },
   { path: '/country-clue', key: 'country_clue', priority: '0.8', changefreq: 'daily' },
   { path: '/voyage-voyage', key: 'voyage_voyage', priority: '0.8', changefreq: 'daily' },

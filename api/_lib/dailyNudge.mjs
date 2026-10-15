@@ -25,6 +25,7 @@ const LOCALES = {
 
 // Games with a daily challenge (src/utils/gameTypes.js) → id of their title in the locales (games.{id}.title).
 export const NUDGE_GAMES = {
+  DAILY_CHALLENGE: 'daily_challenge',
   BORDER_GUESS: 'border_guess',
   COUNTRY_CLUE: 'country_clue',
   VOYAGE_VOYAGE: 'voyage_voyage',
@@ -47,6 +48,17 @@ const BODY = {
   it: '{{username}} ha finito {{game}} di oggi. Allora, vieni a battermi! 😏',
 }
 
+// The Daily Challenge's title already says "of the day": no "du jour" after it.
+const CHALLENGE_BODY = {
+  fr: '{{username}} a terminé le {{game}}. Bah alors, viens me battre ! 😏',
+  en: '{{username}} just finished the {{game}}. Come and beat me! 😏',
+  ru: '{{username}} прошёл(а) {{game}}. Ну что, приходи побеждать! 😏',
+  es: '{{username}} ha terminado el {{game}}. ¿Y bien? ¡Ven a ganarme! 😏',
+  pt: '{{username}} terminou o {{game}}. E aí, vem me vencer! 😏',
+  de: '{{username}} hat die {{game}} geschafft. Na, komm und schlag mich! 😏',
+  it: '{{username}} ha finito la {{game}}. Allora, vieni a battermi! 😏',
+}
+
 const RECENT_BODY = {
   fr: '{{username}} vient de jouer à {{game}}{{score}}. Viens me battre ! 😏',
   en: '{{username}} just played {{game}}{{score}}. Come and beat me! 😏',
@@ -62,7 +74,8 @@ export function nudgeMessage(lang, username, gameType, { recent = false, score =
   const locale = LOCALES[lang] ? lang : 'en'
   const game = LOCALES[locale].games?.[RECENT_GAMES[gameType]]?.title ?? gameType
   const points = recent && Number.isFinite(score) ? ` (${Math.round(score)} pts)` : ''
-  return (recent ? RECENT_BODY : BODY)[locale]
+  const bodies = recent ? RECENT_BODY : gameType === 'DAILY_CHALLENGE' ? CHALLENGE_BODY : BODY
+  return bodies[locale]
     .replace('{{username}}', username)
     .replace('{{game}}', game)
     .replace('{{score}}', points)

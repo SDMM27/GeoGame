@@ -20,6 +20,7 @@ const CountryCluePage = lazyWithGeometries(() => import("./pages/CountryCluePage
 const RankingGamePage = lazy(() => import("./pages/RankingGamePage"));
 const VoyageVoyagePage = lazyWithGeometries(() => import("./pages/VoyageVoyagePage"));
 const QuizPage = lazy(() => import("./pages/QuizPage"));
+const DailyChallengePage = lazyWithGeometries(() => import("./pages/DailyChallengePage"));
 const SurvivalPage = lazyWithGeometries(() => import("./pages/SurvivalPage"));
 const AtlasPage = lazyWithGeometries(() => import("./pages/atlas/AtlasPage"));
 const AccountPage = lazy(() => import("./pages/AccountPage"));
@@ -51,6 +52,7 @@ export default function App() {
               <Route path="/voyage-voyage" element={<VoyageVoyagePage />} />
               <Route path="/ranking" element={<RankingGamePage />} />
               <Route path="/quiz" element={<QuizPage />} />
+              <Route path="/challenge" element={<DailyChallengePage />} />
               <Route path="/survival" element={<SurvivalPage />} />
               <Route path="/atlas" element={<AtlasPage />} />
               <Route path="/scores" element={<ScoresPage />} />

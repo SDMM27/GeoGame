@@ -165,6 +165,11 @@ describe('nudgeMessage', () => {
     expect(nudgeMessage('de', 'Alice', 'BORDER_GUESS')).toContain('Alice hat')
   })
 
+  it('names the Daily Challenge without repeating "of the day"', () => {
+    expect(nudgeMessage('fr', 'Alice', 'DAILY_CHALLENGE')).toBe('Alice a terminé le Challenge du jour. Bah alors, viens me battre ! 😏')
+    expect(nudgeMessage('en', 'Alice', 'DAILY_CHALLENGE')).toContain('finished the Daily Challenge')
+  })
+
   it('has a title for every game with a daily challenge', () => {
     for (const [gameType, id] of Object.entries(NUDGE_GAMES)) {
       for (const lang of ['fr', 'en', 'ru', 'es', 'pt', 'de', 'it']) {

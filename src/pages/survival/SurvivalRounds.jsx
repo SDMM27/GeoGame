@@ -79,7 +79,9 @@ export function PlacementRound({ survival }) {
   useEffect(() => {
     if (!map || outcome !== 'failed') return
     const layer = geoJsonRef.current?.getLayers().find((l) => l.feature.properties.ADMIN === target)
-    if (layer) map.flyToBounds(layer.getBounds(), { maxZoom: 6, duration: 0.8 })
+    // A map with no size yet (hidden tab, layout not done) can't fly: Leaflet would throw on NaN coordinates
+    const size = map.getSize()
+    if (layer && size.x > 0 && size.y > 0) map.flyToBounds(layer.getBounds(), { maxZoom: 6, duration: 0.8 })
   }, [map, outcome, target])
 
   return (

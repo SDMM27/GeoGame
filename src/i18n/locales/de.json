@@ -42,6 +42,10 @@
     "multi": "Mehrspieler spielen"
   },
   "games": {
+    "daily_challenge": {
+      "title": "Tages-Challenge",
+      "description": "12 Fragen: Länder auf der Karte finden, Flaggen erkennen, Hauptstädte nennen. Dieselbe Challenge für alle."
+    },
     "placement": {
       "title": "Finde das Land",
       "description": "Finde alle Länder der gewählten Schwierigkeit."
@@ -534,6 +538,23 @@
       "between": "Zwischen {{min}} und {{max}}"
     }
   },
+  "daily_challenge": {
+    "rules": "12 Fragen, heute für alle gleich: Länder auf der Karte finden, Flaggen und Hauptstädte nennen. Ein Versuch pro Frage, je {{seconds}} s, keine Leben. Dein Ergebnis ist die Zahl der richtigen Antworten; die Gesamtzeit entscheidet bei Gleichstand. Du kannst nur einmal pro Tag spielen.",
+    "start": "Challenge starten",
+    "continue": "Challenge fortsetzen",
+    "resumed_note": "Du hast die Seite während einer Frage verlassen: Sie zählt als verpasst.",
+    "round": "Frage {{n}}/{{total}}",
+    "correct_short": "richtig",
+    "skip": "Überspringen",
+    "result_title": "Challenge geschafft!",
+    "score_label": "Richtige Antworten",
+    "time_label": "Gesamtzeit",
+    "rounds_title": "Deine 12 Fragen",
+    "col_score": "Punkte",
+    "share_label": "RICHTIGE ANTWORTEN",
+    "share_time": "Zeit: {{time}}",
+    "come_back": "Komm morgen für eine neue Challenge wieder!"
+  },
   "account": {
     "title": "Mein Konto",
     "signin_tab": "Anmelden",
@@ -603,6 +624,7 @@
     "games_count_one": "{{count}} Spiel",
     "games_count_other": "{{count}} Spiele",
     "best_score": "Rekord {{score}} Pkt.",
+    "best_challenge": "Bestwert {{score}}",
     "best_attempts_one": "Rekord: {{count}} Versuch",
     "best_attempts_other": "Rekord: {{count}} Versuche",
     "wins": "{{wins}}/{{dailies}} Challenges gelöst",
@@ -1086,6 +1108,10 @@
     "quiz": {
       "title": "Geo-Quiz — Tägliches Geografie-Quiz | GeoGame",
       "description": "Eine Geografie-Frage pro Tag, um deine Freunde herauszufordern, oder Fragen am Stück in der Schwierigkeit deiner Wahl."
+    },
+    "daily_challenge": {
+      "title": "Tages-Challenge — 12 Geografiefragen pro Tag | GeoGame",
+      "description": "Jeden Tag dieselben 12 Fragen für alle: Länder auf der Karte finden, Flaggen erkennen, Hauptstädte nennen. Schlag deine Freunde und klettere in der Rangliste."
     },
     "survival": {
       "title": "Survival — Geografie-Spiele am Stück | GeoGame",

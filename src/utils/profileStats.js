@@ -4,12 +4,24 @@ import { GAME_TYPES } from './gameTypes'
 import { serverNow } from './serverTime'
 
 export const DAILY_GAME_TYPES = [
+  GAME_TYPES.DAILY_CHALLENGE,
   GAME_TYPES.BORDER_GUESS,
   GAME_TYPES.COUNTRY_CLUE,
   GAME_TYPES.VOYAGE_VOYAGE,
   GAME_TYPES.RANKING,
   GAME_TYPES.QUIZ,
 ]
+
+// First day of the dailies added after the others (the other ones have always been there).
+export const DAILY_GAME_SINCE = {
+  [GAME_TYPES.DAILY_CHALLENGE]: '2026-10-16',
+}
+
+// The dailies there were on a day ('2026-10-13'): "every daily done" on a day means those ones, so that a player keeps
+// the sweeps they made before a daily was added.
+export function dailyTypesOn(day) {
+  return DAILY_GAME_TYPES.filter((type) => !DAILY_GAME_SINCE[type] || day >= DAILY_GAME_SINCE[type])
+}
 
 // Same day as the daily challenges (server time by default).
 export function dayKey(date = new Date(serverNow())) {

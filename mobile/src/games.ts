@@ -22,9 +22,23 @@ export type GameDefinition = {
   kind: 'setup' | 'daily' | 'survival'
   // Playable in a multiplayer room
   multi: boolean
+  // Daily only: no infinite mode (Daily Challenge)
+  dailyOnly?: boolean
 }
 
 export const GAMES: GameDefinition[] = [
+  {
+    id: 'daily_challenge',
+    type: GAME_TYPES.DAILY_CHALLENGE,
+    titleKey: 'games.daily_challenge.title',
+    descKey: 'games.daily_challenge.description',
+    icon: 'target',
+    color: gameColors.daily_challenge,
+    route: '/game/challenge',
+    kind: 'daily',
+    multi: false,
+    dailyOnly: true,
+  },
   {
     id: 'placement',
     type: GAME_TYPES.PLACEMENT,

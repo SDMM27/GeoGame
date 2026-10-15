@@ -52,6 +52,15 @@ describe('lookups', () => {
     expect(MULTI_GAMES.map((game) => game.id)).toEqual(['placement', 'flags', 'capitals', 'border_guess', 'country_clue', 'quiz', 'survival'])
     expect(getGame('voyage_voyage')?.multi).toBe(false)
     expect(getGame('ranking')?.multi).toBe(false)
+    expect(getGame('daily_challenge')?.multi).toBe(false)
+  })
+
+  it('puts the Daily Challenge first among the dailies, without an infinite mode', () => {
+    const dailies = GAMES.filter((game) => game.kind === 'daily')
+    expect(dailies[0].id).toBe('daily_challenge')
+    expect(dailies[0].route).toBe('/game/challenge')
+    expect(getGameByType('DAILY_CHALLENGE')?.id).toBe('daily_challenge')
+    expect(GAMES.filter((game) => game.dailyOnly).map((game) => game.id)).toEqual(['daily_challenge'])
   })
 
   it('only offers a setup sheet to Placement, Flags and Capitals', () => {

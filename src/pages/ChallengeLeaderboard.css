@@ -1,0 +1,10 @@
+/* src/pages/ChallengeLeaderboard.css */
+
+/* The 12 rounds of a player: 4 per line, one emoji for the kind of round and one for the result */
+.challenge-lb__grid {
+  margin: 0;
+  white-space: pre-line;
+  line-height: 1.9;
+  font-size: 1.05rem;
+  letter-spacing: 1px;
+}

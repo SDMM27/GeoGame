@@ -39,13 +39,15 @@ function DailyCard({ game, width }: { game: GameDefinition; width: number }) {
             {t('mobile.home.daily')}
           </Text>
         </Touchable>
-        <Touchable
-          accessibilityRole="button"
-          accessibilityLabel={t('mobile.home.infinite')}
-          onPress={() => router.push({ pathname: game.route as never, params: { mode: 'infinite' } })}
-          style={styles.dailySecondary}>
-          <MaterialCommunityIcons name="infinity" size={20} color={colors.text} />
-        </Touchable>
+        {!game.dailyOnly && (
+          <Touchable
+            accessibilityRole="button"
+            accessibilityLabel={t('mobile.home.infinite')}
+            onPress={() => router.push({ pathname: game.route as never, params: { mode: 'infinite' } })}
+            style={styles.dailySecondary}>
+            <MaterialCommunityIcons name="infinity" size={20} color={colors.text} />
+          </Touchable>
+        )}
         {game.multi && (
           <Touchable
             accessibilityRole="button"

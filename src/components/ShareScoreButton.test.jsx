@@ -13,6 +13,8 @@ vi.mock('react-i18next', () => ({
   }),
 }))
 
+vi.mock('./NudgeFriends', () => ({ default: () => null }))
+
 vi.mock('../utils/shareScore', () => ({
   copyShareText: vi.fn().mockResolvedValue(undefined),
 }))

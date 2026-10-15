@@ -149,7 +149,7 @@ export function ResultsSheet({ title, score, scoreText, scoreLabel, accent = col
     const challengeUrl = challenge
       ? buildChallengeUrl({ ...challenge, pseudo, score, origin: SITE_ORIGIN })
       : undefined
-    const message = generateShareText({ score, pseudo, ...rest, challengeUrl })
+    const message = generateShareText({ score, pseudo, ...rest, challengeUrl, siteUrl: SITE_ORIGIN })
     await Share.share({ message })
   }
 
@@ -276,9 +276,10 @@ export function ResultsSheet({ title, score, scoreText, scoreLabel, accent = col
             </Animated.View>
           )}
 
-          {share?.challenge && (
+          {/* Daily: nudge about the daily challenge; otherwise about the game just recorded in the history */}
+          {share && (share.challenge || record) && (
             <Animated.View entering={FadeInDown.delay(280).springify()}>
-              <NudgeFriends gameType={share.gameType} />
+              <NudgeFriends gameType={share.gameType} recent={!share.challenge} />
             </Animated.View>
           )}
 

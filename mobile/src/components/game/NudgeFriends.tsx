@@ -16,7 +16,8 @@ type Friend = { uid: string; username: string }
 type Result = Awaited<ReturnType<typeof nudgeFriend>>
 type State = 'sending' | Result
 
-export function NudgeFriends({ gameType }: { gameType: string }) {
+// `recent`: a regular game (any game of that type played in the last hours) rather than the daily challenge.
+export function NudgeFriends({ gameType, recent = false }: { gameType: string; recent?: boolean }) {
   const { t } = useTranslation()
   const { account } = useAccount()
   const { friends } = useFriendships(account?.uid) as { friends: Friend[] }
@@ -26,7 +27,7 @@ export function NudgeFriends({ gameType }: { gameType: string }) {
 
   const send = async (friend: Friend) => {
     setStates((current) => ({ ...current, [friend.uid]: 'sending' }))
-    const result = await nudgeFriend(friend.uid, gameType)
+    const result = await nudgeFriend(friend.uid, gameType, { recent })
     setStates((current) => ({ ...current, [friend.uid]: result }))
   }
 

@@ -31,3 +31,11 @@ describe('nudgeFriend', () => {
     expect(await nudgeFriend('bob', 'QUIZ')).toBe('error')
   })
 })
+
+describe('nudgeFriend for a regular game', () => {
+  it('asks for the recent mode', async () => {
+    callPush.mockResolvedValue({ status: 200, body: { sent: 1 } })
+    expect(await nudgeFriend('bob', 'FLAGS', { recent: true })).toBe('sent')
+    expect(callPush).toHaveBeenLastCalledWith('daily-nudge', { friendUid: 'bob', gameType: 'FLAGS', mode: 'recent' })
+  })
+})

@@ -19,7 +19,7 @@ export { forgetDevice, useDailyReminder } from './device'
 // Android channels, one per kind, so each can be muted on its own in the system settings.
 const CHANNELS = { invites: 'mobile.invites.channel', friends: 'mobile.invites.friends_channel', daily: 'mobile.invites.daily_channel' }
 
-type PushData = { type?: string; room?: string; uid?: string; gameType?: string }
+type PushData = { type?: string; room?: string; uid?: string; gameType?: string; mode?: string }
 
 // In the foreground the in-app banner (InviteBanner) already shows an invite, and the daily reminder is pointless;
 // friend requests and friends' "come beat me" nudges still show up.
@@ -72,8 +72,11 @@ export function usePushNotifications(uid: string | null | undefined) {
     } else if (data?.type === 'daily_nudge') {
       Notifications.clearLastNotificationResponseAsync()
       // Straight to the daily challenge the friend finished.
-      const game = GAMES.find((item) => item.kind === 'daily' && item.type === data.gameType)
-      if (game) router.navigate({ pathname: game.route as never, params: { mode: 'daily' } })
+      const game =
+        data.mode === 'recent'
+          ? GAMES.find((item) => item.type === data.gameType)
+          : GAMES.find((item) => item.kind === 'daily' && item.type === data.gameType)
+      if (game) router.navigate(data.mode === 'recent' ? (game.route as never) : { pathname: game.route as never, params: { mode: 'daily' } })
       else router.navigate('/')
     } else if (data?.type === 'daily') {
       Notifications.clearLastNotificationResponseAsync()

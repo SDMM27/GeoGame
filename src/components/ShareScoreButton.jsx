@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { copyShareText, shareChallenge } from '../utils/shareScore'
 import { buildChallengeUrl } from '../utils/challenge'
+import NudgeFriends from './NudgeFriends'
 import './ShareScoreButton.css'
 
 // `challenge` ({ route, dailyKey, solved }) : à fournir en mode daily pour afficher
@@ -71,6 +72,7 @@ export default function ShareScoreButton({ score, gameType, difficulty, scoreLab
           {copied ? t('share.copied') : t('share.copy_button')}
         </button>
       )}
+      <NudgeFriends gameType={gameType} recent={!challenge} />
     </div>
   )
 }

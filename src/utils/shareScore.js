@@ -211,13 +211,16 @@ export async function exportShareCard(data) {
   }
 }
 
-export function generateShareText({ score, gameType, difficulty, pseudo, scoreLabel = 'POINTS', details, challengeUrl }) {
+const SITE_URL = 'https://geo-game-delta.vercel.app'
+
+export function generateShareText({ score, gameType, difficulty, pseudo, scoreLabel = 'POINTS', details, challengeUrl, siteUrl }) {
   const label = getGameLabel(gameType)
   const displayPseudo = pseudo?.trim() || t('share.anonymous', 'Anonyme')
   const playedBy = t('share.played_by', 'joué par')
   const canYouBeat = t('share.can_you_beat', 'Peux-tu faire mieux ?')
   const translatedDiff = translateDifficulty(difficulty)
-  const site = typeof window !== 'undefined' && window.location?.hostname ? window.location.hostname : 'geogame.vercel.app'
+  // Full address with the protocol, otherwise messaging apps don't make the link clickable.
+  const site = siteUrl ?? (typeof window !== 'undefined' && /^https?:/.test(window.location?.origin ?? '') ? window.location.origin : SITE_URL)
 
   const lines = [
     `🌍 GeoGame — ${label}`,

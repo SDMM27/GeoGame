@@ -21,7 +21,9 @@
     "usd": "{{value}} $",
     "close": "Schließen",
     "unknown": "Unbekannt",
-    "open": "Atlas öffnen"
+    "open": "Atlas öffnen",
+    "history": "Geschichte",
+    "history_quiz": "📜 Mein Wissen über die Geschichte testen"
   },
   "continents": {
     "Europe": "Europa",
@@ -536,10 +538,25 @@
       "digits_one": "Es ist eine {{count}}-stellige Zahl",
       "digits_other": "Es ist eine {{count}}-stellige Zahl",
       "between": "Zwischen {{min}} und {{max}}"
+    },
+    "pick_theme": "Wähle ein Thema",
+    "themes": {
+      "geo": "🌍 Geografie",
+      "geo_hint": "Flüsse, Berge, Länder…",
+      "history": "📜 Geschichte",
+      "history_hint": "Wichtige Daten und Ereignisse"
+    },
+    "history": {
+      "title": "Geschichtsquiz",
+      "country_title": "Geschichte: {{country}}",
+      "country_hint": "Alle Fragen zu diesem Land, von der leichtesten bis zur schwersten."
     }
   },
   "daily_challenge": {
     "rules": "12 Fragen, heute für alle gleich: Länder auf der Karte finden, Flaggen und Hauptstädte nennen. Ein Versuch pro Frage, je {{seconds}} s, keine Leben. Dein Ergebnis ist die Zahl der richtigen Antworten; die Gesamtzeit entscheidet bei Gleichstand. Du kannst nur einmal pro Tag spielen.",
+    "level": "Level des Tages: {{label}} ({{n}}/7)",
+    "levels": {"1": "Sehr leicht", "2": "Leicht", "3": "Machbar", "4": "Mittel", "5": "Knifflig", "6": "Schwer", "7": "Knallhart"},
+    "week_note": "Von Montag bis Sonntag wird die Challenge jeden Tag schwerer. Sonntag wird es knallhart!",
     "start": "Challenge starten",
     "continue": "Challenge fortsetzen",
     "resumed_note": "Du hast die Seite während einer Frage verlassen: Sie zählt als verpasst.",

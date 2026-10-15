@@ -127,7 +127,7 @@ function Playing({ challenge }: { challenge: Challenge }) {
 function Rules({ challenge }: { challenge: Challenge }) {
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
-  const { phase, resumed, start } = challenge
+  const { phase, resumed, start, level } = challenge
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
       <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + 42 + space.md, paddingBottom: insets.bottom + space.xl }]}>
@@ -142,6 +142,17 @@ function Rules({ challenge }: { challenge: Challenge }) {
             <Text variant="body" style={{ textAlign: 'center' }}>
               {t('daily_challenge.rules', { seconds: CHALLENGE_TIMER })}
             </Text>
+            {level != null && (
+              <View style={{ alignItems: 'center', gap: space.xs }}>
+                <Text variant="body" color={colors.warning} style={{ textAlign: 'center', fontWeight: '700' }}>
+                  {'●'.repeat(level)}{'○'.repeat(7 - level)}{'  '}
+                  {t('daily_challenge.level', { label: t(`daily_challenge.levels.${level}`), n: level })}
+                </Text>
+                <Text variant="caption" style={{ textAlign: 'center' }}>
+                  {t('daily_challenge.week_note')}
+                </Text>
+              </View>
+            )}
             {resumed && (
               <Text variant="caption" color={colors.warning} style={{ textAlign: 'center' }}>
                 {t('daily_challenge.resumed_note')}

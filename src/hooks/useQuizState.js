@@ -1,6 +1,8 @@
 // src/hooks/useQuizState.js
 import { useCallback, useRef, useState } from 'react'
-import { ANSWER_MODES, CHOICE_HINTS, checkFreeAnswer, generateQuestion, getQuizPoints, MAX_HINTS } from '../utils/quizQuestions'
+import {
+  ANSWER_MODES, CHOICE_HINTS, checkFreeAnswer, generateHistoryQuestion, generateQuestion, getQuizPoints, MAX_HINTS, QUIZ_THEMES,
+} from '../utils/quizQuestions'
 import { mulberry32 } from '../utils/prng'
 
 const EMPTY_STATS = { answered: 0, correct: 0, score: 0, streak: 0, bestStreak: 0, hints: 0 }
@@ -16,10 +18,12 @@ function shuffled(items) {
 
 /**
  * `seed` (multijoueur) : tous les joueurs tirent la même suite de questions.
+ * start(difficulty, mode, { theme, country }) : `theme` histoire et éventuellement un seul pays.
  */
 export default function useQuizState({ seed = null } = {}) {
   const [maxDifficulty, setMaxDifficulty] = useState(null)
   const [answerMode, setAnswerMode] = useState(ANSWER_MODES.CHOICES)
+  const [topic, setTopic] = useState({ theme: QUIZ_THEMES.GEO, country: null })
   const [question, setQuestion] = useState(null)
   // Choix multiples : id du choix cliqué. Réponse libre : { input, match }
   const [selectedId, setSelectedId] = useState(null)
@@ -32,24 +36,32 @@ export default function useQuizState({ seed = null } = {}) {
   const usedKeysRef = useRef(new Set())
   const randomRef = useRef(Math.random)
 
-  const drawQuestion = useCallback((difficulty, mode) => {
-    const next = generateQuestion(difficulty, usedKeysRef.current, randomRef.current, mode)
-    next?.usedKeys.forEach((k) => usedKeysRef.current.add(k))
+  const drawQuestion = useCallback((difficulty, mode, { theme, country }) => {
+    const next = theme === QUIZ_THEMES.HISTORY
+      ? generateHistoryQuestion(difficulty, usedKeysRef.current, randomRef.current, country)
+      : generateQuestion(difficulty, usedKeysRef.current, randomRef.current, mode)
+    // Plus aucune question d'histoire inédite : fin de la partie
+    if (!next) {
+      setIsFinished(true)
+      return
+    }
+    next.usedKeys.forEach((k) => usedKeysRef.current.add(k))
     setQuestion(next)
     setSelectedId(null)
     setFreeResult(null)
     setHintsUsed(0)
-    setEliminationOrder(next ? shuffled(next.choices.filter((c) => c.id !== next.correctId).map((c) => c.id)) : [])
+    setEliminationOrder(shuffled(next.choices.filter((c) => c.id !== next.correctId).map((c) => c.id)))
   }, [])
 
-  const start = useCallback((difficulty, mode = answerMode) => {
+  const start = useCallback((difficulty, mode = answerMode, { theme = QUIZ_THEMES.GEO, country = null } = {}) => {
     usedKeysRef.current = new Set()
     randomRef.current = seed == null ? Math.random : mulberry32(seed)
     setMaxDifficulty(difficulty)
     setAnswerMode(mode)
+    setTopic({ theme, country })
     setStats(EMPTY_STATS)
     setIsFinished(false)
-    drawQuestion(difficulty, mode)
+    drawQuestion(difficulty, mode, { theme, country })
   }, [answerMode, drawQuestion, seed])
 
   const isAnswered = Boolean(selectedId || freeResult)
@@ -97,8 +109,8 @@ export default function useQuizState({ seed = null } = {}) {
 
   const next = useCallback(() => {
     if (!isAnswered) return
-    drawQuestion(maxDifficulty, answerMode)
-  }, [isAnswered, maxDifficulty, answerMode, drawQuestion])
+    drawQuestion(maxDifficulty, answerMode, topic)
+  }, [isAnswered, maxDifficulty, answerMode, topic, drawQuestion])
 
   const quit = useCallback(() => setIsFinished(true), [])
 
@@ -111,6 +123,8 @@ export default function useQuizState({ seed = null } = {}) {
   return {
     maxDifficulty,
     answerMode,
+    theme: topic.theme,
+    country: topic.country,
     question,
     selectedId,
     freeResult,

@@ -21,7 +21,9 @@
     "usd": "{{value}} $",
     "close": "Chiudi",
     "unknown": "Sconosciuto",
-    "open": "Apri l'atlante"
+    "open": "Apri l'atlante",
+    "history": "Storia",
+    "history_quiz": "📜 Mettimi alla prova sulla sua storia"
   },
   "continents": {
     "Europe": "Europa",
@@ -536,10 +538,25 @@
       "digits_one": "È un numero di {{count}} cifra",
       "digits_other": "È un numero di {{count}} cifre",
       "between": "Tra {{min}} e {{max}}"
+    },
+    "pick_theme": "Scegli un tema",
+    "themes": {
+      "geo": "🌍 Geografia",
+      "geo_hint": "Fiumi, montagne, paesi…",
+      "history": "📜 Storia",
+      "history_hint": "Date ed eventi chiave"
+    },
+    "history": {
+      "title": "Quiz di Storia",
+      "country_title": "Storia: {{country}}",
+      "country_hint": "Tutte le domande su questo paese, dalla più facile alla più difficile."
     }
   },
   "daily_challenge": {
     "rules": "12 domande, uguali per tutti oggi: trova i paesi sulla mappa, riconosci le bandiere, indica le capitali. Un solo tentativo per domanda, {{seconds}} s ciascuna, niente vite. Il tuo punteggio è il numero di risposte esatte; il tempo totale decide i pareggi. Puoi giocare una sola volta al giorno.",
+    "level": "Livello del giorno: {{label}} ({{n}}/7)",
+    "levels": {"1": "Molto facile", "2": "Facile", "3": "Abbordabile", "4": "Medio", "5": "Impegnativo", "6": "Difficile", "7": "Tremendo"},
+    "week_note": "Dal lunedì alla domenica, la sfida diventa ogni giorno più difficile. La domenica è tremenda!",
     "start": "Inizia la sfida",
     "continue": "Continua la sfida",
     "resumed_note": "Hai lasciato la pagina durante una domanda: conta come sbagliata.",

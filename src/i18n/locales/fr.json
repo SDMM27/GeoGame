@@ -21,7 +21,9 @@
     "usd": "{{value}} $",
     "close": "Fermer",
     "unknown": "Non renseigné",
-    "open": "Ouvrir l’atlas"
+    "open": "Ouvrir l’atlas",
+    "history": "Histoire",
+    "history_quiz": "📜 Me tester sur son histoire"
   },
   "continents": {
     "Europe": "Europe",
@@ -536,10 +538,25 @@
       "digits_one": "C'est un nombre à {{count}} chiffre",
       "digits_other": "C'est un nombre à {{count}} chiffres",
       "between": "Entre {{min}} et {{max}}"
+    },
+    "pick_theme": "Choisis ton thème",
+    "themes": {
+      "geo": "🌍 Géographie",
+      "geo_hint": "Fleuves, montagnes, pays…",
+      "history": "📜 Histoire",
+      "history_hint": "Dates et événements clés"
+    },
+    "history": {
+      "title": "Quiz Histoire",
+      "country_title": "Histoire : {{country}}",
+      "country_hint": "Toutes les questions sur ce pays, de la plus facile à la plus difficile."
     }
   },
   "daily_challenge": {
     "rules": "12 questions, les mêmes pour tout le monde aujourd’hui : place des pays sur la carte, reconnais des drapeaux, nomme des capitales. Un seul essai par question, {{seconds}} s chacune, pas de vies. Ton score est le nombre de bonnes réponses ; le temps total départage les égalités. Tu ne peux jouer qu’une fois par jour.",
+    "level": "Niveau du jour : {{label}} ({{n}}/7)",
+    "levels": {"1": "Très facile", "2": "Facile", "3": "Abordable", "4": "Moyen", "5": "Corsé", "6": "Difficile", "7": "Redoutable"},
+    "week_note": "Du lundi au dimanche, le challenge devient de plus en plus difficile. Dimanche, accroche-toi !",
     "start": "Lancer le challenge",
     "continue": "Reprendre le challenge",
     "resumed_note": "Tu as quitté la page pendant une question : elle compte comme ratée.",

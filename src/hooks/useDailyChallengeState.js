@@ -10,10 +10,11 @@
 // Nothing here needs the DOM besides the guarded localStorage, like useDailyQuizState.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
-  CHALLENGE_RAMP,
   CHALLENGE_ROUNDS,
   CHALLENGE_ROUND_TYPES,
   CHALLENGE_TIMER,
+  challengeLevel,
+  challengeRamp,
   challengeSeed,
 } from '../utils/dailyChallenge'
 import useDailyKey from './useDailyKey'
@@ -105,7 +106,7 @@ export default function useDailyChallengeState() {
     lives: CHALLENGE_ROUNDS,
     seed: challengeSeed(known ? dailyKey : ''),
     timer: CHALLENGE_TIMER,
-    ramp: CHALLENGE_RAMP,
+    ramp: challengeRamp(known ? dailyKey : ''),
     maxRounds: CHALLENGE_ROUNDS,
     distinctCountries: true,
     paused: !(running && known && !finished),
@@ -162,6 +163,8 @@ export default function useDailyChallengeState() {
     // Every round of the day (empty until the day is known)
     rounds: known ? survival.rounds : NO_ROUNDS,
     total: CHALLENGE_ROUNDS,
+    // Difficulty of the day, 1 (Monday) to 7 (Sunday); null for the days before the weekly ramp
+    level: known ? challengeLevel(dailyKey) : null,
     round: shown ? survival.round : null,
     roundIndex: shown ? roundIndex : (saved?.index ?? 0),
     // 'correct' | 'failed' | null for each round

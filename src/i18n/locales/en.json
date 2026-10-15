@@ -21,7 +21,9 @@
     "usd": "${{value}}",
     "close": "Close",
     "unknown": "Unknown",
-    "open": "Open the atlas"
+    "open": "Open the atlas",
+    "history": "History",
+    "history_quiz": "📜 Test me on its history"
   },
   "continents": {
     "Europe": "Europe",
@@ -536,10 +538,25 @@
       "digits_one": "It's a {{count}}-digit number",
       "digits_other": "It's a {{count}}-digit number",
       "between": "Between {{min}} and {{max}}"
+    },
+    "pick_theme": "Pick a theme",
+    "themes": {
+      "geo": "🌍 Geography",
+      "geo_hint": "Rivers, mountains, countries…",
+      "history": "📜 History",
+      "history_hint": "Key dates and events"
+    },
+    "history": {
+      "title": "History Quiz",
+      "country_title": "History: {{country}}",
+      "country_hint": "Every question about this country, from easiest to hardest."
     }
   },
   "daily_challenge": {
     "rules": "12 questions, the same for everyone today: find countries on the map, name flags and capitals. One try per question, {{seconds}} s each, no lives. Your score is the number of right answers; the total time breaks ties. You can only play once a day.",
+    "level": "Today's level: {{label}} ({{n}}/7)",
+    "levels": {"1": "Very easy", "2": "Easy", "3": "Approachable", "4": "Medium", "5": "Tough", "6": "Hard", "7": "Brutal"},
+    "week_note": "From Monday to Sunday, the challenge gets harder every day. Sunday is brutal!",
     "start": "Start the challenge",
     "continue": "Continue the challenge",
     "resumed_note": "You left during a question: it counts as missed.",

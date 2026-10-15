@@ -6,6 +6,7 @@
 
 import countries from '../data/countriesWithDifficulty_FR.json'
 import curatedQuestions from '../data/quizQuestions.json'
+import historyQuestions from '../data/historyQuestions.json'
 import { GEO_FEATURES, MOUTHS } from '../data/geoFeatures'
 import { countryBorders } from '../data/countryBorders'
 import { getCountryAreaKm2 } from './countryArea'
@@ -29,6 +30,9 @@ export function getQuizPoints(difficulty, hintsUsed = 0) {
 }
 
 export const ANSWER_MODES = { CHOICES: 'choices', FREE: 'free' }
+
+// Les questions d'histoire forment un quiz à part : jamais mélangées au quiz géo ni au quiz du jour
+export const QUIZ_THEMES = { GEO: 'geo', HISTORY: 'history' }
 
 const LANGS = LANGUAGE_CODES
 
@@ -480,12 +484,12 @@ function superlativeFeature(allowed, random, type, filter, getValue, minRatio) {
   })
 }
 
-function curatedToQuestion(q, random) {
+function curatedToQuestion(q, random, prefix = 'curated') {
   const correct = { id: 'answer', kind: 'text', value: q.answer }
   const wrong = q.wrong.map((w, i) => ({ id: `wrong${i}`, kind: 'text', value: w }))
   return {
-    ...buildQuestion({ type: 'curated', difficulty: q.difficulty, correct, wrong, random, key: `curated:${q.id}` }),
-    usedKeys: [`curated:${q.id}`],
+    ...buildQuestion({ type: 'curated', difficulty: q.difficulty, correct, wrong, random, key: `${prefix}:${q.id}` }),
+    usedKeys: [`${prefix}:${q.id}`],
     text: q.question,
     fact: q.fact,
     accept: q.accept ?? [],
@@ -529,6 +533,40 @@ export function generateQuestion(
   if (alreadySeen) return alreadySeen
   if (curatedPool.length) return curatedToQuestion(pick(curatedPool, random), random)
   return easier
+}
+
+// ─── Histoire ──────────────────────────────────────────────────────────────
+
+// Pays qui ont assez de questions d'histoire pour un quiz à eux seuls (codes ISO). Les autres
+// (la Belgique pour Waterloo…) n'apparaissent que dans le quiz d'histoire général.
+const MIN_COUNTRY_QUESTIONS = 5
+const historyCountByCountry = historyQuestions.flatMap((q) => q.countries)
+  .reduce((counts, iso) => counts.set(iso, (counts.get(iso) ?? 0) + 1), new Map())
+export const HISTORY_COUNTRIES = [...historyCountByCountry]
+  .filter(([, count]) => count >= MIN_COUNTRY_QUESTIONS)
+  .map(([iso]) => iso)
+
+/**
+ * Tire une question d'histoire inédite. Avec `country`, seulement les questions sur ce pays,
+ * de la plus facile à la plus difficile, quelle que soit la difficulté choisie.
+ * Renvoie null quand il n'en reste plus : la partie s'arrête là.
+ */
+export function generateHistoryQuestion(difficulty, usedKeys = new Set(), random = Math.random, country = null) {
+  const pool = historyQuestions.filter(
+    (q) => !usedKeys.has(`history:${q.id}`) && (!country || q.countries.includes(country))
+  )
+  let candidates
+  if (country) {
+    const rank = (q) => QUIZ_DIFFICULTIES.indexOf(q.difficulty)
+    const easiest = Math.min(...pool.map(rank))
+    candidates = pool.filter((q) => rank(q) === easiest)
+  } else {
+    // Comme pour le quiz géo : la difficulté choisie d'abord, puis les plus faciles une fois épuisée
+    const allowed = getAllowedDifficulties(difficulty)
+    const exact = pool.filter((q) => q.difficulty === difficulty)
+    candidates = exact.length ? exact : pool.filter((q) => allowed.includes(q.difficulty))
+  }
+  return candidates.length ? curatedToQuestion(pick(candidates, random), random, 'history') : null
 }
 
 // ─── Question du jour ──────────────────────────────────────────────────────

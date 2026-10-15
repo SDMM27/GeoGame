@@ -106,6 +106,22 @@ function Playing({ challenge }) {
   )
 }
 
+// Difficulty of the day: 7 bars, Monday one, Sunday all of them
+function ChallengeLevel({ level }) {
+  const { t } = useTranslation()
+  return (
+    <div className="challenge-level">
+      <div className="challenge-level__head">
+        <span className="challenge-level__bars" aria-hidden="true">
+          {Array.from({ length: 7 }, (_, i) => <span key={i} className={i < level ? 'is-on' : ''} />)}
+        </span>
+        <strong>{t('daily_challenge.level', { label: t(`daily_challenge.levels.${level}`), n: level })}</strong>
+      </div>
+      <p className="quiz-muted">{t('daily_challenge.week_note')}</p>
+    </div>
+  )
+}
+
 export default function DailyChallengePage() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
@@ -165,6 +181,7 @@ export default function DailyChallengePage() {
         {phase === 'ready' && (
           <section className="quiz-card">
             <p className="quiz-daily-rules">{t('daily_challenge.rules', { seconds: CHALLENGE_TIMER })}</p>
+            {challenge.level && <ChallengeLevel level={challenge.level} />}
             {challenge.resumed && <p className="challenge-resumed">{t('daily_challenge.resumed_note')}</p>}
             <button className="daily-start-btn" onClick={challenge.start}>
               {t(challenge.resumed ? 'daily_challenge.continue' : 'daily_challenge.start')}

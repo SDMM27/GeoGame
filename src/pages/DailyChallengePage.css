@@ -33,6 +33,38 @@
   font-weight: 600;
 }
 
+.challenge-level {
+  margin: 0 0 14px;
+}
+
+.challenge-level__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.challenge-level__bars {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.challenge-level__bars span {
+  width: 8px;
+  height: 14px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.challenge-level__bars span.is-on {
+  background: var(--warning);
+}
+
+.challenge-level p {
+  margin: 4px 0 0;
+  font-size: 0.9rem;
+}
+
 /* Result */
 .challenge-result {
   text-align: center;

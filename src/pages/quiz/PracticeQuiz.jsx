@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import NavBar from '../../components/NavBar'
 import useQuizState from '../../hooks/useQuizState'
-import { ANSWER_MODES, getQuestionHints, localizeQuestion } from '../../utils/quizQuestions'
+import { ANSWER_MODES, HISTORY_COUNTRIES, QUIZ_THEMES, getQuestionHints, localizeQuestion } from '../../utils/quizQuestions'
 import DifficultyPicker from './DifficultyPicker'
 import Summary from './Summary'
 import { DIFFICULTY_COLORS } from './constants'
@@ -11,8 +12,13 @@ import { DIFFICULTY_COLORS } from './constants'
 // a fixed number of them. `room`: { seed, difficulty, answerMode, total, onAnswered(count), onFinished(result) }
 export default function PracticeQuiz({ room = null }) {
   const { t, i18n } = useTranslation()
+  const location = useLocation()
+  // /quiz?mode=infinite&theme=history[&country=FR] : arrivée depuis la fiche d'un pays de l'atlas
+  const params = new URLSearchParams(location.search)
+  const presetCountry = HISTORY_COUNTRIES.includes(params.get('country')) ? params.get('country') : null
+  const presetTheme = presetCountry || params.get('theme') === QUIZ_THEMES.HISTORY ? QUIZ_THEMES.HISTORY : QUIZ_THEMES.GEO
   const {
-    maxDifficulty, answerMode, question, selectedId, freeResult, isAnswered, isCorrect, stats, isFinished,
+    maxDifficulty, answerMode, theme, country, question, selectedId, freeResult, isAnswered, isCorrect, stats, isFinished,
     hintsUsed, maxHints, canUseHint, hiddenChoiceIds, points,
     start, answer, submitFree, takeHint, next, quit, backToDifficulty,
   } = useQuizState({ seed: room?.seed ?? null })
@@ -101,7 +107,7 @@ export default function PracticeQuiz({ room = null }) {
       <main className="quiz-main">
         <header className="quiz-header">
           <h1>
-            {t('games.quiz.title')}
+            {(maxDifficulty ? theme : presetTheme) === QUIZ_THEMES.HISTORY ? t('quiz.history.title') : t('games.quiz.title')}
             {room && (
               <small className="quiz-room-count">
                 {t('mp_room.question', { n: Math.min(stats.answered + (isAnswered ? 0 : 1), room.total), total: room.total })}
@@ -117,14 +123,15 @@ export default function PracticeQuiz({ room = null }) {
           )}
         </header>
 
-        {!maxDifficulty && !room && <DifficultyPicker onPick={start} />}
+        {!maxDifficulty && !room && <DifficultyPicker onPick={start} initialTheme={presetTheme} country={presetCountry} />}
 
         {maxDifficulty && isFinished && !room && (
           <Summary
             stats={stats}
             maxDifficulty={maxDifficulty}
-            onRestart={() => start(maxDifficulty, answerMode)}
+            onRestart={() => start(maxDifficulty, answerMode, { theme, country })}
             onChangeDifficulty={backToDifficulty}
+            recordable={theme !== QUIZ_THEMES.HISTORY}
           />
         )}
 

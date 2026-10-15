@@ -75,6 +75,17 @@
   margin-bottom: 20px;
 }
 
+.quiz-country-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.quiz-country-title img {
+  width: 32px;
+  border-radius: 3px;
+}
+
 .quiz-mode-tabs {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

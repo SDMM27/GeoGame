@@ -111,6 +111,8 @@ export function StreakCard({ stats }: { stats: ProfileStats }) {
   const { t } = useTranslation()
   const doneToday = DAILY_GAME_TYPES.filter((type: string) => stats.todayDaily[type]).length
   const alive = stats.streak.current > 0
+  const [selected, setSelected] = useState<string | null>(null)
+  const selectedGame = selected ? stats.todayDaily[selected] : undefined
   return (
     <View style={styles.card}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.lg }}>
@@ -134,23 +136,33 @@ export function StreakCard({ stats }: { stats: ProfileStats }) {
           <Text variant="caption">{t('profile.today_title')}</Text>
           <Text variant="caption">{t('profile.today_done', { done: doneToday, total: DAILY_GAME_TYPES.length })}</Text>
         </View>
-        <DailyChips today={stats.todayDaily} />
+        <DailyChips today={stats.todayDaily} onSelect={setSelected} />
       </View>
+      {selectedGame && <GameDetailModal game={selectedGame} visible onClose={() => setSelected(null)} />}
     </View>
   )
 }
 
 // One chip per daily challenge: colored when done (green if solved), faded otherwise.
-export function DailyChips({ today, size = 36 }: { today: Record<string, { solved?: boolean }>; size?: number }) {
+// With `onSelect`, a done chip opens what the player did in that challenge.
+export function DailyChips({
+  today,
+  size = 36,
+  onSelect,
+}: {
+  today: Record<string, { solved?: boolean }>
+  size?: number
+  onSelect?: (type: string) => void
+}) {
+  const { t } = useTranslation()
   return (
     <View style={{ flexDirection: 'row', gap: space.sm }}>
       {DAILY_GAME_TYPES.map((type: string) => {
         const game = getGameByType(type)
         const result = today[type]
         if (!game) return null
-        return (
+        const chip = (
           <View
-            key={type}
             style={[
               styles.chip,
               { width: size, height: size, borderRadius: size / 3 },
@@ -163,6 +175,13 @@ export function DailyChips({ today, size = 36 }: { today: Record<string, { solve
               </View>
             )}
           </View>
+        )
+        return result && onSelect ? (
+          <Touchable key={type} accessibilityRole="button" accessibilityLabel={t(game.titleKey)} onPress={() => onSelect(type)}>
+            {chip}
+          </Touchable>
+        ) : (
+          <View key={type}>{chip}</View>
         )
       })}
     </View>

@@ -40,23 +40,29 @@ export function Avatar({ username, size = 44 }) {
 }
 
 // One chip per daily challenge: colored when done, with a ✓ / ✗ badge.
-export function DailyChips({ today, small = false }) {
+// With `onSelect`, a done chip opens what the player did in that challenge.
+export function DailyChips({ today, small = false, onSelect }) {
   const { t } = useTranslation()
   return (
     <div className={`profile-daily-chips${small ? ' profile-daily-chips--small' : ''}`}>
       {DAILY_GAME_TYPES.map((type) => {
         const meta = GAME_META[type]
         const result = today[type]
-        return (
-          <span
-            key={type}
-            title={t(meta.titleKey)}
-            className={`profile-daily-chip${result ? ' done' : ''}`}
-            style={result ? { borderColor: meta.color, background: `${meta.color}26` } : undefined}
-          >
+        const props = {
+          title: t(meta.titleKey),
+          className: `profile-daily-chip${result ? ' done' : ''}${result && onSelect ? ' clickable' : ''}`,
+          style: result ? { borderColor: meta.color, background: `${meta.color}26` } : undefined,
+        }
+        const content = (
+          <>
             {meta.emoji}
             {result && <i className={result.solved === false ? 'failed' : ''}>{result.solved === false ? '✗' : '✓'}</i>}
-          </span>
+          </>
+        )
+        return result && onSelect ? (
+          <button key={type} type="button" {...props} onClick={() => onSelect(type)}>{content}</button>
+        ) : (
+          <span key={type} {...props}>{content}</span>
         )
       })}
     </div>
@@ -88,6 +94,7 @@ function StreakCard({ stats }) {
   const { t } = useTranslation()
   const doneToday = DAILY_GAME_TYPES.filter((type) => stats.todayDaily[type]).length
   const alive = stats.streak.current > 0
+  const [selected, setSelected] = useState(null)
   return (
     <div className="profile-card profile-streak">
       <div className="profile-streak-main">
@@ -106,8 +113,11 @@ function StreakCard({ stats }) {
           <small>{t('profile.today_title')}</small>
           <small>{t('profile.today_done', { done: doneToday, total: DAILY_GAME_TYPES.length })}</small>
         </div>
-        <DailyChips today={stats.todayDaily} />
+        <DailyChips today={stats.todayDaily} onSelect={setSelected} />
       </div>
+      {selected && stats.todayDaily[selected] && (
+        <GameDetail game={stats.todayDaily[selected]} meta={GAME_META[selected]} onClose={() => setSelected(null)} />
+      )}
     </div>
   )
 }

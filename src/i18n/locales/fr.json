@@ -898,6 +898,42 @@
       "title": "Âme du salon",
       "desc": "Joue 25 parties multijoueur"
     },
+    "capital_tour": {
+      "title": "Tour du monde des capitales",
+      "desc": "Trouver toutes les capitales d'une partie dans les 5 difficultés"
+    },
+    "flag_tour": {
+      "title": "Tour du monde des drapeaux",
+      "desc": "Reconnaître tous les drapeaux d'une partie dans les 5 difficultés"
+    },
+    "placement_tour": {
+      "title": "Tour du monde du placement",
+      "desc": "Placer tous les pays d'une partie dans les 5 difficultés"
+    },
+    "capital_impossible": {
+      "title": "Capitales impossibles",
+      "desc": "Trouver toutes les capitales d'une partie en Impossible"
+    },
+    "flag_impossible": {
+      "title": "Drapeaux impossibles",
+      "desc": "Reconnaître tous les drapeaux d'une partie en Impossible"
+    },
+    "placement_impossible": {
+      "title": "Placement impossible",
+      "desc": "Placer tous les pays d'une partie en Impossible"
+    },
+    "impossible_trio": {
+      "title": "Trio impossible",
+      "desc": "Réussir une partie parfaite en Impossible au Placement, aux Drapeaux et aux Capitales"
+    },
+    "hardcore_trio": {
+      "title": "Trio hardcore",
+      "desc": "Réussir une partie parfaite en Hardcore au Placement, aux Drapeaux et aux Capitales"
+    },
+    "world_champion": {
+      "title": "Champion du monde",
+      "desc": "Réussir une partie parfaite au Placement, aux Drapeaux et aux Capitales dans les 5 difficultés"
+    },
     "tiers": {
       "bronze": "Bronze",
       "silver": "Argent",

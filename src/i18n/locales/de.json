@@ -898,6 +898,42 @@
       "title": "Seele des Raums",
       "desc": "Spiele 25 Mehrspielerpartien"
     },
+    "capital_tour": {
+      "title": "Hauptstädte-Weltreise",
+      "desc": "Finde alle Hauptstädte einer Partie in allen 5 Schwierigkeitsstufen"
+    },
+    "flag_tour": {
+      "title": "Flaggen-Weltreise",
+      "desc": "Erkenne alle Flaggen einer Partie in allen 5 Schwierigkeitsstufen"
+    },
+    "placement_tour": {
+      "title": "Platzierungs-Weltreise",
+      "desc": "Platziere alle Länder einer Partie in allen 5 Schwierigkeitsstufen"
+    },
+    "capital_impossible": {
+      "title": "Unmögliche Hauptstädte",
+      "desc": "Finde alle Hauptstädte einer Partie auf Unmöglich"
+    },
+    "flag_impossible": {
+      "title": "Unmögliche Flaggen",
+      "desc": "Erkenne alle Flaggen einer Partie auf Unmöglich"
+    },
+    "placement_impossible": {
+      "title": "Unmögliche Platzierung",
+      "desc": "Platziere alle Länder einer Partie auf Unmöglich"
+    },
+    "impossible_trio": {
+      "title": "Unmögliches Trio",
+      "desc": "Spiele je eine perfekte Partie auf Unmöglich in Platzierung, Flaggen und Hauptstädten"
+    },
+    "hardcore_trio": {
+      "title": "Hardcore-Trio",
+      "desc": "Spiele je eine perfekte Partie auf Hardcore in Platzierung, Flaggen und Hauptstädten"
+    },
+    "world_champion": {
+      "title": "Weltmeister",
+      "desc": "Spiele in Platzierung, Flaggen und Hauptstädten in allen 5 Schwierigkeitsstufen eine perfekte Partie"
+    },
     "tiers": {
       "bronze": "Bronze",
       "silver": "Silber",

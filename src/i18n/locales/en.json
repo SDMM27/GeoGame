@@ -898,6 +898,42 @@
       "title": "Soul of the room",
       "desc": "Play 25 multiplayer games"
     },
+    "capital_tour": {
+      "title": "Capital grand tour",
+      "desc": "Find every capital of a game on all 5 difficulties"
+    },
+    "flag_tour": {
+      "title": "Flag grand tour",
+      "desc": "Recognize every flag of a game on all 5 difficulties"
+    },
+    "placement_tour": {
+      "title": "Placement grand tour",
+      "desc": "Place every country of a game on all 5 difficulties"
+    },
+    "capital_impossible": {
+      "title": "Impossible capitals",
+      "desc": "Find every capital of a game on Impossible"
+    },
+    "flag_impossible": {
+      "title": "Impossible flags",
+      "desc": "Recognize every flag of a game on Impossible"
+    },
+    "placement_impossible": {
+      "title": "Impossible placement",
+      "desc": "Place every country of a game on Impossible"
+    },
+    "impossible_trio": {
+      "title": "Impossible trio",
+      "desc": "Play a flawless Impossible game in Placement, Flags and Capitals"
+    },
+    "hardcore_trio": {
+      "title": "Hardcore trio",
+      "desc": "Play a flawless Hardcore game in Placement, Flags and Capitals"
+    },
+    "world_champion": {
+      "title": "World champion",
+      "desc": "Play a flawless game in Placement, Flags and Capitals on all 5 difficulties"
+    },
     "tiers": {
       "bronze": "Bronze",
       "silver": "Silver",

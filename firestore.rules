@@ -124,11 +124,41 @@ service cloud.firestore {
         && badges.count is int && badges.count >= 0 && badges.count <= 200;
     }
 
+    // users/{uid}.challenges: the ids of the challenges (sticky achievements) the player unlocked, kept for good.
+    function challengeAt(ids, index) {
+      return ids.size() <= index || (ids[index] is string && ids[index].size() <= 40);
+    }
+
+    function validChallenges(ids) {
+      return ids is list && ids.size() <= 20
+        && challengeAt(ids, 0)
+        && challengeAt(ids, 1)
+        && challengeAt(ids, 2)
+        && challengeAt(ids, 3)
+        && challengeAt(ids, 4)
+        && challengeAt(ids, 5)
+        && challengeAt(ids, 6)
+        && challengeAt(ids, 7)
+        && challengeAt(ids, 8)
+        && challengeAt(ids, 9)
+        && challengeAt(ids, 10)
+        && challengeAt(ids, 11)
+        && challengeAt(ids, 12)
+        && challengeAt(ids, 13)
+        && challengeAt(ids, 14)
+        && challengeAt(ids, 15)
+        && challengeAt(ids, 16)
+        && challengeAt(ids, 17)
+        && challengeAt(ids, 18)
+        && challengeAt(ids, 19);
+    }
+
     match /users/{uid} {
       allow read: if true;
       allow update: if request.auth != null && request.auth.uid == uid
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['badges'])
-        && validBadges(request.resource.data.badges);
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['badges', 'challenges'])
+        && (!('badges' in request.resource.data.diff(resource.data).affectedKeys()) || validBadges(request.resource.data.badges))
+        && (!('challenges' in request.resource.data.diff(resource.data).affectedKeys()) || validChallenges(request.resource.data.challenges));
       // Community directory (src/utils/community.js): users/{uid}.communityAt is the opt-in. Joining stamps the
       // server time, leaving removes the field. Nothing else changes with it.
       allow update: if request.auth != null && request.auth.uid == uid

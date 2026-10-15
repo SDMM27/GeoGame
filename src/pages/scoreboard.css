@@ -120,7 +120,7 @@
 
 .scoreboard-header {
   display: grid;
-  grid-template-columns: 48px 1fr 100px 80px 120px;
+  grid-template-columns: 48px minmax(0, 1fr) 100px 80px 120px;
   padding: 8px 16px;
   font-size: 0.7rem;
   letter-spacing: 2px;
@@ -131,7 +131,7 @@
 
 .scoreboard-row {
   display: grid;
-  grid-template-columns: 48px 1fr 100px 80px 120px;
+  grid-template-columns: 48px minmax(0, 1fr) 100px 80px 120px;
   align-items: center;
   padding: 12px 16px;
   background: var(--bg-card);
@@ -154,6 +154,8 @@
 }
 
 .scoreboard-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -209,7 +211,7 @@
   }
 
   .scoreboard-rank { grid-area: rank; }
-  .scoreboard-name { grid-area: name; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .scoreboard-name { grid-area: name; }
   .scoreboard-score { grid-area: score; text-align: right; }
   .scoreboard-time { grid-area: time; }
   .scoreboard-difficulty,

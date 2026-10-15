@@ -234,6 +234,7 @@ export default function CountryCluePage() {
                   ? t('share.details_found_attempts', { count: guesses.length })
                   : t('share.details_not_found_attempts', { count: guesses.length })}
                 challenge={mode === 'daily' ? { route: '/country-clue', dailyKey, solved: isSolved } : null}
+                nudge={mode === 'daily'}
               />
             )}
 

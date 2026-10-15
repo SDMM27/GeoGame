@@ -263,6 +263,7 @@ export default function BorderGuessPage() {
                   ? t('share.details_found_attempts', { count: guesses.length })
                   : t('share.details_not_found_attempts', { count: guesses.length })}
                 challenge={mode === 'daily' ? { route: '/border-guess', dailyKey, solved: isSolved } : null}
+                nudge={mode === 'daily'}
               />
             )}
 

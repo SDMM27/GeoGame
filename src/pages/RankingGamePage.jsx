@@ -382,6 +382,7 @@ export default function RankingGamePage() {
               difficulty={mode === 'daily' ? 'Daily' : 'Infini'}
               details={t('share.details_ranking_error', { count: totalError })}
               challenge={mode === 'daily' ? { route: '/ranking', dailyKey } : null}
+              nudge={mode === 'daily'}
             />
 
             {/* Correct rankings revealed */}

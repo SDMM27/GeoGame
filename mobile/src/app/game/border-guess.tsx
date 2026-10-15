@@ -123,7 +123,7 @@ function BorderGuessGame({ mode, play }: { mode: string; play?: RoomPlay }) {
                 />
               </View>
             ) : currentCountry ? (
-              <Animated.View key={currentCountry.properties.ADMIN} entering={ZoomIn.springify().damping(16)} style={{ flex: 1 }}>
+              <Animated.View key={currentCountry.properties.ADMIN} entering={ZoomIn.springify().dampingRatio(0.7)} style={{ flex: 1 }}>
                 <CountrySilhouette
                   country={currentCountry}
                   color={ACCENT}

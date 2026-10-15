@@ -11,6 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { matchKnownAnswer } from '@shared/utils/answerLexicon'
 
 import { setupGameRecord } from '@/account/history'
+import { useClearedAnswerGuard } from '@/components/game/answerInput'
 import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
 import { ResultsSheet, type SaveConfig } from '@/components/game/ResultsSheet'
 import { Text, Touchable } from '@/components/ui'
@@ -99,6 +100,7 @@ export function TypingGame({
     handleSubmitRef.current = handleSubmit
   })
   const submitAnswer = useCallback(() => handleSubmitRef.current(), [])
+  const changeAnswer = useClearedAnswerGuard(inputValue, setInputValue)
   const autoSubmit = useEffectEvent(() => handleSubmit())
   useEffect(() => {
     if (shouldAutoSubmit) autoSubmit()
@@ -193,7 +195,7 @@ export function TypingGame({
           {targetCountry && (
             <Animated.View
               key={targetCountryISO ?? targetCountry.properties.ADMIN}
-              entering={ZoomIn.springify().damping(16)}
+              entering={ZoomIn.springify().dampingRatio(0.7)}
               style={[styles.flagCard, typing && { width: flagHeight * 1.5, height: flagHeight, padding: space.sm }]}>
               {flag ? (
                 <Image source={flag} contentFit="contain" style={styles.flag} accessibilityLabel={t(config.promptKey)} />
@@ -220,7 +222,7 @@ export function TypingGame({
             <AnswerInput
               ref={inputRef}
               value={inputValue}
-              onChangeText={setInputValue}
+              onChangeText={changeAnswer}
               onSubmit={submitAnswer}
               placeholder={t(config.placeholderKey)}
               locked={locked}

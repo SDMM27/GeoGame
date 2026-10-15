@@ -15,6 +15,7 @@ import { normalize } from '@shared/utils/normalizeAnswer'
 import { localizeQuestion } from '@shared/utils/quizQuestions'
 import { matchesWhileTyping } from '@shared/utils/survival'
 
+import { useClearedAnswerGuard } from '@/components/game/answerInput'
 import { BorderGuessRow, type BorderGuess } from '@/components/game/GuessCards'
 import { GuessInputBar } from '@/components/game/GuessInputBar'
 import { CountrySilhouette } from '@/components/map/CountrySilhouette'
@@ -130,6 +131,7 @@ export function TypedRound({ survival, onSubmit }: { survival: Survival; onSubmi
     setValue(text)
     if (isPlaying && matchesWhileTyping(round, text)) submit(text)
   }
+  const changeAnswer = useClearedAnswerGuard(value, onChangeText)
 
   useEffect(() => {
     inputRef.current?.focus()
@@ -145,14 +147,14 @@ export function TypedRound({ survival, onSubmit }: { survival: Survival; onSubmi
         </Text>
       </View>
       {isCapital ? (
-        <Animated.View entering={ZoomIn.springify().damping(16)} style={styles.capitalCountry}>
+        <Animated.View entering={ZoomIn.springify().dampingRatio(0.7)} style={styles.capitalCountry}>
           {flag && <Image source={flag} contentFit="contain" style={styles.smallFlag} />}
           <Text variant="title" numberOfLines={2} adjustsFontSizeToFit style={{ flexShrink: 1, textAlign: 'center' }}>
             {countryLabel(country, i18n.language)}
           </Text>
         </Animated.View>
       ) : (
-        <Animated.View entering={ZoomIn.springify().damping(16)} style={styles.flagCard}>
+        <Animated.View entering={ZoomIn.springify().dampingRatio(0.7)} style={styles.flagCard}>
           {flag ? (
             <Image source={flag} contentFit="contain" style={styles.flag} accessibilityLabel={t(`survival.prompt.${round!.type}`)} />
           ) : (
@@ -164,7 +166,7 @@ export function TypedRound({ survival, onSubmit }: { survival: Survival; onSubmi
         <TextInput
           ref={inputRef}
           value={value}
-          onChangeText={onChangeText}
+          onChangeText={changeAnswer}
           onSubmitEditing={() => submit()}
           submitBehavior="submit"
           placeholder={t(isCapital ? 'survival.capital_placeholder' : 'placeholders.country_name')}
@@ -244,7 +246,7 @@ export function BorderRound({ survival, height }: { survival: Survival; height: 
   return (
     <View style={{ gap: space.lg }}>
       <View style={[styles.silhouette, { height }]}>
-        <Animated.View key={country.properties.ADMIN} entering={ZoomIn.springify().damping(16)} style={{ flex: 1 }}>
+        <Animated.View key={country.properties.ADMIN} entering={ZoomIn.springify().dampingRatio(0.7)} style={{ flex: 1 }}>
           <CountrySilhouette country={country as never} color={gameColors.border_guess} style={{ flex: 1 }} />
         </Animated.View>
       </View>

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
+import { useClearedAnswerGuard } from '@/components/game/answerInput'
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible'
 import { clean } from '@/i18n'
 import { colors, fonts, radius, space } from '@/theme'
@@ -41,6 +42,7 @@ export function GuessInputBar({
   // The keyboard covers the home indicator: no bottom inset under the input while typing.
   const keyboardVisible = useKeyboardVisible()
   const inputRef = useRef<TextInput>(null)
+  const changeAnswer = useClearedAnswerGuard(value, onChangeText)
   const trimmed = value.trim()
   const visibleSuggestions = locked || suggestions.includes(trimmed) ? [] : suggestions
 
@@ -81,7 +83,7 @@ export function GuessInputBar({
         <TextInput
           ref={inputRef}
           value={value}
-          onChangeText={onChangeText}
+          onChangeText={changeAnswer}
           onSubmitEditing={onSubmit}
           submitBehavior="submit"
           placeholder={placeholder}

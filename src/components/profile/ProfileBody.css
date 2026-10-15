@@ -64,6 +64,9 @@
   filter: grayscale(1);
 }
 .profile-daily-chip.done { opacity: 1; filter: none; }
+button.profile-daily-chip { font-family: inherit; color: inherit; padding: 0; }
+.profile-daily-chip.clickable { cursor: pointer; transition: transform 0.12s; }
+.profile-daily-chip.clickable:hover { transform: translateY(-2px); }
 .profile-daily-chip i {
   position: absolute; top: -5px; right: -5px;
   width: 16px; height: 16px; border-radius: 50%;

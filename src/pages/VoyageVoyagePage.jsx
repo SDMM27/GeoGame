@@ -384,6 +384,7 @@ export default function VoyageVoyagePage() {
               scoreLabel="PTS"
               details={t('share.details_voyage', { steps: stepsUsed, optimal: optimalLength })}
               challenge={mode === 'daily' ? { route: '/voyage-voyage', dailyKey } : null}
+              nudge={mode === 'daily'}
             />
 
             {mode === 'daily' && (

@@ -7,8 +7,10 @@ import './ShareScoreButton.css'
 
 // `challenge` ({ route, dailyKey, solved }) : à fournir en mode daily pour afficher
 // le bouton « Défier un ami », qui partage un lien vers le même défi du jour.
+// `nudge` : false pour masquer « Défie un ami » quand la partie n'est pas enregistrée (modes infinis), le serveur
+// refuserait la notification faute de partie récente.
 // `scoreText` (« 9/12 ») et `grid` (les manches du Challenge du jour) : voir generateShareText.
-export default function ShareScoreButton({ score, gameType, difficulty, scoreLabel = 'POINTS', scoreText, details, grid, challenge }) {
+export default function ShareScoreButton({ score, gameType, difficulty, scoreLabel = 'POINTS', scoreText, details, grid, challenge, nudge = true }) {
   const { t } = useTranslation()
   const [pseudo, setPseudo] = useState(() => localStorage.getItem('geogame_pseudo') ?? '')
   const [copied, setCopied] = useState(false)
@@ -73,7 +75,7 @@ export default function ShareScoreButton({ score, gameType, difficulty, scoreLab
           {copied ? t('share.copied') : t('share.copy_button')}
         </button>
       )}
-      <NudgeFriends gameType={gameType} recent={!challenge} />
+      {nudge && <NudgeFriends gameType={gameType} recent={!challenge} />}
     </div>
   )
 }

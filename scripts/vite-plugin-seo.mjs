@@ -6,7 +6,6 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { OG_IMAGE, SEO_PAGES, SITE_NAME, SITE_URL } from '../src/seo/seoPages.js'
-import { LANGUAGES, LANGUAGE_CODES } from '../src/i18n/languages.js'
 
 const HEAD_RE = /<!-- seo:head -->[\s\S]*?<!-- \/seo:head -->|<!-- seo:head -->/
 const NOSCRIPT_RE = /<!-- seo:noscript -->[\s\S]*?<!-- \/seo:noscript -->|<!-- seo:noscript -->/
@@ -30,7 +29,7 @@ function structuredData(strings) {
       applicationCategory: 'GameApplication',
       genre: ['Geography', 'Quiz', 'Educational'],
       operatingSystem: 'Web',
-      inLanguage: LANGUAGE_CODES,
+      inLanguage: 'fr',
       image: SITE_URL + OG_IMAGE,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
     },
@@ -55,12 +54,11 @@ export function renderHead(page, strings) {
     `<meta property="og:description" content="${escape(description)}" />`,
     `<meta property="og:url" content="${url}" />`,
     `<meta property="og:image" content="${image}" />`,
-    '<meta property="og:image:width" content="512" />',
-    '<meta property="og:image:height" content="512" />',
+    '<meta property="og:image:width" content="1200" />',
+    '<meta property="og:image:height" content="630" />',
     `<meta property="og:image:alt" content="${SITE_NAME}" />`,
     '<meta property="og:locale" content="fr_FR" />',
-    ...LANGUAGES.filter(({ code }) => code !== 'fr').map(({ og }) => `<meta property="og:locale:alternate" content="${og}" />`),
-    '<meta name="twitter:card" content="summary" />',
+    '<meta name="twitter:card" content="summary_large_image" />',
     `<meta name="twitter:title" content="${escape(title)}" />`,
     `<meta name="twitter:description" content="${escape(description)}" />`,
     `<meta name="twitter:image" content="${image}" />`,

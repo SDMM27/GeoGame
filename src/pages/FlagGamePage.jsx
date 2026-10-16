@@ -10,6 +10,7 @@ import { GAME_TYPES } from '../utils/gameTypes'
 import { setupGameRecord } from '../utils/gameHistory'
 import { useRecordGame } from '../auth'
 import { matchKnownAnswer } from '../utils/answerLexicon'
+import { restartTyping } from '../utils/restartTyping'
 import { getCountryName, getAllCountryNames } from '../utils/getCountryName'
 import PhaseIndicator from '../components/PhaseIndicator'
 import Form from './form'
@@ -40,7 +41,9 @@ function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state
   const inputRef = useRef(null)
   const [isInputFocused, setIsInputFocused] = useState(false)
   useEffect(() => {
-    if (targetCountry && !revealedName) inputRef.current?.focus()
+    if (!targetCountry || revealedName) return
+    restartTyping(inputRef.current)
+    inputRef.current?.focus()
   }, [targetCountry, revealedName])
 
   const progressPct = stats.total ? (stats.found / stats.total) * 100 : 0

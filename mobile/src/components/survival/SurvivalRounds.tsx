@@ -15,7 +15,7 @@ import { normalize } from '@shared/utils/normalizeAnswer'
 import { localizeQuestion } from '@shared/utils/quizQuestions'
 import { matchesWhileTyping } from '@shared/utils/survival'
 
-import { useClearedAnswerGuard } from '@/components/game/answerInput'
+import { ANSWER_KEYBOARD_PROPS, useClearedAnswerGuard } from '@/components/game/answerInput'
 import { BorderGuessRow, type BorderGuess } from '@/components/game/GuessCards'
 import { GuessInputBar } from '@/components/game/GuessInputBar'
 import { CountrySilhouette } from '@/components/map/CountrySilhouette'
@@ -171,7 +171,7 @@ export function TypedRound({ survival, onSubmit }: { survival: Survival; onSubmi
           submitBehavior="submit"
           placeholder={t(isCapital ? 'survival.capital_placeholder' : 'placeholders.country_name')}
           placeholderTextColor={colors.textFaint}
-          autoCapitalize="words"
+          {...ANSWER_KEYBOARD_PROPS}
           autoCorrect={false}
           spellCheck={false}
           autoComplete="off"

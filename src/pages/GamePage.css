@@ -341,3 +341,15 @@
     flex-direction: column;
   }
 }
+
+/* On phones the blur behind the HUD is recomputed on every frame while the map pans or zooms, which makes the map
+   stutter on mid-range Android devices. The glass background is already 85 % opaque: the blur adds little there. */
+@media (pointer: coarse) {
+  .hud-main,
+  .hud-stats,
+  .hud-btn,
+  .controls-hint,
+  .game-over-overlay {
+    backdrop-filter: none;
+  }
+}

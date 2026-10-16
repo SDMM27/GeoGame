@@ -74,3 +74,8 @@
   background: rgba(34, 211, 238, 0.14);
   border-color: rgba(34, 211, 238, 0.5);
 }
+
+.share-image-btn:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}

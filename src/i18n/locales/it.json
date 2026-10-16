@@ -413,6 +413,8 @@
   "share": {
     "copy_button": "📋 Copia il risultato",
     "copied": "✓ Risultato copiato!",
+    "share_image": "🖼️ Condividi l'immagine",
+    "download_image": "⬇️ Scarica l'immagine",
     "pseudo_placeholder": "Il tuo nome (facoltativo)",
     "anonymous": "Anonimo",
     "played_by": "giocato da",
@@ -1177,6 +1179,14 @@
     "scores": {
       "title": "Classifiche — Migliori punteggi | GeoGame",
       "description": "I migliori punteggi dei giocatori di GeoGame per ogni gioco, difficoltà e continente."
+    },
+    "privacy": {
+      "title": "Informativa sulla privacy | GeoGame",
+      "description": "Quali dati tratta GeoGame, perché, per quanto tempo e come esercitare i tuoi diritti (accesso, cancellazione, opposizione)."
+    },
+    "terms": {
+      "title": "Condizioni d’uso | GeoGame",
+      "description": "Le regole di utilizzo di GeoGame: account, comportamento atteso, classifiche pubbliche e responsabilità."
     }
   },
   "daily_elsewhere": {

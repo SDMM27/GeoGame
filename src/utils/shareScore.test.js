@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { generateShareCard, exportShareCard, GAME_LABELS, generateShareText } from './shareScore'
+import { generateShareCard, exportShareCard, GAME_LABELS, generateShareText, getGameUrl, shareScoreText } from './shareScore'
 
 // Mock i18n so tests are independent of locale files
 vi.mock('../i18n', () => {
@@ -194,5 +194,72 @@ describe('generateShareText', () => {
   it('translates difficulty from mode key', () => {
     const text = generateShareText({ score: 0, gameType: 'RANKING', difficulty: 'Infini', pseudo: 'X' })
     expect(text).toContain('Infini') // maps to modes.infinite → 'Infini' in mock
+  })
+})
+
+describe('game link', () => {
+  const site = 'https://example.test'
+
+  it.each([
+    ['FLAGS', '/flag-game'],
+    ['PLACEMENT', '/game'],
+    ['CAPITALS', '/capitals-game'],
+    ['BORDER_GUESS', '/border-guess'],
+    ['COUNTRY_CLUE', '/country-clue'],
+    ['RANKING', '/ranking'],
+    ['VOYAGE_VOYAGE', '/voyage-voyage'],
+    ['QUIZ', '/quiz'],
+  ])('maps %s to %s', (gameType, route) => {
+    expect(getGameUrl(gameType, site)).toBe(`${site}${route}`)
+  })
+
+  it('falls back to the origin for DAILY_CHALLENGE and unknown types', () => {
+    expect(getGameUrl('DAILY_CHALLENGE', site)).toBe(site)
+    expect(getGameUrl('NOPE', site)).toBe(site)
+  })
+
+  it('shares the game route in the text, tolerating a trailing slash', () => {
+    const text = generateShareText({ score: 1, gameType: 'CAPITALS', difficulty: 'Facile', pseudo: 'X', siteUrl: `${site}/` })
+    expect(text).toContain(`${site}/capitals-game`)
+    expect(text).not.toContain('utm')
+  })
+
+  it('keeps the challenge url as is when given', () => {
+    const challengeUrl = `${site}/challenge?mode=daily&score=3`
+    const text = generateShareText({ score: 3, gameType: 'DAILY_CHALLENGE', difficulty: 'Daily', pseudo: 'X', challengeUrl, siteUrl: site })
+    expect(text).toContain(challengeUrl)
+  })
+})
+
+describe('shareScoreText', () => {
+  afterEach(() => {
+    Object.defineProperty(navigator, 'share', { value: undefined, configurable: true })
+    vi.restoreAllMocks()
+  })
+
+  const data = { score: 1, gameType: 'FLAGS', difficulty: 'Facile', pseudo: 'X' }
+
+  it('uses navigator.share whenever it exists, even on a non-touch device', async () => {
+    const share = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'share', { value: share, configurable: true })
+    expect(await shareScoreText(data)).toBe('shared')
+    expect(share).toHaveBeenCalledOnce()
+  })
+
+  it('stays silent when the user cancels the share sheet', async () => {
+    const share = vi.fn().mockRejectedValue(Object.assign(new Error('cancel'), { name: 'AbortError' }))
+    const writeText = vi.fn()
+    Object.defineProperty(navigator, 'share', { value: share, configurable: true })
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true })
+    expect(await shareScoreText(data)).toBe('cancelled')
+    expect(writeText).not.toHaveBeenCalled()
+  })
+
+  it('copies to the clipboard without navigator.share', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'share', { value: undefined, configurable: true })
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true })
+    expect(await shareScoreText(data)).toBe('copied')
+    expect(writeText).toHaveBeenCalledOnce()
   })
 })

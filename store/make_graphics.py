@@ -1,4 +1,5 @@
-# Builds the Play Store graphics from the app's assets and screenshots: python store/make_graphics.py
+# Builds the Play Store graphics from the app's assets and screenshots (plus the website's og.png and
+# maskable icon in public/): python store/make_graphics.py
 # (Fonts come from mobile/node_modules: run `npm install` in mobile first.)
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
@@ -75,12 +76,50 @@ def feature_graphic(lang):
     return im.convert('RGB')
 
 
+def og_image():
+    """Social preview of the website (public/og.png, 1200x630): logo, name and French tagline on the dark background."""
+    W, H = 1200, 630
+    im = Image.new('RGBA', (W, H), BG + (255,))
+    glow = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+    g = ImageDraw.Draw(glow)
+    g.ellipse((640, -120, 1240, 420), fill=(61, 220, 151, 70))
+    g.ellipse((780, 260, 1380, 800), fill=(122, 162, 255, 80))
+    im.alpha_composite(glow.filter(ImageFilter.GaussianBlur(110)))
+
+    d = ImageDraw.Draw(im)
+    logo = Image.open(APP / 'assets' / 'images' / 'logo.png').convert('RGBA').resize((120, 120), Image.LANCZOS)
+    im.alpha_composite(logo, (80, 150))
+    d.text((228, 146), 'GeoGame', font=font('bricolage-grotesque', '700Bold', 100), fill=TEXT)
+    title, subtitle = TAGLINES['fr']
+    d.text((82, 312), title, font=font('bricolage-grotesque', '600SemiBold', 58), fill=ACCENT)
+    body = font('inter', '500Medium', 28)
+    for i, line in enumerate(subtitle.split(' · ')):
+        d.text((82, 400 + i * 42), line[0].upper() + line[1:], font=body, fill=MUTED)
+    for i, color in enumerate(GAME_COLORS):
+        x = 84 + i * 36
+        d.ellipse((x, 530, x + 20, 550), fill=color)
+    return im.convert('RGB')
+
+
+def maskable_icon():
+    """512x512 maskable PWA icon (public/logo512-maskable.png): the app icon foreground inside the safe zone."""
+    size = 512
+    im = Image.new('RGBA', (size, size), BG + (255,))
+    fg = Image.open(APP / 'assets' / 'images' / 'android-icon-foreground.png').convert('RGBA')
+    inner = round(size * 0.6)
+    im.alpha_composite(fg.resize((inner, inner), Image.LANCZOS), ((size - inner) // 2, (size - inner) // 2))
+    return im.convert('RGB')
+
+
 def main():
     out = ROOT / 'graphics'
     out.mkdir(exist_ok=True)
     Image.open(APP / 'assets' / 'images' / 'icon.png').convert('RGBA').resize((512, 512), Image.LANCZOS).save(out / 'icon-512.png')
     for lang in TAGLINES:
         feature_graphic(lang).save(out / f'feature-graphic-{lang}.png')
+    public = ROOT.parent / 'public'
+    og_image().save(public / 'og.png', optimize=True)
+    maskable_icon().save(public / 'logo512-maskable.png', optimize=True)
     print('done:', *sorted(p.name for p in out.iterdir()))
 
 

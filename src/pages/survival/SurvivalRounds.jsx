@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next'
 import { GeoJSON, MapContainer } from 'react-leaflet'
 import countries from '../../data/countriesWithDifficulty_FR.json'
 import { BORDER_GUESS_COUNTRIES } from '../../hooks/useBorderGuessState'
-import LandLayer from '../../components/map/LandLayer'
 import { createAppFillRenderer } from '../../components/map/appFillRenderer'
 import { getCountryStyle, getFocusCountry } from '../../utils/borderGuessMap'
 import { GAME_TYPES } from '../../utils/gameTypes'
@@ -13,6 +12,7 @@ import { getCapitalName, getCountryName } from '../../utils/getCountryName'
 import { normalize } from '../../utils/normalizeAnswer'
 import { localizeQuestion } from '../../utils/quizQuestions'
 import { matchesWhileTyping } from '../../utils/survival'
+import { restartTyping } from '../../utils/restartTyping'
 import { FitCountryBounds, GuessHistory } from '../BorderGuessPage'
 import SmallCountryCircles from '../game/SmallCountryCircles'
 import { getShiftedFeatures } from '../game/shiftedFeatures'
@@ -104,7 +104,6 @@ export function PlacementRound({ survival }) {
           setTimeout(() => leafletMap.invalidateSize(), 100)
         }}
       >
-        <LandLayer />
         {[
           ['left', geoJsonRefLeft, getShiftedFeatures().left],
           ['main', geoJsonRef, countries.features],
@@ -145,6 +144,7 @@ function AnswerInput({ survival, placeholder, onSubmit, autoSubmit = null, sugge
 
   useEffect(() => {
     setValue('')
+    restartTyping(inputRef.current)
     inputRef.current?.focus()
   }, [roundIndex])
 

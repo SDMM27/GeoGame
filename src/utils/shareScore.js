@@ -26,6 +26,24 @@ const GAME_TYPE_LOCALE_KEYS = {
   DAILY_CHALLENGE: 'games.daily_challenge.title',
 }
 
+// Route of each game on the site: the shared link opens the game that was played.
+// DAILY_CHALLENGE has no entry here: it shares a challenge link (see utils/challenge.js).
+export const GAME_ROUTES = {
+  FLAGS: '/flag-game',
+  PLACEMENT: '/game',
+  CAPITALS: '/capitals-game',
+  BORDER_GUESS: '/border-guess',
+  COUNTRY_CLUE: '/country-clue',
+  RANKING: '/ranking',
+  VOYAGE_VOYAGE: '/voyage-voyage',
+  QUIZ: '/quiz',
+}
+
+// `site` : origin without trailing slash. Unknown game types fall back to the origin alone.
+export function getGameUrl(gameType, site) {
+  return `${site}${GAME_ROUTES[gameType] ?? ''}`
+}
+
 function getGameLabel(gameType) {
   const key = GAME_TYPE_LOCALE_KEYS[gameType]
   if (key && i18n.isInitialized) return i18n.t(key)
@@ -53,7 +71,10 @@ function t(key, fallback) {
   return fallback
 }
 
-export function generateShareCard({ score, gameType, difficulty, pseudo, scoreLabel = 'POINTS' }) {
+const ACCENT = '#3DDC97'
+
+// `scoreText`: the score as it reads on the card when the number alone doesn't ('9/12').
+export function generateShareCard({ score, gameType, difficulty, pseudo, scoreLabel = 'POINTS', scoreText }) {
   return new Promise((resolve, reject) => {
     try {
       const W = 1200, H = 630
@@ -65,9 +86,8 @@ export function generateShareCard({ score, gameType, difficulty, pseudo, scoreLa
 
       // Background gradient
       const grad = ctx.createLinearGradient(0, 0, W, H)
-      grad.addColorStop(0, '#0f2027')
-      grad.addColorStop(0.5, '#203a43')
-      grad.addColorStop(1, '#2c5364')
+      grad.addColorStop(0, '#0B1020')
+      grad.addColorStop(1, '#141C36')
       ctx.fillStyle = grad
       ctx.fillRect(0, 0, W, H)
 
@@ -89,15 +109,14 @@ export function generateShareCard({ score, gameType, difficulty, pseudo, scoreLa
 
       // Branding (top-left)
       ctx.save()
-      ctx.globalAlpha = 0.5
-      ctx.fillStyle = '#ffffff'
+      ctx.fillStyle = ACCENT
       ctx.font = '600 16px "Segoe UI", sans-serif'
       ctx.textAlign = 'left'
       ctx.fillText('🌍 GEOGAME', padX, padY + 16)
       ctx.restore()
 
       // Difficulty badge (top-right)
-      const badgeText = difficulty ?? ''
+      const badgeText = translateDifficulty(difficulty)
       if (badgeText) {
         ctx.save()
         ctx.font = '13px "Segoe UI", sans-serif'
@@ -145,10 +164,10 @@ export function generateShareCard({ score, gameType, difficulty, pseudo, scoreLa
 
       // Score (large, center)
       ctx.save()
-      ctx.fillStyle = '#ffffff'
+      ctx.fillStyle = ACCENT
       ctx.font = '900 96px "Segoe UI", sans-serif'
       ctx.textAlign = 'center'
-      ctx.fillText(String(Math.round(score ?? 0)), W / 2, centerY + 28)
+      ctx.fillText(scoreText ?? String(Math.round(score ?? 0)), W / 2, centerY + 28)
       ctx.restore()
 
       // Score label (below score)
@@ -196,20 +215,38 @@ export function generateShareCard({ score, gameType, difficulty, pseudo, scoreLa
   })
 }
 
+// Native image share when the browser can share files, PNG download otherwise.
+// Returns 'shared' | 'downloaded' | 'cancelled'.
 export async function exportShareCard(data) {
   const blob = await generateShareCard(data)
   const file = new File([blob], 'geogame-score.png', { type: 'image/png' })
   if (navigator.canShare?.({ files: [file] })) {
-    await navigator.share({ files: [file], title: 'GeoGame' })
-  } else {
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'geogame-score.png'
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    setTimeout(() => URL.revokeObjectURL(url), 150)
+    try {
+      await navigator.share({ files: [file], title: 'GeoGame' })
+      return 'shared'
+    } catch (err) {
+      if (err?.name === 'AbortError') return 'cancelled'
+      throw err
+    }
+  }
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'geogame-score.png'
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  setTimeout(() => URL.revokeObjectURL(url), 150)
+  return 'downloaded'
+}
+
+// Can the browser hand a PNG to its share sheet? Otherwise the image action downloads it.
+export function canShareImage() {
+  if (typeof File === 'undefined') return false
+  try {
+    return !!navigator.canShare?.({ files: [new File([''], 'geogame-score.png', { type: 'image/png' })] })
+  } catch {
+    return false
   }
 }
 
@@ -224,7 +261,8 @@ export function generateShareText({ score, gameType, difficulty, pseudo, scoreLa
   const canYouBeat = t('share.can_you_beat', 'Peux-tu faire mieux ?')
   const translatedDiff = translateDifficulty(difficulty)
   // Full address with the protocol, otherwise messaging apps don't make the link clickable.
-  const site = siteUrl ?? (typeof window !== 'undefined' && /^https?:/.test(window.location?.origin ?? '') ? window.location.origin : SITE_URL)
+  const origin = siteUrl ?? (typeof window !== 'undefined' && /^https?:/.test(window.location?.origin ?? '') ? window.location.origin : SITE_URL)
+  const site = getGameUrl(gameType, origin.replace(/\/$/, ''))
 
   const lines = [
     `🌍 GeoGame — ${label}`,
@@ -247,12 +285,11 @@ export async function copyShareText(data) {
   await copyText(generateShareText(data))
 }
 
-// Défi : feuille de partage native sur mobile, presse-papier ailleurs.
+// Feuille de partage native quand le navigateur en a une (mobile et desktop), presse-papier sinon.
 // Retourne 'shared' | 'copied' | 'cancelled'.
-export async function shareChallenge(data) {
+export async function shareScoreText(data) {
   const text = generateShareText(data)
-  const isTouch = typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches
-  if (isTouch && navigator.share) {
+  if (typeof navigator !== 'undefined' && navigator.share) {
     try {
       await navigator.share({ text })
       return 'shared'
@@ -263,6 +300,8 @@ export async function shareChallenge(data) {
   await copyText(text)
   return 'copied'
 }
+
+export const shareChallenge = shareScoreText
 
 async function copyText(text) {
   try {

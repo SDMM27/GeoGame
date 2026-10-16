@@ -11,6 +11,7 @@ import { GAME_TYPES } from '../utils/gameTypes'
 import { setupGameRecord } from '../utils/gameHistory'
 import { useRecordGame } from '../auth'
 import { matchKnownAnswer } from '../utils/answerLexicon'
+import { restartTyping } from '../utils/restartTyping'
 import { getCountryName, getCapitalName, getAllCapitalNames } from '../utils/getCountryName'
 import PhaseIndicator from '../components/PhaseIndicator'
 import Form from './form'
@@ -45,6 +46,7 @@ function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, s
   // Focus input à chaque nouveau pays
   useEffect(() => {
     if (targetCountry && !revealedName) {
+      restartTyping(inputRef.current)
       inputRef.current?.focus()
     }
   }, [targetCountry, revealedName])

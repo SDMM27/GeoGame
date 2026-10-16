@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { copyShareText, shareChallenge } from '../utils/shareScore'
+import { shareScoreText, exportShareCard, canShareImage } from '../utils/shareScore'
 import { buildChallengeUrl } from '../utils/challenge'
 import NudgeFriends from './NudgeFriends'
 import './ShareScoreButton.css'
@@ -15,13 +15,18 @@ export default function ShareScoreButton({ score, gameType, difficulty, scoreLab
   const [pseudo, setPseudo] = useState(() => localStorage.getItem('geogame_pseudo') ?? '')
   const [copied, setCopied] = useState(false)
   const [challengeCopied, setChallengeCopied] = useState(false)
+  const [imageBusy, setImageBusy] = useState(false)
+  // Native image share when the browser supports files, PNG download otherwise.
+  const imageShareable = canShareImage()
 
   const handleCopy = async () => {
     localStorage.setItem('geogame_pseudo', pseudo)
     try {
-      await copyShareText({ score, gameType, difficulty, pseudo, scoreLabel, scoreText, details, grid })
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      const result = await shareScoreText({ score, gameType, difficulty, pseudo, scoreLabel, scoreText, details, grid })
+      if (result === 'copied') {
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+      }
     } catch (err) {
       console.error(err)
     }
@@ -37,13 +42,25 @@ export default function ShareScoreButton({ score, gameType, difficulty, scoreLab
       solved: challenge.solved,
     })
     try {
-      const result = await shareChallenge({ score, gameType, difficulty, pseudo, scoreLabel, scoreText, details, grid, challengeUrl })
+      const result = await shareScoreText({ score, gameType, difficulty, pseudo, scoreLabel, scoreText, details, grid, challengeUrl })
       if (result === 'copied') {
         setChallengeCopied(true)
         setTimeout(() => setChallengeCopied(false), 2000)
       }
     } catch (err) {
       console.error(err)
+    }
+  }
+
+  const handleImage = async () => {
+    localStorage.setItem('geogame_pseudo', pseudo)
+    setImageBusy(true)
+    try {
+      await exportShareCard({ score, gameType, difficulty, pseudo, scoreLabel, scoreText })
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setImageBusy(false)
     }
   }
 
@@ -75,6 +92,13 @@ export default function ShareScoreButton({ score, gameType, difficulty, scoreLab
           {copied ? t('share.copied') : t('share.copy_button')}
         </button>
       )}
+      <button
+        className="share-copy-btn share-image-btn"
+        onClick={handleImage}
+        disabled={imageBusy}
+      >
+        {imageShareable ? t('share.share_image') : t('share.download_image')}
+      </button>
       {nudge && <NudgeFriends gameType={gameType} recent={!challenge} />}
     </div>
   )

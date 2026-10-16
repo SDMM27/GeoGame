@@ -413,6 +413,8 @@
   "share": {
     "copy_button": "📋 Copy results",
     "copied": "✓ Result copied!",
+    "share_image": "🖼️ Share image",
+    "download_image": "⬇️ Download image",
     "pseudo_placeholder": "Your username (optional)",
     "anonymous": "Anonymous",
     "played_by": "played by",
@@ -1177,6 +1179,14 @@
     "scores": {
       "title": "Leaderboards — High scores | GeoGame",
       "description": "GeoGame players' high scores for every game, difficulty and continent."
+    },
+    "privacy": {
+      "title": "Privacy Policy | GeoGame",
+      "description": "What data GeoGame processes, why, for how long, and how to exercise your rights (access, erasure, objection)."
+    },
+    "terms": {
+      "title": "Terms of Use | GeoGame",
+      "description": "The rules for using GeoGame: account, expected behaviour, public leaderboards and responsibilities."
     }
   },
   "daily_elsewhere": {

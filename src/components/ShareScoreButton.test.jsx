@@ -9,6 +9,8 @@ vi.mock('react-i18next', () => ({
       'share.copied': '✓ Résultat copié !',
       'share.pseudo_placeholder': 'Ton pseudo (optionnel)',
       'share.anonymous': 'Anonyme',
+      'share.share_image': "Partager l'image",
+      'share.download_image': "Télécharger l'image",
     }[key] ?? key),
   }),
 }))
@@ -16,10 +18,12 @@ vi.mock('react-i18next', () => ({
 vi.mock('./NudgeFriends', () => ({ default: () => null }))
 
 vi.mock('../utils/shareScore', () => ({
-  copyShareText: vi.fn().mockResolvedValue(undefined),
+  shareScoreText: vi.fn().mockResolvedValue('copied'),
+  exportShareCard: vi.fn().mockResolvedValue('downloaded'),
+  canShareImage: vi.fn().mockReturnValue(false),
 }))
 
-import { copyShareText } from '../utils/shareScore'
+import { shareScoreText, exportShareCard, canShareImage } from '../utils/shareScore'
 
 describe('ShareScoreButton', () => {
   beforeEach(() => {
@@ -43,31 +47,33 @@ describe('ShareScoreButton', () => {
     render(<ShareScoreButton score={42} gameType="FLAGS" difficulty="Difficile" />)
     fireEvent.change(screen.getByPlaceholderText('Ton pseudo (optionnel)'), { target: { value: 'Bob' } })
     fireEvent.click(screen.getByRole('button', { name: /copier/i }))
-    await waitFor(() => expect(copyShareText).toHaveBeenCalled())
+    await waitFor(() => expect(shareScoreText).toHaveBeenCalled())
     expect(localStorage.getItem('geogame_pseudo')).toBe('Bob')
   })
 
-  it('calls copyShareText with all props', async () => {
+  it('calls shareScoreText with all props', async () => {
     render(<ShareScoreButton score={42} gameType="FLAGS" difficulty="Difficile" details="35/50 pays" />)
     fireEvent.change(screen.getByPlaceholderText('Ton pseudo (optionnel)'), { target: { value: 'Pierre' } })
     fireEvent.click(screen.getByRole('button', { name: /copier/i }))
     await waitFor(() =>
-      expect(copyShareText).toHaveBeenCalledWith({
+      expect(shareScoreText).toHaveBeenCalledWith({
         score: 42,
         gameType: 'FLAGS',
         difficulty: 'Difficile',
         pseudo: 'Pierre',
         scoreLabel: 'POINTS',
+        scoreText: undefined,
         details: '35/50 pays',
+        grid: undefined,
       })
     )
   })
 
-  it('forwards a custom scoreLabel to copyShareText', async () => {
+  it('forwards a custom scoreLabel to shareScoreText', async () => {
     render(<ShareScoreButton score={5} gameType="BORDER_GUESS" difficulty="Daily" scoreLabel="ESSAIS" />)
     fireEvent.click(screen.getByRole('button', { name: /copier/i }))
     await waitFor(() =>
-      expect(copyShareText).toHaveBeenCalledWith(expect.objectContaining({ scoreLabel: 'ESSAIS' }))
+      expect(shareScoreText).toHaveBeenCalledWith(expect.objectContaining({ scoreLabel: 'ESSAIS' }))
     )
   })
 
@@ -75,5 +81,34 @@ describe('ShareScoreButton', () => {
     render(<ShareScoreButton score={42} gameType="FLAGS" difficulty="Difficile" />)
     fireEvent.click(screen.getByRole('button', { name: /copier/i }))
     await waitFor(() => expect(screen.getByText(/copié/i)).toBeInTheDocument())
+  })
+
+  it('does not show the copied confirmation when the native sheet was used', async () => {
+    shareScoreText.mockResolvedValueOnce('shared')
+    render(<ShareScoreButton score={42} gameType="FLAGS" difficulty="Difficile" />)
+    fireEvent.click(screen.getByRole('button', { name: /copier/i }))
+    await waitFor(() => expect(shareScoreText).toHaveBeenCalled())
+    expect(screen.queryByText(/copié/i)).not.toBeInTheDocument()
+  })
+
+  it('offers an image download when files cannot be shared natively', async () => {
+    render(<ShareScoreButton score={42} gameType="FLAGS" difficulty="Difficile" scoreText="9/12" />)
+    fireEvent.click(screen.getByRole('button', { name: /télécharger/i }))
+    await waitFor(() =>
+      expect(exportShareCard).toHaveBeenCalledWith({
+        score: 42,
+        gameType: 'FLAGS',
+        difficulty: 'Difficile',
+        pseudo: '',
+        scoreLabel: 'POINTS',
+        scoreText: '9/12',
+      })
+    )
+  })
+
+  it('offers the native image share when the browser supports it', () => {
+    canShareImage.mockReturnValueOnce(true)
+    render(<ShareScoreButton score={42} gameType="FLAGS" difficulty="Difficile" />)
+    expect(screen.getByRole('button', { name: /partager/i })).toBeInTheDocument()
   })
 })

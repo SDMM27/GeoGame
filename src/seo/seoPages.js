@@ -2,9 +2,12 @@
 // canonical of the current route) and the build (vite.config.mjs writes one HTML file per page with
 // its own tags, plus sitemap.xml). Texts live in the locales under seo.<key>.
 // Adding a page: also add it to the first rewrite of vercel.json (checked by seo.test.jsx).
-export const SITE_URL = 'https://geo-game-delta.vercel.app'
+
+// VITE_SITE_URL: public address of the site (import.meta.env in the app, process.env in the Node build plugin).
+const CONFIGURED_URL = (import.meta.env ? import.meta.env.VITE_SITE_URL : '') || (typeof process !== 'undefined' ? process.env.VITE_SITE_URL : '')
+export const SITE_URL = (CONFIGURED_URL || 'https://geo-game-delta.vercel.app').replace(/\/+$/, '')
 export const SITE_NAME = 'GeoGame'
-export const OG_IMAGE = '/logo512.png'
+export const OG_IMAGE = '/og.png'
 
 export const SEO_PAGES = [
   { path: '/', key: 'home', priority: '1.0', changefreq: 'weekly' },
@@ -22,6 +25,8 @@ export const SEO_PAGES = [
   { path: '/atlas', key: 'atlas', priority: '0.7', changefreq: 'monthly' },
   { path: '/multiplayer', key: 'multiplayer', priority: '0.7', changefreq: 'monthly' },
   { path: '/scores', key: 'scores', priority: '0.6', changefreq: 'daily' },
+  { path: '/privacy', key: 'privacy', priority: '0.3', changefreq: 'yearly' },
+  { path: '/terms', key: 'terms', priority: '0.3', changefreq: 'yearly' },
 ]
 
 export function findSeoPage(pathname) {

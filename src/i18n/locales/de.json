@@ -413,6 +413,8 @@
   "share": {
     "copy_button": "📋 Ergebnis kopieren",
     "copied": "✓ Ergebnis kopiert!",
+    "share_image": "🖼️ Bild teilen",
+    "download_image": "⬇️ Bild herunterladen",
     "pseudo_placeholder": "Dein Name (optional)",
     "anonymous": "Anonym",
     "played_by": "gespielt von",
@@ -1177,6 +1179,14 @@
     "scores": {
       "title": "Ranglisten — Bestenliste | GeoGame",
       "description": "Die besten Punktzahlen der GeoGame-Spieler in jedem Spiel, jeder Schwierigkeit und jedem Kontinent."
+    },
+    "privacy": {
+      "title": "Datenschutzerklärung | GeoGame",
+      "description": "Welche Daten GeoGame verarbeitet, warum, wie lange und wie du deine Rechte ausübst (Auskunft, Löschung, Widerspruch)."
+    },
+    "terms": {
+      "title": "Nutzungsbedingungen | GeoGame",
+      "description": "Die Regeln für die Nutzung von GeoGame: Konto, erwartetes Verhalten, öffentliche Ranglisten und Verantwortlichkeiten."
     }
   },
   "daily_elsewhere": {

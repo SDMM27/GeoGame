@@ -216,6 +216,11 @@ select {
   background: var(--map-ocean);
 }
 
+/* A clicked country takes the focus, and the browser outlines its whole bounding box: a big white rectangle. */
+.leaflet-container .leaflet-interactive:focus {
+  outline: none;
+}
+
 /* Country name over a game map (Find the Country: found or revealed countries) */
 .leaflet-tooltip.map-tooltip {
   background: var(--bg-primary);

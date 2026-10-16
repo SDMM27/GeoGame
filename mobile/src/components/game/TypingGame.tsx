@@ -11,7 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { matchKnownAnswer } from '@shared/utils/answerLexicon'
 
 import { setupGameRecord } from '@/account/history'
-import { useClearedAnswerGuard } from '@/components/game/answerInput'
+import { ANSWER_KEYBOARD_PROPS, useClearedAnswerGuard } from '@/components/game/answerInput'
 import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
 import { ResultsSheet, type SaveConfig } from '@/components/game/ResultsSheet'
 import { Text, Touchable } from '@/components/ui'
@@ -322,7 +322,7 @@ const AnswerInput = memo(function AnswerInput({
       submitBehavior="submit"
       placeholder={placeholder}
       placeholderTextColor={colors.textFaint}
-      autoCapitalize="words"
+      {...ANSWER_KEYBOARD_PROPS}
       autoCorrect={false}
       spellCheck={false}
       autoComplete="off"

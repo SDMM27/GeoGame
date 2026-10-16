@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import { useClearedAnswerGuard } from '@/components/game/answerInput'
+import { ANSWER_KEYBOARD_PROPS, useClearedAnswerGuard } from '@/components/game/answerInput'
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible'
 import { clean } from '@/i18n'
 import { colors, fonts, radius, space } from '@/theme'
@@ -88,7 +88,7 @@ export function GuessInputBar({
           submitBehavior="submit"
           placeholder={placeholder}
           placeholderTextColor={colors.textFaint}
-          autoCapitalize="words"
+          {...ANSWER_KEYBOARD_PROPS}
           autoCorrect={false}
           spellCheck={false}
           autoComplete="off"

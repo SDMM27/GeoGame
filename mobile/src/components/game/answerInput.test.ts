@@ -1,6 +1,11 @@
 import { ANSWER_KEYBOARD_PROPS, isStaleAfterClear } from './answerInput'
 
-jest.mock('react-native', () => ({ Platform: { select: (options: any) => options.android } }))
+// Partial mock: replacing the whole module breaks jest-expo's setup, which reads react-native's native modules
+jest.mock('react-native', () => {
+  const ReactNative = jest.requireActual('react-native')
+  ReactNative.Platform.select = (options: any) => options.android
+  return ReactNative
+})
 
 describe('ANSWER_KEYBOARD_PROPS', () => {
   it('uses a keyboard that composes no word on Android', () => {

@@ -7,7 +7,6 @@ import { GAME_TYPES } from '../../utils/gameTypes'
 import { setupGameRecord } from '../../utils/gameHistory'
 import { useRecordGame } from '../../auth'
 import { getCountryName } from '../../utils/getCountryName'
-import LandLayer from '../../components/map/LandLayer'
 import { createAppFillRenderer } from '../../components/map/appFillRenderer'
 import PhaseIndicator from '../../components/PhaseIndicator'
 import countries from '../../data/countriesWithDifficulty_FR.json'
@@ -198,7 +197,6 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
           setTimeout(() => target.invalidateSize(), 100)
         }}
       >
-        <LandLayer />
         <GeoJSON
           key="geojson-left"
           ref={geoJsonRefLeft}

@@ -768,13 +768,14 @@ service cloud.firestore {
         && (game.get('ramp', null) == null || validSurvivalRamp(game.ramp));
     }
 
-    // players.{id}: { pseudo, uid?, seenAt? }; seenAt is the heartbeat, always the server time.
+    // players.{id}: { pseudo, uid?, seenAt? }; seenAt is the heartbeat, always the server time. uid: the writer's own
+    // account, so that a duel between two accounts can be rated (api/_lib/elo.mjs).
     function validRoomPlayer(player) {
       return player is map
         && player.keys().hasOnly(['pseudo', 'uid', 'seenAt'])
         && player.keys().hasAll(['pseudo'])
         && validName(player.pseudo)
-        && (player.get('uid', null) == null || (player.uid is string && player.uid.size() <= 128))
+        && (player.get('uid', null) == null || (request.auth != null && player.uid == request.auth.uid))
         && (player.get('seenAt', null) == null || player.seenAt == request.time);
     }
 
@@ -1013,6 +1014,18 @@ service cloud.firestore {
 
       allow create: if validReport(request.resource.data);
       allow read, update, delete: if false;
+    }
+
+    // ---------- Elo (api/_lib/elo.mjs, written by the server only) ----------
+
+    // The players' ratings, shown on the profiles and the Elo leaderboards (src/utils/elo.js).
+    match /elo/{uid} {
+      allow read: if true;
+    }
+
+    // The countries' ratings per solo mode. eloGains, eloDuels and eloDuelPairs stay server-only (no rule).
+    match /eloQuestions/{id} {
+      allow read: if true;
     }
 
     // Top of the week (api/weekly-top.mjs, written by the server only): shown on the Community page.

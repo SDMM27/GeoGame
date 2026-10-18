@@ -1270,5 +1270,21 @@
       "lilac": "Lilac",
       "rose": "Rose"
     }
+  },
+  "elo": {
+    "tab": "Elo",
+    "title": "Elo leaderboard",
+    "explain": "Duels: one overall rating, updated after each duel between two signed-in players. Solo: one rating per mode; you never lose points in solo, and each country only pays off once per season. A season lasts one quarter.",
+    "season": "Season {{quarter}} · {{year}}",
+    "duel": "Duels",
+    "rating": "Elo",
+    "col_duel": "Games · wins",
+    "col_found": "Countries found",
+    "duel_detail": "{{games}} games · {{wins}} wins",
+    "profile_title": "Elo",
+    "unplayed": "Not played yet this season",
+    "empty": "Nobody has a rating this season yet.",
+    "found_count_one": "{{count}} country found",
+    "found_count_other": "{{count}} countries found"
   }
 }

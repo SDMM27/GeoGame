@@ -5,9 +5,11 @@ import { useCallback, useState, type ComponentProps, type ReactNode } from 'reac
 import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native'
 
+import { usePlayerElo } from '@shared/hooks/usePlayerElo'
 import { usePlayerProfile } from '@shared/hooks/usePlayerProfile'
 import { TIER_COLORS } from '@shared/utils/achievements'
 import { decorationStyle } from '@shared/utils/decorations'
+import { formatSeason } from '@shared/utils/elo'
 import { describeBest, describeDetails, describeMode, describeResult, formatPlayedAt } from '@shared/utils/profileFormat'
 import { dailyTypesOn, dayKey, formatPlayTime } from '@shared/utils/profileStats'
 
@@ -306,6 +308,48 @@ export function ByGameSection({ stats }: { stats: ProfileStats }) {
   )
 }
 
+type EloEntry = { key: string; rating: number; played: boolean; games?: number; wins?: number; found?: number }
+
+// Elo ratings of the current season: duels, then each solo mode.
+export function EloSection({ uid }: { uid: string }) {
+  const { t } = useTranslation()
+  const { loading, error, season, entries } = usePlayerElo(uid) as { loading: boolean; error: boolean; season: string; entries: EloEntry[] }
+  if (loading || error) return null
+  return (
+    <View style={{ gap: space.md }}>
+      <SectionTitle title={t('elo.profile_title')} right={<Text variant="caption">{formatSeason(season, t)}</Text>} />
+      <View style={styles.list}>
+        {entries.map((entry, index) => {
+          const game = entry.key === 'duel' ? undefined : getGameByType(entry.key)
+          const color = game?.color ?? colors.highlight
+          let detail = t('elo.unplayed')
+          if (entry.played) {
+            detail = entry.key === 'duel' ? t('elo.duel_detail', { games: entry.games, wins: entry.wins }) : t('elo.found_count', { count: entry.found })
+          }
+          return (
+            <View key={entry.key} style={[styles.listRow, index > 0 && styles.listDivider]}>
+              <View style={[styles.gameIcon, { backgroundColor: `${color}1F` }]}>
+                <MaterialCommunityIcons name={game?.icon ?? 'sword-cross'} size={20} color={color} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text variant="bodyStrong" numberOfLines={1}>
+                  {game ? t(game.titleKey) : t('elo.duel')}
+                </Text>
+                <Text variant="caption" numberOfLines={1}>
+                  {detail}
+                </Text>
+              </View>
+              <Text variant="bodyStrong" color={color} style={{ fontSize: 15 }}>
+                {entry.rating}
+              </Text>
+            </View>
+          )
+        })}
+      </View>
+    </View>
+  )
+}
+
 export function GameHistoryRow({ game, divider }: { game: HistoryGame; divider?: boolean }) {
   const { t, i18n } = useTranslation()
   const [open, setOpen] = useState(false)
@@ -429,6 +473,7 @@ export function ProfileBody({
       games={profile.games as HistoryGame[]}
       stats={profile.stats as ProfileStats}
       achievements={profile.achievements as Achievement[]}
+      uid={uid}
       onSeeHistory={onSeeHistory}
     />
   )
@@ -439,11 +484,14 @@ export function ProfileView({
   games,
   stats,
   achievements,
+  uid,
   onSeeHistory,
 }: {
   games: HistoryGame[]
   stats: ProfileStats
   achievements: Achievement[]
+  /** Whose Elo ratings to show (loaded on their own); none when left out. */
+  uid?: string
   onSeeHistory: () => void
 }) {
   const { t } = useTranslation()
@@ -451,6 +499,7 @@ export function ProfileView({
     <View style={{ gap: space.xl }}>
       <StatTiles stats={stats} />
       <StreakCard stats={stats} />
+      {uid ? <EloSection uid={uid} /> : null}
       <AchievementsSection achievements={achievements} />
       <View style={{ gap: space.md }}>
         <SectionTitle

@@ -1,4 +1,20 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { act, renderHook } from '@testing-library/react'
+import useGameState from './useGameState'
+import { reportEloAnswer } from '../utils/eloReport'
+import { FIXTURE_COUNTRIES } from './testUtils/countriesFixture'
+
+vi.mock('../data/countriesWithDifficulty_FR.json', async () => import('./testUtils/countriesFixture'))
+vi.mock('react-router-dom', () => ({ useNavigate: () => vi.fn() }))
+vi.mock('react-toastify', () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }))
+vi.mock('react-i18next', () => {
+  const value = { t: (key) => key, i18n: { language: 'fr' } }
+  return { useTranslation: () => value }
+})
+vi.mock('../utils/multiplayerSnapshot', () => ({ saveSnapshot: vi.fn() }))
+vi.mock('../utils/eloReport', () => ({ reportEloAnswer: vi.fn(), flushElo: vi.fn() }))
+
+beforeEach(() => vi.clearAllMocks())
 
 // Helper: builds a fake Leaflet layer with a name and a mutable style
 function makeLayer(name, initialStyle = {}) {
@@ -182,5 +198,30 @@ describe('score dégressif selon tentatives', () => {
     expect(computeScore('Moyen', 2)).toBeGreaterThan(computeScore('Facile', 2))
     expect(computeScore('Difficile', 2)).toBeGreaterThan(computeScore('Moyen', 2))
     expect(computeScore('Impossible', 2)).toBeGreaterThan(computeScore('Difficile', 2))
+  })
+})
+
+describe('useGameState — Elo', () => {
+  it('reports the errors made before the country was found', () => {
+    const { result } = renderHook(() => useGameState('Facile', false))
+    const name = result.current.targetCountry
+    const wrong = FIXTURE_COUNTRIES.find((c) => c.properties.ADMIN !== name).properties.ADMIN
+    act(() => result.current.onCountryNameClick(wrong))
+    act(() => result.current.onCountryNameClick(name))
+    expect(reportEloAnswer).toHaveBeenCalledWith('PLACEMENT', name, { found: true, errors: 1 })
+  })
+
+  it('reports a country shown with "see" as not found', () => {
+    const { result } = renderHook(() => useGameState('Facile', false))
+    const name = result.current.targetCountry
+    act(() => result.current.seeCountry())
+    act(() => result.current.onCountryNameClick(name))
+    expect(reportEloAnswer).toHaveBeenCalledWith('PLACEMENT', name, { found: false, errors: 0 })
+  })
+
+  it('reports nothing in a room (override list)', () => {
+    const { result } = renderHook(() => useGameState('Facile', false, ['France', 'Espagne'], null, 'room-key'))
+    act(() => result.current.onCountryNameClick('France'))
+    expect(reportEloAnswer).not.toHaveBeenCalled()
   })
 })

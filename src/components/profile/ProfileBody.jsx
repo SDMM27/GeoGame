@@ -11,6 +11,7 @@ import { GAME_TYPES } from '../../utils/gameTypes'
 import { describeBest, describeDetails, describeMode, describeResult, formatPlayedAt } from '../../utils/profileFormat'
 import { dailyTypesOn, dayKey, formatPlayTime } from '../../utils/profileStats'
 import BadgeStrip from './BadgeStrip'
+import EloSection from './EloSection'
 import './ProfileBody.css'
 
 export const GAME_META = {
@@ -328,15 +329,16 @@ export default function ProfileBody({ uid, friendsCount, own = false }) {
 
   if (loading) return <p className="profile-muted profile-center">…</p>
   if (error) return <p className="profile-muted">{t('profile.load_error')}</p>
-  return <ProfileView games={games} stats={stats} achievements={achievements} />
+  return <ProfileView games={games} stats={stats} achievements={achievements} uid={uid} />
 }
 
-// The sections themselves, from already loaded data.
-export function ProfileView({ games, stats, achievements }) {
+// The sections themselves, from already loaded data (the Elo ratings load on their own, for `uid`).
+export function ProfileView({ games, stats, achievements, uid }) {
   return (
     <div className="profile-body">
       <StatTiles stats={stats} />
       <StreakCard stats={stats} />
+      {uid && <EloSection uid={uid} />}
       <Achievements achievements={achievements} />
       <History games={games} />
       <ByGame stats={stats} />

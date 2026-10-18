@@ -1,4 +1,20 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { act, renderHook } from '@testing-library/react'
+import useFlagGameState from './useFlagGameState'
+import { reportEloAnswer, flushElo } from '../utils/eloReport'
+import { FIXTURE_COUNTRIES, byName } from './testUtils/countriesFixture'
+
+vi.mock('../data/countriesWithDifficulty_FR.json', async () => import('./testUtils/countriesFixture'))
+vi.mock('react-router-dom', () => ({ useNavigate: () => vi.fn() }))
+vi.mock('react-toastify', () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }))
+vi.mock('react-i18next', () => {
+  const value = { t: (key) => key, i18n: { language: 'fr' } }
+  return { useTranslation: () => value }
+})
+vi.mock('../utils/multiplayerSnapshot', () => ({ saveSnapshot: vi.fn() }))
+vi.mock('../utils/eloReport', () => ({ reportEloAnswer: vi.fn(), flushElo: vi.fn() }))
+
+beforeEach(() => vi.clearAllMocks())
 
 // Mirror of the scoring logic in useFlagGameState — first error is free.
 function computeFlagScore(diff, errorCount) {
@@ -33,4 +49,46 @@ describe('computeFlagScore — première erreur tolérée', () => {
   it('Impossible, 2 erreurs = 7', () => expect(computeFlagScore('Impossible', 2)).toBe(7))
 
   it('difficulté inconnue retourne 0', () => expect(computeFlagScore('Hardcore', 0)).toBe(0))
+})
+
+const typed = (result, text) => {
+  act(() => result.current.setInputValue(text))
+  act(() => result.current.handleSubmit())
+}
+
+describe('useFlagGameState — Elo', () => {
+  it('reports a country found on the first try', () => {
+    const { result } = renderHook(() => useFlagGameState('Facile', false))
+    const name = result.current.targetCountry.properties.ADMIN
+    typed(result, name)
+    expect(reportEloAnswer).toHaveBeenCalledWith('FLAGS', name, { found: true, errors: 0 })
+  })
+
+  it('reports the errors made before the country was found', () => {
+    const { result } = renderHook(() => useFlagGameState('Facile', false))
+    const name = result.current.targetCountry.properties.ADMIN
+    typed(result, 'Atlantide')
+    typed(result, 'Mordor')
+    typed(result, name)
+    expect(reportEloAnswer).toHaveBeenCalledTimes(1)
+    expect(reportEloAnswer).toHaveBeenCalledWith('FLAGS', name, { found: true, errors: 2 })
+  })
+
+  it('reports a country revealed after 3 errors or with "see" as not found', () => {
+    const { result } = renderHook(() => useFlagGameState('Facile', false))
+    const first = result.current.targetCountry.properties.ADMIN
+    ;['a1', 'a2', 'a3'].forEach((text) => typed(result, text))
+    expect(reportEloAnswer).toHaveBeenCalledWith('FLAGS', first, { found: false, errors: 3 })
+    reportEloAnswer.mockClear()
+    const other = renderHook(() => useFlagGameState('Facile', false))
+    const second = other.result.current.targetCountry.properties.ADMIN
+    act(() => other.result.current.seeCountry())
+    expect(reportEloAnswer).toHaveBeenCalledWith('FLAGS', second, { found: false, errors: 0 })
+  })
+
+  it('reports nothing in a room (override list)', () => {
+    const { result } = renderHook(() => useFlagGameState('Facile', false, [byName('France'), byName('Espagne')], null, 'room-key'))
+    typed(result, 'France')
+    expect(reportEloAnswer).not.toHaveBeenCalled()
+  })
 })

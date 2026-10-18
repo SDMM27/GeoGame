@@ -1270,5 +1270,21 @@
       "lilac": "Lilas",
       "rose": "Rose"
     }
+  },
+  "elo": {
+    "tab": "Elo",
+    "title": "Classement Elo",
+    "explain": "Duels : une note globale, mise à jour après chaque duel entre deux joueurs connectés. Solo : une note par mode ; on ne perd jamais de points en solo, et chaque pays ne rapporte qu'une fois par saison. Une saison dure un trimestre.",
+    "season": "Saison {{quarter}} · {{year}}",
+    "duel": "Duels",
+    "rating": "Elo",
+    "col_duel": "Parties · victoires",
+    "col_found": "Pays trouvés",
+    "duel_detail": "{{games}} parties · {{wins}} victoires",
+    "profile_title": "Elo",
+    "unplayed": "Pas encore joué cette saison",
+    "empty": "Personne n’a encore de note cette saison.",
+    "found_count_one": "{{count}} pays trouvé",
+    "found_count_other": "{{count}} pays trouvés"
   }
 }

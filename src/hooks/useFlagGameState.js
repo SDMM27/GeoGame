@@ -7,6 +7,8 @@ import { formatTime } from '../utils/formatTime'
 import { matchKnownAnswer } from '../utils/answerLexicon'
 import { getAllCountryNames, getCountryName } from '../utils/getCountryName'
 import { saveSnapshot } from '../utils/multiplayerSnapshot'
+import { GAME_TYPES } from '../utils/gameTypes'
+import { reportEloAnswer, flushElo } from '../utils/eloReport'
 
 const DIFFICULTIES = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
 
@@ -57,6 +59,8 @@ export default function useFlagGameState(difficulty, isTraining, overrideCountri
   const [clickOnSeeCountry, setClickOnSeeCountry] = useState(false)
   const clickOnSeeCountryRef = useRef(false)
   const gameOverToastShownRef = useRef(false)
+  // Room games (override list) are rated as duels, not as solo answers.
+  const ratedRef = useRef(!overrideCountries)
 
   // Refs for snapshot saves (always current, avoids stale closures in intervals)
   const statsForSnapRef = useRef({ found: 0, skipped: 0, total: 0, totalErrors: 0 })
@@ -157,6 +161,7 @@ export default function useFlagGameState(difficulty, isTraining, overrideCountri
   useEffect(() => {
     if (!allProcessed || !gameStarted || gameOverToastShownRef.current) return
     gameOverToastShownRef.current = true
+    flushElo()
     if (isTraining) {
       toast.success(t('toasts.all_flags_found'), {
         containerId: 'centerToast',
@@ -215,6 +220,7 @@ export default function useFlagGameState(difficulty, isTraining, overrideCountri
         const name = getCountryName(props.ISO_A2, i18n.language) || props.ADMIN
         toast.success(t(result.match === 'typo' ? 'toasts.typo_accepted' : 'toasts.found_country', { name }), { containerId: 'topRightToast' })
         incrementScore(props.DifficultyFlag, consecutiveErrorsRef.current)
+        if (ratedRef.current) reportEloAnswer(GAME_TYPES.FLAGS, props.ADMIN, { found: true, errors: consecutiveErrorsRef.current })
       }
       setStats(prev =>
         wasSkipped
@@ -232,6 +238,7 @@ export default function useFlagGameState(difficulty, isTraining, overrideCountri
       if (newErrors >= 3) {
         toast.error(t('toasts.location_reveal', { name: getCountryName(props.ISO_A2, i18n.language) || props.ADMIN }), { containerId: 'topRightToast' })
         setRevealedName(props.ADMIN)
+        if (ratedRef.current) reportEloAnswer(GAME_TYPES.FLAGS, props.ADMIN, { found: false, errors: newErrors })
       } else {
         toast.error(t('toasts.wrong'), { containerId: 'topRightToast' })
       }
@@ -243,7 +250,9 @@ export default function useFlagGameState(difficulty, isTraining, overrideCountri
     if (revealedName) return
     setClickOnSeeCountry(true)
     clickOnSeeCountryRef.current = true
-    setRevealedName(targetCountryRef.current?.properties?.ADMIN ?? null)
+    const admin = targetCountryRef.current?.properties?.ADMIN ?? null
+    setRevealedName(admin)
+    if (admin && ratedRef.current) reportEloAnswer(GAME_TYPES.FLAGS, admin, { found: false, errors: consecutiveErrorsRef.current })
   }
 
   // Keep snapshot refs in sync

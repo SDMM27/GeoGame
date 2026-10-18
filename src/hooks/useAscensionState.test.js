@@ -3,6 +3,7 @@ import { act, renderHook } from '@testing-library/react'
 import useAscensionState from './useAscensionState'
 import { GAME_TYPES } from '../utils/gameTypes'
 import { saveSnapshot } from '../utils/multiplayerSnapshot'
+import { reportEloAnswer } from '../utils/eloReport'
 import { FIXTURE_COUNTRIES, byName } from './testUtils/countriesFixture'
 
 const mocks = vi.hoisted(() => ({ navigate: vi.fn() }))
@@ -15,6 +16,7 @@ vi.mock('react-i18next', () => {
   return { useTranslation: () => value }
 })
 vi.mock('../utils/multiplayerSnapshot', () => ({ saveSnapshot: vi.fn() }))
+vi.mock('../utils/eloReport', () => ({ reportEloAnswer: vi.fn(), flushElo: vi.fn() }))
 
 const FACILE = FIXTURE_COUNTRIES.filter((c) => c.properties.Difficulty === 'Facile').map((c) => c.properties.ADMIN)
 const MOYEN = FIXTURE_COUNTRIES.filter((c) => c.properties.Difficulty === 'Moyen').map((c) => c.properties.ADMIN)
@@ -262,5 +264,33 @@ describe('useAscensionState — multijoueur', () => {
     saveSnapshot.mockClear()
     answer(result, 'France')
     expect(saveSnapshot).toHaveBeenLastCalledWith('room:1', expect.objectContaining({ found: 1, skipped: 0, score: 3, countryIndex: 1 }))
+  })
+})
+
+describe('useAscensionState — Elo', () => {
+  it('reports each country under the underlying game, with the errors made on it', () => {
+    const { result } = renderAscension(GAME_TYPES.FLAGS, { Facile: 2 })
+    const first = targetName(result)
+    answer(result, 'Atlantide')
+    answer(result, 'Mordor')
+    answer(result, first)
+    expect(reportEloAnswer).toHaveBeenCalledWith('FLAGS', first, { found: true, errors: 2 })
+    const second = targetName(result)
+    answer(result, second)
+    expect(reportEloAnswer).toHaveBeenCalledWith('FLAGS', second, { found: true, errors: 0 })
+  })
+
+  it('reports a country shown on the map as not found', () => {
+    const { result } = renderAscension(GAME_TYPES.PLACEMENT, { Facile: 2 })
+    const first = targetName(result)
+    act(() => result.current.seeCountry())
+    act(() => result.current.onCountryNameClick(first))
+    expect(reportEloAnswer).toHaveBeenCalledWith('PLACEMENT', first, { found: false, errors: 0 })
+  })
+
+  it('reports nothing in a room (override lists)', () => {
+    const { result } = renderAscension(GAME_TYPES.FLAGS, { Facile: 1 }, { overrides: { Facile: [byName('Allemagne')] } })
+    answer(result, 'Allemagne')
+    expect(reportEloAnswer).not.toHaveBeenCalled()
   })
 })

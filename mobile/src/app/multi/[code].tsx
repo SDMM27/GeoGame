@@ -8,6 +8,7 @@ import Animated, { FadeIn, ZoomIn } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useFriendships } from '@shared/hooks/usePlayerProfile'
+import useDuelElo from '@shared/hooks/useDuelElo'
 import useLobbyHost from '@shared/hooks/useLobbyHost'
 import useMultiplayerRoom from '@shared/hooks/useMultiplayerRoom'
 import { sendFriendRequestTo } from '@shared/utils/friends'
@@ -272,6 +273,7 @@ export default function RoomScreen() {
   const hasNextLive = isLive && room?.status === 'playing' && current < games.length - 1
   // Heartbeat, and the host role passes on when the host is gone
   useLobbyHost(room, playerId)
+  useDuelElo(room, results, playerId)
 
   // The game screen picks the game to play from the room and the player's results
   const play = () => {

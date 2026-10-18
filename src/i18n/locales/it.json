@@ -1270,5 +1270,21 @@
       "lilac": "Lilla",
       "rose": "Rosa"
     }
+  },
+  "elo": {
+    "tab": "Elo",
+    "title": "Classifica Elo",
+    "explain": "Duelli: un punteggio globale, aggiornato dopo ogni duello tra due giocatori connessi. Solo: un punteggio per modalità; in solo non perdi mai punti e ogni paese vale una sola volta per stagione. Una stagione dura un trimestre.",
+    "season": "Stagione {{quarter}} · {{year}}",
+    "duel": "Duelli",
+    "rating": "Elo",
+    "col_duel": "Partite · vittorie",
+    "col_found": "Paesi trovati",
+    "duel_detail": "{{games}} partite · {{wins}} vittorie",
+    "profile_title": "Elo",
+    "unplayed": "Non ancora giocato in questa stagione",
+    "empty": "Nessuno ha ancora un punteggio in questa stagione.",
+    "found_count_one": "{{count}} paese trovato",
+    "found_count_other": "{{count}} paesi trovati"
   }
 }

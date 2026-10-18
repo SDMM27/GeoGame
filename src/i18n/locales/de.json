@@ -1270,5 +1270,21 @@
       "lilac": "Flieder",
       "rose": "Rosa"
     }
+  },
+  "elo": {
+    "tab": "Elo",
+    "title": "Elo-Rangliste",
+    "explain": "Duelle: eine Gesamtwertung, die nach jedem Duell zwischen zwei angemeldeten Spielern aktualisiert wird. Solo: eine Wertung pro Modus; im Solo verlierst du nie Punkte, und jedes Land zählt pro Saison nur einmal. Eine Saison dauert ein Quartal.",
+    "season": "Saison {{quarter}} · {{year}}",
+    "duel": "Duelle",
+    "rating": "Elo",
+    "col_duel": "Spiele · Siege",
+    "col_found": "Gefundene Länder",
+    "duel_detail": "{{games}} Spiele · {{wins}} Siege",
+    "profile_title": "Elo",
+    "unplayed": "In dieser Saison noch nicht gespielt",
+    "empty": "In dieser Saison hat noch niemand eine Wertung.",
+    "found_count_one": "{{count}} Land gefunden",
+    "found_count_other": "{{count}} Länder gefunden"
   }
 }

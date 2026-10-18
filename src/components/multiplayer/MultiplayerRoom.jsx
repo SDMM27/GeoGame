@@ -13,6 +13,7 @@ import {
   roomForGame,
   roomGames,
 } from '../../utils/multiplayerRoom'
+import useDuelElo from '../../hooks/useDuelElo'
 import useLobbyHost from '../../hooks/useLobbyHost'
 import { rememberPlayers } from '../../utils/recentPlayers'
 import { rememberRoom } from '../../utils/recentRooms'
@@ -54,6 +55,7 @@ export default function MultiplayerRoom({ room, progress, gameResults, playerId 
   const games = roomGames(room)
   const current = currentGameIndex(room)
   const results = useMemo(() => Object.values(gameResults), [gameResults])
+  useDuelElo(room, results, playerId)
   const known = useMemo(
     () => [...results, ...doneHere.map((gameIndex) => ({ playerId, gameIndex }))],
     [results, doneHere, playerId]

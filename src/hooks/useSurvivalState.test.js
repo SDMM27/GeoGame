@@ -4,14 +4,17 @@ import useSurvivalState from './useSurvivalState'
 import { GAME_TYPES } from '../utils/gameTypes'
 import { buildSurvivalRounds } from '../utils/survival'
 import { loadSnapshot } from '../utils/multiplayerSnapshot'
+import { reportEloAnswer, flushElo } from '../utils/eloReport'
 
 vi.mock('react-router-dom', () => ({ useNavigate: () => vi.fn() }))
+vi.mock('../utils/eloReport', () => ({ reportEloAnswer: vi.fn(), flushElo: vi.fn() }))
 
 const { PLACEMENT, FLAGS, BORDER_GUESS, QUIZ } = GAME_TYPES
 
 const play = (options) => renderHook(() => useSurvivalState(options))
 
 beforeEach(() => {
+  vi.clearAllMocks()
   vi.useFakeTimers()
   localStorage.clear()
 })
@@ -223,5 +226,34 @@ describe('useSurvivalState', () => {
     act(() => { vi.advanceTimersByTime(100) })
     expect(result.current.lives).toBe(3)
     expect(result.current.isPlaying).toBe(true)
+  })
+})
+
+describe('useSurvivalState — Elo', () => {
+  it('reports a right round as found and a failed one as not found with one error', () => {
+    const { result } = play({ modes: [FLAGS], lives: 3, seed: 1 })
+    const first = result.current.round.country.properties.ADMIN
+    act(() => { result.current.submitText('zzzz') })
+    expect(reportEloAnswer).toHaveBeenCalledWith('SURVIVAL', first, { found: false, errors: 1 })
+    act(() => { vi.advanceTimersByTime(2500) })
+    const second = result.current.round.country.properties.ADMIN
+    act(() => { result.current.submitText(second) })
+    expect(reportEloAnswer).toHaveBeenCalledWith('SURVIVAL', second, { found: true, errors: 0 })
+    expect(reportEloAnswer).toHaveBeenCalledTimes(2)
+  })
+
+  it('reports a given-up round once and flushes when the run is over', () => {
+    const { result } = play({ modes: [FLAGS], lives: 1, seed: 1 })
+    act(() => { result.current.giveUp() })
+    expect(reportEloAnswer).toHaveBeenCalledTimes(1)
+    expect(flushElo).toHaveBeenCalled()
+  })
+
+  it('reports nothing in a room or for the Daily Challenge', () => {
+    const room = play({ modes: [FLAGS], lives: 3, seed: 1, snapshotKey: 'room' })
+    act(() => { room.result.current.submitText('zzzz') })
+    const daily = play({ modes: [FLAGS], lives: 3, seed: 1, maxRounds: 12, distinctCountries: true })
+    act(() => { daily.result.current.submitText('zzzz') })
+    expect(reportEloAnswer).not.toHaveBeenCalled()
   })
 })

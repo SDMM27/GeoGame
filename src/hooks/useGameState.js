@@ -7,6 +7,8 @@ import countries from '../data/countriesWithDifficulty_FR.json'
 import { formatTime } from '../utils/formatTime'
 import { saveSnapshot } from '../utils/multiplayerSnapshot'
 import { getCountryName } from '../utils/getCountryName'
+import { GAME_TYPES } from '../utils/gameTypes'
+import { reportEloAnswer, flushElo } from '../utils/eloReport'
 import { HOVER_STYLE, MAP_COLORS } from '../utils/mapColors'
 
 const DIFFICULTIES = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
@@ -68,6 +70,8 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
   const gameOverToastShownRef = useRef(false)
   const foundCountriesRef = useRef(new Set())
   const shownCountriesRef = useRef(new Set())
+  // Room games (override list) are rated as duels, not as solo answers.
+  const ratedRef = useRef(!overrideCountries)
 
   // Redirect if no difficulty
   useEffect(() => {
@@ -220,6 +224,7 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
   useEffect(() => {
     if (!allProcessed || !gameStarted || gameOverToastShownRef.current) return
     gameOverToastShownRef.current = true
+    flushElo()
     if (isTraining) {
       toast.success(t('toasts.all_countries_found'), {
         containerId: 'centerToast',
@@ -275,6 +280,7 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
         })
         incrementScore(targetDiff, consecutiveErrorsRef.current)
       }
+      if (ratedRef.current) reportEloAnswer(GAME_TYPES.PLACEMENT, clickedName, { found: !wasSkipped, errors: consecutiveErrorsRef.current })
       setStyleForCountry(clickedName, { fillColor: MAP_COLORS.right, weight: 2, fillOpacity: 0.5 })
       shownCountriesRef.current.delete(clickedName)
       foundCountriesRef.current.add(clickedName)

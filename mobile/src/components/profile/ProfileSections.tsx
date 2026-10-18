@@ -7,12 +7,16 @@ import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, View } fro
 
 import { usePlayerProfile } from '@shared/hooks/usePlayerProfile'
 import { TIER_COLORS } from '@shared/utils/achievements'
+import { decorationStyle } from '@shared/utils/decorations'
 import { describeBest, describeDetails, describeMode, describeResult, formatPlayedAt } from '@shared/utils/profileFormat'
 import { dailyTypesOn, dayKey, formatPlayTime } from '@shared/utils/profileStats'
 
 import { Button, Text, Touchable } from '@/components/ui'
 import { getGameByType } from '@/games'
 import { colors, fonts, radius, space } from '@/theme'
+import { RING_WIDTH_DOUBLE, ringBorder } from './decorationStyle'
+
+export type Decoration = { frame: string; color: string }
 
 type IconName = ComponentProps<typeof MaterialCommunityIcons>['name']
 
@@ -52,12 +56,30 @@ export function avatarColor(username: string) {
   return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length]
 }
 
-export function Avatar({ username, size = 44 }: { username: string; size?: number }) {
-  return (
+// Gap between the ring of a frame and the avatar
+const RING_GAP = 2
+// Room around a decorated avatar, whatever its frame: the same for every frame (or none) so the layout never jumps.
+const RING_ROOM = RING_GAP + RING_WIDTH_DOUBLE
+
+// With `decoration` ({ frame, color } ids, see @shared/utils/decorations) the avatar gets room for a frame ring, drawn
+// when the decoration has one. Without it (lists, other screens) the avatar is just the disc.
+export function Avatar({ username, size = 44, decoration }: { username: string; size?: number; decoration?: Decoration | null }) {
+  const disc = (
     <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: avatarColor(username), alignItems: 'center', justifyContent: 'center' }}>
       <Text style={{ fontFamily: fonts.display, fontSize: size * 0.45, lineHeight: size * 0.55 }} color={colors.onAccent}>
         {username.charAt(0).toUpperCase()}
       </Text>
+    </View>
+  )
+  if (decoration === undefined) return disc
+  const ring = ringBorder(decorationStyle(decoration).frame)
+  const outer = size + RING_ROOM * 2
+  const ringSize = size + (RING_GAP + (ring?.borderWidth ?? 0)) * 2
+  return (
+    <View style={{ width: outer, height: outer, alignItems: 'center', justifyContent: 'center' }}>
+      <View style={[{ width: ringSize, height: ringSize, borderRadius: ringSize / 2, alignItems: 'center', justifyContent: 'center' }, ring]}>
+        {disc}
+      </View>
     </View>
   )
 }

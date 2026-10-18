@@ -18,12 +18,15 @@ import {
   signUp,
   USERNAME_MAX,
 } from '@shared/utils/account'
+import { useDecoration } from '@shared/hooks/useDecoration'
 import { useFriendships } from '@shared/hooks/usePlayerProfile'
+import { decorationStyle } from '@shared/utils/decorations'
 import { LEGAL_PATHS } from '@shared/legal/legalInfo'
 
 import { auth, useAccount, type Account } from '@/account/auth'
 import { reauthenticateWithGoogle, signInWithGoogle } from '@/account/google'
 import { API_ORIGIN, legalUrl } from '@/links'
+import { DecorationPicker } from '@/components/profile/DecorationPicker'
 import { Avatar, ProfileBody, SectionTitle } from '@/components/profile/ProfileSections'
 import { Button, Pill, Segmented, Text, Touchable } from '@/components/ui'
 import { forgetDevice, useDailyReminder, useWebPushPermission } from '@/notifications/push'
@@ -426,13 +429,15 @@ function Profile({ account }: { account: Account }) {
   const { t, i18n } = useTranslation()
   const friendships = useFriendships(account.uid)
   const username = account.username ?? '?'
+  const decoration = useDecoration(account.uid)
+  const { nameColor } = decorationStyle(decoration)
 
   return (
     <View style={{ gap: space.xl }}>
       <View style={styles.header}>
-        <Avatar username={username} size={72} />
+        <Avatar username={username} size={72} decoration={decoration} />
         <View style={{ flex: 1, gap: 2 }}>
-          <Text variant="title" numberOfLines={1} adjustsFontSizeToFit>
+          <Text variant="title" numberOfLines={1} adjustsFontSizeToFit color={nameColor ?? undefined}>
             {username}
           </Text>
           {account.createdAt && (
@@ -442,6 +447,7 @@ function Profile({ account }: { account: Account }) {
           )}
         </View>
       </View>
+      <DecorationPicker uid={account.uid} username={username} />
       <FriendsCard count={friendships.friends.length} pending={friendships.incoming.length} />
       <ProfileBody
         uid={account.uid}

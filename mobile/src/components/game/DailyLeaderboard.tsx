@@ -12,6 +12,7 @@ import { useLeaderboard } from '@/hooks/useLeaderboard'
 import { loadErrorKey } from '@/leaderboards'
 import { colors, radius, space } from '@/theme'
 import { Text } from '../ui'
+import { DecoratedName } from '../leaderboards/DecoratedName'
 import { ReportFlag } from '../leaderboards/ReportFlag'
 import { AnswerList, ExpandableRow } from './ExpandableRow'
 import { visibleRows } from './leaderboardRows'
@@ -86,11 +87,7 @@ export function DailyLeaderboard({
             <Text variant="bodyStrong" style={styles.rank}>
               {MEDALS[index] ?? `${index + 1}`}
             </Text>
-            <Text
-              variant="body"
-              numberOfLines={1}
-              style={{ flex: 1 }}
-              onPress={score.uid ? () => router.push({ pathname: '/player/[uid]', params: { uid: score.uid! } }) : undefined}>
+            <DecoratedName uid={score.uid} fill onPress={score.uid ? () => router.push({ pathname: '/player/[uid]', params: { uid: score.uid! } }) : undefined}>
               {score.name}
               {score.uid === account?.uid && score.uid && (
                 <Text variant="caption" color={colors.accent}>
@@ -98,7 +95,7 @@ export function DailyLeaderboard({
                   {t('score_save.you')}
                 </Text>
               )}
-            </Text>
+            </DecoratedName>
             {score.id && !(score.uid && score.uid === account?.uid) ? (
               <ReportFlag target={{ collection: 'daily_scores', id: score.id, name: score.name }} />
             ) : null}

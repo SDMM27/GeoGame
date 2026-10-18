@@ -1241,5 +1241,34 @@
     "weekly_title": "Top of the week",
     "weekly_hint": "Daily challenges of the last 7 days: 1 point per challenge played, plus a podium bonus. Updated every day.",
     "weekly_empty": "No ranking yet: play the daily challenges!"
+  },
+  "decorations": {
+    "title": "Customize",
+    "hint": "Pick a frame and a username color: they show on your profile and in the leaderboards.",
+    "open": "Customize profile",
+    "close": "Close",
+    "frames": "Frame",
+    "colors": "Username color",
+    "preview": "Preview",
+    "saving": "Saving…",
+    "error": "Couldn’t save, try again.",
+    "locked": "Level {{level}}",
+    "frame": {
+      "none": "None",
+      "silver": "Silver",
+      "gold": "Gold",
+      "ocean": "Ocean",
+      "jungle": "Jungle",
+      "volcano": "Volcano"
+    },
+    "color": {
+      "default": "Default",
+      "mint": "Mint",
+      "sky": "Sky",
+      "coral": "Coral",
+      "amber": "Amber",
+      "lilac": "Lilac",
+      "rose": "Rose"
+    }
   }
 }

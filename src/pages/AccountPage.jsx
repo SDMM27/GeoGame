@@ -19,7 +19,10 @@ import {
 import { reauthenticateWithGoogle, signInWithGoogle } from '../utils/accountGoogle'
 import FriendsPanel from '../components/profile/FriendsPanel'
 import ProfileBody, { Avatar } from '../components/profile/ProfileBody'
+import DecorationPicker from '../components/profile/DecorationPicker'
 import { useFriendships } from '../hooks/usePlayerProfile'
+import { useDecoration } from '../hooks/useDecoration'
+import { decorationStyle } from '../utils/decorations'
 import './AccountPage.css'
 
 function GoogleButton({ onError }) {
@@ -300,13 +303,14 @@ function AccountSettings({ account }) {
 function Profile({ account }) {
   const { t, i18n } = useTranslation()
   const friendships = useFriendships(account.uid)
+  const decoration = useDecoration(account.uid)
 
   return (
     <>
       <header className="profile-header">
-        <Avatar username={account.username} size={72} />
+        <Avatar username={account.username} size={72} decoration={decoration} />
         <div className="profile-header-text">
-          <h1>{account.username}</h1>
+          <h1 style={{ color: decorationStyle(decoration).nameColor ?? undefined }}>{account.username}</h1>
           {account.createdAt && (
             <small>
               {t('profile.member_since', {
@@ -316,6 +320,7 @@ function Profile({ account }) {
           )}
         </div>
       </header>
+      <DecorationPicker account={account} />
       <FriendsPanel account={account} friendships={friendships} />
       <ProfileBody uid={account.uid} own friendsCount={friendships.loading ? undefined : friendships.friends.length} />
       <AccountSettings account={account} />

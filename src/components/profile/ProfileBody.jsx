@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { usePlayerProfile } from '../../hooks/usePlayerProfile'
 import { TIER_COLORS } from '../../utils/achievements'
 import { badgeSummary, readBadges } from '../../utils/badges'
+import { decorationStyle } from '../../utils/decorations'
 import { GAME_TYPES } from '../../utils/gameTypes'
 import { describeBest, describeDetails, describeMode, describeResult, formatPlayedAt } from '../../utils/profileFormat'
 import { dailyTypesOn, dayKey, formatPlayTime } from '../../utils/profileStats'
@@ -27,13 +28,21 @@ export const GAME_META = {
 
 const AVATAR_COLORS = ['#3DDC97', '#7AA2FF', '#FF7A6B', '#F5B83D', '#C792FF', '#5FD4F4', '#FF9EC7', '#B4E05A']
 
-export function Avatar({ username, size = 44 }) {
+// `decoration` ({ frame, color } ids): draws the frame as a ring inside the avatar's box, so the size never changes.
+export function Avatar({ username, size = 44, decoration }) {
   let hash = 0
   for (const char of username) hash = (hash * 31 + char.charCodeAt(0)) | 0
+  const frame = decorationStyle(decoration).frame
+  const ring = frame && {
+    boxSizing: 'border-box',
+    border: `${frame.style === 'double' ? 5 : 3}px ${frame.style} ${frame.color}`,
+    padding: 2,
+    backgroundClip: 'content-box',
+  }
   return (
     <span
       className="profile-avatar"
-      style={{ width: size, height: size, fontSize: size * 0.45, background: AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length] }}
+      style={{ width: size, height: size, fontSize: size * 0.45, background: AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length], ...ring }}
     >
       {username.charAt(0).toUpperCase()}
     </span>

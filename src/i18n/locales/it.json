@@ -1241,5 +1241,34 @@
     "weekly_title": "Top della settimana",
     "weekly_hint": "Sfide del giorno degli ultimi 7 giorni: 1 punto per sfida giocata, più un bonus per il podio. Aggiornata ogni giorno.",
     "weekly_empty": "Ancora nessuna classifica: gioca le sfide del giorno!"
+  },
+  "decorations": {
+    "title": "Personalizza",
+    "hint": "Scegli una cornice e un colore per il nome: compaiono sul tuo profilo e nelle classifiche.",
+    "open": "Personalizza profilo",
+    "close": "Chiudi",
+    "frames": "Cornice",
+    "colors": "Colore del nome",
+    "preview": "Anteprima",
+    "saving": "Salvataggio…",
+    "error": "Impossibile salvare, riprova.",
+    "locked": "Livello {{level}}",
+    "frame": {
+      "none": "Nessuna",
+      "silver": "Argento",
+      "gold": "Oro",
+      "ocean": "Oceano",
+      "jungle": "Giungla",
+      "volcano": "Vulcano"
+    },
+    "color": {
+      "default": "Predefinito",
+      "mint": "Menta",
+      "sky": "Cielo",
+      "coral": "Corallo",
+      "amber": "Ambra",
+      "lilac": "Lilla",
+      "rose": "Rosa"
+    }
   }
 }

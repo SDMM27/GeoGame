@@ -12,6 +12,7 @@ import { sendFriendRequestTo } from '@shared/utils/friends'
 import { loadErrorKey, rankLabel } from '@/leaderboards'
 import { colors, radius, space } from '@/theme'
 import { Text, Touchable } from '../ui'
+import { DecoratedName } from './DecoratedName'
 import { ReportFlag, type ReportTarget } from './ReportFlag'
 
 type IconName = ComponentProps<typeof MaterialCommunityIcons>['name']
@@ -117,7 +118,7 @@ export function LeaderboardRow({
         {rankLabel(index)}
       </Text>
       <View style={{ flex: 1 }}>
-        <Text variant="body" numberOfLines={1} color={mine ? colors.accent : undefined}>
+        <DecoratedName uid={uid} color={mine ? colors.accent : undefined}>
           {name}
           {mine ? (
             <Text variant="caption" color={colors.accent}>
@@ -125,7 +126,7 @@ export function LeaderboardRow({
               {t('score_save.you')}
             </Text>
           ) : null}
-        </Text>
+        </DecoratedName>
         {detail ? (
           <Text variant="caption" numberOfLines={1}>
             {detail}

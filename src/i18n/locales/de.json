@@ -1241,5 +1241,34 @@
     "weekly_title": "Top der Woche",
     "weekly_hint": "Tagesaufgaben der letzten 7 Tage: 1 Punkt pro gespielter Aufgabe plus Bonus für das Podium. Täglich aktualisiert.",
     "weekly_empty": "Noch keine Rangliste: Spiel die Tagesaufgaben!"
+  },
+  "decorations": {
+    "title": "Anpassen",
+    "hint": "Wähle einen Rahmen und eine Namensfarbe: Sie erscheinen auf deinem Profil und in den Bestenlisten.",
+    "open": "Profil anpassen",
+    "close": "Schließen",
+    "frames": "Rahmen",
+    "colors": "Namensfarbe",
+    "preview": "Vorschau",
+    "saving": "Wird gespeichert…",
+    "error": "Speichern fehlgeschlagen, versuch es noch einmal.",
+    "locked": "Level {{level}}",
+    "frame": {
+      "none": "Keiner",
+      "silver": "Silber",
+      "gold": "Gold",
+      "ocean": "Ozean",
+      "jungle": "Dschungel",
+      "volcano": "Vulkan"
+    },
+    "color": {
+      "default": "Standard",
+      "mint": "Minze",
+      "sky": "Himmel",
+      "coral": "Koralle",
+      "amber": "Bernstein",
+      "lilac": "Flieder",
+      "rose": "Rosa"
+    }
   }
 }

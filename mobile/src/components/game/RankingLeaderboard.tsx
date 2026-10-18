@@ -9,6 +9,7 @@ import { useLeaderboard } from '@/hooks/useLeaderboard'
 import { loadErrorKey } from '@/leaderboards'
 import { colors, radius, space } from '@/theme'
 import { Text } from '../ui'
+import { DecoratedName } from '../leaderboards/DecoratedName'
 import { AnswerList, ExpandableRow } from './ExpandableRow'
 import { visibleRows } from './leaderboardRows'
 
@@ -44,11 +45,7 @@ export function RankingLeaderboard({ dailyKey, refreshKey, maxRows = DEFAULT_MAX
             <Text variant="bodyStrong" style={styles.rank}>
               {MEDALS[index] ?? `${index + 1}`}
             </Text>
-            <Text
-              variant="body"
-              numberOfLines={1}
-              style={{ flex: 1 }}
-              onPress={score.uid ? () => router.push({ pathname: '/player/[uid]', params: { uid: score.uid! } }) : undefined}>
+            <DecoratedName uid={score.uid} fill onPress={score.uid ? () => router.push({ pathname: '/player/[uid]', params: { uid: score.uid! } }) : undefined}>
               {score.name}
               {score.uid === account?.uid && score.uid && (
                 <Text variant="caption" color={colors.accent}>
@@ -56,7 +53,7 @@ export function RankingLeaderboard({ dailyKey, refreshKey, maxRows = DEFAULT_MAX
                   {t('score_save.you')}
                 </Text>
               )}
-            </Text>
+            </DecoratedName>
             <Text variant="bodyStrong" style={styles.value}>
               {score.score} {t('units.pts')}
             </Text>

@@ -1241,5 +1241,34 @@
     "weekly_title": "Top da semana",
     "weekly_hint": "Desafios diários dos últimos 7 dias: 1 ponto por desafio jogado, mais um bônus pelo pódio. Atualizado todo dia.",
     "weekly_empty": "Ainda não há ranking: jogue os desafios do dia!"
+  },
+  "decorations": {
+    "title": "Personalizar",
+    "hint": "Escolhe uma moldura e uma cor de nome: aparecem no teu perfil e nas classificações.",
+    "open": "Personalizar perfil",
+    "close": "Fechar",
+    "frames": "Moldura",
+    "colors": "Cor do nome",
+    "preview": "Pré-visualização",
+    "saving": "A guardar…",
+    "error": "Não foi possível guardar, tenta de novo.",
+    "locked": "Nível {{level}}",
+    "frame": {
+      "none": "Nenhuma",
+      "silver": "Prata",
+      "gold": "Ouro",
+      "ocean": "Oceano",
+      "jungle": "Selva",
+      "volcano": "Vulcão"
+    },
+    "color": {
+      "default": "Padrão",
+      "mint": "Menta",
+      "sky": "Céu",
+      "coral": "Coral",
+      "amber": "Âmbar",
+      "lilac": "Lilás",
+      "rose": "Rosa"
+    }
   }
 }

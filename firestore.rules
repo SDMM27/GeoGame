@@ -153,10 +153,21 @@ service cloud.firestore {
         && challengeAt(ids, 19);
     }
 
+    // users/{uid}.decoration (src/utils/decorations.js): the frame and name color the player picked from the catalog.
+    // Ids only; the client drops unknown ones. Only starter items exist, so being unlocked isn't checked here yet.
+    function validDecoration(decoration) {
+      return decoration is map
+        && decoration.keys().hasOnly(['frame', 'color'])
+        && decoration.keys().hasAll(['frame', 'color'])
+        && decoration.frame is string && decoration.frame.size() > 0 && decoration.frame.size() <= 40
+        && decoration.color is string && decoration.color.size() > 0 && decoration.color.size() <= 40;
+    }
+
     match /users/{uid} {
       allow read: if true;
       allow update: if request.auth != null && request.auth.uid == uid
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['badges', 'challenges'])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['badges', 'challenges', 'decoration'])
+        && (!('decoration' in request.resource.data.diff(resource.data).affectedKeys()) || validDecoration(request.resource.data.decoration))
         && (!('badges' in request.resource.data.diff(resource.data).affectedKeys()) || validBadges(request.resource.data.badges))
         && (!('challenges' in request.resource.data.diff(resource.data).affectedKeys()) || validChallenges(request.resource.data.challenges));
       // Community directory (src/utils/community.js): users/{uid}.communityAt is the opt-in. Joining stamps the

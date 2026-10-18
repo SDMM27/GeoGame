@@ -6,7 +6,9 @@ import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
+import { useDecoration } from '@shared/hooks/useDecoration'
 import { useFriendships } from '@shared/hooks/usePlayerProfile'
+import { decorationStyle } from '@shared/utils/decorations'
 import { fetchPlayer } from '@shared/utils/friends'
 
 import { useAccount } from '@/account/auth'
@@ -25,6 +27,8 @@ export default function PlayerScreen() {
   const { uid } = useLocalSearchParams<{ uid: string }>()
   const { account } = useAccount()
   const friendships = useFriendships(account?.uid)
+  const decoration = useDecoration(uid)
+  const { nameColor } = decorationStyle(decoration)
   const [player, setPlayer] = useState<Player | null | undefined>(undefined)
 
   useEffect(() => {
@@ -47,9 +51,9 @@ export default function PlayerScreen() {
       ) : (
         <>
           <View style={styles.header}>
-            <Avatar username={player.username} size={64} />
+            <Avatar username={player.username} size={64} decoration={decoration} />
             <View style={{ flex: 1, gap: 2 }}>
-              <Text variant="heading" numberOfLines={1}>
+              <Text variant="heading" numberOfLines={1} color={nameColor ?? undefined}>
                 {player.username}
               </Text>
               {player.createdAt && (

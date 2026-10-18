@@ -238,6 +238,38 @@ describe('public challenges', () => {
   })
 })
 
+describe('profile decoration', () => {
+  const decoration = { frame: 'gold', color: 'sky' }
+
+  it('lets an account pick its own decoration, alone or with its badges, and anyone read it', async () => {
+    await assertSucceeds(as('alice').doc('users/alice').update({ decoration }))
+    await assertSucceeds(as('alice').doc('users/alice').update({ decoration: { frame: 'none', color: 'default' } }))
+    await assertSucceeds(as('alice').doc('users/alice').update({ decoration, badges: { top: [], count: 0 } }))
+    await assertSucceeds(as('alice').doc('users/alice').update({ decoration: { frame: 'x'.repeat(40), color: 'y' } }))
+    await assertSucceeds(anonymous().doc('users/alice').get())
+  })
+
+  it("refuses someone else's decoration, and a visitor's", async () => {
+    await assertFails(as('mallory').doc('users/alice').update({ decoration }))
+    await assertFails(anonymous().doc('users/alice').update({ decoration }))
+  })
+
+  it('refuses a malformed decoration', async () => {
+    const update = (value) => as('alice').doc('users/alice').update({ decoration: value })
+    await assertFails(update('gold'))
+    await assertFails(update({ frame: 'gold' }))
+    await assertFails(update({ frame: 'gold', color: 'sky', emblem: 'star' }))
+    await assertFails(update({ frame: 1, color: 'sky' }))
+    await assertFails(update({ frame: '', color: 'sky' }))
+    await assertFails(update({ frame: 'x'.repeat(41), color: 'sky' }))
+  })
+
+  it('refuses changing anything else along with the decoration', async () => {
+    await assertFails(as('alice').doc('users/alice').update({ decoration, username: 'Bob' }))
+    await assertFails(as('alice').doc('users/alice').update({ decoration, admin: true }))
+  })
+})
+
 describe('community directory', () => {
   it('lets an account join with the server time, leave, and anyone list the members', async () => {
     await assertSucceeds(as('alice').doc('users/alice').update({ communityAt: now() }))

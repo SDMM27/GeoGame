@@ -1241,5 +1241,34 @@
     "weekly_title": "Top de la semaine",
     "weekly_hint": "Défis du jour des 7 derniers jours : 1 point par défi joué, plus un bonus pour le podium. Mis à jour chaque jour.",
     "weekly_empty": "Pas encore de classement : joue les défis du jour !"
+  },
+  "decorations": {
+    "title": "Personnaliser",
+    "hint": "Choisis un cadre et une couleur de pseudo : ils apparaissent sur ton profil et dans les classements.",
+    "open": "Personnaliser le profil",
+    "close": "Fermer",
+    "frames": "Cadre",
+    "colors": "Couleur du pseudo",
+    "preview": "Aperçu",
+    "saving": "Enregistrement…",
+    "error": "Impossible d’enregistrer, réessaie.",
+    "locked": "Niveau {{level}}",
+    "frame": {
+      "none": "Aucun",
+      "silver": "Argent",
+      "gold": "Or",
+      "ocean": "Océan",
+      "jungle": "Jungle",
+      "volcano": "Volcan"
+    },
+    "color": {
+      "default": "Par défaut",
+      "mint": "Menthe",
+      "sky": "Ciel",
+      "coral": "Corail",
+      "amber": "Ambre",
+      "lilac": "Lilas",
+      "rose": "Rose"
+    }
   }
 }

@@ -8,6 +8,7 @@ import { firestore } from '../Firebase'
 import { ACHIEVEMENTS, computeAchievements, unlockedStickyIds, withRemembered } from './achievements'
 import { fetchGames } from './gameHistory'
 import { computeStats } from './profileStats'
+import { fetchPublicData, patchPublicData } from './publicProfile'
 
 export const BADGES_SHOWN = 3
 const KNOWN_IDS = new Set(ACHIEVEMENTS.map((achievement) => achievement.id))
@@ -61,7 +62,7 @@ export async function syncBadges(uid, achievements) {
     if (!sameList(merged, data.challenges)) changes.challenges = merged
     if (Object.keys(changes).length === 0) return
     await updateDoc(ref, changes)
-    if (changes.badges) cache.set(uid, { at: Date.now(), value: readBadges({ badges: summary }) })
+    if (changes.badges) patchPublicData(uid, { badges: summary })
   } catch (error) {
     // Badges are a bonus: never get in the way of the profile or of a game.
     console.warn('[badges]', error?.code, error)
@@ -94,26 +95,7 @@ export async function refreshOwnBadges(uid) {
   }
 }
 
-const CACHE_FOR = 10 * 60 * 1000
-const cache = new Map()
-const pending = new Map()
-
-// The badges of one account (cached for a few minutes); nothing for a visitor or when they can't be read.
+// The badges of one account (cached for a few minutes, see publicProfile.js); nothing for a visitor or when they can't be read.
 export async function fetchBadges(uid) {
-  const cached = cache.get(uid)
-  if (cached && Date.now() - cached.at < CACHE_FOR) return cached.value
-  if (!pending.has(uid)) {
-    pending.set(
-      uid,
-      getDoc(doc(firestore, 'users', uid))
-        .then((snapshot) => readBadges(snapshot.data()))
-        .catch(() => ({ top: [], count: 0 }))
-        .then((value) => {
-          cache.set(uid, { at: Date.now(), value })
-          pending.delete(uid)
-          return value
-        })
-    )
-  }
-  return pending.get(uid)
+  return readBadges(await fetchPublicData(uid))
 }

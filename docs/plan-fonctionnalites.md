@@ -12,6 +12,7 @@
 
 3. **Décorations de profil**
    Cadres, couleurs ou badges visibles sur le profil et dans les classements. Déblocage via les étapes 5 et 6 ; ici on pose le modèle de données et l'affichage, avec quelques décorations de départ.
+   Fait : `users/{uid}.decoration = { frame, color }` (catalogue dans `src/utils/decorations.js`, 6 cadres et 7 couleurs de départ, tous débloqués), sélecteur sur le profil, cadre et couleur sur les profils et dans les classements, site et app. Chaque objet porte une règle `unlock` (`starter` aujourd'hui, `level` prévu pour l'étape 5) ; les règles Firestore ne vérifient pas encore le déblocage, à ajouter quand des objets seront verrouillés.
 
 4. **Elo et classement des joueurs**
    - **Duels** : Elo global, mis à jour après chaque duel terminé (score de départ 1000, facteur K standard).

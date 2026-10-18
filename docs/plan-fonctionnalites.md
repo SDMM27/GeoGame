@@ -29,7 +29,7 @@
 6. **Fragments de drapeaux et badges**
    - Les défis remplis donnent des fragments de drapeau ; assez de fragments débloquent un drapeau.
    - Badge « Mythique » : tous les drapeaux débloqués.
-   - Badge « Légende » : tous les pays trouvés sans faute, dans les modes drapeaux et trouver.
+   - Badge « Légende » : tous les pays trouvés sans faute, dans les modes drapeaux, trouver et hardcore.
    Dépend de l'étape 5.
 
 7. **Mode hardcore : trouver le pays (sans frontières)**
@@ -50,7 +50,7 @@ Ces réponses changent le détail des étapes ; le plan reste valable sans elles
 
 - **Étape 1** : résolu, minuit heure locale du joueur, comme les défis du jour.
 - **Étape 4** : résolu, duels à Elo global, modes solo à Elo par mode, règles anti-farm et saisons décrites ci-dessus.
-- **Étape 6** : résolu, le badge Légende vaut pour les modes drapeaux et trouver. Le mode hardcore (étape 7) n'est pas encore tranché.
+- **Étape 6** : résolu, le badge Légende vaut pour les modes drapeaux, trouver et hardcore.
 - **Étape 8** : quelle est la règle de réussite (un seul pays par manche, score, temps) ?
 - **Étape 9** : spectateur en temps réel, ou partie terminée rejouable ?
 - **Étape 10** : quels modes sont « courts » et « récompensants » ? Quelle difficulté reste proposée par défaut, si une ?

@@ -226,7 +226,6 @@ export default function VoyageVoyagePage() {
             targetCountry={targetCountry}
             guessHistory={guessHistory}
             hintFeatures={hintFeatures}
-            interactive={isGameOver}
           />
         )}
       </div>

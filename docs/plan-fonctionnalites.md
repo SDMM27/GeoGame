@@ -43,6 +43,9 @@
 
 10. **Rééquilibrer le choix des modes**
     Ne plus choisir la difficulté par défaut, et mettre en avant les modes courts et plus récompensants. Dépend des étapes 5 et 6 pour définir les récompenses.
+    - Mettre en avant le mode **Ascension** sur l'accueil.
+    - Pour les nouveaux joueurs, le préréglage par défaut est « Découverte » (10 faciles, 5 moyens, 1 difficile) : des pays faciles au début pour le plaisir de réussir, puis un peu de moyen pour s'entraîner.
+    - Les pays difficiles restent accessibles mais ne sont plus le point de départ.
 
 ## Questions à trancher
 
@@ -53,4 +56,4 @@ Ces réponses changent le détail des étapes ; le plan reste valable sans elles
 - **Étape 6** : résolu, le badge Légende vaut pour les modes drapeaux, trouver et hardcore.
 - **Étape 8** : résolu, le mode se joue au score, comme les autres modes à score.
 - **Étape 9** : résolu, spectateur en temps réel.
-- **Étape 10** : quels modes sont « courts » et « récompensants » ? Quelle difficulté reste proposée par défaut, si une ?
+- **Étape 10** : résolu, Ascension mise en avant, préréglage « Découverte » par défaut pour les nouveaux joueurs.

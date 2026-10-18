@@ -7,7 +7,8 @@
 //   invitePushes, invitePushLimits, friendPushes, dailyNudges   server-only push bookkeeping (api/_lib/invitePush.mjs,
 //                 friendPush.mjs, dailyNudge.mjs), in milliseconds
 //   eloGains      a country answered in a season (api/_lib/elo.mjs): kept past the season's end (ELO_GAIN_MAX_AGE_MS)
-//   eloDuels, eloDuelPairs   duels already rated, kept past the rooms' lifetime (10 days), and the daily caps per pair
+//   eloDuels, eloDuelPairs, eloDuelAccounts   duels already rated, kept past the rooms' lifetime (10 days), and the
+//                 daily caps per pair and per account
 import { Timestamp } from 'firebase-admin/firestore'
 
 const HOUR = 60 * 60 * 1000
@@ -70,5 +71,6 @@ export async function cleanupExpired({ db, now = Date.now() }) {
     eloGains: await drain(db.collection('eloGains').where('at', '<', now - ELO_GAIN_MAX_AGE_MS), deleteDoc),
     eloDuels: await drain(db.collection('eloDuels').where('at', '<', now - ELO_DUEL_MAX_AGE_MS), deleteDoc),
     eloDuelPairs: await drain(db.collection('eloDuelPairs').where('at', '<', now - ELO_PAIR_MAX_AGE_MS), deleteDoc),
+    eloDuelAccounts: await drain(db.collection('eloDuelAccounts').where('at', '<', now - ELO_PAIR_MAX_AGE_MS), deleteDoc),
   }
 }

@@ -105,11 +105,13 @@ describe('cleanupExpired', () => {
     await db.doc('eloDuels/NEW234_0').set({ rated: true, at: NOW - 1000 })
     await db.doc('eloDuelPairs/old').set({ count: 1, at: NOW - ELO_PAIR_MAX_AGE_MS - 1000 })
     await db.doc('eloDuelPairs/new').set({ count: 1, at: NOW - 1000 })
+    await db.doc('eloDuelAccounts/old').set({ uid: 'alice', count: 1, at: NOW - ELO_PAIR_MAX_AGE_MS - 1000 })
+    await db.doc('eloDuelAccounts/new').set({ uid: 'alice', count: 1, at: NOW - 1000 })
 
     const deleted = await cleanupExpired({ db, now: NOW })
 
     expect(deleted).toEqual({ rooms: 0, invites: 1, _clockSync: 1, invitePushes: 1, friendPushes: 1, dailyNudges: 1, invitePushLimits: 1,
-      eloGains: 1, eloDuels: 1, eloDuelPairs: 1 })
+      eloGains: 1, eloDuels: 1, eloDuelPairs: 1, eloDuelAccounts: 1 })
     expect(await exists('invites/NEW_bob')).toBe(true)
     expect(await exists('_clockSync/new')).toBe(true)
     expect(await exists('invitePushes/NEW_bob')).toBe(true)
@@ -119,6 +121,7 @@ describe('cleanupExpired', () => {
     expect(await exists('eloGains/new')).toBe(true)
     expect(await exists('eloDuels/NEW234_0')).toBe(true)
     expect(await exists('eloDuelPairs/new')).toBe(true)
+    expect(await exists('eloDuelAccounts/new')).toBe(true)
   })
 
   it('goes through several pages', async () => {

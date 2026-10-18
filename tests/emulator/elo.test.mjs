@@ -5,7 +5,9 @@ import { getAuth } from 'firebase-admin/auth'
 import { getFirestore } from 'firebase-admin/firestore'
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
-import { DUEL_PAIR_DAILY_LIMIT, handleElo } from '../../api/_lib/elo.mjs'
+import { Timestamp } from 'firebase-admin/firestore'
+
+import { DUEL_ACCOUNT_DAILY_LIMIT, DUEL_PAIR_DAILY_LIMIT, MIN_DUEL_ACCOUNT_AGE_MS, handleElo } from '../../api/_lib/elo.mjs'
 import { QUESTION_START, duelResult, seasonKeyAt, seasonReset, soloResult } from '../../src/utils/eloRating.js'
 
 const PROJECT = 'geogame-sdmm'
@@ -148,7 +150,7 @@ describe('duels', () => {
   async function seedRoom({ code = ROOM, source = 'app2', players, results }) {
     await db.doc(`rooms/${code}`).set({ source, mode: 'live', games: [game], game, gameIndex: 0, players })
     for (const [playerId, result] of Object.entries(results)) {
-      await db.doc(`rooms/${code}/gameResults/0_${playerId}`).set({ playerId, gameIndex: 0, elapsedTime: 1000, ...result })
+      await db.doc(`rooms/${code}/gameResults/0_${playerId}`).set({ playerId, gameIndex: 0, elapsedTime: 1000, total: 10, countriesSolved: 5, attempts: 6, ...result })
     }
   }
   const twoPlayers = { p1: { pseudo: 'Alice', uid: 'alice' }, p2: { pseudo: 'Bob', uid: 'bob' } }
@@ -158,7 +160,7 @@ describe('duels', () => {
     await seedRoom({ players: twoPlayers, results: { p1: { weightedScore: 30 } } })
     expect((await duel('alice')).body).toEqual({ status: 'pending' })
 
-    await db.doc(`rooms/${ROOM}/gameResults/0_p2`).set({ playerId: 'p2', gameIndex: 0, weightedScore: 20, elapsedTime: 900 })
+    await db.doc(`rooms/${ROOM}/gameResults/0_p2`).set({ playerId: 'p2', gameIndex: 0, weightedScore: 20, elapsedTime: 900, total: 10, countriesSolved: 5, attempts: 6 })
     const expected = duelResult(1000, 1000, 1)
     expect((await duel('alice')).body).toEqual({ status: 'rated', rating: expected.a, delta: expected.a - 1000 })
     // The other player's call reads the same outcome.
@@ -197,5 +199,38 @@ describe('duels', () => {
     for (const code of codes.slice(0, DUEL_PAIR_DAILY_LIMIT)) expect((await duel('alice', code)).body.status).toBe('rated')
     expect((await duel('alice', codes[DUEL_PAIR_DAILY_LIMIT])).body).toEqual({ status: 'unrated', reason: 'pair_limit' })
     expect((await data('elo/alice')).duel.games).toBe(DUEL_PAIR_DAILY_LIMIT)
+  })
+
+  it(`rates ${DUEL_ACCOUNT_DAILY_LIMIT} duels a day per account, whoever the opponent`, async () => {
+    const day = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' }).format(new Date(NOW))
+    await db.doc(`eloDuelAccounts/alice_${day}`).set({ uid: 'alice', count: DUEL_ACCOUNT_DAILY_LIMIT, at: NOW })
+    await seedRoom({ players: twoPlayers, results: { p1: { weightedScore: 30 }, p2: { weightedScore: 20 } } })
+    expect((await duel('bob')).body).toEqual({ status: 'unrated', reason: 'account_limit' })
+    expect((await db.doc('elo/bob').get()).exists).toBe(false)
+  })
+
+  it('does not rate implausible results', async () => {
+    const cases = [
+      { p1: { weightedScore: 91 }, p2: { weightedScore: 20 } }, // more than 9 points per country
+      { p1: { weightedScore: 30, countriesSolved: 11 }, p2: { weightedScore: 20 } }, // more found than played
+      { p1: { weightedScore: 30, total: 12 }, p2: { weightedScore: 20 } }, // not the same game
+      { p1: { weightedScore: -1 }, p2: { weightedScore: 20 } },
+      { p1: { weightedScore: 30, elapsedTime: 0 }, p2: { weightedScore: 20 } },
+    ]
+    for (const [index, results] of cases.entries()) {
+      const code = `PLA${'BCDEF'[index]}23`
+      await seedRoom({ code, players: twoPlayers, results })
+      expect((await duel('alice', code)).body, code).toEqual({ status: 'unrated', reason: 'implausible' })
+    }
+    expect((await db.doc('elo/alice').get()).exists).toBe(false)
+  })
+
+  it('does not rate a duel with an account created less than 3 days ago', async () => {
+    await db.doc('users/bob').set({ username: 'Bob', createdAt: Timestamp.fromMillis(NOW - MIN_DUEL_ACCOUNT_AGE_MS + 60000) })
+    await seedRoom({ players: twoPlayers, results: { p1: { weightedScore: 30 }, p2: { weightedScore: 20 } } })
+    expect((await duel('alice')).body).toEqual({ status: 'unrated', reason: 'new_account' })
+
+    await db.doc('users/bob').set({ username: 'Bob', createdAt: Timestamp.fromMillis(NOW - MIN_DUEL_ACCOUNT_AGE_MS - 60000) })
+    expect((await duel('alice')).body.status).toBe('rated')
   })
 })

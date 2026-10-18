@@ -5,12 +5,16 @@
 //   eloGains/{uid}_{season}_{mode}_{country}       { won }: the player answered that country this season (won: found)
 //   eloDuels/{room}_{gameIndex}                    a duel already rated (or refused), so it counts once
 //   eloDuelPairs/{uidA}_{uidB}_{day}               rated duels between two accounts on a day (Paris), DUEL_PAIR_DAILY_LIMIT at most
-// The bookkeeping (eloGains, eloDuels, eloDuelPairs) carries `at` (ms) for the daily cleanup (cleanupExpired.mjs).
+//   eloDuelAccounts/{uid}_{day}                    rated duels of an account on a day, DUEL_ACCOUNT_DAILY_LIMIT at most
+// The bookkeeping (eloGains, eloDuels, eloDuelPairs, eloDuelAccounts) carries `at` (ms) for the daily cleanup
+// (cleanupExpired.mjs).
 //
 // Solo answers are reported by the client, so they can be made up; what bounds a cheater is that a country pays once
 // per mode and season, and only gains (never losses) exist in solo. Duels are read from the room's gameResults, which
 // only each player can write (proved by their secret, see firestore.rules), between two accounts the rules tie to
-// the players' own uid; the daily cap per pair limits farming with a second account.
+// the players' own uid. A player can still inflate their own result: what bounds it is that results must be plausible
+// (plausibleResults), accounts younger than MIN_DUEL_ACCOUNT_AGE_MS are not rated, and the daily caps per pair and per
+// account limit farming with other accounts.
 import countriesMeta from '../../src/data/countries.meta.json' with { type: 'json' }
 import { rankResults } from '../../src/utils/multiplayerScoring.js'
 import {
@@ -27,6 +31,11 @@ import {
 export const MAX_RESULTS = 50
 export const MAX_ERRORS = 1000
 export const DUEL_PAIR_DAILY_LIMIT = 3
+export const DUEL_ACCOUNT_DAILY_LIMIT = 20
+export const MIN_DUEL_ACCOUNT_AGE_MS = 3 * 24 * 60 * 60 * 1000
+// Most points a country gives in Placement, Flags and Capitals (SCORE_TABLE in src/utils/scoringRules.js).
+const MAX_POINTS_PER_COUNTRY = 9
+const SCORE_TABLE_GAMES = ['PLACEMENT', 'FLAGS', 'CAPITALS']
 
 const reply = (status, body) => ({ status, body })
 
@@ -165,6 +174,27 @@ export function duelScore(game, a, b) {
   return first.playerId === a.playerId ? 1 : 0
 }
 
+const isCount = (value) => Number.isFinite(value) && value >= 0
+
+/**
+ * Whether the two results of a game could be real: same number of countries, no more found than that, a time, and
+ * no more points than the countries can give.
+ */
+export function plausibleResults(game, a, b) {
+  if (!Number.isInteger(a.total) || a.total < 1 || a.total !== b.total) return false
+  return [a, b].every((result) =>
+    isCount(result.countriesSolved) && result.countriesSolved <= result.total
+    && isCount(result.weightedScore) && isCount(result.attempts)
+    && Number.isFinite(result.elapsedTime) && result.elapsedTime > 0
+    && (!SCORE_TABLE_GAMES.includes(game.type) || result.weightedScore <= result.total * MAX_POINTS_PER_COUNTRY))
+}
+
+// An account created over MIN_DUEL_ACCOUNT_AGE_MS ago (accounts from before createdAt count as old).
+function oldEnough(user, now) {
+  const createdAt = user.data().createdAt?.toMillis?.()
+  return createdAt == null || now - createdAt >= MIN_DUEL_ACCOUNT_AGE_MS
+}
+
 /**
  * A finished game of a two-player room: { status: 'pending' } until both results are in, then the duel is rated once,
  * { status: 'rated', rating, delta } (the caller's), or { status: 'unrated', reason } when it can't count.
@@ -192,16 +222,25 @@ export async function rateDuel({ db, uid, room: code, gameIndex, now = Date.now(
   if (!resultA.exists || !resultB.exists) return reply(200, { status: 'pending' })
   if (!userA.exists || !userB.exists) return reply(200, { status: 'unrated', reason: 'not_signed_in' })
 
-  const score = duelScore(game, { ...resultA.data(), playerId: idA }, { ...resultB.data(), playerId: idB })
+  if (!oldEnough(userA, now) || !oldEnough(userB, now)) return reply(200, { status: 'unrated', reason: 'new_account' })
+  const a = { ...resultA.data(), playerId: idA }
+  const b = { ...resultB.data(), playerId: idB }
+  if (!plausibleResults(game, a, b)) return reply(200, { status: 'unrated', reason: 'implausible' })
+
+  const score = duelScore(game, a, b)
   const season = seasonKeyAt(new Date(now))
+  const day = dayFormatter.format(new Date(now))
   const [low, high] = [playerA.uid, playerB.uid].sort()
   const duelRef = db.doc(`eloDuels/${code}_${gameIndex}`)
-  const pairRef = db.doc(`eloDuelPairs/${low}_${high}_${dayFormatter.format(new Date(now))}`)
+  const pairRef = db.doc(`eloDuelPairs/${low}_${high}_${day}`)
+  const accountRefA = db.doc(`eloDuelAccounts/${playerA.uid}_${day}`)
+  const accountRefB = db.doc(`eloDuelAccounts/${playerB.uid}_${day}`)
   const refA = db.doc(`elo/${playerA.uid}`)
   const refB = db.doc(`elo/${playerB.uid}`)
 
   return db.runTransaction(async (transaction) => {
-    const [duelSnap, pairSnap, eloA, eloB] = await transaction.getAll(duelRef, pairRef, refA, refB)
+    const [duelSnap, pairSnap, accountA, accountB, eloA, eloB] =
+      await transaction.getAll(duelRef, pairRef, accountRefA, accountRefB, refA, refB)
     const mine = playerA.uid === uid ? 'a' : 'b'
     if (duelSnap.exists) {
       const done = duelSnap.data()
@@ -213,6 +252,12 @@ export async function rateDuel({ db, uid, room: code, gameIndex, now = Date.now(
     if (count >= DUEL_PAIR_DAILY_LIMIT) {
       transaction.set(duelRef, { rated: false, reason: 'pair_limit', at: now })
       return reply(200, { status: 'unrated', reason: 'pair_limit' })
+    }
+    const countA = accountA.exists ? accountA.data().count : 0
+    const countB = accountB.exists ? accountB.data().count : 0
+    if (countA >= DUEL_ACCOUNT_DAILY_LIMIT || countB >= DUEL_ACCOUNT_DAILY_LIMIT) {
+      transaction.set(duelRef, { rated: false, reason: 'account_limit', at: now })
+      return reply(200, { status: 'unrated', reason: 'account_limit' })
     }
 
     const stateA = ratingsForSeason(eloA.exists ? eloA.data() : null, season)
@@ -232,6 +277,8 @@ export async function rateDuel({ db, uid, room: code, gameIndex, now = Date.now(
     }
     transaction.set(duelRef, { rated: true, score, ...outcome, at: now })
     transaction.set(pairRef, { count: count + 1, at: now })
+    transaction.set(accountRefA, { uid: playerA.uid, count: countA + 1, at: now })
+    transaction.set(accountRefB, { uid: playerB.uid, count: countB + 1, at: now })
     return reply(200, { status: 'rated', rating: outcome[mine].rating, delta: outcome[mine].delta })
   })
 }

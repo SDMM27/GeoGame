@@ -45,11 +45,13 @@ const ALICE = [
   'friendships/alice_bob', 'invites/ROOM01_alice', 'invites/ROOM02_bob', 'invitePushLimits/alice',
   'dailyReminderPushes/alice', 'friendPushes/alice_bob_request', 'friendPushes/alice_bob_accepted',
   'dailyNudges/alice_bob_QUIZ', 'dailyNudges/bob_alice_QUIZ', 'elo/alice', 'eloGains/alice_2026-Q4_FLAGS_France',
+  'eloDuelAccounts/alice_2026-10-18',
 ]
 const OTHERS = [
   'users/bob', 'usernames/bob', 'users/bob/games/g1', 'scores/s2', 'daily_scores/s1', 'reports/carol_daily_scores_s1',
   'reports/carol_scores_s2', 'friendships/bob_carol', 'invites/ROOM03_carol', 'dailyReminderPushes/bob', 'friendPushes/bob_carol_request',
   'dailyNudges/bob_carol_QUIZ', 'elo/bob', 'eloGains/bob_2026-Q4_FLAGS_France',
+  'eloDuelAccounts/bob_2026-10-18',
 ]
 
 async function seed() {
@@ -90,6 +92,8 @@ async function seed() {
     'eloGains/alice_2026-Q4_FLAGS_France': { uid: 'alice', won: true, at: 0 },
     'elo/bob': { uid: 'bob', name: 'Bob', season: '2026-Q4', solo: {}, carry: {} },
     'eloGains/bob_2026-Q4_FLAGS_France': { uid: 'bob', won: true, at: 0 },
+    'eloDuelAccounts/alice_2026-10-18': { uid: 'alice', count: 1, at: 0 },
+    'eloDuelAccounts/bob_2026-10-18': { uid: 'bob', count: 1, at: 0 },
   }
   const batch = db.batch()
   for (const [path, data] of Object.entries(docs)) batch.set(db.doc(path), data)

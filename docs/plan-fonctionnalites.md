@@ -5,7 +5,7 @@
 ## Étapes
 
 1. **Reset de « Voyage voyage » à minuit** (bug)
-   Le reset quotidien part un peu plus tard que minuit. Aligner l'heure du reset sur minuit heure locale du joueur, comme les défis du jour, côté site et côté API. Référence : `docs/superpowers/specs/2026-04-28-voyage-voyage-design.md`.
+   Le reset quotidien partait en UTC (1 h ou 2 h du matin à Paris). Il utilise maintenant `getDailyKey()`, comme les autres défis du jour : minuit à Paris, via l'heure serveur. Référence : `docs/superpowers/specs/2026-04-28-voyage-voyage-design.md`.
 
 2. **Zoom sur « Voyage voyage »**
    Permettre de zoomer et de se déplacer sur la carte du mode, sur ordinateur et sur mobile. Indépendant des autres étapes.
@@ -51,7 +51,7 @@
 
 Ces réponses changent le détail des étapes ; le plan reste valable sans elles pour les étapes 1 et 2.
 
-- **Étape 1** : résolu, minuit heure locale du joueur, comme les défis du jour.
+- **Étape 1** : résolu, comme les défis du jour. Ces défis se calculent à minuit à Paris, pas à l'heure locale du joueur.
 - **Étape 4** : résolu, duels à Elo global, modes solo à Elo par mode, règles anti-farm et saisons décrites ci-dessus.
 - **Étape 6** : résolu, le badge Légende vaut pour les modes drapeaux, trouver et hardcore.
 - **Étape 8** : résolu, le mode se joue au score, comme les autres modes à score.

@@ -10,6 +10,7 @@ import {
   findShortestPath,
 } from '../utils/voyageVoyageUtils'
 import { checkAnswer } from '../utils/normalizeAnswer'
+import { getDailyKey } from '../utils/dailyKey'
 
 function getFeatureByISO(iso) {
   return countries.features.find(f => f.properties.ISO_A2 === iso) ?? null
@@ -75,7 +76,7 @@ export default function useVoyageVoyageState(mode = 'infinite') {
   }, [])
 
   const initGame = useCallback(() => {
-    const dateStr = new Date().toISOString().slice(0, 10)
+    const dateStr = getDailyKey()
 
     if (mode === 'daily') {
       const saved = localStorage.getItem(dailyKey(dateStr))
@@ -144,7 +145,7 @@ export default function useVoyageVoyageState(mode = 'infinite') {
   // Sauvegarde de la progression en mode journalier
   useEffect(() => {
     if (modeRef.current !== 'daily' || !startCountry || !targetCountry || guessHistory.length === 0) return
-    const dateStr = new Date().toISOString().slice(0, 10)
+    const dateStr = getDailyKey()
     const key = dailyKey(dateStr)
     const existing = localStorage.getItem(key)
     if (!existing) return
@@ -287,6 +288,6 @@ export default function useVoyageVoyageState(mode = 'infinite') {
     useHint,
     submitGuess,
     resetGame,
-    dailyKey: new Date().toISOString().slice(0, 10),
+    dailyKey: getDailyKey(),
   }
 }

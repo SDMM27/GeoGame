@@ -52,5 +52,5 @@ Ces réponses changent le détail des étapes ; le plan reste valable sans elles
 - **Étape 4** : résolu, duels à Elo global, modes solo à Elo par mode, règles anti-farm et saisons décrites ci-dessus.
 - **Étape 6** : résolu, le badge Légende vaut pour les modes drapeaux, trouver et hardcore.
 - **Étape 8** : résolu, le mode se joue au score, comme les autres modes à score.
-- **Étape 9** : spectateur en temps réel, ou partie terminée rejouable ?
+- **Étape 9** : résolu, spectateur en temps réel.
 - **Étape 10** : quels modes sont « courts » et « récompensants » ? Quelle difficulté reste proposée par défaut, si une ?

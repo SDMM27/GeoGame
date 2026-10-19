@@ -61,7 +61,13 @@ type Props = {
 }
 
 const MAX_SCALE = 2 ** (18 - BASE_ZOOM)
-const MARKER_THRESHOLD_PX = 8
+// Same rule as the website's SmallCountryCircles: a country whose biggest piece is under 2.5 degrees gets a dot,
+// which goes away once that piece is about 28px wide.
+const MARKER_MAX_SPAN = (2.5 * WORLD_SIZE) / 360
+const MARKER_HIDE_PX = 28
+const MARKER_RADIUS_PX = 8
+// A tap this close to a dot's center picks its country
+const MARKER_TAP_PX = 18
 const TAP_TOLERANCE_PX = 16
 // A finger that moves further than this is dragging the map, not tapping a country
 const TAP_MAX_MOVE_PX = 10
@@ -96,6 +102,10 @@ function toBounds(bounds: BoundsInput): LatLngBounds {
     return { south, west, north, east }
   }
   return bounds
+}
+
+function isMarkerVisible(shape: CountryShape, scale: number) {
+  return shape.marker.span < MARKER_MAX_SPAN && shape.marker.span * scale < MARKER_HIDE_PX
 }
 
 function wrapX(tx: number, scale: number) {
@@ -226,7 +236,8 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
     { scale: scale.value },
   ])
   const thick = useDerivedValue(() => 2 / scale.value)
-  const markerRadius = useDerivedValue(() => 6 / scale.value)
+  const markerRadius = useDerivedValue(() => MARKER_RADIUS_PX / scale.value)
+  const markerStroke = useDerivedValue(() => 2 / scale.value)
 
   // ---- Leaflet-compatible layers ------------------------------------------------
   const layers = useMemo<MapLayer[]>(
@@ -280,13 +291,13 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
   const markers = useMemo(() => {
     if (!showSmallCountryMarkers) return []
     return shapes
-      .filter((shape) => Math.max(shape.width, shape.height) * zoomScale < MARKER_THRESHOLD_PX)
+      .filter((shape) => isMarkerVisible(shape, zoomScale))
       .map((shape) => {
         const style = styles[shape.name]
         return {
           name: shape.name,
-          x: shape.x + shape.width / 2,
-          y: shape.y + shape.height / 2,
+          x: shape.marker.x,
+          y: shape.marker.y,
           color: isVisibleFill(style) ? mapColor(style!.fillColor)! : colors.text,
           styled: isVisibleFill(style),
         }
@@ -425,7 +436,20 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
       const latlng = unproject(mx, my)
 
       let hit: CountryShape | null = null
-      for (const shape of shapes) {
+      // Dots sit on top of the map, as on the website: a tap on one wins
+      if (showSmallCountryMarkers) {
+        let best = MARKER_TAP_PX / s
+        for (const shape of shapes) {
+          if (!isMarkerVisible(shape, s)) continue
+          const dx = Math.abs(shape.marker.x - mx)
+          const distance = Math.hypot(Math.min(dx, WORLD_SIZE - dx), shape.marker.y - my)
+          if (distance <= best) {
+            best = distance
+            hit = shape
+          }
+        }
+      }
+      if (!hit) for (const shape of shapes) {
         if (mx < shape.x || mx > shape.x + shape.width || my < shape.y || my > shape.y + shape.height) continue
         if (shape.path.contains(mx, my)) {
           if (!hit || shape.width * shape.height < hit.width * hit.height) hit = shape
@@ -449,7 +473,7 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
       if (hit && onCountryPress) onCountryPress(layerByName.get(hit.name)!, latlng)
       else onMapPress?.(latlng)
     },
-    [shapes, layerByName, onCountryPress, onMapPress, scale, tx, ty]
+    [shapes, layerByName, onCountryPress, onMapPress, scale, tx, ty, showSmallCountryMarkers]
   )
 
   // ---- Gestures ------------------------------------------------------------------
@@ -545,14 +569,10 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
     <>
       <MapScene base={basePath} fills={fills} strokes={strokes} thick={thick} showBorders={showBorders} />
       {markers.map((marker) => (
-        <Circle
-          key={marker.name}
-          cx={marker.x}
-          cy={marker.y}
-          r={markerRadius}
-          color={marker.color}
-          opacity={marker.styled ? 0.95 : 0.55}
-        />
+        <Group key={marker.name}>
+          <Circle cx={marker.x} cy={marker.y} r={markerRadius} color={marker.styled ? marker.color : '#ffffff'} opacity={marker.styled ? 0.6 : 0.15} />
+          <Circle cx={marker.x} cy={marker.y} r={markerRadius} color={marker.color} style="stroke" strokeWidth={markerStroke} opacity={marker.styled ? 1 : 0.8} />
+        </Group>
       ))}
       {overlays.map((overlay, index) =>
         overlay.type === 'line' ? (

@@ -35,6 +35,9 @@ export type CountryShape = {
   width: number
   height: number
   geoBounds: LatLngBounds
+  // Biggest piece of land, in map space: where a tiny country's dot goes and how big that piece is.
+  // The whole country's bounds are no use for archipelagos (huge span, yet every island is a speck).
+  marker: { x: number; y: number; span: number }
 }
 
 export const projection = geoMercator()
@@ -67,6 +70,24 @@ export function getGeoBounds(feature: CountryFeature): LatLngBounds {
   return { south, west, north, east }
 }
 
+// Box of a ring in map space, over the dateline when the ring crosses it
+function ringBox(ring: Position[]) {
+  let lngs = ring.map((c) => c[0])
+  if (Math.max(...lngs) - Math.min(...lngs) > 180) lngs = lngs.map((l) => (l < 0 ? l + 360 : l))
+  const lats = ring.map((c) => c[1])
+  const west = Math.min(...lngs)
+  const east = Math.max(...lngs)
+  const top = project(Math.max(...lats), 0).y
+  const bottom = project(Math.min(...lats), 0).y
+  const center = project((Math.max(...lats) + Math.min(...lats)) / 2, ((((west + east) / 2 + 540) % 360) - 180))
+  return { x: center.x, y: center.y, span: Math.max(((east - west) * WORLD_SIZE) / 360, bottom - top) }
+}
+
+function biggestPiece(geometry: Geometry): CountryShape['marker'] {
+  const polygons = geometry.type === 'Polygon' ? [geometry.coordinates] : geometry.type === 'MultiPolygon' ? geometry.coordinates : []
+  return polygons.map((polygon) => ringBox(polygon[0])).reduce((a, c) => (c.span > a.span ? c : a), { x: 0, y: 0, span: -1 })
+}
+
 let shapeCache: Map<string, CountryShape> | null = null
 
 function buildShape(feature: CountryFeature): CountryShape | null {
@@ -84,6 +105,7 @@ function buildShape(feature: CountryFeature): CountryShape | null {
     width: bounds.width,
     height: bounds.height,
     geoBounds: getGeoBounds(feature),
+    marker: biggestPiece(feature.geometry),
   }
 }
 

@@ -46,10 +46,10 @@ function MissionRow({ entry, reward, fragments }: { entry: Entry; reward: number
       </View>
       <View style={{ flex: 1, gap: 6 }}>
         <View style={styles.missionTop}>
-          <Text variant="bodyStrong" numberOfLines={2} style={{ flex: 1, fontSize: 14, lineHeight: 19 }}>
+          <Text variant="bodyStrong" style={styles.missionTitle}>
             {title}
           </Text>
-          <Text variant="caption" color={done ? colors.accent : colors.textMuted} style={{ fontSize: 12 }}>
+          <Text variant="caption" color={done ? colors.accent : colors.textMuted} style={styles.missionReward}>
             {t('missions.reward', { xp: reward })} · {t('missions.fragments', { count: fragments })}
           </Text>
         </View>
@@ -141,7 +141,9 @@ const styles = StyleSheet.create({
   group: { gap: space.sm },
   mission: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   missionIcon: { width: 36, height: 36, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
-  missionTop: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
+  missionTop: { gap: 2 },
+  missionTitle: { fontSize: 14, lineHeight: 19, flexShrink: 1 },
+  missionReward: { fontSize: 12, alignSelf: 'flex-end' },
   track: { height: 6, borderRadius: radius.pill, backgroundColor: colors.surfaceHigh, overflow: 'hidden' },
   fill: { height: '100%', borderRadius: radius.pill },
   bonus: {

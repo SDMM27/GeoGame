@@ -71,5 +71,7 @@ Toutes les décisions listées ici sont prises ; elles ne représentent pas des 
 
 Les étapes 1 à 10 sont implémentées et les traductions des missions, fragments et badges en es/pt/de/it/ru ont été relues. Reste :
 
-- **Déployer les règles Firestore** (`npm run deploy:rules`) avant de publier le site et l'application : plafonds `HARDCORE_*` et `MISSING_FLAG_*` (sans eux, ces scores sont refusés) et règles de `presence/{uid}` (sans elles, la présence des amis ne s'affiche pas).
+- **Publier le site et l'application** (les règles Firestore sont déployées depuis le 2026-10-19).
+- **Tester sur de vrais comptes** la présence des amis (en ligne, en partie, « Regarder ») et la Survie vue par un joueur éliminé.
+- **Surveiller les écritures Firestore** : la présence écrit toutes les 2 minutes par joueur connecté (quota du plan Spark : 20 000 écritures par jour).
 - **Relecture native** des noms de préréglages et des textes de présence en es/pt/de/it/ru.

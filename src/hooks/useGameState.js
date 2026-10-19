@@ -10,6 +10,7 @@ import { getCountryName } from '../utils/getCountryName'
 import { GAME_TYPES } from '../utils/gameTypes'
 import { reportEloAnswer, flushElo } from '../utils/eloReport'
 import { HOVER_STYLE, MAP_COLORS } from '../utils/mapColors'
+import { scoreHardcoreTap } from '../utils/hardcoreScoring'
 
 const DIFFICULTIES = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
 
@@ -47,7 +48,7 @@ export function getTotalCountriesByContinent(continent) {
 
 let alreadyChosenCountries = []
 
-export default function useGameState(difficulty, isTraining, overrideCountries = null, mpSnapshot = null, mpSnapshotKey = null, continent = null) {
+export default function useGameState(difficulty, isTraining, overrideCountries = null, mpSnapshot = null, mpSnapshotKey = null, continent = null, gameType = GAME_TYPES.PLACEMENT) {
   const navigate = useNavigate()
   const { t, i18n } = useTranslation()
 
@@ -168,13 +169,14 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
   useEffect(() => { clickOnSeeCountryRef.current = clickOnSeeCountry }, [clickOnSeeCountry])
 
   const setStyleForCountry = useCallback((name, style) => {
+    const countryStyle = gameType === GAME_TYPES.HARDCORE ? { ...style, color: MAP_COLORS.stroke } : style
     const allRefs = [geoJsonRef, ...extraGeoJsonRefs.current]
     for (const ref of allRefs) {
       if (!ref.current) continue
       const layer = ref.current.getLayers().find(l => l.feature.properties.ADMIN === name)
-      if (layer) layer.setStyle(style)
+      if (layer) layer.setStyle(countryStyle)
     }
-  }, [])
+  }, [gameType])
 
   // 3 consecutive errors: highlight country
   useEffect(() => {
@@ -249,11 +251,46 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
     }
   }, [difficulty, continent, getRandomCountry, overrideCountries])
 
+  const handleHardcoreTap = useCallback((point) => {
+    if (gameType !== GAME_TYPES.HARDCORE || !gameStartedRef.current || clickOnSeeCountryRef.current) return
+    const name = targetCountryRef.current
+    const feature = countries.features.find((country) => country.properties.ADMIN === name)
+    if (!feature) return
+
+    const result = scoreHardcoreTap(point, feature)
+    setScore((current) => current + result.points)
+    reportEloAnswer(GAME_TYPES.HARDCORE, name, { found: result.inside, errors: 0 })
+    setStyleForCountry(name, {
+      fillColor: result.inside ? MAP_COLORS.right : MAP_COLORS.wrong,
+      weight: 2,
+      fillOpacity: 0.5,
+    })
+    if (result.inside) {
+      foundCountriesRef.current.add(name)
+      setStats((prev) => ({ ...prev, found: prev.found + 1, foundFirstTry: (prev.foundFirstTry ?? 0) + 1 }))
+    } else {
+      shownCountriesRef.current.add(name)
+      setStats((prev) => ({ ...prev, skipped: prev.skipped + 1, totalErrors: (prev.totalErrors ?? 0) + 1 }))
+    }
+    changeCountry()
+    const feedback = result.inside
+      ? `${t('toasts.found_country', { name: getCountryName(feature.properties.ISO_A2, i18n.language) || name })} +${result.points}`
+      : `${t('toasts.wrong')} +${result.points}`
+    toast[result.inside ? 'success' : 'error'](feedback, {
+      containerId: 'topRightToast',
+    })
+  }, [changeCountry, gameType, i18n.language, setStyleForCountry, t])
+
+  const onMapClick = useCallback((event) => {
+    if (gameType === GAME_TYPES.HARDCORE) handleHardcoreTap(event.latlng)
+  }, [gameType, handleHardcoreTap])
+
   const onCountryMouseOver = (event) => {
     const layer = event.target
     const name = layer.feature.properties.ADMIN
     if (foundCountriesRef.current.has(name)) return
     if (shownCountriesRef.current.has(name)) return
+    if (gameType === GAME_TYPES.HARDCORE) return
     layer.setStyle(HOVER_STYLE)
   }
 
@@ -262,6 +299,7 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
     const name = layer.feature.properties.ADMIN
     if (foundCountriesRef.current.has(name)) return
     if (shownCountriesRef.current.has(name)) return
+    if (gameType === GAME_TYPES.HARDCORE) return
     layer.setStyle(COUNTRY_STYLE)
   }
 
@@ -280,7 +318,7 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
         })
         incrementScore(targetDiff, consecutiveErrorsRef.current)
       }
-      if (ratedRef.current) reportEloAnswer(GAME_TYPES.PLACEMENT, clickedName, { found: !wasSkipped, errors: consecutiveErrorsRef.current })
+      if (ratedRef.current) reportEloAnswer(gameType, clickedName, { found: !wasSkipped, errors: consecutiveErrorsRef.current })
       setStyleForCountry(clickedName, { fillColor: MAP_COLORS.right, weight: 2, fillOpacity: 0.5 })
       shownCountriesRef.current.delete(clickedName)
       foundCountriesRef.current.add(clickedName)
@@ -303,11 +341,11 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
       consecutiveErrorsRef.current = newErrors
       setStats(prev => ({ ...prev, totalErrors: (prev.totalErrors ?? 0) + 1 }))
     }
-  }, [changeCountry, setStyleForCountry])
+  }, [changeCountry, gameType, setStyleForCountry])
 
   const onCountryClick = useCallback((event) => {
-    handleCountrySelected(event.target.feature.properties.ADMIN)
-  }, [handleCountrySelected])
+    if (gameType !== GAME_TYPES.HARDCORE) handleCountrySelected(event.target.feature.properties.ADMIN)
+  }, [gameType, handleCountrySelected])
 
   const onCountryNameClick = useCallback((name) => {
     handleCountrySelected(name)
@@ -427,6 +465,7 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
     mapRef,
     setMapRef,
     onCountryClick,
+    onMapClick,
     onCountryNameClick,
     onCountryMouseOver,
     onCountryMouseOut,

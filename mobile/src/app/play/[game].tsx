@@ -87,7 +87,7 @@ function GameSetupSheet() {
   const ascensionTotal = Object.values(phases).reduce((sum, n) => sum + n, 0)
 
   const start = (training: boolean) => {
-    const params: Record<string, string> = { training: training ? '1' : '0' }
+    const params: Record<string, string> = { training: training ? '1' : '0', gameType: game.type }
     if (mode === 'ascension') {
       params.ascension = JSON.stringify(phases)
       if (presetName) params.preset = presetName
@@ -128,14 +128,14 @@ function GameSetupSheet() {
           <SheetCloseButton />
         </View>
 
-        <Segmented<Mode>
+        {game.id !== 'hardcore' && <Segmented<Mode>
           value={mode}
           onChange={setMode}
           options={[
             { value: 'standard', label: t('mobile.setup.standard') },
             { value: 'ascension', label: t('mobile.setup.ascension') },
           ]}
-        />
+        />}
 
         {mode === 'standard' ? (
           <>

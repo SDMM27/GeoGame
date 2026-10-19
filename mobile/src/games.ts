@@ -51,6 +51,17 @@ export const GAMES: GameDefinition[] = [
     multi: true,
   },
   {
+    id: 'hardcore',
+    type: GAME_TYPES.HARDCORE,
+    titleKey: 'games.hardcore.title',
+    descKey: 'games.hardcore.description',
+    icon: 'skull-outline',
+    color: gameColors.hardcore,
+    route: '/game/placement',
+    kind: 'setup',
+    multi: false,
+  },
+  {
     id: 'flags',
     type: GAME_TYPES.FLAGS,
     titleKey: 'games.flags.title',

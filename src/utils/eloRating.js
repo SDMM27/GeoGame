@@ -21,6 +21,7 @@ export const SEASON_RESET = 0.5
 // Modes with a solo rating. Their countries come from the same data, each with its difficulty for that mode.
 export const ELO_MODES = [
   GAME_TYPES.PLACEMENT,
+  GAME_TYPES.HARDCORE,
   GAME_TYPES.FLAGS,
   GAME_TYPES.CAPITALS,
   GAME_TYPES.BORDER_GUESS,

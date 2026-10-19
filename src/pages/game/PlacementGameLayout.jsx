@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { MapContainer, GeoJSON } from 'react-leaflet'
+import { MapContainer, GeoJSON, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import { ToastContainer } from 'react-toastify'
 import { GAME_TYPES } from '../../utils/gameTypes'
@@ -18,14 +18,21 @@ import { getShiftedFeatures } from './shiftedFeatures'
 import { MAP_COLORS } from '../../utils/mapColors'
 
 const GEO_STYLE = { fillColor: 'transparent', color: MAP_COLORS.stroke, fillOpacity: 1, weight: 1 }
+const HARDCORE_GEO_STYLE = { fillColor: MAP_COLORS.land, color: 'transparent', fillOpacity: 1, weight: 0 }
 
-export default function PlacementGameLayout({ difficulty, isTraining, isAscension, presetName, state, onGameFinished = null, continent }) {
+function MapClickListener({ onClick }) {
+  useMapEvents({ click: onClick })
+  return null
+}
+
+export default function PlacementGameLayout({ difficulty, isTraining, isAscension, presetName, state, onGameFinished = null, continent, gameType = GAME_TYPES.PLACEMENT }) {
   const { t, i18n } = useTranslation()
   const {
     targetCountry, targetCountryISO, score, timer, stats,
     isGameOver, displayTimer,
     geoJsonRef, extraGeoJsonRefs, mapRef, setMapRef,
     onCountryClick, onCountryNameClick, onCountryMouseOver, onCountryMouseOut,
+    onMapClick,
     foundCountriesRef, shownCountriesRef,
     seeCountry, restartGame, goHome,
     currentPhase, phaseCountRemaining, totalPhaseCount, phaseStats,
@@ -35,7 +42,7 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
   // Multiplayer games (onGameFinished) belong to their room, not to the history.
   useRecordGame(
     isGameOver && !onGameFinished
-      ? setupGameRecord({ gameType: GAME_TYPES.PLACEMENT, isTraining, isAscension, presetName, difficulty, continent, score, stats, timer })
+      ? setupGameRecord({ gameType, isTraining, isAscension, presetName, difficulty, continent, score, stats, timer })
       : null
   )
 
@@ -141,7 +148,7 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
 
       <div className="hud-actions">
         {!onGameFinished && <button className="hud-btn hud-btn--home" onClick={goHome}>{t('buttons.home')}</button>}
-        <button className="hud-btn hud-btn--reveal" onClick={seeCountry}>{t('buttons.reveal')}</button>
+        {gameType !== GAME_TYPES.HARDCORE && <button className="hud-btn hud-btn--reveal" onClick={seeCountry}>{t('buttons.reveal')}</button>}
         {!onGameFinished && <button className="hud-btn hud-btn--restart" onClick={restartGame}>{t('buttons.restart')}</button>}
       </div>
 
@@ -167,11 +174,11 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
               <>
                 <ShareScoreButton
                   score={score}
-                  gameType="PLACEMENT"
+                  gameType={gameType}
                   difficulty={difficulty}
                   details={t('share.details_placement_timer', { found: stats.found, total: stats.total, time: timer ? `${Math.floor(timer/60000)}m${String(Math.floor((timer%60000)/1000)).padStart(2,'0')}s` : '' })}
                 />
-                <Form finalScore={score} difficulty={difficulty} elapsedTime={timer} gameType="PLACEMENT" continent={continent} />
+                <Form finalScore={score} difficulty={difficulty} elapsedTime={timer} gameType={gameType} continent={continent} />
               </>
             )}
             {!onGameFinished && (
@@ -197,16 +204,17 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
           setTimeout(() => target.invalidateSize(), 100)
         }}
       >
+        {gameType === GAME_TYPES.HARDCORE && <MapClickListener onClick={onMapClick} />}
         <GeoJSON
           key="geojson-left"
           ref={geoJsonRefLeft}
-          style={GEO_STYLE}
+          style={gameType === GAME_TYPES.HARDCORE ? HARDCORE_GEO_STYLE : GEO_STYLE}
           data={getShiftedFeatures().left}
           onEachFeature={onEachOffsetFeature}
         />
         <GeoJSON
           ref={geoJsonRef}
-          style={GEO_STYLE}
+          style={gameType === GAME_TYPES.HARDCORE ? HARDCORE_GEO_STYLE : GEO_STYLE}
           data={countries.features}
           onEachFeature={(feature, layer) => {
             layer.on({ click: onCountryClick, mouseover: onMouseOver, mouseout: onCountryMouseOut })
@@ -215,7 +223,7 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
         <GeoJSON
           key="geojson-right"
           ref={geoJsonRefRight}
-          style={GEO_STYLE}
+          style={gameType === GAME_TYPES.HARDCORE ? HARDCORE_GEO_STYLE : GEO_STYLE}
           data={getShiftedFeatures().right}
           onEachFeature={onEachOffsetFeature}
         />

@@ -88,7 +88,6 @@ export function FlagCollectionView({ flags, mastery }) {
               <li key={mode}>
                 <span>{t(`collection.mode_${mode}`)}</span>
                 <span>{mastery[mode].found} / {mastery[mode].total}</span>
-                {mode === 'hardcore' && <small>{t('collection.legend_hardcore_soon')}</small>}
               </li>
             ))}
           </ul>

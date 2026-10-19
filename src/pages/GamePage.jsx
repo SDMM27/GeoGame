@@ -12,8 +12,8 @@ import './GamePage.css'
 
 export { MultiplayerPlacementGame }
 
-function StandardPlacementGame({ difficulty, isTraining, continent }) {
-  const state = useGameState(difficulty, isTraining, null, null, null, continent)
+function StandardPlacementGame({ difficulty, isTraining, continent, gameType }) {
+  const state = useGameState(difficulty, isTraining, null, null, null, continent, gameType)
   return (
     <PlacementGameLayout
       difficulty={difficulty ?? continent}
@@ -22,6 +22,7 @@ function StandardPlacementGame({ difficulty, isTraining, continent }) {
       presetName={null}
       state={state}
       continent={continent}
+      gameType={gameType}
     />
   )
 }
@@ -40,7 +41,9 @@ function AscensionPlacementGame({ phases, isTraining, presetName }) {
 }
 
 export default function GamePage() {
-  const { difficulty, isTraining, isAscension, phases, presetName, continent } = useLocation().state || {}
+  const location = useLocation()
+  const params = new URLSearchParams(location.search)
+  const { difficulty = params.get('difficulty'), isTraining, isAscension, phases, presetName, continent, gameType = params.get('gameType') ?? GAME_TYPES.PLACEMENT } = location.state || {}
 
   if (isAscension) {
     return (
@@ -52,5 +55,5 @@ export default function GamePage() {
     )
   }
 
-  return <StandardPlacementGame difficulty={difficulty} isTraining={isTraining} continent={continent} />
+  return <StandardPlacementGame difficulty={difficulty} isTraining={isTraining} continent={continent} gameType={gameType} />
 }

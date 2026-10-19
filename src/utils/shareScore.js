@@ -3,6 +3,7 @@ import i18n from '../i18n'
 // Static fallback labels (used when i18n is not initialised, e.g. in tests)
 export const GAME_LABELS = {
   PLACEMENT: 'Placement',
+  HARDCORE: 'Hardcore',
   FLAGS: 'Jeu des Drapeaux',
   CAPITALS: 'Capitales',
   BORDER_GUESS: 'Border Guess',
@@ -17,6 +18,7 @@ export const GAME_LABELS = {
 const GAME_TYPE_LOCALE_KEYS = {
   FLAGS: 'games.flags.title',
   PLACEMENT: 'games.placement.title',
+  HARDCORE: 'games.hardcore.title',
   CAPITALS: 'games.capitals.title',
   BORDER_GUESS: 'games.border_guess.title',
   COUNTRY_CLUE: 'games.country_clue.title',
@@ -31,6 +33,7 @@ const GAME_TYPE_LOCALE_KEYS = {
 export const GAME_ROUTES = {
   FLAGS: '/flag-game',
   PLACEMENT: '/game',
+  HARDCORE: '/game?gameType=HARDCORE&difficulty=Hardcore',
   CAPITALS: '/capitals-game',
   BORDER_GUESS: '/border-guess',
   COUNTRY_CLUE: '/country-clue',

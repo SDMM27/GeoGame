@@ -52,6 +52,10 @@
       "title": "Find the Country",
       "description": "Find all countries of the chosen difficulty."
     },
+    "hardcore": {
+      "title": "Hardcore",
+      "description": "Find countries on a map without borders."
+    },
     "flags": {
       "title": "Find the Flag",
       "description": "Identify the country from its flag."

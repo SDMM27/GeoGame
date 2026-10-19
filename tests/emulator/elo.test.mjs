@@ -137,6 +137,12 @@ describe('solo', () => {
     expect((await data('mastery/alice')).flags).toEqual(['France', 'Aruba'])
   })
 
+  it('records the countries tapped inside in Hardcore, and rates the mode', async () => {
+    await solo('alice', [{ country: 'France', found: true, errors: 0 }, { country: 'Japon', found: false, errors: 0 }], 'HARDCORE')
+    expect(await data('mastery/alice')).toEqual({ placement: [], flags: [], hardcore: ['France'], updatedAt: NOW })
+    expect((await data('elo/alice')).solo.HARDCORE.found).toBe(1)
+  })
+
   it('records no mastery for the other modes, nor for a missed answer', async () => {
     await solo('alice', [{ country: 'France', found: true, errors: 0 }], 'CAPITALS')
     await solo('alice', [{ country: 'France', found: false, errors: 0 }], 'PLACEMENT')

@@ -13,7 +13,7 @@
 // Mastery (the "Légende" badge)
 // - mastery/{uid}, written by the server only (api/_lib/elo.mjs rateSolo): { placement: [ADMIN names], flags: [...],
 //   hardcore: [...], updatedAt }, the countries the player found at the first try (found, no error) in that mode,
-//   for good (not per season). 'hardcore' is reserved for the no-borders mode (step 7): nothing writes it yet.
+//   for good (not per season). In Hardcore (no borders, one tap per country), "first try" is a tap inside the country.
 //   Like Elo, the answers are reported by the client, so the badge is as honest as Elo.
 import { mulberry32 } from './prng.js'
 

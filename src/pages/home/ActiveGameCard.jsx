@@ -39,11 +39,11 @@ export default function ActiveGameCard({ game }) {
     }
 
     if (selectionMode === "continent") {
-      navigate(game.route, { state: { continent: continentOverride ?? selectedContinent, isTraining } });
+      navigate(game.route, { state: { continent: continentOverride ?? selectedContinent, isTraining, gameType: game.id } });
       return;
     }
 
-    navigate(game.route, { state: { difficulty: difficultyOverride ?? difficulty, isTraining } });
+    navigate(game.route, { state: { difficulty: difficultyOverride ?? difficulty, isTraining, gameType: game.id } });
   };
 
   // The same choices for a multiplayer room (src/components/multiplayer/RoomConfig.jsx)
@@ -82,12 +82,12 @@ export default function ActiveGameCard({ game }) {
           >
             {t('modes.standard')}
           </button>
-          <button
+          {!game.noAscension && <button
             className={`game-mode-tab${mode === "ascension" ? " game-mode-tab--active" : ""}`}
             onClick={() => setMode("ascension")}
           >
             {t('modes.ascension')}
-          </button>
+          </button>}
         </div>
         {mode === "standard" ? (
           <>

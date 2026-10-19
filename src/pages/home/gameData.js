@@ -81,6 +81,17 @@ export const GAMES = [
     active: true,
   },
   {
+    id: GAME_TYPES.HARDCORE,
+    kind: "setup",
+    multiId: null,
+    icon: "💀",
+    titleKey: "games.hardcore.title",
+    descKey: "games.hardcore.description",
+    route: "/game",
+    active: true,
+    noAscension: true,
+  },
+  {
     id: GAME_TYPES.FLAGS,
     kind: "setup",
     multiId: "flags",

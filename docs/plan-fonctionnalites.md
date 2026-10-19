@@ -9,6 +9,7 @@
 
 2. **Zoom sur « Voyage voyage »**
    Permettre de zoomer et de se déplacer sur la carte du mode, sur ordinateur et sur mobile. Indépendant des autres étapes.
+   Fait : zoom molette/contrôles tactiles et déplacement sur le site ; zoom pincé et déplacement sur l’application mobile.
 
 3. **Décorations de profil**
    Cadres, couleurs ou badges visibles sur le profil et dans les classements. Déblocage via les étapes 5 et 6 ; ici on pose le modèle de données et l'affichage, avec quelques décorations de départ.
@@ -38,18 +39,21 @@
 
 7. **Mode hardcore : trouver le pays (sans frontières)**
    Nouveau mode où le pays doit être trouvé sans les frontières affichées. Dépend de l'étape 4 pour le classement, optionnel.
+   Fait : mode jouable sur le site et l'application mobile, sélection de pays comme dans Trouver, sans frontières visibles avant la réponse et sans bouton Révéler. Une seule tentative par pays ; 1 000 points si la carte est touchée dans le pays, sinon un score réduit selon la distance (0 à 2 000 km). Elo et maîtrise du premier essai enregistrés sous `HARDCORE`, avec classements et historique dédiés.
 
 8. **Jeu de drapeau avec un élément manquant**
    Un drapeau dont une partie ou une couleur manque ; le joueur doit identifier le pays. Nouveau mode, avec sa propre difficulté, séparée de celle des autres modes.
 
 9. **Spectateur des parties des autres**
    Regarder une partie multijoueur en cours, en lecture seule. Demande une synchro de l'état de partie côté serveur ; le plus gros chantier, à faire après les étapes de scoring.
+   Partiellement fait : en survie, un joueur éliminé peut suivre les participants encore en jeu. Reste à permettre de rejoindre et regarder une partie multijoueur en cours en lecture seule, avec synchronisation temps réel.
 
 10. **Rééquilibrer le choix des modes**
     Ne plus choisir la difficulté par défaut, et mettre en avant les modes courts et plus récompensants. Dépend des étapes 5 et 6 pour définir les récompenses.
     - Mettre en avant le mode **Ascension** sur l'accueil.
     - Pour les nouveaux joueurs, le préréglage par défaut est « Découverte » (10 faciles, 5 moyens, 1 difficile) : des pays faciles au début pour le plaisir de réussir, puis un peu de moyen pour s'entraîner.
     - Les pays difficiles restent accessibles mais ne sont plus le point de départ.
+   À faire : Ascension est proposée dans les cartes de jeux, mais n'est pas encore mise en avant sur l'accueil ; les nouveaux joueurs démarrent sur le préréglage « Progressif », pas « Découverte ».
 
 ## Questions à trancher
 

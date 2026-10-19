@@ -52,6 +52,10 @@
       "title": "Trova il Paese",
       "description": "Trova tutti i paesi della difficoltà scelta."
     },
+    "hardcore": {
+      "title": "Hardcore",
+      "description": "Trova i paesi su una mappa senza confini."
+    },
     "flags": {
       "title": "Trova la Bandiera",
       "description": "Riconosci il paese dalla sua bandiera."

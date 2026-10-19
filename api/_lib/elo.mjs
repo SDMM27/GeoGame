@@ -11,9 +11,8 @@
 // (cleanupExpired.mjs).
 //
 // mastery/{uid} = { placement: [ADMIN names], flags: [...], hardcore: [...], updatedAt }: the countries found at the first
-// try (found, no error) in Placement and Flags, forever (flagCollection.js, for the "Légende" badge). 'hardcore' is
-// reserved for the no-borders mode: nothing writes it yet. Like Elo, the answers are reported by the client, so the
-// badge is as honest as Elo.
+// try (found, no error) in Placement, Flags and Hardcore (a tap inside the country), forever (flagCollection.js, for
+// the "Légende" badge). Like Elo, the answers are reported by the client, so the badge is as honest as Elo.
 //
 // Solo answers are reported by the client, so they can be made up; what bounds a cheater is that a country pays once
 // per mode and season, and only gains (never losses) exist in solo. Duels are read from the room's gameResults, which
@@ -51,7 +50,7 @@ const reply = (status, body) => ({ status, body })
 const COUNTRIES = new Map(countriesMeta.features.map(({ properties }) => [properties.ADMIN, properties]))
 
 // Mastery key of the solo modes that have one.
-const MASTERY_KEYS = { [GAME_TYPES.PLACEMENT]: 'placement', [GAME_TYPES.FLAGS]: 'flags' }
+const MASTERY_KEYS = { [GAME_TYPES.PLACEMENT]: 'placement', [GAME_TYPES.FLAGS]: 'flags', [GAME_TYPES.HARDCORE]: 'hardcore' }
 
 // A country name as a document id piece ('/' is the only character an id can't hold).
 const countryKey = (name) => name.replace(/\//g, '_')

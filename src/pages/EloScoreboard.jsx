@@ -8,6 +8,7 @@ import { ELO_MODES } from '../utils/eloRating'
 const MEDAL = ['🥇', '🥈', '🥉']
 const GAME_TITLE_KEYS = {
   PLACEMENT: 'games.placement.title',
+  HARDCORE: 'games.hardcore.title',
   FLAGS: 'games.flags.title',
   CAPITALS: 'games.capitals.title',
   BORDER_GUESS: 'games.border_guess.title',

@@ -52,6 +52,10 @@
       "title": "Trouve le Pays",
       "description": "Trouve tous les pays de la difficulté choisie."
     },
+    "hardcore": {
+      "title": "Hardcore",
+      "description": "Trouve les pays sur une carte sans frontières."
+    },
     "flags": {
       "title": "Trouve le Drapeau",
       "description": "Identifie le pays à partir de son drapeau."

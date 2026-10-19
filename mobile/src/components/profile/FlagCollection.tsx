@@ -162,7 +162,6 @@ export function FlagCollectionView({ collection }: { collection: Collection }) {
           <View key={mode} style={styles.modeRow}>
             <Text variant="caption" style={{ flex: 1 }}>
               {t(`collection.mode_${mode}`)}
-              {mode === 'hardcore' ? ` · ${t('collection.legend_hardcore_soon')}` : ''}
             </Text>
             <Text variant="caption">
               {progress.found}/{progress.total}

@@ -1,5 +1,7 @@
 export const GAME_TYPES = {
     PLACEMENT: 'PLACEMENT',
+    // Placement without borders (step 7 of docs/plan-fonctionnalites.md); not the 'Hardcore' difficulty (every country)
+    HARDCORE: 'HARDCORE',
     FLAGS: 'FLAGS',
     CAPITALS: 'CAPITALS',
     BORDER_GUESS: 'BORDER_GUESS',

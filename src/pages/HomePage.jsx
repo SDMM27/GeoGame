@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import NavBar from "../components/NavBar";
 import AppBanner from "../components/AppBanner";
 import LegalLinks from "../components/LegalLinks";
+import MissionsCard from "./home/MissionsCard";
 import GameConfigModal from "./home/GameConfigModal";
 import { DailyCard, HomeRow } from "./home/HomeCards";
 import { gameColor } from "../utils/roomGames";
@@ -18,8 +19,9 @@ export default function HomePage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [configGameId, setConfigGameId] = useState(null);
+  const [configInitialMode, setConfigInitialMode] = useState("standard");
   const configGame = GAMES.find((game) => game.id === configGameId) ?? null;
-  const closeConfig = useCallback(() => setConfigGameId(null), []);
+  const closeConfig = useCallback(() => { setConfigGameId(null); setConfigInitialMode("standard"); }, []);
 
   return (
     <div className="home-page">
@@ -41,6 +43,25 @@ export default function HomePage() {
               <DailyCard key={game.id} game={game} />
             ))}
           </div>
+        </section>
+
+        <section className="home-section">
+          <MissionsCard />
+        </section>
+
+        <section className="home-section" aria-labelledby="home-ascension">
+          <button
+            type="button"
+            className="ascension-featured"
+            onClick={() => { setConfigInitialMode("ascension"); setConfigGameId("PLACEMENT"); }}
+          >
+            <span className="ascension-featured-icon" aria-hidden="true">🏔️</span>
+            <span className="ascension-featured-copy">
+              <strong id="home-ascension">{t("modes.ascension")}</strong>
+              <span>{t("games.placement.description")}</span>
+            </span>
+            <span className="ascension-featured-cta">{t("buttons.play")} →</span>
+          </button>
         </section>
 
         <section className="home-section" aria-labelledby="home-games">
@@ -73,7 +94,7 @@ export default function HomePage() {
         </section>
       </main>
       <LegalLinks />
-      {configGame && <GameConfigModal game={configGame} onClose={closeConfig} />}
+      {configGame && <GameConfigModal game={configGame} initialMode={configInitialMode} onClose={closeConfig} />}
     </div>
   );
 }

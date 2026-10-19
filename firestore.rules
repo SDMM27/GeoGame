@@ -153,10 +153,36 @@ service cloud.firestore {
         && challengeAt(ids, 19);
     }
 
+    // users/{uid}.decoration (src/utils/decorations.js): the frame and name color the player picked from the catalog.
+    // Ids only; the client drops unknown ones. An item unlocked at a level (decorationLevel, same levels as the
+    // catalog: src/utils/decorations.test.js checks it) needs that level in users/{uid}.xp, which only the server writes.
+    function decorationLevel(id) {
+      return {
+        'sunrise': 3, 'glacier': 6, 'amethyst': 10, 'ruby': 15, 'emerald': 20, 'crown': 30,
+        'lime': 2, 'peach': 4, 'turquoise': 8, 'violet': 12, 'crimson': 18, 'gilded': 25
+      }.get(id, 0);
+    }
+
+    function playerLevel(data) {
+      return data.get('xp', {}).get('level', 1);
+    }
+
+    function validDecoration(decoration, level) {
+      return decoration is map
+        && decoration.keys().hasOnly(['frame', 'color'])
+        && decoration.keys().hasAll(['frame', 'color'])
+        && decoration.frame is string && decoration.frame.size() > 0 && decoration.frame.size() <= 40
+        && decoration.color is string && decoration.color.size() > 0 && decoration.color.size() <= 40
+        && level is int && decorationLevel(decoration.frame) <= level && decorationLevel(decoration.color) <= level;
+    }
+
+    // users/{uid}.xp (src/utils/missions.js) and users/{uid}.flags (src/utils/flagCollection.js): XP, missions paid and
+    // the flag collection, written by api/xp only; the hasOnly below keeps them out of any client update.
     match /users/{uid} {
       allow read: if true;
       allow update: if request.auth != null && request.auth.uid == uid
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['badges', 'challenges'])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['badges', 'challenges', 'decoration'])
+        && (!('decoration' in request.resource.data.diff(resource.data).affectedKeys()) || validDecoration(request.resource.data.decoration, playerLevel(resource.data)))
         && (!('badges' in request.resource.data.diff(resource.data).affectedKeys()) || validBadges(request.resource.data.badges))
         && (!('challenges' in request.resource.data.diff(resource.data).affectedKeys()) || validChallenges(request.resource.data.challenges));
       // Community directory (src/utils/community.js): users/{uid}.communityAt is the opt-in. Joining stamps the
@@ -267,6 +293,34 @@ service cloud.firestore {
       allow delete: if request.auth != null && request.auth.uid in resource.data.users;
     }
 
+    // Presence (src/utils/presence.js): presence/{uid} = { at, room, game, expiresAt }, when the player was last seen
+    // in the website or the app and the multiplayer room they are playing in, so their friends see them online or in
+    // a game and can watch it. Written by the player only (an account with a username), at the server time; read by
+    // the player and their accepted friends only, one document at a time (no list: a friend list is a set of gets).
+    // expiresAt lets the daily cleanup (api/_lib/cleanupExpired.mjs) drop the presence of players gone for a day.
+    match /presence/{uid} {
+      function validPresence(data) {
+        return data.keys().hasOnly(['at', 'room', 'game', 'expiresAt'])
+          && data.keys().hasAll(['at', 'room', 'game', 'expiresAt'])
+          && data.at == request.time
+          && (data.room == null || (data.room is string && data.room.matches('^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{6}$')))
+          && (data.game == null || (data.game is string && data.game.matches('^[A-Z_]{1,40}$')))
+          && expiresWithin(data.expiresAt, duration.value(1, 'h'), duration.value(2, 'd'));
+      }
+
+      function isFriend(uid) {
+        let friendship = /databases/$(database)/documents/friendships/$(friendshipOf(uid, request.auth.uid));
+        return exists(friendship) && get(friendship).data.status == 'accepted';
+      }
+
+      allow get: if request.auth != null && (request.auth.uid == uid || isFriend(uid));
+      allow list: if false;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && get(/databases/$(database)/documents/users/$(uid)).data.get('username', null) is string
+        && validPresence(request.resource.data);
+      allow delete: if request.auth != null && request.auth.uid == uid;
+    }
+
     // Room invites between friends (src/utils/invites.js): invites/{room}_{to}
     // { from, fromUsername, to, room, gameId, mode, createdAt, expiresAt? } (expiresAt: see api/cleanup-expired.mjs, missing from older apps)
     match /invites/{id} {
@@ -322,6 +376,16 @@ service cloud.firestore {
           'PLACEMENT_Afrique': 383,
           'PLACEMENT_Amériques': 407,
           'PLACEMENT_Océanie': 201,
+          'HARDCORE_Facile': 31900,
+          'HARDCORE_Moyen': 51700,
+          'HARDCORE_Difficile': 115500,
+          'HARDCORE_Impossible': 62700,
+          'HARDCORE_Hardcore': 261800,
+          'HARDCORE_Europe': 56100,
+          'HARDCORE_Asie': 57200,
+          'HARDCORE_Afrique': 61600,
+          'HARDCORE_Amériques': 57200,
+          'HARDCORE_Océanie': 26400,
           'FLAGS_Facile': 109,
           'FLAGS_Moyen': 347,
           'FLAGS_Difficile': 663,
@@ -332,6 +396,16 @@ service cloud.firestore {
           'FLAGS_Afrique': 389,
           'FLAGS_Amériques': 383,
           'FLAGS_Océanie': 211,
+          'MISSING_FLAG_Facile': 70,
+          'MISSING_FLAG_Moyen': 275,
+          'MISSING_FLAG_Difficile': 616,
+          'MISSING_FLAG_Impossible': 773,
+          'MISSING_FLAG_Hardcore': 1733,
+          'MISSING_FLAG_Europe': 319,
+          'MISSING_FLAG_Asie': 358,
+          'MISSING_FLAG_Afrique': 437,
+          'MISSING_FLAG_Amériques': 407,
+          'MISSING_FLAG_Océanie': 213,
           'CAPITALS_Facile': 103,
           'CAPITALS_Moyen': 297,
           'CAPITALS_Difficile': 740,
@@ -359,6 +433,16 @@ service cloud.firestore {
           'PLACEMENT_Afrique': 5600,
           'PLACEMENT_Amériques': 5200,
           'PLACEMENT_Océanie': 2400,
+          'HARDCORE_Facile': 2900,
+          'HARDCORE_Moyen': 4700,
+          'HARDCORE_Difficile': 10500,
+          'HARDCORE_Impossible': 5700,
+          'HARDCORE_Hardcore': 23800,
+          'HARDCORE_Europe': 5100,
+          'HARDCORE_Asie': 5200,
+          'HARDCORE_Afrique': 5600,
+          'HARDCORE_Amériques': 5200,
+          'HARDCORE_Océanie': 2400,
           'FLAGS_Facile': 3300,
           'FLAGS_Moyen': 6300,
           'FLAGS_Difficile': 8600,
@@ -369,6 +453,16 @@ service cloud.firestore {
           'FLAGS_Afrique': 5600,
           'FLAGS_Amériques': 5200,
           'FLAGS_Océanie': 2400,
+          'MISSING_FLAG_Facile': 2100,
+          'MISSING_FLAG_Moyen': 5000,
+          'MISSING_FLAG_Difficile': 8000,
+          'MISSING_FLAG_Impossible': 7800,
+          'MISSING_FLAG_Hardcore': 22900,
+          'MISSING_FLAG_Europe': 5100,
+          'MISSING_FLAG_Asie': 5200,
+          'MISSING_FLAG_Afrique': 5600,
+          'MISSING_FLAG_Amériques': 5200,
+          'MISSING_FLAG_Océanie': 2400,
           'CAPITALS_Facile': 3100,
           'CAPITALS_Moyen': 5400,
           'CAPITALS_Difficile': 9600,
@@ -757,13 +851,14 @@ service cloud.firestore {
         && (game.get('ramp', null) == null || validSurvivalRamp(game.ramp));
     }
 
-    // players.{id}: { pseudo, uid?, seenAt? }; seenAt is the heartbeat, always the server time.
+    // players.{id}: { pseudo, uid?, seenAt? }; seenAt is the heartbeat, always the server time. uid: the writer's own
+    // account, so that a duel between two accounts can be rated (api/_lib/elo.mjs).
     function validRoomPlayer(player) {
       return player is map
         && player.keys().hasOnly(['pseudo', 'uid', 'seenAt'])
         && player.keys().hasAll(['pseudo'])
         && validName(player.pseudo)
-        && (player.get('uid', null) == null || (player.uid is string && player.uid.size() <= 128))
+        && (player.get('uid', null) == null || (request.auth != null && player.uid == request.auth.uid))
         && (player.get('seenAt', null) == null || player.seenAt == request.time);
     }
 
@@ -934,9 +1029,10 @@ service cloud.firestore {
           let room = get(/databases/$(database)/documents/rooms/$(roomId)).data;
           return validProgress(data)
             && (room.get('source', null) == 'app2'
-                ? validPlayerId(playerId) && proved(playerId)
+                ? validPlayerId(playerId) && playerId in room.players && proved(playerId)
                     && expiresWithin(data.expiresAt, duration.value(1, 'h'), duration.value(10, 'd'))
                 : legacyOpen() && validPlayerId(playerId)
+                    && playerId in room.players
                     && (data.get('expiresAt', null) == null
                         || expiresWithin(data.expiresAt, duration.value(1, 'h'), duration.value(10, 'd'))));
         }
@@ -965,9 +1061,10 @@ service cloud.firestore {
           let room = get(/databases/$(database)/documents/rooms/$(roomId)).data;
           return validResult(data)
             && (room.get('source', null) == 'app2'
-                ? proved(data.playerId)
+                ? data.playerId in room.players && proved(data.playerId)
                     && expiresWithin(data.expiresAt, duration.value(1, 'h'), duration.value(10, 'd'))
                 : legacyOpen()
+                    && data.playerId in room.players
                     && (data.get('expiresAt', null) == null
                         || expiresWithin(data.expiresAt, duration.value(1, 'h'), duration.value(10, 'd'))));
         }
@@ -1002,6 +1099,24 @@ service cloud.firestore {
 
       allow create: if validReport(request.resource.data);
       allow read, update, delete: if false;
+    }
+
+    // ---------- Elo (api/_lib/elo.mjs, written by the server only) ----------
+
+    // The players' ratings, shown on the profiles and the Elo leaderboards (src/utils/elo.js).
+    match /elo/{uid} {
+      allow read: if true;
+    }
+
+    // Countries found at the first try per mode, for the "Légende" badge (src/utils/flagCollection.js, written by rateSolo
+    // in api/_lib/elo.mjs only): readable by everyone, so the profiles can show the progress.
+    match /mastery/{uid} {
+      allow read: if true;
+    }
+
+    // The countries' ratings per solo mode. eloGains, eloDuels and eloDuelPairs stay server-only (no rule).
+    match /eloQuestions/{id} {
+      allow read: if true;
     }
 
     // Top of the week (api/weekly-top.mjs, written by the server only): shown on the Community page.

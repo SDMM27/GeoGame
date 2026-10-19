@@ -4,6 +4,8 @@ import { Analytics } from "@vercel/analytics/react"
 import HomePage from "./pages/HomePage";
 import RouteFallback from "./components/RouteFallback";
 import RouteMeta from "./components/RouteMeta";
+import XpToast from "./components/XpToast";
+import PresenceHeartbeat from "./components/PresenceHeartbeat";
 import InviteBanner from "./components/multiplayer/InviteBanner";
 import RouteErrorBoundary, { ErrorBoundary } from "./components/RouteErrorBoundary";
 import { loadCountryGeometries } from "./data/countryGeometry";
@@ -14,6 +16,7 @@ const lazyWithGeometries = (load) =>
 
 const GamePage = lazyWithGeometries(() => import("./pages/GamePage"));
 const FlagGamePage = lazy(() => import("./pages/FlagGamePage"));
+const MissingFlagGamePage = lazy(() => import("./pages/FlagGamePage").then((module) => ({ default: module.MissingFlagGamePage })));
 const CapitalsGamePage = lazy(() => import("./pages/CapitalsGamePage"));
 const BorderGuessPage = lazyWithGeometries(() => import("./pages/BorderGuessPage"));
 const CountryCluePage = lazyWithGeometries(() => import("./pages/CountryCluePage"));
@@ -40,12 +43,15 @@ export default function App() {
       <Router>
         <RouteMeta />
         <InviteBanner />
+        <XpToast />
+        <PresenceHeartbeat />
         <RouteErrorBoundary>
           <Suspense fallback={<RouteFallback />}>
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/game" element={<GamePage />} />
               <Route path="/flag-game" element={<FlagGamePage />} />
+              <Route path="/missing-flag" element={<MissingFlagGamePage />} />
               <Route path="/capitals-game" element={<CapitalsGamePage />} />
               <Route path="/border-guess" element={<BorderGuessPage />} />
               <Route path="/country-clue" element={<CountryCluePage />} />

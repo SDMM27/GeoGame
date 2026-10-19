@@ -7,6 +7,8 @@ import { formatTime } from '../utils/formatTime'
 import { matchKnownAnswer } from '../utils/answerLexicon'
 import { getAllCountryNames, getCountryName } from '../utils/getCountryName'
 import { saveSnapshot } from '../utils/multiplayerSnapshot'
+import { GAME_TYPES } from '../utils/gameTypes'
+import { reportEloAnswer, flushElo } from '../utils/eloReport'
 
 const DIFFICULTIES = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
 
@@ -22,12 +24,24 @@ function getAvailableDifficulties(difficulty) {
   return [difficulty]
 }
 
-export function getTotalFlagCountries(difficulty) {
+// Missing Flag has its own difficulty (a flag can be easy to name whole and hard once a third is hidden).
+function flagDifficultyProperty(gameType) {
+  return gameType === GAME_TYPES.MISSING_FLAG ? 'DifficultyMissingFlag' : 'DifficultyFlag'
+}
+
+export function getTotalFlagCountries(difficulty, gameType = GAME_TYPES.FLAGS) {
   const available = getAvailableDifficulties(difficulty)
+  const property = flagDifficultyProperty(gameType)
   return countries.features.filter(c =>
-    available.includes(c.properties.DifficultyFlag) && c.properties.ISO_A2
+    available.includes(c.properties[property]) && c.properties.ISO_A2
   ).length
 }
+
+export function getTotalMissingFlagCountries(difficulty) {
+  return getTotalFlagCountries(difficulty, GAME_TYPES.MISSING_FLAG)
+}
+
+export const getTotalMissingFlagCountriesByContinent = getTotalFlagCountriesByContinent
 
 export function getTotalFlagCountriesByContinent(continent) {
   return countries.features.filter(c =>
@@ -37,7 +51,7 @@ export function getTotalFlagCountriesByContinent(continent) {
 
 let alreadyChosenCountries = []
 
-export default function useFlagGameState(difficulty, isTraining, overrideCountries = null, mpSnapshot = null, mpSnapshotKey = null, continent = null) {
+export default function useFlagGameState(difficulty, isTraining, overrideCountries = null, mpSnapshot = null, mpSnapshotKey = null, continent = null, gameType = GAME_TYPES.FLAGS) {
   const navigate = useNavigate()
   const { t, i18n } = useTranslation()
 
@@ -57,6 +71,8 @@ export default function useFlagGameState(difficulty, isTraining, overrideCountri
   const [clickOnSeeCountry, setClickOnSeeCountry] = useState(false)
   const clickOnSeeCountryRef = useRef(false)
   const gameOverToastShownRef = useRef(false)
+  // Room games (override list) are rated as duels, not as solo answers.
+  const ratedRef = useRef(!overrideCountries)
 
   // Refs for snapshot saves (always current, avoids stale closures in intervals)
   const statsForSnapRef = useRef({ found: 0, skipped: 0, total: 0, totalErrors: 0 })
@@ -74,13 +90,13 @@ export default function useFlagGameState(difficulty, isTraining, overrideCountri
           !alreadyChosenCountries.includes(c.properties.ADMIN)
         )
       : countries.features.filter(c =>
-          getAvailableDifficulties(diff).includes(c.properties.DifficultyFlag) &&
+          getAvailableDifficulties(diff).includes(c.properties[flagDifficultyProperty(gameType)]) &&
           c.properties.ISO_A2 &&
           !alreadyChosenCountries.includes(c.properties.ADMIN)
         )
     if (filtered.length === 0) return null
     return filtered[Math.floor(Math.random() * filtered.length)]
-  }, [])
+  }, [gameType])
 
   const orderedIndexRef = useRef(0)
 
@@ -92,7 +108,7 @@ export default function useFlagGameState(difficulty, isTraining, overrideCountri
       ? overrideCountries.length
       : continent
         ? getTotalFlagCountriesByContinent(continent)
-        : getTotalFlagCountries(difficulty)
+        : getTotalFlagCountries(difficulty, gameType)
 
     if (mpSnapshot && overrideCountries && mpSnapshot.countryIndex > 0) {
       // Restore state — player refreshed mid-game
@@ -157,6 +173,7 @@ export default function useFlagGameState(difficulty, isTraining, overrideCountri
   useEffect(() => {
     if (!allProcessed || !gameStarted || gameOverToastShownRef.current) return
     gameOverToastShownRef.current = true
+    flushElo()
     if (isTraining) {
       toast.success(t('toasts.all_flags_found'), {
         containerId: 'centerToast',
@@ -214,7 +231,8 @@ export default function useFlagGameState(difficulty, isTraining, overrideCountri
       if (!wasSkipped) {
         const name = getCountryName(props.ISO_A2, i18n.language) || props.ADMIN
         toast.success(t(result.match === 'typo' ? 'toasts.typo_accepted' : 'toasts.found_country', { name }), { containerId: 'topRightToast' })
-        incrementScore(props.DifficultyFlag, consecutiveErrorsRef.current)
+        incrementScore(props[flagDifficultyProperty(gameType)], consecutiveErrorsRef.current)
+        if (ratedRef.current) reportEloAnswer(gameType, props.ADMIN, { found: true, errors: consecutiveErrorsRef.current })
       }
       setStats(prev =>
         wasSkipped
@@ -232,6 +250,7 @@ export default function useFlagGameState(difficulty, isTraining, overrideCountri
       if (newErrors >= 3) {
         toast.error(t('toasts.location_reveal', { name: getCountryName(props.ISO_A2, i18n.language) || props.ADMIN }), { containerId: 'topRightToast' })
         setRevealedName(props.ADMIN)
+        if (ratedRef.current) reportEloAnswer(gameType, props.ADMIN, { found: false, errors: newErrors })
       } else {
         toast.error(t('toasts.wrong'), { containerId: 'topRightToast' })
       }
@@ -243,7 +262,9 @@ export default function useFlagGameState(difficulty, isTraining, overrideCountri
     if (revealedName) return
     setClickOnSeeCountry(true)
     clickOnSeeCountryRef.current = true
-    setRevealedName(targetCountryRef.current?.properties?.ADMIN ?? null)
+    const admin = targetCountryRef.current?.properties?.ADMIN ?? null
+    setRevealedName(admin)
+    if (admin && ratedRef.current) reportEloAnswer(gameType, admin, { found: false, errors: consecutiveErrorsRef.current })
   }
 
   // Keep snapshot refs in sync
@@ -302,7 +323,7 @@ export default function useFlagGameState(difficulty, isTraining, overrideCountri
     setTimeout(() => {
       const total = continent
         ? getTotalFlagCountriesByContinent(continent)
-        : getTotalFlagCountries(difficulty)
+        : getTotalFlagCountries(difficulty, gameType)
       setStats({ found: 0, skipped: 0, total, totalErrors: 0 })
       const next = getRandomCountry(difficulty, continent)
       if (next) {

@@ -99,7 +99,6 @@ export default function VoyageVoyageMap({
   targetCountry,
   guessHistory,
   hintFeatures = [],
-  interactive = false,
 }) {
   const targetISO = targetCountry?.properties.ISO_A2 ?? ''
   const targetInChain = guessHistory.some(
@@ -136,11 +135,11 @@ export default function VoyageVoyageMap({
       style={{ width: '100%', height: '100%' }}
       center={[20, 0]}
       zoom={2}
-      zoomControl={interactive}
-      scrollWheelZoom={interactive}
-      dragging={interactive}
-      doubleClickZoom={interactive}
-      touchZoom={interactive}
+      zoomControl
+      scrollWheelZoom
+      dragging
+      doubleClickZoom
+      touchZoom
       attributionControl={false}
     >
       <Graticule />

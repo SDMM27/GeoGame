@@ -1,6 +1,7 @@
 // Ascension leaderboard of the Rankings tab: fastest runs per game and preset (collection ascension_scores).
 import { useTranslation } from 'react-i18next'
 
+import { presetLabel } from '@shared/utils/ascensionPresets'
 import { formatTime } from '@shared/utils/formatTime'
 import { fetchAscensionScores } from '@shared/utils/saveScore'
 
@@ -45,7 +46,7 @@ export function AscensionLeaderboard({
     <LeaderboardCard scores={scores} error={error} emptyText={t('mobile.leaderboards.empty_ascension')}>
       {visibleRows(scores ?? [], account?.uid, MAX_ROWS).map(({ score, index }) => {
         const game = score.gameType ? getGameByType(score.gameType) : undefined
-        const detail = [filters.game === allGames && game ? t(game.titleKey) : null, score.presetName].filter(Boolean).join(' · ')
+        const detail = [filters.game === allGames && game ? t(game.titleKey) : null, score.presetName ? presetLabel(score.presetName, t) : null].filter(Boolean).join(' · ')
         return (
           <LeaderboardRow
             key={`${score.uid ?? score.name}-${score.gameType}-${score.presetName}-${index}`}

@@ -3,6 +3,7 @@ import { act, renderHook } from '@testing-library/react'
 import { toast } from 'react-toastify'
 import useBorderGuessState, { ROOM_MAX_ATTEMPTS, roomRoundErrors } from './useBorderGuessState'
 import { FIXTURE_COUNTRIES, byName } from './testUtils/countriesFixture'
+import { reportEloAnswer } from '../utils/eloReport'
 
 const mocks = vi.hoisted(() => ({ navigate: vi.fn(), dailyKey: '2026-10-08' }))
 
@@ -13,6 +14,7 @@ vi.mock('react-i18next', () => {
   const value = { t: (key) => key, i18n: { language: 'fr' } }
   return { useTranslation: () => value }
 })
+vi.mock('../utils/eloReport', () => ({ reportEloAnswer: vi.fn(), flushElo: vi.fn() }))
 vi.mock('./useDailyKey', () => ({ default: (enabled = true) => (enabled ? mocks.dailyKey : null) }))
 
 const NAMES = FIXTURE_COUNTRIES.map((c) => c.properties.ADMIN)
@@ -169,5 +171,32 @@ describe('useBorderGuessState — infini et multijoueur', () => {
   it('goes back home on an unknown mode', () => {
     renderHook(() => useBorderGuessState('weekly'))
     expect(mocks.navigate).toHaveBeenCalledWith('/')
+  })
+})
+
+describe('useBorderGuessState — Elo', () => {
+  it('reports the free mode with the wrong guesses made before the answer', () => {
+    const { result } = renderHook(() => useBorderGuessState('infinite'))
+    const answer = result.current.answerName
+    const wrong = NAMES.filter((n) => n !== answer).slice(0, 2)
+    wrong.forEach((name) => guess(result, name))
+    guess(result, answer)
+    expect(reportEloAnswer).toHaveBeenCalledWith('BORDER_GUESS', answer, { found: true, errors: 2 })
+  })
+
+  it('reports a revealed country as not found', () => {
+    const { result } = renderHook(() => useBorderGuessState('infinite'))
+    const answer = result.current.answerName
+    guess(result, NAMES.find((n) => n !== answer))
+    act(() => result.current.revealCountry())
+    expect(reportEloAnswer).toHaveBeenCalledWith('BORDER_GUESS', answer, { found: false, errors: 1 })
+  })
+
+  it('reports nothing for the daily or in a room', () => {
+    const daily = renderHook(() => useBorderGuessState('daily'))
+    guess(daily.result, daily.result.current.answerName)
+    const room = renderHook(() => useBorderGuessState('infinite', { overrideCountry: byName('Japon') }))
+    guess(room.result, 'Japon')
+    expect(reportEloAnswer).not.toHaveBeenCalled()
   })
 })

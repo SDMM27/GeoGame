@@ -255,7 +255,7 @@ export default function VoyageScreen() {
                 target={targetCountry}
                 guesses={guessHistory as Guess[]}
                 hints={hintFeatures}
-                interactive={isGameOver}
+                interactive
               />
             </>
           )}

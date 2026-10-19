@@ -52,6 +52,10 @@
       "title": "Trova il Paese",
       "description": "Trova tutti i paesi della difficoltà scelta."
     },
+    "hardcore": {
+      "title": "Hardcore",
+      "description": "Trova i paesi su una mappa senza confini."
+    },
     "flags": {
       "title": "Trova la Bandiera",
       "description": "Riconosci il paese dalla sua bandiera."
@@ -87,6 +91,11 @@
     "survival": {
       "title": "Sopravvivenza",
       "description": "Gioca round di più giochi di fila: ogni errore ti costa una vita."
+    },
+    "missing_flag": {
+      "title": "Bandiera incompleta",
+      "description": "Identifica il paese anche se manca una striscia della bandiera.",
+      "missing_part": "Parte mancante della bandiera"
     }
   },
   "modes": {
@@ -140,6 +149,9 @@
   },
   "presets": {
     "progressive": "Progressivo",
+    "discovery": "Scoperta",
+    "challenge": "Sfida",
+    "hardcore": "Estremo",
     "custom": "Personalizzato"
   },
   "labels": {
@@ -557,7 +569,15 @@
   "daily_challenge": {
     "rules": "12 domande, uguali per tutti oggi: trova i paesi sulla mappa, riconosci le bandiere, indica le capitali. Un solo tentativo per domanda, {{seconds}} s ciascuna, niente vite. Il tuo punteggio è il numero di risposte esatte; il tempo totale decide i pareggi. Puoi giocare una sola volta al giorno.",
     "level": "Livello del giorno: {{label}} ({{n}}/7)",
-    "levels": {"1": "Molto facile", "2": "Facile", "3": "Abbordabile", "4": "Medio", "5": "Impegnativo", "6": "Difficile", "7": "Tremendo"},
+    "levels": {
+      "1": "Molto facile",
+      "2": "Facile",
+      "3": "Abbordabile",
+      "4": "Medio",
+      "5": "Impegnativo",
+      "6": "Difficile",
+      "7": "Tremendo"
+    },
     "week_note": "Dal lunedì alla domenica, la sfida diventa ogni giorno più difficile. La domenica è tremenda!",
     "start": "Inizia la sfida",
     "continue": "Continua la sfida",
@@ -695,6 +715,10 @@
     }
   },
   "friends": {
+    "online": "Online",
+    "in_game": "In partita · {{game}}",
+    "in_game_short": "In partita",
+    "watch": "Guarda",
     "title": "Amici",
     "count_one": "{{count}} amico",
     "count_other": "{{count}} amici",
@@ -949,6 +973,14 @@
       "title": "Trio hardcore",
       "desc": "Fai una partita perfetta in Hardcore in Posizionamento, Bandiere e Capitali"
     },
+    "mythic": {
+      "title": "Mitico",
+      "desc": "Sblocca tutte le bandiere"
+    },
+    "legend_master": {
+      "title": "Leggenda",
+      "desc": "Trova tutti i paesi al primo tentativo nelle modalità Bandiere, Posizionamento e Hardcore"
+    },
     "world_champion": {
       "title": "Campione del mondo",
       "desc": "Fai una partita perfetta in Posizionamento, Bandiere e Capitali in tutte e 5 le difficoltà"
@@ -1008,6 +1040,9 @@
     "from_app": "Partita creata nell'app",
     "code": "Codice della partita",
     "join_hint": "Scegli il tuo nome utente per entrare nella partita.",
+    "watch": "Guarda la partita in corso",
+    "spectator": "Stai guardando questa partita",
+    "spectator_hint": "Classifica e progressi si aggiornano in tempo reale. Non partecipi alla partita.",
     "join": "Entra",
     "players": "Giocatori · {{count}}",
     "you": "tu",
@@ -1241,5 +1276,128 @@
     "weekly_title": "Top della settimana",
     "weekly_hint": "Sfide del giorno degli ultimi 7 giorni: 1 punto per sfida giocata, più un bonus per il podio. Aggiornata ogni giorno.",
     "weekly_empty": "Ancora nessuna classifica: gioca le sfide del giorno!"
+  },
+  "decorations": {
+    "title": "Personalizza",
+    "hint": "Scegli una cornice e un colore per il nome: compaiono sul tuo profilo e nelle classifiche.",
+    "open": "Personalizza profilo",
+    "close": "Chiudi",
+    "frames": "Cornice",
+    "colors": "Colore del nome",
+    "preview": "Anteprima",
+    "saving": "Salvataggio…",
+    "error": "Impossibile salvare, riprova.",
+    "locked": "Livello {{level}}",
+    "frame": {
+      "none": "Nessuna",
+      "silver": "Argento",
+      "gold": "Oro",
+      "ocean": "Oceano",
+      "jungle": "Giungla",
+      "volcano": "Vulcano",
+      "sunrise": "Alba",
+      "glacier": "Ghiacciaio",
+      "amethyst": "Ametista",
+      "ruby": "Rubino",
+      "emerald": "Smeraldo",
+      "crown": "Corona"
+    },
+    "color": {
+      "default": "Predefinito",
+      "mint": "Menta",
+      "sky": "Cielo",
+      "coral": "Corallo",
+      "amber": "Ambra",
+      "lilac": "Lilla",
+      "rose": "Rosa",
+      "lime": "Lime",
+      "peach": "Pesca",
+      "turquoise": "Turchese",
+      "violet": "Viola",
+      "crimson": "Cremisi",
+      "gilded": "Dorato"
+    }
+  },
+  "elo": {
+    "tab": "Elo",
+    "title": "Classifica Elo",
+    "explain": "Duelli: un punteggio globale, aggiornato dopo ogni duello tra due giocatori connessi. Solo: un punteggio per modalità; in solo non perdi mai punti e ogni paese vale una sola volta per stagione. Una stagione dura un trimestre.",
+    "season": "Stagione {{quarter}} · {{year}}",
+    "duel": "Duelli",
+    "rating": "Elo",
+    "col_duel": "Partite · vittorie",
+    "col_found": "Paesi trovati",
+    "duel_detail": "{{games}} partite · {{wins}} vittorie",
+    "profile_title": "Elo",
+    "unplayed": "Non ancora giocato in questa stagione",
+    "empty": "Nessuno ha ancora un punteggio in questa stagione.",
+    "found_count_one": "{{count}} paese trovato",
+    "found_count_other": "{{count}} paesi trovati"
+  },
+  "missions": {
+    "title": "Missioni",
+    "daily": "Missioni del giorno",
+    "weekly": "Missioni della settimana",
+    "bonus": "Bonus: tutte e 3 le missioni",
+    "reward": "+{{xp}} XP",
+    "per_game": "+{{xp}} XP a partita, {{count}} al giorno",
+    "sign_in": "Accedi per guadagnare XP, salire di livello e sbloccare cornici e colori.",
+    "resets_daily": "Nuove missioni a mezzanotte",
+    "resets_weekly": "Nuove missioni il lunedì",
+    "play_3": "Gioca {{count}} partite",
+    "dailies_3": "Gioca {{count}} giochi del giorno",
+    "daily_challenge": "Gioca la sfida del giorno",
+    "daily_wins_2": "Vinci {{count}} giochi del giorno",
+    "flags_20": "Trova {{count}} bandiere",
+    "placement_20": "Posiziona {{count}} paesi sulla mappa",
+    "capitals_15": "Trova {{count}} capitali",
+    "ascension_1": "Gioca una partita di Ascesa",
+    "survival_1": "Gioca una partita di Sopravvivenza",
+    "perfect_1": "Finisci una partita senza errori (10 paesi o più)",
+    "types_3": "Gioca a {{count}} giochi diversi",
+    "week_play_20": "Gioca {{count}} partite",
+    "week_daily_days_5": "Gioca un gioco del giorno in {{count}} giorni diversi",
+    "week_dailies_15": "Gioca {{count}} giochi del giorno",
+    "week_daily_wins_10": "Vinci {{count}} giochi del giorno",
+    "week_found_200": "Trova {{count}} paesi in totale",
+    "week_perfect_3": "Finisci {{count}} partite senza errori (10 paesi o più)",
+    "week_types_6": "Gioca a {{count}} giochi diversi",
+    "week_ascension_3": "Gioca {{count}} partite di Ascesa",
+    "fragments_one": "+{{count}} frammento",
+    "fragments_other": "+{{count}} frammenti"
+  },
+  "level": {
+    "label": "Livello {{level}}",
+    "short": "Liv. {{level}}",
+    "progress": "{{into}} / {{needed}} XP",
+    "total": "{{total}} XP",
+    "up": "Livello {{level}} raggiunto!",
+    "gained": "+{{xp}} XP",
+    "fragments_one": "+{{count}} frammento di bandiera",
+    "fragments_other": "+{{count}} frammenti di bandiera",
+    "flag_unlocked": "Bandiera sbloccata: {{name}} ({{rarity}})"
+  },
+  "collection": {
+    "title": "Collezione di bandiere",
+    "progress": "{{count}} / {{total}} bandiere",
+    "current": "Bandiera in corso",
+    "pieces": "{{count}} / {{total}} frammenti",
+    "hint": "Ogni missione completata dà frammenti; 4 frammenti ricostruiscono una bandiera.",
+    "empty": "Completa missioni per ottenere i tuoi primi frammenti di bandiera.",
+    "complete": "Collezione completata!",
+    "unlocked": "Bandiere sbloccate",
+    "show_all": "Mostra tutto",
+    "show_less": "Mostra meno",
+    "legend_progress": "Leggenda: {{count}} / {{total}} paesi trovati al primo tentativo",
+    "legend_hardcore_soon": "La modalità hardcore arriva presto",
+    "mode_placement": "Posizionamento",
+    "mode_flags": "Bandiere",
+    "mode_hardcore": "Hardcore",
+    "rarity": {
+      "common": "Comune",
+      "uncommon": "Non comune",
+      "rare": "Raro",
+      "legendary": "Leggendario"
+    }
   }
 }

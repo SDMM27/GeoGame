@@ -7,6 +7,14 @@ export const ASCENSION_PRESETS = [
   { name: 'Hardcore',   icon: '💀', phases: { Facile: 5,  Moyen: 10, Difficile: 15, Impossible: 5 } },
 ]
 
+// Translation key of each preset (presets.* in the locales). The French name stays the id, saved with the scores.
+const PRESET_KEYS = { Découverte: 'discovery', Progressif: 'progressive', Challenge: 'challenge', Hardcore: 'hardcore' }
+
+// Shown name of a preset: translated when known, the saved name otherwise.
+export function presetLabel(name, t) {
+  return PRESET_KEYS[name] ? t(`presets.${PRESET_KEYS[name]}`) : name
+}
+
 export function matchPreset(phases) {
   const preset = ASCENSION_PRESETS.find(p =>
     PHASE_ORDER.every(d => (p.phases[d] ?? 0) === (phases[d] ?? 0))

@@ -10,6 +10,8 @@ import countryAliases from '../data/countryAliases.json'
 import { getGeographicCenter, hasCountryGeometry } from '../utils/countryArea'
 import useDailyKey from './useDailyKey'
 import { STABLE_DAILY_PICK_SINCE, pickDaily } from '../utils/dailyPick'
+import { GAME_TYPES } from '../utils/gameTypes'
+import { reportEloAnswer } from '../utils/eloReport'
 
 const DAILY_STORAGE_PREFIX = 'border-guess-daily'
 
@@ -394,6 +396,8 @@ export default function useBorderGuessState(mode, options = {}) {
   const [elapsedTime, setElapsedTime] = useState(null)
   const initialGuessesUsedRef = useRef(false)
   const todayKey = useDailyKey(mode === 'daily' && !overrideCountry)
+  // Only the free mode is rated: the daily has one country for everyone, rooms are rated as duels.
+  const rated = mode === 'infinite' && !overrideCountry
 
   useEffect(() => {
     if (overrideCountry) return  // pas de redirect en mode multijoueur
@@ -540,6 +544,7 @@ export default function useBorderGuessState(mode, options = {}) {
       const finalElapsed = startedAt != null ? Date.now() - startedAt : null
       setElapsedTime(finalElapsed)
       setStatus('won')
+      if (rated) reportEloAnswer(GAME_TYPES.BORDER_GUESS, answerName, { found: true, errors: guesses.length })
       toast.success(t('toasts.country_was', { name: getCountryName(currentCountry.properties.ISO_A2, i18n.language) || answerName }), { containerId: 'topRightToast' })
       return
     }
@@ -564,6 +569,7 @@ export default function useBorderGuessState(mode, options = {}) {
     if (!currentCountry || isComplete) return
     setStatus('lost')
     setInputValue('')
+    if (rated) reportEloAnswer(GAME_TYPES.BORDER_GUESS, answerName, { found: false, errors: guesses.length })
     toast.info(t('toasts.answer_reveal', { name: getCountryName(currentCountry.properties.ISO_A2, i18n.language) || answerName }), { containerId: 'topRightToast' })
   }
 

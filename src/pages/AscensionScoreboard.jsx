@@ -5,7 +5,7 @@ import { formatTime } from '../utils/formatTime'
 import { useAccount } from '../auth'
 import PlayerName, { mineClass } from '../components/PlayerName'
 import { GAME_TYPES } from '../utils/gameTypes'
-import { ASCENSION_PRESETS } from '../utils/ascensionPresets'
+import { ASCENSION_PRESETS, presetLabel } from '../utils/ascensionPresets'
 import { ALL_PRESETS } from '../utils/leaderboards'
 
 const MEDAL = ['\uD83E\uDD47', '\uD83E\uDD48', '\uD83E\uDD49']
@@ -74,7 +74,7 @@ export default function AscensionScoreboard({ defaultGame = GAME_TYPES.PLACEMENT
           onChange={(event) => setSelectedPreset(event.target.value)}
         >
           {ASCENSION_PRESETS.map((preset) => (
-            <option key={preset.name} value={preset.name}>{preset.icon} {preset.name}</option>
+            <option key={preset.name} value={preset.name}>{preset.icon} {presetLabel(preset.name, t)}</option>
           ))}
           <option value={ALL_PRESETS}>{t('options.all_presets')}</option>
         </select>
@@ -108,7 +108,7 @@ export default function AscensionScoreboard({ defaultGame = GAME_TYPES.PLACEMENT
                 {score.globalTimeMs != null ? formatTime(score.globalTimeMs) : '—'}
               </span>
               <span className="scoreboard-score">{score.globalScore ?? 0} {t('units.pts')}</span>
-              <span className="scoreboard-preset">{score.presetName}</span>
+              <span className="scoreboard-preset">{presetLabel(score.presetName, t)}</span>
             </div>
           ))}
         </div>

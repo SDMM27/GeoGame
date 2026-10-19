@@ -3,7 +3,8 @@
 import * as Haptics from 'expo-haptics'
 
 export type ToastKind = 'success' | 'error' | 'info' | 'warning'
-export type ToastMessage = { id: number; kind: ToastKind; text: string }
+// `flag` (an image source) and `color` dress a toast, e.g. for an unlocked flag.
+export type ToastMessage = { id: number; kind: ToastKind; text: string; flag?: number; color?: string }
 
 type Listener = (toasts: ToastMessage[]) => void
 
@@ -38,9 +39,9 @@ const HAPTICS: Record<ToastKind, () => void> = {
   info: () => Haptics.selectionAsync(),
 }
 
-function show(kind: ToastKind, content: unknown) {
+function show(kind: ToastKind, content: unknown, extra: { flag?: number; color?: string } = {}) {
   const id = nextId++
-  toasts = [...toasts, { id, kind, text: String(content ?? '') }].slice(-MAX_VISIBLE)
+  toasts = [...toasts, { id, kind, text: String(content ?? ''), ...extra }].slice(-MAX_VISIBLE)
   emit()
   HAPTICS[kind]()
   setTimeout(() => dismissToast(id), DURATION_MS)
@@ -69,6 +70,11 @@ export const toast = Object.assign((content: unknown) => show('info', content), 
     } else dismissToast(id)
   },
 }) as ToastFn
+
+// A success toast with a small flag, in `color` (the app only: the site has no equivalent).
+export function showFlagToast(content: string, flag: number | null, color?: string) {
+  return show('success', content, { flag: flag ?? undefined, color })
+}
 
 // The web app renders <ToastContainer />; on mobile <ToastHost /> lives in the root layout.
 export function ToastContainer() {

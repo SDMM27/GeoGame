@@ -24,6 +24,7 @@ export type GameDefinition = {
   multi: boolean
   // Daily only: no infinite mode (Daily Challenge)
   dailyOnly?: boolean
+  noAscension?: boolean
 }
 
 export const GAMES: GameDefinition[] = [
@@ -51,6 +52,18 @@ export const GAMES: GameDefinition[] = [
     multi: true,
   },
   {
+    id: 'hardcore',
+    type: GAME_TYPES.HARDCORE,
+    titleKey: 'games.hardcore.title',
+    descKey: 'games.hardcore.description',
+    icon: 'skull-outline',
+    color: gameColors.hardcore,
+    route: '/game/placement',
+    kind: 'setup',
+    multi: false,
+    noAscension: true,
+  },
+  {
     id: 'flags',
     type: GAME_TYPES.FLAGS,
     titleKey: 'games.flags.title',
@@ -60,6 +73,18 @@ export const GAMES: GameDefinition[] = [
     route: '/game/flags',
     kind: 'setup',
     multi: true,
+  },
+  {
+    id: 'missing_flag',
+    type: GAME_TYPES.MISSING_FLAG,
+    titleKey: 'games.missing_flag.title',
+    descKey: 'games.missing_flag.description',
+    icon: 'puzzle-outline',
+    color: gameColors.missing_flag,
+    route: '/game/missing-flag',
+    kind: 'setup',
+    multi: false,
+    noAscension: true,
   },
   {
     id: 'capitals',

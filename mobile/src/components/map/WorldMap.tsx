@@ -54,6 +54,7 @@ type Props = {
   initialView?: { center: [number, number]; zoom: number }
   overlays?: Overlay[]
   showSmallCountryMarkers?: boolean
+  showBorders?: boolean
   interactive?: boolean
   // Called once the map is measured and framed: the handle's view methods work from then on.
   onReady?: () => void
@@ -117,11 +118,13 @@ const MapScene = memo(function MapScene({
   fills,
   strokes,
   thick,
+  showBorders,
 }: {
   base: SkPath
   fills: { key: string; path: SkPath; color: string; opacity: number }[]
   strokes: { key: string; path: SkPath; color: string; thick: boolean }[]
   thick: SharedValue<number>
+  showBorders: boolean
 }) {
   return (
     <>
@@ -131,7 +134,7 @@ const MapScene = memo(function MapScene({
       ))}
       {/* Width 0 is a Skia hairline: one device pixel at any zoom, drawn without re-stroking
           the whole world on every frame of a pan or pinch. */}
-      <Path path={base} color={colors.landStroke} style="stroke" strokeWidth={0} />
+      {showBorders && <Path path={base} color={colors.landStroke} style="stroke" strokeWidth={0} />}
       {strokes.map((stroke) => (
         <Path
           key={stroke.key}
@@ -187,6 +190,7 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
     initialView,
     overlays = [],
     showSmallCountryMarkers = true,
+    showBorders = true,
     interactive = true,
     onReady,
   },
@@ -539,7 +543,7 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
 
   const scene = (
     <>
-      <MapScene base={basePath} fills={fills} strokes={strokes} thick={thick} />
+      <MapScene base={basePath} fills={fills} strokes={strokes} thick={thick} showBorders={showBorders} />
       {markers.map((marker) => (
         <Circle
           key={marker.name}

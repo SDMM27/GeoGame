@@ -26,7 +26,9 @@ export const colors = {
 export const gameColors = {
   daily_challenge: '#FF9F45',
   placement: '#7AA2FF',
+  hardcore: '#FF7A6B',
   flags: '#FF7A6B',
+  missing_flag: '#C792FF',
   capitals: '#F5B83D',
   border_guess: '#C792FF',
   country_clue: '#3DDC97',

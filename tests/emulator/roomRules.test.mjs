@@ -142,8 +142,12 @@ describe('creating a room', () => {
     await assertSucceeds(joinAs('p3', 'Scunthorpe'))
   })
 
-  it('creates a room whose host has an account', async () => {
-    await assertSucceeds(createRoom({ players: { host: { pseudo: 'Hôte', uid: 'some-account-uid', seenAt: serverTime() } } }))
+  it('creates a room whose host has an account, only under their own uid', async () => {
+    const hostWith = (uid) => ({ players: { host: { pseudo: 'Hôte', uid, seenAt: serverTime() } } })
+    await assertFails(createRoom(hostWith('some-account-uid')))
+    db = env.authenticatedContext('some-account-uid').firestore()
+    await assertFails(createRoom(hostWith('someone-else')))
+    await assertSucceeds(createRoom(hostWith('some-account-uid')))
   })
 
   it('creates an Ascension room', async () => {
@@ -270,9 +274,16 @@ describe('joining and heartbeat', () => {
     await assertSucceeds(joinAs('p2', 'Deux bis'))
   })
 
-  it('lets a player with an account join', async () => {
-    await assertSucceeds(owned('p2', (batch, ref) =>
-      batch.update(ref, { 'players.p2': { pseudo: 'Deux', uid: 'acc-1', seenAt: serverTime() }, by: 'p2' })).commit())
+  it('lets a player with an account join under their own uid only', async () => {
+    const joinWith = (uid) => owned('p2', (batch, ref) =>
+      batch.update(ref, { 'players.p2': { pseudo: 'Deux', uid, seenAt: serverTime() }, by: 'p2' })).commit()
+    // Signed out, or someone else's account: a duel against that account could be rated (api/_lib/elo.mjs).
+    await assertFails(joinWith('acc-1'))
+    db = env.authenticatedContext('acc-2').firestore()
+    await assertFails(joinWith('acc-1'))
+    db = env.authenticatedContext('acc-1').firestore()
+    await assertSucceeds(joinWith('acc-1'))
+    await assertSucceeds(updateRoom('p2', { 'players.p2.seenAt': serverTime() }))
   })
 
   it('lets a player send a heartbeat', async () => {

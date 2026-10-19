@@ -34,6 +34,37 @@
   border: 1px solid var(--border-color);
 }
 
+.flag-display-wrap {
+  position: relative;
+  display: inline-flex;
+  line-height: 0;
+}
+
+.flag-display-wrap--missing .flag-display {
+  width: 100%;
+}
+
+.missing-flag-band {
+  position: absolute;
+  background: repeating-linear-gradient(135deg, #26304a, #26304a 12px, #1b2339 12px, #1b2339 24px);
+}
+
+.missing-flag-band--h {
+  left: 0;
+  right: 0;
+  top: calc(var(--missing-band) * 33.3333%);
+  height: 33.3333%;
+  border-block: 1px dashed rgba(255, 255, 255, 0.35);
+}
+
+.missing-flag-band--v {
+  top: 0;
+  bottom: 0;
+  left: calc(var(--missing-band) * 33.3333%);
+  width: 33.3333%;
+  border-inline: 1px dashed rgba(255, 255, 255, 0.35);
+}
+
 .flag-placeholder {
   width: 320px;
   height: 213px;
@@ -122,6 +153,9 @@
     width: min(100%, 340px);
   }
 
+  .flag-display-wrap { width: min(100%, 340px); }
+  .flag-display-wrap .flag-display { width: 100%; }
+
   .flag-placeholder {
     height: auto;
     aspect-ratio: 3 / 2;
@@ -174,6 +208,9 @@
     height: var(--flag-height);
     border-radius: 12px;
   }
+
+  .flag-display-wrap { height: var(--flag-height); }
+  .flag-display-wrap .flag-display { height: 100%; width: auto; }
 
   .flag-placeholder {
     aspect-ratio: 3 / 2;

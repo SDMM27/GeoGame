@@ -25,6 +25,25 @@ describe('achievements', () => {
     }
   })
 
+  it('unlock the collection ones from the flags and the mastery, with the pool sizes as targets', () => {
+    const compute = (collection) => computeAchievements({ stats: computeStats([]), games: [], collection })
+    const find = (list, id) => list.find((achievement) => achievement.id === id)
+    const partial = compute({ flagsUnlocked: 100, flagsTotal: 239, masteryFound: 5, masteryTotal: 700 })
+    expect(find(partial, 'mythic')).toMatchObject({ progress: 100, target: 239, unlocked: false, sticky: true, tier: 'legend' })
+    expect(find(partial, 'legend_master')).toMatchObject({ progress: 5, target: 700, unlocked: false })
+    const done = compute({ flagsUnlocked: 239, flagsTotal: 239, masteryFound: 700, masteryTotal: 700 })
+    expect(find(done, 'mythic').unlocked).toBe(true)
+    expect(find(done, 'legend_master').unlocked).toBe(true)
+  })
+
+  it('never unlock the collection ones from an empty collection', () => {
+    for (const collection of [undefined, {}, { flagsUnlocked: 0, flagsTotal: 0, masteryFound: 0, masteryTotal: 0 }]) {
+      const list = computeAchievements({ stats: computeStats([]), games: [], collection })
+      expect(list.filter((achievement) => achievement.unlocked)).toEqual([])
+      expect(list.find((achievement) => achievement.id === 'mythic')).toMatchObject({ target: 1, progress: 0 })
+    }
+  })
+
   it('unlock nothing without games', () => {
     expect(unlockedIds([])).toEqual([])
   })

@@ -9,6 +9,7 @@ import { GAME_TYPES } from '../utils/gameTypes'
 import { matchKnownAnswer } from '../utils/answerLexicon'
 import { buildPhaseSequence } from '../utils/ascensionPresets'
 import { saveSnapshot } from '../utils/multiplayerSnapshot'
+import { reportEloAnswer, flushElo } from '../utils/eloReport'
 import { getCapitalName, getCountryName, getAllCountryNames, getAllCapitalNames } from '../utils/getCountryName'
 import { HOVER_STYLE, MAP_COLORS } from '../utils/mapColors'
 
@@ -76,6 +77,8 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
   const [stats, setStats] = useState({ found: 0, skipped: 0, total: 0 })
   const statsRef = useRef({ found: 0, skipped: 0, total: 0 })
   const [isGameOver, setIsGameOver] = useState(false)
+  // Room games (override lists) are rated as duels, not as solo answers.
+  const ratedRef = useRef(!overridesByDifficulty)
 
   // ── Timer ────────────────────────────────────────────────────
   const [timer, setTimer] = useState(mpSnapshot?.elapsedMs ?? 0)
@@ -233,6 +236,11 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
   // Core: advance game after a country is resolved
   // ─────────────────────────────────────────────────────────────
   const advanceGame = useCallback((wasFound, errorsAtTime = 0) => {
+    // The rated mode is the game underneath; the error count is read before it is reset below
+    const target = targetCountryRef.current
+    const admin = gameType === GAME_TYPES.PLACEMENT ? target : target?.properties?.ADMIN
+    if (ratedRef.current && admin) reportEloAnswer(gameType, admin, { found: wasFound, errors: consecutiveErrorsRef.current })
+
     // Update global stats
     const newStats = wasFound
       ? {
@@ -294,6 +302,7 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
       } else {
         // All phases done
         setIsGameOver(true)
+        flushElo()
       }
     } else {
       // Same phase, next country

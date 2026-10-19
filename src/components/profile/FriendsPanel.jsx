@@ -1,13 +1,15 @@
 // Friends of the signed-in player: add by username, requests, and today's daily challenges.
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { usePlayerSearch, useRecentPlayers } from '../../hooks/useCommunity'
+import useFriendsPresence from '../../hooks/useFriendsPresence'
 import { useFriendsToday } from '../../hooks/usePlayerProfile'
 import { USERNAME_MAX } from '../../utils/account'
 import { acceptFriendRequest, friendErrorKey, removeFriendship, SEARCH_MIN, sendFriendRequest } from '../../utils/friends'
 import { clearPendingInvite, getPendingInvite, inviteUrl } from '../../utils/inviteLink'
 import { shareInviteLink } from '../../utils/shareInvite'
+import { GAMES } from '../../pages/home/gameData'
 import FriendCandidates from './FriendCandidates'
 import { Avatar, DailyChips } from './ProfileBody'
 import './FriendsPanel.css'
@@ -19,6 +21,34 @@ function PlayerName({ friend }) {
       <span>{friend.username}</span>
     </Link>
   )
+}
+
+// Online / in game, with the button to watch the friend's room (src/utils/presence.js).
+function FriendStatus({ presence, onWatch }) {
+  const { t } = useTranslation()
+  if (presence?.status === 'playing') {
+    const game = GAMES.find((item) => item.id === presence.game)
+    return (
+      <>
+        <span className="friends-presence friends-presence--playing">
+          <span className="friends-dot" aria-hidden="true" />
+          {game ? t('friends.in_game', { game: t(game.titleKey) }) : t('friends.in_game_short')}
+        </span>
+        <button type="button" className="friends-btn friends-btn--primary" onClick={() => onWatch(presence.room)}>
+          {t('friends.watch')}
+        </button>
+      </>
+    )
+  }
+  if (presence?.status === 'online') {
+    return (
+      <span className="friends-presence">
+        <span className="friends-dot" aria-hidden="true" />
+        {t('friends.online')}
+      </span>
+    )
+  }
+  return null
 }
 
 // A link opened before signing in (see AddFriendPage): offered once the account exists.
@@ -89,6 +119,8 @@ function InviteCard({ account }) {
 export default function FriendsPanel({ account, friendships }) {
   const { t } = useTranslation()
   const today = useFriendsToday(friendships.friends)
+  const presence = useFriendsPresence(friendships.friends.map((friend) => friend.uid))
+  const navigate = useNavigate()
   const [username, setUsername] = useState('')
   const [sending, setSending] = useState(false)
   const [message, setMessage] = useState(null)
@@ -183,6 +215,7 @@ export default function FriendsPanel({ account, friendships }) {
             {friendships.friends.map((friend) => (
               <li key={friend.id} className="friends-row">
                 <PlayerName friend={friend} />
+                <FriendStatus presence={presence[friend.uid]} onWatch={(room) => navigate(`/multiplayer/room/${room}?watch=1`)} />
                 <DailyChips today={today[friend.uid] ?? {}} small />
                 <button type="button" className="friends-btn friends-btn--icon" title={t('friends.remove')} aria-label={t('friends.remove')} onClick={() => handleRemove(friend)}>
                   ✕

@@ -10,6 +10,8 @@ import {
   findShortestPath,
 } from '../utils/voyageVoyageUtils'
 import { checkAnswer } from '../utils/normalizeAnswer'
+import { getDailyKey } from '../utils/dailyKey'
+import useDailyKey from './useDailyKey'
 
 function getFeatureByISO(iso) {
   return countries.features.find(f => f.properties.ISO_A2 === iso) ?? null
@@ -44,6 +46,10 @@ export default function useVoyageVoyageState(mode = 'infinite') {
   const distFromStartRef = useRef({})
   const distToTargetRef = useRef({})
   const optimalRef = useRef(0)
+  // Jour du défi à l'heure du serveur (minuit à Paris), null le temps de la lire : la partie du jour attend.
+  const serverDay = useDailyKey(mode === 'daily')
+  const serverDayRef = useRef(serverDay)
+  serverDayRef.current = serverDay
   const modeRef = useRef(mode)
   modeRef.current = mode
   const unguessedOptimalPathRef = useRef([])
@@ -75,9 +81,10 @@ export default function useVoyageVoyageState(mode = 'infinite') {
   }, [])
 
   const initGame = useCallback(() => {
-    const dateStr = new Date().toISOString().slice(0, 10)
+    const dateStr = serverDay
 
     if (mode === 'daily') {
+      if (!dateStr) return
       const saved = localStorage.getItem(dailyKey(dateStr))
       if (saved) {
         try {
@@ -126,7 +133,7 @@ export default function useVoyageVoyageState(mode = 'infinite') {
         savedScore: null,
       }))
     }
-  }, [mode, setupGame])
+  }, [mode, serverDay, setupGame])
 
   useEffect(() => { initGame() }, [initGame])
 
@@ -143,8 +150,8 @@ export default function useVoyageVoyageState(mode = 'infinite') {
 
   // Sauvegarde de la progression en mode journalier
   useEffect(() => {
-    if (modeRef.current !== 'daily' || !startCountry || !targetCountry || guessHistory.length === 0) return
-    const dateStr = new Date().toISOString().slice(0, 10)
+    const dateStr = serverDayRef.current
+    if (modeRef.current !== 'daily' || !dateStr || !startCountry || !targetCountry || guessHistory.length === 0) return
     const key = dailyKey(dateStr)
     const existing = localStorage.getItem(key)
     if (!existing) return
@@ -287,6 +294,6 @@ export default function useVoyageVoyageState(mode = 'infinite') {
     useHint,
     submitGuess,
     resetGame,
-    dailyKey: new Date().toISOString().slice(0, 10),
+    dailyKey: mode === 'daily' ? serverDay : getDailyKey(),
   }
 }

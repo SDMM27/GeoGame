@@ -1,7 +1,7 @@
 // Renders toasts raised by the shared hooks through the react-toastify shim.
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { useEffect, useState } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { Image, StyleSheet, View } from 'react-native'
 import Animated, { FadeInUp, FadeOutUp, LinearTransition } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -33,8 +33,12 @@ export function ToastHost() {
             layout={LinearTransition.springify()}
             style={styles.toast}
             accessibilityLiveRegion="polite">
-            <MaterialCommunityIcons name={kind.icon} size={18} color={kind.color} />
-            <Text variant="bodyStrong" style={{ flexShrink: 1, fontSize: 14 }}>
+            {toast.flag != null ? (
+              <Image source={toast.flag} style={styles.flag} resizeMode="cover" />
+            ) : (
+              <MaterialCommunityIcons name={kind.icon} size={18} color={kind.color} />
+            )}
+            <Text variant="bodyStrong" color={toast.color} style={{ flexShrink: 1, fontSize: 14 }}>
               {toast.text}
             </Text>
           </Animated.View>
@@ -46,6 +50,7 @@ export function ToastHost() {
 
 const styles = StyleSheet.create({
   host: { position: 'absolute', left: space.lg, right: space.lg, alignItems: 'center', gap: space.sm, zIndex: 100 },
+  flag: { width: 24, height: 16, borderRadius: 3 },
   toast: {
     flexDirection: 'row',
     alignItems: 'center',

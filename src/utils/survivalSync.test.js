@@ -106,3 +106,46 @@ describe('spectating', () => {
     ])
   })
 })
+
+describe('a player out of lives keeps following the shared rounds', () => {
+  // The same loop as useSurvivalSync: the round changes REVEAL_MS after the last player in it answered
+  it('advances round after round while the others play, then stops being a spectator once nobody is left', () => {
+    const timerMs = 30000
+    let current = { round: 0, startAt: START }
+    // 'me' is out since round 1 and no longer writes progress; 'a' and 'b' keep playing
+    const entriesAt = (round, at, extra = {}) => [
+      { id: 'me', round: 1, finished: true, lastSeen: START + 500 },
+      { id: 'a', round, roundDone: true, finished: false, lastSeen: at, ...extra.a },
+      { id: 'b', round, roundDone: true, finished: false, lastSeen: at + 200, ...extra.b },
+    ]
+    const seen = []
+    for (let round = 0; round < 6; round += 1) {
+      const answeredAt = current.startAt + 4000
+      const entries = entriesAt(round, answeredAt)
+      expect(othersStillIn(entries, 'me')).toBe(true)
+      const next = nextRoundStart(entries, { round: current.round, startAt: current.startAt, timerMs })
+      expect(next).toBe(answeredAt + 200 + SURVIVAL_REVEAL_MS)
+      current = { round: current.round + 1, startAt: next }
+      seen.push(current.round)
+    }
+    expect(seen).toEqual([1, 2, 3, 4, 5, 6])
+
+    // Both others lose their last life: nobody left to watch
+    const end = [
+      { id: 'me', round: 1, finished: true },
+      { id: 'a', round: 6, finished: true },
+      { id: 'b', round: 6, finished: true },
+    ]
+    expect(othersStillIn(end, 'me')).toBe(false)
+  })
+
+  it('waits for the players still in, not for the one who is out', () => {
+    const entries = [
+      { id: 'me', round: 1, finished: true, lastSeen: START },
+      { id: 'a', round: 3, roundDone: true, finished: false, lastSeen: START + 2000 },
+      { id: 'b', round: 3, roundDone: false, finished: false, lastSeen: START + 1000 },
+    ]
+    expect(roundWaiting(entries, 3)).toEqual({ done: 1, total: 2 })
+    expect(nextRoundStart(entries, { round: 3, startAt: START, timerMs: 30000 })).toBe(START + 30000 + SURVIVAL_REVEAL_MS)
+  })
+})

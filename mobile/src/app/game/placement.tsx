@@ -32,7 +32,7 @@ const CONTINENT_VIEW: Record<string, { center: [number, number]; zoom: number }>
   Océanie: { center: [-10, 170], zoom: 3.5 },
 }
 
-type Params = { difficulty?: string; continent?: string; training?: string; ascension?: string; preset?: string; room?: string }
+type Params = { difficulty?: string; continent?: string; training?: string; ascension?: string; preset?: string; room?: string; gameType?: string }
 
 function formatDuration(ms: number) {
   const totalSeconds = Math.floor(ms / 1000)
@@ -55,6 +55,7 @@ function PlacementGame({
   isTraining,
   ascension,
   play,
+  gameType = GAME_TYPES.PLACEMENT,
 }: {
   state: GameState
   difficulty: string | null
@@ -62,6 +63,7 @@ function PlacementGame({
   isTraining: boolean
   ascension: { presetName: string | null } | null
   play?: RoomPlay
+  gameType?: string
 }) {
   const { t, i18n } = useTranslation()
   const insets = useSafeAreaInsets()
@@ -76,6 +78,7 @@ function PlacementGame({
     seeCountry,
     restartGame,
     onCountryClick,
+    onMapClick,
     currentPhase,
     phaseCountRemaining,
     totalPhaseCount,
@@ -117,7 +120,14 @@ function PlacementGame({
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.ocean }}>
-      <WorldMap ref={mapRef} onCountryPress={(layer) => onCountryClick({ target: layer })} />
+      <WorldMap
+        ref={mapRef}
+        showBorders={gameType !== GAME_TYPES.HARDCORE}
+        onCountryPress={(layer, latlng) =>
+          gameType === GAME_TYPES.HARDCORE ? onMapClick({ latlng }) : onCountryClick({ target: layer })
+        }
+        onMapPress={(latlng) => onMapClick({ latlng })}
+      />
 
       {!isGameOver && (
         <GameTopBar onQuit={play?.exit}>
@@ -157,13 +167,13 @@ function PlacementGame({
                 {stats.found}/{stats.total} {t('mobile.game.found')} · {remaining} {t('mobile.game.remaining')}
               </Text>
             </View>
-            <Button
+            {gameType !== GAME_TYPES.HARDCORE && <Button
               label={t('mobile.game.reveal')}
               variant="secondary"
               onPress={seeCountry}
               icon={<MaterialCommunityIcons name="eye-outline" size={18} color={colors.text} />}
               style={{ minHeight: 44, paddingHorizontal: space.lg }}
-            />
+            />}
           </View>
         </Animated.View>
       )}
@@ -171,14 +181,14 @@ function PlacementGame({
       {isGameOver && (
         <ResultsSheet
           score={score}
-          accent={gameColors.placement}
+          accent={gameType === GAME_TYPES.HARDCORE ? gameColors.hardcore : gameColors.placement}
           stats={[
             { label: t('labels.countries_found'), value: `${stats.found}/${stats.total}`, color: colors.accent },
             { label: t('mobile.game.time'), value: formatDuration(timer) },
             { label: clean(t('stats.first_try')), value: String(stats.foundFirstTry ?? 0) },
           ]}
           record={setupGameRecord({
-            gameType: GAME_TYPES.PLACEMENT,
+            gameType,
             isTraining,
             roomCode: play?.room.id,
             isAscension: !!ascension,
@@ -196,13 +206,13 @@ function PlacementGame({
                 ? ascension.presetName
                   ? { kind: 'ascension', gameType: GAME_TYPES.PLACEMENT, presetName: ascension.presetName, timer, stats, phaseStats }
                   : null
-                : { kind: 'standard', gameType: 'PLACEMENT', difficulty: (difficulty ?? continent)!, elapsedTime: timer, continent }
+                : { kind: 'standard', gameType, difficulty: (difficulty ?? continent)!, elapsedTime: timer, continent }
           }
           share={
             play
               ? null
               : {
-                  gameType: 'PLACEMENT',
+                  gameType,
                   difficulty: difficulty ?? continent ?? ascension?.presetName,
                   details: t('share.details_placement_timer', { found: stats.found, total: stats.total, time: formatDuration(timer) }),
                 }
@@ -217,9 +227,9 @@ function PlacementGame({
   )
 }
 
-function StandardGame({ difficulty, continent, isTraining }: { difficulty: string | null; continent: string | null; isTraining: boolean }) {
-  const state = useGameState(difficulty, isTraining, null, null, null, continent)
-  return <PlacementGame state={state} difficulty={difficulty} continent={continent} isTraining={isTraining} ascension={null} />
+function StandardGame({ difficulty, continent, isTraining, gameType }: { difficulty: string | null; continent: string | null; isTraining: boolean; gameType: string }) {
+  const state = useGameState(difficulty, isTraining, null, null, null, continent, gameType)
+  return <PlacementGame state={state} difficulty={difficulty} continent={continent} isTraining={isTraining} ascension={null} gameType={gameType} />
 }
 
 function AscensionGame({ phases, presetName, isTraining }: { phases: Record<string, number>; presetName: string | null; isTraining: boolean }) {
@@ -255,7 +265,7 @@ export default function PlacementScreen() {
   if (params.ascension) {
     return <AscensionGame phases={JSON.parse(params.ascension)} presetName={params.preset ?? null} isTraining={isTraining} />
   }
-  return <StandardGame difficulty={params.difficulty ?? null} continent={params.continent ?? null} isTraining={isTraining} />
+  return <StandardGame difficulty={params.difficulty ?? null} continent={params.continent ?? null} isTraining={isTraining} gameType={params.gameType ?? GAME_TYPES.PLACEMENT} />
 }
 
 const styles = StyleSheet.create({

@@ -87,6 +87,54 @@
         { "fieldPath": "score", "order": "DESCENDING" },
         { "fieldPath": "elapsedTime", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "elo",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "season", "order": "ASCENDING" },
+        { "fieldPath": "duel.rating", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "elo",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "season", "order": "ASCENDING" },
+        { "fieldPath": "solo.PLACEMENT.rating", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "elo",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "season", "order": "ASCENDING" },
+        { "fieldPath": "solo.FLAGS.rating", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "elo",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "season", "order": "ASCENDING" },
+        { "fieldPath": "solo.CAPITALS.rating", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "elo",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "season", "order": "ASCENDING" },
+        { "fieldPath": "solo.BORDER_GUESS.rating", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "elo",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "season", "order": "ASCENDING" },
+        { "fieldPath": "solo.SURVIVAL.rating", "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

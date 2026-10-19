@@ -13,4 +13,8 @@ export const MAP_COLORS = {
 
 // The country under the mouse (website only: the app has no hover). A bright fill and a light outline, so it stands
 // out from the land around it and the player knows which country the click will pick.
+// A country in Hardcore (no borders): plain land, no outline. Weight 0 hides the outline on the website; the app draws
+// no outline in the stroke color anyway, and its land fill matches the base map.
+export const HARDCORE_COUNTRY_STYLE = { fillColor: MAP_COLORS.land, color: MAP_COLORS.stroke, fillOpacity: 1, weight: 0 }
+
 export const HOVER_STYLE = { fillColor: MAP_COLORS.hover, color: MAP_COLORS.hoverStroke, weight: 2.5, fillOpacity: 0.5 }

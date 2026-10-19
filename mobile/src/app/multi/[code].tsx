@@ -8,9 +8,11 @@ import Animated, { FadeIn, ZoomIn } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useFriendships } from '@shared/hooks/usePlayerProfile'
+import useDuelElo from '@shared/hooks/useDuelElo'
 import useLobbyHost from '@shared/hooks/useLobbyHost'
 import useMultiplayerRoom from '@shared/hooks/useMultiplayerRoom'
 import { sendFriendRequestTo } from '@shared/utils/friends'
+import { clearPresenceRoom, setPresenceRoom } from '@shared/utils/presence'
 import { rememberPlayers } from '@shared/utils/recentPlayers'
 import { dismissInvite, inviteId, sendRoomInvite } from '@shared/utils/invites'
 import { containsProfanity } from '@shared/utils/profanity'
@@ -244,7 +246,7 @@ function InviteFriends({ room, account, color }: { room: Room; account: Account;
 export default function RoomScreen() {
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
-  const { code, invited } = useLocalSearchParams<{ code: string; invited?: string }>()
+  const { code, invited, watch } = useLocalSearchParams<{ code: string; invited?: string; watch?: string }>()
   const { account } = useAccount()
   const { room, gameResults, loading, error } = useMultiplayerRoom(code) as {
     room: Room | null
@@ -253,6 +255,8 @@ export default function RoomScreen() {
     error: string | null
   }
   const [launching, setLaunching] = useState(false)
+  // A visitor can watch a game in progress without joining (read only: nothing is written)
+  const [watching, setWatching] = useState(watch === '1')
   const playerId = getPlayerId()
   const startAt = room?.startAt ? room.startAt.toMillis() : null
   const remaining = useCountdown(startAt)
@@ -263,6 +267,7 @@ export default function RoomScreen() {
   const current: number = room ? currentGameIndex(room) : 0
   const results = Object.values(gameResults)
   const joined = !!room?.players[playerId]
+  const spectating = !joined && watching && room?.status === 'playing'
   const toPlay: number | null = room && joined ? nextGameToPlay(room, results, playerId) : null
   // Header color and title: the game to play, else the current one
   const game = room ? getGame(games[toPlay ?? current]?.id ?? room.game.id) : null
@@ -272,6 +277,7 @@ export default function RoomScreen() {
   const hasNextLive = isLive && room?.status === 'playing' && current < games.length - 1
   // Heartbeat, and the host role passes on when the host is gone
   useLobbyHost(room, playerId)
+  useDuelElo(room, results, playerId)
 
   // The game screen picks the game to play from the room and the player's results
   const play = () => {
@@ -280,6 +286,15 @@ export default function RoomScreen() {
     startedRef.current = true
     router.replace({ pathname: target.route as never, params: { room: code } })
   }
+
+  // Friends see this player "in game" while they play in a started room (see @shared/utils/presence)
+  const gameType = games[current]?.type ?? null
+  const playing = joined && room?.status === 'playing'
+  useEffect(() => {
+    if (!playing) return undefined
+    setPresenceRoom(code, gameType)
+    return () => clearPresenceRoom(code)
+  }, [playing, code, gameType])
 
   // Keep the room in the recent list of everyone who opens it
   useEffect(() => {
@@ -382,8 +397,29 @@ export default function RoomScreen() {
 
           {games.length > 1 && <GameList room={room!} results={results} playerId={playerId} />}
 
-          {!joined ? (
-            <JoinCard room={room!} account={account} autoJoin={invited === '1'} />
+          {spectating ? (
+            <>
+              <View style={styles.card}>
+                <Text variant="bodyStrong">👀 {t('mp_room.spectator')}</Text>
+                <Text variant="body" color={colors.textMuted}>
+                  {t('mp_room.spectator_hint')}
+                </Text>
+              </View>
+              <Players room={room!} />
+              <Standings code={code} />
+            </>
+          ) : !joined ? (
+            <>
+              <JoinCard room={room!} account={account} autoJoin={invited === '1'} />
+              {room!.status === 'playing' && (
+                <Button
+                  label={t('mp_room.watch')}
+                  variant="secondary"
+                  onPress={() => setWatching(true)}
+                  icon={<MaterialCommunityIcons name="eye-outline" size={18} color={colors.text} />}
+                />
+              )}
+            </>
           ) : inLobby ? (
             <>
               <Players room={room!} />

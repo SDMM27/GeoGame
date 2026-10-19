@@ -9,6 +9,7 @@ import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'r
 import { normalize } from '../utils/normalizeAnswer'
 import { GAME_TYPES } from '../utils/gameTypes'
 import { saveSnapshot } from '../utils/multiplayerSnapshot'
+import { reportEloAnswer, flushElo } from '../utils/eloReport'
 import { buildBorderGuess, findBorderGuessCountry } from './useBorderGuessState'
 import { buildSurvivalRounds, checkCapitalName, checkCountryName, livesLeft, normalizeSurvivalRamp, survivalModesKey } from '../utils/survival'
 
@@ -189,6 +190,24 @@ export default function useSurvivalState({
     const id = setTimeout(() => dispatch({ type: 'goto', index: state.index + 1, at: Date.now() }), delay)
     return () => clearTimeout(id)
   }, [autoAdvance, state.outcome, state.over, state.index, isQuiz, paused])
+
+  // Elo: only the free solo run is rated (rooms are rated as duels, the Daily Challenge has its own rules).
+  // One try per round: right is a win, anything else (wrong, give up, timeout) is found false with one error.
+  const rated = !snapshotKey && autoAdvance && !distinctCountries && maxRounds === undefined
+  const ratedRoundRef = useRef(-1)
+  useEffect(() => {
+    if (!state.outcome) ratedRoundRef.current = -1
+    if (!rated || !state.outcome || ratedRoundRef.current === state.index) return
+    ratedRoundRef.current = state.index
+    const admin = round?.country?.properties?.ADMIN
+    if (admin) {
+      const found = state.outcome === 'correct'
+      reportEloAnswer(GAME_TYPES.SURVIVAL, admin, { found, errors: found ? 0 : 1 })
+    }
+  }, [rated, state.outcome, state.index, round])
+  useEffect(() => {
+    if (rated && state.over) flushElo()
+  }, [rated, state.over])
 
   // Multiplayer: keep the run in localStorage, so a refresh resumes it
   const extraRef = useRef(extraSnapshot)

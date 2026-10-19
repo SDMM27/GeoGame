@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ASCENSION_PRESETS, matchPreset } from "../../utils/ascensionPresets";
+import { ASCENSION_PRESETS, matchPreset, presetLabel } from "../../utils/ascensionPresets";
 import {
   buildPresetPhases,
   getContinentsForGame,
@@ -10,12 +10,12 @@ import {
 } from "./gameData";
 import MultiButton from "./MultiButton";
 
-export default function ActiveGameCard({ game }) {
+export default function ActiveGameCard({ game, initialMode = "standard" }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [mode, setMode] = useState("standard");
+  const [mode, setMode] = useState(initialMode);
   const [difficulty, setDifficulty] = useState("Facile");
-  const [ascensionPhases, setAscensionPhases] = useState(() => buildPresetPhases("Progressif"));
+  const [ascensionPhases, setAscensionPhases] = useState(() => buildPresetPhases("Découverte"));
   const [selectionMode, setSelectionMode] = useState("difficulty");
   const [selectedContinent, setSelectedContinent] = useState(null);
   const continents = useMemo(() => getContinentsForGame(game.id), [game.id]);
@@ -39,11 +39,11 @@ export default function ActiveGameCard({ game }) {
     }
 
     if (selectionMode === "continent") {
-      navigate(game.route, { state: { continent: continentOverride ?? selectedContinent, isTraining } });
+      navigate(game.route, { state: { continent: continentOverride ?? selectedContinent, isTraining, gameType: game.id } });
       return;
     }
 
-    navigate(game.route, { state: { difficulty: difficultyOverride ?? difficulty, isTraining } });
+    navigate(game.route, { state: { difficulty: difficultyOverride ?? difficulty, isTraining, gameType: game.id } });
   };
 
   // The same choices for a multiplayer room (src/components/multiplayer/RoomConfig.jsx)
@@ -82,12 +82,12 @@ export default function ActiveGameCard({ game }) {
           >
             {t('modes.standard')}
           </button>
-          <button
+          {!game.noAscension && <button
             className={`game-mode-tab${mode === "ascension" ? " game-mode-tab--active" : ""}`}
             onClick={() => setMode("ascension")}
           >
             {t('modes.ascension')}
-          </button>
+          </button>}
         </div>
         {mode === "standard" ? (
           <>
@@ -146,7 +146,7 @@ export default function ActiveGameCard({ game }) {
                   className={`ascension-preset${detectedPresetName === preset.name ? " ascension-preset--active" : ""}`}
                   onClick={() => handlePresetClick(preset)}
                 >
-                  <span className="ascension-preset-name">{preset.icon} {preset.name === "Progressif" ? t('presets.progressive') : preset.name}</span>
+                  <span className="ascension-preset-name">{preset.icon} {presetLabel(preset.name, t)}</span>
                   <span className="ascension-preset-count">
                     {t('units.countries', { count: Object.values(preset.phases).reduce((sum, count) => sum + count, 0) })}
                   </span>
@@ -156,7 +156,7 @@ export default function ActiveGameCard({ game }) {
             <div className="ascension-status">
               <span className="ascension-status-label">{t('labels.configuration')}</span>
               <strong className="ascension-status-value">
-                {detectedPreset ? `${detectedPreset.icon} ${detectedPreset.name === "Progressif" ? t('presets.progressive') : detectedPreset.name}` : t('presets.custom')}
+                {detectedPreset ? `${detectedPreset.icon} ${presetLabel(detectedPreset.name, t)}` : t('presets.custom')}
               </strong>
               <span className="ascension-status-total">{totalAscensionCountries} {t('labels.total_countries')}</span>
             </div>

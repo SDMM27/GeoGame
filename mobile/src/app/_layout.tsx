@@ -19,11 +19,13 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { ErrorScreen } from '@/components/ErrorScreen'
 import { InstallHint } from '@/components/InstallHint'
 import { InviteBanner } from '@/components/InviteBanner'
+import { PresenceHeartbeat } from '@/components/PresenceHeartbeat'
 import { PushNotifications } from '@/components/PushNotifications'
 import { ConfirmHost } from '@/components/ConfirmHost'
 import { ToastHost } from '@/components/ToastHost'
 import { UpdateBanner } from '@/components/UpdateBanner'
 import { WhatsNew } from '@/components/WhatsNew'
+import { XpToasts } from '@/components/XpToasts'
 import { colors } from '@/theme'
 import { useLaunchUpdate } from '@/updates'
 
@@ -113,8 +115,10 @@ export default function RootLayout() {
         <WhatsNew />
         <InviteBanner />
         <PushNotifications />
+        <PresenceHeartbeat />
         <ConfirmHost />
         <ToastHost />
+        <XpToasts />
       </ThemeProvider>
     </GestureHandlerRootView>
   )

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { RefreshControl, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import { ASCENSION_PRESETS } from '@shared/utils/ascensionPresets'
+import { ASCENSION_PRESETS, presetLabel } from '@shared/utils/ascensionPresets'
 import { CONTINENTS } from '@shared/utils/continents'
 import { getLast7Days } from '@shared/utils/dateUtils'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
@@ -16,6 +16,7 @@ import {
   CONTINENT_NAMES,
   DIFFICULTIES,
 } from '@shared/utils/leaderboards'
+import { ELO_MODES } from '@shared/utils/eloRating'
 import { dayKey } from '@shared/utils/profileStats'
 import {
   DEFAULT_SURVIVAL_LIVES,
@@ -32,6 +33,7 @@ import { ChallengeLeaderboard } from '@/components/game/ChallengeLeaderboard'
 import { DailyLeaderboard } from '@/components/game/DailyLeaderboard'
 import { RankingLeaderboard } from '@/components/game/RankingLeaderboard'
 import { AscensionLeaderboard } from '@/components/leaderboards/AscensionLeaderboard'
+import { EloLeaderboard } from '@/components/leaderboards/EloLeaderboard'
 import { FilterChips, type Chip } from '@/components/leaderboards/LeaderboardParts'
 import { SoloLeaderboard } from '@/components/leaderboards/SoloLeaderboard'
 import { SurvivalLeaderboard } from '@/components/leaderboards/SurvivalLeaderboard'
@@ -40,11 +42,12 @@ import { Segmented, Text } from '@/components/ui'
 import { GAMES, DIFFICULTY_COLORS, getGameByType } from '@/games'
 import { colors, space } from '@/theme'
 
-type Section = 'solo' | 'ascension' | 'daily' | 'survival'
+type Section = 'solo' | 'ascension' | 'elo' | 'daily' | 'survival'
 type SoloMode = 'difficulty' | 'continent'
 
 const SOLO_GAMES = GAMES.filter((game) => game.kind === 'setup')
 const DAILY_GAMES = GAMES.filter((game) => game.kind === 'daily')
+const ASCENSION_GAMES = SOLO_GAMES.filter((game) => !game.noAscension)
 // Survival: every set of games together, the six mixed, or one game alone
 const ALL_SURVIVAL_MODES = 'all'
 const ALL_SIX = survivalModesKey(SURVIVAL_ROUND_TYPES)
@@ -61,6 +64,7 @@ export default function LeaderboardsScreen() {
   const [continent, setContinent] = useState<string>(ALL_CONTINENTS)
   const [ascensionGame, setAscensionGame] = useState<string>(ALL_GAMES)
   const [preset, setPreset] = useState<string>(ALL_PRESETS)
+  const [eloKey, setEloKey] = useState('duel')
   const [dailyGame, setDailyGame] = useState<string>(DAILY_GAMES[0].type)
   const [survivalLives, setSurvivalLives] = useState(String(DEFAULT_SURVIVAL_LIVES))
   const [survivalModes, setSurvivalModes] = useState<string>(ALL_SURVIVAL_MODES)
@@ -103,6 +107,7 @@ export default function LeaderboardsScreen() {
         options={[
           { value: 'solo', label: t('mobile.leaderboards.solo') },
           { value: 'ascension', label: t('mobile.setup.ascension') },
+          { value: 'elo', label: t('elo.tab') },
           { value: 'daily', label: t('mobile.leaderboards.daily') },
           { value: 'survival', label: t('games.survival.title') },
         ]}
@@ -149,17 +154,34 @@ export default function LeaderboardsScreen() {
 
       {section === 'ascension' && (
         <>
-          <FilterChips label={t('mobile.leaderboards.game')} options={gameChips(SOLO_GAMES, true)} value={ascensionGame} onChange={setAscensionGame} />
+          <FilterChips label={t('mobile.leaderboards.game')} options={gameChips(ASCENSION_GAMES, true)} value={ascensionGame} onChange={setAscensionGame} />
           <FilterChips
             label={t('mobile.leaderboards.preset')}
             options={[
               { value: ALL_PRESETS, label: t('options.all_presets') },
-              ...ASCENSION_PRESETS.map((item: { name: string; icon: string }) => ({ value: item.name, label: `${item.icon} ${item.name}` })),
+              ...ASCENSION_PRESETS.map((item: { name: string; icon: string }) => ({ value: item.name, label: `${item.icon} ${presetLabel(item.name, t)}` })),
             ]}
             value={preset}
             onChange={setPreset}
           />
           <AscensionLeaderboard filters={{ game: ascensionGame, preset }} allGames={ALL_GAMES} refreshKey={refreshKey} onSettled={onSettled} />
+        </>
+      )}
+
+      {section === 'elo' && (
+        <>
+          <FilterChips
+            options={[
+              { value: 'duel', label: t('elo.duel'), icon: 'sword-cross' },
+              ...ELO_MODES.map((mode: string) => {
+                const game = getGameByType(mode)!
+                return { value: mode, label: t(game.titleKey), color: game.color, icon: game.icon }
+              }),
+            ]}
+            value={eloKey}
+            onChange={setEloKey}
+          />
+          <EloLeaderboard eloKey={eloKey} refreshKey={refreshKey} onSettled={onSettled} />
         </>
       )}
 

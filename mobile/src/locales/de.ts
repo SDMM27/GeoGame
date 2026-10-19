@@ -12,6 +12,7 @@ export const de: MobileStrings = {
     daily: 'Tageschallenge',
     infinite: 'Endlos',
     done: 'Erledigt',
+    ascension_subtitle: 'Steige in einem Spiel von leichten Ländern zu den schwersten auf',
   },
   setup: {
     mode: 'Modus',

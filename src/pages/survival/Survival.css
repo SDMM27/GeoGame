@@ -437,3 +437,11 @@
 .survival-spectator-row--out { opacity: 0.55; }
 .survival-spectator-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
 .survival-spectator-status { width: 1.2rem; text-align: center; }
+
+/* Spectator (out of lives in a live room): the round of the others, read-only */
+.survival-spectator-round .survival-silhouette { width: 100%; height: min(30vh, 220px); }
+.survival-spectator-round .survival-country-name { margin: 0; text-align: center; }
+.survival-spectator-quiz { display: flex; flex-direction: column; gap: 10px; width: 100%; text-align: left; }
+.survival-spectator-quiz .quiz-choices { display: flex; flex-direction: column; gap: 6px; }
+.survival-spectator-quiz .quiz-choice { padding: 10px 12px; font-size: 0.95rem; }
+.survival-spectator-quiz .quiz-choice--dim { opacity: 0.5; }

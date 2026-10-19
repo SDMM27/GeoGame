@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { ASCENSION_PRESETS, matchPreset, buildPhaseSequence } from './ascensionPresets'
+import { ASCENSION_PRESETS, matchPreset, buildPhaseSequence, presetLabel } from './ascensionPresets'
 
 describe('ASCENSION_PRESETS', () => {
   it('has 4 presets', () => {
@@ -56,5 +56,18 @@ describe('buildPhaseSequence', () => {
       { difficulty: 'Moyen', count: 3 },
       { difficulty: 'Impossible', count: 2 },
     ])
+  })
+})
+
+describe('presetLabel', () => {
+  const t = (key) => `t:${key}`
+  it('translates the known presets', () => {
+    expect(presetLabel('Découverte', t)).toBe('t:presets.discovery')
+    expect(presetLabel('Progressif', t)).toBe('t:presets.progressive')
+    expect(presetLabel('Hardcore', t)).toBe('t:presets.hardcore')
+  })
+  it('keeps an unknown or missing name', () => {
+    expect(presetLabel('Ancien', t)).toBe('Ancien')
+    expect(presetLabel(null, t)).toBeNull()
   })
 })

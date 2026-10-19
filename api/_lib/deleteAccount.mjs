@@ -2,7 +2,8 @@
 // account's owner, and by the daily cleanup for accounts unused for INACTIVE_ACCOUNT_MS.
 // Deleted: users/{uid} with its games and pushTokens, usernames/{key}, the account's leaderboard entries and the
 // reports made by it or about those entries, friendships, invites sent and received, the push bookkeeping
-// (invitePushLimits, dailyReminderPushes, friendPushes, dailyNudges sent or received), then the Firebase Auth account. Rooms keep the pseudo until they expire (10 days at most, api/cleanup-expired.mjs).
+// (invitePushLimits, dailyReminderPushes, friendPushes, dailyNudges sent or received), the Elo ratings and the countries won
+// (elo, eloGains, eloDuelAccounts), the online status (presence/{uid}), then the Firebase Auth account. Rooms keep the pseudo until they expire (10 days at most, api/cleanup-expired.mjs).
 
 // The account's owner must have signed in again just before (like Firebase's own deleteUser on the client).
 export const RECENT_SIGN_IN_MS = 5 * 60 * 1000
@@ -23,7 +24,7 @@ async function deleteRefs(db, refs) {
 // `db` and `auth`: firebase-admin Firestore and Auth. Returns how many documents went, besides users/{uid}.
 export async function deleteAccountData({ db, auth, uid }) {
   const userRef = db.doc(`users/${uid}`)
-  const [profile, friendships, invitesSent, invitesReceived, nudgesSent, nudgesReceived, reportsMade, ...scores] = await Promise.all([
+  const [profile, friendships, invitesSent, invitesReceived, nudgesSent, nudgesReceived, reportsMade, eloGains, eloDuelAccounts, ...scores] = await Promise.all([
     userRef.get(),
     db.collection('friendships').where('users', 'array-contains', uid).get(),
     db.collection('invites').where('from', '==', uid).get(),
@@ -31,6 +32,8 @@ export async function deleteAccountData({ db, auth, uid }) {
     db.collection('dailyNudges').where('from', '==', uid).get(),
     db.collection('dailyNudges').where('to', '==', uid).get(),
     db.collection('reports').where('reporter', '==', uid).get(),
+    db.collection('eloGains').where('uid', '==', uid).get(),
+    db.collection('eloDuelAccounts').where('uid', '==', uid).get(),
     ...SCORE_COLLECTIONS.map((name) => db.collection(name).where('uid', '==', uid).get()),
   ])
 
@@ -46,7 +49,7 @@ export async function deleteAccountData({ db, auth, uid }) {
 
   const refs = new Map()
   for (const snapshot of [...scoreDocs, ...reportsAbout, ...reportsMade.docs, ...friendships.docs,
-    ...invitesSent.docs, ...invitesReceived.docs, ...nudgesSent.docs, ...nudgesReceived.docs]) {
+    ...invitesSent.docs, ...invitesReceived.docs, ...nudgesSent.docs, ...nudgesReceived.docs, ...eloGains.docs, ...eloDuelAccounts.docs]) {
     refs.set(snapshot.ref.path, snapshot.ref)
   }
   if (profile.exists) {
@@ -58,8 +61,8 @@ export async function deleteAccountData({ db, auth, uid }) {
       if (claimed.exists && claimed.data().uid === uid) refs.set(claimed.ref.path, claimed.ref)
     }
   }
-  // Push bookkeeping (api/_lib/push.mjs, friendPush.mjs, dailyReminder.mjs, dailyNudge.mjs), server only.
-  for (const path of [`invitePushLimits/${uid}`, `dailyReminderPushes/${uid}`,
+  // Push bookkeeping (api/_lib/push.mjs, friendPush.mjs, dailyReminder.mjs, dailyNudge.mjs) and the Elo ratings and mastery, server only.
+  for (const path of [`invitePushLimits/${uid}`, `dailyReminderPushes/${uid}`, `elo/${uid}`, `mastery/${uid}`, `presence/${uid}`,
     ...friendships.docs.flatMap((friendship) => [`friendPushes/${friendship.id}_request`, `friendPushes/${friendship.id}_accepted`])]) {
     refs.set(path, db.doc(path))
   }

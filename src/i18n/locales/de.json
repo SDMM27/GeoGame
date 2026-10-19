@@ -52,6 +52,10 @@
       "title": "Finde das Land",
       "description": "Finde alle Länder der gewählten Schwierigkeit."
     },
+    "hardcore": {
+      "title": "Hardcore",
+      "description": "Finde Länder auf einer Karte ohne Grenzen."
+    },
     "flags": {
       "title": "Finde die Flagge",
       "description": "Erkenne das Land an seiner Flagge."
@@ -87,6 +91,11 @@
     "survival": {
       "title": "Survival",
       "description": "Spiele Runden aus mehreren Spielen hintereinander: Jeder Fehler kostet ein Leben."
+    },
+    "missing_flag": {
+      "title": "Unvollständige Flagge",
+      "description": "Erkenne das Land trotz eines fehlenden Streifens in der Flagge.",
+      "missing_part": "Fehlender Teil der Flagge"
     }
   },
   "modes": {
@@ -140,6 +149,9 @@
   },
   "presets": {
     "progressive": "Ansteigend",
+    "discovery": "Entdeckung",
+    "challenge": "Herausforderung",
+    "hardcore": "Hardcore",
     "custom": "Eigene"
   },
   "labels": {
@@ -557,7 +569,15 @@
   "daily_challenge": {
     "rules": "12 Fragen, heute für alle gleich: Länder auf der Karte finden, Flaggen und Hauptstädte nennen. Ein Versuch pro Frage, je {{seconds}} s, keine Leben. Dein Ergebnis ist die Zahl der richtigen Antworten; die Gesamtzeit entscheidet bei Gleichstand. Du kannst nur einmal pro Tag spielen.",
     "level": "Level des Tages: {{label}} ({{n}}/7)",
-    "levels": {"1": "Sehr leicht", "2": "Leicht", "3": "Machbar", "4": "Mittel", "5": "Knifflig", "6": "Schwer", "7": "Knallhart"},
+    "levels": {
+      "1": "Sehr leicht",
+      "2": "Leicht",
+      "3": "Machbar",
+      "4": "Mittel",
+      "5": "Knifflig",
+      "6": "Schwer",
+      "7": "Knallhart"
+    },
     "week_note": "Von Montag bis Sonntag wird die Challenge jeden Tag schwerer. Sonntag wird es knallhart!",
     "start": "Challenge starten",
     "continue": "Challenge fortsetzen",
@@ -695,6 +715,10 @@
     }
   },
   "friends": {
+    "online": "Online",
+    "in_game": "Spielt · {{game}}",
+    "in_game_short": "Spielt",
+    "watch": "Zuschauen",
     "title": "Freunde",
     "count_one": "{{count}} Freund",
     "count_other": "{{count}} Freunde",
@@ -949,6 +973,14 @@
       "title": "Hardcore-Trio",
       "desc": "Spiele je eine perfekte Partie auf Hardcore in Platzierung, Flaggen und Hauptstädten"
     },
+    "mythic": {
+      "title": "Mythisch",
+      "desc": "Schalte alle Flaggen frei"
+    },
+    "legend_master": {
+      "title": "Legende",
+      "desc": "Finde alle Länder beim ersten Versuch in den Modi Flaggen, Platzierung und Hardcore"
+    },
     "world_champion": {
       "title": "Weltmeister",
       "desc": "Spiele in Platzierung, Flaggen und Hauptstädten in allen 5 Schwierigkeitsstufen eine perfekte Partie"
@@ -1008,6 +1040,9 @@
     "from_app": "Spiel in der App erstellt",
     "code": "Spielcode",
     "join_hint": "Wähle deinen Benutzernamen, um dem Spiel beizutreten.",
+    "watch": "Laufendes Spiel ansehen",
+    "spectator": "Du schaust dieses Spiel an",
+    "spectator_hint": "Rangliste und Fortschritt werden live aktualisiert. Du spielst nicht mit.",
     "join": "Beitreten",
     "players": "Spieler · {{count}}",
     "you": "du",
@@ -1241,5 +1276,128 @@
     "weekly_title": "Top der Woche",
     "weekly_hint": "Tagesaufgaben der letzten 7 Tage: 1 Punkt pro gespielter Aufgabe plus Bonus für das Podium. Täglich aktualisiert.",
     "weekly_empty": "Noch keine Rangliste: Spiel die Tagesaufgaben!"
+  },
+  "decorations": {
+    "title": "Anpassen",
+    "hint": "Wähle einen Rahmen und eine Namensfarbe: Sie erscheinen auf deinem Profil und in den Bestenlisten.",
+    "open": "Profil anpassen",
+    "close": "Schließen",
+    "frames": "Rahmen",
+    "colors": "Namensfarbe",
+    "preview": "Vorschau",
+    "saving": "Wird gespeichert…",
+    "error": "Speichern fehlgeschlagen, versuch es noch einmal.",
+    "locked": "Level {{level}}",
+    "frame": {
+      "none": "Keiner",
+      "silver": "Silber",
+      "gold": "Gold",
+      "ocean": "Ozean",
+      "jungle": "Dschungel",
+      "volcano": "Vulkan",
+      "sunrise": "Morgenrot",
+      "glacier": "Gletscher",
+      "amethyst": "Amethyst",
+      "ruby": "Rubin",
+      "emerald": "Smaragd",
+      "crown": "Krone"
+    },
+    "color": {
+      "default": "Standard",
+      "mint": "Minze",
+      "sky": "Himmel",
+      "coral": "Koralle",
+      "amber": "Bernstein",
+      "lilac": "Flieder",
+      "rose": "Rosa",
+      "lime": "Limette",
+      "peach": "Pfirsich",
+      "turquoise": "Türkis",
+      "violet": "Violett",
+      "crimson": "Karminrot",
+      "gilded": "Golden"
+    }
+  },
+  "elo": {
+    "tab": "Elo",
+    "title": "Elo-Rangliste",
+    "explain": "Duelle: eine Gesamtwertung, die nach jedem Duell zwischen zwei angemeldeten Spielern aktualisiert wird. Solo: eine Wertung pro Modus; im Solo verlierst du nie Punkte, und jedes Land zählt pro Saison nur einmal. Eine Saison dauert ein Quartal.",
+    "season": "Saison {{quarter}} · {{year}}",
+    "duel": "Duelle",
+    "rating": "Elo",
+    "col_duel": "Spiele · Siege",
+    "col_found": "Gefundene Länder",
+    "duel_detail": "{{games}} Spiele · {{wins}} Siege",
+    "profile_title": "Elo",
+    "unplayed": "In dieser Saison noch nicht gespielt",
+    "empty": "In dieser Saison hat noch niemand eine Wertung.",
+    "found_count_one": "{{count}} Land gefunden",
+    "found_count_other": "{{count}} Länder gefunden"
+  },
+  "missions": {
+    "title": "Missionen",
+    "daily": "Tagesmissionen",
+    "weekly": "Wochenmissionen",
+    "bonus": "Bonus: alle 3 Missionen",
+    "reward": "+{{xp}} XP",
+    "per_game": "+{{xp}} XP pro Spiel, {{count}} pro Tag",
+    "sign_in": "Melde dich an, um XP zu sammeln, Level aufzusteigen und Rahmen und Farben freizuschalten.",
+    "resets_daily": "Neue Missionen um Mitternacht",
+    "resets_weekly": "Neue Missionen am Montag",
+    "play_3": "Spiele {{count}} Partien",
+    "dailies_3": "Spiele {{count}} Tagesspiele",
+    "daily_challenge": "Spiele die Tagesherausforderung",
+    "daily_wins_2": "Gewinne {{count}} Tagesspiele",
+    "flags_20": "Finde {{count}} Flaggen",
+    "placement_20": "Platziere {{count}} Länder auf der Karte",
+    "capitals_15": "Finde {{count}} Hauptstädte",
+    "ascension_1": "Spiele eine Partie Aufstieg",
+    "survival_1": "Spiele eine Partie Überleben",
+    "perfect_1": "Beende eine Partie ohne Fehler (ab 10 Ländern)",
+    "types_3": "Spiele {{count}} verschiedene Spiele",
+    "week_play_20": "Spiele {{count}} Partien",
+    "week_daily_days_5": "Spiele an {{count}} verschiedenen Tagen ein Tagesspiel",
+    "week_dailies_15": "Spiele {{count}} Tagesspiele",
+    "week_daily_wins_10": "Gewinne {{count}} Tagesspiele",
+    "week_found_200": "Finde insgesamt {{count}} Länder",
+    "week_perfect_3": "Beende {{count}} Partien ohne Fehler (ab 10 Ländern)",
+    "week_types_6": "Spiele {{count}} verschiedene Spiele",
+    "week_ascension_3": "Spiele {{count}} Partien Aufstieg",
+    "fragments_one": "+{{count}} Fragment",
+    "fragments_other": "+{{count}} Fragmente"
+  },
+  "level": {
+    "label": "Level {{level}}",
+    "short": "Lv. {{level}}",
+    "progress": "{{into}} / {{needed}} XP",
+    "total": "{{total}} XP",
+    "up": "Level {{level}} erreicht!",
+    "gained": "+{{xp}} XP",
+    "fragments_one": "+{{count}} Flaggenfragment",
+    "fragments_other": "+{{count}} Flaggenfragmente",
+    "flag_unlocked": "Flagge freigeschaltet: {{name}} ({{rarity}})"
+  },
+  "collection": {
+    "title": "Flaggensammlung",
+    "progress": "{{count}} / {{total}} Flaggen",
+    "current": "Aktuelle Flagge",
+    "pieces": "{{count}} / {{total}} Fragmente",
+    "hint": "Jede abgeschlossene Mission bringt Fragmente; 4 Fragmente ergeben eine Flagge.",
+    "empty": "Schließe Missionen ab, um deine ersten Flaggenfragmente zu verdienen.",
+    "complete": "Sammlung vollständig!",
+    "unlocked": "Freigeschaltete Flaggen",
+    "show_all": "Alle anzeigen",
+    "show_less": "Weniger anzeigen",
+    "legend_progress": "Legende: {{count}} / {{total}} Länder beim ersten Versuch gefunden",
+    "legend_hardcore_soon": "Der Hardcore-Modus kommt bald",
+    "mode_placement": "Platzierung",
+    "mode_flags": "Flaggen",
+    "mode_hardcore": "Hardcore",
+    "rarity": {
+      "common": "Gewöhnlich",
+      "uncommon": "Ungewöhnlich",
+      "rare": "Selten",
+      "legendary": "Legendär"
+    }
   }
 }

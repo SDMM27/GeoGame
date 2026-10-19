@@ -2,6 +2,7 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { saveAscensionScore } from '../utils/saveScore'
 import { formatTime } from '../utils/formatTime'
+import { presetLabel } from '../utils/ascensionPresets'
 import { useAccount } from '../auth'
 import { useScoreSave } from '../hooks/useScoreSave'
 import LeaderboardSave from '../components/LeaderboardSave'
@@ -26,7 +27,7 @@ export default function AscensionForm({ score, timer, stats, phaseStats, gameTyp
   return (
     <div className="form-container">
       <h2 className="form-title">{t('form.ascension_title')}</h2>
-      {presetName && <p className="form-score-display">{t('labels.preset')} <strong>{presetName}</strong></p>}
+      {presetName && <p className="form-score-display">{t('labels.preset')} <strong>{presetLabel(presetName, t)}</strong></p>}
 
       <div style={{ display: 'flex', justifyContent: 'space-around', margin: '12px 0' }}>
         <div style={{ textAlign: 'center' }}>

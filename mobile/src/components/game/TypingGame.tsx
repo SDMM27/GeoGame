@@ -9,6 +9,7 @@ import Animated, { FadeIn, FadeInDown, ZoomIn } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { matchKnownAnswer } from '@shared/utils/answerLexicon'
+import { getMissingFlagMask } from '@shared/utils/missingFlag'
 
 import { setupGameRecord } from '@/account/history'
 import { ANSWER_KEYBOARD_PROPS, useClearedAnswerGuard } from '@/components/game/answerInput'
@@ -40,6 +41,16 @@ export type TypingGameConfig = {
   answerLabel: (feature: Feature, lang: string) => string
   // Extra clue under the flag (e.g. the country name in Capitals)
   clue?: (feature: Feature, lang: string) => string
+  missingFlag?: boolean
+}
+
+// The hidden third of the flag, on the axis chosen for this flag (see getMissingFlagMask).
+function missingBandPosition(iso: string | null | undefined) {
+  const { axis, band } = getMissingFlagMask(iso)
+  const offset = `${band * 33.3333}%` as const
+  return axis === 'v'
+    ? { top: 0, bottom: 0, left: offset, width: '33.3333%', borderLeftWidth: 1, borderRightWidth: 1 } as const
+    : { left: 0, right: 0, top: offset, height: '33.3333%', borderTopWidth: 1, borderBottomWidth: 1 } as const
 }
 
 export function formatDuration(ms: number) {
@@ -198,7 +209,10 @@ export function TypingGame({
               entering={ZoomIn.springify().dampingRatio(0.7)}
               style={[styles.flagCard, typing && { width: flagHeight * 1.5, height: flagHeight, padding: space.sm }]}>
               {flag ? (
-                <Image source={flag} contentFit="contain" style={styles.flag} accessibilityLabel={t(config.promptKey)} />
+                <View style={styles.flagWrap}>
+                  <Image source={flag} contentFit="contain" style={styles.flag} accessibilityLabel={t(config.promptKey)} />
+                  {config.missingFlag && !revealedName && <View style={[styles.missingBand, missingBandPosition(targetCountryISO)]} accessibilityLabel={t('games.missing_flag.missing_part')} />}
+                </View>
               ) : (
                 <MaterialCommunityIcons name="flag-outline" size={64} color={colors.textFaint} />
               )}
@@ -351,7 +365,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: space.lg,
   },
+  flagWrap: { width: '100%', height: '100%' },
   flag: { width: '100%', height: '100%' },
+  missingBand: { position: 'absolute', backgroundColor: '#202944', borderColor: '#ffffff55' },
   reveal: {
     flexDirection: 'row',
     alignItems: 'center',

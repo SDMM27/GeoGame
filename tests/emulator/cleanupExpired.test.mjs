@@ -7,6 +7,9 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import handler from '../../api/cleanup-expired.mjs'
 import {
   CLOCK_MAX_AGE_MS,
+  ELO_DUEL_MAX_AGE_MS,
+  ELO_GAIN_MAX_AGE_MS,
+  ELO_PAIR_MAX_AGE_MS,
   INVITE_MAX_AGE_MS,
   LEGACY_ROOM_MS,
   PUSH_BOOKKEEPING_MAX_AGE_MS,
@@ -83,7 +86,7 @@ describe('cleanupExpired', () => {
     expect(await exists('rooms/NEWAPP')).toBe(true)
   })
 
-  it('deletes old invites, clock probes and push bookkeeping only', async () => {
+  it('deletes old invites, clock probes, push and Elo bookkeeping only', async () => {
     await db.doc('invites/OLD_bob').set({ createdAt: ts(NOW - INVITE_MAX_AGE_MS - 1000) })
     await db.doc('invites/NEW_bob').set({ createdAt: ts(NOW - 1000) })
     await db.doc('_clockSync/old').set({ t: ts(NOW - CLOCK_MAX_AGE_MS - 1000) })
@@ -96,16 +99,32 @@ describe('cleanupExpired', () => {
     await db.doc('dailyNudges/alice_carol_QUIZ').set({ from: 'alice', to: 'carol', at: NOW - 1000 })
     await db.doc('invitePushLimits/alice').set({ start: NOW - PUSH_BOOKKEEPING_MAX_AGE_MS - 1000, count: 3 })
     await db.doc('invitePushLimits/carol').set({ start: NOW - 1000, count: 3 })
+    await db.doc('presence/old').set({ at: ts(NOW - 2 * 86400000), room: null, game: null, expiresAt: ts(NOW - 1000) })
+    await db.doc('presence/new').set({ at: ts(NOW - 1000), room: 'ABC234', game: 'FLAGS', expiresAt: ts(NOW + 86400000) })
+    await db.doc('eloGains/old').set({ uid: 'alice', won: true, at: NOW - ELO_GAIN_MAX_AGE_MS - 1000 })
+    await db.doc('eloGains/new').set({ uid: 'alice', won: true, at: NOW - 1000 })
+    await db.doc('eloDuels/OLD234_0').set({ rated: true, at: NOW - ELO_DUEL_MAX_AGE_MS - 1000 })
+    await db.doc('eloDuels/NEW234_0').set({ rated: true, at: NOW - 1000 })
+    await db.doc('eloDuelPairs/old').set({ count: 1, at: NOW - ELO_PAIR_MAX_AGE_MS - 1000 })
+    await db.doc('eloDuelPairs/new').set({ count: 1, at: NOW - 1000 })
+    await db.doc('eloDuelAccounts/old').set({ uid: 'alice', count: 1, at: NOW - ELO_PAIR_MAX_AGE_MS - 1000 })
+    await db.doc('eloDuelAccounts/new').set({ uid: 'alice', count: 1, at: NOW - 1000 })
 
     const deleted = await cleanupExpired({ db, now: NOW })
 
-    expect(deleted).toEqual({ rooms: 0, invites: 1, _clockSync: 1, invitePushes: 1, friendPushes: 1, dailyNudges: 1, invitePushLimits: 1 })
+    expect(deleted).toEqual({ rooms: 0, invites: 1, _clockSync: 1, invitePushes: 1, friendPushes: 1, dailyNudges: 1, invitePushLimits: 1,
+      presence: 1, eloGains: 1, eloDuels: 1, eloDuelPairs: 1, eloDuelAccounts: 1 })
     expect(await exists('invites/NEW_bob')).toBe(true)
     expect(await exists('_clockSync/new')).toBe(true)
     expect(await exists('invitePushes/NEW_bob')).toBe(true)
     expect(await exists('friendPushes/alice_carol_request')).toBe(true)
     expect(await exists('dailyNudges/alice_carol_QUIZ')).toBe(true)
     expect(await exists('invitePushLimits/carol')).toBe(true)
+    expect(await exists('presence/new')).toBe(true)
+    expect(await exists('eloGains/new')).toBe(true)
+    expect(await exists('eloDuels/NEW234_0')).toBe(true)
+    expect(await exists('eloDuelPairs/new')).toBe(true)
+    expect(await exists('eloDuelAccounts/new')).toBe(true)
   })
 
   it('goes through several pages', async () => {

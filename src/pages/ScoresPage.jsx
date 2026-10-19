@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import NavBar from '../components/NavBar'
 import Scoreboard from './Scoreboard'
 import AscensionScoreboard from './AscensionScoreboard'
+import EloScoreboard from './EloScoreboard'
 import SurvivalScoreboard from './survival/SurvivalScoreboard'
 import { GAME_TYPES } from '../utils/gameTypes'
 import './scoreboard.css'
@@ -49,10 +50,18 @@ export default function ScoresPage() {
         >
           {t('modes.continent')}
         </button>
+        <button
+          className={`scoreboard-mode-tab ${mode === 'elo' ? 'scoreboard-mode-tab--active' : ''}`}
+          onClick={() => setMode('elo')}
+        >
+          {t('elo.tab')}
+        </button>
       </div>
       {mode === 'ascension'
         ? <AscensionScoreboard defaultGame={game} />
-        : <Scoreboard defaultGame={game} continentMode={mode === 'continent'} />
+        : mode === 'elo'
+          ? <EloScoreboard />
+          : <Scoreboard defaultGame={game} continentMode={mode === 'continent'} />
       }
     </div>
   )

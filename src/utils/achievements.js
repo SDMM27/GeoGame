@@ -2,6 +2,7 @@
 // Each one reports a progress value against a target; titles are in i18n under `achievements.<id>`.
 // `emoji` is used by the website, `icon` (MaterialCommunityIcons) by the app.
 // `sticky` (challenges): once unlocked it stays unlocked, even when the game left the capped history (see `remembered`).
+// `targetFrom`: the target is a number from `collection` (the size of the flag pool, of the mastery sets), not a constant.
 // `tier` ranks the badge (see TIERS): a player's best badges are the highest tiers they unlocked (src/utils/badges.js).
 import { GAME_TYPES } from './gameTypes'
 import { DAILY_GAME_TYPES, dailyTypesOn } from './profileStats'
@@ -199,6 +200,27 @@ export const ACHIEVEMENTS = [
     target: CHALLENGE_GAME_TYPES.length * CHALLENGE_DIFFICULTIES.length,
     value: ({ games }) => perfectPairs(games).size,
   },
+  // Collection (sticky): the flags unlocked with the missions' fragments, and the first-try mastery (flagCollection.js)
+  {
+    id: 'mythic',
+    sticky: true,
+    tier: 'legend',
+    emoji: '🌈',
+    icon: 'flag-checkered',
+    target: 1,
+    targetFrom: 'flagsTotal',
+    value: ({ collection }) => collection.flagsUnlocked ?? 0,
+  },
+  {
+    id: 'legend_master',
+    sticky: true,
+    tier: 'legend',
+    emoji: '👑',
+    icon: 'crown-outline',
+    target: 1,
+    targetFrom: 'masteryTotal',
+    value: ({ collection }) => collection.masteryFound ?? 0,
+  },
 ]
 
 // Most games played on a single (local) day.
@@ -254,10 +276,15 @@ export function withRemembered(achievements, remembered = []) {
 // [{ ...achievement, progress, unlocked }], unlocked first (the highest tiers first), then in list order.
 // Without `friendsCount` (another player's profile: their friends aren't readable), 'friend' is left out.
 // `remembered`: ids of the challenges the player unlocked before (users/{uid}.challenges), which stay unlocked.
-export function computeAchievements({ stats, games, friendsCount, remembered = [] }) {
+// `collection`: { flagsUnlocked, flagsTotal, masteryFound, masteryTotal } (flagCollectionData.js); without it the
+// collection achievements have no progress (their target is at least 1, so 0 of 0 is never "unlocked").
+const NO_COLLECTION = { flagsUnlocked: 0, flagsTotal: 0, masteryFound: 0, masteryTotal: 0 }
+
+export function computeAchievements({ stats, games, friendsCount, remembered = [], collection = NO_COLLECTION }) {
   const list = ACHIEVEMENTS.filter((achievement) => friendsCount != null || achievement.id !== 'friend').map((achievement) => {
-    const progress = Math.min(achievement.value({ stats, games, friendsCount }), achievement.target)
-    return { ...achievement, progress, unlocked: progress >= achievement.target }
+    const target = achievement.targetFrom ? Math.max(1, collection[achievement.targetFrom] ?? 0) : achievement.target
+    const progress = Math.min(achievement.value({ stats, games, friendsCount, collection }), target)
+    return { ...achievement, target, progress, unlocked: progress >= target }
   })
   return withRemembered(sortAchievements(list), remembered)
 }

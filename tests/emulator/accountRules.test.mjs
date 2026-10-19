@@ -238,6 +238,79 @@ describe('public challenges', () => {
   })
 })
 
+describe('profile decoration', () => {
+  const decoration = { frame: 'gold', color: 'sky' }
+
+  it('lets an account pick its own decoration, alone or with its badges, and anyone read it', async () => {
+    await assertSucceeds(as('alice').doc('users/alice').update({ decoration }))
+    await assertSucceeds(as('alice').doc('users/alice').update({ decoration: { frame: 'none', color: 'default' } }))
+    await assertSucceeds(as('alice').doc('users/alice').update({ decoration, badges: { top: [], count: 0 } }))
+    await assertSucceeds(as('alice').doc('users/alice').update({ decoration: { frame: 'x'.repeat(40), color: 'y' } }))
+    await assertSucceeds(anonymous().doc('users/alice').get())
+  })
+
+  it("refuses someone else's decoration, and a visitor's", async () => {
+    await assertFails(as('mallory').doc('users/alice').update({ decoration }))
+    await assertFails(anonymous().doc('users/alice').update({ decoration }))
+  })
+
+  it('refuses a malformed decoration', async () => {
+    const update = (value) => as('alice').doc('users/alice').update({ decoration: value })
+    await assertFails(update('gold'))
+    await assertFails(update({ frame: 'gold' }))
+    await assertFails(update({ frame: 'gold', color: 'sky', emblem: 'star' }))
+    await assertFails(update({ frame: 1, color: 'sky' }))
+    await assertFails(update({ frame: '', color: 'sky' }))
+    await assertFails(update({ frame: 'x'.repeat(41), color: 'sky' }))
+  })
+
+  it('refuses changing anything else along with the decoration', async () => {
+    await assertFails(as('alice').doc('users/alice').update({ decoration, username: 'Bob' }))
+    await assertFails(as('alice').doc('users/alice').update({ decoration, admin: true }))
+  })
+  it('refuses an item unlocked at a higher level than the account has', async () => {
+    const update = (value) => as('alice').doc('users/alice').update({ decoration: value })
+    await assertFails(update({ frame: 'sunrise', color: 'default' }))
+    await assertFails(update({ frame: 'none', color: 'lime' }))
+    await env.withSecurityRulesDisabled((context) => context.firestore().doc('users/alice').update({ xp: { total: 450, level: 4 } }))
+    await assertSucceeds(update({ frame: 'sunrise', color: 'peach' }))
+    await assertFails(update({ frame: 'glacier', color: 'peach' }))
+    await assertFails(update({ frame: 'none', color: 'turquoise' }))
+  })
+})
+
+describe('XP', () => {
+  it('refuses the player writing their own XP, alone or along with something they may write', async () => {
+    const xp = { total: 999999, level: 99 }
+    await assertFails(as('alice').doc('users/alice').update({ xp }))
+    await assertFails(as('alice').doc('users/alice').update({ xp, decoration: { frame: 'crown', color: 'gilded' } }))
+    await assertFails(as('alice').doc('users/alice').update({ 'xp.level': 99 }))
+    await assertFails(claim(as('bob'), 'bob', 'Bob', { user: { xp } }))
+  })
+})
+
+describe('flag collection and mastery', () => {
+  const flags = { unlocked: ['FR', 'JP'], current: 'BR', pieces: 2 }
+
+  it('refuses the player writing their own flags, alone or along with something they may write', async () => {
+    await assertFails(as('alice').doc('users/alice').update({ flags }))
+    await assertFails(as('alice').doc('users/alice').update({ flags, badges: { top: [], count: 0 } }))
+    await assertFails(as('alice').doc('users/alice').update({ 'flags.pieces': 3 }))
+    await assertFails(claim(as('bob'), 'bob', 'Bob', { user: { flags } }))
+  })
+
+  it('refuses any client writing the mastery, and lets anyone read it', async () => {
+    const mastery = { placement: ['France'], flags: [], hardcore: [], updatedAt: 1 }
+    await assertFails(as('alice').doc('mastery/alice').set(mastery))
+    await assertFails(anonymous().doc('mastery/alice').set(mastery))
+    await env.withSecurityRulesDisabled((context) => context.firestore().doc('mastery/alice').set(mastery))
+    await assertFails(as('alice').doc('mastery/alice').update({ flags: ['France'] }))
+    await assertFails(as('alice').doc('mastery/alice').delete())
+    await assertSucceeds(anonymous().doc('mastery/alice').get())
+    await assertSucceeds(as('bob').doc('mastery/alice').get())
+  })
+})
+
 describe('community directory', () => {
   it('lets an account join with the server time, leave, and anyone list the members', async () => {
     await assertSucceeds(as('alice').doc('users/alice').update({ communityAt: now() }))

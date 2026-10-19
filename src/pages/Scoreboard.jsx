@@ -13,7 +13,9 @@ import './scoreboard.css'
 const MEDAL = ['\uD83E\uDD47', '\uD83E\uDD48', '\uD83E\uDD49']
 const ACTIVE_GAMES = [
   { id: GAME_TYPES.PLACEMENT, labelKey: 'games.placement.title' },
+  { id: GAME_TYPES.HARDCORE, labelKey: 'games.hardcore.title' },
   { id: GAME_TYPES.FLAGS, labelKey: 'games.flags.title' },
+  { id: GAME_TYPES.MISSING_FLAG, labelKey: 'games.missing_flag.title' },
   { id: GAME_TYPES.CAPITALS, labelKey: 'games.capitals.title' },
 ]
 

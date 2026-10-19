@@ -2,6 +2,7 @@
 import { formatTime } from './formatTime'
 import { CHALLENGE_ROUNDS } from './dailyChallenge'
 import { GAME_TYPES } from './gameTypes'
+import { presetLabel } from './ascensionPresets'
 
 const formatPoints = (score) => (Number.isInteger(score) ? String(score) : score.toFixed(1))
 
@@ -14,9 +15,7 @@ export function describeMode(game, t) {
       : game.mode === 'multi'
       ? game.roomCode
       : game.presetName
-        ? game.presetName === 'Progressif'
-          ? t('presets.progressive')
-          : game.presetName
+        ? presetLabel(game.presetName, t)
         : game.continent
           ? t(`continents.${game.continent}`)
           : game.difficulty

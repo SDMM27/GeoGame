@@ -6,11 +6,13 @@ import './i18n'
 import { gameColors } from './theme'
 
 describe('GAMES', () => {
-  it('has unique ids, shared game types and routes', () => {
-    for (const key of ['id', 'type', 'route'] as const) {
+  it('has unique ids and shared game types', () => {
+    for (const key of ['id', 'type'] as const) {
       const values = GAMES.map((game) => game[key])
       expect(new Set(values).size).toBe(values.length)
     }
+    // Hardcore reuses Placement's screen and distinguishes itself with route parameters.
+    expect(GAMES.filter((game) => game.route === '/game/placement').map((game) => game.id)).toEqual(['placement', 'hardcore'])
   })
 
   it('covers every game colour of the theme, with that colour', () => {
@@ -63,8 +65,12 @@ describe('lookups', () => {
     expect(GAMES.filter((game) => game.dailyOnly).map((game) => game.id)).toEqual(['daily_challenge'])
   })
 
-  it('only offers a setup sheet to Placement, Flags and Capitals', () => {
-    expect(GAMES.filter((game) => game.kind === 'setup').map((game) => game.id)).toEqual(['placement', 'flags', 'capitals'])
+  it('offers setup sheets to all configurable solo games', () => {
+    expect(GAMES.filter((game) => game.kind === 'setup').map((game) => game.id)).toEqual(['placement', 'hardcore', 'flags', 'missing_flag', 'capitals'])
+  })
+
+  it('offers no Ascension to Hardcore and Missing Flag', () => {
+    expect(GAMES.filter((game) => game.noAscension).map((game) => game.id)).toEqual(['hardcore', 'missing_flag'])
   })
 })
 

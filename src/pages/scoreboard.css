@@ -186,6 +186,19 @@
   font-size: 0.82rem;
 }
 
+.scoreboard-note {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: -12px auto 16px;
+  max-width: 560px;
+}
+
+.scoreboard-header--elo,
+.scoreboard-row--elo {
+  grid-template-columns: 48px minmax(0, 1fr) 90px 160px;
+}
+
 /* Narrow screens: five columns do not fit, so each row becomes two lines (rank, name, score / time, difficulty). */
 @media (max-width: 520px) {
   .scoreboard {

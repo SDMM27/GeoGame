@@ -20,6 +20,7 @@ import {
   roomGames,
 } from '@shared/utils/multiplayerRoom'
 import { formatTime } from '@shared/utils/formatTime'
+import { clearPresenceRoom, setPresenceRoom } from '@shared/utils/presence'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
 
 import { HudPill } from '@/components/game/GameTopBar'
@@ -114,6 +115,14 @@ export function RoomGate({ code, children }: { code: string; children: (play: Ro
     () => (room && content ? { room, content, reportFound, finish, exit: () => openRoom(code) } : null),
     [room, content, reportFound, finish, code]
   )
+
+  // Friends see this player "in game" while they play (see @shared/utils/presence)
+  const gameType = room?.game.type
+  useEffect(() => {
+    if (!gameType) return undefined
+    setPresenceRoom(code, gameType)
+    return () => clearPresenceRoom(code)
+  }, [code, gameType])
 
   // Announce the player as soon as the game starts
   useEffect(() => {

@@ -1,6 +1,6 @@
 import { GAME_TYPES } from "../../utils/gameTypes";
 import { getTotalCountries, getTotalCountriesByContinent } from "../../hooks/useGameState";
-import { getTotalFlagCountries, getTotalFlagCountriesByContinent } from "../../hooks/useFlagGameState";
+import { getTotalFlagCountries, getTotalFlagCountriesByContinent, getTotalMissingFlagCountries, getTotalMissingFlagCountriesByContinent } from "../../hooks/useFlagGameState";
 import { getTotalCapitalCountries, getTotalCapitalCountriesByContinent } from "../../hooks/useCapitalsGameState";
 import { CONTINENTS } from "../../utils/continents";
 import { ASCENSION_PRESETS } from "../../utils/ascensionPresets";
@@ -17,7 +17,9 @@ export function getDifficultiesForGame(gameId) {
   const countFn =
     gameId === GAME_TYPES.FLAGS
       ? getTotalFlagCountries
-      : gameId === GAME_TYPES.CAPITALS
+      : gameId === GAME_TYPES.MISSING_FLAG
+        ? getTotalMissingFlagCountries
+        : gameId === GAME_TYPES.CAPITALS
         ? getTotalCapitalCountries
         : getTotalCountries;
 
@@ -43,7 +45,9 @@ export function getContinentsForGame(gameId) {
   const countFn =
     gameId === GAME_TYPES.FLAGS
       ? getTotalFlagCountriesByContinent
-      : gameId === GAME_TYPES.CAPITALS
+      : gameId === GAME_TYPES.MISSING_FLAG
+        ? getTotalMissingFlagCountriesByContinent
+        : gameId === GAME_TYPES.CAPITALS
         ? getTotalCapitalCountriesByContinent
         : getTotalCountriesByContinent;
 
@@ -81,6 +85,17 @@ export const GAMES = [
     active: true,
   },
   {
+    id: GAME_TYPES.HARDCORE,
+    kind: "setup",
+    multiId: null,
+    icon: "💀",
+    titleKey: "games.hardcore.title",
+    descKey: "games.hardcore.description",
+    route: "/game",
+    active: true,
+    noAscension: true,
+  },
+  {
     id: GAME_TYPES.FLAGS,
     kind: "setup",
     multiId: "flags",
@@ -89,6 +104,17 @@ export const GAMES = [
     descKey: "games.flags.description",
     route: "/flag-game",
     active: true,
+  },
+  {
+    id: GAME_TYPES.MISSING_FLAG,
+    kind: "setup",
+    multiId: null,
+    icon: "🧩",
+    titleKey: "games.missing_flag.title",
+    descKey: "games.missing_flag.description",
+    route: "/missing-flag",
+    active: true,
+    noAscension: true,
   },
   {
     id: GAME_TYPES.CAPITALS,

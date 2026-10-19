@@ -7,9 +7,9 @@ import { ScrollView, StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { getTotalCapitalCountries, getTotalCapitalCountriesByContinent } from '@shared/hooks/useCapitalsGameState'
-import { getTotalFlagCountries, getTotalFlagCountriesByContinent } from '@shared/hooks/useFlagGameState'
+import { getTotalFlagCountries, getTotalFlagCountriesByContinent, getTotalMissingFlagCountries, getTotalMissingFlagCountriesByContinent } from '@shared/hooks/useFlagGameState'
 import { getTotalCountries, getTotalCountriesByContinent } from '@shared/hooks/useGameState'
-import { ASCENSION_PRESETS, matchPreset } from '@shared/utils/ascensionPresets'
+import { ASCENSION_PRESETS, matchPreset, presetLabel } from '@shared/utils/ascensionPresets'
 import { CONTINENTS } from '@shared/utils/continents'
 
 import { SheetCloseButton } from '@/components/SheetCloseButton'
@@ -32,6 +32,7 @@ const CONTINENT_ICONS: Record<string, keyof typeof MaterialCommunityIcons.glyphM
 
 function countFunctions(gameId: string) {
   if (gameId === 'flags') return { byDifficulty: getTotalFlagCountries, byContinent: getTotalFlagCountriesByContinent }
+  if (gameId === 'missing_flag') return { byDifficulty: getTotalMissingFlagCountries, byContinent: getTotalMissingFlagCountriesByContinent }
   if (gameId === 'capitals') return { byDifficulty: getTotalCapitalCountries, byContinent: getTotalCapitalCountriesByContinent }
   return { byDifficulty: getTotalCountries, byContinent: getTotalCountriesByContinent }
 }
@@ -69,15 +70,19 @@ function GameSetupSheet() {
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   // `add`: the room the host adds this game to (see multi/add)
-  const { game: gameId, multi, add } = useLocalSearchParams<{ game: string; multi?: string; add?: string }>()
+  const { game: gameId, multi, add, mode: initialMode } = useLocalSearchParams<{ game: string; multi?: string; add?: string; mode?: string }>()
   const game = getGame(gameId)!
   const counts = countFunctions(gameId)
 
-  const [mode, setMode] = useState<Mode>('standard')
+  // `mode`: the home page's Ascension entry opens the sheet on Ascension
+  const [mode, setMode] = useState<Mode>(initialMode === 'ascension' && !game.noAscension ? 'ascension' : 'standard')
   const [selection, setSelection] = useState<Selection>('difficulty')
   const [difficulty, setDifficulty] = useState('Facile')
   const [continent, setContinent] = useState<string | null>(null)
-  const [phases, setPhases] = useState<Phases>(() => ({ ...ASCENSION_PRESETS[1].phases }))
+  const [phases, setPhases] = useState<Phases>(
+    // New players start on Discovery: easy countries first (docs/plan-fonctionnalites.md, step 10)
+    () => ({ ...(ASCENSION_PRESETS.find((preset: { name: string }) => preset.name === 'Découverte') ?? ASCENSION_PRESETS[0]).phases })
+  )
 
   const caps = useMemo(
     () => Object.fromEntries(DIFFICULTIES.filter((d) => d !== 'Hardcore').map((d) => [d, counts.byDifficulty(d)])),
@@ -87,7 +92,7 @@ function GameSetupSheet() {
   const ascensionTotal = Object.values(phases).reduce((sum, n) => sum + n, 0)
 
   const start = (training: boolean) => {
-    const params: Record<string, string> = { training: training ? '1' : '0' }
+    const params: Record<string, string> = { training: training ? '1' : '0', gameType: game.type }
     if (mode === 'ascension') {
       params.ascension = JSON.stringify(phases)
       if (presetName) params.preset = presetName
@@ -128,14 +133,14 @@ function GameSetupSheet() {
           <SheetCloseButton />
         </View>
 
-        <Segmented<Mode>
+        {!game.noAscension && <Segmented<Mode>
           value={mode}
           onChange={setMode}
           options={[
             { value: 'standard', label: t('mobile.setup.standard') },
             { value: 'ascension', label: t('mobile.setup.ascension') },
           ]}
-        />
+        />}
 
         {mode === 'standard' ? (
           <>
@@ -210,7 +215,7 @@ function GameSetupSheet() {
                       )
                     }
                     style={[styles.preset, active && { borderColor: colors.accent, backgroundColor: `${colors.accent}14` }]}>
-                    <Text variant="bodyStrong">{preset.name === 'Progressif' ? t('presets.progressive') : preset.name}</Text>
+                    <Text variant="bodyStrong">{presetLabel(preset.name, t)}</Text>
                     <Text variant="caption">{t('mobile.setup.countries', { count: total })}</Text>
                   </Touchable>
                 )
@@ -234,7 +239,7 @@ function GameSetupSheet() {
                 </View>
               ))}
               <Text variant="caption" style={{ textAlign: 'center', marginTop: space.xs }}>
-                {presetName ? (presetName === 'Progressif' ? t('presets.progressive') : presetName) : t('presets.custom')} ·{' '}
+                {presetName ? presetLabel(presetName, t) : t('presets.custom')} ·{' '}
                 {t('mobile.setup.total', { count: ascensionTotal })}
               </Text>
             </View>

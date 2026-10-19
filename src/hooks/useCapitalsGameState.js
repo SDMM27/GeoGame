@@ -7,6 +7,8 @@ import countries from '../data/countriesWithDifficulty_FR.json'
 import { formatTime } from '../utils/formatTime'
 import { matchKnownAnswer } from '../utils/answerLexicon'
 import { saveSnapshot } from '../utils/multiplayerSnapshot'
+import { GAME_TYPES } from '../utils/gameTypes'
+import { reportEloAnswer, flushElo } from '../utils/eloReport'
 import { getCountryName, getAllCapitalNames } from '../utils/getCountryName'
 
 const SCORE_TABLE = {
@@ -58,6 +60,8 @@ export default function useCapitalsGameState(difficulty, isTraining, overrideCou
   const [clickOnSeeCountry, setClickOnSeeCountry] = useState(false)
   const clickOnSeeCountryRef = useRef(false)
   const gameOverToastShownRef = useRef(false)
+  // Room games (override list) are rated as duels, not as solo answers.
+  const ratedRef = useRef(!overrideCountries)
 
   // Refs for snapshot saves (always current, avoids stale closures in intervals)
   const statsForSnapRef = useRef({ found: 0, skipped: 0, total: 0, totalErrors: 0 })
@@ -158,6 +162,7 @@ export default function useCapitalsGameState(difficulty, isTraining, overrideCou
   useEffect(() => {
     if (!allProcessed || !gameStarted || gameOverToastShownRef.current) return
     gameOverToastShownRef.current = true
+    flushElo()
     if (isTraining) {
       toast.success(t('toasts.all_capitals_found'), {
         containerId: 'centerToast',
@@ -221,6 +226,7 @@ export default function useCapitalsGameState(difficulty, isTraining, overrideCou
           { containerId: 'topRightToast' }
         )
         incrementScore(props.DifficultyCapitals, consecutiveErrorsRef.current)
+        if (ratedRef.current) reportEloAnswer(GAME_TYPES.CAPITALS, props.ADMIN, { found: true, errors: consecutiveErrorsRef.current })
       }
       setStats(prev =>
         wasSkipped
@@ -238,6 +244,7 @@ export default function useCapitalsGameState(difficulty, isTraining, overrideCou
       if (newErrors >= 3) {
         toast.error(t('toasts.wrong'), { containerId: 'topRightToast' })
         setRevealedName(props.capital)
+        if (ratedRef.current) reportEloAnswer(GAME_TYPES.CAPITALS, props.ADMIN, { found: false, errors: newErrors })
       } else {
         toast.error(t('toasts.wrong'), { containerId: 'topRightToast' })
       }
@@ -249,7 +256,9 @@ export default function useCapitalsGameState(difficulty, isTraining, overrideCou
     if (revealedName) return
     setClickOnSeeCountry(true)
     clickOnSeeCountryRef.current = true
-    setRevealedName(targetCountryRef.current?.properties?.capital ?? null)
+    const target = targetCountryRef.current?.properties
+    setRevealedName(target?.capital ?? null)
+    if (target?.capital && ratedRef.current) reportEloAnswer(GAME_TYPES.CAPITALS, target.ADMIN, { found: false, errors: consecutiveErrorsRef.current })
   }
 
   // Keep snapshot refs in sync

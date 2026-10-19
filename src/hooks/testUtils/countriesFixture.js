@@ -1,5 +1,7 @@
 // Petit jeu de pays pour les tests des hooks, à la place de countriesWithDifficulty_FR.json (89 Mo).
 // Géométrie : un carré de 4° autour du centre donné.
+const MISSING_FLAG_SHIFT = { Facile: 'Moyen', Moyen: 'Difficile', Difficile: 'Facile' }
+
 function country({ admin, isoA2, isoA3, center: [lng, lat], difficulty, capital, population, aliases = [] }) {
   const ring = [[lng - 2, lat - 2], [lng + 2, lat - 2], [lng + 2, lat + 2], [lng - 2, lat + 2], [lng - 2, lat - 2]]
   return {
@@ -10,6 +12,8 @@ function country({ admin, isoA2, isoA3, center: [lng, lat], difficulty, capital,
       ISO_A3: isoA3,
       Difficulty: difficulty,
       DifficultyFlag: difficulty,
+      // Deliberately different from DifficultyFlag, to catch a mode reading the wrong property.
+      DifficultyMissingFlag: MISSING_FLAG_SHIFT[difficulty] ?? difficulty,
       DifficultyCapitals: difficulty,
       capital,
       population,

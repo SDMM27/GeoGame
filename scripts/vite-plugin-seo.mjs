@@ -3,7 +3,7 @@
 // - index.html: <!-- seo:head --> and <!-- seo:noscript --> are filled with the home page (dev and build).
 // - build: dist/<path>/index.html for every other page of SEO_PAGES, sitemap.xml and robots.txt.
 // The texts are the French ones (fallback language), from src/i18n/locales/fr.json under seo.<key>.
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { OG_IMAGE, SEO_PAGES, SITE_NAME, SITE_URL } from '../src/seo/seoPages.js'
 
@@ -121,6 +121,8 @@ export default function seoPlugin() {
     closeBundle() {
       if (config.command !== 'build' || config.build.ssr) return
       const outDir = resolve(config.root, config.build.outDir)
+      // Rollup also calls closeBundle after a failed build: leave the real error visible.
+      if (!existsSync(join(outDir, 'index.html'))) return
       const strings = loadStrings(config.root)
       const html = readFileSync(join(outDir, 'index.html'), 'utf8')
       for (const page of SEO_PAGES.slice(1)) {

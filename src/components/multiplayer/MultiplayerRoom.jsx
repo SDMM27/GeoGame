@@ -13,7 +13,9 @@ import {
   roomForGame,
   roomGames,
 } from '../../utils/multiplayerRoom'
+import useDuelElo from '../../hooks/useDuelElo'
 import useLobbyHost from '../../hooks/useLobbyHost'
+import { clearPresenceRoom, setPresenceRoom } from '../../utils/presence'
 import { rememberPlayers } from '../../utils/recentPlayers'
 import { rememberRoom } from '../../utils/recentRooms'
 import { gameColor } from '../../utils/roomGames'
@@ -41,9 +43,10 @@ const PLAYABLE_TYPES = [
   GAME_TYPES.SURVIVAL,
 ]
 
-export default function MultiplayerRoom({ room, progress, gameResults, playerId }) {
+export default function MultiplayerRoom({ room, progress, gameResults, playerId, watch = false }) {
   const { t } = useTranslation()
   const [playingIndex, setPlayingIndex] = useState(null)
+  const [watching, setWatching] = useState(watch)
   // Games finished here whose result may not be back from Firestore yet
   const [doneHere, setDoneHere] = useState([])
   const [launching, setLaunching] = useState(false)
@@ -54,6 +57,7 @@ export default function MultiplayerRoom({ room, progress, gameResults, playerId 
   const games = roomGames(room)
   const current = currentGameIndex(room)
   const results = useMemo(() => Object.values(gameResults), [gameResults])
+  useDuelElo(room, results, playerId)
   const known = useMemo(
     () => [...results, ...doneHere.map((gameIndex) => ({ playerId, gameIndex }))],
     [results, doneHere, playerId]
@@ -61,6 +65,7 @@ export default function MultiplayerRoom({ room, progress, gameResults, playerId 
   const startAt = room.startAt?.toMillis ? room.startAt.toMillis() : null
   const remaining = useCountdown(startAt)
   const joined = playerId in room.players
+  const spectating = !joined && watching && room.status === 'playing'
   const isHost = room.hostId === playerId
   const toPlay = joined ? nextGameToPlay(room, known, playerId) : null
   const playable = (index) => PLAYABLE_TYPES.includes(games[index]?.type)
@@ -73,6 +78,15 @@ export default function MultiplayerRoom({ room, progress, gameResults, playerId 
   useEffect(() => {
     if (joined) rememberPlayers(room.players, room.players[playerId]?.uid)
   }, [joined, accountsKey]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Friends see this player "in game" while they play in a started room (src/utils/presence.js)
+  const gameType = games[current]?.type ?? null
+  const playing = joined && room.status === 'playing'
+  useEffect(() => {
+    if (!playing) return undefined
+    setPresenceRoom(room.id, gameType)
+    return () => clearPresenceRoom(room.id)
+  }, [playing, room.id, gameType])
 
   const onDone = useCallback((index) => {
     setDoneHere((previous) => [...previous, index])
@@ -147,8 +161,31 @@ export default function MultiplayerRoom({ room, progress, gameResults, playerId 
         </button>
       </div>
 
-      {!joined ? (
-        <JoinForm room={room} playerId={playerId} />
+      {spectating ? (
+        <>
+          <div className="mpr-card">
+            <p className="mpr-watching">👀 {t('mp_room.spectator')}</p>
+            <p className="mpr-muted">{t('mp_room.spectator_hint')}</p>
+          </div>
+          <Players room={room} playerId={playerId} readOnly />
+          <StandingsCard
+            key={current}
+            room={room}
+            progress={progress}
+            results={results}
+            playerId={playerId}
+            defaultTab={current}
+          />
+        </>
+      ) : !joined ? (
+        <>
+          <JoinForm room={room} playerId={playerId} />
+          {room.status === 'playing' && (
+            <button type="button" className="mpr-link-btn" onClick={() => setWatching(true)}>
+              👀 {t('mp_room.watch')}
+            </button>
+          )}
+        </>
       ) : room.status === 'lobby' ? (
         <>
           <Players room={room} playerId={playerId} />

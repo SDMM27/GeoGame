@@ -33,7 +33,7 @@ function AddFriendButton({ account, friendships, uid }) {
 }
 
 // The room's players. `strangersOnly`: once the games have started, only the players the account can still add.
-export default function Players({ room, playerId, strangersOnly = false }) {
+export default function Players({ room, playerId, strangersOnly = false, readOnly = false }) {
   const { t } = useTranslation()
   const { account } = useAccount()
   const friendships = useFriendships(account?.username ? account.uid : null)
@@ -41,7 +41,7 @@ export default function Players({ room, playerId, strangersOnly = false }) {
   const canAdd = (player) => Boolean(account?.username && player.uid && player.uid !== account.uid && !friendships.loading)
   const players = Object.entries(room.players).filter(
     ([, player], index, all) =>
-      !strangersOnly ||
+      readOnly || !strangersOnly ||
       (canAdd(player) &&
         all.findIndex(([, other]) => other.uid === player.uid) === index &&
         !friendships.friends.some((friend) => friend.uid === player.uid))
@@ -50,7 +50,7 @@ export default function Players({ room, playerId, strangersOnly = false }) {
 
   return (
     <div className="mpr-card">
-      <h3>{strangersOnly ? t('mp_room.add_players') : t('mp_room.players', { count: players.length })}</h3>
+      <h3>{strangersOnly && !readOnly ? t('mp_room.add_players') : t('mp_room.players', { count: players.length })}</h3>
       <ul className="mpr-list">
         {players.map(([id, player]) => (
           <li key={id} className={`mpr-row${id === playerId ? ' mpr-row--me' : ''}`}>
@@ -60,7 +60,7 @@ export default function Players({ room, playerId, strangersOnly = false }) {
             </span>
             <BadgeStrip badges={badges[player.uid]} />
             {id === room.hostId && <span className="mpr-badge">{t('mp_room.host')}</span>}
-            {canAdd(player) && <AddFriendButton account={account} friendships={friendships} uid={player.uid} />}
+            {!readOnly && canAdd(player) && <AddFriendButton account={account} friendships={friendships} uid={player.uid} />}
           </li>
         ))}
       </ul>

@@ -7,7 +7,7 @@ import { useAccount } from '../../auth'
 import { GAME_TYPES } from '../../utils/gameTypes'
 import { getSavedPseudo } from '../../utils/account'
 import { containsProfanity } from '../../utils/profanity'
-import { ASCENSION_PRESETS, matchPreset } from '../../utils/ascensionPresets'
+import { ASCENSION_PRESETS, matchPreset, presetLabel } from '../../utils/ascensionPresets'
 import { QUIZ_DIFFICULTIES } from '../../utils/quizQuestions'
 import { getTotalCountries } from '../../hooks/useGameState'
 import { getTotalFlagCountries } from '../../hooks/useFlagGameState'
@@ -17,7 +17,7 @@ import SurvivalOptions, { SURVIVAL_ROUND_ICONS, defaultSurvivalOptions, rampLabe
 import { ROOM_GAMES, roomGameIcon } from '../../utils/roomGames'
 import './RoomConfig.css'
 
-const DEFAULT_ASCENSION_PRESET = ASCENSION_PRESETS.find(p => p.name === 'Progressif') ?? ASCENSION_PRESETS[1]
+const DEFAULT_ASCENSION_PRESET = ASCENSION_PRESETS.find(p => p.name === 'Découverte') ?? ASCENSION_PRESETS[0]
 
 const SETUP_TYPES = [GAME_TYPES.PLACEMENT, GAME_TYPES.FLAGS, GAME_TYPES.CAPITALS]
 const DIFFICULTIES = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
@@ -100,7 +100,7 @@ function SetupSettings({ type, setup, onChange }) {
                 type="button"
                 className={`rc-preset${detectedPreset === p.name ? ' active' : ''}`}
                 onClick={() => handlePreset(p)}
-              >{p.icon} {p.name}</button>
+              >{p.icon} {presetLabel(p.name, t)}</button>
             ))}
           </div>
           {ASCENSION_DIFFS.map(d => (

@@ -2,6 +2,8 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import ReportButton from './ReportButton'
+import { useDecoration } from '../hooks/useDecoration'
+import { decorationStyle } from '../utils/decorations'
 import './PlayerName.css'
 
 // Whether a leaderboard entry belongs to the signed-in account.
@@ -48,10 +50,23 @@ function QuickAdd({ account, entry }) {
 // entries that came with their id), the other players' entries get a discreet report button.
 export default function PlayerName({ entry, account, reportIn }) {
   const { t } = useTranslation()
+  const { frame, nameColor } = decorationStyle(useDecoration(entry.uid))
   return (
     <>
       {entry.uid ? (
-        <Link to={`/player/${entry.uid}`} className="player-name__link" onClick={(event) => event.stopPropagation()}>
+        <Link
+          to={`/player/${entry.uid}`}
+          className={`player-name__link${nameColor ? ' player-name__link--colored' : ''}`}
+          style={nameColor ? { '--name-color': nameColor } : undefined}
+          onClick={(event) => event.stopPropagation()}
+        >
+          {frame && (
+            <span
+              className="player-name__ring"
+              style={{ borderColor: frame.color, borderStyle: frame.style === 'dashed' ? 'dashed' : 'solid' }}
+              aria-hidden="true"
+            />
+          )}
           {entry.name}
         </Link>
       ) : (

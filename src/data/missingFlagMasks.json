@@ -1,0 +1,918 @@
+{
+  "AD": {
+    "axis": "v",
+    "band": 0
+  },
+  "AE": {
+    "axis": "h",
+    "band": 1
+  },
+  "AF": {
+    "axis": "v",
+    "band": 1
+  },
+  "AG": {
+    "axis": "h",
+    "band": 0
+  },
+  "AI": {
+    "axis": "h",
+    "band": 0
+  },
+  "AL": {
+    "axis": "v",
+    "band": 1
+  },
+  "AM": {
+    "axis": "h",
+    "band": 1
+  },
+  "AO": {
+    "axis": "h",
+    "band": 0
+  },
+  "AR": {
+    "axis": "h",
+    "band": 1
+  },
+  "AS": {
+    "axis": "v",
+    "band": 2
+  },
+  "AT": {
+    "axis": "h",
+    "band": 1
+  },
+  "AU": {
+    "axis": "h",
+    "band": 0
+  },
+  "AW": {
+    "axis": "h",
+    "band": 2
+  },
+  "AX": {
+    "axis": "h",
+    "band": 1
+  },
+  "AZ": {
+    "axis": "h",
+    "band": 1
+  },
+  "BA": {
+    "axis": "v",
+    "band": 1
+  },
+  "BB": {
+    "axis": "v",
+    "band": 1
+  },
+  "BD": {
+    "axis": "v",
+    "band": 1
+  },
+  "BE": {
+    "axis": "v",
+    "band": 1
+  },
+  "BF": {
+    "axis": "h",
+    "band": 0
+  },
+  "BG": {
+    "axis": "h",
+    "band": 1
+  },
+  "BH": {
+    "axis": "v",
+    "band": 0
+  },
+  "BI": {
+    "axis": "h",
+    "band": 1
+  },
+  "BJ": {
+    "axis": "v",
+    "band": 0
+  },
+  "BL": {
+    "axis": "v",
+    "band": 1
+  },
+  "BM": {
+    "axis": "h",
+    "band": 2
+  },
+  "BN": {
+    "axis": "h",
+    "band": 1
+  },
+  "BO": {
+    "axis": "h",
+    "band": 2
+  },
+  "BR": {
+    "axis": "v",
+    "band": 1
+  },
+  "BS": {
+    "axis": "h",
+    "band": 1
+  },
+  "BT": {
+    "axis": "v",
+    "band": 0
+  },
+  "BW": {
+    "axis": "h",
+    "band": 1
+  },
+  "BY": {
+    "axis": "h",
+    "band": 2
+  },
+  "BZ": {
+    "axis": "v",
+    "band": 1
+  },
+  "CA": {
+    "axis": "v",
+    "band": 1
+  },
+  "CD": {
+    "axis": "h",
+    "band": 1
+  },
+  "CF": {
+    "axis": "h",
+    "band": 0
+  },
+  "CG": {
+    "axis": "v",
+    "band": 0
+  },
+  "CH": {
+    "axis": "h",
+    "band": 1
+  },
+  "CI": {
+    "axis": "v",
+    "band": 1
+  },
+  "CL": {
+    "axis": "h",
+    "band": 0
+  },
+  "CM": {
+    "axis": "v",
+    "band": 0
+  },
+  "CN": {
+    "axis": "h",
+    "band": 1
+  },
+  "CO": {
+    "axis": "h",
+    "band": 2
+  },
+  "CR": {
+    "axis": "h",
+    "band": 1
+  },
+  "CU": {
+    "axis": "v",
+    "band": 0
+  },
+  "CV": {
+    "axis": "h",
+    "band": 1
+  },
+  "CW": {
+    "axis": "h",
+    "band": 0
+  },
+  "CY": {
+    "axis": "h",
+    "band": 1
+  },
+  "CZ": {
+    "axis": "h",
+    "band": 0
+  },
+  "DE": {
+    "axis": "h",
+    "band": 1
+  },
+  "DJ": {
+    "axis": "h",
+    "band": 0
+  },
+  "DK": {
+    "axis": "h",
+    "band": 1
+  },
+  "DM": {
+    "axis": "h",
+    "band": 1
+  },
+  "DO": {
+    "axis": "h",
+    "band": 1
+  },
+  "DZ": {
+    "axis": "v",
+    "band": 0
+  },
+  "EC": {
+    "axis": "h",
+    "band": 2
+  },
+  "EE": {
+    "axis": "h",
+    "band": 1
+  },
+  "EG": {
+    "axis": "h",
+    "band": 1
+  },
+  "EH": {
+    "axis": "h",
+    "band": 0
+  },
+  "ER": {
+    "axis": "h",
+    "band": 0
+  },
+  "ES": {
+    "axis": "h",
+    "band": 1
+  },
+  "ET": {
+    "axis": "h",
+    "band": 0
+  },
+  "FI": {
+    "axis": "h",
+    "band": 1
+  },
+  "FJ": {
+    "axis": "h",
+    "band": 2
+  },
+  "FK": {
+    "axis": "v",
+    "band": 2
+  },
+  "FM": {
+    "axis": "h",
+    "band": 1
+  },
+  "FO": {
+    "axis": "h",
+    "band": 1
+  },
+  "FR": {
+    "axis": "v",
+    "band": 1
+  },
+  "GA": {
+    "axis": "h",
+    "band": 1
+  },
+  "GB": {
+    "axis": "h",
+    "band": 1
+  },
+  "GD": {
+    "axis": "h",
+    "band": 1
+  },
+  "GE": {
+    "axis": "h",
+    "band": 1
+  },
+  "GG": {
+    "axis": "h",
+    "band": 1
+  },
+  "GH": {
+    "axis": "h",
+    "band": 1
+  },
+  "GL": {
+    "axis": "h",
+    "band": 0
+  },
+  "GM": {
+    "axis": "h",
+    "band": 1
+  },
+  "GN": {
+    "axis": "v",
+    "band": 1
+  },
+  "GQ": {
+    "axis": "h",
+    "band": 0
+  },
+  "GR": {
+    "axis": "h",
+    "band": 1
+  },
+  "GS": {
+    "axis": "h",
+    "band": 0
+  },
+  "GT": {
+    "axis": "v",
+    "band": 1
+  },
+  "GU": {
+    "axis": "h",
+    "band": 1
+  },
+  "GW": {
+    "axis": "v",
+    "band": 0
+  },
+  "GY": {
+    "axis": "v",
+    "band": 0
+  },
+  "HN": {
+    "axis": "h",
+    "band": 1
+  },
+  "HR": {
+    "axis": "h",
+    "band": 2
+  },
+  "HT": {
+    "axis": "h",
+    "band": 2
+  },
+  "HU": {
+    "axis": "h",
+    "band": 1
+  },
+  "ID": {
+    "axis": "h",
+    "band": 0
+  },
+  "IE": {
+    "axis": "v",
+    "band": 1
+  },
+  "IL": {
+    "axis": "h",
+    "band": 1
+  },
+  "IM": {
+    "axis": "v",
+    "band": 1
+  },
+  "IN": {
+    "axis": "h",
+    "band": 1
+  },
+  "IO": {
+    "axis": "h",
+    "band": 0
+  },
+  "IQ": {
+    "axis": "h",
+    "band": 1
+  },
+  "IR": {
+    "axis": "h",
+    "band": 0
+  },
+  "IS": {
+    "axis": "h",
+    "band": 1
+  },
+  "IT": {
+    "axis": "v",
+    "band": 1
+  },
+  "JE": {
+    "axis": "v",
+    "band": 1
+  },
+  "JM": {
+    "axis": "h",
+    "band": 1
+  },
+  "JO": {
+    "axis": "h",
+    "band": 0
+  },
+  "JP": {
+    "axis": "v",
+    "band": 1
+  },
+  "KE": {
+    "axis": "h",
+    "band": 2
+  },
+  "KG": {
+    "axis": "v",
+    "band": 1
+  },
+  "KH": {
+    "axis": "h",
+    "band": 1
+  },
+  "KI": {
+    "axis": "h",
+    "band": 2
+  },
+  "KM": {
+    "axis": "h",
+    "band": 0
+  },
+  "KN": {
+    "axis": "h",
+    "band": 0
+  },
+  "KP": {
+    "axis": "h",
+    "band": 1
+  },
+  "KR": {
+    "axis": "v",
+    "band": 1
+  },
+  "KW": {
+    "axis": "h",
+    "band": 0
+  },
+  "KY": {
+    "axis": "h",
+    "band": 0
+  },
+  "KZ": {
+    "axis": "h",
+    "band": 1
+  },
+  "LA": {
+    "axis": "h",
+    "band": 1
+  },
+  "LB": {
+    "axis": "h",
+    "band": 1
+  },
+  "LC": {
+    "axis": "v",
+    "band": 1
+  },
+  "LI": {
+    "axis": "h",
+    "band": 0
+  },
+  "LK": {
+    "axis": "v",
+    "band": 0
+  },
+  "LR": {
+    "axis": "v",
+    "band": 0
+  },
+  "LS": {
+    "axis": "h",
+    "band": 0
+  },
+  "LT": {
+    "axis": "h",
+    "band": 1
+  },
+  "LU": {
+    "axis": "h",
+    "band": 1
+  },
+  "LV": {
+    "axis": "h",
+    "band": 1
+  },
+  "LY": {
+    "axis": "h",
+    "band": 0
+  },
+  "MA": {
+    "axis": "h",
+    "band": 1
+  },
+  "MC": {
+    "axis": "h",
+    "band": 0
+  },
+  "MD": {
+    "axis": "v",
+    "band": 0
+  },
+  "ME": {
+    "axis": "v",
+    "band": 1
+  },
+  "MF": {
+    "axis": "v",
+    "band": 1
+  },
+  "MG": {
+    "axis": "v",
+    "band": 0
+  },
+  "MH": {
+    "axis": "h",
+    "band": 1
+  },
+  "MK": {
+    "axis": "h",
+    "band": 1
+  },
+  "ML": {
+    "axis": "v",
+    "band": 1
+  },
+  "MM": {
+    "axis": "h",
+    "band": 0
+  },
+  "MN": {
+    "axis": "v",
+    "band": 1
+  },
+  "MO": {
+    "axis": "v",
+    "band": 1
+  },
+  "MP": {
+    "axis": "v",
+    "band": 1
+  },
+  "MR": {
+    "axis": "h",
+    "band": 1
+  },
+  "MS": {
+    "axis": "v",
+    "band": 2
+  },
+  "MT": {
+    "axis": "v",
+    "band": 0
+  },
+  "MU": {
+    "axis": "h",
+    "band": 0
+  },
+  "MV": {
+    "axis": "h",
+    "band": 1
+  },
+  "MW": {
+    "axis": "h",
+    "band": 2
+  },
+  "MX": {
+    "axis": "v",
+    "band": 1
+  },
+  "MY": {
+    "axis": "v",
+    "band": 0
+  },
+  "MZ": {
+    "axis": "h",
+    "band": 0
+  },
+  "NA": {
+    "axis": "h",
+    "band": 0
+  },
+  "NC": {
+    "axis": "h",
+    "band": 0
+  },
+  "NE": {
+    "axis": "h",
+    "band": 2
+  },
+  "NF": {
+    "axis": "v",
+    "band": 1
+  },
+  "NG": {
+    "axis": "v",
+    "band": 1
+  },
+  "NI": {
+    "axis": "h",
+    "band": 1
+  },
+  "NL": {
+    "axis": "h",
+    "band": 1
+  },
+  "NO": {
+    "axis": "h",
+    "band": 1
+  },
+  "NP": {
+    "axis": "v",
+    "band": 2
+  },
+  "NR": {
+    "axis": "h",
+    "band": 1
+  },
+  "NU": {
+    "axis": "h",
+    "band": 0
+  },
+  "NZ": {
+    "axis": "h",
+    "band": 0
+  },
+  "OM": {
+    "axis": "h",
+    "band": 0
+  },
+  "PA": {
+    "axis": "v",
+    "band": 0
+  },
+  "PE": {
+    "axis": "v",
+    "band": 1
+  },
+  "PF": {
+    "axis": "h",
+    "band": 1
+  },
+  "PG": {
+    "axis": "h",
+    "band": 0
+  },
+  "PH": {
+    "axis": "h",
+    "band": 0
+  },
+  "PK": {
+    "axis": "v",
+    "band": 0
+  },
+  "PL": {
+    "axis": "h",
+    "band": 0
+  },
+  "PN": {
+    "axis": "v",
+    "band": 2
+  },
+  "PR": {
+    "axis": "v",
+    "band": 0
+  },
+  "PS": {
+    "axis": "h",
+    "band": 0
+  },
+  "PT": {
+    "axis": "v",
+    "band": 0
+  },
+  "PW": {
+    "axis": "v",
+    "band": 1
+  },
+  "PY": {
+    "axis": "h",
+    "band": 1
+  },
+  "QA": {
+    "axis": "v",
+    "band": 0
+  },
+  "RO": {
+    "axis": "v",
+    "band": 1
+  },
+  "RS": {
+    "axis": "h",
+    "band": 0
+  },
+  "RU": {
+    "axis": "h",
+    "band": 1
+  },
+  "RW": {
+    "axis": "h",
+    "band": 2
+  },
+  "SA": {
+    "axis": "h",
+    "band": 1
+  },
+  "SB": {
+    "axis": "h",
+    "band": 0
+  },
+  "SC": {
+    "axis": "v",
+    "band": 0
+  },
+  "SD": {
+    "axis": "h",
+    "band": 0
+  },
+  "SE": {
+    "axis": "h",
+    "band": 1
+  },
+  "SG": {
+    "axis": "h",
+    "band": 0
+  },
+  "SI": {
+    "axis": "h",
+    "band": 2
+  },
+  "SK": {
+    "axis": "h",
+    "band": 0
+  },
+  "SL": {
+    "axis": "h",
+    "band": 1
+  },
+  "SM": {
+    "axis": "h",
+    "band": 0
+  },
+  "SN": {
+    "axis": "v",
+    "band": 2
+  },
+  "SO": {
+    "axis": "h",
+    "band": 1
+  },
+  "SR": {
+    "axis": "h",
+    "band": 1
+  },
+  "SS": {
+    "axis": "h",
+    "band": 0
+  },
+  "ST": {
+    "axis": "h",
+    "band": 1
+  },
+  "SV": {
+    "axis": "h",
+    "band": 1
+  },
+  "SY": {
+    "axis": "h",
+    "band": 1
+  },
+  "SZ": {
+    "axis": "h",
+    "band": 1
+  },
+  "TC": {
+    "axis": "h",
+    "band": 0
+  },
+  "TD": {
+    "axis": "v",
+    "band": 1
+  },
+  "TG": {
+    "axis": "v",
+    "band": 0
+  },
+  "TH": {
+    "axis": "h",
+    "band": 1
+  },
+  "TJ": {
+    "axis": "h",
+    "band": 0
+  },
+  "TL": {
+    "axis": "v",
+    "band": 0
+  },
+  "TM": {
+    "axis": "v",
+    "band": 0
+  },
+  "TN": {
+    "axis": "v",
+    "band": 1
+  },
+  "TO": {
+    "axis": "v",
+    "band": 0
+  },
+  "TR": {
+    "axis": "h",
+    "band": 1
+  },
+  "TT": {
+    "axis": "v",
+    "band": 1
+  },
+  "TV": {
+    "axis": "h",
+    "band": 0
+  },
+  "TW": {
+    "axis": "h",
+    "band": 0
+  },
+  "TZ": {
+    "axis": "h",
+    "band": 0
+  },
+  "UA": {
+    "axis": "h",
+    "band": 0
+  },
+  "UG": {
+    "axis": "h",
+    "band": 1
+  },
+  "US": {
+    "axis": "v",
+    "band": 0
+  },
+  "UY": {
+    "axis": "h",
+    "band": 1
+  },
+  "UZ": {
+    "axis": "h",
+    "band": 1
+  },
+  "VA": {
+    "axis": "v",
+    "band": 0
+  },
+  "VC": {
+    "axis": "v",
+    "band": 0
+  },
+  "VE": {
+    "axis": "h",
+    "band": 1
+  },
+  "VG": {
+    "axis": "v",
+    "band": 2
+  },
+  "VI": {
+    "axis": "h",
+    "band": 1
+  },
+  "VN": {
+    "axis": "v",
+    "band": 1
+  },
+  "VU": {
+    "axis": "h",
+    "band": 0
+  },
+  "WF": {
+    "axis": "v",
+    "band": 0
+  },
+  "WS": {
+    "axis": "h",
+    "band": 0
+  },
+  "XK": {
+    "axis": "v",
+    "band": 1
+  },
+  "YE": {
+    "axis": "h",
+    "band": 1
+  },
+  "ZA": {
+    "axis": "h",
+    "band": 0
+  },
+  "ZM": {
+    "axis": "v",
+    "band": 2
+  },
+  "ZW": {
+    "axis": "h",
+    "band": 1
+  }
+}

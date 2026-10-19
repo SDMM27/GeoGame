@@ -6,16 +6,19 @@ import { useTranslation } from 'react-i18next'
 import { usePlayerProfile } from '../../hooks/usePlayerProfile'
 import { TIER_COLORS } from '../../utils/achievements'
 import { badgeSummary, readBadges } from '../../utils/badges'
+import { decorationStyle } from '../../utils/decorations'
 import { GAME_TYPES } from '../../utils/gameTypes'
 import { describeBest, describeDetails, describeMode, describeResult, formatPlayedAt } from '../../utils/profileFormat'
 import { dailyTypesOn, dayKey, formatPlayTime } from '../../utils/profileStats'
 import BadgeStrip from './BadgeStrip'
+import EloSection from './EloSection'
 import './ProfileBody.css'
 
 export const GAME_META = {
   [GAME_TYPES.DAILY_CHALLENGE]: { emoji: '🎯', titleKey: 'games.daily_challenge.title', color: '#FF9F45' },
   [GAME_TYPES.PLACEMENT]: { emoji: '🌍', titleKey: 'games.placement.title', color: '#7AA2FF' },
   [GAME_TYPES.FLAGS]: { emoji: '🚩', titleKey: 'games.flags.title', color: '#FF7A6B' },
+  [GAME_TYPES.MISSING_FLAG]: { emoji: '🧩', titleKey: 'games.missing_flag.title', color: '#C792FF' },
   [GAME_TYPES.CAPITALS]: { emoji: '🏛️', titleKey: 'games.capitals.title', color: '#F5B83D' },
   [GAME_TYPES.BORDER_GUESS]: { emoji: '🧭', titleKey: 'games.border_guess.title', color: '#C792FF' },
   [GAME_TYPES.COUNTRY_CLUE]: { emoji: '🔎', titleKey: 'games.country_clue.title', color: '#3DDC97' },
@@ -27,13 +30,21 @@ export const GAME_META = {
 
 const AVATAR_COLORS = ['#3DDC97', '#7AA2FF', '#FF7A6B', '#F5B83D', '#C792FF', '#5FD4F4', '#FF9EC7', '#B4E05A']
 
-export function Avatar({ username, size = 44 }) {
+// `decoration` ({ frame, color } ids): draws the frame as a ring inside the avatar's box, so the size never changes.
+export function Avatar({ username, size = 44, decoration }) {
   let hash = 0
   for (const char of username) hash = (hash * 31 + char.charCodeAt(0)) | 0
+  const frame = decorationStyle(decoration).frame
+  const ring = frame && {
+    boxSizing: 'border-box',
+    border: `${frame.style === 'double' ? 5 : 3}px ${frame.style} ${frame.color}`,
+    padding: 2,
+    backgroundClip: 'content-box',
+  }
   return (
     <span
       className="profile-avatar"
-      style={{ width: size, height: size, fontSize: size * 0.45, background: AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length] }}
+      style={{ width: size, height: size, fontSize: size * 0.45, background: AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length], ...ring }}
     >
       {username.charAt(0).toUpperCase()}
     </span>
@@ -319,15 +330,16 @@ export default function ProfileBody({ uid, friendsCount, own = false }) {
 
   if (loading) return <p className="profile-muted profile-center">…</p>
   if (error) return <p className="profile-muted">{t('profile.load_error')}</p>
-  return <ProfileView games={games} stats={stats} achievements={achievements} />
+  return <ProfileView games={games} stats={stats} achievements={achievements} uid={uid} />
 }
 
-// The sections themselves, from already loaded data.
-export function ProfileView({ games, stats, achievements }) {
+// The sections themselves, from already loaded data (the Elo ratings load on their own, for `uid`).
+export function ProfileView({ games, stats, achievements, uid }) {
   return (
     <div className="profile-body">
       <StatTiles stats={stats} />
       <StreakCard stats={stats} />
+      {uid && <EloSection uid={uid} />}
       <Achievements achievements={achievements} />
       <History games={games} />
       <ByGame stats={stats} />

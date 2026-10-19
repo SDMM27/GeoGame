@@ -11,6 +11,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { SCORE_TABLE, getRankingAttemptScore } from '../src/utils/scoringRules.js'
+import { HARDCORE_MAX_POINTS } from '../src/utils/hardcoreScoring.js'
 import { ASCENSION_PRESETS, buildPhaseSequence } from '../src/utils/ascensionPresets.js'
 import { CONTINENTS } from '../src/utils/continents.js'
 import { CRITERIA_KEYS } from '../src/utils/rankingCriteria.js'
@@ -31,11 +32,16 @@ function constantFrom(path, pattern, label) {
 }
 
 // Each solo game: which country property holds its difficulty, and which countries it can ask for
-// (useGameState, useFlagGameState, useCapitalsGameState and useAscensionState filters).
+// (useGameState, useFlagGameState, useCapitalsGameState and useAscensionState filters), and the most a country gives
+// (SCORE_TABLE by difficulty; Hardcore, a tap inside the country, whatever its difficulty).
+const perfectFor = (property) => (c) => (SCORE_TABLE[c[property]] ? perfect(c[property]) : 0)
 const SOLO_GAMES = {
-  PLACEMENT: { property: 'Difficulty', playable: () => true },
-  FLAGS: { property: 'DifficultyFlag', playable: (c) => Boolean(c.ISO_A2) },
-  CAPITALS: { property: 'DifficultyCapitals', playable: (c) => Boolean(c.ISO_A2 && c.capital) },
+  PLACEMENT: { property: 'Difficulty', playable: () => true, best: perfectFor('Difficulty') },
+  HARDCORE: { property: 'Difficulty', playable: () => true, best: () => HARDCORE_MAX_POINTS },
+  FLAGS: { property: 'DifficultyFlag', playable: (c) => Boolean(c.ISO_A2), best: perfectFor('DifficultyFlag') },
+  // Missing Flag: the Flags game with one band hidden (same countries and score table, its own difficulty)
+  MISSING_FLAG: { property: 'DifficultyMissingFlag', playable: (c) => Boolean(c.ISO_A2), best: perfectFor('DifficultyMissingFlag') },
+  CAPITALS: { property: 'DifficultyCapitals', playable: (c) => Boolean(c.ISO_A2 && c.capital), best: perfectFor('DifficultyCapitals') },
 }
 
 const withMargin = (max) => max + Math.max(2, Math.ceil(max * MARGIN_RATIO))
@@ -46,7 +52,7 @@ function soloLimits() {
   const caps = {}
   const minTimes = {}
   const rows = []
-  for (const [game, { property, playable }] of Object.entries(SOLO_GAMES)) {
+  for (const [game, { property, playable, best }] of Object.entries(SOLO_GAMES)) {
     const modes = [
       ...[...DIFFICULTIES, 'Hardcore'].map((name) => ({
         name,
@@ -55,8 +61,8 @@ function soloLimits() {
       ...CONTINENTS.map(({ name }) => ({ name, pool: countries.filter((c) => playable(c) && c.continent === name) })),
     ]
     for (const { name, pool } of modes) {
-      // A country without a difficulty for this game is asked in continent mode but gives no point.
-      const max = pool.reduce((sum, c) => sum + (SCORE_TABLE[c[property]] ? perfect(c[property]) : 0), 0)
+      // A country without a difficulty for this game is asked in continent mode (it gives no point, but in Hardcore).
+      const max = pool.reduce((sum, c) => sum + best(c), 0)
       const key = `${game}_${name}`
       caps[key] = withMargin(max)
       minTimes[key] = pool.length * MIN_MS_PER_COUNTRY

@@ -7,6 +7,7 @@ import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleShe
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { usePlayerSearch, useRecentPlayers } from '@shared/hooks/useCommunity'
+import useFriendsPresence from '@shared/hooks/useFriendsPresence'
 import { useFriendships, useFriendsToday } from '@shared/hooks/usePlayerProfile'
 import { USERNAME_MAX } from '@shared/utils/account'
 import { acceptFriendRequest, friendErrorKey, removeFriendship, SEARCH_MIN, sendFriendRequest } from '@shared/utils/friends'
@@ -19,12 +20,37 @@ import { FriendCandidates } from '@/components/profile/FriendCandidates'
 import { Avatar, DailyChips, SectionTitle } from '@/components/profile/ProfileSections'
 import { ScreenHeader } from '@/components/ScreenHeader'
 import { Button, Text, Touchable } from '@/components/ui'
+import { getGameByType } from '@/games'
 import { SITE_ORIGIN } from '@/links'
 import { colors, fonts, radius, space } from '@/theme'
 
 type Friendship = { id: string; uid: string; username: string; status: 'friend' | 'incoming' | 'outgoing' }
 
 const openPlayer = (uid: string) => router.push({ pathname: '/player/[uid]', params: { uid } })
+const watchRoom = (code: string) => router.push({ pathname: '/multi/[code]', params: { code, watch: '1' } })
+
+type Presence = { status: 'playing' | 'online' | 'offline'; room: string | null; game: string | null }
+
+// Online (green dot) or in game, as seen by the friends list (see @shared/utils/presence).
+function FriendStatus({ presence }: { presence?: Presence }) {
+  const { t } = useTranslation()
+  if (presence?.status !== 'playing' && presence?.status !== 'online') return null
+  const game = presence.status === 'playing' && presence.game ? getGameByType(presence.game) : undefined
+  const label =
+    presence.status === 'online'
+      ? t('friends.online')
+      : game
+        ? t('friends.in_game', { game: t(game.titleKey) })
+        : t('friends.in_game_short')
+  return (
+    <View style={styles.presence}>
+      <View style={styles.dot} />
+      <Text variant="caption" numberOfLines={1} style={{ flex: 1 }}>
+        {label}
+      </Text>
+    </View>
+  )
+}
 
 export default function FriendsScreen() {
   const { t } = useTranslation()
@@ -32,6 +58,7 @@ export default function FriendsScreen() {
   const { account } = useAccount()
   const friendships = useFriendships(account?.uid)
   const today = useFriendsToday(friendships.friends) as Record<string, Record<string, { solved?: boolean }>>
+  const presence = useFriendsPresence(friendships.friends.map((friend: Friendship) => friend.uid)) as Record<string, Presence>
   const [username, setUsername] = useState('')
   const [sending, setSending] = useState(false)
   const [message, setMessage] = useState<{ kind: 'error' | 'notice'; text: string } | null>(null)
@@ -214,9 +241,19 @@ export default function FriendsScreen() {
                             <Text variant="bodyStrong" numberOfLines={1}>
                               {friend.username}
                             </Text>
+                            <FriendStatus presence={presence[friend.uid]} />
                             <DailyChips today={today[friend.uid] ?? {}} size={22} />
                           </View>
                         </Touchable>
+                        {presence[friend.uid]?.status === 'playing' && presence[friend.uid].room && (
+                          <Button
+                            label={t('friends.watch')}
+                            variant="secondary"
+                            onPress={() => watchRoom(presence[friend.uid].room as string)}
+                            icon={<MaterialCommunityIcons name="eye-outline" size={16} color={colors.text} />}
+                            style={styles.smallButton}
+                          />
+                        )}
                         <Touchable accessibilityRole="button" accessibilityLabel={t('friends.remove')} onPress={() => onRemove(friend)} style={styles.iconButton}>
                           <MaterialCommunityIcons name="account-remove-outline" size={20} color={colors.textMuted} />
                         </Touchable>
@@ -272,6 +309,8 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: space.sm, paddingHorizontal: space.md, paddingVertical: space.md },
   divider: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },
   who: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: space.md },
+  presence: { flexDirection: 'row', alignItems: 'center', gap: space.xs },
+  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.accent },
   smallButton: { minHeight: 38, paddingHorizontal: space.md },
   iconButton: { width: 38, height: 38, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surfaceHigh },
 })

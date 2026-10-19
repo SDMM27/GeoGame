@@ -6,11 +6,13 @@ import { ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
+import { useAccount } from '@/account/auth'
 import { LanguageButton } from '@/components/LanguageButton'
+import { MissionsCard } from '@/components/missions/MissionsCard'
 import { Text, Touchable } from '@/components/ui'
 import { GAMES, type GameDefinition } from '@/games'
 import { startMultiGame } from '@/multiplayer/navigation'
-import { colors, radius, space } from '@/theme'
+import { colors, gameColors, radius, space } from '@/theme'
 
 const DAILY_GAMES = GAMES.filter((game) => game.kind === 'daily')
 // Games with a setup sheet first: Placement, Flags, Capitals, Survival
@@ -92,6 +94,7 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets()
   const { width } = useWindowDimensions()
   const cardWidth = Math.min(300, width * 0.72)
+  const { account } = useAccount()
 
   return (
     <ScrollView
@@ -121,6 +124,31 @@ export default function HomeScreen() {
           <DailyCard key={game.id} game={game} width={cardWidth} />
         ))}
       </ScrollView>
+
+      <View style={{ paddingHorizontal: space.lg, marginTop: space.xxl }}>
+        <MissionsCard uid={account?.uid} />
+      </View>
+
+      {/* Ascension first: a short climb from easy countries, the mode the home page puts forward */}
+      <View style={{ paddingHorizontal: space.lg, marginTop: space.xxl }}>
+        <Touchable
+          accessibilityRole="button"
+          onPress={() => router.push({ pathname: '/play/[game]', params: { game: 'placement', mode: 'ascension' } })}
+          style={[styles.gameRow, styles.ascension]}>
+          <View style={[styles.gameIcon, { backgroundColor: `${gameColors.placement}2E` }]}>
+            <MaterialCommunityIcons name="stairs-up" size={28} color={gameColors.placement} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text variant="heading" style={{ fontSize: 18 }}>
+              {t('mobile.setup.ascension')}
+            </Text>
+            <Text variant="caption" numberOfLines={2}>
+              {t('mobile.home.ascension_subtitle')}
+            </Text>
+          </View>
+          <MaterialCommunityIcons name="chevron-right" size={24} color={gameColors.placement} />
+        </Touchable>
+      </View>
 
       <View style={[styles.sectionHeader, { marginTop: space.xxl }]}>
         <Text variant="heading">{t('mobile.home.games_title')}</Text>
@@ -191,4 +219,5 @@ const styles = StyleSheet.create({
     padding: space.lg,
   },
   gameIcon: { width: 56, height: 56, borderRadius: radius.lg, alignItems: 'center', justifyContent: 'center' },
+  ascension: { borderColor: `${gameColors.placement}66`, backgroundColor: `${gameColors.placement}14` },
 })

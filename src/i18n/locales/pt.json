@@ -149,6 +149,9 @@
   },
   "presets": {
     "progressive": "Progressivo",
+    "discovery": "Descoberta",
+    "challenge": "Desafio",
+    "hardcore": "Extremo",
     "custom": "Personalizado"
   },
   "labels": {

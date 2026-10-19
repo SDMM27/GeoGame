@@ -259,7 +259,7 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
 
     const result = scoreHardcoreTap(point, feature)
     setScore((current) => current + result.points)
-    reportEloAnswer(GAME_TYPES.HARDCORE, name, { found: result.inside, errors: 0 })
+    if (ratedRef.current) reportEloAnswer(GAME_TYPES.HARDCORE, name, { found: result.inside, errors: 0 })
     setStyleForCountry(name, {
       fillColor: result.inside ? MAP_COLORS.right : MAP_COLORS.wrong,
       weight: 2,

@@ -149,6 +149,9 @@
   },
   "presets": {
     "progressive": "Progressive",
+    "discovery": "Discovery",
+    "challenge": "Challenge",
+    "hardcore": "Hardcore",
     "custom": "Custom"
   },
   "labels": {

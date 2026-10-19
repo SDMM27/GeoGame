@@ -9,7 +9,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { getTotalCapitalCountries, getTotalCapitalCountriesByContinent } from '@shared/hooks/useCapitalsGameState'
 import { getTotalFlagCountries, getTotalFlagCountriesByContinent } from '@shared/hooks/useFlagGameState'
 import { getTotalCountries, getTotalCountriesByContinent } from '@shared/hooks/useGameState'
-import { ASCENSION_PRESETS, matchPreset } from '@shared/utils/ascensionPresets'
+import { ASCENSION_PRESETS, matchPreset, presetLabel } from '@shared/utils/ascensionPresets'
 import { CONTINENTS } from '@shared/utils/continents'
 
 import { SheetCloseButton } from '@/components/SheetCloseButton'
@@ -213,7 +213,7 @@ function GameSetupSheet() {
                       )
                     }
                     style={[styles.preset, active && { borderColor: colors.accent, backgroundColor: `${colors.accent}14` }]}>
-                    <Text variant="bodyStrong">{preset.name === 'Progressif' ? t('presets.progressive') : preset.name}</Text>
+                    <Text variant="bodyStrong">{presetLabel(preset.name, t)}</Text>
                     <Text variant="caption">{t('mobile.setup.countries', { count: total })}</Text>
                   </Touchable>
                 )
@@ -237,7 +237,7 @@ function GameSetupSheet() {
                 </View>
               ))}
               <Text variant="caption" style={{ textAlign: 'center', marginTop: space.xs }}>
-                {presetName ? (presetName === 'Progressif' ? t('presets.progressive') : presetName) : t('presets.custom')} ·{' '}
+                {presetName ? presetLabel(presetName, t) : t('presets.custom')} ·{' '}
                 {t('mobile.setup.total', { count: ascensionTotal })}
               </Text>
             </View>

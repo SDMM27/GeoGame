@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ASCENSION_PRESETS, matchPreset } from "../../utils/ascensionPresets";
+import { ASCENSION_PRESETS, matchPreset, presetLabel } from "../../utils/ascensionPresets";
 import {
   buildPresetPhases,
   getContinentsForGame,
@@ -146,7 +146,7 @@ export default function ActiveGameCard({ game, initialMode = "standard" }) {
                   className={`ascension-preset${detectedPresetName === preset.name ? " ascension-preset--active" : ""}`}
                   onClick={() => handlePresetClick(preset)}
                 >
-                  <span className="ascension-preset-name">{preset.icon} {preset.name === "Progressif" ? t('presets.progressive') : preset.name}</span>
+                  <span className="ascension-preset-name">{preset.icon} {presetLabel(preset.name, t)}</span>
                   <span className="ascension-preset-count">
                     {t('units.countries', { count: Object.values(preset.phases).reduce((sum, count) => sum + count, 0) })}
                   </span>
@@ -156,7 +156,7 @@ export default function ActiveGameCard({ game, initialMode = "standard" }) {
             <div className="ascension-status">
               <span className="ascension-status-label">{t('labels.configuration')}</span>
               <strong className="ascension-status-value">
-                {detectedPreset ? `${detectedPreset.icon} ${detectedPreset.name === "Progressif" ? t('presets.progressive') : detectedPreset.name}` : t('presets.custom')}
+                {detectedPreset ? `${detectedPreset.icon} ${presetLabel(detectedPreset.name, t)}` : t('presets.custom')}
               </strong>
               <span className="ascension-status-total">{totalAscensionCountries} {t('labels.total_countries')}</span>
             </div>

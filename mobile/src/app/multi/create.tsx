@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
+import { presetLabel } from '@shared/utils/ascensionPresets'
 import { containsProfanity } from '@shared/utils/profanity'
 import { matchSurvivalRamp, parseSurvivalModes } from '@shared/utils/survivalConfig'
 import { QUIZ_DIFFICULTIES } from '@shared/utils/quizQuestions'
@@ -66,7 +67,7 @@ export default function CreateRoomSheet() {
         .map((type: string) => t(`survival.round_type.${type}`))
         .join(', ')}`
     : setup.phases
-    ? `${t('mobile.setup.ascension')} · ${setup.presetName === 'Progressif' ? t('presets.progressive') : (setup.presetName ?? t('presets.custom'))}`
+    ? `${t('mobile.setup.ascension')} · ${setup.presetName ? presetLabel(setup.presetName, t) : t('presets.custom')}`
     : setup.continent
       ? t(`continents.${setup.continent}`)
       : setup.difficulty

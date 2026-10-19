@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { RefreshControl, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import { ASCENSION_PRESETS } from '@shared/utils/ascensionPresets'
+import { ASCENSION_PRESETS, presetLabel } from '@shared/utils/ascensionPresets'
 import { CONTINENTS } from '@shared/utils/continents'
 import { getLast7Days } from '@shared/utils/dateUtils'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
@@ -159,7 +159,7 @@ export default function LeaderboardsScreen() {
             label={t('mobile.leaderboards.preset')}
             options={[
               { value: ALL_PRESETS, label: t('options.all_presets') },
-              ...ASCENSION_PRESETS.map((item: { name: string; icon: string }) => ({ value: item.name, label: `${item.icon} ${item.name}` })),
+              ...ASCENSION_PRESETS.map((item: { name: string; icon: string }) => ({ value: item.name, label: `${item.icon} ${presetLabel(item.name, t)}` })),
             ]}
             value={preset}
             onChange={setPreset}

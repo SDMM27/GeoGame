@@ -5,11 +5,11 @@
 ## Étapes
 
 1. **Reset de « Voyage voyage » à minuit** (bug)
-   Le reset quotidien partait en UTC (1 h ou 2 h du matin à Paris). Il utilise maintenant `getDailyKey()`, comme les autres défis du jour : minuit à Paris, via l'heure serveur. Référence : `docs/superpowers/specs/2026-04-28-voyage-voyage-design.md`.
+   Le reset quotidien partait en UTC (1 h ou 2 h du matin à Paris). Il utilise maintenant `useDailyKey()`, comme les autres défis du jour : minuit à Paris, via l'heure serveur ; la partie du jour attend de connaître cette heure, pour qu'avancer la date de l'appareil ne donne pas le défi du lendemain. Référence : `docs/superpowers/specs/2026-04-28-voyage-voyage-design.md`.
 
 2. **Zoom sur « Voyage voyage »**
    Permettre de zoomer et de se déplacer sur la carte du mode, sur ordinateur et sur mobile. Indépendant des autres étapes.
-   Fait : zoom molette/contrôles tactiles et déplacement sur le site ; zoom pincé et déplacement sur l’application mobile.
+   Fait : zoom molette/contrôles tactiles et déplacement sur le site ; zoom pincé et déplacement sur l’application mobile, pendant toute la partie.
 
 3. **Décorations de profil**
    Cadres, couleurs ou badges visibles sur le profil et dans les classements. Déblocage via les étapes 5 et 6 ; ici on pose le modèle de données et l'affichage, avec quelques décorations de départ.
@@ -39,7 +39,7 @@
 
 7. **Mode hardcore : trouver le pays (sans frontières)**
    Nouveau mode où le pays doit être trouvé sans les frontières affichées. Dépend de l'étape 4 pour le classement, optionnel.
-   Fait : mode jouable sur le site et l'application mobile, sélection de pays comme dans Trouver, sans frontières visibles avant la réponse (y compris après « Recommencer ») et sans bouton Révéler ni Ascension. Une seule tentative par pays ; 1 000 points si la carte est touchée dans le pays, sinon un score réduit selon la distance (0 à 2 000 km). Elo et maîtrise du premier essai enregistrés sous `HARDCORE`, avec classements et historique dédiés.
+   Fait : mode jouable sur le site et l'application mobile, sélection de pays comme dans Trouver, sans frontières visibles avant la réponse (y compris après « Recommencer ») et sans bouton Révéler ni Ascension. Une seule tentative par pays ; 1 000 points si la carte est touchée dans le pays, sinon un score réduit selon la distance (0 à 2 000 km). Elo et maîtrise du premier essai enregistrés sous `HARDCORE` (sauf sur une liste de pays imposée, comme les autres modes), avec classements et historique dédiés.
 
 8. **Jeu de drapeau avec un élément manquant**
    Un drapeau dont une partie ou une couleur manque ; le joueur doit identifier le pays. Nouveau mode, avec sa propre difficulté, séparée de celle des autres modes.
@@ -54,7 +54,7 @@
     - Mettre en avant le mode **Ascension** sur l'accueil.
     - Pour les nouveaux joueurs, le préréglage par défaut est « Découverte » (10 faciles, 5 moyens, 1 difficile) : des pays faciles au début pour le plaisir de réussir, puis un peu de moyen pour s'entraîner.
     - Les pays difficiles restent accessibles mais ne sont plus le point de départ.
-   Fait : entrée Ascension mise en avant sur l'accueil du site, ouvrant directement sa configuration ; le préréglage initial est « Découverte » (10 faciles, 5 moyens, 1 difficile) sur le site et l'application. L'accueil de l'application n'a pas encore d'entrée Ascension mise en avant.
+   Fait : entrée Ascension mise en avant sur l'accueil du site, ouvrant directement sa configuration ; le préréglage initial est « Découverte » (10 faciles, 5 moyens, 1 difficile) sur le site et l'application, y compris en salle multijoueur ; les noms des préréglages sont traduits dans les 7 langues. L'accueil de l'application n'a pas encore d'entrée Ascension mise en avant.
 
 ## Décisions actées
 

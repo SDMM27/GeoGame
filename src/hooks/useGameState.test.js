@@ -234,4 +234,17 @@ describe('useGameState — Hardcore', () => {
     act(() => result.current.restartGame())
     expect(layer.options).toMatchObject({ fillColor: '#2A3E66', fillOpacity: 1, weight: 0 })
   })
+
+  it('reports a tap to Elo in a normal game', () => {
+    const { result } = renderHook(() => useGameState('Facile', false, null, null, null, null, 'HARDCORE'))
+    const name = result.current.targetCountry
+    act(() => result.current.onMapClick({ latlng: { lat: 0, lng: 0 } }))
+    expect(reportEloAnswer).toHaveBeenCalledWith('HARDCORE', name, expect.objectContaining({ errors: 0 }))
+  })
+
+  it('reports nothing with an imposed list of countries', () => {
+    const { result } = renderHook(() => useGameState('Facile', false, ['France', 'Espagne'], null, null, null, 'HARDCORE'))
+    act(() => result.current.onMapClick({ latlng: { lat: 0, lng: 0 } }))
+    expect(reportEloAnswer).not.toHaveBeenCalled()
+  })
 })

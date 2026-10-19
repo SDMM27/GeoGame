@@ -149,6 +149,9 @@
   },
   "presets": {
     "progressive": "Прогрессивный",
+    "discovery": "Знакомство",
+    "challenge": "Испытание",
+    "hardcore": "Хардкор",
     "custom": "Особый"
   },
   "labels": {

@@ -3,7 +3,7 @@
 // Deleted: users/{uid} with its games and pushTokens, usernames/{key}, the account's leaderboard entries and the
 // reports made by it or about those entries, friendships, invites sent and received, the push bookkeeping
 // (invitePushLimits, dailyReminderPushes, friendPushes, dailyNudges sent or received), the Elo ratings and the countries won
-// (elo, eloGains, eloDuelAccounts), then the Firebase Auth account. Rooms keep the pseudo until they expire (10 days at most, api/cleanup-expired.mjs).
+// (elo, eloGains, eloDuelAccounts), the online status (presence/{uid}), then the Firebase Auth account. Rooms keep the pseudo until they expire (10 days at most, api/cleanup-expired.mjs).
 
 // The account's owner must have signed in again just before (like Firebase's own deleteUser on the client).
 export const RECENT_SIGN_IN_MS = 5 * 60 * 1000
@@ -62,7 +62,7 @@ export async function deleteAccountData({ db, auth, uid }) {
     }
   }
   // Push bookkeeping (api/_lib/push.mjs, friendPush.mjs, dailyReminder.mjs, dailyNudge.mjs) and the Elo ratings and mastery, server only.
-  for (const path of [`invitePushLimits/${uid}`, `dailyReminderPushes/${uid}`, `elo/${uid}`, `mastery/${uid}`,
+  for (const path of [`invitePushLimits/${uid}`, `dailyReminderPushes/${uid}`, `elo/${uid}`, `mastery/${uid}`, `presence/${uid}`,
     ...friendships.docs.flatMap((friendship) => [`friendPushes/${friendship.id}_request`, `friendPushes/${friendship.id}_accepted`])]) {
     refs.set(path, db.doc(path))
   }

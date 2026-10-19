@@ -7,7 +7,7 @@ import { ScrollView, StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { getTotalCapitalCountries, getTotalCapitalCountriesByContinent } from '@shared/hooks/useCapitalsGameState'
-import { getTotalFlagCountries, getTotalFlagCountriesByContinent } from '@shared/hooks/useFlagGameState'
+import { getTotalFlagCountries, getTotalFlagCountriesByContinent, getTotalMissingFlagCountries, getTotalMissingFlagCountriesByContinent } from '@shared/hooks/useFlagGameState'
 import { getTotalCountries, getTotalCountriesByContinent } from '@shared/hooks/useGameState'
 import { ASCENSION_PRESETS, matchPreset, presetLabel } from '@shared/utils/ascensionPresets'
 import { CONTINENTS } from '@shared/utils/continents'
@@ -31,7 +31,8 @@ const CONTINENT_ICONS: Record<string, keyof typeof MaterialCommunityIcons.glyphM
 }
 
 function countFunctions(gameId: string) {
-  if (gameId === 'flags' || gameId === 'missing_flag') return { byDifficulty: getTotalFlagCountries, byContinent: getTotalFlagCountriesByContinent }
+  if (gameId === 'flags') return { byDifficulty: getTotalFlagCountries, byContinent: getTotalFlagCountriesByContinent }
+  if (gameId === 'missing_flag') return { byDifficulty: getTotalMissingFlagCountries, byContinent: getTotalMissingFlagCountriesByContinent }
   if (gameId === 'capitals') return { byDifficulty: getTotalCapitalCountries, byContinent: getTotalCapitalCountriesByContinent }
   return { byDifficulty: getTotalCountries, byContinent: getTotalCountriesByContinent }
 }
@@ -69,11 +70,12 @@ function GameSetupSheet() {
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   // `add`: the room the host adds this game to (see multi/add)
-  const { game: gameId, multi, add } = useLocalSearchParams<{ game: string; multi?: string; add?: string }>()
+  const { game: gameId, multi, add, mode: initialMode } = useLocalSearchParams<{ game: string; multi?: string; add?: string; mode?: string }>()
   const game = getGame(gameId)!
   const counts = countFunctions(gameId)
 
-  const [mode, setMode] = useState<Mode>('standard')
+  // `mode`: the home page's Ascension entry opens the sheet on Ascension
+  const [mode, setMode] = useState<Mode>(initialMode === 'ascension' && !game.noAscension ? 'ascension' : 'standard')
   const [selection, setSelection] = useState<Selection>('difficulty')
   const [difficulty, setDifficulty] = useState('Facile')
   const [continent, setContinent] = useState<string | null>(null)

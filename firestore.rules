@@ -293,6 +293,34 @@ service cloud.firestore {
       allow delete: if request.auth != null && request.auth.uid in resource.data.users;
     }
 
+    // Presence (src/utils/presence.js): presence/{uid} = { at, room, game, expiresAt }, when the player was last seen
+    // in the website or the app and the multiplayer room they are playing in, so their friends see them online or in
+    // a game and can watch it. Written by the player only (an account with a username), at the server time; read by
+    // the player and their accepted friends only, one document at a time (no list: a friend list is a set of gets).
+    // expiresAt lets the daily cleanup (api/_lib/cleanupExpired.mjs) drop the presence of players gone for a day.
+    match /presence/{uid} {
+      function validPresence(data) {
+        return data.keys().hasOnly(['at', 'room', 'game', 'expiresAt'])
+          && data.keys().hasAll(['at', 'room', 'game', 'expiresAt'])
+          && data.at == request.time
+          && (data.room == null || (data.room is string && data.room.matches('^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{6}$')))
+          && (data.game == null || (data.game is string && data.game.matches('^[A-Z_]{1,40}$')))
+          && expiresWithin(data.expiresAt, duration.value(1, 'h'), duration.value(2, 'd'));
+      }
+
+      function isFriend(uid) {
+        let friendship = /databases/$(database)/documents/friendships/$(friendshipOf(uid, request.auth.uid));
+        return exists(friendship) && get(friendship).data.status == 'accepted';
+      }
+
+      allow get: if request.auth != null && (request.auth.uid == uid || isFriend(uid));
+      allow list: if false;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && get(/databases/$(database)/documents/users/$(uid)).data.get('username', null) is string
+        && validPresence(request.resource.data);
+      allow delete: if request.auth != null && request.auth.uid == uid;
+    }
+
     // Room invites between friends (src/utils/invites.js): invites/{room}_{to}
     // { from, fromUsername, to, room, gameId, mode, createdAt, expiresAt? } (expiresAt: see api/cleanup-expired.mjs, missing from older apps)
     match /invites/{id} {
@@ -368,16 +396,16 @@ service cloud.firestore {
           'FLAGS_Afrique': 389,
           'FLAGS_Amériques': 383,
           'FLAGS_Océanie': 211,
-          'MISSING_FLAG_Facile': 109,
-          'MISSING_FLAG_Moyen': 347,
-          'MISSING_FLAG_Difficile': 663,
-          'MISSING_FLAG_Impossible': 466,
-          'MISSING_FLAG_Hardcore': 1583,
-          'MISSING_FLAG_Europe': 278,
-          'MISSING_FLAG_Asie': 325,
-          'MISSING_FLAG_Afrique': 389,
-          'MISSING_FLAG_Amériques': 383,
-          'MISSING_FLAG_Océanie': 211,
+          'MISSING_FLAG_Facile': 70,
+          'MISSING_FLAG_Moyen': 275,
+          'MISSING_FLAG_Difficile': 616,
+          'MISSING_FLAG_Impossible': 773,
+          'MISSING_FLAG_Hardcore': 1733,
+          'MISSING_FLAG_Europe': 319,
+          'MISSING_FLAG_Asie': 358,
+          'MISSING_FLAG_Afrique': 437,
+          'MISSING_FLAG_Amériques': 407,
+          'MISSING_FLAG_Océanie': 213,
           'CAPITALS_Facile': 103,
           'CAPITALS_Moyen': 297,
           'CAPITALS_Difficile': 740,
@@ -425,10 +453,10 @@ service cloud.firestore {
           'FLAGS_Afrique': 5600,
           'FLAGS_Amériques': 5200,
           'FLAGS_Océanie': 2400,
-          'MISSING_FLAG_Facile': 3300,
-          'MISSING_FLAG_Moyen': 6300,
-          'MISSING_FLAG_Difficile': 8600,
-          'MISSING_FLAG_Impossible': 4700,
+          'MISSING_FLAG_Facile': 2100,
+          'MISSING_FLAG_Moyen': 5000,
+          'MISSING_FLAG_Difficile': 8000,
+          'MISSING_FLAG_Impossible': 7800,
           'MISSING_FLAG_Hardcore': 22900,
           'MISSING_FLAG_Europe': 5100,
           'MISSING_FLAG_Asie': 5200,

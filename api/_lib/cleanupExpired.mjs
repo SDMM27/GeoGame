@@ -6,6 +6,7 @@
 //   _clockSync    server time probes (src/utils/serverTime.js) over CLOCK_MAX_AGE_MS old
 //   invitePushes, invitePushLimits, friendPushes, dailyNudges   server-only push bookkeeping (api/_lib/invitePush.mjs,
 //                 friendPush.mjs, dailyNudge.mjs), in milliseconds
+//   presence      friends' online status (src/utils/presence.js), expiresAt passed (written every 2 minutes, valid 1 day)
 //   eloGains      a country answered in a season (api/_lib/elo.mjs): kept past the season's end (ELO_GAIN_MAX_AGE_MS)
 //   eloDuels, eloDuelPairs, eloDuelAccounts   duels already rated, kept past the rooms' lifetime (10 days), and the
 //                 daily caps per pair and per account
@@ -68,6 +69,7 @@ export async function cleanupExpired({ db, now = Date.now() }) {
       db.collection('invitePushLimits').where('start', '<', now - PUSH_BOOKKEEPING_MAX_AGE_MS),
       deleteDoc
     ),
+    presence: await drain(db.collection('presence').where('expiresAt', '<', at(now)), deleteDoc),
     eloGains: await drain(db.collection('eloGains').where('at', '<', now - ELO_GAIN_MAX_AGE_MS), deleteDoc),
     eloDuels: await drain(db.collection('eloDuels').where('at', '<', now - ELO_DUEL_MAX_AGE_MS), deleteDoc),
     eloDuelPairs: await drain(db.collection('eloDuelPairs').where('at', '<', now - ELO_PAIR_MAX_AGE_MS), deleteDoc),

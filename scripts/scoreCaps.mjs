@@ -39,8 +39,8 @@ const SOLO_GAMES = {
   PLACEMENT: { property: 'Difficulty', playable: () => true, best: perfectFor('Difficulty') },
   HARDCORE: { property: 'Difficulty', playable: () => true, best: () => HARDCORE_MAX_POINTS },
   FLAGS: { property: 'DifficultyFlag', playable: (c) => Boolean(c.ISO_A2), best: perfectFor('DifficultyFlag') },
-  // Missing Flag: the Flags game with one band hidden (same countries, difficulty and score table)
-  MISSING_FLAG: { property: 'DifficultyFlag', playable: (c) => Boolean(c.ISO_A2), best: perfectFor('DifficultyFlag') },
+  // Missing Flag: the Flags game with one band hidden (same countries and score table, its own difficulty)
+  MISSING_FLAG: { property: 'DifficultyMissingFlag', playable: (c) => Boolean(c.ISO_A2), best: perfectFor('DifficultyMissingFlag') },
   CAPITALS: { property: 'DifficultyCapitals', playable: (c) => Boolean(c.ISO_A2 && c.capital), best: perfectFor('DifficultyCapitals') },
 }
 

@@ -715,6 +715,10 @@
     }
   },
   "friends": {
+    "online": "Online",
+    "in_game": "In partita · {{game}}",
+    "in_game_short": "In partita",
+    "watch": "Guarda",
     "title": "Amici",
     "count_one": "{{count}} amico",
     "count_other": "{{count}} amici",

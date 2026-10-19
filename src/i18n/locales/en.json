@@ -715,6 +715,10 @@
     }
   },
   "friends": {
+    "online": "Online",
+    "in_game": "Playing · {{game}}",
+    "in_game_short": "Playing",
+    "watch": "Watch",
     "title": "Friends",
     "count_one": "{{count}} friend",
     "count_other": "{{count}} friends",

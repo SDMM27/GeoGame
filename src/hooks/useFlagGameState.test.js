@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { act, renderHook } from '@testing-library/react'
-import useFlagGameState from './useFlagGameState'
+import useFlagGameState, { getTotalFlagCountries, getTotalMissingFlagCountries } from './useFlagGameState'
+import { GAME_TYPES } from '../utils/gameTypes'
 import { reportEloAnswer, flushElo } from '../utils/eloReport'
 import { FIXTURE_COUNTRIES, byName } from './testUtils/countriesFixture'
 
@@ -90,5 +91,30 @@ describe('useFlagGameState — Elo', () => {
     const { result } = renderHook(() => useFlagGameState('Facile', false, [byName('France'), byName('Espagne')], null, 'room-key'))
     typed(result, 'France')
     expect(reportEloAnswer).not.toHaveBeenCalled()
+  })
+})
+
+describe('useFlagGameState — Drapeau incomplet', () => {
+  const difficultyOf = (country, property) => country.properties[property]
+
+  it('picks countries by DifficultyMissingFlag, not DifficultyFlag', () => {
+    for (let i = 0; i < 10; i++) {
+      const { result } = renderHook(() => useFlagGameState('Facile', false, null, null, null, null, GAME_TYPES.MISSING_FLAG))
+      expect(difficultyOf(result.current.targetCountry, 'DifficultyMissingFlag')).toBe('Facile')
+    }
+  })
+
+  it('counts the countries of the mode by DifficultyMissingFlag', () => {
+    const count = (property, level) => FIXTURE_COUNTRIES.filter((c) => c.properties[property] === level && c.properties.ISO_A2).length
+    expect(getTotalMissingFlagCountries('Facile')).toBe(count('DifficultyMissingFlag', 'Facile'))
+    expect(getTotalMissingFlagCountries('Facile')).not.toBe(getTotalFlagCountries('Facile'))
+    expect(getTotalFlagCountries('Facile')).toBe(count('DifficultyFlag', 'Facile'))
+  })
+
+  it('reports the answers under the MISSING_FLAG mode', () => {
+    const { result } = renderHook(() => useFlagGameState('Facile', false, null, null, null, null, GAME_TYPES.MISSING_FLAG))
+    const name = result.current.targetCountry.properties.ADMIN
+    typed(result, name)
+    expect(reportEloAnswer).toHaveBeenCalledWith('MISSING_FLAG', name, { found: true, errors: 0 })
   })
 })

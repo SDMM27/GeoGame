@@ -735,6 +735,10 @@
     }
   },
   "friends": {
+    "online": "В сети",
+    "in_game": "Играет · {{game}}",
+    "in_game_short": "Играет",
+    "watch": "Смотреть",
     "title": "Друзья",
     "count_one": "{{count}} друг",
     "count_few": "{{count}} друга",

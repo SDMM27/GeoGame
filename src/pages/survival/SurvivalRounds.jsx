@@ -20,7 +20,7 @@ import { HOVER_STYLE, MAP_COLORS } from '../../utils/mapColors'
 import '../BorderGuessPage.css'
 import '../QuizPage.css'
 
-const countryLabel = (country, lang) => getCountryName(country.properties.ISO_A2, lang) || country.properties.ADMIN
+export const countryLabel = (country, lang) => getCountryName(country.properties.ISO_A2, lang) || country.properties.ADMIN
 
 /** What the right answer of a round reads like, in the player's language. */
 export function roundAnswer(round, lang, t) {
@@ -238,33 +238,40 @@ function useCountrySuggestions(pool) {
   }, [pool, i18n.language])
 }
 
+/** The silhouette of a Border Guess round, not interactive (also what a spectator sees). */
+export function BorderSilhouette({ country }) {
+  const focus = useMemo(() => getFocusCountry(country), [country])
+  return (
+    <div className="survival-silhouette">
+      <MapContainer
+        key={country.properties.ADMIN}
+        className="border-guess-map"
+        center={[20, 0]}
+        zoom={2}
+        zoomControl={false}
+        attributionControl={false}
+        dragging={false}
+        doubleClickZoom={false}
+        scrollWheelZoom={false}
+        boxZoom={false}
+        keyboard={false}
+        touchZoom={false}
+      >
+        <GeoJSON data={focus} style={() => getCountryStyle(country)} />
+        <FitCountryBounds country={country} />
+      </MapContainer>
+    </div>
+  )
+}
+
 export function BorderRound({ survival, onSubmit }) {
   const { t, i18n } = useTranslation()
   const { round, guesses } = survival
   const suggestions = useCountrySuggestions(BORDER_GUESS_COUNTRIES)
-  const focus = useMemo(() => getFocusCountry(round.country), [round.country])
 
   return (
     <div className="survival-guess">
-      <div className="survival-silhouette">
-        <MapContainer
-          key={round.country.properties.ADMIN}
-          className="border-guess-map"
-          center={[20, 0]}
-          zoom={2}
-          zoomControl={false}
-          attributionControl={false}
-          dragging={false}
-          doubleClickZoom={false}
-          scrollWheelZoom={false}
-          boxZoom={false}
-          keyboard={false}
-          touchZoom={false}
-        >
-          <GeoJSON data={focus} style={() => getCountryStyle(round.country)} />
-          <FitCountryBounds country={round.country} />
-        </MapContainer>
-      </div>
+      <BorderSilhouette country={round.country} />
       <AnswerInput survival={survival} placeholder={t('placeholders.country_examples')} onSubmit={onSubmit} suggestions={suggestions} />
       <GuessHistory guesses={guesses} t={t} i18n={i18n} />
     </div>

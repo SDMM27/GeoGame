@@ -1,6 +1,6 @@
 import { GAME_TYPES } from "../../utils/gameTypes";
 import { getTotalCountries, getTotalCountriesByContinent } from "../../hooks/useGameState";
-import { getTotalFlagCountries, getTotalFlagCountriesByContinent } from "../../hooks/useFlagGameState";
+import { getTotalFlagCountries, getTotalFlagCountriesByContinent, getTotalMissingFlagCountries, getTotalMissingFlagCountriesByContinent } from "../../hooks/useFlagGameState";
 import { getTotalCapitalCountries, getTotalCapitalCountriesByContinent } from "../../hooks/useCapitalsGameState";
 import { CONTINENTS } from "../../utils/continents";
 import { ASCENSION_PRESETS } from "../../utils/ascensionPresets";
@@ -15,9 +15,11 @@ const DIFFICULTY_COLORS = {
 
 export function getDifficultiesForGame(gameId) {
   const countFn =
-    gameId === GAME_TYPES.FLAGS || gameId === GAME_TYPES.MISSING_FLAG
+    gameId === GAME_TYPES.FLAGS
       ? getTotalFlagCountries
-      : gameId === GAME_TYPES.CAPITALS
+      : gameId === GAME_TYPES.MISSING_FLAG
+        ? getTotalMissingFlagCountries
+        : gameId === GAME_TYPES.CAPITALS
         ? getTotalCapitalCountries
         : getTotalCountries;
 
@@ -41,9 +43,11 @@ export function getDifficultyCaps(gameId) {
 
 export function getContinentsForGame(gameId) {
   const countFn =
-    gameId === GAME_TYPES.FLAGS || gameId === GAME_TYPES.MISSING_FLAG
+    gameId === GAME_TYPES.FLAGS
       ? getTotalFlagCountriesByContinent
-      : gameId === GAME_TYPES.CAPITALS
+      : gameId === GAME_TYPES.MISSING_FLAG
+        ? getTotalMissingFlagCountriesByContinent
+        : gameId === GAME_TYPES.CAPITALS
         ? getTotalCapitalCountriesByContinent
         : getTotalCountriesByContinent;
 

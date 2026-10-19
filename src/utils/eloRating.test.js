@@ -3,6 +3,7 @@ import {
   ELO_START,
   duelResult,
   errorFactor,
+  difficultyField,
   expectedScore,
   ratingOf,
   ratingsForSeason,
@@ -85,5 +86,12 @@ describe('seasons', () => {
     expect(ratingOf(same, 'FLAGS')).toBe(1300)
     expect(ratingOf(same, 'CAPITALS')).toBe(1400)
     expect(ratingOf(ratingsForSeason(null, '2026-Q4'), 'duel')).toBe(ELO_START)
+  })
+})
+
+describe('difficultyField', () => {
+  it('uses its own difficulty for Missing Flag', () => {
+    expect(difficultyField('MISSING_FLAG')).toBe('DifficultyMissingFlag')
+    expect(difficultyField('FLAGS')).toBe('DifficultyFlag')
   })
 })

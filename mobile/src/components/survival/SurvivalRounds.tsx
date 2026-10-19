@@ -46,7 +46,7 @@ export type Survival = {
   giveUp: () => void
 }
 
-const countryLabel = (country: Feature, lang: string) => getCountryName(country.properties.ISO_A2, lang) || country.properties.ADMIN
+export const countryLabel = (country: Feature, lang: string) => getCountryName(country.properties.ISO_A2, lang) || country.properties.ADMIN
 
 /** What the right answer of a round reads like, in the player's language. */
 export function roundAnswer(round: SurvivalRound | null, lang: string, t: TFunction) {
@@ -240,16 +240,22 @@ export function GuessRoundInput({ survival, pool, onSubmit }: { survival: Surviv
 
 export const BORDER_POOL = BORDER_GUESS_COUNTRIES as Feature[]
 
+/** The silhouette of a Border Guess round, read-only (also what a spectator sees). */
+export function BorderSilhouette({ country, height }: { country: Feature; height: number }) {
+  return (
+    <View style={[styles.silhouette, { height }]}>
+      <Animated.View key={country.properties.ADMIN} entering={ZoomIn.springify().dampingRatio(0.7)} style={{ flex: 1 }}>
+        <CountrySilhouette country={country as never} color={gameColors.border_guess} style={{ flex: 1 }} />
+      </Animated.View>
+    </View>
+  )
+}
+
 export function BorderRound({ survival, height }: { survival: Survival; height: number }) {
   const guesses = survival.guesses as BorderGuess[]
-  const country = survival.round!.country!
   return (
     <View style={{ gap: space.lg }}>
-      <View style={[styles.silhouette, { height }]}>
-        <Animated.View key={country.properties.ADMIN} entering={ZoomIn.springify().dampingRatio(0.7)} style={{ flex: 1 }}>
-          <CountrySilhouette country={country as never} color={gameColors.border_guess} style={{ flex: 1 }} />
-        </Animated.View>
-      </View>
+      <BorderSilhouette country={survival.round!.country!} height={height} />
       <View style={{ gap: space.sm }}>
         {guesses
           .map((guess, index) => ({ guess, index }))

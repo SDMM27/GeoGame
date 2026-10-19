@@ -12,7 +12,7 @@ import { useRecordGame } from '../auth'
 import { matchKnownAnswer } from '../utils/answerLexicon'
 import { restartTyping } from '../utils/restartTyping'
 import { getCountryName, getAllCountryNames } from '../utils/getCountryName'
-import { getMissingFlagBand } from '../utils/missingFlag'
+import { getMissingFlagMask } from '../utils/missingFlag'
 import PhaseIndicator from '../components/PhaseIndicator'
 import Form from './form'
 import AscensionForm from './AscensionForm'
@@ -128,7 +128,7 @@ function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state
           ? missingFlag
             ? <div className={`flag-display-wrap${!revealedName ? ' flag-display-wrap--missing' : ''}`}>
                 <img src={`/flags/${isoA2}.png`} alt={revealedName ? (getCountryName(targetCountryISO, i18n.language) || targetCountry?.properties?.ADMIN) : '?'} className="flag-display" />
-                {!revealedName && <span className="missing-flag-band" style={{ '--missing-band': getMissingFlagBand(targetCountryISO) }} aria-label={t('games.missing_flag.missing_part')} />}
+                {!revealedName && <span className={`missing-flag-band missing-flag-band--${getMissingFlagMask(targetCountryISO).axis}`} style={{ '--missing-band': getMissingFlagMask(targetCountryISO).band }} aria-label={t('games.missing_flag.missing_part')} />}
               </div>
             : <img src={`/flags/${isoA2}.png`} alt={revealedName ? (getCountryName(targetCountryISO, i18n.language) || targetCountry?.properties?.ADMIN) : '?'} className="flag-display" />
           : <div className="flag-placeholder" />

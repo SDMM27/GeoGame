@@ -17,8 +17,8 @@ import { SURVIVAL_ROUND_ICONS } from '../../components/SurvivalOptions'
 import { DIFFICULTY_COLORS } from '../quiz/constants'
 import SurvivalForm from './SurvivalForm'
 import { BorderRound, PlacementRound, QuizRound, TypedRound, roundAnswer } from './SurvivalRounds'
+import Spectator from './Spectator'
 import { othersStillIn, spectatorRows } from '../../utils/survivalSync'
-import { localizeQuestion } from '../../utils/quizQuestions'
 import 'react-toastify/dist/ReactToastify.css'
 import './Survival.css'
 
@@ -35,47 +35,6 @@ function Hearts({ lives, maxLives }) {
         </span>
       ))}
     </span>
-  )
-}
-
-// Out of lives in a live room: the round the others are playing, who is still in, and the answer once they all answered
-function Spectator({ round, roundIndex, rows, waiting, maxLives, onExit }) {
-  const { t, i18n } = useTranslation()
-  const revealed = waiting.total > 0 && waiting.done === waiting.total
-  const iso = round?.country?.properties?.ISO_A2
-  const showsFlag = iso && (round.type === GAME_TYPES.FLAGS || round.type === GAME_TYPES.CAPITALS)
-  return (
-    <div className="survival-spectator">
-      <p className="survival-spectator-title">👀 {t('survival.spectating')}</p>
-      {round && (
-        <div className="survival-spectator-round">
-          <span className="survival-hud-label">
-            {t('survival.round', { n: roundIndex + 1 })} · {SURVIVAL_ROUND_ICONS[round.type]} {t(`survival.prompt.${round.type}`)}
-          </span>
-          {showsFlag && <img src={`/flags/${iso.toLowerCase()}.png`} alt="" className="survival-flag survival-flag--small" />}
-          {round.type === GAME_TYPES.QUIZ && <strong>{localizeQuestion(round.question, i18n.language, t).prompt}</strong>}
-          <span className={revealed ? 'survival-spectator-answer' : 'survival-muted'}>
-            {revealed ? t('survival.answer_was', { answer: roundAnswer(round, i18n.language, t) }) : t('survival.waiting_players', waiting)}
-          </span>
-        </div>
-      )}
-      <ul className="survival-spectator-list">
-        {rows.map((row) => (
-          <li key={row.id} className={row.out ? 'survival-spectator-row survival-spectator-row--out' : 'survival-spectator-row'}>
-            <span className="survival-spectator-name">{row.pseudo}</span>
-            {row.out ? (
-              <span>💀 {t('survival.out_round', { n: row.outRound + 1 })}</span>
-            ) : (
-              <>
-                <span>{maxLives > 5 ? `❤️ × ${row.lives}` : '❤️'.repeat(row.lives)}</span>
-                <span className="survival-spectator-status">{row.answered ? '✓' : '…'}</span>
-              </>
-            )}
-          </li>
-        ))}
-      </ul>
-      <button className="survival-btn" onClick={onExit}>{t('survival.back_to_room')}</button>
-    </div>
   )
 }
 

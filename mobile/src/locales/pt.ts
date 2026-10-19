@@ -12,6 +12,7 @@ export const pt: MobileStrings = {
     daily: 'Desafio do dia',
     infinite: 'Infinito',
     done: 'Feito',
+    ascension_subtitle: 'Suba dos países fáceis aos mais difíceis numa só partida',
   },
   setup: {
     mode: 'Modo',

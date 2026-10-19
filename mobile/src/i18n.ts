@@ -23,6 +23,7 @@ const fr = {
     daily: 'Défi du jour',
     infinite: 'Infini',
     done: 'Fait',
+    ascension_subtitle: 'Grimpe des pays faciles aux plus difficiles, en une seule partie',
   },
   setup: {
     mode: 'Mode',
@@ -251,6 +252,7 @@ const en: MobileStrings = {
     daily: 'Daily',
     infinite: 'Infinite',
     done: 'Done',
+    ascension_subtitle: 'Climb from easy countries to the hardest ones, in a single game',
   },
   setup: {
     mode: 'Mode',
@@ -477,6 +479,7 @@ const ru: MobileStrings = {
     daily: 'Задание дня',
     infinite: 'Бесконечно',
     done: 'Готово',
+    ascension_subtitle: 'Поднимайся от лёгких стран к самым сложным за одну игру',
   },
   setup: {
     mode: 'Режим',

@@ -37,10 +37,12 @@ import { ResultsSheet } from '@/components/game/ResultsSheet'
 import {
   BORDER_POOL,
   BorderRound,
+  BorderSilhouette,
   GuessRoundInput,
   PlacementRound,
   QuizRound,
   TypedRound,
+  countryLabel,
   roundAnswer,
   type Survival,
 } from '@/components/survival/SurvivalRounds'
@@ -82,8 +84,10 @@ function Spectator({ round, roundIndex, rows, waiting, maxLives }: {
   const { t, i18n } = useTranslation()
   const revealed = waiting.total > 0 && waiting.done === waiting.total
   const iso: string | undefined = round?.country?.properties?.ISO_A2
-  const flag = iso && (round.type === GAME_TYPES.FLAGS || round.type === GAME_TYPES.CAPITALS) ? getFlag(iso) : null
+  const flag = iso ? getFlag(iso) : null
   const roundGame = round ? getGameByType(round.type) : null
+  const localized = round?.type === GAME_TYPES.QUIZ ? localizeQuestion(round.question, i18n.language, t) : null
+  const countryName = round?.country ? countryLabel(round.country, i18n.language) : ''
   return (
     <View style={styles.spectator}>
       <Text variant="label">👀 {t('survival.spectating')}</Text>
@@ -91,10 +95,42 @@ function Spectator({ round, roundIndex, rows, waiting, maxLives }: {
         <View style={{ alignItems: 'center', gap: space.sm }}>
           <Text variant="bodyStrong" color={roundGame?.color}>
             {t('survival.round', { n: roundIndex + 1 })} · {t(`survival.prompt.${round.type}`)}
+            {round.difficulty ? ` · ${t(`difficulties.${round.difficulty}`)}` : ''}
           </Text>
-          {flag && <Image source={flag} contentFit="contain" style={{ width: 96, height: 64 }} />}
-          {round.type === GAME_TYPES.QUIZ && (
-            <Text variant="body" style={{ textAlign: 'center' }}>{localizeQuestion(round.question, i18n.language, t).prompt}</Text>
+          {round.type === GAME_TYPES.PLACEMENT && (
+            <Text variant="title" numberOfLines={2} style={{ textAlign: 'center' }}>{countryName}</Text>
+          )}
+          {round.type === GAME_TYPES.FLAGS && flag && <Image source={flag} contentFit="contain" style={{ width: 144, height: 96 }} />}
+          {round.type === GAME_TYPES.CAPITALS && (
+            <View style={styles.spectatorCountry}>
+              {flag && <Image source={flag} contentFit="contain" style={{ width: 64, height: 44 }} />}
+              <Text variant="title" numberOfLines={2} style={{ flexShrink: 1, textAlign: 'center' }}>{countryName}</Text>
+            </View>
+          )}
+          {round.type === GAME_TYPES.BORDER_GUESS && (
+            <View style={{ alignSelf: 'stretch' }}>
+              <BorderSilhouette country={round.country} height={180} />
+            </View>
+          )}
+          {localized && (
+            <View style={{ alignSelf: 'stretch', gap: space.sm }}>
+              <Text variant="bodyStrong">{localized.prompt}</Text>
+              {localized.choices.map((choice: { id: string; label: string }, index: number) => {
+                const correct = revealed && choice.id === round.question.correctId
+                return (
+                  <View
+                    key={choice.id}
+                    style={[
+                      styles.spectatorChoice,
+                      correct && { borderColor: colors.accent, backgroundColor: `${colors.accent}1F` },
+                      revealed && !correct && { opacity: 0.45 },
+                    ]}>
+                    <Text variant="caption">{index + 1}</Text>
+                    <Text variant="body" style={{ flex: 1 }}>{choice.label}</Text>
+                  </View>
+                )
+              })}
+            </View>
           )}
           <Text variant={revealed ? 'bodyStrong' : 'caption'} color={revealed ? colors.accent : undefined} style={{ textAlign: 'center' }}>
             {revealed ? t('survival.answer_was', { answer: roundAnswer(round, i18n.language, t) }) : t('survival.waiting_players', waiting)}
@@ -415,6 +451,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.surface,
+  },
+  spectatorCountry: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.md },
+  spectatorChoice: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.sm,
+    padding: space.sm,
+    borderRadius: radius.md,
+    borderWidth: 1.5,
+    borderColor: colors.border,
   },
   spectatorRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm, minHeight: 32 },
   content: { paddingHorizontal: space.xl, paddingBottom: space.xl, gap: space.lg },

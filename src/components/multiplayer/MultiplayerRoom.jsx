@@ -15,6 +15,7 @@ import {
 } from '../../utils/multiplayerRoom'
 import useDuelElo from '../../hooks/useDuelElo'
 import useLobbyHost from '../../hooks/useLobbyHost'
+import { clearPresenceRoom, setPresenceRoom } from '../../utils/presence'
 import { rememberPlayers } from '../../utils/recentPlayers'
 import { rememberRoom } from '../../utils/recentRooms'
 import { gameColor } from '../../utils/roomGames'
@@ -42,10 +43,10 @@ const PLAYABLE_TYPES = [
   GAME_TYPES.SURVIVAL,
 ]
 
-export default function MultiplayerRoom({ room, progress, gameResults, playerId }) {
+export default function MultiplayerRoom({ room, progress, gameResults, playerId, watch = false }) {
   const { t } = useTranslation()
   const [playingIndex, setPlayingIndex] = useState(null)
-  const [watching, setWatching] = useState(false)
+  const [watching, setWatching] = useState(watch)
   // Games finished here whose result may not be back from Firestore yet
   const [doneHere, setDoneHere] = useState([])
   const [launching, setLaunching] = useState(false)
@@ -77,6 +78,15 @@ export default function MultiplayerRoom({ room, progress, gameResults, playerId 
   useEffect(() => {
     if (joined) rememberPlayers(room.players, room.players[playerId]?.uid)
   }, [joined, accountsKey]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Friends see this player "in game" while they play in a started room (src/utils/presence.js)
+  const gameType = games[current]?.type ?? null
+  const playing = joined && room.status === 'playing'
+  useEffect(() => {
+    if (!playing) return undefined
+    setPresenceRoom(room.id, gameType)
+    return () => clearPresenceRoom(room.id)
+  }, [playing, room.id, gameType])
 
   const onDone = useCallback((index) => {
     setDoneHere((previous) => [...previous, index])

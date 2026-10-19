@@ -44,6 +44,10 @@
 .friends-btn--icon { width: 30px; height: 30px; padding: 0; color: var(--text-muted); }
 .friends-btn--danger { color: var(--danger); }
 
+.friends-presence { display: inline-flex; align-items: center; gap: 0.35rem; color: var(--text-muted); font-size: 0.8rem; font-weight: 600; white-space: nowrap; }
+.friends-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 6px rgba(74, 222, 128, 0.6); }
+.friends-presence--playing { color: var(--text-primary); }
+
 .friends-rank { width: 1.6rem; text-align: center; color: var(--text-muted); font-weight: 800; }
 .friends-detail { color: var(--text-muted); font-size: 0.85rem; font-weight: 600; white-space: nowrap; }
 .friends-state { color: var(--text-muted); font-size: 0.85rem; font-weight: 600; white-space: nowrap; }

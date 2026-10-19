@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
   pieceFlag: { width: 96, height: 64, borderRadius: radius.sm, overflow: 'hidden', backgroundColor: colors.surfaceHigh },
   quarter: { position: 'absolute', width: '50%', height: '50%', overflow: 'hidden' },
   quarterImage: { position: 'absolute', width: '200%', height: '200%' },
-  cover: { ...StyleSheet.absoluteFillObject, backgroundColor: colors.borderStrong },
+  cover: { ...StyleSheet.absoluteFill, backgroundColor: colors.borderStrong },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
   cell: { width: CELL, height: CELL * 0.7, borderRadius: 6, borderWidth: 2, overflow: 'hidden', backgroundColor: colors.surfaceHigh },
   cellSelected: { transform: [{ scale: 1.1 }] },

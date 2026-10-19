@@ -268,6 +268,25 @@ describe('profile decoration', () => {
     await assertFails(as('alice').doc('users/alice').update({ decoration, username: 'Bob' }))
     await assertFails(as('alice').doc('users/alice').update({ decoration, admin: true }))
   })
+  it('refuses an item unlocked at a higher level than the account has', async () => {
+    const update = (value) => as('alice').doc('users/alice').update({ decoration: value })
+    await assertFails(update({ frame: 'sunrise', color: 'default' }))
+    await assertFails(update({ frame: 'none', color: 'lime' }))
+    await env.withSecurityRulesDisabled((context) => context.firestore().doc('users/alice').update({ xp: { total: 450, level: 4 } }))
+    await assertSucceeds(update({ frame: 'sunrise', color: 'peach' }))
+    await assertFails(update({ frame: 'glacier', color: 'peach' }))
+    await assertFails(update({ frame: 'none', color: 'turquoise' }))
+  })
+})
+
+describe('XP', () => {
+  it('refuses the player writing their own XP, alone or along with something they may write', async () => {
+    const xp = { total: 999999, level: 99 }
+    await assertFails(as('alice').doc('users/alice').update({ xp }))
+    await assertFails(as('alice').doc('users/alice').update({ xp, decoration: { frame: 'crown', color: 'gilded' } }))
+    await assertFails(as('alice').doc('users/alice').update({ 'xp.level': 99 }))
+    await assertFails(claim(as('bob'), 'bob', 'Bob', { user: { xp } }))
+  })
 })
 
 describe('community directory', () => {

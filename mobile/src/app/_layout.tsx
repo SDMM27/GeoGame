@@ -24,6 +24,7 @@ import { ConfirmHost } from '@/components/ConfirmHost'
 import { ToastHost } from '@/components/ToastHost'
 import { UpdateBanner } from '@/components/UpdateBanner'
 import { WhatsNew } from '@/components/WhatsNew'
+import { XpToasts } from '@/components/XpToasts'
 import { colors } from '@/theme'
 import { useLaunchUpdate } from '@/updates'
 
@@ -115,6 +116,7 @@ export default function RootLayout() {
         <PushNotifications />
         <ConfirmHost />
         <ToastHost />
+        <XpToasts />
       </ThemeProvider>
     </GestureHandlerRootView>
   )

@@ -27,6 +27,7 @@
 
 5. **Défis de la semaine et du jour, XP et items**
    Chaque défi rapporte de l'XP ; l'XP fait monter un niveau qui débloque des items (décorations de profil, etc.). Prérequis des étapes 3, 6 et 10.
+   Fait : appelés « Missions » dans l'interface (« Défi du jour » désignait déjà les jeux quotidiens). Chaque jour 3 missions du jour (60 XP chacune, +40 de bonus pour les 3), chaque semaine ISO 3 missions de la semaine (250 XP, +250), tirées au sort et identiques pour tous, heure de Paris ; plus 10 XP par partie, 10 parties par jour au maximum. Règles dans `src/utils/missions.js` ; le serveur seul écrit `users/{uid}.xp` (`POST /api/xp`, `api/_lib/xp.mjs`) en relisant l'historique des parties, appelé après chaque partie et à l'affichage. Niveau n → n+1 : 100 + 50 × (n − 1) XP. 12 nouvelles décorations débloquées du niveau 2 au niveau 30 ; les règles Firestore refusent un objet verrouillé (`decorationLevel`, test de cohérence avec le catalogue). Affichage : carte Missions sur l'accueil, niveau sur les profils, toast « +N XP », site et app. Traductions es/pt/de/it/ru à faire relire.
 
 6. **Fragments de drapeaux et badges**
    - Les défis remplis donnent des fragments de drapeau ; assez de fragments débloquent un drapeau.

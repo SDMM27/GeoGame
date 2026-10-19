@@ -4,6 +4,7 @@ import { Navigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import NavBar from '../components/NavBar'
 import ProfileBody, { Avatar } from '../components/profile/ProfileBody'
+import LevelBadge from '../components/profile/LevelBadge'
 import { useAccount } from '../auth'
 import { useFriendships } from '../hooks/usePlayerProfile'
 import FriendAction from '../components/profile/FriendAction'
@@ -53,6 +54,7 @@ export default function PlayerPage() {
                     })}
                   </small>
                 )}
+                <LevelBadge uid={player.uid} />
                 {isFriend && <span className="profile-friend-pill">✓ {t('friends.is_friend')}</span>}
               </div>
             </header>

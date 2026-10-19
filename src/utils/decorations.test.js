@@ -1,3 +1,4 @@
+import { readFileSync } from 'fs'
 import { describe, expect, it } from 'vitest'
 import {
   DEFAULT_DECORATION,
@@ -37,11 +38,28 @@ describe('decorations', () => {
   })
 
   it('unlocks starter items for everyone, and level items from that level', () => {
-    expect(FRAMES.every((item) => isUnlocked(item))).toBe(true)
+    expect(FRAMES.filter((item) => item.unlock.kind === 'starter').every((item) => isUnlocked(item))).toBe(true)
     const levelItem = { id: 'x', unlock: { kind: 'level', level: 5 } }
     expect(isUnlocked(levelItem)).toBe(false)
     expect(isUnlocked(levelItem, { level: 4 })).toBe(false)
     expect(isUnlocked(levelItem, { level: 5 })).toBe(true)
     expect(isUnlocked({ id: 'y', unlock: { kind: 'mystery' } })).toBe(false)
+  })
+
+  it('has the same unlock levels as firestore.rules', () => {
+    const rules = readFileSync('firestore.rules', 'utf8')
+    const map = rules.match(/function decorationLevel\(id\) \{\s*return \{([^}]*)\}/)[1]
+    const inRules = Object.fromEntries([...map.matchAll(/'([^']+)':\s*(\d+)/g)].map(([, id, level]) => [id, Number(level)]))
+    const inCatalog = Object.fromEntries(
+      [...FRAMES, ...NAME_COLORS].filter((item) => item.unlock.kind === 'level').map((item) => [item.id, item.unlock.level])
+    )
+    expect(inRules).toEqual(inCatalog)
+  })
+
+  it('unlocks level items from their level', () => {
+    const sunrise = FRAMES.find((item) => item.id === 'sunrise')
+    expect(isUnlocked(sunrise, { level: 2 })).toBe(false)
+    expect(isUnlocked(sunrise, { level: 3 })).toBe(true)
+    expect(isUnlocked(sunrise)).toBe(false)
   })
 })

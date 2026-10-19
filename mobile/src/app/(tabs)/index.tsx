@@ -6,7 +6,9 @@ import { ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
+import { useAccount } from '@/account/auth'
 import { LanguageButton } from '@/components/LanguageButton'
+import { MissionsCard } from '@/components/missions/MissionsCard'
 import { Text, Touchable } from '@/components/ui'
 import { GAMES, type GameDefinition } from '@/games'
 import { startMultiGame } from '@/multiplayer/navigation'
@@ -92,6 +94,7 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets()
   const { width } = useWindowDimensions()
   const cardWidth = Math.min(300, width * 0.72)
+  const { account } = useAccount()
 
   return (
     <ScrollView
@@ -121,6 +124,10 @@ export default function HomeScreen() {
           <DailyCard key={game.id} game={game} width={cardWidth} />
         ))}
       </ScrollView>
+
+      <View style={{ paddingHorizontal: space.lg, marginTop: space.xxl }}>
+        <MissionsCard uid={account?.uid} />
+      </View>
 
       <View style={[styles.sectionHeader, { marginTop: space.xxl }]}>
         <Text variant="heading">{t('mobile.home.games_title')}</Text>

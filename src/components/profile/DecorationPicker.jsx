@@ -3,13 +3,14 @@ import React, { useEffect, useId, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDecoration } from '../../hooks/useDecoration'
+import { useXp } from '../../hooks/useXp'
 import { DEFAULT_DECORATION, FRAMES, NAME_COLORS, decorationStyle, isUnlocked, saveDecoration } from '../../utils/decorations'
 import { Avatar } from './ProfileBody'
 import './DecorationPicker.css'
 
-function Option({ selected, item, onPick, children, label }) {
+function Option({ selected, item, level, onPick, children, label }) {
   const { t } = useTranslation()
-  const locked = !isUnlocked(item)
+  const locked = !isUnlocked(item, { level })
   return (
     <button type="button" className="decoration-option" aria-pressed={selected} disabled={locked} onClick={onPick}>
       {children}
@@ -23,6 +24,7 @@ function PickerDialog({ account, onClose }) {
   const { t } = useTranslation()
   const titleId = useId()
   const saved = useDecoration(account.uid)
+  const level = useXp(account.uid)?.level ?? 1
   const [choice, setChoice] = useState(null)
   const [saving, setSaving] = useState(false)
   const [failed, setFailed] = useState(false)
@@ -42,7 +44,7 @@ function PickerDialog({ account, onClose }) {
     setFailed(false)
     setSaving(true)
     try {
-      await saveDecoration(account.uid, next)
+      await saveDecoration(account.uid, next, { level })
     } catch (error) {
       console.warn('[decorations]', error?.code, error)
       setChoice(previous)
@@ -71,7 +73,7 @@ function PickerDialog({ account, onClose }) {
         <h3 className="decoration-section">{t('decorations.frames')}</h3>
         <div className="decoration-options">
           {FRAMES.map((frame) => (
-            <Option key={frame.id} item={frame} selected={current.frame === frame.id} onPick={() => pick({ frame: frame.id })} label={t(`decorations.frame.${frame.id}`)}>
+            <Option key={frame.id} item={frame} level={level} selected={current.frame === frame.id} onPick={() => pick({ frame: frame.id })} label={t(`decorations.frame.${frame.id}`)}>
               <Avatar username={account.username} size={40} decoration={{ frame: frame.id, color: 'default' }} />
             </Option>
           ))}
@@ -79,7 +81,7 @@ function PickerDialog({ account, onClose }) {
         <h3 className="decoration-section">{t('decorations.colors')}</h3>
         <div className="decoration-options">
           {NAME_COLORS.map((color) => (
-            <Option key={color.id} item={color} selected={current.color === color.id} onPick={() => pick({ color: color.id })} label={t(`decorations.color.${color.id}`)}>
+            <Option key={color.id} item={color} level={level} selected={current.color === color.id} onPick={() => pick({ color: color.id })} label={t(`decorations.color.${color.id}`)}>
               <span className="decoration-swatch" style={{ background: color.value ?? 'var(--text-muted)' }} />
             </Option>
           ))}

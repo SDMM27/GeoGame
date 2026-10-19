@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native'
 
 import { useDecoration } from '@shared/hooks/useDecoration'
+import { useXp } from '@shared/hooks/useXp'
 import { DEFAULT_DECORATION, decorationStyle, FRAMES, isUnlocked, NAME_COLORS, saveDecoration } from '@shared/utils/decorations'
 
 import { Button, Text, Touchable } from '@/components/ui'
@@ -17,6 +18,7 @@ type Item = { id: string; unlock?: { kind: string; level?: number } }
 
 export function DecorationPicker({ uid, username }: { uid: string; username: string }) {
   const { t } = useTranslation()
+  const level: number = useXp(uid)?.level ?? 1
   const saved: Decoration = useDecoration(uid) ?? DEFAULT_DECORATION
   const [open, setOpen] = useState(false)
   // The choice being saved, shown instead of the saved one meanwhile
@@ -30,7 +32,7 @@ export function DecorationPicker({ uid, username }: { uid: string; username: str
     setPending(next)
     setFailed(false)
     try {
-      await saveDecoration(uid, next)
+      await saveDecoration(uid, next, { level })
     } catch (error) {
       console.warn('[decoration]', error)
       setFailed(true)
@@ -39,7 +41,7 @@ export function DecorationPicker({ uid, username }: { uid: string; username: str
     }
   }
 
-  const lockedLabel = (item: Item) => (isUnlocked(item) ? null : t('decorations.locked', { level: item.unlock?.level }))
+  const lockedLabel = (item: Item) => (isUnlocked(item, { level }) ? null : t('decorations.locked', { level: item.unlock?.level }))
 
   return (
     <>

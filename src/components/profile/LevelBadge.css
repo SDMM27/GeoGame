@@ -1,0 +1,29 @@
+.level-chip {
+  display: inline-block;
+  padding: 0.1rem 0.6rem;
+  border-radius: var(--radius-pill);
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-border);
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.xp-bar {
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--border-color);
+  overflow: hidden;
+}
+
+.xp-bar-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width 0.4s ease;
+}
+
+.level-badge { display: flex; flex-direction: column; gap: 0.3rem; max-width: 260px; }
+.level-badge-head { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; }
+.level-badge-head small { color: var(--text-muted); font-size: 0.75rem; white-space: nowrap; }

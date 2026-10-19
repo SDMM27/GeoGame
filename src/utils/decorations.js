@@ -3,13 +3,15 @@
 // users/{uid}.decoration = { frame, color }: catalog ids, written by the player on their own document
 // (firestore.rules: validDecoration). Like the badges, it is a courtesy: anything unknown reads as the default.
 //
-// Every item says how it is unlocked. Only `starter` items exist for now; levels (XP, step 5 of
-// docs/plan-fonctionnalites.md) and flag fragments (step 6) will add more kinds.
+// Every item says how it is unlocked: `starter` items from the start, `level` items at a player level (XP, see
+// missions.js); flag fragments (step 6 of docs/plan-fonctionnalites.md) will add more kinds. firestore.rules keeps
+// the level of each `level` item (decorationLevel) and refuses a locked one; a test checks both lists match.
 import { doc, updateDoc } from 'firebase/firestore'
 import { firestore } from '../Firebase'
 import { cachedPublicData, fetchPublicData, patchPublicData } from './publicProfile'
 
 const STARTER = { kind: 'starter' }
+const atLevel = (level) => ({ kind: 'level', level })
 
 // `style`: solid, dashed or double (the app draws double as a thicker solid line).
 export const FRAMES = [
@@ -19,6 +21,12 @@ export const FRAMES = [
   { id: 'ocean', color: '#5FD4F4', style: 'solid', unlock: STARTER },
   { id: 'jungle', color: '#3DDC97', style: 'dashed', unlock: STARTER },
   { id: 'volcano', color: '#FF7A6B', style: 'double', unlock: STARTER },
+  { id: 'sunrise', color: '#FFB86B', style: 'dashed', unlock: atLevel(3) },
+  { id: 'glacier', color: '#A8E6FF', style: 'double', unlock: atLevel(6) },
+  { id: 'amethyst', color: '#B57BFF', style: 'double', unlock: atLevel(10) },
+  { id: 'ruby', color: '#FF4D6D', style: 'double', unlock: atLevel(15) },
+  { id: 'emerald', color: '#1FD18B', style: 'double', unlock: atLevel(20) },
+  { id: 'crown', color: '#FFE066', style: 'double', unlock: atLevel(30) },
 ]
 
 // `value` null: the usual text color.
@@ -30,6 +38,12 @@ export const NAME_COLORS = [
   { id: 'amber', value: '#F5B83D', unlock: STARTER },
   { id: 'lilac', value: '#C792FF', unlock: STARTER },
   { id: 'rose', value: '#FF9EC7', unlock: STARTER },
+  { id: 'lime', value: '#B4E05A', unlock: atLevel(2) },
+  { id: 'peach', value: '#FFB38A', unlock: atLevel(4) },
+  { id: 'turquoise', value: '#2EE6D6', unlock: atLevel(8) },
+  { id: 'violet', value: '#9D7BFF', unlock: atLevel(12) },
+  { id: 'crimson', value: '#FF4D6D', unlock: atLevel(18) },
+  { id: 'gilded', value: '#FFD447', unlock: atLevel(25) },
 ]
 
 export const DEFAULT_DECORATION = { frame: 'none', color: 'default' }
@@ -37,7 +51,7 @@ export const DEFAULT_DECORATION = { frame: 'none', color: 'default' }
 const FRAMES_BY_ID = Object.fromEntries(FRAMES.map((item) => [item.id, item]))
 const COLORS_BY_ID = Object.fromEntries(NAME_COLORS.map((item) => [item.id, item]))
 
-// Whether the player may pick `item`. `progress` will carry their level and fragments (steps 5 and 6).
+// Whether the player may pick `item`. `progress`: { level } (readXp in missions.js), fragments later (step 6).
 export function isUnlocked(item, progress = {}) {
   switch (item.unlock?.kind) {
     case 'starter':

@@ -20,6 +20,7 @@ import { reauthenticateWithGoogle, signInWithGoogle } from '../utils/accountGoog
 import FriendsPanel from '../components/profile/FriendsPanel'
 import ProfileBody, { Avatar } from '../components/profile/ProfileBody'
 import DecorationPicker from '../components/profile/DecorationPicker'
+import LevelBadge from '../components/profile/LevelBadge'
 import { useFriendships } from '../hooks/usePlayerProfile'
 import { useDecoration } from '../hooks/useDecoration'
 import { decorationStyle } from '../utils/decorations'
@@ -318,6 +319,7 @@ function Profile({ account }) {
               })}
             </small>
           )}
+          <LevelBadge uid={account.uid} />
         </div>
       </header>
       <DecorationPicker account={account} />

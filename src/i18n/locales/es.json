@@ -1259,7 +1259,13 @@
       "gold": "Oro",
       "ocean": "Océano",
       "jungle": "Selva",
-      "volcano": "Volcán"
+      "volcano": "Volcán",
+      "sunrise": "Amanecer",
+      "glacier": "Glaciar",
+      "amethyst": "Amatista",
+      "ruby": "Rubí",
+      "emerald": "Esmeralda",
+      "crown": "Corona"
     },
     "color": {
       "default": "Por defecto",
@@ -1268,7 +1274,13 @@
       "coral": "Coral",
       "amber": "Ámbar",
       "lilac": "Lila",
-      "rose": "Rosa"
+      "rose": "Rosa",
+      "lime": "Lima",
+      "peach": "Melocotón",
+      "turquoise": "Turquesa",
+      "violet": "Violeta",
+      "crimson": "Carmesí",
+      "gilded": "Dorado"
     }
   },
   "elo": {
@@ -1286,5 +1298,43 @@
     "empty": "Nadie tiene puntuación esta temporada todavía.",
     "found_count_one": "{{count}} país encontrado",
     "found_count_other": "{{count}} países encontrados"
+  },
+  "missions": {
+    "title": "Misiones",
+    "daily": "Misiones del día",
+    "weekly": "Misiones de la semana",
+    "bonus": "Bonus: las 3 misiones",
+    "reward": "+{{xp}} XP",
+    "per_game": "+{{xp}} XP por partida, {{count}} al día",
+    "sign_in": "Inicia sesión para ganar XP, subir de nivel y desbloquear marcos y colores.",
+    "resets_daily": "Nuevas misiones a medianoche",
+    "resets_weekly": "Nuevas misiones el lunes",
+    "play_3": "Juega {{count}} partidas",
+    "dailies_3": "Juega {{count}} juegos del día",
+    "daily_challenge": "Juega el desafío del día",
+    "daily_wins_2": "Acierta {{count}} juegos del día",
+    "flags_20": "Encuentra {{count}} banderas",
+    "placement_20": "Sitúa {{count}} países en el mapa",
+    "capitals_15": "Encuentra {{count}} capitales",
+    "ascension_1": "Juega una partida de Ascensión",
+    "survival_1": "Juega una partida de Supervivencia",
+    "perfect_1": "Termina una partida sin fallos (10 países o más)",
+    "types_3": "Juega a {{count}} juegos distintos",
+    "week_play_20": "Juega {{count}} partidas",
+    "week_daily_days_5": "Juega un juego del día {{count}} días distintos",
+    "week_dailies_15": "Juega {{count}} juegos del día",
+    "week_daily_wins_10": "Acierta {{count}} juegos del día",
+    "week_found_200": "Encuentra {{count}} países en total",
+    "week_perfect_3": "Termina {{count}} partidas sin fallos (10 países o más)",
+    "week_types_6": "Juega a {{count}} juegos distintos",
+    "week_ascension_3": "Juega {{count}} partidas de Ascensión"
+  },
+  "level": {
+    "label": "Nivel {{level}}",
+    "short": "Niv. {{level}}",
+    "progress": "{{into}} / {{needed}} XP",
+    "total": "{{total}} XP",
+    "up": "¡Nivel {{level}} alcanzado!",
+    "gained": "+{{xp}} XP"
   }
 }

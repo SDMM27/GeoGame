@@ -154,20 +154,34 @@ service cloud.firestore {
     }
 
     // users/{uid}.decoration (src/utils/decorations.js): the frame and name color the player picked from the catalog.
-    // Ids only; the client drops unknown ones. Only starter items exist, so being unlocked isn't checked here yet.
-    function validDecoration(decoration) {
+    // Ids only; the client drops unknown ones. An item unlocked at a level (decorationLevel, same levels as the
+    // catalog: src/utils/decorations.test.js checks it) needs that level in users/{uid}.xp, which only the server writes.
+    function decorationLevel(id) {
+      return {
+        'sunrise': 3, 'glacier': 6, 'amethyst': 10, 'ruby': 15, 'emerald': 20, 'crown': 30,
+        'lime': 2, 'peach': 4, 'turquoise': 8, 'violet': 12, 'crimson': 18, 'gilded': 25
+      }.get(id, 0);
+    }
+
+    function playerLevel(data) {
+      return data.get('xp', {}).get('level', 1);
+    }
+
+    function validDecoration(decoration, level) {
       return decoration is map
         && decoration.keys().hasOnly(['frame', 'color'])
         && decoration.keys().hasAll(['frame', 'color'])
         && decoration.frame is string && decoration.frame.size() > 0 && decoration.frame.size() <= 40
-        && decoration.color is string && decoration.color.size() > 0 && decoration.color.size() <= 40;
+        && decoration.color is string && decoration.color.size() > 0 && decoration.color.size() <= 40
+        && level is int && decorationLevel(decoration.frame) <= level && decorationLevel(decoration.color) <= level;
     }
 
+    // users/{uid}.xp (src/utils/missions.js): XP and missions paid, written by api/xp only; no client rule writes it.
     match /users/{uid} {
       allow read: if true;
       allow update: if request.auth != null && request.auth.uid == uid
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['badges', 'challenges', 'decoration'])
-        && (!('decoration' in request.resource.data.diff(resource.data).affectedKeys()) || validDecoration(request.resource.data.decoration))
+        && (!('decoration' in request.resource.data.diff(resource.data).affectedKeys()) || validDecoration(request.resource.data.decoration, playerLevel(resource.data)))
         && (!('badges' in request.resource.data.diff(resource.data).affectedKeys()) || validBadges(request.resource.data.badges))
         && (!('challenges' in request.resource.data.diff(resource.data).affectedKeys()) || validChallenges(request.resource.data.challenges));
       // Community directory (src/utils/community.js): users/{uid}.communityAt is the opt-in. Joining stamps the

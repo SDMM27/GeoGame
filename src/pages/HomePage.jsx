@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import NavBar from "../components/NavBar";
 import AppBanner from "../components/AppBanner";
 import LegalLinks from "../components/LegalLinks";
+import MissionsCard from "./home/MissionsCard";
 import GameConfigModal from "./home/GameConfigModal";
 import { DailyCard, HomeRow } from "./home/HomeCards";
 import { gameColor } from "../utils/roomGames";
@@ -41,6 +42,10 @@ export default function HomePage() {
               <DailyCard key={game.id} game={game} />
             ))}
           </div>
+        </section>
+
+        <section className="home-section">
+          <MissionsCard />
         </section>
 
         <section className="home-section" aria-labelledby="home-games">

@@ -27,6 +27,7 @@ import { auth, useAccount, type Account } from '@/account/auth'
 import { reauthenticateWithGoogle, signInWithGoogle } from '@/account/google'
 import { API_ORIGIN, legalUrl } from '@/links'
 import { DecorationPicker } from '@/components/profile/DecorationPicker'
+import { FlagCollection } from '@/components/profile/FlagCollection'
 import { LevelBar } from '@/components/profile/LevelBar'
 import { Avatar, ProfileBody, SectionTitle } from '@/components/profile/ProfileSections'
 import { Button, Pill, Segmented, Text, Touchable } from '@/components/ui'
@@ -449,6 +450,7 @@ function Profile({ account }: { account: Account }) {
         </View>
       </View>
       <LevelBar uid={account.uid} />
+      <FlagCollection uid={account.uid} />
       <DecorationPicker uid={account.uid} username={username} />
       <FriendsCard count={friendships.friends.length} pending={friendships.incoming.length} />
       <ProfileBody

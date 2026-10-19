@@ -6,7 +6,8 @@ import { Timestamp, getFirestore } from 'firebase-admin/firestore'
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { handleXp } from '../../api/_lib/xp.mjs'
-import { GAMES_PER_DAY, GAME_XP, levelOf, missionsAt } from '../../src/utils/missions.js'
+import { PIECES_PER_FLAG } from '../../src/utils/flagCollection.js'
+import { GAMES_PER_DAY, GAME_XP, MISSIONS_PER_PERIOD, levelOf, missionsAt } from '../../src/utils/missions.js'
 
 const PROJECT = 'geogame-sdmm'
 // Monday 2026-10-19, 12:00 in Paris.
@@ -106,6 +107,34 @@ describe('paying XP', () => {
     expect(today.body.xp.dayGames).toBe(1)
     const tomorrow = await call('alice', NOW + DAY)
     expect(tomorrow.body.xp).toMatchObject({ day: '2026-10-20', dayGames: 0, dayMissions: [], total: today.body.xp.total })
+  })
+
+  it('pays the fragments of the missions into the flag collection with the XP, once', async () => {
+    const games = [
+      ...Array.from({ length: 3 }, () => ({ gameType: 'DAILY_CHALLENGE', mode: 'daily', solved: true, dailyKey: '2026-10-19' })),
+      { gameType: 'FLAGS', mode: 'standard', found: 20, total: 20 },
+      { gameType: 'PLACEMENT', mode: 'ascension', found: 20, total: 20 },
+      { gameType: 'CAPITALS', mode: 'standard', found: 15, total: 15 },
+      { gameType: 'SURVIVAL', mode: 'survival' },
+    ]
+    await addGames('alice', games)
+    const { body } = await call('alice')
+    expect(body.fragments).toBeGreaterThanOrEqual(MISSIONS_PER_PERIOD + 1)
+    const stored = (await db.doc('users/alice').get()).data().flags
+    expect(stored).toEqual(body.flags)
+    expect(stored.unlocked.length * PIECES_PER_FLAG + stored.pieces).toBe(body.fragments)
+    expect(body.unlockedFlags).toEqual(stored.unlocked)
+
+    const again = await call('alice')
+    expect(again.body).toMatchObject({ gained: 0, fragments: 0, unlockedFlags: [], flags: stored })
+    expect((await db.doc('users/alice').get()).data().flags).toEqual(stored)
+  })
+
+  it('leaves the flag collection alone when no mission was paid', async () => {
+    await addGames('alice', [{}])
+    const { body } = await call('alice')
+    expect(body).toMatchObject({ fragments: 0, unlockedFlags: [], flags: { unlocked: [], current: null, pieces: 0 } })
+    expect((await db.doc('users/alice').get()).data().flags).toBeUndefined()
   })
 
   it('keeps the rest of the users document', async () => {

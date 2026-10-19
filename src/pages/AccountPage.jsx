@@ -20,6 +20,7 @@ import { reauthenticateWithGoogle, signInWithGoogle } from '../utils/accountGoog
 import FriendsPanel from '../components/profile/FriendsPanel'
 import ProfileBody, { Avatar } from '../components/profile/ProfileBody'
 import DecorationPicker from '../components/profile/DecorationPicker'
+import FlagCollection from '../components/profile/FlagCollection'
 import LevelBadge from '../components/profile/LevelBadge'
 import { useFriendships } from '../hooks/usePlayerProfile'
 import { useDecoration } from '../hooks/useDecoration'
@@ -323,6 +324,7 @@ function Profile({ account }) {
         </div>
       </header>
       <DecorationPicker account={account} />
+      <FlagCollection uid={account.uid} />
       <FriendsPanel account={account} friendships={friendships} />
       <ProfileBody uid={account.uid} own friendsCount={friendships.loading ? undefined : friendships.friends.length} />
       <AccountSettings account={account} />

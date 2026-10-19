@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { computeAchievements } from '../utils/achievements'
 import { fetchChallenges, syncBadges } from '../utils/badges'
+import { fetchCollection } from '../utils/flagCollectionData'
 import { fetchCachedDailyGames, fetchCachedGames, fetchDailyGames, fetchGames } from '../utils/gameHistory'
 import { computeStats, dayKey } from '../utils/profileStats'
 import { watchSharedFriendships } from '../utils/friends'
@@ -52,10 +53,24 @@ export function usePlayerProfile(uid, { friendsCount, own = false } = {}) {
     }
   }, [own, uid])
 
+  // Flags unlocked and countries mastered (public: also shown on other players' profiles); none until they are read.
+  const [collection, setCollection] = useState(undefined)
+  useEffect(() => {
+    setCollection(undefined)
+    if (!uid) return undefined
+    let cancelled = false
+    fetchCollection(uid)
+      .then((result) => !cancelled && setCollection(result.summary))
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [uid])
+
   const stats = useMemo(() => computeStats(state.games), [state.games])
   const achievements = useMemo(
-    () => computeAchievements({ stats, games: state.games, friendsCount, remembered }),
-    [stats, state.games, friendsCount, remembered]
+    () => computeAchievements({ stats, games: state.games, friendsCount, remembered, collection }),
+    [stats, state.games, friendsCount, remembered, collection]
   )
 
   const loaded = !state.loading && !state.error

@@ -13,6 +13,7 @@ import { fetchPlayer } from '@shared/utils/friends'
 
 import { useAccount } from '@/account/auth'
 import { FriendAction } from '@/components/profile/FriendAction'
+import { FlagCollection } from '@/components/profile/FlagCollection'
 import { LevelBar } from '@/components/profile/LevelBar'
 import { Avatar, ProfileBody } from '@/components/profile/ProfileSections'
 import { ScreenHeader } from '@/components/ScreenHeader'
@@ -73,6 +74,7 @@ export default function PlayerScreen() {
             </View>
           </View>
           <LevelBar uid={player.uid} />
+          <FlagCollection uid={player.uid} />
           <FriendAction player={player} />
           <ProfileBody
             uid={player.uid}

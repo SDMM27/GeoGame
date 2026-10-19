@@ -61,8 +61,8 @@ export async function deleteAccountData({ db, auth, uid }) {
       if (claimed.exists && claimed.data().uid === uid) refs.set(claimed.ref.path, claimed.ref)
     }
   }
-  // Push bookkeeping (api/_lib/push.mjs, friendPush.mjs, dailyReminder.mjs, dailyNudge.mjs) and the Elo ratings, server only.
-  for (const path of [`invitePushLimits/${uid}`, `dailyReminderPushes/${uid}`, `elo/${uid}`,
+  // Push bookkeeping (api/_lib/push.mjs, friendPush.mjs, dailyReminder.mjs, dailyNudge.mjs) and the Elo ratings and mastery, server only.
+  for (const path of [`invitePushLimits/${uid}`, `dailyReminderPushes/${uid}`, `elo/${uid}`, `mastery/${uid}`,
     ...friendships.docs.flatMap((friendship) => [`friendPushes/${friendship.id}_request`, `friendPushes/${friendship.id}_accepted`])]) {
     refs.set(path, db.doc(path))
   }

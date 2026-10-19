@@ -6,6 +6,7 @@
 import { doc, getDoc, updateDoc } from 'firebase/firestore'
 import { firestore } from '../Firebase'
 import { ACHIEVEMENTS, computeAchievements, unlockedStickyIds, withRemembered } from './achievements'
+import { fetchCollection } from './flagCollectionData'
 import { fetchGames } from './gameHistory'
 import { computeStats } from './profileStats'
 import { fetchPublicData, patchPublicData } from './publicProfile'
@@ -87,8 +88,8 @@ export async function refreshOwnBadges(uid) {
   if (Date.now() - lastRefresh < REFRESH_EVERY) return
   lastRefresh = Date.now()
   try {
-    const games = await fetchGames(uid)
-    await syncBadges(uid, computeAchievements({ stats: computeStats(games), games }))
+    const [games, { summary }] = await Promise.all([fetchGames(uid), fetchCollection(uid)])
+    await syncBadges(uid, computeAchievements({ stats: computeStats(games), games, collection: summary }))
   } catch (error) {
     lastRefresh = 0
     console.warn('[badges]', error?.code, error)

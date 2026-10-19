@@ -10,6 +10,13 @@
 //   the history; what bounds a cheater is that the XP of a day and of a week is capped.
 // - XP makes a level: going from level n to n + 1 takes LEVEL_BASE + LEVEL_STEP × (n - 1) XP. Levels unlock items
 //   (decorations.js).
+// - Missions and bonuses also pay flag fragments (flagCollection.js), once, in the same call as their XP.
+import {
+  DAILY_BONUS_FRAGMENTS,
+  DAILY_MISSION_FRAGMENTS,
+  WEEKLY_BONUS_FRAGMENTS,
+  WEEKLY_MISSION_FRAGMENTS,
+} from './flagCollection.js'
 import { GAME_TYPES } from './gameTypes.js'
 import { seededShuffle } from './prng.js'
 
@@ -172,34 +179,39 @@ export function readXp(data, day, week) {
 }
 
 /**
- * What `games` earn on top of the `state` already paid (readXp at `now`): { gained, state } with the new state to
- * store, and `levelUp` when the level went up. Missions done but already paid pay nothing.
+ * What `games` earn on top of the `state` already paid (readXp at `now`): { gained, fragments, state } with the new
+ * state to store, `fragments` earned by the missions and bonuses newly paid (not by the games), and `levelUp` when the
+ * level went up. Missions done but already paid pay nothing.
  */
 export function grantXp(state, games, now) {
   const progress = missionsAt(games, now)
   let gained = 0
-  const pay = (paid, entries, missionXp, bonusXp) => {
+  let fragments = 0
+  const pay = (paid, entries, missionXp, bonusXp, missionFragments, bonusFragments) => {
     const next = [...paid]
     for (const { mission, done } of entries) {
       if (done && !next.includes(mission.id)) {
         next.push(mission.id)
         gained += missionXp
+        fragments += missionFragments
       }
     }
     if (entries.every((entry) => entry.done) && !next.includes(BONUS_ID)) {
       next.push(BONUS_ID)
       gained += bonusXp
+      fragments += bonusFragments
     }
     return next
   }
-  const dayMissions = pay(state.dayMissions, progress.daily, DAILY_MISSION_XP, DAILY_BONUS_XP)
-  const weekMissions = pay(state.weekMissions, progress.weekly, WEEKLY_MISSION_XP, WEEKLY_BONUS_XP)
+  const dayMissions = pay(state.dayMissions, progress.daily, DAILY_MISSION_XP, DAILY_BONUS_XP, DAILY_MISSION_FRAGMENTS, DAILY_BONUS_FRAGMENTS)
+  const weekMissions = pay(state.weekMissions, progress.weekly, WEEKLY_MISSION_XP, WEEKLY_BONUS_XP, WEEKLY_MISSION_FRAGMENTS, WEEKLY_BONUS_FRAGMENTS)
   const dayGames = Math.max(state.dayGames, Math.min(GAMES_PER_DAY, progress.todayGames))
   gained += (dayGames - state.dayGames) * GAME_XP
   const total = state.total + gained
   const { level } = levelOf(total)
   return {
     gained,
+    fragments,
     levelUp: level > state.level,
     state: { total, level, day: progress.day, dayMissions, dayGames, week: progress.week, weekMissions },
   }

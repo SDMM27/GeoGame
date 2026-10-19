@@ -21,7 +21,7 @@ export function cachedXp(uid) {
 
 const claimListeners = new Set()
 
-// Called with { gained, levelUp, level } each time the server answered a claim (gained may be 0).
+// Called with { gained, levelUp, level, fragments, unlockedFlags } each time the server answered a claim (gained may be 0).
 export function onXpClaimed(listener) {
   claimListeners.add(listener)
   return () => claimListeners.delete(listener)
@@ -30,7 +30,7 @@ export function onXpClaimed(listener) {
 let pushApi = null
 let inFlight = null
 
-// Asks the server to pay the signed-in player `uid`. Resolves with { xp, gained, levelUp }, or null (signed out,
+// Asks the server to pay the signed-in player `uid`. Resolves with { xp, gained, levelUp, flags, fragments, unlockedFlags }, or null (signed out,
 // offline, refused). Calls made while one runs share it.
 export function claimXp(uid) {
   if (!uid) return Promise.resolve(null)
@@ -39,9 +39,11 @@ export function claimXp(uid) {
       pushApi ??= import('./pushApi')
       const response = await (await pushApi).callPush('xp', {})
       if (response?.status !== 200 || !response.body?.xp) return null
-      const { xp, gained, levelUp } = response.body
-      patchPublicData(uid, { xp })
-      claimListeners.forEach((listener) => listener({ gained, levelUp: Boolean(levelUp), level: xp.level }))
+      const { xp, gained, levelUp, flags, fragments, unlockedFlags } = response.body
+      patchPublicData(uid, flags ? { xp, flags } : { xp })
+      claimListeners.forEach((listener) =>
+        listener({ gained, levelUp: Boolean(levelUp), level: xp.level, fragments: fragments ?? 0, unlockedFlags: unlockedFlags ?? [] })
+      )
       return response.body
     } catch (error) {
       console.warn('[xp]', error)

@@ -4,6 +4,7 @@ import { Navigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import NavBar from '../components/NavBar'
 import ProfileBody, { Avatar } from '../components/profile/ProfileBody'
+import FlagCollection from '../components/profile/FlagCollection'
 import LevelBadge from '../components/profile/LevelBadge'
 import { useAccount } from '../auth'
 import { useFriendships } from '../hooks/usePlayerProfile'
@@ -59,6 +60,7 @@ export default function PlayerPage() {
               </div>
             </header>
             <FriendAction account={account} player={player} friendships={friendships} />
+            <FlagCollection uid={player.uid} />
             <ProfileBody uid={player.uid} />
           </>
         )}

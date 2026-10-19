@@ -949,6 +949,14 @@
       "title": "Hardcore-Trio",
       "desc": "Spiele je eine perfekte Partie auf Hardcore in Platzierung, Flaggen und Hauptstädten"
     },
+    "mythic": {
+      "title": "Mythisch",
+      "desc": "Schalte alle Flaggen frei"
+    },
+    "legend_master": {
+      "title": "Legende",
+      "desc": "Finde alle Länder beim ersten Versuch in den Modi Flaggen, Platzierung und Hardcore"
+    },
     "world_champion": {
       "title": "Weltmeister",
       "desc": "Spiele in Platzierung, Flaggen und Hauptstädten in allen 5 Schwierigkeitsstufen eine perfekte Partie"
@@ -1327,7 +1335,9 @@
     "week_found_200": "Finde insgesamt {{count}} Länder",
     "week_perfect_3": "Beende {{count}} Partien ohne Fehler (ab 10 Ländern)",
     "week_types_6": "Spiele {{count}} verschiedene Spiele",
-    "week_ascension_3": "Spiele {{count}} Partien Aufstieg"
+    "week_ascension_3": "Spiele {{count}} Partien Aufstieg",
+    "fragments_one": "+{{count}} Fragment",
+    "fragments_other": "+{{count}} Fragmente"
   },
   "level": {
     "label": "Level {{level}}",
@@ -1335,6 +1345,32 @@
     "progress": "{{into}} / {{needed}} XP",
     "total": "{{total}} XP",
     "up": "Level {{level}} erreicht!",
-    "gained": "+{{xp}} XP"
+    "gained": "+{{xp}} XP",
+    "fragments_one": "+{{count}} Flaggenfragment",
+    "fragments_other": "+{{count}} Flaggenfragmente",
+    "flag_unlocked": "Flagge freigeschaltet: {{name}} ({{rarity}})"
+  },
+  "collection": {
+    "title": "Flaggensammlung",
+    "progress": "{{count}} / {{total}} Flaggen",
+    "current": "Aktuelle Flagge",
+    "pieces": "{{count}} / {{total}} Fragmente",
+    "hint": "Jede abgeschlossene Mission bringt Fragmente; 4 Fragmente ergeben eine Flagge.",
+    "empty": "Schließe Missionen ab, um deine ersten Flaggenfragmente zu verdienen.",
+    "complete": "Sammlung vollständig!",
+    "unlocked": "Freigeschaltete Flaggen",
+    "show_all": "Alle anzeigen",
+    "show_less": "Weniger anzeigen",
+    "legend_progress": "Legende: {{count}} / {{total}} Länder beim ersten Versuch gefunden",
+    "legend_hardcore_soon": "Der Hardcore-Modus kommt bald",
+    "mode_placement": "Platzierung",
+    "mode_flags": "Flaggen",
+    "mode_hardcore": "Hardcore",
+    "rarity": {
+      "common": "Gewöhnlich",
+      "uncommon": "Ungewöhnlich",
+      "rare": "Selten",
+      "legendary": "Legendär"
+    }
   }
 }

@@ -15,6 +15,13 @@ import {
   WEEKLY_MISSION_XP,
 } from '@shared/utils/missions'
 
+import {
+  DAILY_BONUS_FRAGMENTS,
+  DAILY_MISSION_FRAGMENTS,
+  WEEKLY_BONUS_FRAGMENTS,
+  WEEKLY_MISSION_FRAGMENTS,
+} from '@shared/utils/flagCollection'
+
 import { XpBar, type Xp } from '@/components/profile/XpBar'
 import { Text, Touchable } from '@/components/ui'
 import { colors, radius, space } from '@/theme'
@@ -26,7 +33,7 @@ type Entry = {
   paid: boolean
 }
 
-function MissionRow({ entry, reward }: { entry: Entry; reward: number }) {
+function MissionRow({ entry, reward, fragments }: { entry: Entry; reward: number; fragments: number }) {
   const { t } = useTranslation()
   const { mission, progress, done, paid } = entry
   const shown = Math.min(progress, mission.target)
@@ -43,7 +50,7 @@ function MissionRow({ entry, reward }: { entry: Entry; reward: number }) {
             {title}
           </Text>
           <Text variant="caption" color={done ? colors.accent : colors.textMuted} style={{ fontSize: 12 }}>
-            {t('missions.reward', { xp: reward })}
+            {t('missions.reward', { xp: reward })} · {t('missions.fragments', { count: fragments })}
           </Text>
         </View>
         <View style={styles.track}>
@@ -54,7 +61,7 @@ function MissionRow({ entry, reward }: { entry: Entry; reward: number }) {
   )
 }
 
-function Bonus({ xp, paid }: { xp: number; paid: boolean }) {
+function Bonus({ xp, fragments, paid }: { xp: number; fragments: number; paid: boolean }) {
   const { t } = useTranslation()
   return (
     <View style={[styles.bonus, paid && { borderColor: colors.accent }]}>
@@ -63,7 +70,7 @@ function Bonus({ xp, paid }: { xp: number; paid: boolean }) {
         {t('missions.bonus')}
       </Text>
       <Text variant="caption" color={paid ? colors.accent : colors.warning} style={{ fontSize: 12 }}>
-        {t('missions.reward', { xp })}
+        {t('missions.reward', { xp })} · {t('missions.fragments', { count: fragments })}
       </Text>
     </View>
   )
@@ -95,9 +102,9 @@ export function MissionsCard({ uid }: { uid: string | null | undefined }) {
           <View style={styles.group}>
             <Text variant="label">{t('missions.daily')}</Text>
             {(missions.daily as Entry[]).map((entry) => (
-              <MissionRow key={entry.mission.id} entry={entry} reward={DAILY_MISSION_XP} />
+              <MissionRow key={entry.mission.id} entry={entry} reward={DAILY_MISSION_XP} fragments={DAILY_MISSION_FRAGMENTS} />
             ))}
-            <Bonus xp={DAILY_BONUS_XP} paid={Boolean(missions.dailyBonus)} />
+            <Bonus xp={DAILY_BONUS_XP} fragments={DAILY_BONUS_FRAGMENTS} paid={Boolean(missions.dailyBonus)} />
             <Text variant="caption" style={{ fontSize: 12 }}>
               {t('missions.per_game', { xp: GAME_XP, count: GAMES_PER_DAY })}
             </Text>
@@ -108,9 +115,9 @@ export function MissionsCard({ uid }: { uid: string | null | undefined }) {
           <View style={styles.group}>
             <Text variant="label">{t('missions.weekly')}</Text>
             {(missions.weekly as Entry[]).map((entry) => (
-              <MissionRow key={entry.mission.id} entry={entry} reward={WEEKLY_MISSION_XP} />
+              <MissionRow key={entry.mission.id} entry={entry} reward={WEEKLY_MISSION_XP} fragments={WEEKLY_MISSION_FRAGMENTS} />
             ))}
-            <Bonus xp={WEEKLY_BONUS_XP} paid={Boolean(missions.weeklyBonus)} />
+            <Bonus xp={WEEKLY_BONUS_XP} fragments={WEEKLY_BONUS_FRAGMENTS} paid={Boolean(missions.weeklyBonus)} />
             <Text variant="caption" style={{ fontSize: 12 }}>
               {t('missions.resets_weekly')}
             </Text>

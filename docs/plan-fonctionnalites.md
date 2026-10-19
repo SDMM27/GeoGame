@@ -34,6 +34,7 @@
    - Badge « Mythique » : tous les drapeaux débloqués.
    - Badge « Légende » : tous les pays trouvés sans faute, dans les modes drapeaux, trouver et hardcore.
    Dépend de l'étape 5.
+   Fait : chaque mission payée donne des fragments (1 par mission du jour et pour son bonus, 3 par mission de la semaine et pour son bonus, environ 40 par semaine), versés par le serveur dans la même transaction que l'XP (`users/{uid}.flags = { unlocked, current, pieces }`). 4 fragments reconstituent le drapeau en cours ; le suivant est tiré au sort parmi les 239 restants, pondéré par la rareté (Facile = commun ×4, Moyen = peu commun ×3, Difficile = rare ×2, Impossible = légendaire ×1, d'après `DifficultyFlag`). Règles dans `src/utils/flagCollection.js`. Le serveur Elo note pour toujours les pays trouvés du premier coup en trouver et drapeaux (`mastery/{uid}`, `hardcore` réservé à l'étape 7). Badges `mythic` (239 drapeaux) et `legend_master` (705 pays : 238 trouver + 229 drapeaux + 238 hardcore), rang légende. Affichage : collection sur les profils, fragments sur la carte Missions et dans le toast d'XP, site et app. Traductions es/pt/de/it/ru à faire relire.
 
 7. **Mode hardcore : trouver le pays (sans frontières)**
    Nouveau mode où le pays doit être trouvé sans les frontières affichées. Dépend de l'étape 4 pour le classement, optionnel.

@@ -119,6 +119,30 @@ describe('solo', () => {
     expect(body.gained).toBe(soloResult({ rating: 1000, question: QUESTION_START.Facile, found: true, errors: 0, alreadyWon: false, rateQuestion: true }).gain)
   })
 
+  it('records the countries found at the first try in Placement and Flags, forever', async () => {
+    await solo('alice', [
+      { country: 'France', found: true, errors: 0 },
+      { country: 'Aruba', found: true, errors: 1 },
+      { country: 'Japon', found: false, errors: 0 },
+    ])
+    expect(await data('mastery/alice')).toEqual({ placement: [], flags: ['France'], hardcore: [], updatedAt: NOW })
+
+    await solo('alice', [{ country: 'Aruba', found: true, errors: 0 }, { country: 'France', found: true, errors: 0 }], 'PLACEMENT', NOW + 1000)
+    expect(await data('mastery/alice')).toEqual({ placement: ['Aruba', 'France'], flags: ['France'], hardcore: [], updatedAt: NOW + 1000 })
+
+    // Nothing new: untouched. A later season keeps it too.
+    await solo('alice', [{ country: 'France', found: true, errors: 0 }], 'FLAGS', NOW + 2000)
+    expect((await data('mastery/alice')).updatedAt).toBe(NOW + 1000)
+    await solo('alice', [{ country: 'Aruba', found: true, errors: 0 }], 'FLAGS', NOW + 200 * 24 * 3600 * 1000)
+    expect((await data('mastery/alice')).flags).toEqual(['France', 'Aruba'])
+  })
+
+  it('records no mastery for the other modes, nor for a missed answer', async () => {
+    await solo('alice', [{ country: 'France', found: true, errors: 0 }], 'CAPITALS')
+    await solo('alice', [{ country: 'France', found: false, errors: 0 }], 'PLACEMENT')
+    expect((await db.doc('mastery/alice').get()).exists).toBe(false)
+  })
+
   it('does not list a player who won nothing', async () => {
     await solo('alice', [{ country: 'Aruba', found: false, errors: 1 }])
     expect((await db.doc('elo/alice').get()).exists).toBe(false)

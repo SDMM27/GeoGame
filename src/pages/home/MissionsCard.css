@@ -54,6 +54,7 @@
 .mission-progress .xp-bar { flex: 1; height: 6px; }
 .mission-progress small { color: var(--text-muted); font-size: 0.7rem; white-space: nowrap; }
 .mission-reward { flex-shrink: 0; color: var(--accent); font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
+.mission-fragments { display: block; color: var(--text-muted); font-size: 0.7rem; font-weight: 400; text-align: right; }
 
 .missions-bonus {
   display: flex;

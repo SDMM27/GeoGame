@@ -19,6 +19,10 @@
   pointer-events: none;
 }
 
+.xp-toast { flex-wrap: wrap; justify-content: center; }
+.xp-toast-flag { display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 600; }
+.xp-toast-flag img { height: 16px; width: auto; border-radius: 2px; }
+
 .xp-toast strong { color: var(--accent); }
 
 @keyframes xp-toast-in {

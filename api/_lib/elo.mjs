@@ -6,8 +6,14 @@
 //   eloDuels/{room}_{gameIndex}                    a duel already rated (or refused), so it counts once
 //   eloDuelPairs/{uidA}_{uidB}_{day}               rated duels between two accounts on a day (Paris), DUEL_PAIR_DAILY_LIMIT at most
 //   eloDuelAccounts/{uid}_{day}                    rated duels of an account on a day, DUEL_ACCOUNT_DAILY_LIMIT at most
+//   mastery/{uid}                                  countries found at the first try per mode, for good (public, see below)
 // The bookkeeping (eloGains, eloDuels, eloDuelPairs, eloDuelAccounts) carries `at` (ms) for the daily cleanup
 // (cleanupExpired.mjs).
+//
+// mastery/{uid} = { placement: [ADMIN names], flags: [...], hardcore: [...], updatedAt }: the countries found at the first
+// try (found, no error) in Placement and Flags, forever (flagCollection.js, for the "Légende" badge). 'hardcore' is
+// reserved for the no-borders mode: nothing writes it yet. Like Elo, the answers are reported by the client, so the
+// badge is as honest as Elo.
 //
 // Solo answers are reported by the client, so they can be made up; what bounds a cheater is that a country pays once
 // per mode and season, and only gains (never losses) exist in solo. Duels are read from the room's gameResults, which
@@ -16,7 +22,9 @@
 // (plausibleResults), accounts younger than MIN_DUEL_ACCOUNT_AGE_MS are not rated, and the daily caps per pair and per
 // account limit farming with other accounts.
 import countriesMeta from '../../src/data/countries.meta.json' with { type: 'json' }
+import { MASTERY_MODES } from '../../src/utils/flagCollection.js'
 import { rankResults } from '../../src/utils/multiplayerScoring.js'
+import { GAME_TYPES } from '../../src/utils/gameTypes.js'
 import {
   ELO_MODES,
   QUESTION_START,
@@ -41,6 +49,9 @@ const reply = (status, body) => ({ status, body })
 
 // properties of each country, by its ADMIN name (what the games use).
 const COUNTRIES = new Map(countriesMeta.features.map(({ properties }) => [properties.ADMIN, properties]))
+
+// Mastery key of the solo modes that have one.
+const MASTERY_KEYS = { [GAME_TYPES.PLACEMENT]: 'placement', [GAME_TYPES.FLAGS]: 'flags' }
 
 // A country name as a document id piece ('/' is the only character an id can't hold).
 const countryKey = (name) => name.replace(/\//g, '_')
@@ -97,6 +108,7 @@ export async function rateSolo({ db, uid, name, mode, results, now = Date.now() 
   const season = seasonKeyAt(new Date(now))
   const field = difficultyField(mode)
   const eloRef = db.doc(`elo/${uid}`)
+  const masteryRef = db.doc(`mastery/${uid}`)
   const items = results.map((result) => {
     const key = countryKey(result.country)
     return {
@@ -108,8 +120,9 @@ export async function rateSolo({ db, uid, name, mode, results, now = Date.now() 
   })
 
   return db.runTransaction(async (transaction) => {
-    const [eloSnap, ...snaps] = await transaction.getAll(
+    const [eloSnap, masterySnap, ...snaps] = await transaction.getAll(
       eloRef,
+      masteryRef,
       ...items.map((item) => item.gainRef),
       ...items.map((item) => item.questionRef)
     )
@@ -146,6 +159,18 @@ export async function rateSolo({ db, uid, name, mode, results, now = Date.now() 
         if (item.found) won += 1
       }
     })
+
+    const masteryKey = MASTERY_KEYS[mode]
+    if (masteryKey) {
+      const mastery = masterySnap.exists ? masterySnap.data() : {}
+      const known = new Set(mastery[masteryKey] ?? [])
+      const fresh = items.filter((item) => item.found && item.errors === 0 && !known.has(item.country)).map((item) => item.country)
+      if (fresh.length > 0) {
+        const next = Object.fromEntries(MASTERY_MODES.map((key) => [key, mastery[key] ?? []]))
+        next[masteryKey] = [...next[masteryKey], ...fresh]
+        transaction.set(masteryRef, { ...next, updatedAt: now })
+      }
+    }
 
     rating = Math.round(rating * 10) / 10
     gained = Math.round(gained * 10) / 10

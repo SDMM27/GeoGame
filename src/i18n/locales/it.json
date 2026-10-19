@@ -949,6 +949,14 @@
       "title": "Trio hardcore",
       "desc": "Fai una partita perfetta in Hardcore in Posizionamento, Bandiere e Capitali"
     },
+    "mythic": {
+      "title": "Mitico",
+      "desc": "Sblocca tutte le bandiere"
+    },
+    "legend_master": {
+      "title": "Leggenda",
+      "desc": "Trova tutti i paesi al primo tentativo nelle modalità Bandiere, Posizionamento e Hardcore"
+    },
     "world_champion": {
       "title": "Campione del mondo",
       "desc": "Fai una partita perfetta in Posizionamento, Bandiere e Capitali in tutte e 5 le difficoltà"
@@ -1327,7 +1335,9 @@
     "week_found_200": "Trova {{count}} paesi in totale",
     "week_perfect_3": "Finisci {{count}} partite senza errori (10 paesi o più)",
     "week_types_6": "Gioca a {{count}} giochi diversi",
-    "week_ascension_3": "Gioca {{count}} partite di Ascesa"
+    "week_ascension_3": "Gioca {{count}} partite di Ascesa",
+    "fragments_one": "+{{count}} frammento",
+    "fragments_other": "+{{count}} frammenti"
   },
   "level": {
     "label": "Livello {{level}}",
@@ -1335,6 +1345,32 @@
     "progress": "{{into}} / {{needed}} XP",
     "total": "{{total}} XP",
     "up": "Livello {{level}} raggiunto!",
-    "gained": "+{{xp}} XP"
+    "gained": "+{{xp}} XP",
+    "fragments_one": "+{{count}} frammento di bandiera",
+    "fragments_other": "+{{count}} frammenti di bandiera",
+    "flag_unlocked": "Bandiera sbloccata: {{name}} ({{rarity}})"
+  },
+  "collection": {
+    "title": "Collezione di bandiere",
+    "progress": "{{count}} / {{total}} bandiere",
+    "current": "Bandiera in corso",
+    "pieces": "{{count}} / {{total}} frammenti",
+    "hint": "Ogni missione completata dà frammenti; 4 frammenti ricostruiscono una bandiera.",
+    "empty": "Completa missioni per ottenere i tuoi primi frammenti di bandiera.",
+    "complete": "Collezione completata!",
+    "unlocked": "Bandiere sbloccate",
+    "show_all": "Mostra tutto",
+    "show_less": "Mostra meno",
+    "legend_progress": "Leggenda: {{count}} / {{total}} paesi trovati al primo tentativo",
+    "legend_hardcore_soon": "La modalità hardcore arriva presto",
+    "mode_placement": "Posizionamento",
+    "mode_flags": "Bandiere",
+    "mode_hardcore": "Hardcore",
+    "rarity": {
+      "common": "Comune",
+      "uncommon": "Non comune",
+      "rare": "Raro",
+      "legendary": "Leggendario"
+    }
   }
 }

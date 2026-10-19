@@ -949,6 +949,14 @@
       "title": "Trio hardcore",
       "desc": "Réussir une partie parfaite en Hardcore au Placement, aux Drapeaux et aux Capitales"
     },
+    "mythic": {
+      "title": "Mythique",
+      "desc": "Débloquer tous les drapeaux"
+    },
+    "legend_master": {
+      "title": "Légende",
+      "desc": "Trouver tous les pays du premier coup en modes drapeaux, trouver et hardcore"
+    },
     "world_champion": {
       "title": "Champion du monde",
       "desc": "Réussir une partie parfaite au Placement, aux Drapeaux et aux Capitales dans les 5 difficultés"
@@ -1327,7 +1335,9 @@
     "week_found_200": "Trouve {{count}} pays en tout",
     "week_perfect_3": "Finis {{count}} parties sans faute (10 pays ou plus)",
     "week_types_6": "Joue à {{count}} jeux différents",
-    "week_ascension_3": "Joue {{count}} parties d’Ascension"
+    "week_ascension_3": "Joue {{count}} parties d’Ascension",
+    "fragments_one": "+{{count}} fragment",
+    "fragments_other": "+{{count}} fragments"
   },
   "level": {
     "label": "Niveau {{level}}",
@@ -1335,6 +1345,32 @@
     "progress": "{{into}} / {{needed}} XP",
     "total": "{{total}} XP",
     "up": "Niveau {{level}} atteint !",
-    "gained": "+{{xp}} XP"
+    "gained": "+{{xp}} XP",
+    "fragments_one": "+{{count}} fragment de drapeau",
+    "fragments_other": "+{{count}} fragments de drapeau",
+    "flag_unlocked": "Drapeau débloqué : {{name}} ({{rarity}})"
+  },
+  "collection": {
+    "title": "Collection de drapeaux",
+    "progress": "{{count}} / {{total}} drapeaux",
+    "current": "Drapeau en cours",
+    "pieces": "{{count}} / {{total}} fragments",
+    "hint": "Chaque mission remplie donne des fragments ; 4 fragments reconstituent un drapeau.",
+    "empty": "Remplis des missions pour gagner tes premiers fragments de drapeau.",
+    "complete": "Collection complète !",
+    "unlocked": "Drapeaux débloqués",
+    "show_all": "Tout afficher",
+    "show_less": "Afficher moins",
+    "legend_progress": "Légende : {{count}} / {{total}} pays trouvés du premier coup",
+    "legend_hardcore_soon": "Le mode hardcore arrive bientôt",
+    "mode_placement": "Trouver",
+    "mode_flags": "Drapeaux",
+    "mode_hardcore": "Hardcore",
+    "rarity": {
+      "common": "Commun",
+      "uncommon": "Peu commun",
+      "rare": "Rare",
+      "legendary": "Légendaire"
+    }
   }
 }

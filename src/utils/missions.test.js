@@ -19,6 +19,7 @@ import {
   weekKeyOf,
   weeklyMissions,
 } from './missions'
+import { DAILY_BONUS_FRAGMENTS, DAILY_MISSION_FRAGMENTS, WEEKLY_MISSION_FRAGMENTS } from './flagCollection'
 
 // Monday 2026-10-19, 12:00 in Paris (UTC+2).
 const NOW = Date.UTC(2026, 9, 19, 10)
@@ -125,5 +126,14 @@ describe('XP', () => {
     expect(result.levelUp).toBe(true)
     expect(result.state.level).toBe(levelOf(result.state.total).level)
     expect(grantXp(result.state, games, NOW).gained).toBe(0)
+    // Fragments come with the missions and the bonus, not with the games, and are paid once.
+    // (The same games may also finish weekly missions, which pay their own.)
+    const weekly = result.state.weekMissions.filter((id) => id !== BONUS_ID).length
+    expect(result.fragments).toBe(MISSIONS_PER_PERIOD * DAILY_MISSION_FRAGMENTS + DAILY_BONUS_FRAGMENTS + weekly * WEEKLY_MISSION_FRAGMENTS)
+    expect(grantXp(result.state, games, NOW).fragments).toBe(0)
+  })
+
+  it('pays no fragment for games alone', () => {
+    expect(grantXp(fresh(), [game(), game()], NOW)).toMatchObject({ fragments: 0 })
   })
 })

@@ -176,7 +176,8 @@ service cloud.firestore {
         && level is int && decorationLevel(decoration.frame) <= level && decorationLevel(decoration.color) <= level;
     }
 
-    // users/{uid}.xp (src/utils/missions.js): XP and missions paid, written by api/xp only; no client rule writes it.
+    // users/{uid}.xp (src/utils/missions.js) and users/{uid}.flags (src/utils/flagCollection.js): XP, missions paid and
+    // the flag collection, written by api/xp only; the hasOnly below keeps them out of any client update.
     match /users/{uid} {
       allow read: if true;
       allow update: if request.auth != null && request.auth.uid == uid
@@ -1034,6 +1035,12 @@ service cloud.firestore {
 
     // The players' ratings, shown on the profiles and the Elo leaderboards (src/utils/elo.js).
     match /elo/{uid} {
+      allow read: if true;
+    }
+
+    // Countries found at the first try per mode, for the "Légende" badge (src/utils/flagCollection.js, written by rateSolo
+    // in api/_lib/elo.mjs only): readable by everyone, so the profiles can show the progress.
+    match /mastery/{uid} {
       allow read: if true;
     }
 

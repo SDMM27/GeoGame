@@ -949,6 +949,14 @@
       "title": "Hardcore trio",
       "desc": "Play a flawless Hardcore game in Placement, Flags and Capitals"
     },
+    "mythic": {
+      "title": "Mythic",
+      "desc": "Unlock every flag"
+    },
+    "legend_master": {
+      "title": "Legend",
+      "desc": "Find every country on the first try in the flags, find and hardcore modes"
+    },
     "world_champion": {
       "title": "World champion",
       "desc": "Play a flawless game in Placement, Flags and Capitals on all 5 difficulties"
@@ -1327,7 +1335,9 @@
     "week_found_200": "Find {{count}} countries in total",
     "week_perfect_3": "Finish {{count}} games with no mistakes (10 countries or more)",
     "week_types_6": "Play {{count}} different games",
-    "week_ascension_3": "Play {{count}} Ascension games"
+    "week_ascension_3": "Play {{count}} Ascension games",
+    "fragments_one": "+{{count}} fragment",
+    "fragments_other": "+{{count}} fragments"
   },
   "level": {
     "label": "Level {{level}}",
@@ -1335,6 +1345,32 @@
     "progress": "{{into}} / {{needed}} XP",
     "total": "{{total}} XP",
     "up": "Level {{level}} reached!",
-    "gained": "+{{xp}} XP"
+    "gained": "+{{xp}} XP",
+    "fragments_one": "+{{count}} flag fragment",
+    "fragments_other": "+{{count}} flag fragments",
+    "flag_unlocked": "Flag unlocked: {{name}} ({{rarity}})"
+  },
+  "collection": {
+    "title": "Flag collection",
+    "progress": "{{count}} / {{total}} flags",
+    "current": "Flag in progress",
+    "pieces": "{{count}} / {{total}} fragments",
+    "hint": "Every mission completed gives fragments; 4 fragments rebuild a flag.",
+    "empty": "Complete missions to earn your first flag fragments.",
+    "complete": "Collection complete!",
+    "unlocked": "Unlocked flags",
+    "show_all": "Show all",
+    "show_less": "Show less",
+    "legend_progress": "Legend: {{count}} / {{total}} countries found on the first try",
+    "legend_hardcore_soon": "Hardcore mode is coming soon",
+    "mode_placement": "Find",
+    "mode_flags": "Flags",
+    "mode_hardcore": "Hardcore",
+    "rarity": {
+      "common": "Common",
+      "uncommon": "Uncommon",
+      "rare": "Rare",
+      "legendary": "Legendary"
+    }
   }
 }

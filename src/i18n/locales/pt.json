@@ -949,6 +949,14 @@
       "title": "Trio hardcore",
       "desc": "Faça uma partida perfeita em Hardcore em Localização, Bandeiras e Capitais"
     },
+    "mythic": {
+      "title": "Mítico",
+      "desc": "Desbloqueie todas as bandeiras"
+    },
+    "legend_master": {
+      "title": "Lenda",
+      "desc": "Encontre todos os países na primeira tentativa nos modos Bandeiras, Localização e Hardcore"
+    },
     "world_champion": {
       "title": "Campeão do mundo",
       "desc": "Faça uma partida perfeita em Localização, Bandeiras e Capitais nas 5 dificuldades"
@@ -1327,7 +1335,9 @@
     "week_found_200": "Encontre {{count}} países no total",
     "week_perfect_3": "Termine {{count}} partidas sem erros (10 países ou mais)",
     "week_types_6": "Jogue {{count}} jogos diferentes",
-    "week_ascension_3": "Jogue {{count}} partidas de Ascensão"
+    "week_ascension_3": "Jogue {{count}} partidas de Ascensão",
+    "fragments_one": "+{{count}} fragmento",
+    "fragments_other": "+{{count}} fragmentos"
   },
   "level": {
     "label": "Nível {{level}}",
@@ -1335,6 +1345,32 @@
     "progress": "{{into}} / {{needed}} XP",
     "total": "{{total}} XP",
     "up": "Nível {{level}} alcançado!",
-    "gained": "+{{xp}} XP"
+    "gained": "+{{xp}} XP",
+    "fragments_one": "+{{count}} fragmento de bandeira",
+    "fragments_other": "+{{count}} fragmentos de bandeira",
+    "flag_unlocked": "Bandeira desbloqueada: {{name}} ({{rarity}})"
+  },
+  "collection": {
+    "title": "Coleção de bandeiras",
+    "progress": "{{count}} / {{total}} bandeiras",
+    "current": "Bandeira em andamento",
+    "pieces": "{{count}} / {{total}} fragmentos",
+    "hint": "Cada missão concluída dá fragmentos; 4 fragmentos reconstroem uma bandeira.",
+    "empty": "Complete missões para ganhar seus primeiros fragmentos de bandeira.",
+    "complete": "Coleção completa!",
+    "unlocked": "Bandeiras desbloqueadas",
+    "show_all": "Mostrar tudo",
+    "show_less": "Mostrar menos",
+    "legend_progress": "Lenda: {{count}} / {{total}} países encontrados na primeira tentativa",
+    "legend_hardcore_soon": "O modo Hardcore chega em breve",
+    "mode_placement": "Localização",
+    "mode_flags": "Bandeiras",
+    "mode_hardcore": "Hardcore",
+    "rarity": {
+      "common": "Comum",
+      "uncommon": "Incomum",
+      "rare": "Rara",
+      "legendary": "Lendária"
+    }
   }
 }

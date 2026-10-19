@@ -289,6 +289,28 @@ describe('XP', () => {
   })
 })
 
+describe('flag collection and mastery', () => {
+  const flags = { unlocked: ['FR', 'JP'], current: 'BR', pieces: 2 }
+
+  it('refuses the player writing their own flags, alone or along with something they may write', async () => {
+    await assertFails(as('alice').doc('users/alice').update({ flags }))
+    await assertFails(as('alice').doc('users/alice').update({ flags, badges: { top: [], count: 0 } }))
+    await assertFails(as('alice').doc('users/alice').update({ 'flags.pieces': 3 }))
+    await assertFails(claim(as('bob'), 'bob', 'Bob', { user: { flags } }))
+  })
+
+  it('refuses any client writing the mastery, and lets anyone read it', async () => {
+    const mastery = { placement: ['France'], flags: [], hardcore: [], updatedAt: 1 }
+    await assertFails(as('alice').doc('mastery/alice').set(mastery))
+    await assertFails(anonymous().doc('mastery/alice').set(mastery))
+    await env.withSecurityRulesDisabled((context) => context.firestore().doc('mastery/alice').set(mastery))
+    await assertFails(as('alice').doc('mastery/alice').update({ flags: ['France'] }))
+    await assertFails(as('alice').doc('mastery/alice').delete())
+    await assertSucceeds(anonymous().doc('mastery/alice').get())
+    await assertSucceeds(as('bob').doc('mastery/alice').get())
+  })
+})
+
 describe('community directory', () => {
   it('lets an account join with the server time, leave, and anyone list the members', async () => {
     await assertSucceeds(as('alice').doc('users/alice').update({ communityAt: now() }))

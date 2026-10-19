@@ -5,12 +5,17 @@
 // The progress is read from the player's own history (users/{uid}/games), which the player writes: a game made up
 // there can complete a mission. What bounds it is that a mission pays once per period, games pay for GAMES_PER_DAY
 // a day at most, and the history's fields are bounded by the rules. Asking again pays nothing more (idempotent).
+import countriesMeta from '../../src/data/countries.meta.json' with { type: 'json' }
+import { addFragments, flagPool, readFlags } from '../../src/utils/flagCollection.js'
 import { grantXp, missionDayAt, readXp, weekKeyOf } from '../../src/utils/missions.js'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 // The games of the current week (Paris) are within the last 8 days whatever the time zone offset.
 const HISTORY_WINDOW_MS = 8 * DAY_MS
 const MAX_GAMES = 1000
+
+// The flags that fragments unlock.
+const POOL = flagPool(countriesMeta.features)
 
 const reply = (status, body) => ({ status, body })
 
@@ -28,7 +33,8 @@ const toGame = (snapshot) => {
   return { ...data, playedAt: data.playedAt?.toMillis?.() }
 }
 
-/** Pays what the player's recent games earn: { xp, gained, levelUp }. */
+/** Pays what the player's recent games earn: { xp, gained, levelUp, flags, fragments,
+ *  unlockedFlags }: the missions' fragments go to the flag collection in the same transaction as the XP. */
 export async function claimXp({ db, uid, now = Date.now(), Timestamp }) {
   const userRef = db.doc(`users/${uid}`)
   const snapshot = await userRef
@@ -45,9 +51,13 @@ export async function claimXp({ db, uid, now = Date.now(), Timestamp }) {
   return db.runTransaction(async (transaction) => {
     const user = await transaction.get(userRef)
     if (!user.exists || !user.data().username) return reply(403, { error: 'no_account' })
-    const { gained, levelUp, state } = grantXp(readXp(user.data(), day, week), games, now)
-    if (gained > 0 || user.data().xp?.day !== day || user.data().xp?.week !== week) transaction.update(userRef, { xp: state })
-    return reply(200, { xp: state, gained, levelUp })
+    const { gained, fragments, levelUp, state } = grantXp(readXp(user.data(), day, week), games, now)
+    const collected = addFragments(readFlags(user.data(), POOL), fragments, POOL, uid)
+    const changes = {}
+    if (gained > 0 || user.data().xp?.day !== day || user.data().xp?.week !== week) changes.xp = state
+    if (fragments > 0) changes.flags = collected.state
+    if (Object.keys(changes).length > 0) transaction.update(userRef, changes)
+    return reply(200, { xp: state, gained, levelUp, flags: collected.state, fragments, unlockedFlags: collected.unlocked })
   })
 }
 

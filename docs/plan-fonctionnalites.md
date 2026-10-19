@@ -39,22 +39,22 @@
 
 7. **Mode hardcore : trouver le pays (sans frontières)**
    Nouveau mode où le pays doit être trouvé sans les frontières affichées. Dépend de l'étape 4 pour le classement, optionnel.
-   Fait : mode jouable sur le site et l'application mobile, sélection de pays comme dans Trouver, sans frontières visibles avant la réponse et sans bouton Révéler. Une seule tentative par pays ; 1 000 points si la carte est touchée dans le pays, sinon un score réduit selon la distance (0 à 2 000 km). Elo et maîtrise du premier essai enregistrés sous `HARDCORE`, avec classements et historique dédiés.
+   Fait : mode jouable sur le site et l'application mobile, sélection de pays comme dans Trouver, sans frontières visibles avant la réponse (y compris après « Recommencer ») et sans bouton Révéler ni Ascension. Une seule tentative par pays ; 1 000 points si la carte est touchée dans le pays, sinon un score réduit selon la distance (0 à 2 000 km). Elo et maîtrise du premier essai enregistrés sous `HARDCORE`, avec classements et historique dédiés.
 
 8. **Jeu de drapeau avec un élément manquant**
    Un drapeau dont une partie ou une couleur manque ; le joueur doit identifier le pays. Nouveau mode, avec sa propre difficulté, séparée de celle des autres modes.
-   Fait : mode « Drapeau incomplet » sur le site et l'application mobile ; une bande du drapeau est masquée, partie manquante stable pour chaque pays. Difficulté, score et Elo dédiés ; accessible depuis l'accueil et les classements.
+   Fait : mode « Drapeau incomplet » sur le site et l'application mobile ; un tiers horizontal du drapeau est masqué, toujours le même pour un pays. Elo, classement et plafonds de score dédiés (`MISSING_FLAG` dans `scripts/scoreCaps.mjs`) ; la difficulté d'un pays reprend pour l'instant celle du jeu des drapeaux (`DifficultyFlag`). Pas d'Ascension. Accessible depuis l'accueil et les classements.
 
 9. **Spectateur des parties des autres**
    Regarder une partie multijoueur en cours, en lecture seule. Demande une synchro de l'état de partie côté serveur ; le plus gros chantier, à faire après les étapes de scoring.
-   Fait : un visiteur peut ouvrir une salle en cours en lecture seule sans la rejoindre ; roster, classement et progression se synchronisent en temps réel. Les règles Firestore limitent les écritures de progression et résultats aux membres de la salle.
+   Fait sur le site : un visiteur peut ouvrir une salle en cours en lecture seule sans la rejoindre ; roster, classement et progression se synchronisent en temps réel. Les règles Firestore limitent les écritures de progression et résultats aux membres de la salle. L'application mobile n'a pas encore de mode spectateur.
 
 10. **Rééquilibrer le choix des modes**
     Ne plus choisir la difficulté par défaut, et mettre en avant les modes courts et plus récompensants. Dépend des étapes 5 et 6 pour définir les récompenses.
     - Mettre en avant le mode **Ascension** sur l'accueil.
     - Pour les nouveaux joueurs, le préréglage par défaut est « Découverte » (10 faciles, 5 moyens, 1 difficile) : des pays faciles au début pour le plaisir de réussir, puis un peu de moyen pour s'entraîner.
     - Les pays difficiles restent accessibles mais ne sont plus le point de départ.
-   Fait : entrée Ascension mise en avant sur l'accueil, ouvrant directement sa configuration ; le préréglage initial est « Découverte » (10 faciles, 5 moyens, 1 difficile).
+   Fait : entrée Ascension mise en avant sur l'accueil du site, ouvrant directement sa configuration ; le préréglage initial est « Découverte » (10 faciles, 5 moyens, 1 difficile) sur le site et l'application. L'accueil de l'application n'a pas encore d'entrée Ascension mise en avant.
 
 ## Décisions actées
 
@@ -69,4 +69,9 @@ Toutes les décisions listées ici sont prises ; elles ne représentent pas des 
 
 ## Suivi restant
 
-Aucun : les étapes 1 à 10 sont implémentées et les traductions des missions, fragments et badges en es/pt/de/it/ru ont été relues.
+Les étapes 1 à 10 sont implémentées et les traductions des missions, fragments et badges en es/pt/de/it/ru ont été relues. Reste :
+
+- **Déployer les règles Firestore** (`npm run deploy:rules`) avant de publier les modes Hardcore et Drapeau incomplet : sans les plafonds `HARDCORE_*` et `MISSING_FLAG_*`, leurs scores sont refusés.
+- **Spectateur sur l'application mobile** (étape 9, site seulement).
+- **Ascension mise en avant sur l'accueil de l'application** (étape 10, site seulement).
+- **Drapeau incomplet** : une difficulté propre au mode, et une partie masquée choisie selon le drapeau (bande verticale pour la France ou l'Italie ; sur un drapeau uni, masquer un tiers n'enlève presque rien).

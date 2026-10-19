@@ -225,3 +225,13 @@ describe('useGameState — Elo', () => {
     expect(reportEloAnswer).not.toHaveBeenCalled()
   })
 })
+
+describe('useGameState — Hardcore', () => {
+  it('keeps the map without borders when the game restarts', () => {
+    const { result } = renderHook(() => useGameState('Facile', false, null, null, null, null, 'HARDCORE'))
+    const layer = makeLayer('France', { fillColor: '#3DDC97', weight: 2 })
+    result.current.geoJsonRef.current = { getLayers: () => [layer] }
+    act(() => result.current.restartGame())
+    expect(layer.options).toMatchObject({ fillColor: '#2A3E66', fillOpacity: 1, weight: 0 })
+  })
+})

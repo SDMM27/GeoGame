@@ -61,6 +61,7 @@ export const GAMES: GameDefinition[] = [
     route: '/game/placement',
     kind: 'setup',
     multi: false,
+    noAscension: true,
   },
   {
     id: 'flags',

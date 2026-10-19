@@ -77,7 +77,10 @@ function GameSetupSheet() {
   const [selection, setSelection] = useState<Selection>('difficulty')
   const [difficulty, setDifficulty] = useState('Facile')
   const [continent, setContinent] = useState<string | null>(null)
-  const [phases, setPhases] = useState<Phases>(() => ({ ...ASCENSION_PRESETS[1].phases }))
+  const [phases, setPhases] = useState<Phases>(
+    // New players start on Discovery: easy countries first (docs/plan-fonctionnalites.md, step 10)
+    () => ({ ...(ASCENSION_PRESETS.find((preset: { name: string }) => preset.name === 'Découverte') ?? ASCENSION_PRESETS[0]).phases })
+  )
 
   const caps = useMemo(
     () => Object.fromEntries(DIFFICULTIES.filter((d) => d !== 'Hardcore').map((d) => [d, counts.byDifficulty(d)])),
@@ -128,7 +131,7 @@ function GameSetupSheet() {
           <SheetCloseButton />
         </View>
 
-        {!game.noAscension && game.id !== 'hardcore' && <Segmented<Mode>
+        {!game.noAscension && <Segmented<Mode>
           value={mode}
           onChange={setMode}
           options={[

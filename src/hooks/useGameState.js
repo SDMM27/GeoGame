@@ -9,7 +9,7 @@ import { saveSnapshot } from '../utils/multiplayerSnapshot'
 import { getCountryName } from '../utils/getCountryName'
 import { GAME_TYPES } from '../utils/gameTypes'
 import { reportEloAnswer, flushElo } from '../utils/eloReport'
-import { HOVER_STYLE, MAP_COLORS } from '../utils/mapColors'
+import { HARDCORE_COUNTRY_STYLE, HOVER_STYLE, MAP_COLORS } from '../utils/mapColors'
 import { scoreHardcoreTap } from '../utils/hardcoreScoring'
 
 const DIFFICULTIES = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
@@ -380,7 +380,7 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
     foundCountriesRef.current.clear()
     shownCountriesRef.current.clear()
     for (const ref of [geoJsonRef, ...extraGeoJsonRefs.current]) {
-      if (ref.current) ref.current.getLayers().forEach(l => l.setStyle(COUNTRY_STYLE))
+      if (ref.current) ref.current.getLayers().forEach(l => l.setStyle(gameType === GAME_TYPES.HARDCORE ? HARDCORE_COUNTRY_STYLE : COUNTRY_STYLE))
     }
     startTimeRef.current = null;
     timerRef.current = 0;

@@ -15,10 +15,9 @@ import AscensionForm from '../AscensionForm'
 import ShareScoreButton from '../../components/ShareScoreButton'
 import SmallCountryCircles from './SmallCountryCircles'
 import { getShiftedFeatures } from './shiftedFeatures'
-import { MAP_COLORS } from '../../utils/mapColors'
+import { HARDCORE_COUNTRY_STYLE, MAP_COLORS } from '../../utils/mapColors'
 
 const GEO_STYLE = { fillColor: 'transparent', color: MAP_COLORS.stroke, fillOpacity: 1, weight: 1 }
-const HARDCORE_GEO_STYLE = { fillColor: MAP_COLORS.land, color: 'transparent', fillOpacity: 1, weight: 0 }
 
 function MapClickListener({ onClick }) {
   useMapEvents({ click: onClick })
@@ -208,13 +207,13 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
         <GeoJSON
           key="geojson-left"
           ref={geoJsonRefLeft}
-          style={gameType === GAME_TYPES.HARDCORE ? HARDCORE_GEO_STYLE : GEO_STYLE}
+          style={gameType === GAME_TYPES.HARDCORE ? HARDCORE_COUNTRY_STYLE : GEO_STYLE}
           data={getShiftedFeatures().left}
           onEachFeature={onEachOffsetFeature}
         />
         <GeoJSON
           ref={geoJsonRef}
-          style={gameType === GAME_TYPES.HARDCORE ? HARDCORE_GEO_STYLE : GEO_STYLE}
+          style={gameType === GAME_TYPES.HARDCORE ? HARDCORE_COUNTRY_STYLE : GEO_STYLE}
           data={countries.features}
           onEachFeature={(feature, layer) => {
             layer.on({ click: onCountryClick, mouseover: onMouseOver, mouseout: onCountryMouseOut })
@@ -223,7 +222,7 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
         <GeoJSON
           key="geojson-right"
           ref={geoJsonRefRight}
-          style={gameType === GAME_TYPES.HARDCORE ? HARDCORE_GEO_STYLE : GEO_STYLE}
+          style={gameType === GAME_TYPES.HARDCORE ? HARDCORE_COUNTRY_STYLE : GEO_STYLE}
           data={getShiftedFeatures().right}
           onEachFeature={onEachOffsetFeature}
         />

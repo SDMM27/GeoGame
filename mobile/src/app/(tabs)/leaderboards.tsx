@@ -47,6 +47,7 @@ type SoloMode = 'difficulty' | 'continent'
 
 const SOLO_GAMES = GAMES.filter((game) => game.kind === 'setup')
 const DAILY_GAMES = GAMES.filter((game) => game.kind === 'daily')
+const ASCENSION_GAMES = SOLO_GAMES.filter((game) => !game.noAscension)
 // Survival: every set of games together, the six mixed, or one game alone
 const ALL_SURVIVAL_MODES = 'all'
 const ALL_SIX = survivalModesKey(SURVIVAL_ROUND_TYPES)
@@ -153,7 +154,7 @@ export default function LeaderboardsScreen() {
 
       {section === 'ascension' && (
         <>
-          <FilterChips label={t('mobile.leaderboards.game')} options={gameChips(SOLO_GAMES, true)} value={ascensionGame} onChange={setAscensionGame} />
+          <FilterChips label={t('mobile.leaderboards.game')} options={gameChips(ASCENSION_GAMES, true)} value={ascensionGame} onChange={setAscensionGame} />
           <FilterChips
             label={t('mobile.leaderboards.preset')}
             options={[

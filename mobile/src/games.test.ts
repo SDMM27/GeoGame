@@ -68,6 +68,10 @@ describe('lookups', () => {
   it('offers setup sheets to all configurable solo games', () => {
     expect(GAMES.filter((game) => game.kind === 'setup').map((game) => game.id)).toEqual(['placement', 'hardcore', 'flags', 'missing_flag', 'capitals'])
   })
+
+  it('offers no Ascension to Hardcore and Missing Flag', () => {
+    expect(GAMES.filter((game) => game.noAscension).map((game) => game.id)).toEqual(['hardcore', 'missing_flag'])
+  })
 })
 
 describe('difficulties', () => {

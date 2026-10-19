@@ -145,7 +145,7 @@ export function FlagCollectionView({ collection }: { collection: Collection }) {
                   onPress={() => setSelected(selected === iso ? null : iso)}
                   style={[styles.cell, { borderColor: COLORS[RARITY_OF.get(iso) ?? 'common'] }, selected === iso && styles.cellSelected]}
                 >
-                  {source != null && <Image source={source} style={StyleSheet.absoluteFill} resizeMode="cover" />}
+                  {source != null && <Image source={source} style={styles.cellImage} resizeMode="cover" />}
                 </Touchable>
               )
             })}
@@ -222,6 +222,7 @@ const styles = StyleSheet.create({
   cover: { ...StyleSheet.absoluteFill, backgroundColor: colors.borderStrong },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
   cell: { width: CELL, height: CELL * 0.7, borderRadius: 6, borderWidth: 2, overflow: 'hidden', backgroundColor: colors.surfaceHigh },
+  cellImage: { width: CELL - 4, height: CELL * 0.7 - 4 },
   cellSelected: { transform: [{ scale: 1.1 }] },
   legend: { gap: 6, paddingTop: space.sm, borderTopWidth: 1, borderTopColor: colors.border },
   modeRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },

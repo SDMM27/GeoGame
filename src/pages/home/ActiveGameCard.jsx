@@ -10,12 +10,12 @@ import {
 } from "./gameData";
 import MultiButton from "./MultiButton";
 
-export default function ActiveGameCard({ game }) {
+export default function ActiveGameCard({ game, initialMode = "standard" }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [mode, setMode] = useState("standard");
+  const [mode, setMode] = useState(initialMode);
   const [difficulty, setDifficulty] = useState("Facile");
-  const [ascensionPhases, setAscensionPhases] = useState(() => buildPresetPhases("Progressif"));
+  const [ascensionPhases, setAscensionPhases] = useState(() => buildPresetPhases("Découverte"));
   const [selectionMode, setSelectionMode] = useState("difficulty");
   const [selectedContinent, setSelectedContinent] = useState(null);
   const continents = useMemo(() => getContinentsForGame(game.id), [game.id]);

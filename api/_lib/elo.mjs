@@ -40,9 +40,9 @@ export const MAX_ERRORS = 1000
 export const DUEL_PAIR_DAILY_LIMIT = 3
 export const DUEL_ACCOUNT_DAILY_LIMIT = 20
 export const MIN_DUEL_ACCOUNT_AGE_MS = 3 * 24 * 60 * 60 * 1000
-// Most points a country gives in Placement, Flags and Capitals (SCORE_TABLE in src/utils/scoringRules.js).
+// Most points a country gives in the score-table games (SCORE_TABLE in src/utils/scoringRules.js).
 const MAX_POINTS_PER_COUNTRY = 9
-const SCORE_TABLE_GAMES = ['PLACEMENT', 'FLAGS', 'CAPITALS']
+const SCORE_TABLE_GAMES = ['PLACEMENT', 'FLAGS', 'MISSING_FLAG', 'CAPITALS']
 
 const reply = (status, body) => ({ status, body })
 

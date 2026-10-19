@@ -31,7 +31,7 @@ const CONTINENT_ICONS: Record<string, keyof typeof MaterialCommunityIcons.glyphM
 }
 
 function countFunctions(gameId: string) {
-  if (gameId === 'flags') return { byDifficulty: getTotalFlagCountries, byContinent: getTotalFlagCountriesByContinent }
+  if (gameId === 'flags' || gameId === 'missing_flag') return { byDifficulty: getTotalFlagCountries, byContinent: getTotalFlagCountriesByContinent }
   if (gameId === 'capitals') return { byDifficulty: getTotalCapitalCountries, byContinent: getTotalCapitalCountriesByContinent }
   return { byDifficulty: getTotalCountries, byContinent: getTotalCountriesByContinent }
 }
@@ -128,7 +128,7 @@ function GameSetupSheet() {
           <SheetCloseButton />
         </View>
 
-        {game.id !== 'hardcore' && <Segmented<Mode>
+        {!game.noAscension && game.id !== 'hardcore' && <Segmented<Mode>
           value={mode}
           onChange={setMode}
           options={[

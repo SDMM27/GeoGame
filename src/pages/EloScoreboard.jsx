@@ -10,6 +10,7 @@ const GAME_TITLE_KEYS = {
   PLACEMENT: 'games.placement.title',
   HARDCORE: 'games.hardcore.title',
   FLAGS: 'games.flags.title',
+  MISSING_FLAG: 'games.missing_flag.title',
   CAPITALS: 'games.capitals.title',
   BORDER_GUESS: 'games.border_guess.title',
   SURVIVAL: 'games.survival.title',

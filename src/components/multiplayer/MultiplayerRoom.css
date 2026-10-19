@@ -28,6 +28,7 @@
 .mpr-friend-btn:disabled { opacity: 0.6; cursor: default; }
 .mpr-friend-sent { flex-shrink: 0; font-size: 0.8rem; color: var(--success); }
 .mpr-waiting { text-align: center; color: var(--text-muted); font-style: italic; }
+.mpr-watching { margin: 0; font-weight: 700; }
 .mpr-finished { margin: 0; text-align: center; font-size: 1.2rem; font-weight: 700; color: var(--success); }
 .mpr-countdown { display: flex; flex-direction: column; align-items: center; padding: 2rem 0; }
 .mpr-countdown strong { font-size: 6rem; line-height: 1; color: var(--accent); animation: mpr-pop 0.35s ease-out; }

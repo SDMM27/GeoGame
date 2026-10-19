@@ -91,6 +91,11 @@
     "survival": {
       "title": "Sobrevivência",
       "description": "Encadeie rodadas de vários jogos: cada erro custa uma vida."
+    },
+    "missing_flag": {
+      "title": "Bandeira incompleta",
+      "description": "Identifique o país mesmo com uma faixa da bandeira em falta.",
+      "missing_part": "Parte em falta da bandeira"
     }
   },
   "modes": {
@@ -561,7 +566,15 @@
   "daily_challenge": {
     "rules": "12 perguntas, as mesmas para todos hoje: localize países no mapa, reconheça bandeiras, diga capitais. Uma só tentativa por pergunta, {{seconds}} s cada, sem vidas. Sua pontuação é o número de acertos; o tempo total desempata. Você só pode jogar uma vez por dia.",
     "level": "Nível do dia: {{label}} ({{n}}/7)",
-    "levels": {"1": "Muito fácil", "2": "Fácil", "3": "Acessível", "4": "Médio", "5": "Puxado", "6": "Difícil", "7": "Brutal"},
+    "levels": {
+      "1": "Muito fácil",
+      "2": "Fácil",
+      "3": "Acessível",
+      "4": "Médio",
+      "5": "Puxado",
+      "6": "Difícil",
+      "7": "Brutal"
+    },
     "week_note": "De segunda a domingo, o desafio fica mais difícil a cada dia. Domingo é brutal!",
     "start": "Começar o desafio",
     "continue": "Continuar o desafio",
@@ -1020,6 +1033,9 @@
     "from_app": "Partida criada no app",
     "code": "Código da partida",
     "join_hint": "Escolha seu nome de usuário para entrar na partida.",
+    "watch": "Assistir à partida em andamento",
+    "spectator": "Você está assistindo a esta partida",
+    "spectator_hint": "A classificação e o progresso são atualizados em tempo real. Você não participa da partida.",
     "join": "Entrar",
     "players": "Jogadores · {{count}}",
     "you": "você",
@@ -1324,7 +1340,7 @@
     "play_3": "Jogue {{count}} partidas",
     "dailies_3": "Jogue {{count}} jogos do dia",
     "daily_challenge": "Jogue o desafio do dia",
-    "daily_wins_2": "Acerte {{count}} jogos do dia",
+    "daily_wins_2": "Complete {{count}} jogos do dia",
     "flags_20": "Encontre {{count}} bandeiras",
     "placement_20": "Posicione {{count}} países no mapa",
     "capitals_15": "Encontre {{count}} capitais",
@@ -1335,7 +1351,7 @@
     "week_play_20": "Jogue {{count}} partidas",
     "week_daily_days_5": "Jogue um jogo do dia em {{count}} dias diferentes",
     "week_dailies_15": "Jogue {{count}} jogos do dia",
-    "week_daily_wins_10": "Acerte {{count}} jogos do dia",
+    "week_daily_wins_10": "Complete {{count}} jogos do dia",
     "week_found_200": "Encontre {{count}} países no total",
     "week_perfect_3": "Termine {{count}} partidas sem erros (10 países ou mais)",
     "week_types_6": "Jogue {{count}} jogos diferentes",

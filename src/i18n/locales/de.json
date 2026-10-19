@@ -91,6 +91,11 @@
     "survival": {
       "title": "Survival",
       "description": "Spiele Runden aus mehreren Spielen hintereinander: Jeder Fehler kostet ein Leben."
+    },
+    "missing_flag": {
+      "title": "Unvollständige Flagge",
+      "description": "Erkenne das Land trotz eines fehlenden Streifens in der Flagge.",
+      "missing_part": "Fehlender Teil der Flagge"
     }
   },
   "modes": {
@@ -561,7 +566,15 @@
   "daily_challenge": {
     "rules": "12 Fragen, heute für alle gleich: Länder auf der Karte finden, Flaggen und Hauptstädte nennen. Ein Versuch pro Frage, je {{seconds}} s, keine Leben. Dein Ergebnis ist die Zahl der richtigen Antworten; die Gesamtzeit entscheidet bei Gleichstand. Du kannst nur einmal pro Tag spielen.",
     "level": "Level des Tages: {{label}} ({{n}}/7)",
-    "levels": {"1": "Sehr leicht", "2": "Leicht", "3": "Machbar", "4": "Mittel", "5": "Knifflig", "6": "Schwer", "7": "Knallhart"},
+    "levels": {
+      "1": "Sehr leicht",
+      "2": "Leicht",
+      "3": "Machbar",
+      "4": "Mittel",
+      "5": "Knifflig",
+      "6": "Schwer",
+      "7": "Knallhart"
+    },
     "week_note": "Von Montag bis Sonntag wird die Challenge jeden Tag schwerer. Sonntag wird es knallhart!",
     "start": "Challenge starten",
     "continue": "Challenge fortsetzen",
@@ -1020,6 +1033,9 @@
     "from_app": "Spiel in der App erstellt",
     "code": "Spielcode",
     "join_hint": "Wähle deinen Benutzernamen, um dem Spiel beizutreten.",
+    "watch": "Laufendes Spiel ansehen",
+    "spectator": "Du schaust dieses Spiel an",
+    "spectator_hint": "Rangliste und Fortschritt werden live aktualisiert. Du spielst nicht mit.",
     "join": "Beitreten",
     "players": "Spieler · {{count}}",
     "you": "du",

@@ -23,6 +23,7 @@ export const ELO_MODES = [
   GAME_TYPES.PLACEMENT,
   GAME_TYPES.HARDCORE,
   GAME_TYPES.FLAGS,
+  GAME_TYPES.MISSING_FLAG,
   GAME_TYPES.CAPITALS,
   GAME_TYPES.BORDER_GUESS,
   GAME_TYPES.SURVIVAL,
@@ -34,6 +35,7 @@ export const QUESTION_START = { Facile: 800, Moyen: 1000, Difficile: 1200, Impos
 // Difficulty field of a country (countries.meta.json properties) for a mode.
 export function difficultyField(mode) {
   if (mode === GAME_TYPES.FLAGS) return 'DifficultyFlag'
+  if (mode === GAME_TYPES.MISSING_FLAG) return 'DifficultyFlag'
   if (mode === GAME_TYPES.CAPITALS) return 'DifficultyCapitals'
   return 'Difficulty'
 }

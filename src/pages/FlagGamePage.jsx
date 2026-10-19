@@ -12,6 +12,7 @@ import { useRecordGame } from '../auth'
 import { matchKnownAnswer } from '../utils/answerLexicon'
 import { restartTyping } from '../utils/restartTyping'
 import { getCountryName, getAllCountryNames } from '../utils/getCountryName'
+import { getMissingFlagBand } from '../utils/missingFlag'
 import PhaseIndicator from '../components/PhaseIndicator'
 import Form from './form'
 import AscensionForm from './AscensionForm'
@@ -20,7 +21,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import './GamePage.css'
 import './FlagGamePage.css'
 
-function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state, onGameFinished = null, continent }) {
+function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state, onGameFinished = null, continent, gameType = GAME_TYPES.FLAGS, missingFlag = false }) {
   const { t, i18n } = useTranslation()
   const {
     targetCountry, targetCountryISO, score, timer, stats,
@@ -34,7 +35,7 @@ function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state
   // Multiplayer games (onGameFinished) belong to their room, not to the history.
   useRecordGame(
     isGameOver && !onGameFinished
-      ? setupGameRecord({ gameType: GAME_TYPES.FLAGS, isTraining, isAscension, presetName, difficulty, continent, score, stats, timer })
+      ? setupGameRecord({ gameType, isTraining, isAscension, presetName, difficulty, continent, score, stats, timer })
       : null
   )
 
@@ -124,7 +125,12 @@ function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state
 
       <div className="flag-game-main">
         {isoA2
-          ? <img src={`/flags/${isoA2}.png`} alt={revealedName ? (getCountryName(targetCountryISO, i18n.language) || targetCountry?.properties?.ADMIN) : '?'} className="flag-display" />
+          ? missingFlag
+            ? <div className={`flag-display-wrap${!revealedName ? ' flag-display-wrap--missing' : ''}`}>
+                <img src={`/flags/${isoA2}.png`} alt={revealedName ? (getCountryName(targetCountryISO, i18n.language) || targetCountry?.properties?.ADMIN) : '?'} className="flag-display" />
+                {!revealedName && <span className="missing-flag-band" style={{ '--missing-band': getMissingFlagBand(targetCountryISO) }} aria-label={t('games.missing_flag.missing_part')} />}
+              </div>
+            : <img src={`/flags/${isoA2}.png`} alt={revealedName ? (getCountryName(targetCountryISO, i18n.language) || targetCountry?.properties?.ADMIN) : '?'} className="flag-display" />
           : <div className="flag-placeholder" />
         }
         {revealedName && <div className="flag-revealed-name">{getCountryName(targetCountryISO, i18n.language) || targetCountry?.properties?.ADMIN}</div>}
@@ -171,11 +177,11 @@ function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state
               <>
                 <ShareScoreButton
                   score={score}
-                  gameType="FLAGS"
+                  gameType={gameType}
                   difficulty={difficulty}
                   details={t('share.details_flags_timer', { found: stats.found, total: stats.total, time: timer ? `${Math.floor(timer/60000)}m${String(Math.floor((timer%60000)/1000)).padStart(2,'0')}s` : '' })}
                 />
-                <Form finalScore={score} difficulty={difficulty} elapsedTime={timer} gameType="FLAGS" continent={continent} />
+                <Form finalScore={score} difficulty={difficulty} elapsedTime={timer} gameType={gameType} continent={continent} />
               </>
             )}
             {!onGameFinished && (
@@ -194,8 +200,8 @@ function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state
   )
 }
 
-function StandardFlagGame({ difficulty, isTraining, continent }) {
-  const state = useFlagGameState(difficulty, isTraining, null, null, null, continent)
+function StandardFlagGame({ difficulty, isTraining, continent, gameType = GAME_TYPES.FLAGS, missingFlag = false }) {
+  const state = useFlagGameState(difficulty, isTraining, null, null, null, continent, gameType)
   return (
     <FlagGameLayout
       difficulty={difficulty ?? continent}
@@ -204,12 +210,14 @@ function StandardFlagGame({ difficulty, isTraining, continent }) {
       presetName={null}
       state={state}
       continent={continent}
+      gameType={gameType}
+      missingFlag={missingFlag}
     />
   )
 }
 
-function AscensionFlagGame({ phases, isTraining, presetName }) {
-  const state = useAscensionState(GAME_TYPES.FLAGS, phases, isTraining, true)
+function AscensionFlagGame({ phases, isTraining, presetName, gameType = GAME_TYPES.FLAGS, missingFlag = false }) {
+  const state = useAscensionState(gameType, phases, isTraining, true)
   return (
     <FlagGameLayout
       difficulty={null}
@@ -217,6 +225,8 @@ function AscensionFlagGame({ phases, isTraining, presetName }) {
       isAscension
       presetName={presetName}
       state={state}
+      gameType={gameType}
+      missingFlag={missingFlag}
     />
   )
 }
@@ -352,4 +362,9 @@ export default function FlagGamePage() {
   }
 
   return <StandardFlagGame difficulty={difficulty} isTraining={isTraining} continent={continent} />
+}
+
+export function MissingFlagGamePage() {
+  const { difficulty, isTraining, continent } = useLocation().state || {}
+  return <StandardFlagGame difficulty={difficulty} isTraining={isTraining} continent={continent} gameType={GAME_TYPES.MISSING_FLAG} missingFlag />
 }

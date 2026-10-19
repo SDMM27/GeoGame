@@ -981,9 +981,10 @@ service cloud.firestore {
           let room = get(/databases/$(database)/documents/rooms/$(roomId)).data;
           return validProgress(data)
             && (room.get('source', null) == 'app2'
-                ? validPlayerId(playerId) && proved(playerId)
+                ? validPlayerId(playerId) && playerId in room.players && proved(playerId)
                     && expiresWithin(data.expiresAt, duration.value(1, 'h'), duration.value(10, 'd'))
                 : legacyOpen() && validPlayerId(playerId)
+                    && playerId in room.players
                     && (data.get('expiresAt', null) == null
                         || expiresWithin(data.expiresAt, duration.value(1, 'h'), duration.value(10, 'd'))));
         }
@@ -1012,9 +1013,10 @@ service cloud.firestore {
           let room = get(/databases/$(database)/documents/rooms/$(roomId)).data;
           return validResult(data)
             && (room.get('source', null) == 'app2'
-                ? proved(data.playerId)
+                ? data.playerId in room.players && proved(data.playerId)
                     && expiresWithin(data.expiresAt, duration.value(1, 'h'), duration.value(10, 'd'))
                 : legacyOpen()
+                    && data.playerId in room.players
                     && (data.get('expiresAt', null) == null
                         || expiresWithin(data.expiresAt, duration.value(1, 'h'), duration.value(10, 'd'))));
         }

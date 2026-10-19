@@ -91,6 +91,11 @@
     "survival": {
       "title": "Survival",
       "description": "Play rounds of several games in a row: every mistake costs you a life."
+    },
+    "missing_flag": {
+      "title": "Missing Flag",
+      "description": "Identify the country with a band missing from its flag.",
+      "missing_part": "Missing part of the flag"
     }
   },
   "modes": {
@@ -561,7 +566,15 @@
   "daily_challenge": {
     "rules": "12 questions, the same for everyone today: find countries on the map, name flags and capitals. One try per question, {{seconds}} s each, no lives. Your score is the number of right answers; the total time breaks ties. You can only play once a day.",
     "level": "Today's level: {{label}} ({{n}}/7)",
-    "levels": {"1": "Very easy", "2": "Easy", "3": "Approachable", "4": "Medium", "5": "Tough", "6": "Hard", "7": "Brutal"},
+    "levels": {
+      "1": "Very easy",
+      "2": "Easy",
+      "3": "Approachable",
+      "4": "Medium",
+      "5": "Tough",
+      "6": "Hard",
+      "7": "Brutal"
+    },
     "week_note": "From Monday to Sunday, the challenge gets harder every day. Sunday is brutal!",
     "start": "Start the challenge",
     "continue": "Continue the challenge",
@@ -1020,6 +1033,9 @@
     "from_app": "Game created in the mobile app",
     "code": "Game code",
     "join_hint": "Choose your username to join the game.",
+    "watch": "Watch the game in progress",
+    "spectator": "You are watching this game",
+    "spectator_hint": "Standings and progress update live. You are not playing in this game.",
     "join": "Join",
     "players": "Players · {{count}}",
     "you": "you",

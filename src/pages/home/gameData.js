@@ -15,7 +15,7 @@ const DIFFICULTY_COLORS = {
 
 export function getDifficultiesForGame(gameId) {
   const countFn =
-    gameId === GAME_TYPES.FLAGS
+    gameId === GAME_TYPES.FLAGS || gameId === GAME_TYPES.MISSING_FLAG
       ? getTotalFlagCountries
       : gameId === GAME_TYPES.CAPITALS
         ? getTotalCapitalCountries
@@ -41,7 +41,7 @@ export function getDifficultyCaps(gameId) {
 
 export function getContinentsForGame(gameId) {
   const countFn =
-    gameId === GAME_TYPES.FLAGS
+    gameId === GAME_TYPES.FLAGS || gameId === GAME_TYPES.MISSING_FLAG
       ? getTotalFlagCountriesByContinent
       : gameId === GAME_TYPES.CAPITALS
         ? getTotalCapitalCountriesByContinent
@@ -100,6 +100,17 @@ export const GAMES = [
     descKey: "games.flags.description",
     route: "/flag-game",
     active: true,
+  },
+  {
+    id: GAME_TYPES.MISSING_FLAG,
+    kind: "setup",
+    multiId: null,
+    icon: "🧩",
+    titleKey: "games.missing_flag.title",
+    descKey: "games.missing_flag.description",
+    route: "/missing-flag",
+    active: true,
+    noAscension: true,
   },
   {
     id: GAME_TYPES.CAPITALS,

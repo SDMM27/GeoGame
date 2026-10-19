@@ -45,6 +45,7 @@ const PLAYABLE_TYPES = [
 export default function MultiplayerRoom({ room, progress, gameResults, playerId }) {
   const { t } = useTranslation()
   const [playingIndex, setPlayingIndex] = useState(null)
+  const [watching, setWatching] = useState(false)
   // Games finished here whose result may not be back from Firestore yet
   const [doneHere, setDoneHere] = useState([])
   const [launching, setLaunching] = useState(false)
@@ -63,6 +64,7 @@ export default function MultiplayerRoom({ room, progress, gameResults, playerId 
   const startAt = room.startAt?.toMillis ? room.startAt.toMillis() : null
   const remaining = useCountdown(startAt)
   const joined = playerId in room.players
+  const spectating = !joined && watching && room.status === 'playing'
   const isHost = room.hostId === playerId
   const toPlay = joined ? nextGameToPlay(room, known, playerId) : null
   const playable = (index) => PLAYABLE_TYPES.includes(games[index]?.type)
@@ -149,8 +151,31 @@ export default function MultiplayerRoom({ room, progress, gameResults, playerId 
         </button>
       </div>
 
-      {!joined ? (
-        <JoinForm room={room} playerId={playerId} />
+      {spectating ? (
+        <>
+          <div className="mpr-card">
+            <p className="mpr-watching">👀 {t('mp_room.spectator')}</p>
+            <p className="mpr-muted">{t('mp_room.spectator_hint')}</p>
+          </div>
+          <Players room={room} playerId={playerId} readOnly />
+          <StandingsCard
+            key={current}
+            room={room}
+            progress={progress}
+            results={results}
+            playerId={playerId}
+            defaultTab={current}
+          />
+        </>
+      ) : !joined ? (
+        <>
+          <JoinForm room={room} playerId={playerId} />
+          {room.status === 'playing' && (
+            <button type="button" className="mpr-link-btn" onClick={() => setWatching(true)}>
+              👀 {t('mp_room.watch')}
+            </button>
+          )}
+        </>
       ) : room.status === 'lobby' ? (
         <>
           <Players room={room} playerId={playerId} />

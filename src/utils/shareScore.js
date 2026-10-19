@@ -5,6 +5,7 @@ export const GAME_LABELS = {
   PLACEMENT: 'Placement',
   HARDCORE: 'Hardcore',
   FLAGS: 'Jeu des Drapeaux',
+  MISSING_FLAG: 'Drapeau incomplet',
   CAPITALS: 'Capitales',
   BORDER_GUESS: 'Border Guess',
   COUNTRY_CLUE: 'Country Clue',
@@ -17,6 +18,7 @@ export const GAME_LABELS = {
 // Maps game type keys → i18n locale paths
 const GAME_TYPE_LOCALE_KEYS = {
   FLAGS: 'games.flags.title',
+  MISSING_FLAG: 'games.missing_flag.title',
   PLACEMENT: 'games.placement.title',
   HARDCORE: 'games.hardcore.title',
   CAPITALS: 'games.capitals.title',
@@ -32,6 +34,7 @@ const GAME_TYPE_LOCALE_KEYS = {
 // DAILY_CHALLENGE has no entry here: it shares a challenge link (see utils/challenge.js).
 export const GAME_ROUTES = {
   FLAGS: '/flag-game',
+  MISSING_FLAG: '/missing-flag',
   PLACEMENT: '/game',
   HARDCORE: '/game?gameType=HARDCORE&difficulty=Hardcore',
   CAPITALS: '/capitals-game',

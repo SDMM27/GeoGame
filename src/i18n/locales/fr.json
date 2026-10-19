@@ -91,6 +91,11 @@
     "survival": {
       "title": "Survie",
       "description": "Enchaîne des manches de plusieurs jeux : chaque erreur te coûte une vie."
+    },
+    "missing_flag": {
+      "title": "Drapeau incomplet",
+      "description": "Identifie le pays malgré une bande manquante sur son drapeau.",
+      "missing_part": "Partie manquante du drapeau"
     }
   },
   "modes": {
@@ -561,7 +566,15 @@
   "daily_challenge": {
     "rules": "12 questions, les mêmes pour tout le monde aujourd’hui : place des pays sur la carte, reconnais des drapeaux, nomme des capitales. Un seul essai par question, {{seconds}} s chacune, pas de vies. Ton score est le nombre de bonnes réponses ; le temps total départage les égalités. Tu ne peux jouer qu’une fois par jour.",
     "level": "Niveau du jour : {{label}} ({{n}}/7)",
-    "levels": {"1": "Très facile", "2": "Facile", "3": "Abordable", "4": "Moyen", "5": "Corsé", "6": "Difficile", "7": "Redoutable"},
+    "levels": {
+      "1": "Très facile",
+      "2": "Facile",
+      "3": "Abordable",
+      "4": "Moyen",
+      "5": "Corsé",
+      "6": "Difficile",
+      "7": "Redoutable"
+    },
     "week_note": "Du lundi au dimanche, le challenge devient de plus en plus difficile. Dimanche, accroche-toi !",
     "start": "Lancer le challenge",
     "continue": "Reprendre le challenge",
@@ -1020,6 +1033,9 @@
     "from_app": "Partie créée sur l'app mobile",
     "code": "Code de la partie",
     "join_hint": "Choisis ton pseudo pour rejoindre la partie.",
+    "watch": "Regarder la partie en cours",
+    "spectator": "Tu regardes cette partie",
+    "spectator_hint": "Le classement et la progression se mettent à jour en direct. Tu ne participes pas à la partie.",
     "join": "Rejoindre",
     "players": "Joueurs · {{count}}",
     "you": "toi",

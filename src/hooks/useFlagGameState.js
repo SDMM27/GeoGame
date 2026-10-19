@@ -39,7 +39,7 @@ export function getTotalFlagCountriesByContinent(continent) {
 
 let alreadyChosenCountries = []
 
-export default function useFlagGameState(difficulty, isTraining, overrideCountries = null, mpSnapshot = null, mpSnapshotKey = null, continent = null) {
+export default function useFlagGameState(difficulty, isTraining, overrideCountries = null, mpSnapshot = null, mpSnapshotKey = null, continent = null, gameType = GAME_TYPES.FLAGS) {
   const navigate = useNavigate()
   const { t, i18n } = useTranslation()
 
@@ -220,7 +220,7 @@ export default function useFlagGameState(difficulty, isTraining, overrideCountri
         const name = getCountryName(props.ISO_A2, i18n.language) || props.ADMIN
         toast.success(t(result.match === 'typo' ? 'toasts.typo_accepted' : 'toasts.found_country', { name }), { containerId: 'topRightToast' })
         incrementScore(props.DifficultyFlag, consecutiveErrorsRef.current)
-        if (ratedRef.current) reportEloAnswer(GAME_TYPES.FLAGS, props.ADMIN, { found: true, errors: consecutiveErrorsRef.current })
+        if (ratedRef.current) reportEloAnswer(gameType, props.ADMIN, { found: true, errors: consecutiveErrorsRef.current })
       }
       setStats(prev =>
         wasSkipped
@@ -238,7 +238,7 @@ export default function useFlagGameState(difficulty, isTraining, overrideCountri
       if (newErrors >= 3) {
         toast.error(t('toasts.location_reveal', { name: getCountryName(props.ISO_A2, i18n.language) || props.ADMIN }), { containerId: 'topRightToast' })
         setRevealedName(props.ADMIN)
-        if (ratedRef.current) reportEloAnswer(GAME_TYPES.FLAGS, props.ADMIN, { found: false, errors: newErrors })
+        if (ratedRef.current) reportEloAnswer(gameType, props.ADMIN, { found: false, errors: newErrors })
       } else {
         toast.error(t('toasts.wrong'), { containerId: 'topRightToast' })
       }
@@ -252,7 +252,7 @@ export default function useFlagGameState(difficulty, isTraining, overrideCountri
     clickOnSeeCountryRef.current = true
     const admin = targetCountryRef.current?.properties?.ADMIN ?? null
     setRevealedName(admin)
-    if (admin && ratedRef.current) reportEloAnswer(GAME_TYPES.FLAGS, admin, { found: false, errors: consecutiveErrorsRef.current })
+    if (admin && ratedRef.current) reportEloAnswer(gameType, admin, { found: false, errors: consecutiveErrorsRef.current })
   }
 
   // Keep snapshot refs in sync

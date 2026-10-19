@@ -8,6 +8,7 @@ import { GAME_TYPES } from '../../utils/gameTypes'
 const ELO_META = {
   duel: { emoji: '⚔️', titleKey: 'elo.duel', color: '#7AA2FF' },
   [GAME_TYPES.PLACEMENT]: { emoji: '🌍', titleKey: 'games.placement.title', color: '#7AA2FF' },
+  [GAME_TYPES.HARDCORE]: { emoji: '🌍', titleKey: 'games.hardcore.title', color: '#FF9F45' },
   [GAME_TYPES.FLAGS]: { emoji: '🚩', titleKey: 'games.flags.title', color: '#FF7A6B' },
   [GAME_TYPES.MISSING_FLAG]: { emoji: '🧩', titleKey: 'games.missing_flag.title', color: '#C792FF' },
   [GAME_TYPES.CAPITALS]: { emoji: '🏛️', titleKey: 'games.capitals.title', color: '#F5B83D' },
@@ -28,6 +29,7 @@ export default function EloSection({ uid }) {
       <ul className="profile-list">
         {entries.map((entry) => {
           const meta = ELO_META[entry.key]
+          if (!meta) return null
           let detail = t('elo.unplayed')
           if (entry.played) {
             detail = entry.key === 'duel' ? t('elo.duel_detail', { games: entry.games, wins: entry.wins }) : t('elo.found_count', { count: entry.found })

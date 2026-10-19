@@ -57,10 +57,12 @@ describe('sortFlags', () => {
 })
 
 describe('FlagCollectionView', () => {
-  it('covers the pieces not won yet on the current flag and hides its name', () => {
+  it('shows the won flag pieces and covers only the pieces not won yet', () => {
     const tree = render(collection(['f00'], 'f05', 2))
     const hidden = tree.root.findAll((node) => node.props.testID === 'hidden-piece' && typeof node.type === 'string')
+    const visible = tree.root.findAll((node) => node.props.testID === 'visible-piece' && typeof node.type === 'string')
     expect(hidden).toHaveLength(2)
+    expect(visible).toHaveLength(2)
     // Pieces come in the order TL, TR, BL, BR: the two covered ones are the bottom row
     expect(hidden.map((node) => [node.props.style[1].left, node.props.style[1].top])).toEqual([
       [0, '50%'],

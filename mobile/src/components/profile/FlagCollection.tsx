@@ -38,15 +38,24 @@ function PieceFlag({ iso, pieces }: { iso: string; pieces: number }) {
   const quarters = Array.from({ length: PIECES_PER_FLAG }, (_, index) => index)
   return (
     <View style={styles.pieceFlag} testID="piece-flag">
-      {source != null && <Image source={source} style={StyleSheet.absoluteFill} resizeMode="cover" />}
       {quarters.map((index) =>
-        index < pieces ? null : (
-          <View
-            key={index}
-            testID="hidden-piece"
-            style={[styles.cover, { left: index % 2 === 0 ? 0 : '50%', top: index < 2 ? 0 : '50%' }]}
-          />
-        ),
+        <View
+          key={index}
+          testID={index < pieces ? 'visible-piece' : 'hidden-piece'}
+          style={[styles.quarter, { left: index % 2 === 0 ? 0 : '50%', top: index < 2 ? 0 : '50%' }]}
+        >
+          {source != null && (
+            <Image
+              source={source}
+              resizeMode="stretch"
+              style={[
+                styles.quarterImage,
+                { left: index % 2 === 0 ? 0 : '-100%', top: index < 2 ? 0 : '-100%' },
+              ]}
+            />
+          )}
+          {index >= pieces && <View style={styles.cover} />}
+        </View>,
       )}
     </View>
   )
@@ -208,7 +217,9 @@ const styles = StyleSheet.create({
   dot: { width: 10, height: 10, borderRadius: radius.pill },
   current: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   pieceFlag: { width: 96, height: 64, borderRadius: radius.sm, overflow: 'hidden', backgroundColor: colors.surfaceHigh },
-  cover: { position: 'absolute', width: '50%', height: '50%', backgroundColor: colors.borderStrong },
+  quarter: { position: 'absolute', width: '50%', height: '50%', overflow: 'hidden' },
+  quarterImage: { position: 'absolute', width: '200%', height: '200%' },
+  cover: { ...StyleSheet.absoluteFill, backgroundColor: colors.borderStrong },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
   cell: { width: CELL, height: CELL * 0.7, borderRadius: 6, borderWidth: 2, overflow: 'hidden', backgroundColor: colors.surfaceHigh },
   cellSelected: { transform: [{ scale: 1.1 }] },

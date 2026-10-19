@@ -73,6 +73,7 @@ describe('FlagCollectionView', () => {
     expect(screen.queryByText('collection.show_all')).toBeNull()
     expect(screen.getByText(/collection\.legend_progress/).textContent).toContain('"count":3')
     expect(screen.getByText('1 / 10')).toBeTruthy()
-    expect(screen.getByText('collection.legend_hardcore_soon')).toBeTruthy()
+    expect(screen.getByText('collection.mode_hardcore')).toBeTruthy()
+    expect(screen.queryByText('collection.legend_hardcore_soon')).toBeNull()
   })
 })

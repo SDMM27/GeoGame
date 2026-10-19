@@ -77,7 +77,8 @@ describe('FlagCollectionView', () => {
     expect(out).toContain('collection.empty')
     expect(out).not.toContain('collection.unlocked')
     expect(out).toContain('collection.legend_progress {\\"count\\":7,\\"total\\":28}')
-    expect(out).toContain('collection.legend_hardcore_soon')
+    expect(out).toContain('collection.mode_hardcore')
+    expect(out).not.toContain('collection.legend_hardcore_soon')
   })
 
   it('shows the complete message when every flag is unlocked', () => {

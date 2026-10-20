@@ -1050,6 +1050,7 @@
     "waiting_host": "En attente du lancement par l'hôte…",
     "starting_in": "Début dans",
     "late_hint": "La partie a déjà commencé, tu peux quand même la jouer.",
+    "joined_late": "Ce jeu avait déjà commencé quand tu as rejoint la partie : tu ne peux pas y participer.",
     "challenge_play_hint": "Joue quand tu veux : tout le monde a les mêmes pays.",
     "play": "Jouer",
     "standings": "Classement",

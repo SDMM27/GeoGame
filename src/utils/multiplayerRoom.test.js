@@ -2,7 +2,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import {
   getPlayerKey, getRoomContent, isRoomFormat, pickNewHost, rankRoomResults, HOST_GONE_MS,
-  nextGameToPlay, overallStandings, roomForGame, roomGames,
+  joinedLate, nextGameToPlay, overallStandings, roomForGame, roomGames,
 } from './multiplayerRoom'
 import { getSeededFlagCountries, getSeededBorderGuessCountries } from './multiplayerSeed'
 import { GAME_TYPES } from './gameTypes'
@@ -121,6 +121,17 @@ describe('multi-game rooms', () => {
     expect(nextGameToPlay(live, [], 'me')).toBe(1)
     expect(nextGameToPlay(live, [{ playerId: 'me', gameIndex: 1 }], 'me')).toBeNull()
     expect(nextGameToPlay({ ...live, status: 'lobby' }, [], 'me')).toBeNull()
+  })
+
+  it('keeps a live player who joined after the launch out of the current game, not a challenge player', () => {
+    const at = (ms) => ({ toMillis: () => ms })
+    const live = { ...room, mode: 'live', status: 'playing', gameIndex: 0, startAt: at(1000) }
+    const withMe = (seenAt) => ({ ...live, players: { me: { pseudo: 'Me', seenAt } } })
+    expect(nextGameToPlay(withMe(at(2000)), [], 'me')).toBeNull()
+    expect(joinedLate(withMe(at(2000)), 'me')).toBe(true)
+    expect(nextGameToPlay(withMe(at(500)), [], 'me')).toBe(0)
+    expect(nextGameToPlay(withMe(undefined), [], 'me')).toBe(0)
+    expect(nextGameToPlay({ ...withMe(at(2000)), mode: 'challenge' }, [], 'me')).toBe(0)
   })
 
   it('sums the points of each game into the overall standings', () => {

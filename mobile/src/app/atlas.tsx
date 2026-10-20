@@ -3,9 +3,9 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { Image } from 'expo-image'
 import { router } from 'expo-router'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Platform, ScrollView, StyleSheet, TextInput, View, useWindowDimensions } from 'react-native'
+import { Keyboard, Platform, ScrollView, StyleSheet, TextInput, View, useWindowDimensions } from 'react-native'
 import Animated, { FadeIn, FadeInDown, SlideInDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -197,12 +197,41 @@ export default function AtlasScreen() {
   const [selected, setSelected] = useState<string | null>(null)
   const [query, setQuery] = useState('')
   const sheetHeight = Math.round(height * 0.55)
+  // Back button / search row over the top of the map
+  const topBarHeight = insets.top + space.sm + 44
 
   const info = useMemo(
     () => (selected ? (getCountryInfo(findAtlasCountry(selected), i18n.language) as Info | null) : null),
     [selected, i18n.language]
   )
   const results = useMemo(() => searchAtlasCountries(query, i18n.language, 6), [query, i18n.language])
+
+  // Frame the selected country's main piece of land between the search bar and the sheet. Small islands get a
+  // closer zoom, and a map the player already zoomed in further is not zoomed back out.
+  const pendingFrame = useRef<string | null>(null)
+  const frame = useCallback(() => {
+    const map = mapRef.current
+    const admin = pendingFrame.current
+    const bounds = admin && mainPartBounds(findAtlasCountry(admin))
+    if (!map || !bounds) return
+    map.fitBounds(bounds, {
+      maxZoom: Math.max(MAX_FRAME_ZOOM, map.getZoom()),
+      padding: 32,
+      paddingTop: topBarHeight,
+      paddingBottom: sheetHeight,
+      animate: true,
+    })
+  }, [topBarHeight, sheetHeight])
+
+  // Where the keyboard resizes the map (Android), the map's onResize frames with the new size; elsewhere this does.
+  // Either way the frame is only pending until shortly after the keyboard has closed.
+  useEffect(() => {
+    const subscription = Keyboard.addListener('keyboardDidHide', () => {
+      frame()
+      setTimeout(() => { pendingFrame.current = null }, 400)
+    })
+    return () => subscription.remove()
+  }, [frame])
 
   const select = useCallback(
     (admin: string) => {
@@ -215,14 +244,15 @@ export default function AtlasScreen() {
         .getLayers()
         .filter((layer: MapLayer) => layer.feature.properties.ADMIN === admin)
         .forEach((layer: MapLayer) => layer.setStyle(SELECTED))
-      // Frame its main piece of land, in the part of the map above the sheet. Small islands get a closer
-      // zoom, and a map the player already zoomed in further is not zoomed back out.
-      const bounds = mainPartBounds(findAtlasCountry(admin))
-      if (bounds) {
-        map.fitBounds(bounds, { maxZoom: Math.max(MAX_FRAME_ZOOM, map.getZoom()), paddingBottom: sheetHeight, animate: true })
+      pendingFrame.current = admin
+      // Picked from the search: the keyboard is still open and shrinks the map, so frame once it has closed
+      if (Keyboard.isVisible()) Keyboard.dismiss()
+      else {
+        frame()
+        pendingFrame.current = null
       }
     },
-    [sheetHeight]
+    [frame]
   )
 
   const close = () => {
@@ -232,7 +262,7 @@ export default function AtlasScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.ocean }}>
-      <WorldMap ref={mapRef} onCountryPress={(layer) => select(layer.feature.properties.ADMIN)} />
+      <WorldMap ref={mapRef} onCountryPress={(layer) => select(layer.feature.properties.ADMIN)} onResize={() => pendingFrame.current && frame()} />
 
       <View pointerEvents="box-none" style={[styles.top, { top: insets.top + space.sm }]}>
         <View style={styles.searchRow}>

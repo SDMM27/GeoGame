@@ -39,7 +39,8 @@ type BoundsInput = LatLngBounds | [[number, number], [number, number]]
 export type WorldMapHandle = {
   setView: (center: [number, number] | LatLng, zoom?: number, options?: ViewOptions) => void
   flyTo: (center: [number, number] | LatLng, zoom?: number, options?: ViewOptions) => void
-  fitBounds: (bounds: BoundsInput, options?: ViewOptions & { padding?: number; maxZoom?: number }) => void
+  // paddingBottom: pixels hidden at the bottom (a sheet over the map); the bounds are framed in the part above it
+  fitBounds: (bounds: BoundsInput, options?: ViewOptions & { padding?: number; paddingBottom?: number; maxZoom?: number }) => void
   fitCountries: (names: string[], options?: ViewOptions & { maxZoom?: number }) => void
   getZoom: () => number
   invalidateSize: () => void
@@ -308,7 +309,7 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
   const minScale = useCallback(() => (size.width > 0 ? size.width / WORLD_SIZE : 0.3), [size.width])
 
   const applyView = useCallback(
-    (targetScale: number, centerX: number, centerY: number, options?: ViewOptions) => {
+    (targetScale: number, centerX: number, centerY: number, options?: ViewOptions, focusY?: number) => {
       const { width: W, height: H } = viewSize.current
       if (!W || !H) return
       const s = Math.min(MAX_SCALE, Math.max(minScale(), targetScale))
@@ -316,7 +317,7 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
       const currentCenterX = (W / 2 - tx.value) / scale.value
       const shift = Math.round((currentCenterX - centerX) / WORLD_SIZE) * WORLD_SIZE
       const nextX = W / 2 - (centerX + shift) * s
-      const nextY = clampY(H / 2 - centerY * s, s, H)
+      const nextY = clampY((focusY ?? H / 2) - centerY * s, s, H)
       setZoomScale(s)
       if (options?.animate === false) {
         scale.value = s
@@ -343,16 +344,17 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
   )
 
   const fitBounds = useCallback(
-    (input: BoundsInput, options?: ViewOptions & { padding?: number; maxZoom?: number }) => {
+    (input: BoundsInput, options?: ViewOptions & { padding?: number; paddingBottom?: number; maxZoom?: number }) => {
       const b = toBounds(input)
       const topLeft = project(b.north, b.west)
       const bottomRight = project(b.south, b.east)
       const padding = options?.padding ?? 48
+      const visibleHeight = Math.max(1, viewSize.current.height - (options?.paddingBottom ?? 0))
       const w = Math.max(1, bottomRight.x - topLeft.x)
       const h = Math.max(1, bottomRight.y - topLeft.y)
-      let s = Math.min((viewSize.current.width - padding * 2) / w, (viewSize.current.height - padding * 2) / h)
+      let s = Math.min((viewSize.current.width - padding * 2) / w, Math.max(1, visibleHeight - padding * 2) / h)
       if (options?.maxZoom != null) s = Math.min(s, 2 ** (options.maxZoom - BASE_ZOOM))
-      applyView(s, topLeft.x + w / 2, topLeft.y + h / 2, options)
+      applyView(s, topLeft.x + w / 2, topLeft.y + h / 2, options, visibleHeight / 2)
     },
     [applyView]
   )

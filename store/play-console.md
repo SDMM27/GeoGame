@@ -6,9 +6,9 @@ Si l'app change (pub, nouvelle donnée, chat…), il faut mettre à jour ces ré
 
 Adresses utiles :
 
-- Politique de confidentialité : https://geo-game-delta.vercel.app/privacy
-- Suppression du compte : https://geo-game-delta.vercel.app/delete-account
-- Site web : https://geo-game-delta.vercel.app
+- Politique de confidentialité : https://geo-game.app/privacy
+- Suppression du compte : https://geo-game.app/delete-account
+- Site web : https://geo-game.app
 - E-mail de contact : appgeogame@gmail.com (celui de `src/legal/legalInfo.js`)
 
 ---
@@ -66,7 +66,7 @@ Choisir **« Tout ou partie des fonctionnalités sont limitées »** et fournir 
 ## Suppression des données
 
 - L'app permet de créer un compte : **Oui**.
-- Lien de suppression : https://geo-game-delta.vercel.app/delete-account
+- Lien de suppression : https://geo-game.app/delete-account
 - On peut aussi demander la suppression de certaines données sans supprimer le compte (score enregistré sans compte, etc.) : **Oui**, par e-mail.
 
 ---

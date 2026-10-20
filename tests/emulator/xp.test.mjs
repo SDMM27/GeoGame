@@ -8,7 +8,7 @@ import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { handleXp } from '../../api/_lib/xp.mjs'
 import countriesMeta from '../../src/data/countries.meta.json' with { type: 'json' }
 import { flagPool, piecesOf } from '../../src/utils/flagCollection.js'
-import { GAMES_PER_DAY, GAME_XP, levelOf, missionsAt } from '../../src/utils/missions.js'
+import { GAMES_PER_DAY, GAME_XP, grantXp, levelOf, missionDayAt, readXp, weekKeyOf } from '../../src/utils/missions.js'
 
 const POOL = flagPool(countriesMeta.features)
 const PROJECT = 'geogame-sdmm'
@@ -95,8 +95,11 @@ describe('paying XP', () => {
     ]
     await addGames('alice', games)
     const { body } = await call('alice')
-    const daily = missionsAt(games.map((game) => ({ ...game, playedAt: NOW - HOUR })), NOW).daily
-    expect(body.xp.dayMissions).toEqual([...daily.map((entry) => entry.mission.id), 'bonus'])
+    // Whatever missions the day draws, the server pays what the shared rules give for these games
+    const day = missionDayAt(NOW)
+    const expected = grantXp(readXp({}, day, weekKeyOf(day)), games.map((game) => ({ ...game, playedAt: NOW - HOUR })), NOW)
+    expect(body.xp).toEqual(expected.state)
+    expect(body).toMatchObject({ gained: expected.gained, fragments: expected.fragments, levelUp: expected.levelUp })
     expect(body.xp.level).toBe(levelOf(body.xp.total).level)
     expect(body.levelUp).toBe(true)
   })

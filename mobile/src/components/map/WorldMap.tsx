@@ -35,12 +35,13 @@ export type Overlay =
 
 export type ViewOptions = { animate?: boolean; duration?: number }
 type BoundsInput = LatLngBounds | [[number, number], [number, number]]
+type FitOptions = ViewOptions & { padding?: number; paddingTop?: number; paddingBottom?: number; maxZoom?: number }
 
 export type WorldMapHandle = {
   setView: (center: [number, number] | LatLng, zoom?: number, options?: ViewOptions) => void
   flyTo: (center: [number, number] | LatLng, zoom?: number, options?: ViewOptions) => void
-  // paddingBottom: pixels hidden at the bottom (a sheet over the map); the bounds are framed in the part above it
-  fitBounds: (bounds: BoundsInput, options?: ViewOptions & { padding?: number; paddingBottom?: number; maxZoom?: number }) => void
+  // paddingTop/paddingBottom: pixels hidden by overlays (a search bar, a sheet); the bounds are framed in the part between
+  fitBounds: (bounds: BoundsInput, options?: FitOptions) => void
   fitCountries: (names: string[], options?: ViewOptions & { maxZoom?: number }) => void
   getZoom: () => number
   invalidateSize: () => void
@@ -59,6 +60,8 @@ type Props = {
   interactive?: boolean
   // Called once the map is measured and framed: the handle's view methods work from then on.
   onReady?: () => void
+  // Called after the map is resized (e.g. the Android keyboard closing), once the handle uses the new size
+  onResize?: (size: { width: number; height: number }) => void
 }
 
 const MAX_SCALE = 2 ** (18 - BASE_ZOOM)
@@ -204,6 +207,7 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
     showBorders = true,
     interactive = true,
     onReady,
+    onResize,
   },
   ref
 ) {
@@ -344,17 +348,18 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
   )
 
   const fitBounds = useCallback(
-    (input: BoundsInput, options?: ViewOptions & { padding?: number; paddingBottom?: number; maxZoom?: number }) => {
+    (input: BoundsInput, options?: FitOptions) => {
       const b = toBounds(input)
       const topLeft = project(b.north, b.west)
       const bottomRight = project(b.south, b.east)
       const padding = options?.padding ?? 48
-      const visibleHeight = Math.max(1, viewSize.current.height - (options?.paddingBottom ?? 0))
+      const top = options?.paddingTop ?? 0
+      const visibleHeight = Math.max(1, viewSize.current.height - top - (options?.paddingBottom ?? 0))
       const w = Math.max(1, bottomRight.x - topLeft.x)
       const h = Math.max(1, bottomRight.y - topLeft.y)
       let s = Math.min((viewSize.current.width - padding * 2) / w, Math.max(1, visibleHeight - padding * 2) / h)
       if (options?.maxZoom != null) s = Math.min(s, 2 ** (options.maxZoom - BASE_ZOOM))
-      applyView(s, topLeft.x + w / 2, topLeft.y + h / 2, options, visibleHeight / 2)
+      applyView(s, topLeft.x + w / 2, topLeft.y + h / 2, options, top + visibleHeight / 2)
     },
     [applyView]
   )
@@ -419,6 +424,7 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
     viewW.value = width
     viewH.value = height
     setSize({ width, height })
+    onResize?.({ width, height })
   }
   useEffect(() => {
     if (framed.current || !size.width || !size.height) return

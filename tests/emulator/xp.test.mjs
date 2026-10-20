@@ -6,9 +6,11 @@ import { Timestamp, getFirestore } from 'firebase-admin/firestore'
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { handleXp } from '../../api/_lib/xp.mjs'
-import { PIECES_PER_FLAG } from '../../src/utils/flagCollection.js'
-import { GAMES_PER_DAY, GAME_XP, MISSIONS_PER_PERIOD, levelOf, missionsAt } from '../../src/utils/missions.js'
+import countriesMeta from '../../src/data/countries.meta.json' with { type: 'json' }
+import { flagPool, piecesOf } from '../../src/utils/flagCollection.js'
+import { GAMES_PER_DAY, GAME_XP, levelOf, missionsAt } from '../../src/utils/missions.js'
 
+const POOL = flagPool(countriesMeta.features)
 const PROJECT = 'geogame-sdmm'
 // Monday 2026-10-19, 12:00 in Paris.
 const NOW = Date.UTC(2026, 9, 19, 10)
@@ -109,7 +111,7 @@ describe('paying XP', () => {
     expect(tomorrow.body.xp).toMatchObject({ day: '2026-10-20', dayGames: 0, dayMissions: [], total: today.body.xp.total })
   })
 
-  it('pays the fragments of the missions into the flag collection with the XP, once', async () => {
+  it('pays the fragments of the levels gained into the flag collection with the XP, once', async () => {
     const games = [
       ...Array.from({ length: 3 }, () => ({ gameType: 'DAILY_CHALLENGE', mode: 'daily', solved: true, dailyKey: '2026-10-19' })),
       { gameType: 'FLAGS', mode: 'standard', found: 20, total: 20 },
@@ -119,10 +121,14 @@ describe('paying XP', () => {
     ]
     await addGames('alice', games)
     const { body } = await call('alice')
-    expect(body.fragments).toBeGreaterThanOrEqual(MISSIONS_PER_PERIOD + 1)
+    // The daily missions pay XP only, so the fragments come from the levels (and the weekly missions) these games reach
+    expect(body.fragments).toBeGreaterThanOrEqual(body.xp.level - 1)
+    expect(body.fragments).toBeGreaterThan(0)
     const stored = (await db.doc('users/alice').get()).data().flags
     expect(stored).toEqual(body.flags)
-    expect(stored.unlocked.length * PIECES_PER_FLAG + stored.pieces).toBe(body.fragments)
+    // Each flag costs the pieces of its rarity
+    const spent = stored.unlocked.reduce((sum, iso) => sum + piecesOf(iso, POOL), 0)
+    expect(spent + stored.pieces).toBe(body.fragments)
     expect(body.unlockedFlags).toEqual(stored.unlocked)
 
     const again = await call('alice')

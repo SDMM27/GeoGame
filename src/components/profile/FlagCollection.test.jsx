@@ -28,14 +28,29 @@ afterEach(cleanup)
 
 describe('FlagCollectionView', () => {
   it('shows only the pieces won of the current flag and hides its name', () => {
+    // F01 is uncommon: 3 pieces
     view({ unlocked: [], current: 'F01', pieces: 2 })
-    expect(document.querySelectorAll('.flag-piece')).toHaveLength(4)
-    expect(document.querySelectorAll('.flag-piece--hidden')).toHaveLength(2)
-    expect(document.querySelector('.flag-piece--0.flag-piece--hidden')).toBeNull()
-    expect(document.querySelector('.flag-piece--2.flag-piece--hidden')).not.toBeNull()
+    const pieces = [...document.querySelectorAll('.flag-piece')]
+    expect(pieces).toHaveLength(3)
+    expect(pieces.map((piece) => piece.classList.contains('flag-piece--hidden'))).toEqual([false, false, true])
     expect(screen.getByText('?')).toBeTruthy()
     expect(screen.queryByText(/name-F01/)).toBeNull()
-    expect(screen.getByText(/collection\.pieces/).textContent).toContain('"count":2')
+    expect(screen.getByText(/collection\.pieces/).textContent).toContain('"count":2,"total":3')
+  })
+
+  it('cuts the flag into as many pieces as its rarity costs', () => {
+    // F03 is legendary: 6 pieces in 3 columns × 2 rows; F00 is common: 2 pieces
+    view({ unlocked: [], current: 'F03', pieces: 4 })
+    const pieces = [...document.querySelectorAll('.flag-piece')]
+    expect(pieces).toHaveLength(6)
+    expect(document.querySelectorAll('.flag-piece--hidden')).toHaveLength(2)
+    expect(pieces[3].style.top).toBe('50%')
+    expect(pieces[3].style.left).toBe('0%')
+    expect(screen.getByText(/collection\.pieces/).textContent).toContain('"count":4,"total":6')
+    cleanup()
+    view({ unlocked: [], current: 'F00', pieces: 1 })
+    expect(document.querySelectorAll('.flag-piece')).toHaveLength(2)
+    expect(screen.getByText(/collection\.pieces/).textContent).toContain('"total":2')
   })
 
   it('shows the empty message with nothing unlocked and no current flag', () => {

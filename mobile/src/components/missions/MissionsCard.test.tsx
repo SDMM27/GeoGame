@@ -18,8 +18,8 @@ jest.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string, params?: Record<string, unknown>) => (params ? `${key} ${JSON.stringify(params)}` : key) }),
 }))
 
-const entry = (id: string, progress: number, target: number, paid = false) => ({
-  mission: { id, icon: 'flag', target },
+const entry = (id: string, progress: number, target: number, paid = false, tier?: 'easy' | 'medium' | 'hard') => ({
+  mission: { id, icon: 'flag', target, tier },
   progress,
   done: progress >= target,
   paid,
@@ -45,7 +45,7 @@ describe('MissionsCard', () => {
       loading: false,
       xp: { total: 130, level: 2, into: 30, needed: 150 },
       daily: [entry('play_3', 3, 3, true), entry('score_1', 1, 2)],
-      weekly: [entry('week_a', 0, 5)],
+      weekly: [entry('week_a', 0, 5, false, 'easy'), entry('week_b', 0, 5, false, 'hard')],
       dailyBonus: false,
       weeklyBonus: true,
     })
@@ -61,5 +61,34 @@ describe('MissionsCard', () => {
     expect(out).toContain('missions.week_a')
     expect(out).toContain('missions.bonus')
     expect(out).not.toContain('missions.sign_in')
+  })
+
+  it('pays XP only for the daily missions, and XP plus fragments by tier for the weekly ones', () => {
+    mockUseMissions.mockReturnValue({
+      loading: false,
+      xp: { total: 130, level: 2, into: 30, needed: 150 },
+      daily: [entry('play_3', 0, 3)],
+      weekly: [entry('week_a', 0, 5, false, 'easy'), entry('week_b', 0, 5, false, 'hard')],
+      dailyBonus: false,
+      weeklyBonus: false,
+    })
+    let tree!: ReturnType<typeof create>
+    act(() => {
+      tree = create(<MissionsCard uid="u1" />)
+    })
+    const out = texts(tree)
+    // Daily: 60 XP, bonus 40 XP, never a fragment chip
+    expect(out).toContain('missions.reward {\\"xp\\":60}')
+    expect(out).toContain('missions.reward {\\"xp\\":40}')
+    // Weekly: easy 150 XP + 1 fragment, hard 400 XP + 3 fragments, bonus 250 XP + 2 fragments
+    expect(out).toContain('missions.reward {\\"xp\\":150} · missions.fragments {\\"count\\":1}')
+    expect(out).toContain('missions.reward {\\"xp\\":400} · missions.fragments {\\"count\\":3}')
+    expect(out).toContain('missions.reward {\\"xp\\":250} · missions.fragments {\\"count\\":2}')
+    expect(out).not.toContain('{\\"count\\":0}')
+    expect(out).toContain('missions.tier_easy')
+    expect(out).toContain('missions.tier_hard')
+    // Bonus labels: 3 daily missions, 5 weekly ones
+    expect(out).toContain('missions.bonus {\\"count\\":3}')
+    expect(out).toContain('missions.bonus {\\"count\\":5}')
   })
 })

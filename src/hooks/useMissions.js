@@ -11,7 +11,7 @@ const RECENT_GAMES = 300
 /**
  * The signed-in player's missions of today and this week, with their progress, plus their XP:
  * { loading, xp, day, week, daily: [{ mission, progress, done, paid }], weekly: [...], dailyBonus, weeklyBonus }
- * (`paid`: the server already paid it; the bonuses say whether the 3 missions of the period are paid).
+ * (`paid`: the server already paid it; the bonuses say whether the bonus of the period is paid).
  * Asks the server to pay what is due when it loads and after each game (useRecordGame), then reloads the progress.
  * `uid` null (visitor): nothing loads.
  */

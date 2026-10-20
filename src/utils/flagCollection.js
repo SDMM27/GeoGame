@@ -3,12 +3,13 @@
 // Firebase import and no JSON import: the data is passed in, and the API bundles this file.
 //
 // Flags
-// - Completed missions and bonuses pay fragments (missions.js grantXp). PIECES_PER_FLAG pieces rebuild one flag; the
-//   flags are drawn at random among those not unlocked yet, the rarer (harder) ones less often.
-// - Pace: a week pays 3 daily missions × 7 + 7 daily bonuses + 3 weekly missions × 3 + a weekly bonus × 3 at most,
-//   about 40 fragments, so about 10 flags a week and about 6 months to collect the 239 flags.
+// - Weekly missions, the weekly bonus and each level gained pay fragments (missions.js grantXp); daily missions pay XP
+//   only. A flag costs PIECES_BY_RARITY[rarity] pieces (the rarer, the more); the flags are drawn at random among
+//   those not unlocked yet, the rarer (harder) ones less often.
+// - Pace: a week pays 2 × 1 + 2 × 2 + 3 for the weekly missions + 2 for the weekly bonus = 11 fragments, plus about 1
+//   per level gained. The 239 flags cost 911 pieces in all (33 common × 2, 73 uncommon × 3, 86 rare × 4, 47 legendary × 6).
 // - users/{uid}.flags, written by the server only: { unlocked: [iso, in the order they were unlocked],
-//   current: iso being rebuilt | null, pieces: 0..PIECES_PER_FLAG - 1 pieces of `current` }.
+//   current: iso being rebuilt | null, pieces: 0..piecesFor(rarity of current) - 1 pieces of `current` }.
 //
 // Mastery (the "Légende" badge)
 // - mastery/{uid}, written by the server only (api/_lib/elo.mjs rateSolo): { placement: [ADMIN names], flags: [...],
@@ -17,17 +18,32 @@
 //   Like Elo, the answers are reported by the client, so the badge is as honest as Elo.
 import { mulberry32 } from './prng.js'
 
-export const PIECES_PER_FLAG = 4
-// Fragments paid with the missions (same moments as the XP).
-export const DAILY_MISSION_FRAGMENTS = 1
-export const DAILY_BONUS_FRAGMENTS = 1
-export const WEEKLY_MISSION_FRAGMENTS = 3
-export const WEEKLY_BONUS_FRAGMENTS = 3
+// Fragments paid with the missions (same moments as the XP; the weekly missions pay by tier, see WEEKLY_TIERS in
+// missions.js) and with each level gained.
+export const DAILY_MISSION_FRAGMENTS = 0
+export const DAILY_BONUS_FRAGMENTS = 0
+export const WEEKLY_TIER_FRAGMENTS = { easy: 1, medium: 2, hard: 3 }
+export const WEEKLY_BONUS_FRAGMENTS = 2
+export const LEVEL_UP_FRAGMENTS = 1
 
 export const RARITIES = ['common', 'uncommon', 'rare', 'legendary']
 export const RARITY_COLORS = { common: '#9AA5B1', uncommon: '#4CAF7A', rare: '#4A90E2', legendary: '#C792FF' }
 // Odds of being drawn as the next flag, relative to each other.
 export const RARITY_WEIGHTS = { common: 4, uncommon: 3, rare: 2, legendary: 1 }
+// Pieces that rebuild a flag of each rarity.
+export const PIECES_BY_RARITY = { common: 2, uncommon: 3, rare: 4, legendary: 6 }
+
+// Pieces of a flag of `rarity` ('uncommon' when unknown, like rarityOf).
+export const piecesFor = (rarity) => PIECES_BY_RARITY[rarity] ?? PIECES_BY_RARITY.uncommon
+
+// How the pieces of a flag cut into columns × rows when it is drawn (2 side by side, 3 strips, 4 quarters, 6 in two rows).
+export const pieceGrid = (pieces) => {
+  const cols = pieces >= 6 ? 3 : pieces === 4 ? 2 : pieces
+  return { cols, rows: Math.ceil(pieces / cols) }
+}
+
+// Pieces of the flag `iso` of `pool`.
+export const piecesOf = (iso, pool) => piecesFor(pool.find((flag) => flag.iso === iso)?.rarity)
 
 const RARITY_BY_DIFFICULTY = { Facile: 'common', Moyen: 'uncommon', Difficile: 'rare', Impossible: 'legendary' }
 
@@ -52,7 +68,7 @@ export function readFlags(data, pool) {
   const raw = data?.flags ?? {}
   const unlocked = [...new Set(Array.isArray(raw.unlocked) ? raw.unlocked : [])].filter((iso) => known.has(iso))
   const current = known.has(raw.current) && !unlocked.includes(raw.current) ? raw.current : null
-  const pieces = current && Number.isFinite(raw.pieces) ? Math.min(PIECES_PER_FLAG - 1, Math.max(0, Math.floor(raw.pieces))) : 0
+  const pieces = current && Number.isFinite(raw.pieces) ? Math.min(piecesOf(current, pool) - 1, Math.max(0, Math.floor(raw.pieces))) : 0
   return { unlocked, current, pieces }
 }
 
@@ -89,7 +105,7 @@ export function addFragments(state, count, pool, seed) {
   if (count > 0 && !current) current = draw()
   for (let left = Math.max(0, Math.floor(count)); left > 0 && current; left -= 1) {
     pieces += 1
-    if (pieces >= PIECES_PER_FLAG) {
+    if (pieces >= piecesOf(current, pool)) {
       unlocked.push(current)
       completed.push(current)
       pieces = 0

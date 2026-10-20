@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FLAG_POOL, fetchCollection } from '../../utils/flagCollectionData'
-import { MASTERY_MODES, PIECES_PER_FLAG, RARITIES, RARITY_COLORS } from '../../utils/flagCollection'
+import { MASTERY_MODES, RARITIES, RARITY_COLORS, pieceGrid, piecesFor } from '../../utils/flagCollection'
 import { getCountryName } from '../../utils/getCountryName'
 import './FlagCollection.css'
 
@@ -25,6 +25,8 @@ export function FlagCollectionView({ flags, mastery }) {
   const shown = showAll ? sorted : sorted.slice(0, SHOWN_FIRST)
   const counts = RARITIES.map((rarity) => ({ rarity, count: flags.unlocked.filter((iso) => rarityOf.get(iso) === rarity).length }))
   const complete = flags.unlocked.length >= total
+  const cost = piecesFor(rarityOf.get(flags.current))
+  const { cols, rows } = pieceGrid(cost)
 
   return (
     <section className="flag-collection">
@@ -45,14 +47,18 @@ export function FlagCollectionView({ flags, mastery }) {
         <div className="flag-collection-current">
           <div className="flag-pieces" data-testid="flag-pieces">
             <img src={`/flags/${flags.current.toLowerCase()}.png`} alt="" />
-            {[0, 1, 2, 3].map((piece) => (
-              <span key={piece} className={`flag-piece flag-piece--${piece}${piece < flags.pieces ? '' : ' flag-piece--hidden'}`} />
+            {Array.from({ length: cost }, (_, piece) => (
+              <span
+                key={piece}
+                className={`flag-piece${piece < flags.pieces ? '' : ' flag-piece--hidden'}`}
+                style={{ left: `${(piece % cols) * (100 / cols)}%`, top: `${Math.floor(piece / cols) * (100 / rows)}%`, width: `${100 / cols}%`, height: `${100 / rows}%` }}
+              />
             ))}
           </div>
           <div className="flag-collection-current-text">
             <small>{t('collection.current')}</small>
             <strong>?</strong>
-            <span>{t('collection.pieces', { count: flags.pieces, total: PIECES_PER_FLAG })}</span>
+            <span>{t('collection.pieces', { count: flags.pieces, total: cost })}</span>
             <small className="flag-collection-hint">{t('collection.hint')}</small>
           </div>
         </div>

@@ -3,27 +3,38 @@
 // this file.
 //
 // - Every day (Paris midnight, like the dailies) 3 missions are drawn from DAILY_POOL, the same for everyone; every
-//   week (Monday to Sunday, Paris) 3 from WEEKLY_POOL. A mission is done when the player's games of that day or week
-//   reach its target. Each one pays once, plus a bonus when the 3 of the period are done.
+//   week (Monday to Sunday, Paris) 5 from WEEKLY_POOL: 2 easy, 2 medium and 1 hard (WEEKLY_TIERS: the harder, the
+//   more XP and fragments). A mission is done when the player's games of that day or week reach its target. Each
+//   one pays once, plus a bonus when all those of the period are done.
 // - Each game in the history also pays GAME_XP, for at most GAMES_PER_DAY games a day.
 // - Progress is read from the game history (users/{uid}/games, see gameHistory.js), so a mission is only as honest as
 //   the history; what bounds a cheater is that the XP of a day and of a week is capped.
 // - XP makes a level: going from level n to n + 1 takes LEVEL_BASE + LEVEL_STEP × (n - 1) XP. Levels unlock items
 //   (decorations.js).
-// - Missions and bonuses also pay flag fragments (flagCollection.js), once, in the same call as their XP.
+// - Flag fragments (flagCollection.js) are paid in the same call as the XP: by the weekly missions and bonus, and by
+//   each level gained. The daily missions pay XP only.
 import {
   DAILY_BONUS_FRAGMENTS,
   DAILY_MISSION_FRAGMENTS,
+  LEVEL_UP_FRAGMENTS,
   WEEKLY_BONUS_FRAGMENTS,
-  WEEKLY_MISSION_FRAGMENTS,
+  WEEKLY_TIER_FRAGMENTS,
 } from './flagCollection.js'
 import { GAME_TYPES } from './gameTypes.js'
 import { seededShuffle } from './prng.js'
 
-export const MISSIONS_PER_PERIOD = 3
+export const DAILY_MISSIONS = 3
+// Weekly missions drawn from each tier of WEEKLY_POOL, easy first.
+export const WEEKLY_MISSIONS_BY_TIER = { easy: 2, medium: 2, hard: 1 }
+export const WEEKLY_MISSIONS = Object.values(WEEKLY_MISSIONS_BY_TIER).reduce((sum, count) => sum + count, 0)
 export const DAILY_MISSION_XP = 60
 export const DAILY_BONUS_XP = 40
-export const WEEKLY_MISSION_XP = 250
+// What a weekly mission pays, by tier.
+export const WEEKLY_TIERS = {
+  easy: { xp: 150, fragments: WEEKLY_TIER_FRAGMENTS.easy },
+  medium: { xp: 250, fragments: WEEKLY_TIER_FRAGMENTS.medium },
+  hard: { xp: 400, fragments: WEEKLY_TIER_FRAGMENTS.hard },
+}
 export const WEEKLY_BONUS_XP = 250
 export const GAME_XP = 10
 export const GAMES_PER_DAY = 10
@@ -42,8 +53,9 @@ const sumFound = (games, gameType) =>
 const allFound = (games) => games.reduce((sum, game) => (Number.isFinite(game.found) ? sum + game.found : sum), 0)
 const distinct = (values) => new Set(values).size
 
-// `value(games)`: progress from the games of the period. Titles are in i18n under `missions.<id>`, with {{count}} the
-// target. `emoji` is used by the website, `icon` (MaterialCommunityIcons) by the app.
+// `value(games)`: progress from the games of the period; weekly missions have a `tier` (WEEKLY_TIERS). Titles are in
+// i18n under `missions.<id>`, with {{count}} the target. `emoji` is used by the website, `icon`
+// (MaterialCommunityIcons) by the app.
 export const DAILY_POOL = [
   { id: 'play_3', emoji: '🎮', icon: 'gamepad-variant-outline', target: 3, value: (games) => games.length },
   { id: 'dailies_3', emoji: '📅', icon: 'calendar-check-outline', target: 3, value: (games) => count(games, isDaily) },
@@ -65,14 +77,17 @@ export const DAILY_POOL = [
 ]
 
 export const WEEKLY_POOL = [
-  { id: 'week_play_20', emoji: '🕹️', icon: 'controller-classic-outline', target: 20, value: (games) => games.length },
-  { id: 'week_daily_days_5', emoji: '🔥', icon: 'fire', target: 5, value: (games) => distinct(games.filter(isDaily).map((game) => game.dailyKey)) },
-  { id: 'week_dailies_15', emoji: '📆', icon: 'calendar-multiselect', target: 15, value: (games) => count(games, isDaily) },
-  { id: 'week_daily_wins_10', emoji: '🏅', icon: 'medal-outline', target: 10, value: (games) => count(games, (game) => isDaily(game) && game.solved) },
-  { id: 'week_found_200', emoji: '🗺️', icon: 'map-marker-multiple-outline', target: 200, value: allFound },
-  { id: 'week_perfect_3', emoji: '💠', icon: 'star-four-points-outline', target: 3, value: (games) => count(games, isPerfect) },
-  { id: 'week_types_6', emoji: '🧩', icon: 'puzzle-outline', target: 6, value: (games) => distinct(games.map((game) => game.gameType)) },
-  { id: 'week_ascension_3', emoji: '🏔️', icon: 'summit', target: 3, value: (games) => count(games, (game) => game.mode === 'ascension') },
+  { id: 'week_play_20', tier: 'easy', emoji: '🕹️', icon: 'controller-classic-outline', target: 20, value: (games) => games.length },
+  { id: 'week_daily_days_5', tier: 'medium', emoji: '🔥', icon: 'fire', target: 5, value: (games) => distinct(games.filter(isDaily).map((game) => game.dailyKey)) },
+  { id: 'week_dailies_15', tier: 'easy', emoji: '📆', icon: 'calendar-multiselect', target: 15, value: (games) => count(games, isDaily) },
+  { id: 'week_daily_wins_10', tier: 'medium', emoji: '🏅', icon: 'medal-outline', target: 10, value: (games) => count(games, (game) => isDaily(game) && game.solved) },
+  { id: 'week_found_200', tier: 'easy', emoji: '🗺️', icon: 'map-marker-multiple-outline', target: 200, value: allFound },
+  { id: 'week_found_500', tier: 'medium', emoji: '🌐', icon: 'map-search-outline', target: 500, value: allFound },
+  { id: 'week_daily_days_7', tier: 'hard', emoji: '🗓️', icon: 'calendar-star', target: 7, value: (games) => distinct(games.filter(isDaily).map((game) => game.dailyKey)) },
+  { id: 'week_daily_wins_20', tier: 'hard', emoji: '🏆', icon: 'trophy-outline', target: 20, value: (games) => count(games, (game) => isDaily(game) && game.solved) },
+  { id: 'week_perfect_3', tier: 'hard', emoji: '💠', icon: 'star-four-points-outline', target: 3, value: (games) => count(games, isPerfect) },
+  { id: 'week_types_6', tier: 'easy', emoji: '🧩', icon: 'puzzle-outline', target: 6, value: (games) => distinct(games.map((game) => game.gameType)) },
+  { id: 'week_ascension_3', tier: 'medium', emoji: '🏔️', icon: 'summit', target: 3, value: (games) => count(games, (game) => game.mode === 'ascension') },
 ]
 
 // ---------- Periods (Paris time, like dailyKey.js, which can't be imported here: it reads the server clock) ----------
@@ -111,8 +126,16 @@ function seedOf(text) {
   return hash >>> 0
 }
 
-export const dailyMissions = (day) => seededShuffle(DAILY_POOL, seedOf(`missions:day:${day}`)).slice(0, MISSIONS_PER_PERIOD)
-export const weeklyMissions = (week) => seededShuffle(WEEKLY_POOL, seedOf(`missions:week:${week}`)).slice(0, MISSIONS_PER_PERIOD)
+export const dailyMissions = (day) => seededShuffle(DAILY_POOL, seedOf(`missions:day:${day}`)).slice(0, DAILY_MISSIONS)
+
+// Each tier is shuffled with its own seed; the missions come in the order easy, medium, hard.
+export const weeklyMissions = (week) =>
+  Object.entries(WEEKLY_MISSIONS_BY_TIER).flatMap(([tier, size]) =>
+    seededShuffle(
+      WEEKLY_POOL.filter((mission) => mission.tier === tier),
+      seedOf(`missions:week:${week}:${tier}`),
+    ).slice(0, size),
+  )
 
 // Games of the history with their day: `playedAt` in ms (fromSnapshot in gameHistory.js), Firestore Timestamps too.
 const playedTime = (game) => (typeof game.playedAt === 'number' ? game.playedAt : game.playedAt?.toMillis?.())
@@ -180,20 +203,21 @@ export function readXp(data, day, week) {
 
 /**
  * What `games` earn on top of the `state` already paid (readXp at `now`): { gained, fragments, state } with the new
- * state to store, `fragments` earned by the missions and bonuses newly paid (not by the games), and `levelUp` when the
+ * state to store, `fragments` earned by the missions, bonuses and levels newly paid, and `levelUp` when the
  * level went up. Missions done but already paid pay nothing.
  */
 export function grantXp(state, games, now) {
   const progress = missionsAt(games, now)
   let gained = 0
   let fragments = 0
-  const pay = (paid, entries, missionXp, bonusXp, missionFragments, bonusFragments) => {
+  const pay = (paid, entries, rewardOf, bonusXp, bonusFragments) => {
     const next = [...paid]
     for (const { mission, done } of entries) {
       if (done && !next.includes(mission.id)) {
         next.push(mission.id)
-        gained += missionXp
-        fragments += missionFragments
+        const reward = rewardOf(mission)
+        gained += reward.xp
+        fragments += reward.fragments
       }
     }
     if (entries.every((entry) => entry.done) && !next.includes(BONUS_ID)) {
@@ -203,12 +227,15 @@ export function grantXp(state, games, now) {
     }
     return next
   }
-  const dayMissions = pay(state.dayMissions, progress.daily, DAILY_MISSION_XP, DAILY_BONUS_XP, DAILY_MISSION_FRAGMENTS, DAILY_BONUS_FRAGMENTS)
-  const weekMissions = pay(state.weekMissions, progress.weekly, WEEKLY_MISSION_XP, WEEKLY_BONUS_XP, WEEKLY_MISSION_FRAGMENTS, WEEKLY_BONUS_FRAGMENTS)
+  const dailyReward = { xp: DAILY_MISSION_XP, fragments: DAILY_MISSION_FRAGMENTS }
+  const dayMissions = pay(state.dayMissions, progress.daily, () => dailyReward, DAILY_BONUS_XP, DAILY_BONUS_FRAGMENTS)
+  const weekMissions = pay(state.weekMissions, progress.weekly, (mission) => WEEKLY_TIERS[mission.tier], WEEKLY_BONUS_XP, WEEKLY_BONUS_FRAGMENTS)
   const dayGames = Math.max(state.dayGames, Math.min(GAMES_PER_DAY, progress.todayGames))
   gained += (dayGames - state.dayGames) * GAME_XP
   const total = state.total + gained
   const { level } = levelOf(total)
+  // state.level is levelOf(stored total) (readXp), so each level gained is paid once.
+  fragments += (level - state.level) * LEVEL_UP_FRAGMENTS
   return {
     gained,
     fragments,

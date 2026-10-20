@@ -4,7 +4,8 @@
 //
 // - Every day (Paris midnight, like the dailies) 3 missions are drawn from DAILY_POOL, the same for everyone; every
 //   week (Monday to Sunday, Paris) 5 from WEEKLY_POOL: 2 easy, 2 medium and 1 hard (WEEKLY_TIERS: the harder, the
-//   more XP and fragments). A mission is done when the player's games of that day or week reach its target. Each
+//   more XP and fragments). Every mission has a family, and a draw never holds two of the same family, even across
+//   the tiers of the week. A mission is done when the player's games of that day or week reach its target. Each
 //   one pays once, plus a bonus when all those of the period are done.
 // - Each game in the history also pays GAME_XP, for at most GAMES_PER_DAY games a day.
 // - Progress is read from the game history (users/{uid}/games, see gameHistory.js), so a mission is only as honest as
@@ -52,42 +53,75 @@ const sumFound = (games, gameType) =>
   games.reduce((sum, game) => (game.gameType === gameType && Number.isFinite(game.found) ? sum + game.found : sum), 0)
 const allFound = (games) => games.reduce((sum, game) => (Number.isFinite(game.found) ? sum + game.found : sum), 0)
 const distinct = (values) => new Set(values).size
+const ofType = (gameType) => (game) => game.gameType === gameType
+const dailyOf = (gameType) => (game) => isDaily(game) && game.gameType === gameType
+const isChallenge = dailyOf(GAME_TYPES.DAILY_CHALLENGE)
+// The daily challenge has 12 questions: `score` is the number of correct answers.
+const isChallengeOf10 = (game) => isChallenge(game) && game.score >= 10
+const isMulti = (game) => game.mode === 'multi'
+const HARD_DIFFICULTIES = ['Difficile', 'Impossible', 'Hardcore']
+const DIFFICULTY_TYPES = [...SETUP_TYPES, GAME_TYPES.HARDCORE, GAME_TYPES.MISSING_FLAG]
+const isHardDifficulty = (game) => HARD_DIFFICULTIES.includes(game.difficulty)
+const isDifficult = (game) => DIFFICULTY_TYPES.includes(game.gameType) && isHardDifficulty(game)
 
-// `value(games)`: progress from the games of the period; weekly missions have a `tier` (WEEKLY_TIERS). Titles are in
-// i18n under `missions.<id>`, with {{count}} the target. `emoji` is used by the website, `icon`
-// (MaterialCommunityIcons) by the app.
+// `value(games)`: progress from the games of the period; weekly missions have a `tier` (WEEKLY_TIERS). `family`: a draw
+// never holds two missions of the same family (they would measure almost the same thing). Titles are in i18n under
+// `missions.<id>`, with {{count}} the target. `emoji` is used by the website, `icon` (MaterialCommunityIcons) by the app.
 export const DAILY_POOL = [
-  { id: 'play_3', emoji: '🎮', icon: 'gamepad-variant-outline', target: 3, value: (games) => games.length },
-  { id: 'dailies_3', emoji: '📅', icon: 'calendar-check-outline', target: 3, value: (games) => count(games, isDaily) },
-  {
-    id: 'daily_challenge',
-    emoji: '🎯',
-    icon: 'bullseye-arrow',
-    target: 1,
-    value: (games) => count(games, (game) => isDaily(game) && game.gameType === GAME_TYPES.DAILY_CHALLENGE),
-  },
-  { id: 'daily_wins_2', emoji: '✅', icon: 'check-decagram-outline', target: 2, value: (games) => count(games, (game) => isDaily(game) && game.solved) },
-  { id: 'flags_20', emoji: '🚩', icon: 'flag-variant-outline', target: 20, value: (games) => sumFound(games, GAME_TYPES.FLAGS) },
-  { id: 'placement_20', emoji: '🌍', icon: 'earth', target: 20, value: (games) => sumFound(games, GAME_TYPES.PLACEMENT) },
-  { id: 'capitals_15', emoji: '🏛️', icon: 'bank-outline', target: 15, value: (games) => sumFound(games, GAME_TYPES.CAPITALS) },
-  { id: 'ascension_1', emoji: '⛰️', icon: 'image-filter-hdr', target: 1, value: (games) => count(games, (game) => game.mode === 'ascension') },
-  { id: 'survival_1', emoji: '❤️', icon: 'heart-pulse', target: 1, value: (games) => count(games, (game) => game.gameType === GAME_TYPES.SURVIVAL) },
-  { id: 'perfect_1', emoji: '💎', icon: 'diamond-stone', target: 1, value: (games) => count(games, isPerfect) },
-  { id: 'types_3', emoji: '🧭', icon: 'compass-outline', target: 3, value: (games) => distinct(games.map((game) => game.gameType)) },
+  { id: 'play_3', family: 'volume', emoji: '🎮', icon: 'gamepad-variant-outline', target: 3, value: (games) => games.length },
+  { id: 'play_5', family: 'volume', emoji: '🕹️', icon: 'controller-classic-outline', target: 5, value: (games) => games.length },
+  { id: 'dailies_3', family: 'dailies', emoji: '📅', icon: 'calendar-check-outline', target: 3, value: (games) => count(games, isDaily) },
+  { id: 'daily_wins_2', family: 'dailies', emoji: '✅', icon: 'check-decagram-outline', target: 2, value: (games) => count(games, (game) => isDaily(game) && game.solved) },
+  { id: 'daily_challenge', family: 'challenge', emoji: '🎯', icon: 'bullseye-arrow', target: 1, value: (games) => count(games, isChallenge) },
+  { id: 'challenge_10', family: 'challenge', emoji: '🥇', icon: 'bullseye', target: 1, value: (games) => count(games, isChallengeOf10) },
+  { id: 'border_guess', family: 'border', emoji: '🗾', icon: 'map-outline', target: 1, value: (games) => count(games, dailyOf(GAME_TYPES.BORDER_GUESS)) },
+  { id: 'country_clue', family: 'clue', emoji: '🔎', icon: 'magnify', target: 1, value: (games) => count(games, dailyOf(GAME_TYPES.COUNTRY_CLUE)) },
+  { id: 'daily_quiz', family: 'quiz', emoji: '❓', icon: 'help-circle-outline', target: 1, value: (games) => count(games, dailyOf(GAME_TYPES.QUIZ)) },
+  { id: 'quiz_infinite_1', family: 'quiz', emoji: '♾️', icon: 'infinity', target: 1, value: (games) => count(games, (game) => game.gameType === GAME_TYPES.QUIZ && game.mode === 'infinite') },
+  { id: 'ranking', family: 'ranking', emoji: '📊', icon: 'sort-descending', target: 1, value: (games) => count(games, dailyOf(GAME_TYPES.RANKING)) },
+  { id: 'voyage', family: 'voyage', emoji: '🧳', icon: 'airplane', target: 1, value: (games) => count(games, dailyOf(GAME_TYPES.VOYAGE_VOYAGE)) },
+  { id: 'flags_20', family: 'flags', emoji: '🚩', icon: 'flag-variant-outline', target: 20, value: (games) => sumFound(games, GAME_TYPES.FLAGS) },
+  { id: 'missing_flag_1', family: 'flags', emoji: '🏳️', icon: 'flag-outline', target: 1, value: (games) => count(games, ofType(GAME_TYPES.MISSING_FLAG)) },
+  { id: 'placement_20', family: 'placement', emoji: '🌍', icon: 'earth', target: 20, value: (games) => sumFound(games, GAME_TYPES.PLACEMENT) },
+  { id: 'hardcore_1', family: 'hardcore', emoji: '🔥', icon: 'fire', target: 1, value: (games) => count(games, ofType(GAME_TYPES.HARDCORE)) },
+  { id: 'capitals_15', family: 'capitals', emoji: '🏛️', icon: 'bank-outline', target: 15, value: (games) => sumFound(games, GAME_TYPES.CAPITALS) },
+  { id: 'ascension_1', family: 'ascension', emoji: '⛰️', icon: 'image-filter-hdr', target: 1, value: (games) => count(games, (game) => game.mode === 'ascension') },
+  { id: 'survival_1', family: 'survival', emoji: '❤️', icon: 'heart-pulse', target: 1, value: (games) => count(games, ofType(GAME_TYPES.SURVIVAL)) },
+  { id: 'perfect_1', family: 'perfect', emoji: '💎', icon: 'diamond-stone', target: 1, value: (games) => count(games, isPerfect) },
+  { id: 'types_3', family: 'types', emoji: '🧭', icon: 'compass-outline', target: 3, value: (games) => distinct(games.map((game) => game.gameType)) },
+  { id: 'multi_1', family: 'multi', emoji: '👥', icon: 'account-group-outline', target: 1, value: (games) => count(games, isMulti) },
+  { id: 'found_50', family: 'found', emoji: '🗺️', icon: 'map-marker-multiple-outline', target: 50, value: allFound },
 ]
 
 export const WEEKLY_POOL = [
-  { id: 'week_play_20', tier: 'easy', emoji: '🕹️', icon: 'controller-classic-outline', target: 20, value: (games) => games.length },
-  { id: 'week_daily_days_5', tier: 'medium', emoji: '🔥', icon: 'fire', target: 5, value: (games) => distinct(games.filter(isDaily).map((game) => game.dailyKey)) },
-  { id: 'week_dailies_15', tier: 'easy', emoji: '📆', icon: 'calendar-multiselect', target: 15, value: (games) => count(games, isDaily) },
-  { id: 'week_daily_wins_10', tier: 'medium', emoji: '🏅', icon: 'medal-outline', target: 10, value: (games) => count(games, (game) => isDaily(game) && game.solved) },
-  { id: 'week_found_200', tier: 'easy', emoji: '🗺️', icon: 'map-marker-multiple-outline', target: 200, value: allFound },
-  { id: 'week_found_500', tier: 'medium', emoji: '🌐', icon: 'map-search-outline', target: 500, value: allFound },
-  { id: 'week_daily_days_7', tier: 'hard', emoji: '🗓️', icon: 'calendar-star', target: 7, value: (games) => distinct(games.filter(isDaily).map((game) => game.dailyKey)) },
-  { id: 'week_daily_wins_20', tier: 'hard', emoji: '🏆', icon: 'trophy-outline', target: 20, value: (games) => count(games, (game) => isDaily(game) && game.solved) },
-  { id: 'week_perfect_3', tier: 'hard', emoji: '💠', icon: 'star-four-points-outline', target: 3, value: (games) => count(games, isPerfect) },
-  { id: 'week_types_6', tier: 'easy', emoji: '🧩', icon: 'puzzle-outline', target: 6, value: (games) => distinct(games.map((game) => game.gameType)) },
-  { id: 'week_ascension_3', tier: 'medium', emoji: '🏔️', icon: 'summit', target: 3, value: (games) => count(games, (game) => game.mode === 'ascension') },
+  // Easy
+  { id: 'week_play_20', family: 'volume', tier: 'easy', emoji: '🕹️', icon: 'controller-classic-outline', target: 20, value: (games) => games.length },
+  { id: 'week_dailies_15', family: 'dailies', tier: 'easy', emoji: '📆', icon: 'calendar-multiselect', target: 15, value: (games) => count(games, isDaily) },
+  { id: 'week_types_6', family: 'types', tier: 'easy', emoji: '🧩', icon: 'puzzle-outline', target: 6, value: (games) => distinct(games.map((game) => game.gameType)) },
+  { id: 'week_found_200', family: 'found', tier: 'easy', emoji: '🗺️', icon: 'map-marker-multiple-outline', target: 200, value: allFound },
+  { id: 'week_flags_60', family: 'flags', tier: 'easy', emoji: '🚩', icon: 'flag-variant-outline', target: 60, value: (games) => sumFound(games, GAME_TYPES.FLAGS) },
+  { id: 'week_placement_60', family: 'placement', tier: 'easy', emoji: '🌍', icon: 'earth', target: 60, value: (games) => sumFound(games, GAME_TYPES.PLACEMENT) },
+  { id: 'week_capitals_40', family: 'capitals', tier: 'easy', emoji: '🏛️', icon: 'bank-outline', target: 40, value: (games) => sumFound(games, GAME_TYPES.CAPITALS) },
+  { id: 'week_challenge_3', family: 'challenge', tier: 'easy', emoji: '🎯', icon: 'bullseye-arrow', target: 3, value: (games) => distinct(games.filter(isChallenge).map((game) => game.dailyKey)) },
+  // Medium
+  { id: 'week_daily_days_5', family: 'daily_days', tier: 'medium', emoji: '🔥', icon: 'fire', target: 5, value: (games) => distinct(games.filter(isDaily).map((game) => game.dailyKey)) },
+  { id: 'week_daily_wins_10', family: 'daily_wins', tier: 'medium', emoji: '🏅', icon: 'medal-outline', target: 10, value: (games) => count(games, (game) => isDaily(game) && game.solved) },
+  { id: 'week_ascension_3', family: 'ascension', tier: 'medium', emoji: '🏔️', icon: 'summit', target: 3, value: (games) => count(games, (game) => game.mode === 'ascension') },
+  { id: 'week_found_500', family: 'found', tier: 'medium', emoji: '🌐', icon: 'map-search-outline', target: 500, value: allFound },
+  { id: 'week_survival_5', family: 'survival', tier: 'medium', emoji: '❤️', icon: 'heart-pulse', target: 5, value: (games) => count(games, ofType(GAME_TYPES.SURVIVAL)) },
+  { id: 'week_hardcore_3', family: 'hardcore', tier: 'medium', emoji: '🔥', icon: 'skull-outline', target: 3, value: (games) => count(games, ofType(GAME_TYPES.HARDCORE)) },
+  { id: 'week_multi_3', family: 'multi', tier: 'medium', emoji: '👥', icon: 'account-group-outline', target: 3, value: (games) => count(games, isMulti) },
+  { id: 'week_difficult_3', family: 'difficulty', tier: 'medium', emoji: '💪', icon: 'arm-flex-outline', target: 3, value: (games) => count(games, isDifficult) },
+  { id: 'week_missing_flag_3', family: 'flags', tier: 'medium', emoji: '🏳️', icon: 'flag-outline', target: 3, value: (games) => count(games, ofType(GAME_TYPES.MISSING_FLAG)) },
+  // Hard
+  { id: 'week_daily_days_7', family: 'daily_days', tier: 'hard', emoji: '🗓️', icon: 'calendar-star', target: 7, value: (games) => distinct(games.filter(isDaily).map((game) => game.dailyKey)) },
+  { id: 'week_daily_wins_20', family: 'daily_wins', tier: 'hard', emoji: '🏆', icon: 'trophy-outline', target: 20, value: (games) => count(games, (game) => isDaily(game) && game.solved) },
+  { id: 'week_perfect_3', family: 'perfect', tier: 'hard', emoji: '💠', icon: 'star-four-points-outline', target: 3, value: (games) => count(games, isPerfect) },
+  { id: 'week_types_10', family: 'types', tier: 'hard', emoji: '🧭', icon: 'compass-outline', target: 10, value: (games) => distinct(games.map((game) => game.gameType)) },
+  { id: 'week_found_1000', family: 'found', tier: 'hard', emoji: '🌏', icon: 'earth-arrow-right', target: 1000, value: allFound },
+  { id: 'week_play_50', family: 'volume', tier: 'hard', emoji: '🎮', icon: 'gamepad-variant-outline', target: 50, value: (games) => games.length },
+  { id: 'week_perfect_hard_1', family: 'perfect', tier: 'hard', emoji: '👑', icon: 'crown-outline', target: 1, value: (games) => count(games, (game) => isPerfect(game) && isHardDifficulty(game)) },
+  { id: 'week_challenge_10', family: 'challenge', tier: 'hard', emoji: '🥇', icon: 'bullseye', target: 1, value: (games) => count(games, isChallengeOf10) },
 ]
 
 // ---------- Periods (Paris time, like dailyKey.js, which can't be imported here: it reads the server clock) ----------
@@ -126,16 +160,34 @@ function seedOf(text) {
   return hash >>> 0
 }
 
-export const dailyMissions = (day) => seededShuffle(DAILY_POOL, seedOf(`missions:day:${day}`)).slice(0, DAILY_MISSIONS)
+// The first `size` missions of `shuffled` whose family isn't in `families` yet (which gets the families taken).
+function pickDistinctFamilies(shuffled, size, families) {
+  const picked = []
+  for (const mission of shuffled) {
+    if (picked.length === size) break
+    if (families.has(mission.family)) continue
+    families.add(mission.family)
+    picked.push(mission)
+  }
+  return picked
+}
 
-// Each tier is shuffled with its own seed; the missions come in the order easy, medium, hard.
-export const weeklyMissions = (week) =>
-  Object.entries(WEEKLY_MISSIONS_BY_TIER).flatMap(([tier, size]) =>
-    seededShuffle(
+export const dailyMissions = (day) => pickDistinctFamilies(seededShuffle(DAILY_POOL, seedOf(`missions:day:${day}`)), DAILY_MISSIONS, new Set())
+
+// Each tier is shuffled with its own seed. The hard tier is drawn first, then medium, then easy, each skipping the
+// families already taken; the missions come in the order easy, medium, hard.
+export function weeklyMissions(week) {
+  const families = new Set()
+  const drawn = {}
+  for (const tier of Object.keys(WEEKLY_MISSIONS_BY_TIER).reverse()) {
+    const shuffled = seededShuffle(
       WEEKLY_POOL.filter((mission) => mission.tier === tier),
       seedOf(`missions:week:${week}:${tier}`),
-    ).slice(0, size),
-  )
+    )
+    drawn[tier] = pickDistinctFamilies(shuffled, WEEKLY_MISSIONS_BY_TIER[tier], families)
+  }
+  return Object.keys(WEEKLY_MISSIONS_BY_TIER).flatMap((tier) => drawn[tier])
+}
 
 // Games of the history with their day: `playedAt` in ms (fromSnapshot in gameHistory.js), Firestore Timestamps too.
 const playedTime = (game) => (typeof game.playedAt === 'number' ? game.playedAt : game.playedAt?.toMillis?.())

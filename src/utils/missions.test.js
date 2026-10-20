@@ -23,6 +23,7 @@ import {
   weekKeyOf,
   weeklyMissions,
 } from './missions'
+import { GAME_TYPES } from './gameTypes'
 import { DAILY_BONUS_FRAGMENTS, DAILY_MISSION_FRAGMENTS, LEVEL_UP_FRAGMENTS, WEEKLY_BONUS_FRAGMENTS } from './flagCollection'
 
 // Monday 2026-10-19, 12:00 in Paris (UTC+2).
@@ -30,6 +31,20 @@ const NOW = Date.UTC(2026, 9, 19, 10)
 const HOUR = 60 * 60 * 1000
 
 const game = (overrides = {}) => ({ gameType: 'FLAGS', mode: 'standard', found: 5, total: 20, playedAt: NOW - HOUR, ...overrides })
+
+// Games finishing any mission of the pools, all played today: every game type as a solved daily on 7 different keys,
+// plus survival, hardcore, missing flag, ascension, multiplayer and infinite quiz games.
+const everything = () => [
+  ...Array.from({ length: 36 }, (_, index) =>
+    game({ mode: 'daily', solved: true, gameType: Object.values(GAME_TYPES)[index % 12], score: 12, found: 40, total: 40, difficulty: 'Difficile', dailyKey: `2026-10-${19 + (index % 7)}` }),
+  ),
+  ...Array.from({ length: 6 }, () => game({ gameType: 'SURVIVAL', mode: 'survival', found: undefined })),
+  ...Array.from({ length: 4 }, () => game({ gameType: 'HARDCORE', found: undefined })),
+  ...Array.from({ length: 4 }, () => game({ gameType: 'MISSING_FLAG', found: undefined })),
+  ...Array.from({ length: 4 }, () => game({ gameType: 'PLACEMENT', mode: 'ascension', found: 20, total: 20 })),
+  ...Array.from({ length: 4 }, () => game({ mode: 'multi' })),
+  ...Array.from({ length: 2 }, () => game({ gameType: 'QUIZ', mode: 'infinite', found: undefined })),
+]
 
 describe('periods', () => {
   it('uses the day in Paris', () => {
@@ -85,6 +100,71 @@ describe('missions', () => {
     expect(ids).not.toContain(BONUS_ID)
   })
 
+  it('gives every mission a family and never draws two of the same family', () => {
+    expect([...DAILY_POOL, ...WEEKLY_POOL].every((mission) => typeof mission.family === 'string' && mission.family)).toBe(true)
+    const pad = (value) => String(value).padStart(2, '0')
+    for (let index = 0; index < 200; index += 1) {
+      const day = missionDayAt(Date.UTC(2026, 0, 1) + index * 24 * 60 * 60 * 1000)
+      const daily = dailyMissions(day)
+      expect(daily).toHaveLength(DAILY_MISSIONS)
+      expect(new Set(daily.map((mission) => mission.family)).size, day).toBe(DAILY_MISSIONS)
+      const week = weeklyMissions(`${2026 + Math.floor(index / 53)}-W${pad((index % 53) + 1)}`)
+      expect(week.map((mission) => mission.tier), `week ${index}`).toEqual(['easy', 'easy', 'medium', 'medium', 'hard'])
+      expect(new Set(week.map((mission) => mission.family)).size, `week ${index}`).toBe(WEEKLY_MISSIONS)
+    }
+  })
+
+  it('computes the progress of the new missions', () => {
+    const find = (id) => [...DAILY_POOL, ...WEEKLY_POOL].find((mission) => mission.id === id)
+    const value = (id, games) => find(id).value(games)
+    const daily = (gameType, overrides = {}) => game({ gameType, mode: 'daily', dailyKey: '2026-10-19', ...overrides })
+
+    expect(value('play_5', [game(), game(), game()])).toBe(3)
+    expect(value('challenge_10', [daily('DAILY_CHALLENGE', { score: 9 }), daily('QUIZ', { score: 12 })])).toBe(0)
+    expect(value('challenge_10', [daily('DAILY_CHALLENGE', { score: 10 })])).toBe(1)
+    expect(value('week_challenge_10', [daily('DAILY_CHALLENGE', { score: 12 })])).toBe(1)
+    for (const [id, gameType] of [['border_guess', 'BORDER_GUESS'], ['country_clue', 'COUNTRY_CLUE'], ['daily_quiz', 'QUIZ'], ['ranking', 'RANKING'], ['voyage', 'VOYAGE_VOYAGE']]) {
+      expect(value(id, [game({ gameType, mode: 'standard' }), daily('FLAGS')]), id).toBe(0)
+      expect(value(id, [daily(gameType)]), id).toBe(1)
+    }
+    expect(value('quiz_infinite_1', [daily('QUIZ'), game({ gameType: 'QUIZ', mode: 'infinite' })])).toBe(1)
+    expect(value('missing_flag_1', [game({ gameType: 'MISSING_FLAG' }), game()])).toBe(1)
+    expect(value('week_missing_flag_3', [game({ gameType: 'MISSING_FLAG' }), game({ gameType: 'MISSING_FLAG' })])).toBe(2)
+    expect(value('hardcore_1', [game({ gameType: 'HARDCORE' }), game({ difficulty: 'Hardcore' })])).toBe(1)
+    expect(value('week_hardcore_3', [game({ gameType: 'HARDCORE' }), game({ gameType: 'HARDCORE' })])).toBe(2)
+    expect(value('multi_1', [game({ mode: 'multi' }), game()])).toBe(1)
+    expect(value('week_multi_3', [game({ mode: 'multi' }), game({ mode: 'multi', gameType: 'SURVIVAL' }), game()])).toBe(2)
+    expect(value('week_survival_5', [game({ gameType: 'SURVIVAL', mode: 'survival' }), game()])).toBe(1)
+    expect(value('found_50', [game({ found: 30 }), game({ gameType: 'QUIZ', found: undefined }), game({ found: 25 })])).toBe(55)
+    expect(value('week_found_1000', [game({ found: 30 }), game({ found: 25 })])).toBe(55)
+    expect(value('week_flags_60', [game({ found: 30 }), game({ gameType: 'CAPITALS', found: 25 })])).toBe(30)
+    expect(value('week_placement_60', [game({ gameType: 'PLACEMENT', found: 12 }), game({ found: 25 })])).toBe(12)
+    expect(value('week_capitals_40', [game({ gameType: 'CAPITALS', found: 12 }), game({ found: 25 })])).toBe(12)
+    expect(
+      value('week_challenge_3', [
+        daily('DAILY_CHALLENGE', { dailyKey: '2026-10-19' }),
+        daily('DAILY_CHALLENGE', { dailyKey: '2026-10-19' }),
+        daily('DAILY_CHALLENGE', { dailyKey: '2026-10-20' }),
+        daily('FLAGS', { dailyKey: '2026-10-21' }),
+      ]),
+    ).toBe(2)
+    expect(
+      value('week_difficult_3', [
+        game({ difficulty: 'Difficile' }),
+        game({ gameType: 'PLACEMENT', difficulty: 'Impossible' }),
+        game({ gameType: 'CAPITALS', difficulty: 'Hardcore' }),
+        game({ gameType: 'MISSING_FLAG', difficulty: 'Difficile' }),
+        game({ difficulty: 'Moyen' }),
+        game({ gameType: 'QUIZ', difficulty: 'Difficile' }),
+      ]),
+    ).toBe(4)
+    expect(value('week_types_10', [game(), game({ gameType: 'QUIZ' }), game({ gameType: 'SURVIVAL' })])).toBe(3)
+    expect(value('week_play_50', [game(), game()])).toBe(2)
+    const perfect = { found: 20, total: 20 }
+    expect(value('week_perfect_hard_1', [game({ ...perfect, difficulty: 'Moyen' }), game({ found: 19, total: 20, difficulty: 'Difficile' })])).toBe(0)
+    expect(value('week_perfect_hard_1', [game({ ...perfect, difficulty: 'Moyen' }), game({ ...perfect, difficulty: 'Difficile' })])).toBe(1)
+  })
+
   it("counts today's games for the daily missions and the week's for the weekly ones", () => {
     const games = [
       game(),
@@ -136,39 +216,28 @@ describe('XP', () => {
 
   it('pays each mission done once, and the bonus when the three are done', () => {
     // Enough games of every kind to finish any daily mission.
-    const games = [
-      ...Array.from({ length: 3 }, () => game({ mode: 'daily', solved: true, gameType: 'DAILY_CHALLENGE', dailyKey: '2026-10-19' })),
-      game({ gameType: 'FLAGS', found: 20, total: 20 }),
-      game({ gameType: 'PLACEMENT', found: 20, total: 20, mode: 'ascension' }),
-      game({ gameType: 'CAPITALS', found: 15, total: 15 }),
-      game({ gameType: 'SURVIVAL', mode: 'survival', found: undefined }),
-    ]
+    const games = everything()
     const result = grantXp(fresh(), games, NOW)
     const daily = missionsAt(games, NOW).daily
     expect(daily.every((entry) => entry.done)).toBe(true)
     expect(result.state.dayMissions).toEqual([...daily.map((entry) => entry.mission.id), BONUS_ID])
-    expect(result.gained).toBeGreaterThanOrEqual(DAILY_MISSIONS * DAILY_MISSION_XP + DAILY_BONUS_XP + games.length * GAME_XP)
+    expect(result.gained).toBeGreaterThanOrEqual(DAILY_MISSIONS * DAILY_MISSION_XP + DAILY_BONUS_XP + GAMES_PER_DAY * GAME_XP)
     expect(result.levelUp).toBe(true)
     expect(result.state.level).toBe(levelOf(result.state.total).level)
     expect(grantXp(result.state, games, NOW).gained).toBe(0)
     // The daily missions pay XP only. Fragments come with the weekly missions the same games may finish, and with
     // the levels gained, and are paid once.
     expect(DAILY_MISSION_FRAGMENTS + DAILY_BONUS_FRAGMENTS).toBe(0)
-    const weekly = missionsAt(games, NOW).weekly.filter((entry) => entry.done)
-    const weeklyFragments = weekly.reduce((sum, entry) => sum + WEEKLY_TIERS[entry.mission.tier].fragments, 0)
-    expect(result.fragments).toBe(weeklyFragments + (result.state.level - 1) * LEVEL_UP_FRAGMENTS)
+    const weekly = missionsAt(games, NOW).weekly
+    const weeklyFragments = weekly.filter((entry) => entry.done).reduce((sum, entry) => sum + WEEKLY_TIERS[entry.mission.tier].fragments, 0)
+    const weeklyBonus = weekly.every((entry) => entry.done) ? WEEKLY_BONUS_FRAGMENTS : 0
+    expect(result.fragments).toBe(weeklyFragments + weeklyBonus + (result.state.level - 1) * LEVEL_UP_FRAGMENTS)
     expect(grantXp(result.state, games, NOW).fragments).toBe(0)
   })
 
   it('pays the weekly missions by tier, and a bonus with fragments when the 5 are done', () => {
-    // 7 days of 3 solved dailies on 6 different game types, 3 perfect games, 3 ascension games, 630+ countries found.
-    const types = ['PLACEMENT', 'FLAGS', 'CAPITALS', 'SURVIVAL', 'DAILY_CHALLENGE', 'QUIZ']
-    const games = [
-      ...Array.from({ length: 21 }, (_, index) =>
-        game({ mode: 'daily', solved: true, gameType: types[index % 6], found: 30, total: 30, dailyKey: `2026-10-${19 + (index % 7)}`, playedAt: NOW - HOUR + (index % 7) * 24 * HOUR }),
-      ),
-      ...Array.from({ length: 3 }, () => game({ mode: 'ascension', gameType: 'PLACEMENT' })),
-    ]
+    // Enough games of every kind to finish any weekly mission.
+    const games = everything()
     const weekly = missionsAt(games, NOW).weekly
     expect(weekly.every((entry) => entry.done)).toBe(true)
     // The day is already paid: only the week is left

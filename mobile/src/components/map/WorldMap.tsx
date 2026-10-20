@@ -251,12 +251,9 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
         feature: shape.feature,
         setStyle: (style: LeafletStyle) =>
           setStyles((prev) => ({ ...prev, [shape.name]: { ...prev[shape.name], ...style } })),
-        getBounds: () => ({
-          getCenter: () => ({
-            lat: (shape.geoBounds.south + shape.geoBounds.north) / 2,
-            lng: (shape.geoBounds.west + shape.geoBounds.east) / 2,
-          }),
-        }),
+        // Center of the biggest piece of land: the middle of the lat/lng box fell in the Atlantic for countries
+        // across the dateline (Fiji, New Zealand, Russia, the United States), where a reveal left a black screen.
+        getBounds: () => ({ getCenter: () => unproject(shape.marker.x, shape.marker.y) }),
       })),
     [shapes]
   )

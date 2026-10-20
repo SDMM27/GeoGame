@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import countriesMeta from '../data/countries.meta.json'
 import countriesFull from '../data/countriesWithDifficulty_FR.json'
 import {
-  PIECES_PER_FLAG,
+  PIECES_BY_RARITY,
   RARITIES,
   RARITY_COLORS,
   RARITY_WEIGHTS,
@@ -10,6 +10,9 @@ import {
   flagPool,
   masteryProgress,
   masterySets,
+  pieceGrid,
+  piecesFor,
+  piecesOf,
   rarityOf,
   readFlags,
 } from './flagCollection'
@@ -24,6 +27,31 @@ describe('rarity', () => {
     expect([undefined, '', 'Hardcore'].map(rarityOf)).toEqual(['uncommon', 'uncommon', 'uncommon'])
     expect(Object.keys(RARITY_COLORS)).toEqual(RARITIES)
     expect(Object.keys(RARITY_WEIGHTS)).toEqual(RARITIES)
+  })
+})
+
+describe('pieces by rarity', () => {
+  it('asks more pieces for the rarer flags', () => {
+    expect(RARITIES.map(piecesFor)).toEqual([2, 3, 4, 6])
+    expect(Object.keys(PIECES_BY_RARITY)).toEqual(RARITIES)
+    expect(piecesFor(undefined)).toBe(3)
+    expect(small.map((flag) => piecesOf(flag.iso, small))).toEqual([2, 3, 4, 6])
+    expect(piecesOf('ZZ', small)).toBe(3)
+  })
+
+  it('costs 911 pieces for the 239 flags', () => {
+    const pool = flagPool(countriesMeta.features)
+    expect(pool.reduce((sum, flag) => sum + piecesFor(flag.rarity), 0)).toBe(911)
+    expect(RARITIES.map((rarity) => pool.filter((flag) => flag.rarity === rarity).length)).toEqual([33, 73, 86, 47])
+  })
+
+  it('cuts each flag into a grid of its pieces', () => {
+    expect([2, 3, 4, 6].map(pieceGrid)).toEqual([
+      { cols: 2, rows: 1 },
+      { cols: 3, rows: 1 },
+      { cols: 2, rows: 2 },
+      { cols: 3, rows: 2 },
+    ])
   })
 })
 
@@ -47,8 +75,11 @@ describe('readFlags', () => {
     expect(readFlags({ flags: { unlocked: ['AA', 'ZZ', 'AA', 'BB'], current: 'CC', pieces: 99 } }, small)).toEqual({
       unlocked: ['AA', 'BB'],
       current: 'CC',
-      pieces: PIECES_PER_FLAG - 1,
+      pieces: 3,
     })
+    // The cap follows the rarity of the current flag: AA is common (2 pieces), DD legendary (6)
+    expect(readFlags({ flags: { current: 'AA', pieces: 99 } }, small).pieces).toBe(1)
+    expect(readFlags({ flags: { current: 'DD', pieces: 99 } }, small).pieces).toBe(5)
     expect(readFlags({ flags: { unlocked: ['AA'], current: 'AA', pieces: 2 } }, small)).toEqual({ unlocked: ['AA'], current: null, pieces: 0 })
     expect(readFlags({ flags: { current: 'BB', pieces: -3 } }, small)).toEqual({ unlocked: [], current: 'BB', pieces: 0 })
     expect(readFlags({ flags: { current: 'BB', pieces: 1.9 } }, small).pieces).toBe(1)
@@ -57,9 +88,9 @@ describe('readFlags', () => {
 
 describe('addFragments', () => {
   it('draws the first flag, then adds a piece per fragment', () => {
-    const { state, unlocked } = addFragments(empty, 2, small, 'alice')
+    const { state, unlocked } = addFragments(empty, 1, small, 'alice')
     expect(state.current).not.toBeNull()
-    expect(state.pieces).toBe(2)
+    expect(state.pieces).toBe(1)
     expect(unlocked).toEqual([])
   })
 
@@ -68,14 +99,23 @@ describe('addFragments', () => {
   })
 
   it('unlocks the flag on its last piece and draws the next one among those left', () => {
-    const start = { unlocked: [], current: 'AA', pieces: PIECES_PER_FLAG - 1 }
-    const { state, unlocked } = addFragments(start, 1 + PIECES_PER_FLAG + 1, small, 'alice')
-    expect(unlocked).toHaveLength(2)
-    expect(unlocked[0]).toBe('AA')
+    const start = { unlocked: [], current: 'CC', pieces: 3 }
+    const { state, unlocked } = addFragments(start, 2, small, 'alice')
+    expect(unlocked).toEqual(['CC'])
     expect(state.unlocked).toEqual(unlocked)
     expect(state.current).not.toBeNull()
     expect(state.unlocked).not.toContain(state.current)
     expect(state.pieces).toBe(1)
+  })
+
+  it('unlocks a flag at the cost of its rarity', () => {
+    const cost = { AA: 2, BB: 3, CC: 4, DD: 6 }
+    for (const [iso, pieces] of Object.entries(cost)) {
+      const almost = addFragments({ unlocked: [], current: iso, pieces: pieces - 2 }, 1, small, 'alice')
+      expect(almost.unlocked).toEqual([])
+      expect(almost.state).toMatchObject({ current: iso, pieces: pieces - 1 })
+      expect(addFragments({ unlocked: [], current: iso, pieces: pieces - 1 }, 1, small, 'alice').unlocked).toEqual([iso])
+    }
   })
 
   it('is deterministic for a seed and varies with it', () => {
@@ -101,7 +141,7 @@ describe('addFragments', () => {
   })
 
   it('collects every flag, then drops the extra fragments', () => {
-    const { state, unlocked } = addFragments(empty, small.length * PIECES_PER_FLAG + 10, small, 'alice')
+    const { state, unlocked } = addFragments(empty, 15 + 10, small, 'alice')
     expect([...state.unlocked].sort()).toEqual(small.map((flag) => flag.iso))
     expect(unlocked).toEqual(state.unlocked)
     expect(state).toMatchObject({ current: null, pieces: 0 })

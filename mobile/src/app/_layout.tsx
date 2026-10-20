@@ -19,6 +19,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { ErrorScreen } from '@/components/ErrorScreen'
 import { InstallHint } from '@/components/InstallHint'
 import { InviteBanner } from '@/components/InviteBanner'
+import { NotificationPrompt } from '@/components/NotificationPrompt'
 import { PresenceHeartbeat } from '@/components/PresenceHeartbeat'
 import { PushNotifications } from '@/components/PushNotifications'
 import { ConfirmHost } from '@/components/ConfirmHost'
@@ -113,6 +114,7 @@ export default function RootLayout() {
         <InstallHint />
         <UpdateBanner />
         <WhatsNew />
+        <NotificationPrompt />
         <InviteBanner />
         <PushNotifications />
         <PresenceHeartbeat />

@@ -16,6 +16,8 @@ const LANGUAGES: { code: string; label: string }[] = SHARED_LANGUAGES
 
 // Read when the module loads, before the app stores anything for this launch.
 const playedBefore = hasPlayedBefore(globalThis.localStorage)
+// Lets other launch-time prompts (NotificationPrompt) wait their turn when a note is about to show.
+export const whatsNewAtLaunch = pendingNote(globalThis.localStorage, playedBefore) !== null
 
 export function WhatsNew() {
   const { t, i18n } = useTranslation()

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { Image, StyleSheet, View } from 'react-native'
 
 import { fetchCollection, FLAG_POOL } from '@shared/utils/flagCollectionData'
-import { PIECES_PER_FLAG, RARITIES, RARITY_COLORS } from '@shared/utils/flagCollection'
+import { pieceGrid, piecesFor, RARITIES, RARITY_COLORS } from '@shared/utils/flagCollection'
 import { getCountryName } from '@shared/utils/getCountryName'
 import { onPublicDataPatched } from '@shared/utils/publicProfile'
 
@@ -32,17 +32,26 @@ export function sortFlags(unlocked: string[], lang: string): string[] {
   return [...unlocked].sort((a, b) => rank(b) - rank(a) || name(a).localeCompare(name(b), lang))
 }
 
-// The four quarters (top-left, top-right, bottom-left, bottom-right) of a flag; the pieces not won yet are covered.
-function PieceFlag({ iso, pieces }: { iso: string; pieces: number }) {
+// The pieces of a flag (cost pieces, cut by pieceGrid), left to right then top to bottom; the pieces not won yet are covered.
+function PieceFlag({ iso, pieces, cost }: { iso: string; pieces: number; cost: number }) {
   const source = getFlag(iso)
-  const quarters = Array.from({ length: PIECES_PER_FLAG }, (_, index) => index)
+  const { cols, rows } = pieceGrid(cost)
+  const quarters = Array.from({ length: cost }, (_, index) => index)
   return (
     <View style={styles.pieceFlag} testID="piece-flag">
       {quarters.map((index) =>
         <View
           key={index}
           testID={index < pieces ? 'visible-piece' : 'hidden-piece'}
-          style={[styles.quarter, { left: index % 2 === 0 ? 0 : '50%', top: index < 2 ? 0 : '50%' }]}
+          style={[
+            styles.quarter,
+            {
+              left: `${(index % cols) * (100 / cols)}%`,
+              top: `${Math.floor(index / cols) * (100 / rows)}%`,
+              width: `${100 / cols}%`,
+              height: `${100 / rows}%`,
+            },
+          ]}
         >
           {source != null && (
             <Image
@@ -50,7 +59,12 @@ function PieceFlag({ iso, pieces }: { iso: string; pieces: number }) {
               resizeMode="stretch"
               style={[
                 styles.quarterImage,
-                { left: index % 2 === 0 ? 0 : '-100%', top: index < 2 ? 0 : '-100%' },
+                {
+                  left: `${-(index % cols) * 100}%`,
+                  top: `${-Math.floor(index / cols) * 100}%`,
+                  width: `${cols * 100}%`,
+                  height: `${rows * 100}%`,
+                },
               ]}
             />
           )}
@@ -87,6 +101,7 @@ export function FlagCollectionView({ collection }: { collection: Collection }) {
   }, [flags.unlocked])
   const shown = showAll ? sorted : sorted.slice(0, FIRST)
   const complete = flags.unlocked.length >= total
+  const cost = piecesFor(flags.current ? RARITY_OF.get(flags.current) : undefined)
   const nothing = flags.unlocked.length === 0 && !flags.current
   const modes = [
     ['placement', mastery.placement],
@@ -116,12 +131,12 @@ export function FlagCollectionView({ collection }: { collection: Collection }) {
         <Text variant="caption">{t('collection.empty')}</Text>
       ) : flags.current ? (
         <View style={styles.current}>
-          <PieceFlag iso={flags.current} pieces={flags.pieces} />
+          <PieceFlag iso={flags.current} pieces={flags.pieces} cost={cost} />
           <View style={{ flex: 1, gap: 2 }}>
             <Text variant="label">{t('collection.current')}</Text>
             <Text variant="bodyStrong">?</Text>
             <Text variant="caption" color={colors.accent}>
-              {t('collection.pieces', { count: flags.pieces, total: PIECES_PER_FLAG })}
+              {t('collection.pieces', { count: flags.pieces, total: cost })}
             </Text>
             <Text variant="caption" style={{ fontSize: 12 }}>
               {t('collection.hint')}
@@ -217,8 +232,8 @@ const styles = StyleSheet.create({
   dot: { width: 10, height: 10, borderRadius: radius.pill },
   current: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   pieceFlag: { width: 96, height: 64, borderRadius: radius.sm, overflow: 'hidden', backgroundColor: colors.surfaceHigh },
-  quarter: { position: 'absolute', width: '50%', height: '50%', overflow: 'hidden' },
-  quarterImage: { position: 'absolute', width: '200%', height: '200%' },
+  quarter: { position: 'absolute', overflow: 'hidden' },
+  quarterImage: { position: 'absolute' },
   cover: { ...StyleSheet.absoluteFill, backgroundColor: colors.borderStrong },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
   cell: { width: CELL, height: CELL * 0.7, borderRadius: 6, borderWidth: 2, overflow: 'hidden', backgroundColor: colors.surfaceHigh },

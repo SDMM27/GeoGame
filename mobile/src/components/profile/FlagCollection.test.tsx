@@ -58,20 +58,31 @@ describe('sortFlags', () => {
 
 describe('FlagCollectionView', () => {
   it('shows the won flag pieces and covers only the pieces not won yet', () => {
+    // f05 is uncommon: 3 pieces side by side
     const tree = render(collection(['f00'], 'f05', 2))
     const hidden = tree.root.findAll((node) => node.props.testID === 'hidden-piece' && typeof node.type === 'string')
     const visible = tree.root.findAll((node) => node.props.testID === 'visible-piece' && typeof node.type === 'string')
-    expect(hidden).toHaveLength(2)
+    expect(hidden).toHaveLength(1)
     expect(visible).toHaveLength(2)
-    // Pieces come in the order TL, TR, BL, BR: the two covered ones are the bottom row
-    expect(hidden.map((node) => [node.props.style[1].left, node.props.style[1].top])).toEqual([
-      [0, '50%'],
-      ['50%', '50%'],
-    ])
+    // Pieces come left to right: the covered one is the last strip
+    expect(parseFloat(hidden[0].props.style[1].left)).toBeCloseTo(200 / 3)
+    expect(hidden[0].props.style[1].top).toBe('0%')
     const out = text(tree)
-    expect(out).toContain('collection.pieces {\\"count\\":2,\\"total\\":4}')
+    expect(out).toContain('collection.pieces {\\"count\\":2,\\"total\\":3}')
     expect(out).toContain('collection.hint')
     expect(out).not.toContain('F05')
+  })
+
+  it('cuts the flag by its rarity: 6 pieces for a legendary one, 2 for a common one', () => {
+    const pieceCount = (tree: ReturnType<typeof create>) =>
+      tree.root.findAll((node) => /-piece$/.test(String(node.props.testID)) && typeof node.type === 'string')
+    // f03 legendary, f04 common
+    const legendary = render(collection([], 'f03', 4))
+    expect(pieceCount(legendary)).toHaveLength(6)
+    expect(text(legendary)).toContain('collection.pieces {\\"count\\":4,\\"total\\":6}')
+    const common = render(collection([], 'f04', 1))
+    expect(pieceCount(common)).toHaveLength(2)
+    expect(text(common)).toContain('collection.pieces {\\"count\\":1,\\"total\\":2}')
   })
 
   it('shows the empty message when nothing was won at all', () => {

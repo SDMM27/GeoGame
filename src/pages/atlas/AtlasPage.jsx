@@ -21,6 +21,9 @@ const STYLE = { fillColor: '#2A3E66', fillOpacity: 0.55, color: MAP_COLORS.strok
 const STYLE_HOVER = { fillColor: MAP_COLORS.hover, fillOpacity: 0.5, color: MAP_COLORS.hoverStroke, weight: 2 }
 const STYLE_SELECTED = { fillColor: MAP_COLORS.hover, fillOpacity: 0.6, color: MAP_COLORS.hover, weight: 2 }
 
+// Closest zoom a selected country is framed at (Malta is then about 50px wide)
+const MAX_FRAME_ZOOM = 8
+
 // Countries too small to click at low zoom get a dot until the map is zoomed in enough
 const SMALL_SPAN = 0.5
 let smallCountries = null
@@ -117,8 +120,17 @@ export default function AtlasPage() {
     const feature = findAtlasCountry(selected)
     if (map && feature?.geometry) {
       const phone = window.innerWidth <= 760
-      map.flyToBounds(L.geoJSON(getFocusCountry(feature)).getBounds(), {
-        maxZoom: 5,
+      // Frame the copy of the country nearest to the view (a Pacific island clicked on the copy right of the
+      // antimeridian must not send the map round the world)
+      const bounds = L.geoJSON(getFocusCountry(feature)).getBounds()
+      const shift = Math.round((map.getCenter().lng - bounds.getCenter().lng) / 360) * 360
+      const shifted = L.latLngBounds(
+        [bounds.getSouth(), bounds.getWest() + shift],
+        [bounds.getNorth(), bounds.getEast() + shift]
+      )
+      // Small islands get a closer zoom, and a map already zoomed in further is not zoomed back out
+      map.flyToBounds(shifted, {
+        maxZoom: Math.max(MAX_FRAME_ZOOM, map.getZoom()),
         paddingTopLeft: [40, phone ? 70 : 40],
         paddingBottomRight: [40, phone ? Math.round(window.innerHeight * 0.58) + 20 : 40],
         duration: 0.8,

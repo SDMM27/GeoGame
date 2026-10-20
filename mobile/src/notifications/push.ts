@@ -5,8 +5,8 @@ import Constants from 'expo-constants'
 import * as Device from 'expo-device'
 import * as Notifications from 'expo-notifications'
 import { router } from 'expo-router'
-import { useEffect } from 'react'
-import { Platform } from 'react-native'
+import { useEffect, useState } from 'react'
+import { AppState, Linking, Platform } from 'react-native'
 
 import i18n from '@shared/i18n'
 
@@ -31,8 +31,8 @@ Notifications.setNotificationHandler({
   },
 })
 
-// Shows the permission prompt if it hasn't been answered yet: friend requests can come in from the first day.
-async function registerDevice(uid: string) {
+// Shows the permission prompt if it hasn't been answered yet (unless ask is false): friend requests can come in from the first day.
+async function registerDevice(uid: string, ask = true) {
   if (!Device.isDevice) return
   if (Platform.OS === 'android') {
     // Android 13+ only shows the permission prompt once a channel exists.
@@ -41,7 +41,7 @@ async function registerDevice(uid: string) {
     }
   }
   let permission = await Notifications.getPermissionsAsync()
-  if (!permission.granted && permission.canAskAgain) permission = await Notifications.requestPermissionsAsync()
+  if (!permission.granted && ask && permission.canAskAgain) permission = await Notifications.requestPermissionsAsync()
   if (!permission.granted) return
 
   const projectId = Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId
@@ -53,6 +53,11 @@ export function usePushNotifications(uid: string | null | undefined) {
   useEffect(() => {
     if (!uid) return
     registerDevice(uid).catch((error) => console.warn('[push]', error?.code, error))
+    // Back from the settings with notifications allowed: registers the device without asking again.
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') registerDevice(uid, false).catch((error) => console.warn('[push]', error?.code, error))
+    })
+    return () => subscription.remove()
   }, [uid])
 
   // Tapped notification (app in the background or closed): straight to the room, the requests, or the new friend.
@@ -90,4 +95,21 @@ export type WebPushState = 'unsupported' | 'default' | 'granted' | 'denied'
 // Web only (push.web.ts): the app asks for the permission itself, see registerDevice.
 export function useWebPushPermission(_uid: string | null | undefined) {
   return { state: 'unsupported' as WebPushState, enable: async () => {} }
+}
+
+// For NotificationPrompt: 'denied' once the system prompt can't come back, so the player has to go through the settings.
+// While it still can, registerDevice shows it: nothing for the dialog to do ('unsupported').
+export function usePushPermission(uid: string | null | undefined) {
+  const [state, setState] = useState<WebPushState>('unsupported')
+  useEffect(() => {
+    if (!uid || !Device.isDevice) return
+    const check = () =>
+      Notifications.getPermissionsAsync()
+        .then((permission) => setState(permission.granted ? 'granted' : permission.canAskAgain ? 'unsupported' : 'denied'))
+        .catch((error) => console.warn('[push]', error?.code, error))
+    check()
+    const subscription = AppState.addEventListener('change', (appState) => appState === 'active' && check())
+    return () => subscription.remove()
+  }, [uid])
+  return { state, enable: async () => {}, openSettings: (() => Linking.openSettings()) as (() => void) | null }
 }

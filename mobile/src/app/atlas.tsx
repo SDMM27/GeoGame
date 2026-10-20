@@ -30,6 +30,8 @@ import { clean } from '@/i18n'
 import { colors, radius, space } from '@/theme'
 
 const SELECTED = { fillColor: '#7B2FF7', fillOpacity: 0.65, color: '#C4B5FD', weight: 2 }
+// Closest zoom a selected country is framed at (Malta is then about 50px wide)
+const MAX_FRAME_ZOOM = 8
 
 type Rank = { rank: number; total: number } | null
 type Neighbor = { admin: string; iso: string; name: string }
@@ -213,15 +215,14 @@ export default function AtlasScreen() {
         .getLayers()
         .filter((layer: MapLayer) => layer.feature.properties.ADMIN === admin)
         .forEach((layer: MapLayer) => layer.setStyle(SELECTED))
-      // Frame its main piece of land, in the part of the map above the sheet
+      // Frame its main piece of land, in the part of the map above the sheet. Small islands get a closer
+      // zoom, and a map the player already zoomed in further is not zoomed back out.
       const bounds = mainPartBounds(findAtlasCountry(admin))
       if (bounds) {
-        const [[south, west], [north, east]] = bounds
-        const latPad = ((north - south) * sheetHeight) / Math.max(1, height - sheetHeight)
-        map.fitBounds([[south - latPad, west], [north, east]], { maxZoom: 5, animate: true })
+        map.fitBounds(bounds, { maxZoom: Math.max(MAX_FRAME_ZOOM, map.getZoom()), paddingBottom: sheetHeight, animate: true })
       }
     },
-    [height, sheetHeight]
+    [sheetHeight]
   )
 
   const close = () => {

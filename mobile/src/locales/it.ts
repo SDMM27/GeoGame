@@ -192,7 +192,17 @@ export const it: MobileStrings = {
     step_add: 'Scegli “Aggiungi alla schermata Home”',
     step_done: 'Tocca “Aggiungi”, poi apri GeoGame dalla sua icona',
     close: 'Chiudi',
+    push_hint: "Una volta installata, l'app può anche inviarti notifiche: inviti, amici, sfida del giorno.",
     back_to_site: 'Preferisci il sito? Torna al sito',
+  },
+  push_prompt: {
+    title: 'Attiva le notifiche',
+    message: 'Ricevi una notifica quando un amico ti invita a una partita, ti aggiunge o ti sfida, e un promemoria per la sfida del giorno.',
+    enable: 'Attiva',
+    later: 'Più tardi',
+    denied_title: 'Notifiche bloccate',
+    ok: 'OK',
+    open_settings: 'Apri impostazioni',
   },
   leaderboards: {
     solo: 'Solo',

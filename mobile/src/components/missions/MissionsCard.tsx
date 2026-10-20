@@ -2,6 +2,7 @@
 // invitation to sign in for a visitor.
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { router } from 'expo-router'
+import type { TFunction } from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 
@@ -9,31 +10,36 @@ import { useMissions } from '@shared/hooks/useMissions'
 import {
   DAILY_BONUS_XP,
   DAILY_MISSION_XP,
+  DAILY_MISSIONS,
   GAME_XP,
   GAMES_PER_DAY,
   WEEKLY_BONUS_XP,
-  WEEKLY_MISSION_XP,
+  WEEKLY_MISSIONS,
+  WEEKLY_TIERS,
 } from '@shared/utils/missions'
 
-import {
-  DAILY_BONUS_FRAGMENTS,
-  DAILY_MISSION_FRAGMENTS,
-  WEEKLY_BONUS_FRAGMENTS,
-  WEEKLY_MISSION_FRAGMENTS,
-} from '@shared/utils/flagCollection'
+import { DAILY_BONUS_FRAGMENTS, DAILY_MISSION_FRAGMENTS, WEEKLY_BONUS_FRAGMENTS } from '@shared/utils/flagCollection'
 
 import { XpBar, type Xp } from '@/components/profile/XpBar'
 import { Text, Touchable } from '@/components/ui'
 import { colors, radius, space } from '@/theme'
 
 type Entry = {
-  mission: { id: string; icon: string; target: number }
+  mission: { id: string; icon: string; target: number; tier?: 'easy' | 'medium' | 'hard' }
   progress: number
   done: boolean
   paid: boolean
 }
 
-function MissionRow({ entry, reward, fragments }: { entry: Entry; reward: number; fragments: number }) {
+type Reward = { xp: number; fragments: number }
+
+const DAILY_REWARD: Reward = { xp: DAILY_MISSION_XP, fragments: DAILY_MISSION_FRAGMENTS }
+
+// "+60 XP" and, when there are some, "· +2 fragments".
+const rewardText = (t: TFunction, { xp, fragments }: Reward) =>
+  fragments > 0 ? `${t('missions.reward', { xp })} · ${t('missions.fragments', { count: fragments })}` : t('missions.reward', { xp })
+
+function MissionRow({ entry, reward }: { entry: Entry; reward: Reward }) {
   const { t } = useTranslation()
   const { mission, progress, done, paid } = entry
   const shown = Math.min(progress, mission.target)
@@ -49,9 +55,16 @@ function MissionRow({ entry, reward, fragments }: { entry: Entry; reward: number
           <Text variant="bodyStrong" style={styles.missionTitle}>
             {title}
           </Text>
-          <Text variant="caption" color={done ? colors.accent : colors.textMuted} style={styles.missionReward}>
-            {t('missions.reward', { xp: reward })} · {t('missions.fragments', { count: fragments })}
-          </Text>
+          <View style={styles.missionMeta}>
+            {mission.tier ? (
+              <Text variant="caption" color={colors.textFaint} style={styles.missionTier}>
+                {t(`missions.tier_${mission.tier}`)}
+              </Text>
+            ) : null}
+            <Text variant="caption" color={done ? colors.accent : colors.textMuted} style={styles.missionReward}>
+              {rewardText(t, reward)}
+            </Text>
+          </View>
         </View>
         <View style={styles.track}>
           <View style={[styles.fill, { backgroundColor: color, width: `${(shown / mission.target) * 100}%` }]} />
@@ -61,16 +74,16 @@ function MissionRow({ entry, reward, fragments }: { entry: Entry; reward: number
   )
 }
 
-function Bonus({ xp, fragments, paid }: { xp: number; fragments: number; paid: boolean }) {
+function Bonus({ count, reward, paid }: { count: number; reward: Reward; paid: boolean }) {
   const { t } = useTranslation()
   return (
     <View style={[styles.bonus, paid && { borderColor: colors.accent }]}>
       <MaterialCommunityIcons name={paid ? 'check-circle' : 'gift-outline'} size={18} color={paid ? colors.accent : colors.warning} />
       <Text variant="caption" style={{ flex: 1 }}>
-        {t('missions.bonus')}
+        {t('missions.bonus', { count })}
       </Text>
       <Text variant="caption" color={paid ? colors.accent : colors.warning} style={{ fontSize: 12 }}>
-        {t('missions.reward', { xp })} · {t('missions.fragments', { count: fragments })}
+        {rewardText(t, reward)}
       </Text>
     </View>
   )
@@ -102,9 +115,9 @@ export function MissionsCard({ uid }: { uid: string | null | undefined }) {
           <View style={styles.group}>
             <Text variant="label">{t('missions.daily')}</Text>
             {(missions.daily as Entry[]).map((entry) => (
-              <MissionRow key={entry.mission.id} entry={entry} reward={DAILY_MISSION_XP} fragments={DAILY_MISSION_FRAGMENTS} />
+              <MissionRow key={entry.mission.id} entry={entry} reward={DAILY_REWARD} />
             ))}
-            <Bonus xp={DAILY_BONUS_XP} fragments={DAILY_BONUS_FRAGMENTS} paid={Boolean(missions.dailyBonus)} />
+            <Bonus count={DAILY_MISSIONS} reward={{ xp: DAILY_BONUS_XP, fragments: DAILY_BONUS_FRAGMENTS }} paid={Boolean(missions.dailyBonus)} />
             <Text variant="caption" style={{ fontSize: 12 }}>
               {t('missions.per_game', { xp: GAME_XP, count: GAMES_PER_DAY })}
             </Text>
@@ -115,9 +128,9 @@ export function MissionsCard({ uid }: { uid: string | null | undefined }) {
           <View style={styles.group}>
             <Text variant="label">{t('missions.weekly')}</Text>
             {(missions.weekly as Entry[]).map((entry) => (
-              <MissionRow key={entry.mission.id} entry={entry} reward={WEEKLY_MISSION_XP} fragments={WEEKLY_MISSION_FRAGMENTS} />
+              <MissionRow key={entry.mission.id} entry={entry} reward={WEEKLY_TIERS[entry.mission.tier ?? 'easy']} />
             ))}
-            <Bonus xp={WEEKLY_BONUS_XP} fragments={WEEKLY_BONUS_FRAGMENTS} paid={Boolean(missions.weeklyBonus)} />
+            <Bonus count={WEEKLY_MISSIONS} reward={{ xp: WEEKLY_BONUS_XP, fragments: WEEKLY_BONUS_FRAGMENTS }} paid={Boolean(missions.weeklyBonus)} />
             <Text variant="caption" style={{ fontSize: 12 }}>
               {t('missions.resets_weekly')}
             </Text>
@@ -143,7 +156,9 @@ const styles = StyleSheet.create({
   missionIcon: { width: 36, height: 36, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
   missionTop: { gap: 2 },
   missionTitle: { fontSize: 14, lineHeight: 19, flexShrink: 1 },
-  missionReward: { fontSize: 12, alignSelf: 'flex-end' },
+  missionMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.sm },
+  missionTier: { fontSize: 11, textTransform: 'uppercase' },
+  missionReward: { fontSize: 12, marginLeft: 'auto' },
   track: { height: 6, borderRadius: radius.pill, backgroundColor: colors.surfaceHigh, overflow: 'hidden' },
   fill: { height: '100%', borderRadius: radius.pill },
   bonus: {

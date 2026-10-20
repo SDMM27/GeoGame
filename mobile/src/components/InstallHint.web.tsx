@@ -62,6 +62,7 @@ export function InstallHint() {
         </Pressable>
       </View>
       <Text variant="caption">{t('mobile.install.subtitle')}</Text>
+      <Text variant="caption">{t('mobile.install.push_hint')}</Text>
       {!inSafari && (
         <Text variant="bodyStrong" color={colors.warning} style={{ fontSize: 14 }}>
           {t('mobile.install.not_safari')}

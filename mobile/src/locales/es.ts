@@ -192,7 +192,17 @@ export const es: MobileStrings = {
     step_add: 'Elige «Añadir a pantalla de inicio»',
     step_done: 'Toca «Añadir» y abre GeoGame desde su icono',
     close: 'Cerrar',
+    push_hint: 'Una vez instalada, la app también puede enviarte notificaciones: invitaciones, amigos, reto del día.',
     back_to_site: '¿Prefieres la web? Vuelve al sitio',
+  },
+  push_prompt: {
+    title: 'Activa las notificaciones',
+    message: 'Recibe una notificación cuando un amigo te invite a una partida, te añada o te rete, y un recordatorio del reto del día.',
+    enable: 'Activar',
+    later: 'Más tarde',
+    denied_title: 'Notificaciones bloqueadas',
+    ok: 'OK',
+    open_settings: 'Abrir ajustes',
   },
   leaderboards: {
     solo: 'Solo',

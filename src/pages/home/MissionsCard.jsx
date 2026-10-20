@@ -4,21 +4,47 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAccount } from '../../auth'
 import { useMissions } from '../../hooks/useMissions'
-import { DAILY_BONUS_XP, DAILY_MISSION_XP, GAMES_PER_DAY, GAME_XP, WEEKLY_BONUS_XP, WEEKLY_MISSION_XP } from '../../utils/missions'
-import { DAILY_BONUS_FRAGMENTS, DAILY_MISSION_FRAGMENTS, WEEKLY_BONUS_FRAGMENTS, WEEKLY_MISSION_FRAGMENTS } from '../../utils/flagCollection'
+import {
+  DAILY_BONUS_XP,
+  DAILY_MISSION_XP,
+  DAILY_MISSIONS,
+  GAMES_PER_DAY,
+  GAME_XP,
+  WEEKLY_BONUS_XP,
+  WEEKLY_MISSIONS,
+  WEEKLY_TIERS,
+} from '../../utils/missions'
+import { DAILY_BONUS_FRAGMENTS, DAILY_MISSION_FRAGMENTS, WEEKLY_BONUS_FRAGMENTS } from '../../utils/flagCollection'
 import { LevelChip, XpBar } from '../../components/profile/LevelBadge'
 import './MissionsCard.css'
 
-function MissionRow({ entry, xp, fragments }) {
+const DAILY_REWARD = { xp: DAILY_MISSION_XP, fragments: DAILY_MISSION_FRAGMENTS }
+const dailyReward = () => DAILY_REWARD
+const weeklyReward = (mission) => WEEKLY_TIERS[mission.tier]
+
+// "+60 XP" and, when there are some, "+2 fragments".
+function Reward({ xp, fragments }) {
+  const { t } = useTranslation()
+  return (
+    <span className="mission-reward">
+      {t('missions.reward', { xp })}
+      {fragments > 0 && <small className="mission-fragments">{t('missions.fragments', { count: fragments })}</small>}
+    </span>
+  )
+}
+
+function MissionRow({ entry, reward }) {
   const { t } = useTranslation()
   const { mission, progress, done, paid } = entry
   const finished = done || paid
   const shown = Math.min(progress, mission.target)
+  const { xp, fragments } = reward(mission)
   return (
     <li className={`mission-row${finished ? ' mission-row--done' : ''}`}>
       <span className="mission-emoji" aria-hidden="true">{finished ? '✓' : mission.emoji}</span>
       <div className="mission-text">
         <span className="mission-title">{t(`missions.${mission.id}`, { count: mission.target })}</span>
+        {mission.tier && <small className={`mission-tier mission-tier--${mission.tier}`}>{t(`missions.tier_${mission.tier}`)}</small>}
         <div className="mission-progress">
           <div className="xp-bar" role="progressbar" aria-valuemin={0} aria-valuemax={mission.target} aria-valuenow={shown}>
             <div className="xp-bar-fill" style={{ width: `${Math.round((shown / mission.target) * 100)}%` }} />
@@ -26,12 +52,12 @@ function MissionRow({ entry, xp, fragments }) {
           <small>{shown} / {mission.target}</small>
         </div>
       </div>
-      <span className="mission-reward">{t('missions.reward', { xp })}<small className="mission-fragments">{t('missions.fragments', { count: fragments })}</small></span>
+      <Reward xp={xp} fragments={fragments} />
     </li>
   )
 }
 
-function MissionList({ title, entries, xp, fragments, bonusXp, bonusFragments, bonusDone, hint }) {
+function MissionList({ title, entries, reward, bonusCount, bonusXp, bonusFragments, bonusDone, hint }) {
   const { t } = useTranslation()
   const allDone = bonusDone || (entries.length > 0 && entries.every((entry) => entry.done || entry.paid))
   return (
@@ -42,12 +68,12 @@ function MissionList({ title, entries, xp, fragments, bonusXp, bonusFragments, b
       </div>
       <ul className="missions-list">
         {entries.map((entry) => (
-          <MissionRow key={entry.mission.id} entry={entry} xp={xp} fragments={fragments} />
+          <MissionRow key={entry.mission.id} entry={entry} reward={reward} />
         ))}
       </ul>
       <p className={`missions-bonus${allDone ? ' missions-bonus--done' : ''}`}>
-        <span>{allDone ? '✓ ' : ''}{t('missions.bonus')}</span>
-        <span className="mission-reward">{t('missions.reward', { xp: bonusXp })}<small className="mission-fragments">{t('missions.fragments', { count: bonusFragments })}</small></span>
+        <span>{allDone ? '✓ ' : ''}{t('missions.bonus', { count: bonusCount })}</span>
+        <Reward xp={bonusXp} fragments={bonusFragments} />
       </p>
     </div>
   )
@@ -89,8 +115,8 @@ export default function MissionsCard() {
           <MissionList
             title={t('missions.daily')}
             entries={missions.daily}
-            xp={DAILY_MISSION_XP}
-            fragments={DAILY_MISSION_FRAGMENTS}
+            reward={dailyReward}
+            bonusCount={DAILY_MISSIONS}
             bonusXp={DAILY_BONUS_XP}
             bonusFragments={DAILY_BONUS_FRAGMENTS}
             bonusDone={missions.dailyBonus}
@@ -99,8 +125,8 @@ export default function MissionsCard() {
           <MissionList
             title={t('missions.weekly')}
             entries={missions.weekly}
-            xp={WEEKLY_MISSION_XP}
-            fragments={WEEKLY_MISSION_FRAGMENTS}
+            reward={weeklyReward}
+            bonusCount={WEEKLY_MISSIONS}
             bonusXp={WEEKLY_BONUS_XP}
             bonusFragments={WEEKLY_BONUS_FRAGMENTS}
             bonusDone={missions.weeklyBonus}

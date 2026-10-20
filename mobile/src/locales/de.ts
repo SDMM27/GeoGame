@@ -192,7 +192,17 @@ export const de: MobileStrings = {
     step_add: 'Wähle „Zum Home-Bildschirm“',
     step_done: 'Tippe auf „Hinzufügen“ und öffne GeoGame über sein Symbol',
     close: 'Schließen',
+    push_hint: 'Nach der Installation kann dir die App auch Benachrichtigungen senden: Einladungen, Freunde, Tageschallenge.',
     back_to_site: 'Lieber die Website? Zurück zur Website',
+  },
+  push_prompt: {
+    title: 'Benachrichtigungen aktivieren',
+    message: 'Erhalte eine Benachrichtigung, wenn dich ein Freund zu einem Spiel einlädt, dich hinzufügt oder herausfordert, plus eine Erinnerung an die Tageschallenge.',
+    enable: 'Aktivieren',
+    later: 'Später',
+    denied_title: 'Benachrichtigungen blockiert',
+    ok: 'OK',
+    open_settings: 'Einstellungen öffnen',
   },
   leaderboards: {
     solo: 'Solo',

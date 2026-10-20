@@ -72,3 +72,8 @@ export function useWebPushPermission(uid: string | null | undefined) {
   }, [uid])
   return { state, enable }
 }
+
+// For NotificationPrompt: a web app can't open the system settings.
+export function usePushPermission(uid: string | null | undefined) {
+  return { ...useWebPushPermission(uid), openSettings: null as (() => void) | null }
+}

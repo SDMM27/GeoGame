@@ -17,7 +17,7 @@ Légende : **[toi]** = action dans une console ou un compte, **[code]** = travai
 
 | Sujet | Choix | État |
 | --- | --- | --- |
-| Nom de domaine | Vercel Domains (le plus simple) ou Porkbun / Cloudflare (moins cher au renouvellement). `.app` ou `.com`. | **À trancher** avant de remplir les adresses dans la Play Console |
+| Nom de domaine | **geo-game.app** | Acheté le 2026-10-20, code mis à jour |
 | Suivi des plantages | Android vitals (Play Console, gratuit) au lancement ; Sentry gratuit si on veut des traces JS lisibles et le site couvert | **À trancher** (recommandé, pas bloquant) |
 | Mesure d'audience | Vercel Analytics gratuit pour le site + liens UTM + rapports d'acquisition Play Console pour l'app. PostHog ou Umami (offres gratuites) seulement si on veut des événements personnalisés | Proposé |
 
@@ -46,15 +46,17 @@ Google exige 12 testeurs inscrits pendant 14 jours d'affilée avant l'accès à 
 - [ ] **[code]** Si Sentry est retenu : `@sentry/react-native` (app, avec envoi des source maps par EAS) et `@sentry/react` (site). Mettre à jour la politique de confidentialité et la section « Sécurité des données » (journaux de plantage).
 - [ ] **[toi]** Lire les retours des testeurs et Android vitals ; corriger avant la production.
 
-### Domaine (dès qu'il est choisi)
-- [ ] **[toi]** Acheter le domaine, l'ajouter au projet Vercel, définir `VITE_SITE_URL`.
-- [ ] **[code]** Remplacer `geo-game-delta.vercel.app` codé en dur dans :
+### Domaine geo-game.app
+- [x] **[toi]** Acheter le domaine.
+- [ ] **[toi]** L'ajouter au projet Vercel du site (avec `www.geo-game.app` redirigé vers `geo-game.app`). `VITE_SITE_URL` n'est plus nécessaire : c'est la valeur par défaut.
+- [x] **[code]** Remplacer `geo-game-delta.vercel.app` codé en dur dans :
   - `src/utils/shareScore.js` ;
   - `mobile/src/links.ts` et `mobile/vercel.json` ;
   - `api/_lib/pushHandler.mjs` (sujet VAPID) ;
   - `store/play-console.md`, le README.
+- [ ] **[toi]** Variable `VAPID_SUBJECT` sur Vercel, si elle contient l'ancienne adresse.
 - [ ] **[toi]** Domaines autorisés Firebase Auth et reCAPTCHA / App Check ; nouvelle propriété Search Console ; mettre à jour les adresses dans la Play Console.
-- [ ] Rediriger l'ancienne adresse Vercel vers le nouveau domaine (les liens déjà partagés continuent de marcher).
+- [x] **[code]** Rediriger l'ancienne adresse vers le nouveau domaine (`redirects` dans `vercel.json`, sauf `/api` pour les versions de l'app déjà installées).
 
 ### Android App Links (nécessite l'app créée dans la Play Console et le domaine final)
 - [ ] **[code]** `android.intentFilters` avec `autoVerify: true` dans `mobile/app.json` (`/challenge`, `/add/<pseudo>`, `/room`...).

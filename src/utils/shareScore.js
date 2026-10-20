@@ -256,7 +256,7 @@ export function canShareImage() {
   }
 }
 
-const SITE_URL = 'https://geo-game-delta.vercel.app'
+const SITE_URL = 'https://geo-game.app'
 
 // `scoreText`: the score as it reads in the text when "<score> <scoreLabel>" doesn't ("9/12"). `grid`: lines under the details
 // (the Daily Challenge's rounds).

@@ -4,7 +4,7 @@
 
 Mini-jeux de géographie : trouver un pays sur la carte, quiz, drapeaux, capitales, frontières, classements de pays, mode Ascension, défi quotidien et salons multijoueurs. Le dépôt contient le site, l'application mobile et les fonctions serveur.
 
-- Site : https://geo-game-delta.vercel.app/
+- Site : https://geo-game.app/
 - App web (export de l'app mobile) : https://geogame-app.vercel.app/
 
 ## Contenu du dépôt
@@ -34,7 +34,7 @@ Le site est servi sur http://localhost:5173. Variables d'environnement, à mettr
 | --- | --- |
 | `VITE_RECAPTCHA_ENTERPRISE_KEY` | Clé de site reCAPTCHA Enterprise pour Firebase App Check (`src/appCheckKey.js`). Vide : App Check est désactivé. |
 | `VITE_USE_EMULATORS=1` | Connecte le site aux émulateurs Firebase locaux (Firestore sur `127.0.0.1:8080`) au lieu de la production, et désactive App Check. |
-| `VITE_SITE_URL` | Facultative : adresse publique du site (canonical, Open Graph, sitemap, `robots.txt` générés au build). Par défaut `https://geo-game-delta.vercel.app`. |
+| `VITE_SITE_URL` | Facultative : adresse publique du site (canonical, Open Graph, sitemap, `robots.txt` générés au build). Par défaut `https://geo-game.app`. |
 | `VITE_APP_URL`, `VITE_APK_URL` | Facultatives : adresse de l'app web et de l'APK Android (`src/utils/appLinks.js`). |
 
 Pour ne rien écrire dans la base de production pendant le développement, démarrez les émulateurs (voir plus bas) puis lancez `VITE_USE_EMULATORS=1 npm run dev`.

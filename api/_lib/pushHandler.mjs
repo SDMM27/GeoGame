@@ -17,7 +17,7 @@ export function adminApp() {
 export function webPushClient() {
   const { VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT } = process.env
   if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) return null
-  webPush.setVapidDetails(VAPID_SUBJECT || 'https://geo-game-delta.vercel.app', VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)
+  webPush.setVapidDetails(VAPID_SUBJECT || 'https://geo-game.app', VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)
   return webPush
 }
 

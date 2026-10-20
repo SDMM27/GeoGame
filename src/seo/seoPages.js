@@ -5,7 +5,7 @@
 
 // VITE_SITE_URL: public address of the site (import.meta.env in the app, process.env in the Node build plugin).
 const CONFIGURED_URL = (import.meta.env ? import.meta.env.VITE_SITE_URL : '') || (typeof process !== 'undefined' ? process.env.VITE_SITE_URL : '')
-export const SITE_URL = (CONFIGURED_URL || 'https://geo-game-delta.vercel.app').replace(/\/+$/, '')
+export const SITE_URL = (CONFIGURED_URL || 'https://geo-game.app').replace(/\/+$/, '')
 export const SITE_NAME = 'GeoGame'
 export const OG_IMAGE = '/og.png'
 

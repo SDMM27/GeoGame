@@ -1,4 +1,12 @@
 {
+  "redirects": [
+    {
+      "source": "/:path((?!api/).*)",
+      "has": [{ "type": "host", "value": "geo-game-delta.vercel.app" }],
+      "destination": "https://geo-game.app/:path",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/:page(game|flag-game|capitals-game|border-guess|country-clue|voyage-voyage|ranking|quiz|challenge|survival|atlas|multiplayer|scores|privacy|terms)",

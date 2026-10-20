@@ -1050,6 +1050,7 @@
     "waiting_host": "Esperando a que el anfitrión empiece…",
     "starting_in": "Empieza en",
     "late_hint": "La partida ya ha empezado, pero todavía puedes jugarla.",
+    "joined_late": "Este juego ya había empezado cuando te uniste: no puedes participar en él.",
     "challenge_play_hint": "Juega cuando quieras: todos tienen los mismos países.",
     "play": "Jugar",
     "standings": "Clasificación",

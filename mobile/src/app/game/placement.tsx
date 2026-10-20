@@ -126,7 +126,8 @@ function PlacementGame({
         onCountryPress={(layer, latlng) =>
           gameType === GAME_TYPES.HARDCORE ? onMapClick({ latlng }) : onCountryClick({ target: layer })
         }
-        onMapPress={(latlng) => onMapClick({ latlng })}
+        // Only Hardcore reads a tap on the sea: the Ascension hook has no onMapClick
+        onMapPress={gameType === GAME_TYPES.HARDCORE ? (latlng) => onMapClick({ latlng }) : undefined}
       />
 
       {!isGameOver && (

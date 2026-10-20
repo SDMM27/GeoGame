@@ -1050,6 +1050,7 @@
     "waiting_host": "Warten, bis der Gastgeber startet…",
     "starting_in": "Start in",
     "late_hint": "Das Spiel hat schon begonnen, du kannst trotzdem noch mitspielen.",
+    "joined_late": "Dieses Spiel hatte schon begonnen, als du beigetreten bist: Du kannst nicht mehr mitspielen.",
     "challenge_play_hint": "Spiel, wann du willst: Alle bekommen dieselben Länder.",
     "play": "Spielen",
     "standings": "Wertung",

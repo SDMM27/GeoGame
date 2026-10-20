@@ -16,7 +16,7 @@ import { clearPresenceRoom, setPresenceRoom } from '@shared/utils/presence'
 import { rememberPlayers } from '@shared/utils/recentPlayers'
 import { dismissInvite, inviteId, sendRoomInvite } from '@shared/utils/invites'
 import { containsProfanity } from '@shared/utils/profanity'
-import { currentGameIndex, isRoomFormat, nextGameToPlay, roomGames } from '@shared/utils/multiplayerRoom'
+import { currentGameIndex, isRoomFormat, joinedLate, nextGameToPlay, roomGames } from '@shared/utils/multiplayerRoom'
 import { serverNow } from '@shared/utils/serverTime'
 
 import { useAccount, type Account } from '@/account/auth'
@@ -269,6 +269,8 @@ export default function RoomScreen() {
   const joined = !!room?.players[playerId]
   const spectating = !joined && watching && room?.status === 'playing'
   const toPlay: number | null = room && joined ? nextGameToPlay(room, results, playerId) : null
+  // Live: joined after the current game started, so they cannot play it
+  const late = !!room && joined && toPlay == null && joinedLate(room, playerId)
   // Header color and title: the game to play, else the current one
   const game = room ? getGame(games[toPlay ?? current]?.id ?? room.game.id) : null
   const isHost = room?.hostId === playerId
@@ -476,6 +478,11 @@ export default function RoomScreen() {
                   />
                 </View>
               )}
+              {late && (
+                <Text variant="body" color={colors.textMuted} style={{ textAlign: 'center' }}>
+                  {t('mp_room.joined_late')}
+                </Text>
+              )}
               {toPlay == null && hasNextLive && !isHost && (
                 <View style={styles.waiting}>
                   <ActivityIndicator color={colors.textMuted} />
@@ -484,7 +491,7 @@ export default function RoomScreen() {
                   </Text>
                 </View>
               )}
-              {toPlay == null && !hasNextLive && (
+              {toPlay == null && !late && !hasNextLive && (
                 <Text variant="bodyStrong" color={colors.accent} style={{ textAlign: 'center' }}>
                   ✓ {t('mp_room.finished')}
                 </Text>

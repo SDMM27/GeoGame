@@ -2,7 +2,8 @@
 // Multiplayer rooms, shared by the website and the mobile app: one or more games in a row.
 // 'live': everyone starts each game together when the host launches it.
 // 'challenge': everyone plays the games in order, whenever they want.
-// A live room keeps accepting players once launched, so it also works as a challenge afterwards.
+// A live room keeps accepting players once launched, but a player who joins after a game started waits for the next
+// one (joinedLate).
 //
 // Room document (rooms/{code}):
 //   source: 'app2'           the format marker (older app versions only open rooms with source 'app', so they
@@ -120,14 +121,26 @@ export const progressForGame = (progress, index) =>
   Object.fromEntries(Object.entries(progress).filter(([, entry]) => indexOf(entry) === index))
 
 /**
- * The game the player can play now, or null: in a live room the launched game if they did not play it yet;
- * in a challenge the first game they did not play.
+ * Live: the player joined after the current game started, so they wait for the next one (they would otherwise
+ * play it alone, knowing the scores to beat). Their seenAt is the join time once the lobby is over (the
+ * heartbeat only runs in the lobby); an entry without one (older app versions) is never late.
+ */
+export function joinedLate(room, playerId) {
+  if (room.mode !== 'live' || room.status !== 'playing') return false
+  const joinedAt = millis(room.players?.[playerId]?.seenAt)
+  const startAt = millis(room.startAt)
+  return joinedAt != null && startAt != null && joinedAt > startAt
+}
+
+/**
+ * The game the player can play now, or null: in a live room the launched game if they did not play it yet
+ * and were there when it started; in a challenge the first game they did not play.
  */
 export function nextGameToPlay(room, results, playerId) {
   const played = new Set(results.filter((result) => result.playerId === playerId).map(indexOf))
   if (room.mode === 'live') {
     const index = currentGameIndex(room)
-    return room.status === 'playing' && !played.has(index) ? index : null
+    return room.status === 'playing' && !played.has(index) && !joinedLate(room, playerId) ? index : null
   }
   const index = roomGames(room).findIndex((_, i) => !played.has(i))
   return index === -1 ? null : index

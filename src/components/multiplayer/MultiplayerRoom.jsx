@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { GAME_TYPES } from '../../utils/gameTypes'
 import {
   currentGameIndex,
+  joinedLate,
   launchNextGame,
   launchRoom,
   nextGameToPlay,
@@ -118,6 +119,8 @@ export default function MultiplayerRoom({ room, progress, gameResults, playerId,
 
   const counting = room.mode === 'live' && toPlay === current && remaining != null && remaining > 0
   const allPlayed = joined && toPlay == null && room.status === 'playing'
+  // Live: joined after the current game started, so they cannot play it
+  const late = joined && toPlay == null && joinedLate(room, playerId)
   const hasNextLive = room.mode === 'live' && room.status === 'playing' && current < games.length - 1
 
   const onLaunch = async (launch) => {
@@ -225,10 +228,11 @@ export default function MultiplayerRoom({ room, progress, gameResults, playerId,
               )}
             </div>
           )}
+          {late && <p className="mpr-muted">{t('mp_room.joined_late')}</p>}
           {toPlay == null && room.mode === 'live' && hasNextLive && !isHost && (
             <p className="mpr-waiting">{t('mp_room.waiting_next')}</p>
           )}
-          {allPlayed && !hasNextLive && <p className="mpr-finished">✓ {t('mp_room.finished')}</p>}
+          {allPlayed && !late && !hasNextLive && <p className="mpr-finished">✓ {t('mp_room.finished')}</p>}
           {isHost && hasNextLive && (
             <button type="button" className="mpr-btn" onClick={() => onLaunch(() => launchNextGame(room, playerId))} disabled={launching}>
               ▶ {t('mp_room.next_game', { n: current + 2 })} · {gameLabel(games[current + 1], t)}

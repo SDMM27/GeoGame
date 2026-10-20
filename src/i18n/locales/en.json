@@ -1050,6 +1050,7 @@
     "waiting_host": "Waiting for the host to start…",
     "starting_in": "Starting in",
     "late_hint": "The game has already started, you can still play it.",
+    "joined_late": "This game had already started when you joined: you can't take part in it.",
     "challenge_play_hint": "Play whenever you want: everyone gets the same countries.",
     "play": "Play",
     "standings": "Standings",

@@ -89,7 +89,7 @@ export function searchAtlasCountries(query, lang, limit = 8) {
   for (const feature of ATLAS_COUNTRIES) {
     const p = feature.properties
     const names = [countryDisplayName(feature, lang), p.ADMIN, ...(p.aliases ?? []),
-      getCountryName(p.ISO_A2, 'en'), getCountryName(p.ISO_A2, 'ru')].filter(Boolean).map(normalize)
+      getCountryName(p.ISO_A2, 'en'), getCountryName(p.ISO_A2, 'ru'), getCountryName(p.ISO_A2, 'uk')].filter(Boolean).map(normalize)
     const score = names.some((name) => name.startsWith(q)) ? 0 : names.some((name) => name.includes(q)) ? 1 : -1
     if (score >= 0) scored.push([score, countryDisplayName(feature, lang), feature])
   }

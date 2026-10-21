@@ -13,6 +13,8 @@ describe('normalize', () => {
   })
   it("converts apostrophes to spaces", () => {
     expect(normalize("Côte d'Ivoire")).toBe('cote d ivoire')
+    expect(normalize('Côte d’Ivoire')).toBe('cote d ivoire')
+    expect(normalize('Мʼянма')).toBe(normalize("М'янма"))
   })
   it('collapses multiple spaces', () => {
     expect(normalize('A  B   C')).toBe('a b c')

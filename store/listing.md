@@ -1,7 +1,7 @@
 # Fiche Play Store
 
 Textes à coller dans Play Console → Croissance → Fiche principale du Play Store.
-Le français est la langue par défaut ; les autres langues (anglais, espagnol, portugais, allemand, italien, russe) s'ajoutent dans « Gérer les traductions ».
+Le français est la langue par défaut ; les autres langues (anglais, espagnol, portugais, allemand, italien, russe, ukrainien) s'ajoutent dans « Gérer les traductions ».
 
 Limites de Google : nom 30 caractères, description courte 80, description longue 4 000.
 
@@ -51,7 +51,7 @@ Grimpe dans les classements, suis ton historique, tes séries et tes succès. Le
 ATLAS
 Explore la carte du monde : touche un pays pour voir sa capitale, sa population, sa superficie, son PIB et ses voisins.
 
-Gratuit, sans publicité, en 7 langues : français, anglais, espagnol, portugais, allemand, italien et russe.
+Gratuit, sans publicité, en 8 langues : français, anglais, espagnol, portugais, allemand, italien, russe et ukrainien.
 ```
 
 **Notes de version (première publication)**
@@ -106,7 +106,7 @@ Climb the leaderboards, follow your history, streaks and achievements. An accoun
 ATLAS
 Explore the world map: tap a country to see its capital, population, area, GDP and neighbours.
 
-Free, no ads, in 7 languages: English, French, Spanish, Portuguese, German, Italian and Russian.
+Free, no ads, in 8 languages: English, French, Spanish, Portuguese, German, Italian, Russian and Ukrainian.
 ```
 
 **Release notes (first release)**
@@ -161,7 +161,7 @@ Sube en las clasificaciones y sigue tu historial, tus rachas y tus logros. La cu
 ATLAS
 Explora el mapa del mundo: toca un país para ver su capital, población, superficie, PIB y países vecinos.
 
-Gratis, sin publicidad, en 7 idiomas: español, inglés, francés, portugués, alemán, italiano y ruso.
+Gratis, sin publicidad, en 8 idiomas: español, inglés, francés, portugués, alemán, italiano, ruso y ucraniano.
 ```
 
 **Novedades (primera versión)**
@@ -216,7 +216,7 @@ Suba nos rankings e acompanhe seu histórico, suas sequências e suas conquistas
 ATLAS
 Explore o mapa-múndi: toque em um país para ver a capital, a população, a área, o PIB e os vizinhos.
 
-Grátis, sem anúncios, em 7 idiomas: português, inglês, francês, espanhol, alemão, italiano e russo.
+Grátis, sem anúncios, em 8 idiomas: português, inglês, francês, espanhol, alemão, italiano, russo e ucraniano.
 ```
 
 **Novidades (primeira versão)**
@@ -271,7 +271,7 @@ Steig in den Ranglisten auf und verfolge deinen Verlauf, deine Serien und Erfolg
 ATLAS
 Erkunde die Weltkarte: Tippe auf ein Land, um Hauptstadt, Einwohner, Fläche, BIP und Nachbarländer zu sehen.
 
-Kostenlos, ohne Werbung, in 7 Sprachen: Deutsch, Englisch, Französisch, Spanisch, Portugiesisch, Italienisch und Russisch.
+Kostenlos, ohne Werbung, in 8 Sprachen: Deutsch, Englisch, Französisch, Spanisch, Portugiesisch, Italienisch, Russisch und Ukrainisch.
 ```
 
 **Neuerungen (erste Version)**
@@ -326,7 +326,7 @@ Scala le classifiche e segui la tua cronologia, le tue serie e i tuoi traguardi.
 ATLANTE
 Esplora la mappa del mondo: tocca un paese per vederne capitale, popolazione, superficie, PIL e paesi confinanti.
 
-Gratis, senza pubblicità, in 7 lingue: italiano, inglese, francese, spagnolo, portoghese, tedesco e russo.
+Gratis, senza pubblicità, in 8 lingue: italiano, inglese, francese, spagnolo, portoghese, tedesco, russo e ucraino.
 ```
 
 **Novità (prima versione)**
@@ -381,13 +381,68 @@ GeoGame превращает географию в короткие, краси�
 АТЛАС
 Исследуйте карту мира: нажмите на страну, чтобы увидеть её столицу, население, площадь, ВВП и соседей.
 
-Бесплатно, без рекламы, на 7 языках: русском, английском, французском, испанском, португальском, немецком и итальянском.
+Бесплатно, без рекламы, на 8 языках: русском, английском, французском, испанском, португальском, немецком, итальянском и украинском.
 ```
 
 **Что нового (первая версия)**
 
 ```
 Первая версия GeoGame для Android: задания дня, игры с настраиваемой сложностью, выживание, мультиплеер, рейтинги, друзья и атлас.
+```
+
+---
+
+## Українська (uk-UA)
+
+**Назва застосунку** (26/30)
+
+```
+GeoGame – Ігри з географії
+```
+
+**Короткий опис** (80/80)
+
+```
+Прапори, столиці, кордони, вікторини: географія в іграх — наодинці чи з друзями.
+```
+
+**Повний опис**
+
+```
+GeoGame перетворює географію на короткі, гарні й захопливі ігри. Знаходь країни на карті, вгадуй прапор, столицю чи країну лише за її кордонами та повертайся щодня за новими викликами.
+
+ЧЕЛЕНДЖІ ДНЯ
+Нові челенджі щодня опівночі, однакові для всіх:
+• BorderGuess: вгадай країну лише за її кордонами.
+• Country Clue: знайди країну за підказками про відстань, напрямок, півкулю, площу та населення.
+• Voyage Voyage: з’єднай дві країни через спільні кордони найкоротшим шляхом.
+• Country Ranking: розстав країни за населенням, площею чи ВВП.
+• Гео-вікторина: одне запитання на день, щоб кинути виклик друзям.
+Хочеш більше? Кожна гра має й нескінченний режим.
+
+ІГРИ ДЛЯ ТВОГО РІВНЯ
+• Знайди країну: познач усі країни на карті світу.
+• Знайди прапор: визнач країну за її прапором.
+• Знайди столицю: назви столицю за прапором і назвою країни.
+• Виживання: проходь раунди різних ігор поспіль, кожна помилка коштує життя.
+Обери складність (від легкої до Hardcore, аж до всіх 238 країн) або грай по континентах.
+
+ГРАЙ З ДРУЗЯМИ
+Створи гру, поділися кодом і змагайтеся наживо або коли зручно. Додавай друзів, запрошуй їх одним дотиком і порівнюйте результати.
+
+РЕЙТИНГИ ТА ПРОФІЛЬ
+Піднімайся в рейтингах, стеж за історією ігор, серіями та досягненнями. Обліковий запис необов’язковий: грати можна без реєстрації.
+
+АТЛАС
+Досліджуй карту світу: торкнись країни, щоб побачити її столицю, населення, площу, ВВП і сусідів.
+
+Безкоштовно, без реклами, 8 мовами: українською, французькою, англійською, іспанською, португальською, німецькою, італійською та російською.
+```
+
+**Що нового (перша версія)**
+
+```
+Перша версія GeoGame для Android: челенджі дня, ігри з регульованою складністю, виживання, мультиплеєр, рейтинги, друзі та атлас.
 ```
 
 ---

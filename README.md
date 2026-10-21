@@ -11,7 +11,7 @@ Mini-jeux de géographie : trouver un pays sur la carte, quiz, drapeaux, capital
 
 | Dossier | Rôle |
 | --- | --- |
-| `src/` | Site : Vite + React 18, React Router, i18next (fr, en, es, pt, de, it, ru : liste dans `src/i18n/languages.js`, fr et en dans le bundle, les autres chargées à la demande), Leaflet. La logique de jeu (`src/hooks`, `src/utils`) est aussi utilisée par l'app mobile. |
+| `src/` | Site : Vite + React 18, React Router, i18next (fr, en, es, pt, de, it, ru, uk : liste dans `src/i18n/languages.js`, fr et en dans le bundle, les autres chargées à la demande), Leaflet. La logique de jeu (`src/hooks`, `src/utils`) est aussi utilisée par l'app mobile. |
 | `api/` | Fonctions Vercel (`firebase-admin`) : `invite-push.mjs`, `cleanup-expired.mjs`, helpers dans `api/_lib/`. |
 | `mobile/` | Application Expo SDK 57 (Expo Router, `mobile/src/app`). Réutilise `../src` via des shims Metro (`mobile/metro.config.js`, `mobile/src/shims/`, alias `@shared`). |
 | `firestore.rules`, `firestore.indexes.json`, `firebase.json` | Règles, index et émulateurs Firebase (projet `geogame-sdmm`). |
@@ -118,7 +118,7 @@ Face aux émulateurs, `FIRESTORE_EMULATOR_HOST` (et `FIREBASE_AUTH_EMULATOR_HOST
 ## Pages légales et RGPD
 
 - `/privacy` (politique de confidentialité), `/terms` (conditions d'utilisation), `/legal` (mentions légales) et `/delete-account` (suppression de compte, URL à donner à Google Play) : `src/pages/legal/LegalPage.jsx`. Liens en bas de l'accueil et de la page compte, et dans l'onglet Profil de l'app, qui ouvre les pages du site.
-- Textes en fr, en et ru dans `src/legal/documents.js`, en es, pt, de et it dans `src/legal/translations/` ; ils décrivent ce que fait le code (données, prestataires, durées). Toute nouvelle donnée collectée ou tout nouveau prestataire doit y être ajouté, en changeant la date `updated` de `src/legal/legalInfo.js`.
+- Textes en fr, en et ru dans `src/legal/documents.js`, en es, pt, de, it et uk dans `src/legal/translations/` ; ils décrivent ce que fait le code (données, prestataires, durées). Toute nouvelle donnée collectée ou tout nouveau prestataire doit y être ajouté, en changeant la date `updated` de `src/legal/legalInfo.js`.
 - **À compléter avant publication** : `editor` et `email` dans `src/legal/legalInfo.js`.
 - La police Inter est servie par le site (`@fontsource/inter`) et non par Google Fonts, pour ne pas transmettre l'IP des visiteurs à Google.
 
@@ -126,7 +126,7 @@ Face aux émulateurs, `FIRESTORE_EMULATOR_HOST` (et `FIREBASE_AUTH_EMULATOR_HOST
 
 Le jeu de données complet est `src/data/countriesWithDifficulty_FR.json` (environ 90 Mo) ; il n'entre jamais dans le bundle. `node scripts/build-geo-data.mjs [tolérance en mètres]` le découpe en `src/data/countries.meta.json` (propriétés, chargé avec le site) et `src/data/countries.geo.json` (géométries simplifiées, chargées à la demande). `vite.config.mjs` redirige les imports du jeu complet vers le fichier de propriétés.
 
-**Origine des contours.** Base Natural Earth 10m (domaine public). Les contours des petits territoires (moins de 100 sommets) sont remplacés par `node scripts/patch-detailed-geometries.mjs`, puis il faut relancer `build-geo-data.mjs` et, dans `mobile/`, `npm run build:countries` et `npm run build:silhouettes`. Sources : [geoBoundaries](https://www.geoboundaries.org) (CC BY) et, en repli, [OpenStreetMap](https://www.openstreetmap.org/copyright) via Overpass (ODbL) pour Jersey, Saint-Pierre-et-Miquelon, Norfolk, Heard et MacDonald, Sainte-Hélène, les Îles Vierges américaines et Pitcairn. Ces géométries OSM restent sous licence ODbL : `countries.geo.json` est servi publiquement par le site, et le crédit figure dans les mentions légales (7 langues).
+**Origine des contours.** Base Natural Earth 10m (domaine public). Les contours des petits territoires (moins de 100 sommets) sont remplacés par `node scripts/patch-detailed-geometries.mjs`, puis il faut relancer `build-geo-data.mjs` et, dans `mobile/`, `npm run build:countries` et `npm run build:silhouettes`. Sources : [geoBoundaries](https://www.geoboundaries.org) (CC BY) et, en repli, [OpenStreetMap](https://www.openstreetmap.org/copyright) via Overpass (ODbL) pour Jersey, Saint-Pierre-et-Miquelon, Norfolk, Heard et MacDonald, Sainte-Hélène, les Îles Vierges américaines et Pitcairn. Ces géométries OSM restent sous licence ODbL : `countries.geo.json` est servi publiquement par le site, et le crédit figure dans les mentions légales (8 langues).
 
 Scripts d'enrichissement du jeu complet (rarement utiles) : `scripts/difficulte.py`, `enrich_continent.py`, `enrich_iso_a2.py`, `enrich_population.py` (Python), `add-gdp-data.cjs`, `populate-capitals.js`, `generate-borders.mjs` (Node). Autres : `scripts/seedEmulator.mjs` (deux comptes de test dans les émulateurs), `scripts/purgeAnonymousScores.mjs` (purge ponctuelle, nécessite une clé de compte de service) et `scripts/reports.mjs` (signalements, voir Firestore).
 

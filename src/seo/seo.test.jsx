@@ -7,6 +7,7 @@ import { SEO_PAGES, SITE_URL, findSeoPage } from './seoPages'
 import fr from '../i18n/locales/fr.json'
 import en from '../i18n/locales/en.json'
 import ru from '../i18n/locales/ru.json'
+import uk from '../i18n/locales/uk.json'
 import vercel from '../../vercel.json'
 import { renderPage, renderRobots, renderSitemap } from '../../scripts/vite-plugin-seo.mjs'
 
@@ -14,7 +15,7 @@ const TEMPLATE = '<head>\n    <!-- seo:head -->\n  </head><body><div id="root"><
 
 describe('SEO pages', () => {
   it('has a title and a description in every language for every page', () => {
-    for (const locale of [fr, en, ru]) {
+    for (const locale of [fr, en, ru, uk]) {
       for (const page of SEO_PAGES) {
         expect(locale.seo[page.key].title).toBeTruthy()
         expect(locale.seo[page.key].description.length).toBeLessThanOrEqual(170)

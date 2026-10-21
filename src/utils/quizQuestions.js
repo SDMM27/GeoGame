@@ -74,8 +74,8 @@ const TEMPLATES = {
 
 // Noms acceptés en réponse libre pour chaque continent, toutes langues confondues
 const CONTINENT_ANSWERS = {
-  Europe: ['Europe', 'Европа', 'Europa'],
-  Asie: ['Asie', 'Asia', 'Азия', 'Ásia', 'Asien'],
+  Europe: ['Europe', 'Европа', 'Europa', 'Європа'],
+  Asie: ['Asie', 'Asia', 'Азия', 'Ásia', 'Asien', 'Азія'],
   Afrique: ['Afrique', 'Africa', 'Африка', 'África', 'Afrika'],
   Amériques: [
     'Amériques', 'Amérique', 'Amérique du Nord', 'Amérique du Sud', 'Amérique centrale',
@@ -84,8 +84,9 @@ const CONTINENT_ANSWERS = {
     'América', 'Américas', 'América del Norte', 'América del Sur', 'Centroamérica', 'América Central',
     'América do Norte', 'América do Sul', 'Amerika', 'Nordamerika', 'Südamerika', 'Mittelamerika',
     'Americhe', 'America del Nord', 'America del Sud', 'America centrale',
+    'Північна Америка', 'Південна Америка', 'Центральна Америка',
   ],
-  Océanie: ['Océanie', 'Oceania', 'Океания', 'Oceanía', 'Ozeanien'],
+  Océanie: ['Océanie', 'Oceania', 'Океания', 'Oceanía', 'Ozeanien', 'Океанія'],
 }
 
 export function getAllowedDifficulties(maxDifficulty) {

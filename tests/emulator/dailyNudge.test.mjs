@@ -172,7 +172,7 @@ describe('nudgeMessage', () => {
 
   it('has a title for every game with a daily challenge', () => {
     for (const [gameType, id] of Object.entries(NUDGE_GAMES)) {
-      for (const lang of ['fr', 'en', 'ru', 'es', 'pt', 'de', 'it']) {
+      for (const lang of ['fr', 'en', 'ru', 'es', 'pt', 'de', 'it', 'uk']) {
         expect(nudgeMessage(lang, 'A', gameType), `${lang} ${gameType}`).not.toContain(gameType)
       }
       expect(id).toBe(gameType.toLowerCase())

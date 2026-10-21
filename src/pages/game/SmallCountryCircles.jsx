@@ -39,6 +39,8 @@ const getSmallCountries = () => smallCountriesCache ??= (() => {
   return result
 })()
 
+const WORLD_COPY_OFFSETS = [-360, 0, 360]
+
 const CIRCLE_DEFAULT = { fillColor: '#ffffff', fillOpacity: 0.15, color: MAP_COLORS.stroke, weight: 2 }
 const CIRCLE_HOVER = { fillColor: MAP_COLORS.hover, fillOpacity: 0.5, color: MAP_COLORS.hover, weight: 2 }
 
@@ -49,10 +51,12 @@ export default function SmallCountryCircles({ onCountryNameClick, foundCountries
   return getSmallCountries()
     .filter(c => zoom < c.zoomThreshold)
     .filter(c => !foundCountriesRef.current.has(c.name) && !shownCountriesRef.current.has(c.name))
-    .map(c => (
+    // The map draws the world three times (shiftedFeatures): a dot on each copy, or the Pacific islands seen
+    // across the dateline would have none
+    .flatMap(c => WORLD_COPY_OFFSETS.map(offset => (
       <CircleMarker
-        key={c.key}
-        center={[c.lat, c.lng]}
+        key={`${c.key}@${offset}`}
+        center={[c.lat, c.lng + offset]}
         radius={8}
         pathOptions={CIRCLE_DEFAULT}
         eventHandlers={{
@@ -61,5 +65,5 @@ export default function SmallCountryCircles({ onCountryNameClick, foundCountries
           mouseout: (e) => e.target.setStyle(CIRCLE_DEFAULT),
         }}
       />
-    ))
+    )))
 }

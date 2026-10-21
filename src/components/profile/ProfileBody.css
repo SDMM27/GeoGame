@@ -103,6 +103,7 @@ button.profile-daily-chip { font-family: inherit; color: inherit; padding: 0; }
 .profile-achievement small { color: var(--text-muted); font-size: 0.75rem; line-height: 1.3; }
 .profile-progress { height: 4px; border-radius: 2px; background: rgba(255, 255, 255, 0.08); overflow: hidden; margin-top: 0.3rem; }
 .profile-progress span { display: block; height: 100%; background: var(--warning); }
+.profile-progress-count { color: var(--text-muted); font-size: 0.7rem; font-variant-numeric: tabular-nums; }
 
 .profile-filters { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 .profile-filters button {

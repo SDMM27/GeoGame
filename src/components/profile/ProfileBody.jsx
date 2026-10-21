@@ -161,9 +161,12 @@ function Achievements({ achievements }) {
             <small>{t(`achievements.${achievement.id}.desc`)}</small>
             <em className="profile-achievement-tier">{t(`achievements.tiers.${achievement.tier}`)}</em>
             {!achievement.unlocked && achievement.target > 1 && (
-              <div className="profile-progress" title={`${achievement.progress}/${achievement.target}`}>
-                <span style={{ width: `${(achievement.progress / achievement.target) * 100}%` }} />
-              </div>
+              <>
+                <div className="profile-progress" title={`${achievement.progress}/${achievement.target}`}>
+                  <span style={{ width: `${(achievement.progress / achievement.target) * 100}%` }} />
+                </div>
+                <span className="profile-progress-count">{Math.min(achievement.progress, achievement.target)} / {achievement.target}</span>
+              </>
             )}
           </div>
         ))}

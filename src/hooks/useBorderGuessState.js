@@ -28,6 +28,7 @@ const BORDER_GUESS_EXCLUDED = new Set([
   'Montserrat',
   'Monaco',
   'Saint-Martin',
+  'Sint Maarten',
   'Nauru',
   'Gibraltar',
   'Wallis-et-Futuna',

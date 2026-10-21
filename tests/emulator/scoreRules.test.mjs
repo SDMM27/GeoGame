@@ -166,8 +166,16 @@ describe('Ascension scores', () => {
     await assertFails(anonymous().collection('ascension_scores').add(clean({ ...best, name: 'Zoe', uid: undefined, globalScore: row.cap + 1 })))
   })
 
-  it('accepts the three games and a run with skipped countries', async () => {
-    for (const gameType of ['PLACEMENT', 'FLAGS', 'CAPITALS']) {
+  it.each(ascension.rows.map((row) => [row.preset, row]))('caps a Hardcore %s run at the most its taps give', async (preset, row) => {
+    const best = ascensions(preset, { gameType: 'HARDCORE', globalScore: row.hardcoreCap, globalTimeMs: row.minTimeMs })
+    await assertSucceeds(as('alice').collection('ascension_scores').add(best))
+    await assertFails(as('alice').collection('ascension_scores').add({ ...best, globalScore: row.hardcoreCap + 1 }))
+    // The other games keep their own (much lower) caps
+    await assertFails(as('alice').collection('ascension_scores').add({ ...best, gameType: 'PLACEMENT' }))
+  })
+
+  it('accepts the four games and a run with skipped countries', async () => {
+    for (const gameType of ['PLACEMENT', 'HARDCORE', 'FLAGS', 'CAPITALS']) {
       await assertSucceeds(as('alice').collection('ascension_scores').add(ascensions('Progressif', { gameType })))
     }
     const phaseStats = phaseStatsOf('Progressif').map((phase) => ({ ...phase, found: phase.count - 1, skipped: 1 }))

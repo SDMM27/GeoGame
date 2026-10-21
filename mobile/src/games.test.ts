@@ -69,8 +69,8 @@ describe('lookups', () => {
     expect(GAMES.filter((game) => game.kind === 'setup').map((game) => game.id)).toEqual(['placement', 'flags', 'capitals', 'hardcore', 'missing_flag'])
   })
 
-  it('offers no Ascension to Hardcore and Missing Flag', () => {
-    expect(GAMES.filter((game) => game.noAscension).map((game) => game.id)).toEqual(['hardcore', 'missing_flag'])
+  it('offers no Ascension to Missing Flag', () => {
+    expect(GAMES.filter((game) => game.noAscension).map((game) => game.id)).toEqual(['missing_flag'])
   })
 })
 

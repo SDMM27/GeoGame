@@ -27,8 +27,8 @@ function StandardPlacementGame({ difficulty, isTraining, continent, gameType }) 
   )
 }
 
-function AscensionPlacementGame({ phases, isTraining, presetName }) {
-  const state = useAscensionState(GAME_TYPES.PLACEMENT, phases, isTraining, true)
+function AscensionPlacementGame({ phases, isTraining, presetName, gameType = GAME_TYPES.PLACEMENT }) {
+  const state = useAscensionState(gameType, phases, isTraining, true)
   return (
     <PlacementGameLayout
       difficulty={null}
@@ -36,6 +36,7 @@ function AscensionPlacementGame({ phases, isTraining, presetName }) {
       isAscension
       presetName={presetName}
       state={state}
+      gameType={gameType}
     />
   )
 }
@@ -51,6 +52,7 @@ export default function GamePage() {
         phases={phases}
         isTraining={isTraining}
         presetName={presetName ?? null}
+        gameType={gameType}
       />
     )
   }

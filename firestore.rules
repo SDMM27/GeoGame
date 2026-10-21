@@ -563,6 +563,18 @@ service cloud.firestore {
         };
       }
 
+      // Hardcore: up to HARDCORE_MAX_POINTS per country, whatever its difficulty.
+      function ascensionHardcoreCaps() {
+        return {
+          // scoreCaps:begin ascensionHardcoreCaps
+          'Découverte': 16000,
+          'Progressif': 31000,
+          'Challenge': 23000,
+          'Hardcore': 35000
+          // scoreCaps:end ascensionHardcoreCaps
+        };
+      }
+
       function ascensionTotals() {
         return {
           // scoreCaps:begin ascensionTotals
@@ -631,8 +643,8 @@ service cloud.firestore {
       function validAscensionResult(data) {
         let preset = data.presetName;
         let counts = ascensionPhaseCounts();
-        return data.gameType in ['PLACEMENT', 'FLAGS', 'CAPITALS']
-          && inRange(data.globalScore, ascensionCaps().get(preset, -1))
+        return data.gameType in ['PLACEMENT', 'HARDCORE', 'FLAGS', 'CAPITALS']
+          && inRange(data.globalScore, (data.gameType == 'HARDCORE' ? ascensionHardcoreCaps() : ascensionCaps()).get(preset, -1))
           && inRange(data.totalFound + data.totalSkipped, ascensionTotals().get(preset, -1))
           && data.globalTimeMs >= ascensionMinTime().get(preset, 1000000000)
           && data.phaseStats.size() <= ascensionPhases().get(preset, -1)

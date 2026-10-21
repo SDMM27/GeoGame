@@ -72,19 +72,21 @@ function soloLimits() {
   return { caps, minTimes, rows }
 }
 
-// Ascension: the preset fixes how many countries of each difficulty are asked, whatever the game.
+// Ascension: the preset fixes how many countries of each difficulty are asked, whatever the game. Hardcore gives a tap
+// inside the country HARDCORE_MAX_POINTS whatever its difficulty, hence its own caps (exact: the count is fixed).
 function ascensionLimits() {
-  const out = { caps: {}, totals: {}, phases: {}, phaseCounts: {}, minTimes: {}, rows: [] }
+  const out = { caps: {}, hardcoreCaps: {}, totals: {}, phases: {}, phaseCounts: {}, minTimes: {}, rows: [] }
   for (const { name, phases } of ASCENSION_PRESETS) {
     const sequence = buildPhaseSequence(phases)
     const total = sequence.reduce((sum, p) => sum + p.count, 0)
     const max = sequence.reduce((sum, p) => sum + p.count * perfect(p.difficulty), 0)
     out.caps[name] = withMargin(max)
+    out.hardcoreCaps[name] = total * HARDCORE_MAX_POINTS
     out.totals[name] = total
     out.phases[name] = sequence.length
     out.minTimes[name] = total * MIN_MS_PER_COUNTRY
     sequence.forEach((p, i) => { out.phaseCounts[`${name}_${i}`] = p.count })
-    out.rows.push({ preset: name, countries: total, phases: sequence.length, max, cap: out.caps[name], minTimeMs: out.minTimes[name] })
+    out.rows.push({ preset: name, countries: total, phases: sequence.length, max, cap: out.caps[name], hardcoreCap: out.hardcoreCaps[name], minTimeMs: out.minTimes[name] })
   }
   return out
 }
@@ -140,6 +142,7 @@ export function computeLimits() {
     soloCaps: solo.caps,
     soloMinTime: solo.minTimes,
     ascensionCaps: ascension.caps,
+    ascensionHardcoreCaps: ascension.hardcoreCaps,
     ascensionTotals: ascension.totals,
     ascensionPhases: ascension.phases,
     ascensionPhaseCounts: ascension.phaseCounts,

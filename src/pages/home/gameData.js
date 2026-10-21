@@ -183,7 +183,6 @@ export const GAMES = [
     descKey: "games.hardcore.description",
     route: "/game",
     active: true,
-    noAscension: true,
   },
   {
     id: GAME_TYPES.MISSING_FLAG,

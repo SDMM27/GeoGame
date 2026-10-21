@@ -16,6 +16,7 @@ const BODY = {
   pt: 'Os desafios do dia estão te esperando, é sua vez!',
   de: 'Die Tageschallenges warten auf dich, du bist dran!',
   it: 'Le sfide del giorno ti aspettano, tocca a te!',
+  uk: 'Завдання дня чекають на тебе!',
 }
 
 export const reminderMessage = (lang) => BODY[lang] ?? BODY.en

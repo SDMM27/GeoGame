@@ -17,6 +17,7 @@ const LOCALES = {
   pt: require('../../src/i18n/locales/pt.json'),
   de: require('../../src/i18n/locales/de.json'),
   it: require('../../src/i18n/locales/it.json'),
+  uk: require('../../src/i18n/locales/uk.json'),
 }
 
 const BODY = {
@@ -27,6 +28,7 @@ const BODY = {
   pt: '{{username}} convida você para jogar {{game}}',
   de: '{{username}} lädt dich zu {{game}} ein',
   it: '{{username}} ti invita a giocare a {{game}}',
+  uk: '{{username}} запрошує тебе зіграти в {{game}}',
 }
 
 // A second push for the same invite (invited again) waits this long.

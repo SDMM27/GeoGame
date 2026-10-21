@@ -9,17 +9,17 @@ const nameOverrides = {
   CD: {
     fr: 'République démocratique du Congo', en: 'Democratic Republic of the Congo', ru: 'Демократическая Республика Конго',
     es: 'República Democrática del Congo', pt: 'República Democrática do Congo', de: 'Demokratische Republik Kongo',
-    it: 'Repubblica Democratica del Congo',
+    it: 'Repubblica Democratica del Congo', uk: 'Демократична Республіка Конго',
   },
-  CG: { fr: 'Congo', en: 'Congo', ru: 'Конго', es: 'Congo', pt: 'Congo', de: 'Kongo', it: 'Congo' },
-  HK: { es: 'Hong Kong', pt: 'Hong Kong', de: 'Hongkong', it: 'Hong Kong' },
-  MO: { es: 'Macao', pt: 'Macau', de: 'Macau', it: 'Macao' },
-  MM: { es: 'Myanmar', pt: 'Mianmar', de: 'Myanmar', it: 'Myanmar' },
+  CG: { fr: 'Congo', en: 'Congo', ru: 'Конго', es: 'Congo', pt: 'Congo', de: 'Kongo', it: 'Congo', uk: 'Конго' },
+  HK: { es: 'Hong Kong', pt: 'Hong Kong', de: 'Hongkong', it: 'Hong Kong', uk: 'Гонконг' },
+  MO: { es: 'Macao', pt: 'Macau', de: 'Macau', it: 'Macao', uk: 'Макао' },
+  MM: { es: 'Myanmar', pt: 'Mianmar', de: 'Myanmar', it: 'Myanmar', uk: 'Мʼянма' },
   CI: { es: 'Costa de Marfil', de: 'Elfenbeinküste' },
   CV: { de: 'Kap Verde' },
   BN: { de: 'Brunei' },
   TL: { es: 'Timor Oriental', de: 'Osttimor' },
-  PS: { es: 'Palestina', pt: 'Palestina', de: 'Palästina', it: 'Palestina' },
+  PS: { es: 'Palestina', pt: 'Palestina', de: 'Palästina', it: 'Palestina', uk: 'Палестина' },
 }
 
 // Languages other than French, whose names are accepted as answers too (French: the dataset's ADMIN and aliases)

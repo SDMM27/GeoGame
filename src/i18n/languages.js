@@ -11,6 +11,7 @@ export const LANGUAGES = [
   { code: 'de', label: 'Deutsch', locale: 'de-DE', og: 'de_DE' },
   { code: 'it', label: 'Italiano', locale: 'it-IT', og: 'it_IT' },
   { code: 'ru', label: 'Русский', locale: 'ru-RU', og: 'ru_RU' },
+  { code: 'uk', label: 'Українська', locale: 'uk-UA', og: 'uk_UA' },
 ]
 
 export const LANGUAGE_CODES = LANGUAGES.map((language) => language.code)

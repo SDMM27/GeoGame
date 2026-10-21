@@ -2,7 +2,8 @@ export function normalize(str) {
   return str
     .toLowerCase()
     .normalize('NFD').replace(/[̀-ͯ]/g, '')
-    .replace(/[-']/g, ' ')
+    // Typographic and Ukrainian apostrophes ("Мʼянма") read like the one on the keyboard
+    .replace(/[-'’ʼ]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
 }

@@ -15,6 +15,7 @@ const BODY = {
     pt: '{{username}} quer ser seu amigo',
     de: '{{username}} möchte mit dir befreundet sein',
     it: '{{username}} vuole essere tuo amico',
+    uk: '{{username}} хоче додати тебе в друзі',
   },
   accepted: {
     fr: '{{username}} a accepté ta demande d’ami',
@@ -24,6 +25,7 @@ const BODY = {
     pt: '{{username}} aceitou seu pedido de amizade',
     de: '{{username}} hat deine Freundschaftsanfrage angenommen',
     it: '{{username}} ha accettato la tua richiesta di amicizia',
+    uk: 'Тепер ви з {{username}} друзі',
   },
 }
 

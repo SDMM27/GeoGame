@@ -66,8 +66,13 @@ function MissionRow({ entry, reward }: { entry: Entry; reward: Reward }) {
             </Text>
           </View>
         </View>
-        <View style={styles.track}>
-          <View style={[styles.fill, { backgroundColor: color, width: `${(shown / mission.target) * 100}%` }]} />
+        <View style={styles.progress}>
+          <View style={styles.track}>
+            <View style={[styles.fill, { backgroundColor: color, width: `${(shown / mission.target) * 100}%` }]} />
+          </View>
+          <Text variant="caption" color={colors.textMuted} style={styles.count}>
+            {shown} / {mission.target}
+          </Text>
         </View>
       </View>
     </View>
@@ -159,7 +164,9 @@ const styles = StyleSheet.create({
   missionMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.sm },
   missionTier: { fontSize: 11, textTransform: 'uppercase' },
   missionReward: { fontSize: 12, marginLeft: 'auto' },
-  track: { height: 6, borderRadius: radius.pill, backgroundColor: colors.surfaceHigh, overflow: 'hidden' },
+  progress: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
+  count: { fontSize: 12, fontVariant: ['tabular-nums'] },
+  track: { flex: 1, height: 6, borderRadius: radius.pill, backgroundColor: colors.surfaceHigh, overflow: 'hidden' },
   fill: { height: '100%', borderRadius: radius.pill },
   bonus: {
     flexDirection: 'row',

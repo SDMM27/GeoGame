@@ -1,5 +1,5 @@
 // src/hooks/useAscensionState.js
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { useTranslation } from 'react-i18next'
@@ -10,12 +10,14 @@ import { matchKnownAnswer } from '../utils/answerLexicon'
 import { buildPhaseSequence } from '../utils/ascensionPresets'
 import { saveSnapshot } from '../utils/multiplayerSnapshot'
 import { reportEloAnswer, flushElo } from '../utils/eloReport'
+import { scoreHardcoreTap } from '../utils/hardcoreScoring'
 import { getCapitalName, getCountryName, getAllCountryNames, getAllCapitalNames } from '../utils/getCountryName'
-import { HOVER_STYLE, MAP_COLORS } from '../utils/mapColors'
+import { HOVER_STYLE, MAP_COLORS, HARDCORE_COUNTRY_STYLE } from '../utils/mapColors'
 
 // Which country property name holds the difficulty for each game type
 const DIFFICULTY_PROP = {
   [GAME_TYPES.PLACEMENT]: 'Difficulty',
+  [GAME_TYPES.HARDCORE]:  'Difficulty',
   [GAME_TYPES.FLAGS]:     'DifficultyFlag',
   [GAME_TYPES.CAPITALS]:  'DifficultyCapitals',
 }
@@ -23,6 +25,7 @@ const DIFFICULTY_PROP = {
 // Extra per-game country filter (beyond the difficulty match)
 const COUNTRY_FILTER = {
   [GAME_TYPES.PLACEMENT]: () => true,
+  [GAME_TYPES.HARDCORE]:  () => true,
   [GAME_TYPES.FLAGS]:     c => !!c.properties.ISO_A2,
   [GAME_TYPES.CAPITALS]:  c => !!c.properties.ISO_A2 && !!c.properties.capital,
 }
@@ -51,6 +54,8 @@ function getPool(difficulty, gameType, alreadyChosen) {
 
 export default function useAscensionState(gameType, phases, isTraining, isAscensionMode = true, overridesByDifficulty = null, mpSnapshot = null, mpSnapshotKey = null) {
   const navigate = useNavigate()
+  // Placement and Hardcore share the map target (the ADMIN name); Hardcore is tapped without borders
+  const isMapGame = gameType === GAME_TYPES.PLACEMENT || gameType === GAME_TYPES.HARDCORE
   const { t, i18n } = useTranslation()
   // Static: computed once from props — do not recompute during game
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -113,8 +118,8 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
   useEffect(() => { mapRefRef.current = mapRef }, [mapRef])
 
   const setTargetFromFeature = useCallback((feature) => {
-    setTargetCountry(gameType === GAME_TYPES.PLACEMENT ? feature.properties.ADMIN : feature)
-  }, [gameType])
+    setTargetCountry(isMapGame ? feature.properties.ADMIN : feature)
+  }, [isMapGame])
 
   const getRandomCountry = useCallback((difficulty) => {
     if (overridesByDifficulty?.[difficulty]) {
@@ -238,8 +243,9 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
   const advanceGame = useCallback((wasFound, errorsAtTime = 0) => {
     // The rated mode is the game underneath; the error count is read before it is reset below
     const target = targetCountryRef.current
-    const admin = gameType === GAME_TYPES.PLACEMENT ? target : target?.properties?.ADMIN
-    if (ratedRef.current && admin) reportEloAnswer(gameType, admin, { found: wasFound, errors: consecutiveErrorsRef.current })
+    const admin = isMapGame ? target : target?.properties?.ADMIN
+    // Hardcore taps report their own answer (onMapClick), once per country
+    if (gameType !== GAME_TYPES.HARDCORE && ratedRef.current && admin) reportEloAnswer(gameType, admin, { found: wasFound, errors: consecutiveErrorsRef.current })
 
     // Update global stats
     const newStats = wasFound
@@ -263,7 +269,7 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
     // Reset per-country state
     setConsecutiveErrors(0)
     consecutiveErrorsRef.current = 0
-    if (gameType !== GAME_TYPES.PLACEMENT) {
+    if (!isMapGame) {
       setInputValue('')
       setRevealedName(null)
       setClickOnSeeCountry(false)
@@ -312,7 +318,7 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
         setTargetFromFeature(next)
       }
     }
-  }, [gameType, phaseSequence, getRandomCountry, setTargetFromFeature])
+  }, [gameType, isMapGame, phaseSequence, getRandomCountry, setTargetFromFeature])
 
   // ─────────────────────────────────────────────────────────────
   // PLACEMENT-specific: map interaction
@@ -355,18 +361,20 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
   }, [consecutiveErrors, gameType, zoomCountryMap, setStyleForCountry])
 
   const onCountryMouseOver = useCallback((event) => {
+    if (gameType === GAME_TYPES.HARDCORE) return
     const layer = event.target
     const name = layer.feature.properties.ADMIN
     if (foundCountriesRef.current.has(name) || shownCountriesRef.current.has(name)) return
     layer.setStyle(HOVER_STYLE)
-  }, [])
+  }, [gameType])
 
   const onCountryMouseOut = useCallback((event) => {
+    if (gameType === GAME_TYPES.HARDCORE) return
     const layer = event.target
     const name = layer.feature.properties.ADMIN
     if (foundCountriesRef.current.has(name) || shownCountriesRef.current.has(name)) return
     layer.setStyle(COUNTRY_STYLE)
-  }, [])
+  }, [gameType])
 
   const handleCountrySelected = useCallback((clickedName) => {
     if (!gameStartedRef.current) return
@@ -391,15 +399,42 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
   }, [advanceGame, incrementScore, setStyleForCountry])
 
   const onCountryClick = useCallback((event) => {
+    if (gameType === GAME_TYPES.HARDCORE) return
     handleCountrySelected(event.target.feature.properties.ADMIN)
-  }, [handleCountrySelected])
+  }, [gameType, handleCountrySelected])
+
+  // HARDCORE: one tap per country on a map without borders (same scoring as useGameState's handleHardcoreTap)
+  const onMapClick = useCallback((event) => {
+    if (gameType !== GAME_TYPES.HARDCORE || !gameStartedRef.current || !event?.latlng) return
+    const name = targetCountryRef.current
+    if (!name || foundCountriesRef.current.has(name) || shownCountriesRef.current.has(name)) return
+    const feature = countries.features.find(c => c.properties.ADMIN === name)
+    if (!feature) return
+
+    const result = scoreHardcoreTap(event.latlng, feature)
+    setScore(prev => prev + result.points)
+    if (ratedRef.current) reportEloAnswer(GAME_TYPES.HARDCORE, name, { found: result.inside, errors: 0 })
+    setStyleForCountry(name, {
+      fillColor: result.inside ? MAP_COLORS.right : MAP_COLORS.wrong,
+      weight: 2,
+      fillOpacity: 0.5,
+      color: MAP_COLORS.stroke,
+    })
+    if (result.inside) foundCountriesRef.current.add(name)
+    else shownCountriesRef.current.add(name)
+    const feedback = result.inside
+      ? `${t('toasts.found_country', { name: getCountryName(feature.properties.ISO_A2, i18n.language) || name })} +${result.points}`
+      : `${t('toasts.wrong')} +${result.points}`
+    toast[result.inside ? 'success' : 'error'](feedback, { containerId: 'topRightToast' })
+    advanceGame(result.inside, 0)
+  }, [gameType, advanceGame, setStyleForCountry, t, i18n.language])
 
   const onCountryNameClick = useCallback((name) => {
     handleCountrySelected(name)
   }, [handleCountrySelected])
 
   const seeCountry = useCallback(() => {
-    if (gameType !== GAME_TYPES.PLACEMENT) {
+    if (!isMapGame) {
       // FLAGS / CAPITALS
       if (revealedName) return
       setClickOnSeeCountry(true)
@@ -422,16 +457,16 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
         zoomCountryMap(center.lat, center.lng, feat?.properties.Difficulty)
       }
     }
-  }, [gameType, revealedName, zoomCountryMap, setStyleForCountry])
+  }, [gameType, isMapGame, revealedName, zoomCountryMap, setStyleForCountry])
 
   // ─────────────────────────────────────────────────────────────
   // FLAGS / CAPITALS: auto-advance after reveal + submit handler
   // ─────────────────────────────────────────────────────────────
   useEffect(() => {
-    if (gameType === GAME_TYPES.PLACEMENT || !revealedName) return
+    if (isMapGame || !revealedName) return
     const id = setTimeout(() => advanceGame(false), 2000)
     return () => clearTimeout(id)
-  }, [revealedName, gameType, advanceGame])
+  }, [revealedName, isMapGame, advanceGame])
 
   const handleSubmit = useCallback(() => {
     if (!gameStartedRef.current || !targetCountryRef.current || revealedName) return
@@ -531,7 +566,7 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
     foundCountriesRef.current.clear()
     shownCountriesRef.current.clear()
     for (const ref of [geoJsonRef, ...extraGeoJsonRefs.current]) {
-      if (ref.current) ref.current.getLayers().forEach(l => l.setStyle(COUNTRY_STYLE))
+      if (ref.current) ref.current.getLayers().forEach(l => l.setStyle(gameType === GAME_TYPES.HARDCORE ? HARDCORE_COUNTRY_STYLE : COUNTRY_STYLE))
     }
     startTimeRef.current = null
     timerRef.current = 0
@@ -555,7 +590,7 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
         gameStartedRef.current = true
       }
     }, 0)
-  }, [phaseSequence, getRandomCountry, setTargetFromFeature])
+  }, [gameType, phaseSequence, getRandomCountry, setTargetFromFeature])
 
   const goHome = useCallback(() => {
     alreadyChosenCountries = []
@@ -568,11 +603,17 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
   // Return
   // ─────────────────────────────────────────────────────────────
   const currentPhase = phaseSequence[currentPhaseIndex]
+  // Map games: the target's code, so the layouts show its name in the player's language (the target is a French name)
+  const targetCountryISO = useMemo(
+    () => (isMapGame ? countries.features.find(c => c.properties.ADMIN === targetCountry)?.properties?.ISO_A2 ?? null : null),
+    [isMapGame, targetCountry]
+  )
   const displayTimer = isTraining ? '∞' : formatTime(timer)
 
   return {
     // Common (compatible with existing hooks)
     targetCountry,
+    targetCountryISO,
     score,
     timer,
     stats,
@@ -592,6 +633,7 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
     mapRef,
     setMapRef,
     onCountryClick,
+    onMapClick,
     onCountryNameClick,
     onCountryMouseOver,
     onCountryMouseOut,

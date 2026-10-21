@@ -123,10 +123,11 @@ function PlacementGame({
       <WorldMap
         ref={mapRef}
         showBorders={gameType !== GAME_TYPES.HARDCORE}
+        showSmallCountryMarkers={gameType !== GAME_TYPES.HARDCORE}
         onCountryPress={(layer, latlng) =>
           gameType === GAME_TYPES.HARDCORE ? onMapClick({ latlng }) : onCountryClick({ target: layer })
         }
-        // Only Hardcore reads a tap on the sea: the Ascension hook has no onMapClick
+        // Only Hardcore reads a tap on the sea: the sea is only tapped in Hardcore
         onMapPress={gameType === GAME_TYPES.HARDCORE ? (latlng) => onMapClick({ latlng }) : undefined}
       />
 
@@ -205,7 +206,7 @@ function PlacementGame({
               ? null
               : ascension
                 ? ascension.presetName
-                  ? { kind: 'ascension', gameType: GAME_TYPES.PLACEMENT, presetName: ascension.presetName, timer, stats, phaseStats }
+                  ? { kind: 'ascension', gameType, presetName: ascension.presetName, timer, stats, phaseStats }
                   : null
                 : { kind: 'standard', gameType, difficulty: (difficulty ?? continent)!, elapsedTime: timer, continent }
           }
@@ -233,9 +234,9 @@ function StandardGame({ difficulty, continent, isTraining, gameType }: { difficu
   return <PlacementGame state={state} difficulty={difficulty} continent={continent} isTraining={isTraining} ascension={null} gameType={gameType} />
 }
 
-function AscensionGame({ phases, presetName, isTraining }: { phases: Record<string, number>; presetName: string | null; isTraining: boolean }) {
-  const state = useAscensionState(GAME_TYPES.PLACEMENT, phases, isTraining, true)
-  return <PlacementGame state={state} difficulty={null} continent={null} isTraining={isTraining} ascension={{ presetName }} />
+function AscensionGame({ phases, presetName, isTraining, gameType }: { phases: Record<string, number>; presetName: string | null; isTraining: boolean; gameType: string }) {
+  const state = useAscensionState(gameType, phases, isTraining, true)
+  return <PlacementGame state={state} difficulty={null} continent={null} isTraining={isTraining} ascension={{ presetName }} gameType={gameType} />
 }
 
 function RoomGame({ play }: { play: RoomPlay }) {
@@ -264,7 +265,7 @@ export default function PlacementScreen() {
   const isTraining = params.training === '1'
   if (params.room) return <RoomGate code={params.room}>{(play) => <RoomGame play={play} />}</RoomGate>
   if (params.ascension) {
-    return <AscensionGame phases={JSON.parse(params.ascension)} presetName={params.preset ?? null} isTraining={isTraining} />
+    return <AscensionGame phases={JSON.parse(params.ascension)} presetName={params.preset ?? null} isTraining={isTraining} gameType={params.gameType ?? GAME_TYPES.PLACEMENT} />
   }
   return <StandardGame difficulty={params.difficulty ?? null} continent={params.continent ?? null} isTraining={isTraining} gameType={params.gameType ?? GAME_TYPES.PLACEMENT} />
 }

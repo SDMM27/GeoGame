@@ -259,6 +259,7 @@ function GameSetupSheet() {
           />
         ) : (
           <>
+            {game.multi && (
             <Touchable
               accessibilityRole="button"
               accessibilityLabel={t('mobile.multi.title')}
@@ -267,6 +268,7 @@ function GameSetupSheet() {
               style={[styles.multiButton, !canPlay && { opacity: 0.4 }]}>
               <MaterialCommunityIcons name="account-group" size={22} color={colors.text} />
             </Touchable>
+            )}
             <Button
               label={t('mobile.setup.training')}
               variant="secondary"

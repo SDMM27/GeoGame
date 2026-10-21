@@ -294,3 +294,88 @@ describe('useAscensionState — Elo', () => {
     expect(reportEloAnswer).not.toHaveBeenCalled()
   })
 })
+
+describe('useAscensionState — HARDCORE', () => {
+  // Centre exact du carré de la fixture
+  const centre = (name) => {
+    const ring = byName(name).geometry.coordinates[0]
+    return { lat: (ring[0][1] + ring[2][1]) / 2, lng: (ring[0][0] + ring[2][0]) / 2 }
+  }
+  const FAR = { lat: -80, lng: -170 }
+
+  it('starts on a map target of the phase difficulty', () => {
+    const { result } = renderAscension(GAME_TYPES.HARDCORE, { Facile: 2, Moyen: 1 })
+    expect(typeof result.current.targetCountry).toBe('string')
+    expect(FACILE).toContain(targetName(result))
+    expect(result.current.stats).toMatchObject({ found: 0, skipped: 0, total: 3 })
+  })
+
+  it('gives 1000 points for a tap inside the target, counts it as found and moves on', () => {
+    const { result } = renderAscension(GAME_TYPES.HARDCORE, { Facile: 2 })
+    const first = targetName(result)
+    act(() => result.current.onMapClick({ latlng: centre(first) }))
+    expect(result.current.score).toBe(1000)
+    expect(result.current.stats).toMatchObject({ found: 1, skipped: 0 })
+    expect(result.current.foundCountriesRef.current.has(first)).toBe(true)
+    expect(result.current.phaseCountRemaining).toBe(1)
+    expect(targetName(result)).not.toBe(first)
+  })
+
+  it('counts a tap far away as skipped, with fewer points', () => {
+    const { result } = renderAscension(GAME_TYPES.HARDCORE, { Facile: 2 })
+    const first = targetName(result)
+    act(() => result.current.onMapClick({ latlng: FAR }))
+    expect(result.current.score).toBeLessThan(1000)
+    expect(result.current.stats).toMatchObject({ found: 0, skipped: 1 })
+    expect(result.current.shownCountriesRef.current.has(first)).toBe(true)
+  })
+
+  it('advances through the phases and ends the game', () => {
+    const { result } = renderAscension(GAME_TYPES.HARDCORE, { Facile: 1, Moyen: 1 })
+    act(() => result.current.onMapClick({ latlng: centre(targetName(result)) }))
+    expect(result.current.currentPhase).toBe('Moyen')
+    expect(MOYEN).toContain(targetName(result))
+    act(() => result.current.onMapClick({ latlng: centre(targetName(result)) }))
+    expect(result.current.isGameOver).toBe(true)
+    expect(result.current.score).toBe(2000)
+    expect(result.current.phaseStats).toHaveLength(2)
+  })
+
+  it('ignores country clicks (taps go through onMapClick)', () => {
+    const { result } = renderAscension(GAME_TYPES.HARDCORE, { Facile: 2 })
+    const first = targetName(result)
+    act(() => result.current.onCountryClick({ target: { feature: byName(first) } }))
+    expect(result.current.score).toBe(0)
+    expect(result.current.stats).toMatchObject({ found: 0, skipped: 0 })
+    expect(targetName(result)).toBe(first)
+  })
+
+  it('reports exactly one Elo answer per country', () => {
+    const { result } = renderAscension(GAME_TYPES.HARDCORE, { Facile: 2 })
+    const first = targetName(result)
+    act(() => result.current.onMapClick({ latlng: centre(first) }))
+    expect(reportEloAnswer).toHaveBeenCalledTimes(1)
+    expect(reportEloAnswer).toHaveBeenCalledWith('HARDCORE', first, { found: true, errors: 0 })
+    const second = targetName(result)
+    act(() => result.current.onMapClick({ latlng: FAR }))
+    expect(reportEloAnswer).toHaveBeenCalledTimes(2)
+    expect(reportEloAnswer).toHaveBeenLastCalledWith('HARDCORE', second, { found: false, errors: 0 })
+  })
+
+  it('ignores a tap on a target already resolved, and a tap after the end', () => {
+    const { result } = renderAscension(GAME_TYPES.HARDCORE, { Facile: 1 })
+    const first = targetName(result)
+    act(() => result.current.onMapClick({ latlng: centre(first) }))
+    expect(result.current.isGameOver).toBe(true)
+    act(() => result.current.onMapClick({ latlng: centre(first) }))
+    expect(result.current.score).toBe(1000)
+    expect(result.current.stats).toMatchObject({ found: 1, skipped: 0 })
+    expect(reportEloAnswer).toHaveBeenCalledTimes(1)
+  })
+
+  it('has no Elo report in a room (override lists)', () => {
+    const { result } = renderAscension(GAME_TYPES.HARDCORE, { Facile: 1 }, { overrides: { Facile: [byName('Allemagne')] } })
+    act(() => result.current.onMapClick({ latlng: centre('Allemagne') }))
+    expect(reportEloAnswer).not.toHaveBeenCalled()
+  })
+})

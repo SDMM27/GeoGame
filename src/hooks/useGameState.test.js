@@ -232,7 +232,7 @@ describe('useGameState — Hardcore', () => {
     const layer = makeLayer('France', { fillColor: '#3DDC97', weight: 2 })
     result.current.geoJsonRef.current = { getLayers: () => [layer] }
     act(() => result.current.restartGame())
-    expect(layer.options).toMatchObject({ fillColor: '#2A3E66', fillOpacity: 1, weight: 0 })
+    expect(layer.options).toMatchObject({ fillColor: '#2A3E66', color: '#2A3E66', fillOpacity: 1, weight: 1 })
   })
 
   it('reports a tap to Elo in a normal game', () => {

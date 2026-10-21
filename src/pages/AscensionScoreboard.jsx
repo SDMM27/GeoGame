@@ -13,6 +13,7 @@ const ACTIVE_GAMES = [
   { id: GAME_TYPES.PLACEMENT, labelKey: 'games.placement.title' },
   { id: GAME_TYPES.FLAGS, labelKey: 'games.flags.title' },
   { id: GAME_TYPES.CAPITALS, labelKey: 'games.capitals.title' },
+  { id: GAME_TYPES.HARDCORE, labelKey: 'games.hardcore.title' },
 ]
 
 export default function AscensionScoreboard({ defaultGame = GAME_TYPES.PLACEMENT }) {

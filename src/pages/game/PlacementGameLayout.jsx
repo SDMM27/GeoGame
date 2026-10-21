@@ -165,7 +165,7 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
                 timer={timer}
                 stats={stats}
                 phaseStats={phaseStats}
-                gameType={GAME_TYPES.PLACEMENT}
+                gameType={gameType}
                 presetName={presetName ?? null}
                 isTraining={isTraining}
               />
@@ -226,7 +226,8 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
           data={getShiftedFeatures().right}
           onEachFeature={onEachOffsetFeature}
         />
-        {onCountryNameClick && foundCountriesRef && shownCountriesRef && (
+        {/* Hardcore shows no country: the circles would give away where the small ones are */}
+        {gameType !== GAME_TYPES.HARDCORE && onCountryNameClick && foundCountriesRef && shownCountriesRef && (
           <SmallCountryCircles
             onCountryNameClick={onCountryNameClick}
             foundCountriesRef={foundCountriesRef}

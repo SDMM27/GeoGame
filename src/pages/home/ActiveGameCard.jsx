@@ -33,6 +33,7 @@ export default function ActiveGameCard({ game, initialMode = "standard" }) {
           phases: ascensionPhases,
           presetName: detectedPresetName,
           isTraining,
+          gameType: game.id,
         },
       });
       return;

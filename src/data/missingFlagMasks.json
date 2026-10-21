@@ -515,10 +515,6 @@
     "axis": "v",
     "band": 1
   },
-  "MF": {
-    "axis": "v",
-    "band": 1
-  },
   "MG": {
     "axis": "v",
     "band": 0
@@ -774,6 +770,10 @@
   "SV": {
     "axis": "h",
     "band": 1
+  },
+  "SX": {
+    "axis": "h",
+    "band": 0
   },
   "SY": {
     "axis": "h",

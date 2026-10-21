@@ -32,7 +32,7 @@ const getSmallCountries = () => smallCountriesCache ??= (() => {
       const polygons = type === 'Polygon' ? [coordinates] : coordinates
       const biggest = polygons.map((poly) => ringBox(poly[0])).reduce((a, c) => (c.span > a.span ? c : a))
       if (biggest.span >= SMALL_THRESHOLD) continue
-      // Two features can share a name (e.g. both halves of Saint-Martin): the position in the dataset keeps the React key unique
+      // Two features can share a name: the position in the dataset keeps the React key unique
       result.push({ key: `${f.properties.ADMIN}#${index}`, name: f.properties.ADMIN, lat: biggest.lat, lng: biggest.lng, zoomThreshold: zoomThresholdForSpan(biggest.span) })
     } catch (_) { /* skip */ }
   }

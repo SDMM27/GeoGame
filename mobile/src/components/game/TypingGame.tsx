@@ -239,7 +239,6 @@ export function TypingGame({
               onChangeText={changeAnswer}
               onSubmit={submitAnswer}
               placeholder={t(config.placeholderKey)}
-              locked={locked}
             />
             <Touchable
               accessibilityRole="button"
@@ -312,20 +311,23 @@ export function TypingGame({
 
 // Memoized: the game timer re-renders the screen every 100 ms, and re-rendering a controlled
 // TextInput that often makes Android keyboards drop keystrokes (backspace stops working).
+// Never disabled while a game runs, not even while a flag is revealed: on Android, enabling the
+// field again restarts the keyboard's session as focus() reopens it, and Gboard sometimes stays
+// on the old session. Letters still reach the field but Gboard believes it is empty, so
+// Backspace erases nothing until the keyboard is closed. Text typed during a reveal is simply
+// cleared with the next country, and handleSubmit ignores submits while revealed.
 const AnswerInput = memo(function AnswerInput({
   ref,
   value,
   onChangeText,
   onSubmit,
   placeholder,
-  locked,
 }: {
   ref: Ref<TextInput>
   value: string
   onChangeText: (value: string) => void
   onSubmit: () => void
   placeholder: string
-  locked: boolean
 }) {
   return (
     <TextInput
@@ -341,8 +343,7 @@ const AnswerInput = memo(function AnswerInput({
       spellCheck={false}
       autoComplete="off"
       returnKeyType="send"
-      editable={!locked}
-      style={[styles.input, locked && { opacity: 0.5 }]}
+      style={styles.input}
     />
   )
 })

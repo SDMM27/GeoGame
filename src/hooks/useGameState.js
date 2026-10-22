@@ -285,9 +285,16 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
     if (gameType === GAME_TYPES.HARDCORE) handleHardcoreTap(event.latlng)
   }, [gameType, handleHardcoreTap])
 
+  // In a continent game the countries of the other continents are only scenery: no hover, no click, no error
+  const isOutOfPlay = useCallback((name) => {
+    if (!continent) return false
+    return countries.features.find(c => c.properties.ADMIN === name)?.properties.continent !== continent
+  }, [continent])
+
   const onCountryMouseOver = (event) => {
     const layer = event.target
     const name = layer.feature.properties.ADMIN
+    if (isOutOfPlay(name)) return
     if (foundCountriesRef.current.has(name)) return
     if (shownCountriesRef.current.has(name)) return
     if (gameType === GAME_TYPES.HARDCORE) return
@@ -297,6 +304,7 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
   const onCountryMouseOut = (event) => {
     const layer = event.target
     const name = layer.feature.properties.ADMIN
+    if (isOutOfPlay(name)) return
     if (foundCountriesRef.current.has(name)) return
     if (shownCountriesRef.current.has(name)) return
     if (gameType === GAME_TYPES.HARDCORE) return
@@ -304,7 +312,7 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
   }
 
   const handleCountrySelected = useCallback((clickedName) => {
-    if (!gameStartedRef.current) return
+    if (!gameStartedRef.current || isOutOfPlay(clickedName)) return
     const targetDiff = countries.features.find(
       c => c.properties.ADMIN === targetCountryRef.current
     )?.properties.Difficulty
@@ -341,7 +349,7 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
       consecutiveErrorsRef.current = newErrors
       setStats(prev => ({ ...prev, totalErrors: (prev.totalErrors ?? 0) + 1 }))
     }
-  }, [changeCountry, gameType, setStyleForCountry])
+  }, [changeCountry, gameType, isOutOfPlay, setStyleForCountry])
 
   const onCountryClick = useCallback((event) => {
     if (gameType !== GAME_TYPES.HARDCORE) handleCountrySelected(event.target.feature.properties.ADMIN)

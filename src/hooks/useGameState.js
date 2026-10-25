@@ -12,6 +12,7 @@ import { reportEloAnswer, flushElo } from '../utils/eloReport'
 import { HARDCORE_COUNTRY_STYLE, HOVER_STYLE, MAP_COLORS } from '../utils/mapColors'
 import { scoreHardcoreTap } from '../utils/hardcoreScoring'
 import { getLargestLandmassBounds } from '../utils/largestLandmass'
+import { NON_CLICKABLE_MAP_AREAS } from '../utils/mapInteraction'
 
 const DIFFICULTIES = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
 
@@ -296,6 +297,7 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
 
   // In a continent game the countries of the other continents are only scenery: no hover, no click, no error
   const isOutOfPlay = useCallback((name) => {
+    if (NON_CLICKABLE_MAP_AREAS.has(name)) return true
     if (!continent) return false
     return countries.features.find(c => c.properties.ADMIN === name)?.properties.continent !== continent
   }, [continent])

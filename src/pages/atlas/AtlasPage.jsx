@@ -15,6 +15,7 @@ import { getShiftedFeatures } from '../game/shiftedFeatures'
 import CountrySheet from './CountrySheet'
 import { MAP_COLORS } from '../../utils/mapColors'
 import { getSmallCountryCircleDescriptors } from '../../utils/largestLandmass'
+import { NON_CLICKABLE_MAP_AREAS } from '../../utils/mapInteraction'
 import './AtlasPage.css'
 
 const STYLE = { fillColor: '#2A3E66', fillOpacity: 0.55, color: MAP_COLORS.stroke, weight: 1 }
@@ -145,8 +146,8 @@ export default function AtlasPage() {
     if (admin === selectedRef.current) layer.setStyle(STYLE_SELECTED)
     layer.bindTooltip(() => countryDisplayName(feature, i18n.language), { sticky: true, direction: 'top', className: 'atlas-tooltip' })
     layer.on({
-      click: () => select(admin),
-      mouseover: () => { if (admin !== selectedRef.current) restyle(admin, STYLE_HOVER) },
+      click: () => { if (!NON_CLICKABLE_MAP_AREAS.has(admin)) select(admin) },
+      mouseover: () => { if (!NON_CLICKABLE_MAP_AREAS.has(admin) && admin !== selectedRef.current) restyle(admin, STYLE_HOVER) },
       mouseout: () => { if (admin !== selectedRef.current) restyle(admin, STYLE) },
     })
   }

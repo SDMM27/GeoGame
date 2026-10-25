@@ -1,3 +1,5 @@
+import { NON_CLICKABLE_MAP_AREAS } from './mapInteraction'
+
 // Bounds for a country’s largest polygon, kept compact across the antimeridian.
 function ringBounds(ring = []) {
   if (!ring.length) return null
@@ -33,6 +35,7 @@ const WORLD_COPY_OFFSETS = [-360, 0, 360]
 export function getSmallCountryCircleDescriptors(features) {
   const circles = []
   for (const [index, feature] of features.entries()) {
+    if (NON_CLICKABLE_MAP_AREAS.has(feature.properties.ADMIN)) continue
     let largest
     try {
       largest = getLargestLandmassBounds(feature.geometry)
@@ -46,7 +49,7 @@ export function getSmallCountryCircleDescriptors(features) {
         name: feature.properties.ADMIN,
         center: [largest.lat, largest.lng + offset],
         zoomThreshold: Math.ceil(Math.log2(28 / Math.max(largest.span, 0.01))),
-        radius: feature.properties.ADMIN === 'Kiribati' ? 12 : 8,
+        radius: 8,
       })
     }
   }

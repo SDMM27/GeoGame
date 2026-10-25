@@ -9,11 +9,12 @@ import 'leaflet/dist/leaflet.css'
 import NavBar from '../../components/NavBar'
 import countries from '../../data/countriesWithDifficulty_FR.json'
 import LandLayer from '../../components/map/LandLayer'
-import { getCountryMetrics, getFocusCountry } from '../../utils/borderGuessMap'
+import { getFocusCountry } from '../../utils/borderGuessMap'
 import { ATLAS_COUNTRIES, countryDisplayName, findAtlasCountry, getCountryInfo, searchAtlasCountries } from '../../utils/countryInfo'
 import { getShiftedFeatures } from '../game/shiftedFeatures'
 import CountrySheet from './CountrySheet'
 import { MAP_COLORS } from '../../utils/mapColors'
+import { getSmallCountryCircleDescriptors } from '../../utils/largestLandmass'
 import './AtlasPage.css'
 
 const STYLE = { fillColor: '#2A3E66', fillOpacity: 0.55, color: MAP_COLORS.stroke, weight: 1 }
@@ -24,33 +25,22 @@ const STYLE_SELECTED = { fillColor: MAP_COLORS.hover, fillOpacity: 0.6, color: M
 // Closest zoom a selected country is framed at (Malta is then about 50px wide)
 const MAX_FRAME_ZOOM = 8
 
-// Countries too small to click at low zoom get a dot until the map is zoomed in enough
-const SMALL_SPAN = 0.5
 let smallCountries = null
 const getSmallCountries = () =>
-  (smallCountries ??= countries.features.flatMap((feature, index) => {
-    try {
-      const { maxSpan } = getCountryMetrics(feature)
-      if (maxSpan >= SMALL_SPAN) return []
-      const center = L.geoJSON(feature).getBounds().getCenter()
-      return [{ key: `${feature.properties.ADMIN}#${index}`, admin: feature.properties.ADMIN, center, minZoom: Math.ceil(Math.log2(14 / Math.max(maxSpan, 0.01))) }]
-    } catch {
-      return []
-    }
-  }))
+  (smallCountries ??= getSmallCountryCircleDescriptors(countries.features))
 
 function SmallCountryDots({ selected, onSelect }) {
   const [zoom, setZoom] = useState(2)
   useMapEvents({ zoomend: (event) => setZoom(event.target.getZoom()) })
   return getSmallCountries()
-    .filter((dot) => zoom < dot.minZoom)
+    .filter((dot) => zoom < dot.zoomThreshold)
     .map((dot) => (
       <CircleMarker
         key={dot.key}
         center={dot.center}
-        radius={6}
-        pathOptions={dot.admin === selected ? { ...STYLE_SELECTED, fillOpacity: 0.9 } : { fillColor: '#ffffff', fillOpacity: 0.15, color: MAP_COLORS.stroke, weight: 1.5 }}
-        eventHandlers={{ click: () => onSelect(dot.admin) }}
+        radius={dot.radius}
+        pathOptions={dot.name === selected ? { ...STYLE_SELECTED, fillOpacity: 0.9 } : { fillColor: '#ffffff', fillOpacity: 0.15, color: MAP_COLORS.stroke, weight: 2 }}
+        eventHandlers={{ click: () => onSelect(dot.name) }}
       />
     ))
 }

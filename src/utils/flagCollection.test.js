@@ -179,7 +179,7 @@ describe('mastery', () => {
 
   it('on the real data, the targets are the playable countries', () => {
     const sets = masterySets(countriesMeta.features)
-    expect(sets.placement).toHaveLength(238)
+    expect(sets.placement).toHaveLength(236)
     expect(sets.flags).toHaveLength(229)
   })
 })

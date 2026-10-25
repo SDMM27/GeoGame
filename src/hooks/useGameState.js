@@ -11,6 +11,7 @@ import { GAME_TYPES } from '../utils/gameTypes'
 import { reportEloAnswer, flushElo } from '../utils/eloReport'
 import { HARDCORE_COUNTRY_STYLE, HOVER_STYLE, MAP_COLORS } from '../utils/mapColors'
 import { scoreHardcoreTap } from '../utils/hardcoreScoring'
+import { getLargestLandmassBounds } from '../utils/largestLandmass'
 
 const DIFFICULTIES = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
 
@@ -109,6 +110,17 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
     }
   }, [mapRef])
 
+  const zoomToCountry = useCallback((name) => {
+    if (!mapRef) return
+    const feature = countries.features.find((country) => country.properties.ADMIN === name)
+    const largest = getLargestLandmassBounds(feature?.geometry)
+    if (!largest) return
+    // The same island anchors the small-country circle; move to its nearest world copy.
+    const mapLng = mapRef.getCenter().lng
+    const lng = largest.lng + Math.round((mapLng - largest.lng) / 360) * 360
+    zoomCountryMap(largest.lat, lng)
+  }, [mapRef, zoomCountryMap])
+
   const orderedIndexRef = useRef(0)
 
   // Refs for snapshot saves (always current, avoids stale closures in intervals)
@@ -191,12 +203,9 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
       const layer = geoJsonRef.current.getLayers().find(
         l => l.feature.properties.ADMIN === name
       )
-      if (layer) {
-        const center = layer.getBounds().getCenter()
-        zoomCountryMap(center.lat, center.lng)
-      }
+      if (layer) zoomToCountry(name)
     }
-  }, [consecutiveErrors, zoomCountryMap, setStyleForCountry]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [consecutiveErrors, zoomToCountry, setStyleForCountry]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Timer counts UP; stops when all processed
   const allProcessed = stats.total > 0 && (stats.found + stats.skipped >= stats.total)
@@ -370,8 +379,7 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
       l => l.feature.properties.ADMIN === name
     )
     if (!layer) return
-    const center = layer.getBounds().getCenter()
-    zoomCountryMap(center.lat, center.lng)
+    zoomToCountry(name)
   }
 
   const restartGame = () => {

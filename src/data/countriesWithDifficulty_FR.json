@@ -313093,7 +313093,7 @@
             "properties": {
                 "ADMIN": "Brunei",
                 "ISO_A3": "BRN",
-                "Difficulty": "Difficile",
+                "Difficulty": "Impossible",
                 "ISO_A2": "BN",
                 "aliases": [],
                 "capital": "Bandar Seri Begawan",
@@ -742370,7 +742370,7 @@
             "properties": {
                 "ADMIN": "Zone non gouvernée de Chypre",
                 "ISO_A3": "-99",
-                "Difficulty": "Impossible",
+                "Difficulty": "",
                 "ISO_A2": null,
                 "aliases": [],
                 "capital": "",
@@ -760220,7 +760220,7 @@
             "properties": {
                 "ADMIN": "Îles Cook",
                 "ISO_A3": "COK",
-                "Difficulty": "",
+                "Difficulty": "Impossible",
                 "ISO_A2": "CK",
                 "aliases": [],
                 "capital": "Avarua",
@@ -1314343,7 +1314343,7 @@
             "properties": {
                 "ADMIN": "Cosmodrome de Baïkonour",
                 "ISO_A3": "-99",
-                "Difficulty": "Impossible",
+                "Difficulty": "",
                 "ISO_A2": null,
                 "aliases": [],
                 "capital": "",
@@ -1314627,7 +1314627,7 @@
             "properties": {
                 "ADMIN": "Glacier de Siachen",
                 "ISO_A3": "-99",
-                "Difficulty": "Impossible",
+                "Difficulty": "",
                 "ISO_A2": null,
                 "aliases": [],
                 "capital": "",
@@ -1345094,7 +1345094,7 @@
             "properties": {
                 "ADMIN": "Kiribati",
                 "ISO_A3": "KIR",
-                "Difficulty": "",
+                "Difficulty": "Impossible",
                 "ISO_A2": "KI",
                 "aliases": [],
                 "capital": "South Tarawa",
@@ -2209816,7 +2209816,7 @@
             "properties": {
                 "ADMIN": "Base navale américaine de la baie de Guantánamo",
                 "ISO_A3": "-99",
-                "Difficulty": "Impossible",
+                "Difficulty": "",
                 "ISO_A2": null,
                 "aliases": [],
                 "capital": "",

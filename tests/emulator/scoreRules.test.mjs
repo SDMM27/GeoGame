@@ -88,7 +88,7 @@ describe('computed limits', () => {
     const row = (game, mode) => solo.rows.find((r) => r.game === game && r.mode === mode)
     // 29 easy countries at 3 points each, and every difficulty together for Hardcore
     expect(row('PLACEMENT', 'Facile').max).toBe(87)
-    expect(row('PLACEMENT', 'Hardcore').max).toBe(1570)
+    expect(row('PLACEMENT', 'Hardcore').max).toBe(1554)
     expect(ascension.rows.map((r) => r.max)).toEqual([62, 139, 123, 215])
   })
 })
@@ -128,7 +128,7 @@ describe('solo scores', () => {
     // 200 is plenty for Hardcore placement, out of reach on Facile
     await assertSucceeds(as('alice').collection('scores').add(solos({ score: 200, difficulty: 'Hardcore' })))
     await assertFails(as('alice').collection('scores').add(solos({ score: 200, difficulty: 'Facile' })))
-    await assertFails(as('alice').collection('scores').add(solos({ score: 202, difficulty: 'Océanie' })))
+    await assertFails(as('alice').collection('scores').add(solos({ score: 221, difficulty: 'Océanie' })))
   })
 
   it('refuses a game or difficulty that does not exist', async () => {

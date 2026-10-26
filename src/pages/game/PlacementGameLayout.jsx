@@ -71,7 +71,11 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
     onCountryMouseOver(event)
     const layer = event.target
     const name = layer.feature.properties.ADMIN
-    if (!foundCountriesRef?.current.has(name) && !shownCountriesRef?.current.has(name)) return
+    // A tooltip bound in an earlier game opens on its own on hover (Leaflet), so a restart must not keep it
+    if (!foundCountriesRef?.current.has(name) && !shownCountriesRef?.current.has(name)) {
+      layer.unbindTooltip()
+      return
+    }
     if (!layer.getTooltip()) {
       layer.bindTooltip(
         () => getCountryName(layer.feature.properties.ISO_A2, i18n.language) || name,

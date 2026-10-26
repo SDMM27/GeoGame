@@ -173,3 +173,22 @@ button.profile-daily-chip { font-family: inherit; color: inherit; padding: 0; }
   .profile-tiles { grid-template-columns: repeat(2, 1fr); }
   .profile-achievements { grid-template-columns: repeat(2, 1fr); }
 }
+
+.profile-records-count { font-size: 0.85rem; color: var(--text-muted); white-space: nowrap; }
+.profile-records-count.perfect { color: var(--warning); }
+.profile-records { display: flex; flex-direction: column; gap: 0.6rem; padding: 0.9rem; }
+.profile-records-row { display: flex; gap: 4px; }
+.profile-records-header { flex: 1; min-width: 0; text-align: center; font-size: 0.68rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.profile-records-game { display: flex; flex-direction: column; gap: 4px; }
+.profile-records-title { font-size: 0.78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.profile-record-cell {
+  flex: 1; min-width: 0; height: 38px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  padding: 0 4px; border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-subtle); background: rgba(255, 255, 255, 0.04);
+}
+.profile-record-cell strong { font-size: 0.82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; font-variant-numeric: tabular-nums; }
+.profile-record-cell.perfect { border-color: var(--warning); background: color-mix(in srgb, var(--warning) 15%, transparent); }
+.profile-record-cell.perfect strong { color: var(--warning); }
+.profile-record-empty { color: var(--text-muted); opacity: 0.6; font-size: 0.8rem; }
+.profile-record-bar { align-self: stretch; margin-top: 0; }

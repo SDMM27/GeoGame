@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { MapContainer, GeoJSON, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
@@ -14,7 +14,6 @@ import Form from '../form'
 import AscensionForm from '../AscensionForm'
 import ShareScoreButton from '../../components/ShareScoreButton'
 import SmallCountryCircles from './SmallCountryCircles'
-import { getShiftedFeatures } from './shiftedFeatures'
 import { HARDCORE_COUNTRY_STYLE, MAP_COLORS } from '../../utils/mapColors'
 
 const GEO_STYLE = { fillColor: 'transparent', color: MAP_COLORS.stroke, fillOpacity: 1, weight: 1 }
@@ -45,9 +44,8 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
       : null
   )
 
-  const geoJsonRefLeft = useRef(null)
-  const geoJsonRefRight = useRef(null)
-  extraGeoJsonRefs.current = [geoJsonRefLeft, geoJsonRefRight]
+  // One set of countries: the renderer draws the world's copies on either side
+  extraGeoJsonRefs.current = []
 
   const CONTINENT_ZOOM = {
     'Amériques': { center: [10, -80], zoom: 3 },
@@ -83,7 +81,7 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
     layer.openTooltip(event.latlng)
   }, [onCountryMouseOver, foundCountriesRef, shownCountriesRef, i18n])
 
-  const onEachOffsetFeature = useMemo(() => (feature, layer) => {
+  const onEachFeature = useMemo(() => (feature, layer) => {
     layer.on({ click: onCountryClick, mouseover: onMouseOver, mouseout: onCountryMouseOut })
   }, [onCountryClick, onMouseOver, onCountryMouseOut])
 
@@ -205,26 +203,10 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
       >
         {gameType === GAME_TYPES.HARDCORE && <MapClickListener onClick={onMapClick} />}
         <GeoJSON
-          key="geojson-left"
-          ref={geoJsonRefLeft}
-          style={gameType === GAME_TYPES.HARDCORE ? HARDCORE_COUNTRY_STYLE : GEO_STYLE}
-          data={getShiftedFeatures().left}
-          onEachFeature={onEachOffsetFeature}
-        />
-        <GeoJSON
           ref={geoJsonRef}
           style={gameType === GAME_TYPES.HARDCORE ? HARDCORE_COUNTRY_STYLE : GEO_STYLE}
           data={countries.features}
-          onEachFeature={(feature, layer) => {
-            layer.on({ click: onCountryClick, mouseover: onMouseOver, mouseout: onCountryMouseOut })
-          }}
-        />
-        <GeoJSON
-          key="geojson-right"
-          ref={geoJsonRefRight}
-          style={gameType === GAME_TYPES.HARDCORE ? HARDCORE_COUNTRY_STYLE : GEO_STYLE}
-          data={getShiftedFeatures().right}
-          onEachFeature={onEachOffsetFeature}
+          onEachFeature={onEachFeature}
         />
         {/* Hardcore shows no country: the circles would give away where the small ones are */}
         {gameType !== GAME_TYPES.HARDCORE && onCountryNameClick && foundCountriesRef && shownCountriesRef && (

@@ -119,6 +119,130 @@ export function getCountryShapes(): Map<string, CountryShape> {
   return shapeCache
 }
 
+// ---- Base map: simplified levels, cut into tiles ----------------------------------------------------
+// The land under the game's colors is redrawn on every frame of a pan or pinch. Drawing all ~100 000 vertices of the
+// world (twice: the map shows two copies of it) made the gestures stutter on mid-range Android phones. So the base map
+// comes in levels of detail, Douglas-Peucker simplified in map space, each used while its error stays under
+// MAX_ERROR_DP on screen, and each level is cut into tiles: Skia skips a tile's path when it is off screen, so a zoomed
+// in map only draws the land around the view.
+
+// Map units each level may move a vertex by; 0 is the full dataset. ~17k, ~32k, ~61k and ~102k vertices.
+export const LOD_TOLERANCES = [1, 0.3, 0.1, 0]
+const MAX_ERROR_DP = 0.4
+const TILE_GRID = 8
+
+// The level of detail to draw at `scale` (screen dp per map unit)
+export function lodLevel(scale: number) {
+  'worklet'
+  for (let i = 0; i < LOD_TOLERANCES.length - 1; i++) {
+    if (LOD_TOLERANCES[i] * scale <= MAX_ERROR_DP) return i
+  }
+  return LOD_TOLERANCES.length - 1
+}
+
+// Rings in map space as flat [x0, y0, x1, y1, ...], cut at the dateline by d3 like the shapes' paths
+type Ring = number[]
+let ringSink: Ring[] = []
+const ringPath = geoPath(projection, {
+  moveTo: (x: number, y: number) => {
+    ringSink.push([x, y])
+  },
+  lineTo: (x: number, y: number) => {
+    ringSink[ringSink.length - 1].push(x, y)
+  },
+  closePath: () => {},
+  arc: () => {},
+} as unknown as CanvasRenderingContext2D)
+
+const ringCache = new Map<string, Ring[]>()
+function shapeRings(shape: CountryShape) {
+  let rings = ringCache.get(shape.name)
+  if (!rings) {
+    ringSink = []
+    ringPath(shape.feature)
+    rings = ringSink
+    ringCache.set(shape.name, rings)
+  }
+  return rings
+}
+
+// Douglas-Peucker; a ring that would collapse is dropped when it is smaller than the tolerance, kept whole otherwise
+function simplifyRing(ring: Ring, tolerance: number): Ring | null {
+  const count = ring.length / 2
+  if (!tolerance || count <= 4) return ring
+  const keep = new Uint8Array(count)
+  keep[0] = keep[count - 1] = 1
+  const stack = [0, count - 1]
+  const max2 = tolerance * tolerance
+  while (stack.length) {
+    const b = stack.pop()!
+    const a = stack.pop()!
+    const ax = ring[a * 2], ay = ring[a * 2 + 1]
+    const dx = ring[b * 2] - ax, dy = ring[b * 2 + 1] - ay
+    const length2 = dx * dx + dy * dy
+    let farthest = -1
+    let distance2 = max2
+    for (let i = a + 1; i < b; i++) {
+      const px = ring[i * 2] - ax, py = ring[i * 2 + 1] - ay
+      const t = length2 ? Math.max(0, Math.min(1, (px * dx + py * dy) / length2)) : 0
+      const ex = t * dx - px, ey = t * dy - py
+      const d2 = ex * ex + ey * ey
+      if (d2 > distance2) {
+        distance2 = d2
+        farthest = i
+      }
+    }
+    if (farthest >= 0) {
+      keep[farthest] = 1
+      stack.push(a, farthest, farthest, b)
+    }
+  }
+  const out: Ring = []
+  for (let i = 0; i < count; i++) if (keep[i]) out.push(ring[i * 2], ring[i * 2 + 1])
+  if (out.length >= 8) return out
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
+  for (let i = 0; i < ring.length; i += 2) {
+    minX = Math.min(minX, ring[i]); maxX = Math.max(maxX, ring[i])
+    minY = Math.min(minY, ring[i + 1]); maxY = Math.max(maxY, ring[i + 1])
+  }
+  return Math.max(maxX - minX, maxY - minY) < tolerance ? null : ring
+}
+
+// One Skia path per tile and level: tiles[tile][level]. A ring goes to the tile of its box's center (the base map is
+// one color, so a hole drawn in another tile looks the same).
+const tileCache = new Map<string, SkPath[][]>()
+export function getBaseTiles(shapes: CountryShape[]): SkPath[][] {
+  const key = shapes.map((shape) => shape.name).join('|')
+  const cached = tileCache.get(key)
+  if (cached) return cached
+  const cell = WORLD_SIZE / TILE_GRID
+  const svg = new Map<number, string[]>()
+  for (const shape of shapes) {
+    for (const ring of shapeRings(shape)) {
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
+      for (let i = 0; i < ring.length; i += 2) {
+        minX = Math.min(minX, ring[i]); maxX = Math.max(maxX, ring[i])
+        minY = Math.min(minY, ring[i + 1]); maxY = Math.max(maxY, ring[i + 1])
+      }
+      const column = Math.min(TILE_GRID - 1, Math.max(0, Math.floor((minX + maxX) / 2 / cell)))
+      const row = Math.min(TILE_GRID - 1, Math.max(0, Math.floor((minY + maxY) / 2 / cell)))
+      const tile = row * TILE_GRID + column
+      if (!svg.has(tile)) svg.set(tile, LOD_TOLERANCES.map(() => ''))
+      const levels = svg.get(tile)!
+      LOD_TOLERANCES.forEach((tolerance, level) => {
+        const simplified = simplifyRing(ring, tolerance)
+        if (!simplified) return
+        let d = `M${simplified[0].toFixed(2)} ${simplified[1].toFixed(2)}`
+        for (let i = 2; i < simplified.length; i += 2) d += `L${simplified[i].toFixed(2)} ${simplified[i + 1].toFixed(2)}`
+        levels[level] += `${d}Z`
+      })
+    }
+  }
+  const tiles = [...svg.values()].map((levels) => levels.map((d) => Skia.Path.MakeFromSVGString(d || 'M0 0') ?? Skia.Path.Make()))
+  tileCache.set(key, tiles)
+  return tiles
+}
+
 export function project(lat: number, lng: number) {
   const point = projection([lng, lat])
   return point ? { x: point[0], y: point[1] } : { x: 0, y: 0 }

@@ -676,6 +676,8 @@
     "today_title": "Завдання на сьогодні",
     "today_done": "{{done}}/{{total}}",
     "by_game_title": "За іграми",
+    "records_title": "Рекорди",
+    "records_perfect": "{{count}} / {{total}} ідеальних результатів",
     "games_count_one": "{{count}} гра",
     "games_count_few": "{{count}} гри",
     "games_count_many": "{{count}} ігор",

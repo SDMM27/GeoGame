@@ -676,6 +676,8 @@
     "today_title": "Задания на сегодня",
     "today_done": "{{done}}/{{total}}",
     "by_game_title": "По играм",
+    "records_title": "Рекорды",
+    "records_perfect": "{{count}} / {{total}} идеальных результатов",
     "games_count_one": "{{count}} игра",
     "games_count_few": "{{count}} игры",
     "games_count_many": "{{count}} игр",

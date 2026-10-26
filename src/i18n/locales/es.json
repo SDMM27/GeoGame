@@ -660,6 +660,8 @@
     "today_title": "Retos de hoy",
     "today_done": "{{done}}/{{total}}",
     "by_game_title": "Por juego",
+    "records_title": "Récords",
+    "records_perfect": "{{count}} / {{total}} puntuaciones perfectas",
     "games_count_one": "{{count}} partida",
     "games_count_other": "{{count}} partidas",
     "best_score": "Récord {{score}} pts",

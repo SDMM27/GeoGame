@@ -1,11 +1,12 @@
 // Building blocks of a player profile: stats, daily streak, achievements, per-game records and history.
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { router, useFocusEffect } from 'expo-router'
-import { useCallback, useState, type ComponentProps, type ReactNode } from 'react'
+import { useCallback, useRef, useState, type ComponentProps, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native'
 
 import { usePlayerElo } from '@shared/hooks/usePlayerElo'
+import { usePlayerRecords } from '@shared/hooks/usePlayerRecords'
 import { usePlayerProfile } from '@shared/hooks/usePlayerProfile'
 import { TIER_COLORS } from '@shared/utils/achievements'
 import { decorationStyle } from '@shared/utils/decorations'
@@ -13,7 +14,7 @@ import { formatSeason } from '@shared/utils/elo'
 import { describeBest, describeDetails, describeMode, describeResult, formatPlayedAt } from '@shared/utils/profileFormat'
 import { dailyTypesOn, dayKey, formatPlayTime } from '@shared/utils/profileStats'
 
-import { Button, Text, Touchable } from '@/components/ui'
+import { Button, Segmented, Text, Touchable } from '@/components/ui'
 import { getGameByType } from '@/games'
 import { colors, fonts, radius, space } from '@/theme'
 import { RING_WIDTH_DOUBLE, ringBorder } from './decorationStyle'
@@ -308,6 +309,101 @@ export function ByGameSection({ stats }: { stats: ProfileStats }) {
   )
 }
 
+type RecordCell = { key: string; mode: string; score: number | null; perfect: number; isPerfect: boolean; ratio: number }
+type RecordsGrid = { rows: { game: string; difficulties: RecordCell[]; continents: RecordCell[] }[]; perfectCount: number; total: number }
+
+// Best solo score of each game by difficulty or continent: perfect ones in gold, the others with how close they are.
+export function RecordsSection({ uid }: { uid: string }) {
+  const { t } = useTranslation()
+  const { loading, error, grid, reload } = usePlayerRecords(uid) as { loading: boolean; error: boolean; grid: RecordsGrid | null; reload: () => void }
+  const [by, setBy] = useState<'difficulties' | 'continents'>('difficulties')
+  // The first load is the hook's own: only the next focuses reload
+  const focused = useRef(false)
+  useFocusEffect(
+    useCallback(() => {
+      if (focused.current) reload()
+      focused.current = true
+    }, [reload]),
+  )
+  if (loading || error || !grid) return null
+  const labelKey = by === 'difficulties' ? 'difficulties' : 'continents'
+  return (
+    <View style={{ gap: space.md }}>
+      <SectionTitle
+        title={t('profile.records_title')}
+        right={
+          <Text variant="bodyStrong" color={grid.perfectCount > 0 ? colors.warning : colors.textMuted} style={{ fontSize: 13 }}>
+            {t('profile.records_perfect', { count: grid.perfectCount, total: grid.total })}
+          </Text>
+        }
+      />
+      <Segmented
+        value={by}
+        onChange={setBy}
+        options={[
+          { value: 'difficulties', label: t('selection.by_difficulty') },
+          { value: 'continents', label: t('selection.by_continent') },
+        ]}
+      />
+      <View style={[styles.card, { gap: space.sm, padding: space.md }]}>
+        <View style={styles.recordsRow}>
+          {grid.rows[0][by].map((cell) => (
+            <Text key={cell.mode} variant="caption" numberOfLines={1} adjustsFontSizeToFit style={styles.recordsHeader}>
+              {t(`${labelKey}.${cell.mode}`)}
+            </Text>
+          ))}
+        </View>
+        {grid.rows.map((row) => {
+          const game = getGameByType(row.game)
+          if (!game) return null
+          return (
+            <View key={row.game} style={{ gap: 4 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.xs }}>
+                <MaterialCommunityIcons name={game.icon} size={14} color={game.color} />
+                <Text variant="caption" numberOfLines={1} style={{ fontSize: 12 }}>
+                  {t(game.titleKey)}
+                </Text>
+              </View>
+              <View style={styles.recordsRow}>
+                {row[by].map((cell) => (
+                  <View
+                    key={cell.key}
+                    style={[styles.recordCell, cell.isPerfect && { borderColor: colors.warning, backgroundColor: `${colors.warning}26` }]}>
+                    {cell.score == null ? (
+                      <Text variant="caption" color={colors.textFaint}>
+                        —
+                      </Text>
+                    ) : (
+                      <>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+                          {cell.isPerfect && <MaterialCommunityIcons name="star" size={11} color={colors.warning} />}
+                          <Text
+                            variant="bodyStrong"
+                            numberOfLines={1}
+                            adjustsFontSizeToFit
+                            color={cell.isPerfect ? colors.warning : colors.text}
+                            style={{ fontSize: 13, flexShrink: 1 }}>
+                            {cell.score}
+                          </Text>
+                        </View>
+                        {!cell.isPerfect && (
+                          <View style={[styles.track, { alignSelf: 'stretch' }]}>
+                            <View style={[styles.bar, { width: `${cell.ratio * 100}%`, backgroundColor: game.color }]} />
+                          </View>
+                        )}
+                      </>
+                    )}
+                  </View>
+                ))}
+              </View>
+            </View>
+          )
+        })}
+      </View>
+    </View>
+  )
+}
+
 type EloEntry = { key: string; rating: number; played: boolean; games?: number; wins?: number; found?: number }
 
 // Elo ratings of the current season: duels, then each solo mode.
@@ -509,6 +605,7 @@ export function ProfileView({
         {games.length === 0 ? <Text variant="caption">{t('profile.history_empty')}</Text> : <HistoryList games={games.slice(0, 5)} />}
       </View>
       <ByGameSection stats={stats} />
+      {uid ? <RecordsSection uid={uid} /> : null}
     </View>
   )
 }
@@ -544,6 +641,20 @@ const styles = StyleSheet.create({
   achievementIcon: { width: 40, height: 40, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center', marginBottom: space.xs },
   track: { height: 4, borderRadius: 2, backgroundColor: colors.border, overflow: 'hidden' },
   bar: { height: 4, borderRadius: 2, backgroundColor: colors.warning },
+  recordsRow: { flexDirection: 'row', gap: 4 },
+  recordsHeader: { flex: 1, textAlign: 'center', fontSize: 10 },
+  recordCell: {
+    flex: 1,
+    height: 38,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 3,
+    paddingHorizontal: 4,
+    borderRadius: radius.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surfaceHigh,
+  },
   list: { borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
   listRow: { flexDirection: 'row', alignItems: 'center', gap: space.md, paddingHorizontal: space.md, paddingVertical: space.md },
   listDivider: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },

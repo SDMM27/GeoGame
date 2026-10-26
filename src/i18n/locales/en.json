@@ -660,6 +660,8 @@
     "today_title": "Today's challenges",
     "today_done": "{{done}}/{{total}}",
     "by_game_title": "By game",
+    "records_title": "Records",
+    "records_perfect": "{{count}} / {{total}} perfect scores",
     "games_count_one": "{{count}} game",
     "games_count_other": "{{count}} games",
     "best_score": "Best {{score}} pts",

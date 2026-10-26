@@ -660,6 +660,8 @@
     "today_title": "Sfide di oggi",
     "today_done": "{{done}}/{{total}}",
     "by_game_title": "Per gioco",
+    "records_title": "Record",
+    "records_perfect": "{{count}} / {{total}} punteggi perfetti",
     "games_count_one": "{{count}} partita",
     "games_count_other": "{{count}} partite",
     "best_score": "Record {{score}} pt",

@@ -95,6 +95,8 @@ jobs:
       - run: npm ci
       - name: Publish an APK for this runtime on GeoGame-releases, unless the latest release already is one
         run: |
+          # Checked first: without it the release fails only after the APK build, which can take an hour.
+          if [ -z "$GH_TOKEN" ]; then echo "::error::The RELEASES_TOKEN repository secret is missing (see the top of this file)"; exit 1; fi
           released=$(curl -sSfL https://github.com/SDMM27/GeoGame-releases/releases/latest/download/latest.json | jq -r .runtimeVersion || true)
           if [ "$released" = "$RUNTIME" ]; then echo "The latest release is already built for runtime $RUNTIME"; exit 0; fi
           # An APK already built for this runtime (by hand, say) is reused; otherwise one is built on EAS servers.

@@ -116,8 +116,15 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
     const feature = countries.features.find((country) => country.properties.ADMIN === name)
     const largest = getLargestLandmassBounds(feature?.geometry)
     if (!largest) return
-    // The same island anchors the small-country circle; move to its nearest world copy.
-    const mapLng = mapRef.getCenter().lng
+    // The same island anchors the small-country circle. Some mobile map adapters
+    // don't expose Leaflet's getCenter(), so keep the reveal working without it.
+    let mapLng = largest.lng
+    try {
+      const center = mapRef.getCenter?.()
+      if (Number.isFinite(center?.lng)) mapLng = center.lng
+    } catch {
+      // Fall back to the country's canonical longitude; setView still performs the zoom.
+    }
     const lng = largest.lng + Math.round((mapLng - largest.lng) / 360) * 360
     zoomCountryMap(largest.lat, lng)
   }, [mapRef, zoomCountryMap])

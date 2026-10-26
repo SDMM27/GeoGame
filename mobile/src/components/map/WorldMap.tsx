@@ -43,6 +43,7 @@ export type WorldMapHandle = {
   // paddingTop/paddingBottom: pixels hidden by overlays (a search bar, a sheet); the bounds are framed in the part between
   fitBounds: (bounds: BoundsInput, options?: FitOptions) => void
   fitCountries: (names: string[], options?: ViewOptions & { maxZoom?: number }) => void
+  getCenter: () => LatLng
   getZoom: () => number
   invalidateSize: () => void
   // Leaflet GeoJSON layer stand-in
@@ -395,6 +396,14 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
       flyTo: setView,
       fitBounds,
       fitCountries,
+      getCenter: () => {
+        const { width, height } = viewSize.current
+        const currentScale = scale.value
+        return unproject(
+          (width / 2 - wrapX(tx.value, currentScale)) / currentScale,
+          (height / 2 - ty.value) / currentScale
+        )
+      },
       getZoom: () => Math.log2(scale.value) + BASE_ZOOM,
       invalidateSize: () => {},
       geoJson: {

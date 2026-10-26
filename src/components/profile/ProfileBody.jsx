@@ -12,6 +12,7 @@ import { describeBest, describeDetails, describeMode, describeResult, formatPlay
 import { dailyTypesOn, dayKey, formatPlayTime } from '../../utils/profileStats'
 import BadgeStrip from './BadgeStrip'
 import EloSection from './EloSection'
+import RecordsSection from './RecordsSection'
 import './ProfileBody.css'
 
 export const GAME_META = {
@@ -346,6 +347,7 @@ export function ProfileView({ games, stats, achievements, uid }) {
       <Achievements achievements={achievements} />
       <History games={games} />
       <ByGame stats={stats} />
+      {uid && <RecordsSection uid={uid} />}
     </div>
   )
 }

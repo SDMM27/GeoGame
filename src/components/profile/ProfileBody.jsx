@@ -343,11 +343,11 @@ export function ProfileView({ games, stats, achievements, uid }) {
     <div className="profile-body">
       <StatTiles stats={stats} />
       <StreakCard stats={stats} />
-      {uid && <EloSection uid={uid} />}
+      {uid && <RecordsSection uid={uid} />}
       <Achievements achievements={achievements} />
+      {uid && <EloSection uid={uid} />}
       <History games={games} />
       <ByGame stats={stats} />
-      {uid && <RecordsSection uid={uid} />}
     </div>
   )
 }

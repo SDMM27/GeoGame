@@ -4,8 +4,9 @@ import { LANGUAGE_CODES, toLanguage } from '../i18n/languages'
 
 const cache = {}
 
-// Overrides for names where Intl.DisplayNames uses an unwanted form (e.g. "Congo-Kinshasa", "RAE de Hong Kong (China)")
+// Overrides for names where Intl.DisplayNames uses an unwanted form (e.g. "Congo-Kinshasa", "RAE de Hong Kong (China)", "Chine continentale")
 const nameOverrides = {
+  CN: { fr: 'Chine', en: 'China', ru: 'Китай', es: 'China', pt: 'China', de: 'China', it: 'Cina', uk: 'Китай' },
   CD: {
     fr: 'République démocratique du Congo', en: 'Democratic Republic of the Congo', ru: 'Демократическая Республика Конго',
     es: 'República Democrática del Congo', pt: 'República Democrática do Congo', de: 'Demokratische Republik Kongo',

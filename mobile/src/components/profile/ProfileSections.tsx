@@ -595,8 +595,9 @@ export function ProfileView({
     <View style={{ gap: space.xl }}>
       <StatTiles stats={stats} />
       <StreakCard stats={stats} />
-      {uid ? <EloSection uid={uid} /> : null}
+      {uid ? <RecordsSection uid={uid} /> : null}
       <AchievementsSection achievements={achievements} />
+      {uid ? <EloSection uid={uid} /> : null}
       <View style={{ gap: space.md }}>
         <SectionTitle
           title={t('profile.history_title')}
@@ -605,7 +606,6 @@ export function ProfileView({
         {games.length === 0 ? <Text variant="caption">{t('profile.history_empty')}</Text> : <HistoryList games={games.slice(0, 5)} />}
       </View>
       <ByGameSection stats={stats} />
-      {uid ? <RecordsSection uid={uid} /> : null}
     </View>
   )
 }

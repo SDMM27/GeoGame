@@ -12,7 +12,9 @@ import { colors } from '@/theme'
 import {
   BASE_ZOOM,
   WORLD_SIZE,
+  getBaseTiles,
   getCountryShapes,
+  lodLevel,
   project,
   unproject,
   type CountryFeature,
@@ -128,14 +130,34 @@ function clampY(ty: number, scale: number, height: number) {
   return Math.min(0, Math.max(height - size, ty))
 }
 
+// One tile of the base map, at the level of detail of the current zoom (see getBaseTiles)
+const BaseTile = memo(function BaseTile({
+  levels,
+  level,
+  border,
+}: {
+  levels: SkPath[]
+  level: SharedValue<number>
+  border?: boolean
+}) {
+  const path = useDerivedValue(() => levels[level.value])
+  return border ? (
+    <Path path={path} color={colors.landStroke} style="stroke" strokeWidth={0} />
+  ) : (
+    <Path path={path} color={colors.land} />
+  )
+})
+
 const MapScene = memo(function MapScene({
-  base,
+  tiles,
+  level,
   fills,
   strokes,
   thick,
   showBorders,
 }: {
-  base: SkPath
+  tiles: SkPath[][]
+  level: SharedValue<number>
   fills: { key: string; path: SkPath; color: string; opacity: number }[]
   strokes: { key: string; path: SkPath; color: string; thick: boolean }[]
   thick: SharedValue<number>
@@ -143,13 +165,16 @@ const MapScene = memo(function MapScene({
 }) {
   return (
     <>
-      <Path path={base} color={colors.land} />
+      {tiles.map((levels, index) => (
+        <BaseTile key={index} levels={levels} level={level} />
+      ))}
       {fills.map((fill) => (
         <Path key={fill.key} path={fill.path} color={fill.color} opacity={fill.opacity} />
       ))}
       {/* Width 0 is a Skia hairline: one device pixel at any zoom, drawn without re-stroking
           the whole world on every frame of a pan or pinch. */}
-      {showBorders && <Path path={base} color={colors.landStroke} style="stroke" strokeWidth={0} />}
+      {showBorders &&
+        tiles.map((levels, index) => <BaseTile key={index} levels={levels} level={level} border />)}
       {strokes.map((stroke) => (
         <Path
           key={stroke.key}
@@ -218,11 +243,7 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
     return countries.map((name) => all.get(name)).filter((shape): shape is CountryShape => !!shape)
   }, [countries])
 
-  const basePath = useMemo(() => {
-    const path = Skia.Path.Make()
-    shapes.forEach((shape) => path.addPath(shape.path))
-    return path
-  }, [shapes])
+  const tiles = useMemo(() => getBaseTiles(shapes), [shapes])
 
   const [styles, setStyles] = useState<Record<string, LeafletStyle>>({})
   const [size, setSize] = useState({ width: 0, height: 0 })
@@ -241,6 +262,7 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
     { translateY: ty.value },
     { scale: scale.value },
   ])
+  const level = useDerivedValue(() => lodLevel(scale.value))
   const thick = useDerivedValue(() => 2 / scale.value)
   const markerRadius = useDerivedValue(() => MARKER_RADIUS_PX / scale.value)
   const markerStroke = useDerivedValue(() => 2 / scale.value)
@@ -581,7 +603,7 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
 
   const scene = (
     <>
-      <MapScene base={basePath} fills={fills} strokes={strokes} thick={thick} showBorders={showBorders} />
+      <MapScene tiles={tiles} level={level} fills={fills} strokes={strokes} thick={thick} showBorders={showBorders} />
       {markers.map((marker) => (
         <Group key={marker.name}>
           <Circle cx={marker.x} cy={marker.y} r={markerRadius} color={marker.styled ? marker.color : '#ffffff'} opacity={marker.styled ? 0.6 : 0.15} />

@@ -690,8 +690,8 @@ service cloud.firestore {
       function dailyAttempts() {
         return {
           // scoreCaps:begin dailyAttempts
-          'BORDER_GUESS': 510,
-          'COUNTRY_CLUE': 510,
+          'BORDER_GUESS': 504,
+          'COUNTRY_CLUE': 504,
           'QUIZ': 5,
           'VOYAGE_VOYAGE': 263
           // scoreCaps:end dailyAttempts

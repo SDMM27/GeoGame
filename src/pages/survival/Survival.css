@@ -22,6 +22,54 @@
   max-width: none;
 }
 
+/* Map rounds on desktop: the map fills the view under the nav bar, the HUD and the buttons float over it */
+@media (min-width: 601px) {
+  .survival-game--map {
+    padding: 0;
+  }
+
+  .survival-game--map .survival-round {
+    position: absolute;
+    inset: 0;
+  }
+
+  .survival-game--map .survival-map {
+    position: absolute;
+    inset: 0;
+    min-height: 0;
+    border: none;
+    border-radius: 0;
+  }
+
+  .survival-game--map .survival-hud,
+  .survival-game--map .survival-footer {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1001;
+    width: min(720px, calc(100% - 24px));
+  }
+
+  .survival-game--map .survival-hud {
+    top: 12px;
+    background: var(--bg-glass);
+    backdrop-filter: blur(8px);
+  }
+
+  .survival-game--map .survival-target {
+    top: 96px;
+  }
+
+  .survival-game--map .survival-footer {
+    bottom: 16px;
+    min-height: 0;
+  }
+
+  .survival-game--map .survival-outcome {
+    backdrop-filter: blur(8px);
+  }
+}
+
 /* HUD */
 .survival-hud {
   display: grid;
@@ -424,8 +472,7 @@
 
   .survival-map {
     min-height: 55vh;
-  }
-}
+  }}
 
 /* Out of lives in a live room: watching the players still in */
 .survival-spectator { display: flex; flex-direction: column; gap: 12px; width: 100%; }

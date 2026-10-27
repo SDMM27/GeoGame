@@ -54,6 +54,8 @@
 .mp-game-content .game-page,
 .mp-game-content .flag-game-page,
 .mp-game-content .capitals-game-page { min-height: 100%; height: 100%; }
+/* Survival map rounds lay everything out in absolute position: the game takes the room's height, or the map is 0px tall */
+.mp-game-content .survival-game--map { min-height: 100%; }
 /* Keeps the Reveal button clear of the bottom edge */
 .mp-game-content .hud-actions { bottom: 40px; }
 .mpr-scroll { overflow-y: auto; }

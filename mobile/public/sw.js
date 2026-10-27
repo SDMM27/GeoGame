@@ -40,6 +40,7 @@ function screenFor(data) {
   if (data.type === 'friend_accepted' && data.uid) return `/player/${encodeURIComponent(data.uid)}`
   // A friend's nudge: the daily challenge they finished
   if (data.type === 'daily_nudge' && DAILY_ROUTES[data.gameType]) return `${DAILY_ROUTES[data.gameType]}?mode=daily`
+  if (data.type === 'challenge_result' && data.uid) return `/player/${encodeURIComponent(data.uid)}`
   // 'daily': the home screen and its daily challenges
   return '/'
 }

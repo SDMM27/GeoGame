@@ -13,3 +13,9 @@ export async function nudgeFriend(friendUid, gameType, { recent = false } = {}) 
   if (result.body.error === 'rate_limited') return 'rate_limited'
   return 'error'
 }
+
+// After a game: tells the challengers of this player (nudgeFriend) how it went, once they have played the game they were
+// nudged on (api/challenge-result). Fire-and-forget: never breaks the end of a game.
+export function settleChallenges() {
+  return callPush('challenge-result', {}).catch(() => {})
+}

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { refreshOwnBadges } from '../utils/badges'
 import { recordGame } from '../utils/gameHistory'
+import { settleChallenges } from '../utils/dailyNudge'
 import { claimXp } from '../utils/xp'
 
 // Records `record` in the signed-in player's history once, when it goes from null to a value (the end of a game),
@@ -23,6 +24,7 @@ export function useRecordGameWith(auth, record) {
       if (!uid) return
       refreshOwnBadges(uid)
       claimXp(uid)
+      settleChallenges()
     })
   }, [auth, finished])
 }

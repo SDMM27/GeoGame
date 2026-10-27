@@ -234,10 +234,12 @@ export default function useFlagGameState(difficulty, isTraining, overrideCountri
         incrementScore(props[flagDifficultyProperty(gameType)], consecutiveErrorsRef.current)
         if (ratedRef.current) reportEloAnswer(gameType, props.ADMIN, { found: true, errors: consecutiveErrorsRef.current })
       }
+      // Read now: the updater runs at render time, after changeCountry resets the ref
+      const errors = consecutiveErrorsRef.current
       setStats(prev =>
         wasSkipped
           ? { ...prev, skipped: prev.skipped + 1 }
-          : consecutiveErrorsRef.current === 0
+          : errors === 0
             ? { ...prev, found: prev.found + 1, foundFirstTry: (prev.foundFirstTry ?? 0) + 1 }
             : { ...prev, found: prev.found + 1 }
       )

@@ -94,6 +94,23 @@ describe('useFlagGameState — Elo', () => {
   })
 })
 
+describe('useFlagGameState — One tap', () => {
+  it('counts a country found on the first try', () => {
+    const { result } = renderHook(() => useFlagGameState('Facile', false))
+    typed(result, result.current.targetCountry.properties.ADMIN)
+    expect(result.current.stats).toMatchObject({ found: 1, foundFirstTry: 1 })
+  })
+
+  it('does not count a country found after an error', () => {
+    const { result } = renderHook(() => useFlagGameState('Facile', false))
+    const name = result.current.targetCountry.properties.ADMIN
+    typed(result, 'Atlantide')
+    typed(result, name)
+    expect(result.current.stats.found).toBe(1)
+    expect(result.current.stats.foundFirstTry ?? 0).toBe(0)
+  })
+})
+
 describe('useFlagGameState — Drapeau incomplet', () => {
   const difficultyOf = (country, property) => country.properties[property]
 

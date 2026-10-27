@@ -226,6 +226,24 @@ describe('useGameState — Elo', () => {
   })
 })
 
+describe('useGameState — One tap', () => {
+  it('counts a country found on the first click', () => {
+    const { result } = renderHook(() => useGameState('Facile', false))
+    act(() => result.current.onCountryNameClick(result.current.targetCountry))
+    expect(result.current.stats).toMatchObject({ found: 1, foundFirstTry: 1 })
+  })
+
+  it('does not count a country found after an error', () => {
+    const { result } = renderHook(() => useGameState('Facile', false))
+    const name = result.current.targetCountry
+    const wrong = FIXTURE_COUNTRIES.find((c) => c.properties.ADMIN !== name).properties.ADMIN
+    act(() => result.current.onCountryNameClick(wrong))
+    act(() => result.current.onCountryNameClick(name))
+    expect(result.current.stats.found).toBe(1)
+    expect(result.current.stats.foundFirstTry ?? 0).toBe(0)
+  })
+})
+
 describe('useGameState — Hardcore', () => {
   it('keeps the map without borders when the game restarts', () => {
     const { result } = renderHook(() => useGameState('Facile', false, null, null, null, null, 'HARDCORE'))

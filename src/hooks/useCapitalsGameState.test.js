@@ -44,3 +44,20 @@ describe('useCapitalsGameState — Elo', () => {
     expect(reportEloAnswer).not.toHaveBeenCalled()
   })
 })
+
+describe('useCapitalsGameState — One tap', () => {
+  it('counts a capital found on the first try', () => {
+    const { result } = renderHook(() => useCapitalsGameState('Facile', false))
+    typed(result, result.current.targetCountry.properties.capital)
+    expect(result.current.stats).toMatchObject({ found: 1, foundFirstTry: 1 })
+  })
+
+  it('does not count a capital found after an error', () => {
+    const { result } = renderHook(() => useCapitalsGameState('Facile', false))
+    const { capital } = result.current.targetCountry.properties
+    typed(result, 'Atlantis')
+    typed(result, capital)
+    expect(result.current.stats.found).toBe(1)
+    expect(result.current.stats.foundFirstTry ?? 0).toBe(0)
+  })
+})

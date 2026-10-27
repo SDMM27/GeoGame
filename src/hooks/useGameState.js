@@ -348,10 +348,12 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
       setStyleForCountry(clickedName, { fillColor: MAP_COLORS.right, weight: 2, fillOpacity: 0.5 })
       shownCountriesRef.current.delete(clickedName)
       foundCountriesRef.current.add(clickedName)
+      // Read now: the updater runs at render time, after the ref is reset below
+      const errors = consecutiveErrorsRef.current
       setStats(prev =>
         wasSkipped
           ? { ...prev, skipped: prev.skipped + 1 }
-          : consecutiveErrorsRef.current === 0
+          : errors === 0
             ? { ...prev, found: prev.found + 1, foundFirstTry: (prev.foundFirstTry ?? 0) + 1 }
             : { ...prev, found: prev.found + 1 }
       )

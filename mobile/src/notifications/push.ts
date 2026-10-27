@@ -26,7 +26,7 @@ type PushData = { type?: string; room?: string; uid?: string; gameType?: string;
 Notifications.setNotificationHandler({
   handleNotification: async (notification) => {
     const type = (notification.request.content.data as PushData | undefined)?.type
-    const show = type === 'friend_request' || type === 'friend_accepted' || type === 'daily_nudge'
+    const show = type === 'friend_request' || type === 'friend_accepted' || type === 'daily_nudge' || type === 'challenge_result'
     return { shouldShowBanner: show, shouldShowList: show, shouldPlaySound: show, shouldSetBadge: false }
   },
 })
@@ -83,6 +83,10 @@ export function usePushNotifications(uid: string | null | undefined) {
           : GAMES.find((item) => item.kind === 'daily' && item.type === data.gameType)
       if (game) router.navigate(data.mode === 'recent' ? (game.route as never) : { pathname: game.route as never, params: { mode: 'daily' } })
       else router.navigate('/')
+    } else if (data?.type === 'challenge_result' && data.uid) {
+      Notifications.clearLastNotificationResponseAsync()
+      // The friend's profile, to rematch or look at their records.
+      router.push({ pathname: '/player/[uid]', params: { uid: data.uid } })
     } else if (data?.type === 'daily') {
       Notifications.clearLastNotificationResponseAsync()
       router.navigate('/')

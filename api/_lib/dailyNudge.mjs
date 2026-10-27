@@ -5,10 +5,12 @@
 // have played the game (written by the app at the end of the game):
 //   daily (default): that daily challenge today (users/{uid}/games/daily_{gameType}_{day})
 //   mode 'recent':   a game of that type in the last RECENT_MS, its score goes in the message
-// dailyNudges/{from}_{to}_{gameType}[_recent] = { from, to, day, at }: last nudge, server only (no client access in
-// firestore.rules), so a friend gets one nudge per game, per day and per kind from the same player.
+// dailyNudges/{from}_{to}_{gameType}[_recent] = { from, to, day, at, gameType, mode, resolved, challenger: { score, solved } }:
+// last nudge, server only (no client access in firestore.rules), so a friend gets one nudge per game, per day and per kind
+// from the same player. The challenger's result is kept so api/challenge-result can tell them how the friend did.
 import { createRequire } from 'module'
 
+import { isAttemptsGame } from '../../src/utils/challenge.js'
 import { dailyKeyAt } from './dailyReminder.mjs'
 import { callerUid, countSenderPush, pushToAccount, reply } from './push.mjs'
 
@@ -85,6 +87,24 @@ export function nudgeMessage(lang, username, gameType, { recent = false, score =
     .replace('{{score}}', points)
 }
 
+// Daily Border Guess, Country Clue and Quiz rank on attempts (fewer is better); every other game, the infinite Quiz
+// included, on points.
+export const ranksOnAttempts = (gameType, mode) => mode === 'daily' && isAttemptsGame(gameType)
+
+// { score, solved } of a saved game, in the shape compareToChallenge expects, with what makes two games comparable
+// (mode, difficulty, continent, preset). null rather than undefined: Firestore refuses undefined.
+export function pickResult(gameType, game) {
+  const mode = game.mode ?? null
+  return {
+    score: (ranksOnAttempts(gameType, mode) ? game.attempts : game.score) ?? 0,
+    solved: game.solved !== false,
+    mode,
+    difficulty: game.difficulty ?? null,
+    continent: game.continent ?? null,
+    presetName: game.presetName ?? null,
+  }
+}
+
 export const friendshipOf = (a, b) => [a, b].sort().join('_')
 
 // `db` and `auth`: firebase-admin Firestore and Auth; `webPush`: see pushToAccount. Returns { status, body } for the HTTP response.
@@ -109,6 +129,7 @@ export async function sendDailyNudge({ db, auth, idToken, friendUid, gameType, m
   // Claims the nudge in a transaction, so a double tap can't send it twice.
   let username
   let score = null
+  let challenger
   try {
     username = await db.runTransaction(async (transaction) => {
       const [friendship, game, lastNudge, limit, lastGames] = await Promise.all([
@@ -127,12 +148,17 @@ export async function sendDailyNudge({ db, auth, idToken, friendUid, gameType, m
           .find((data) => data.gameType === gameType && now - (data.playedAt?.toMillis?.() ?? 0) < RECENT_MS)
         if (!played) throw reply(409, { error: 'not_played' })
         score = typeof played.score === 'number' ? played.score : null
+        challenger = pickResult(gameType, played)
       } else if (!game.exists || game.data().mode !== 'daily') {
         throw reply(409, { error: 'not_played' })
+      } else {
+        challenger = pickResult(gameType, game.data())
       }
       if (lastNudge.exists && lastNudge.data().day === day) throw reply(429, { error: 'already_sent' })
       countSenderPush(transaction, limitRef, limit, now)
-      transaction.set(nudgeRef, { from: uid, to: friendUid, day, at: now })
+      transaction.set(nudgeRef, {
+        from: uid, to: friendUid, day, at: now, gameType, mode: recent ? 'recent' : 'daily', resolved: false, challenger,
+      })
       return friendship.data().usernames?.[uid] ?? '?'
     })
   } catch (error) {

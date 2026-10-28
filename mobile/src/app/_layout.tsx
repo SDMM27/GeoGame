@@ -9,11 +9,12 @@ import {
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold } from '@expo-google-fonts/inter'
 import { useFonts } from 'expo-font'
 import { DarkTheme, router, Stack, ThemeProvider, type ErrorBoundaryProps } from 'expo-router'
+import * as ScreenOrientation from 'expo-screen-orientation'
 import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Platform } from 'react-native'
+import { Dimensions, Platform } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 import { ErrorScreen } from '@/components/ErrorScreen'
@@ -31,6 +32,13 @@ import { colors } from '@/theme'
 import { useLaunchUpdate } from '@/updates'
 
 SplashScreen.preventAutoHideAsync()
+
+// The manifest leaves orientation free (Google Play flags locked games on large screens, and Android 16 ignores the lock
+// there anyway): phones stay in portrait, tablets and foldables rotate.
+const screen = Dimensions.get('screen')
+if (Platform.OS !== 'web' && Math.min(screen.width, screen.height) < 600) {
+  ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP).catch(() => {})
+}
 
 // Game setup sheets. On Android a sheet lays its content out at its full height, so at 75% the footer with the
 // create button sat below the visible part (empty space above it, and a drag needed to reach it): open them full there.

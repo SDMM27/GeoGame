@@ -254,35 +254,36 @@ function GameSetupSheet() {
             onPress={startMulti}
             disabled={!canPlay}
             color={game.color}
-            style={{ flex: 1 }}
             icon={<MaterialCommunityIcons name="account-group" size={20} color={colors.onAccent} />}
           />
         ) : (
           <>
+            {/* Training gets half the row so its label is never cut; multiplayer goes below */}
+            <View style={styles.footerRow}>
+              <Button
+                label={t('mobile.setup.training')}
+                variant="secondary"
+                onPress={() => start(true)}
+                disabled={mode === 'standard' && selection === 'continent' && !continent}
+                style={{ flex: 1 }}
+              />
+              <Button
+                label={t('mobile.setup.play')}
+                onPress={() => start(false)}
+                disabled={!canPlay}
+                style={{ flex: 1 }}
+                icon={<MaterialCommunityIcons name="play" size={20} color={colors.onAccent} />}
+              />
+            </View>
             {game.multi && (
-            <Touchable
-              accessibilityRole="button"
-              accessibilityLabel={t('mobile.multi.title')}
-              onPress={startMulti}
-              disabled={!canPlay}
-              style={[styles.multiButton, !canPlay && { opacity: 0.4 }]}>
-              <MaterialCommunityIcons name="account-group" size={22} color={colors.text} />
-            </Touchable>
+              <Button
+                label={t('mobile.multi.title')}
+                variant="secondary"
+                onPress={startMulti}
+                disabled={!canPlay}
+                icon={<MaterialCommunityIcons name="account-group" size={20} color={colors.text} />}
+              />
             )}
-            <Button
-              label={t('mobile.setup.training')}
-              variant="secondary"
-              onPress={() => start(true)}
-              disabled={mode === 'standard' && selection === 'continent' && !continent}
-              style={{ flex: 1 }}
-            />
-            <Button
-              label={t('mobile.setup.play')}
-              onPress={() => start(false)}
-              disabled={!canPlay}
-              style={{ flex: 1.4 }}
-              icon={<MaterialCommunityIcons name="play" size={20} color={colors.onAccent} />}
-            />
           </>
         )}
       </View>
@@ -334,22 +335,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  multiButton: {
-    width: 52,
-    borderRadius: radius.md,
-    backgroundColor: colors.surfaceHigh,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   footer: {
-    flexDirection: 'row',
-    gap: space.md,
+    gap: space.sm,
     paddingHorizontal: space.xl,
     paddingTop: space.md,
     borderTopWidth: 1,
     borderTopColor: colors.border,
     backgroundColor: colors.surface,
   },
+  footerRow: { flexDirection: 'row', gap: space.md },
 })

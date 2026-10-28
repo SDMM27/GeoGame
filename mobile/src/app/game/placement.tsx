@@ -1,8 +1,9 @@
 // "Trouve le pays": tap the target country on the map.
 // Game rules come from the website hooks (useGameState / useAscensionState).
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
+import { Image } from 'expo-image'
 import { useLocalSearchParams } from 'expo-router'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import Animated, { FadeIn, FadeInDown, LinearTransition } from 'react-native-reanimated'
@@ -11,14 +12,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import useAscensionState from '@shared/hooks/useAscensionState'
 import useGameState from '@shared/hooks/useGameState'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
-import { getCountryName } from '@shared/utils/getCountryName'
+import { getCapitalName, getCountryName } from '@shared/utils/getCountryName'
 
 import { setupGameRecord } from '@/account/history'
 import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
 import { WorldMap, type WorldMapHandle } from '@/components/map/WorldMap'
 import { allCountries } from '@/components/map/geometry'
-import { Button, Text } from '@/components/ui'
+import { Button, Text, Touchable } from '@/components/ui'
+import { getFlag } from '@/flags'
 import { DIFFICULTY_COLORS } from '@/games'
 import { clean } from '@/i18n'
 import { RoomGate, RoomHudPill, Standings, useReportFound, type RoomPlay } from '@/multiplayer/RoomPlay'
@@ -32,7 +34,21 @@ const CONTINENT_VIEW: Record<string, { center: [number, number]; zoom: number }>
   Océanie: { center: [-10, 170], zoom: 3.5 },
 }
 
-type Params = { difficulty?: string; continent?: string; training?: string; ascension?: string; preset?: string; room?: string; gameType?: string }
+// Optional flag / capital under the target name, to learn them for the other games. Kept between games.
+const SHOW_FLAG_KEY = 'geogame_placement_show_flag'
+const SHOW_CAPITAL_KEY = 'geogame_placement_show_capital'
+
+function useStoredToggle(key: string) {
+  const [on, setOn] = useState(() => globalThis.localStorage?.getItem(key) === '1')
+  const toggle = () =>
+    setOn((prev) => {
+      globalThis.localStorage?.setItem(key, prev ? '0' : '1')
+      return !prev
+    })
+  return [on, toggle] as const
+}
+
+type Params ={ difficulty?: string; continent?: string; training?: string; ascension?: string; preset?: string; room?: string; gameType?: string }
 
 function formatDuration(ms: number) {
   const totalSeconds = Math.floor(ms / 1000)
@@ -114,6 +130,13 @@ function PlacementGame({
   const targetCountryISO: string | null =
     state.targetCountryISO ?? allCountries.find((f) => f.properties.ADMIN === targetCountry)?.properties.ISO_A2 ?? null
   const targetName = getCountryName(targetCountryISO, i18n.language) || targetCountry
+  // Not in rooms: every player gets the same clues there
+  const [showFlag, toggleFlag] = useStoredToggle(SHOW_FLAG_KEY)
+  const [showCapital, toggleCapital] = useStoredToggle(SHOW_CAPITAL_KEY)
+  const targetFeature = allCountries.find((f) => f.properties.ADMIN === targetCountry)
+  const flag = !play && showFlag ? getFlag(targetCountryISO) : null
+  const capital =
+    !play && showCapital ? getCapitalName(targetCountryISO, i18n.language) || targetFeature?.properties.capital || null : null
   const progress = stats.total ? (stats.found + stats.skipped) / stats.total : 0
   const remaining = stats.total - stats.found - stats.skipped
   const phaseColor = currentPhase ? DIFFICULTY_COLORS[currentPhase] : null
@@ -154,11 +177,49 @@ function PlacementGame({
               </Text>
             </View>
           )}
-          <Text variant="label">{t('mobile.game.find')}</Text>
-          <Animated.View key={targetCountry} entering={FadeIn.duration(220)}>
-            <Text variant="title" numberOfLines={2} adjustsFontSizeToFit style={{ marginTop: 2 }}>
-              {targetName}
+          <View style={styles.findRow}>
+            <Text variant="label" style={{ flex: 1 }}>
+              {t('mobile.game.find')}
             </Text>
+            {!play && (
+              <>
+                <Touchable
+                  accessibilityRole="switch"
+                  accessibilityState={{ checked: showFlag }}
+                  accessibilityLabel={t('mobile.game.show_flag')}
+                  onPress={toggleFlag}
+                  style={[styles.toggle, showFlag && styles.toggleOn]}>
+                  <MaterialCommunityIcons name="flag-outline" size={16} color={showFlag ? colors.accent : colors.textMuted} />
+                  <Text variant="caption" color={showFlag ? colors.accent : colors.textMuted}>
+                    {t('mobile.game.show_flag')}
+                  </Text>
+                </Touchable>
+                <Touchable
+                  accessibilityRole="switch"
+                  accessibilityState={{ checked: showCapital }}
+                  accessibilityLabel={t('mobile.game.show_capital')}
+                  onPress={toggleCapital}
+                  style={[styles.toggle, showCapital && styles.toggleOn]}>
+                  <MaterialCommunityIcons name="city-variant-outline" size={16} color={showCapital ? colors.accent : colors.textMuted} />
+                  <Text variant="caption" color={showCapital ? colors.accent : colors.textMuted}>
+                    {t('mobile.game.show_capital')}
+                  </Text>
+                </Touchable>
+              </>
+            )}
+          </View>
+          <Animated.View key={targetCountry} entering={FadeIn.duration(220)} style={styles.targetRow}>
+            {flag && <Image source={flag} contentFit="cover" style={styles.flag} />}
+            <View style={{ flex: 1 }}>
+              <Text variant="title" numberOfLines={2} adjustsFontSizeToFit style={{ marginTop: 2 }}>
+                {targetName}
+              </Text>
+              {capital && (
+                <Text variant="caption" numberOfLines={1}>
+                  {t('mobile.game.capital', { name: capital })}
+                </Text>
+              )}
+            </View>
           </Animated.View>
           <View style={styles.footer}>
             <View style={{ flex: 1, gap: 6 }}>
@@ -282,6 +343,20 @@ const styles = StyleSheet.create({
     padding: space.lg,
   },
   phaseRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: space.sm },
+  findRow: { flexDirection: 'row', alignItems: 'center', gap: space.xs },
+  toggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingVertical: 4,
+    paddingHorizontal: space.sm,
+    borderRadius: radius.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  toggleOn: { borderColor: colors.accent, backgroundColor: `${colors.accent}14` },
+  targetRow: { flexDirection: 'row', alignItems: 'center', gap: space.md },
+  flag: { width: 48, height: 32, borderRadius: 4 },
   footer: { flexDirection: 'row', alignItems: 'center', gap: space.md, marginTop: space.md },
   track: { height: 6, borderRadius: 3, backgroundColor: colors.border, overflow: 'hidden' },
   bar: { height: 6, borderRadius: 3 },

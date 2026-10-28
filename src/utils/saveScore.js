@@ -1,5 +1,6 @@
 import { addDoc, collection, doc, getDoc, getDocs, limit, orderBy, query, serverTimestamp, setDoc, where } from 'firebase/firestore'
 import { firestore } from '../Firebase'
+import { getLeaderboardDocs } from './leaderboardQuery'
 import { sortChallengeScores, sortDailyScores } from './dailyScores'
 import { sortRankingScores } from './rankingScores'
 import { LEADERBOARD_SIZE, ascensionLeaderboard, ascensionQuery, soloLeaderboard, soloQueries, sortSurvivalScores } from './leaderboards'
@@ -144,7 +145,7 @@ const withId = (doc) => ({ ...doc.data(), id: doc.id })
 
 // Daily-challenge scores of one day, best first.
 export async function fetchDailyScores(gameType, dailyKey) {
-  const snapshot = await getDocs(
+  const snapshot = await getLeaderboardDocs(
     query(collection(firestore, 'daily_scores'), where('gameType', '==', gameType), where('dailyKey', '==', dailyKey))
   )
   return sortDailyScores(snapshot.docs.map(withId))
@@ -152,7 +153,7 @@ export async function fetchDailyScores(gameType, dailyKey) {
 
 // Daily Challenge scores of one day, best first.
 export async function fetchChallengeScores(dailyKey) {
-  const snapshot = await getDocs(
+  const snapshot = await getLeaderboardDocs(
     query(
       collection(firestore, 'daily_scores'),
       where('gameType', '==', GAME_TYPES.DAILY_CHALLENGE),
@@ -164,7 +165,7 @@ export async function fetchChallengeScores(dailyKey) {
 
 // Country Ranking scores of one day, best first (the best LEADERBOARD_SIZE).
 export async function fetchRankingScores(dailyKey) {
-  const snapshot = await getDocs(
+  const snapshot = await getLeaderboardDocs(
     query(
       collection(firestore, 'daily_scores'),
       where('gameType', '==', GAME_TYPES.RANKING),
@@ -181,7 +182,7 @@ export async function fetchRankingScores(dailyKey) {
 async function fetchTop(collectionName, filterSets, orderFields) {
   const results = await Promise.all(
     filterSets.map((filters) =>
-      getDocs(
+      getLeaderboardDocs(
         query(
           collection(firestore, collectionName),
           ...Object.entries(filters).map(([field, value]) => where(field, '==', value)),

@@ -96,7 +96,7 @@ function CountrySheet({ info, onSelect, onClose, maxHeight }: { info: Info; onSe
       style={[styles.sheet, { maxHeight }]}>
       <ScrollView contentContainerStyle={{ padding: space.lg, gap: space.lg, paddingBottom: insets.bottom + space.lg }}>
         <View style={styles.sheetHeader}>
-          {flag && <Image source={flag} contentFit="cover" style={styles.flag} />}
+          {flag && <Image source={flag} contentFit="cover" style={styles.flag} accessible={false} alt="" />}
           <View style={{ flex: 1 }}>
             <Text variant="title" numberOfLines={2} adjustsFontSizeToFit>
               {info.name}
@@ -133,7 +133,7 @@ function CountrySheet({ info, onSelect, onClose, maxHeight }: { info: Info; onSe
                 const neighborFlag = getFlag(neighbor.iso)
                 return (
                   <Touchable key={neighbor.admin} accessibilityRole="button" onPress={() => onSelect(neighbor.admin)} style={styles.chip}>
-                    {neighborFlag && <Image source={neighborFlag} contentFit="cover" style={styles.chipFlag} />}
+                    {neighborFlag && <Image source={neighborFlag} contentFit="cover" style={styles.chipFlag} accessible={false} alt="" />}
                     <Text variant="caption" color={colors.text}>
                       {neighbor.name}
                     </Text>
@@ -275,7 +275,7 @@ export default function AtlasScreen() {
               value={query}
               onChangeText={setQuery}
               placeholder={t('atlas.search_placeholder')}
-              placeholderTextColor={colors.textFaint}
+              placeholderTextColor={colors.textMuted}
               autoCorrect={false}
               returnKeyType="search"
               onSubmitEditing={() => results[0] && select(results[0].properties.ADMIN)}
@@ -294,7 +294,7 @@ export default function AtlasScreen() {
                 const flag = getFlag(feature.properties.ISO_A2)
                 return (
                   <Touchable key={feature.properties.ADMIN} onPress={() => select(feature.properties.ADMIN)} style={styles.result}>
-                    {flag && <Image source={flag} contentFit="cover" style={styles.chipFlag} />}
+                    {flag && <Image source={flag} contentFit="cover" style={styles.chipFlag} accessible={false} alt="" />}
                     <Text variant="body">{countryDisplayName(feature, i18n.language)}</Text>
                   </Touchable>
                 )

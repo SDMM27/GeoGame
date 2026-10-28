@@ -3,6 +3,7 @@ import { Canvas, Path, Skia } from '@shopify/react-native-skia'
 import { geoMercator, geoPath } from 'd3-geo'
 import type { Geometry } from 'geojson'
 import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { View, type LayoutChangeEvent, type StyleProp, type ViewStyle } from 'react-native'
 
 import { getFocusCountry } from '@shared/utils/borderGuessMap'
@@ -20,11 +21,15 @@ export function CountrySilhouette({
   country,
   color = colors.highlight,
   style,
+  label,
 }: {
   country: CountryFeature
   color?: string
   style?: StyleProp<ViewStyle>
+  /** Spoken description; the outline is the question by default, so it does not name the country. */
+  label?: string
 }) {
+  const { t } = useTranslation()
   const [size, setSize] = useState({ width: 0, height: 0 })
 
   const path = useMemo(() => {
@@ -53,7 +58,12 @@ export function CountrySilhouette({
   }
 
   return (
-    <View style={style} onLayout={onLayout}>
+    <View
+      accessible
+      accessibilityRole="image"
+      accessibilityLabel={label ?? t('mobile.a11y.outline_to_identify')}
+      style={style}
+      onLayout={onLayout}>
       {path && (
         <Canvas style={{ flex: 1 }}>
           <Path path={path} color={`${color}33`} />

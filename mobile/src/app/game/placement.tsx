@@ -3,7 +3,7 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { Image } from 'expo-image'
 import { useLocalSearchParams } from 'expo-router'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import Animated, { FadeIn, FadeInDown, LinearTransition } from 'react-native-reanimated'
@@ -14,6 +14,7 @@ import useGameState from '@shared/hooks/useGameState'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
 import { getCapitalName, getCountryName } from '@shared/utils/getCountryName'
 
+import { announce } from '@/a11y'
 import { setupGameRecord } from '@/account/history'
 import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
@@ -127,6 +128,23 @@ function PlacementGame({
   const remaining = stats.total - stats.found - stats.skipped
   const phaseColor = currentPhase ? DIFFICULTY_COLORS[currentPhase] : null
 
+  // Result of the last tap, written and spoken (the map only shows it in colour)
+  const [feedback, setFeedback] = useState<{ text: string; color: string } | null>(null)
+  const seen = useRef({ found: stats.found, skipped: stats.skipped, errors: stats.totalErrors ?? 0, name: targetName })
+  useEffect(() => {
+    const prev = seen.current
+    const errors = stats.totalErrors ?? 0
+    let next: { text: string; color: string } | null = null
+    if (stats.found > prev.found) next = { text: t('mobile.a11y.map_found', { name: prev.name }), color: colors.accent }
+    else if (stats.skipped > prev.skipped) next = { text: t('mobile.a11y.map_missed', { name: prev.name }), color: colors.warning }
+    else if (errors > prev.errors) next = { text: t('mobile.a11y.wrong'), color: colors.danger }
+    seen.current = { found: stats.found, skipped: stats.skipped, errors, name: targetName }
+    if (next) {
+      setFeedback(next)
+      announce(next.text)
+    }
+  }, [stats.found, stats.skipped, stats.totalErrors, targetName, t])
+
   return (
     <View style={{ flex: 1, backgroundColor: colors.ocean }}>
       <WorldMap
@@ -167,9 +185,14 @@ function PlacementGame({
             <Text variant="label">
               {t('mobile.game.find')}
             </Text>
+            {feedback && (
+              <Text variant="caption" color={feedback.color} numberOfLines={1} style={{ flexShrink: 1 }}>
+                {feedback.text}
+              </Text>
+            )}
           </View>
           <Animated.View key={targetCountry} entering={FadeIn.duration(220)} style={styles.targetRow}>
-            {flag && <Image source={flag} contentFit="cover" style={styles.flag} />}
+            {flag && <Image source={flag} contentFit="cover" style={styles.flag} accessible={false} alt="" />}
             <View style={{ flex: 1 }}>
               <Text variant="title" numberOfLines={2} adjustsFontSizeToFit style={{ marginTop: 2 }}>
                 {targetName}
@@ -303,7 +326,7 @@ const styles = StyleSheet.create({
     padding: space.lg,
   },
   phaseRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: space.sm },
-  findRow: { flexDirection: 'row', alignItems: 'center', gap: space.xs },
+  findRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.xs },
   targetRow: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   flag: { width: 48, height: 32, borderRadius: 4 },
   footer: { flexDirection: 'row', alignItems: 'center', gap: space.md, marginTop: space.md },

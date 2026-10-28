@@ -134,7 +134,7 @@ export default function FriendsScreen() {
                 setMessage(null)
               }}
               placeholder={t('friends.add_placeholder')}
-              placeholderTextColor={colors.textFaint}
+              placeholderTextColor={colors.textMuted}
               maxLength={USERNAME_MAX}
               autoCapitalize="none"
               autoCorrect={false}

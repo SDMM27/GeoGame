@@ -127,7 +127,7 @@ export default function MultiplayerScreen() {
             value={code}
             onChangeText={(value) => setCode(normalizeCode(value))}
             placeholder={t('mobile.multi.code_placeholder')}
-            placeholderTextColor={colors.textFaint}
+            placeholderTextColor={colors.textMuted}
             autoCapitalize="characters"
             autoCorrect={false}
             autoComplete="off"

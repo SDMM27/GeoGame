@@ -86,7 +86,7 @@ export function ReportFlag({ target }: { target: ReportTarget }) {
                     value={note}
                     onChangeText={setNote}
                     placeholder={t('report.note')}
-                    placeholderTextColor={colors.textFaint}
+                    placeholderTextColor={colors.textMuted}
                     maxLength={REPORT_NOTE_MAX}
                     style={styles.input}
                   />

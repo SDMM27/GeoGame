@@ -148,7 +148,7 @@ export function TypedRound({ survival, onSubmit }: { survival: Survival; onSubmi
       </View>
       {isCapital ? (
         <Animated.View entering={ZoomIn.springify().dampingRatio(0.7)} style={styles.capitalCountry}>
-          {flag && <Image source={flag} contentFit="contain" style={styles.smallFlag} />}
+          {flag && <Image source={flag} contentFit="contain" style={styles.smallFlag} accessible={false} alt="" />}
           <Text variant="title" numberOfLines={2} adjustsFontSizeToFit style={{ flexShrink: 1, textAlign: 'center' }}>
             {countryLabel(country, i18n.language)}
           </Text>
@@ -156,7 +156,7 @@ export function TypedRound({ survival, onSubmit }: { survival: Survival; onSubmi
       ) : (
         <Animated.View entering={ZoomIn.springify().dampingRatio(0.7)} style={styles.flagCard}>
           {flag ? (
-            <Image source={flag} contentFit="contain" style={styles.flag} accessibilityLabel={t(`survival.prompt.${round!.type}`)} />
+            <Image source={flag} contentFit="contain" style={styles.flag} accessible accessibilityLabel={t('mobile.a11y.flag_to_identify')} />
           ) : (
             <MaterialCommunityIcons name="flag-outline" size={64} color={colors.textFaint} />
           )}
@@ -170,7 +170,7 @@ export function TypedRound({ survival, onSubmit }: { survival: Survival; onSubmi
           onSubmitEditing={() => submit()}
           submitBehavior="submit"
           placeholder={t(isCapital ? 'survival.capital_placeholder' : 'placeholders.country_name')}
-          placeholderTextColor={colors.textFaint}
+          placeholderTextColor={colors.textMuted}
           {...ANSWER_KEYBOARD_PROPS}
           autoCorrect={false}
           spellCheck={false}
@@ -283,6 +283,14 @@ export function QuizRound({ survival }: { survival: Survival }) {
     return { opacity: 0.45 }
   }
 
+  // Outcome spoken after the choice, not only shown in colour
+  const outcomeLabel = (choice: { id: string; label: string }) => {
+    if (!outcome) return choice.label
+    if (choice.id === question.correctId) return `${choice.label}, ${t('mobile.a11y.choice_correct')}`
+    if (wrongPicks.includes(choice.id)) return `${choice.label}, ${t('mobile.a11y.choice_wrong')}`
+    return choice.label
+  }
+
   return (
     <View style={{ gap: space.lg }}>
       <Text variant="heading" style={{ fontSize: 20, lineHeight: 27 }}>
@@ -293,6 +301,8 @@ export function QuizRound({ survival }: { survival: Survival }) {
           <Touchable
             key={choice.id}
             accessibilityRole="button"
+            accessibilityLabel={outcomeLabel(choice)}
+            accessibilityState={{ selected: !!outcome && wrongPicks.includes(choice.id) }}
             onPress={() => chooseAnswer(choice.id)}
             disabled={!isPlaying}
             style={[styles.choice, choiceStyle(choice.id)]}>
@@ -302,6 +312,10 @@ export function QuizRound({ survival }: { survival: Survival }) {
             <Text variant="bodyStrong" style={{ flex: 1 }}>
               {choice.label}
             </Text>
+            {outcome && choice.id === question.correctId && <MaterialCommunityIcons name="check-circle" size={20} color={colors.accent} />}
+            {outcome && choice.id !== question.correctId && wrongPicks.includes(choice.id) && (
+              <MaterialCommunityIcons name="close-circle" size={20} color={colors.danger} />
+            )}
           </Touchable>
         ))}
       </View>

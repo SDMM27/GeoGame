@@ -27,6 +27,7 @@ import { GuessesMap } from '@/components/map/GuessesMap'
 import { Button, Text } from '@/components/ui'
 import { getFlag } from '@/flags'
 import { useElapsed } from '@/hooks/useElapsed'
+import { useAnnounceResult } from '@/hooks/useAnnounceResult'
 import { clean } from '@/i18n'
 import { RoomGate, RoomHudPill, Standings, type RoomPlay } from '@/multiplayer/RoomPlay'
 import { useRoomRounds, useRoundResult } from '@/multiplayer/useRoomRounds'
@@ -40,7 +41,7 @@ function AnswerCard({ iso, name, capital, solved }: { iso: string | null; name: 
   const flag = getFlag(iso)
   return (
     <View style={styles.answer}>
-      {flag && <Image source={flag} contentFit="contain" style={styles.answerFlag} />}
+      {flag && <Image source={flag} contentFit="contain" style={styles.answerFlag} accessible={false} alt="" />}
       <View style={{ flex: 1 }}>
         <Text variant="title" color={solved ? colors.accent : colors.warning} numberOfLines={2} adjustsFontSizeToFit>
           {name}
@@ -104,6 +105,7 @@ function CountryClueGame({ mode, play }: { mode: string; play?: RoomPlay }) {
   )
   const locked = isComplete || (isDaily && !hasStarted)
   const answer = getCountryName(currentCountryISO, i18n.language) || answerName
+  useAnnounceResult(isComplete, isSolved, answer)
   const capital = getCapitalName(currentCountryISO, i18n.language) || answerCapital
   const attemptsLabel = guesses.length === 1 ? t('units.attempt_one') : t('units.attempt_other')
   const mapGuesses = [

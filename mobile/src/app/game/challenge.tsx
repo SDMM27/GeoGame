@@ -2,7 +2,7 @@
 // each, 20 s per round, no lives. Rules → rounds (components/survival/SurvivalRounds) → result, leaderboard and sharing.
 // The run itself is the website's useDailyChallengeState.
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
@@ -15,6 +15,7 @@ import { formatTime } from '@shared/utils/formatTime'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
 import { getCountryName } from '@shared/utils/getCountryName'
 
+import { announce } from '@/a11y'
 import { useAccount } from '@/account/auth'
 import { ChallengeLeaderboard } from '@/components/game/ChallengeLeaderboard'
 import { DailyPlayedElsewhere } from '@/components/game/DailyPlayedElsewhere'
@@ -43,6 +44,18 @@ function Playing({ challenge }: { challenge: Challenge }) {
   const { t, i18n } = useTranslation()
   const insets = useSafeAreaInsets()
   const { round, roundIndex, total, score, timeLeftMs, outcome, timedOut, next, giveUp, submitText } = challenge
+
+  // Spoken: each round's result, then the timer turning red
+  const fiveLeft = timeLeftMs != null && Math.ceil(timeLeftMs / 1000) === 5 && !outcome
+  useEffect(() => {
+    if (!outcome) return
+    announce(outcome === 'correct' ? t('mobile.a11y.correct') : t('mobile.a11y.wrong_answer', { answer: roundAnswer(round, i18n.language, t) }))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [outcome, roundIndex])
+  useEffect(() => {
+    if (fiveLeft) announce(t('mobile.a11y.seconds_left', { count: 5 }))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fiveLeft, roundIndex])
   if (!round) return null
 
   // The survival rounds read a few more fields than a challenge has: a round is a single try

@@ -6,8 +6,8 @@ export const colors = {
   border: '#232C48',
   borderStrong: '#34406A',
   text: '#EEF1F8',
-  textMuted: '#7A84A3',
-  textFaint: '#4F5878',
+  textMuted: '#8892B0',
+  textFaint: '#6B7596',
 
   accent: '#3DDC97',
   onAccent: '#06281A',

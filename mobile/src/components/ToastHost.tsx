@@ -34,9 +34,9 @@ export function ToastHost() {
             style={styles.toast}
             accessibilityLiveRegion="polite">
             {toast.flag != null ? (
-              <Image source={toast.flag} style={styles.flag} resizeMode="cover" />
+              <Image source={toast.flag} style={styles.flag} resizeMode="cover" accessible={false} alt="" />
             ) : (
-              <MaterialCommunityIcons name={kind.icon} size={18} color={kind.color} />
+              <MaterialCommunityIcons name={kind.icon} size={18} color={kind.color} aria-hidden />
             )}
             <Text variant="bodyStrong" color={toast.color} style={{ flexShrink: 1, fontSize: 14 }}>
               {toast.text}

@@ -163,7 +163,7 @@ export function ClueGuessCard({ guess, index, progress }: { guess: ClueGuess; in
         <Text variant="caption" style={{ width: 18 }}>
           {index + 1}
         </Text>
-        {flag && <Image source={flag} contentFit="cover" style={clueStyles.flag} />}
+        {flag && <Image source={flag} contentFit="cover" style={clueStyles.flag} accessible={false} alt="" />}
         <Text variant="bodyStrong" numberOfLines={1} style={{ flex: 1 }}>
           {name}
         </Text>
@@ -238,7 +238,7 @@ export function ClueGuessSummary({ guesses, progress }: { guesses: ClueGuess[]; 
             <Text variant="caption" style={{ width: 18 }}>
               {index + 1}
             </Text>
-            {flag && <Image source={flag} contentFit="cover" style={clueStyles.flag} />}
+            {flag && <Image source={flag} contentFit="cover" style={clueStyles.flag} accessible={false} alt="" />}
             <Text variant="body" numberOfLines={1} style={{ flex: 1 }}>
               {closest ? '📍 ' : ''}
               {name}

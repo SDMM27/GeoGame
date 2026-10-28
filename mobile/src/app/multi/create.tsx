@@ -191,7 +191,7 @@ export default function CreateRoomSheet() {
                 value={pseudo}
                 onChangeText={setPseudo}
                 placeholder={t('labels.your_username')}
-                placeholderTextColor={colors.textFaint}
+                placeholderTextColor={colors.textMuted}
                 maxLength={20}
                 autoCapitalize="none"
                 autoCorrect={false}

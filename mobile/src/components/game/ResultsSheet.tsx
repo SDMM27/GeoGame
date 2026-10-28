@@ -16,6 +16,7 @@ import { saveAscensionScore, saveChallengeScore, saveDailyScore, saveRankingScor
 import { GAME_TYPES } from '@shared/utils/gameTypes'
 import { generateShareText } from '@shared/utils/shareScore'
 
+import { announce } from '@/a11y'
 import { useAccount } from '@/account/auth'
 import { useRecordGame, type GameRecord } from '@/account/history'
 import { SITE_ORIGIN } from '@/links'
@@ -95,6 +96,8 @@ export function ResultsSheet({ title, score, scoreText, scoreLabel, accent = col
 
   useEffect(() => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+    announce(title ?? t('mobile.game.finished'))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Signed in: saved on its own under the account. Visitor: saved under the name they type.
@@ -233,7 +236,7 @@ export function ResultsSheet({ title, score, scoreText, scoreLabel, accent = col
                         saver.clear()
                       }}
                       placeholder={t('labels.your_username')}
-                      placeholderTextColor={colors.textFaint}
+                      placeholderTextColor={colors.textMuted}
                       maxLength={20}
                       autoCapitalize="none"
                       autoCorrect={false}

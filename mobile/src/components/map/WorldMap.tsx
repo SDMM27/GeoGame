@@ -3,6 +3,7 @@
 // website's game hooks (../src/hooks) drive it unchanged.
 import { Canvas, Circle, Group, Path, Skia, type SkPath } from '@shopify/react-native-skia'
 import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { StyleSheet, View, type LayoutChangeEvent } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { Easing, cancelAnimation, useDerivedValue, useSharedValue, withTiming, type SharedValue } from 'react-native-reanimated'
@@ -237,6 +238,7 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
   },
   ref
 ) {
+  const { t } = useTranslation()
   const shapes = useMemo(() => {
     const all = getCountryShapes()
     if (!countries) return [...all.values()]
@@ -622,7 +624,7 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
 
   return (
     <GestureDetector gesture={gesture}>
-      <View style={mapStyles.container} onLayout={onLayout}>
+      <View accessible accessibilityRole="image" accessibilityLabel={t('mobile.a11y.world_map')} style={mapStyles.container} onLayout={onLayout}>
         <Canvas style={StyleSheet.absoluteFill}>
           <Group transform={transform}>
             {scene}

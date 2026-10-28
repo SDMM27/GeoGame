@@ -55,6 +55,8 @@ function PieceFlag({ iso, pieces, cost }: { iso: string; pieces: number; cost: n
         >
           {source != null && (
             <Image
+              accessible={false}
+              alt=""
               source={source}
               resizeMode="stretch"
               style={[
@@ -160,7 +162,7 @@ export function FlagCollectionView({ collection }: { collection: Collection }) {
                   onPress={() => setSelected(selected === iso ? null : iso)}
                   style={[styles.cell, { borderColor: COLORS[RARITY_OF.get(iso) ?? 'common'] }, selected === iso && styles.cellSelected]}
                 >
-                  {source != null && <Image source={source} style={styles.cellImage} resizeMode="cover" />}
+                  {source != null && <Image source={source} style={styles.cellImage} resizeMode="cover" accessible={false} alt="" />}
                 </Touchable>
               )
             })}

@@ -23,6 +23,7 @@ import { GuessInputBar } from '@/components/game/GuessInputBar'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
 import { CountrySilhouette } from '@/components/map/CountrySilhouette'
 import { Button, Text } from '@/components/ui'
+import { useAnnounceResult } from '@/hooks/useAnnounceResult'
 import { useElapsed } from '@/hooks/useElapsed'
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible'
 import { clean } from '@/i18n'
@@ -79,6 +80,7 @@ function BorderGuessGame({ mode, play }: { mode: string; play?: RoomPlay }) {
   const elapsed = useElapsed(play ? rounds.startedAt : startedAt, (isDaily && hasStarted && !isComplete) || (!!play && rounds.endedAt == null))
   const locked = isComplete || (isDaily && !hasStarted)
   const answer = getCountryName(currentCountryISO, i18n.language) || answerName
+  useAnnounceResult(isComplete, isSolved, answer)
   const attemptsLabel = guesses.length === 1 ? t('units.attempt_one') : t('units.attempt_other')
   // Keep the silhouette compact so the latest guesses stay on screen, smaller still while typing.
   const { height: windowHeight } = useWindowDimensions()

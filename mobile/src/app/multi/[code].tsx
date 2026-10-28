@@ -19,6 +19,7 @@ import { containsProfanity } from '@shared/utils/profanity'
 import { currentGameIndex, isRoomFormat, joinedLate, nextGameToPlay, roomGames } from '@shared/utils/multiplayerRoom'
 import { serverNow } from '@shared/utils/serverTime'
 
+import { announce } from '@/a11y'
 import { useAccount, type Account } from '@/account/auth'
 import { SITE_ORIGIN } from '@/links'
 import { BadgeStrip, useRoomBadges } from '@/components/profile/BadgeStrip'
@@ -88,7 +89,7 @@ function JoinCard({ room, account, autoJoin }: { room: Room; account: Account | 
         value={pseudo}
         onChangeText={setPseudo}
         placeholder={t('labels.your_username')}
-        placeholderTextColor={colors.textFaint}
+        placeholderTextColor={colors.textMuted}
         maxLength={20}
         autoCapitalize="none"
         autoCorrect={false}
@@ -317,8 +318,13 @@ export default function RoomScreen() {
   // Live: start together when a game's countdown reaches zero (only for players who were waiting for it)
   useEffect(() => {
     if (!isLive || toPlay !== current) return
-    if (remaining != null && remaining > 0) sawCountdownRef.current = startAt
-    else if (remaining === 0 && sawCountdownRef.current === startAt) play()
+    if (remaining != null && remaining > 0) {
+      if (sawCountdownRef.current !== startAt) announce(`${t('mobile.a11y.countdown')}. ${t('mobile.a11y.seconds_left', { count: Math.ceil(remaining / 1000) })}`)
+      sawCountdownRef.current = startAt
+    } else if (remaining === 0 && sawCountdownRef.current === startAt) {
+      announce(t('mobile.a11y.go'))
+      play()
+    }
   })
 
   const onShare = () => {

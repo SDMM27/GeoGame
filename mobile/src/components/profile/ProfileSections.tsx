@@ -370,7 +370,7 @@ export function RecordsSection({ uid }: { uid: string }) {
                     key={cell.key}
                     style={[styles.recordCell, cell.isPerfect && { borderColor: colors.warning, backgroundColor: `${colors.warning}26` }]}>
                     {cell.score == null ? (
-                      <Text variant="caption" color={colors.textFaint}>
+                      <Text variant="caption" color={colors.textMuted}>
                         —
                       </Text>
                     ) : (

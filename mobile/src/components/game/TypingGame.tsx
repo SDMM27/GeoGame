@@ -11,6 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { matchKnownAnswer } from '@shared/utils/answerLexicon'
 import { getMissingFlagMask } from '@shared/utils/missingFlag'
 
+import { announce } from '@/a11y'
 import { setupGameRecord } from '@/account/history'
 import { ANSWER_KEYBOARD_PROPS, useClearedAnswerGuard } from '@/components/game/answerInput'
 import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
@@ -122,6 +123,17 @@ export function TypingGame({
     if (isGameOver) play?.finish({ weightedScore: score, countriesSolved: stats.found, attempts: stats.totalErrors ?? 0, elapsedTime: timer })
   }, [isGameOver, play, score, stats, timer])
 
+  // Spoken: a found country, or the answer once revealed
+  const lastFound = useRef(stats.found)
+  useEffect(() => {
+    if (stats.found > lastFound.current) announce(t('mobile.a11y.correct'))
+    lastFound.current = stats.found
+  }, [stats.found, t])
+  useEffect(() => {
+    if (revealedName && targetCountry) announce(t('mobile.a11y.wrong_answer', { answer: config.answerLabel(targetCountry, i18n.language) }))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [revealedName])
+
   // Keep the keyboard up from one country to the next
   useEffect(() => {
     if (targetCountry && !revealedName && !isGameOver) inputRef.current?.focus()
@@ -210,7 +222,19 @@ export function TypingGame({
               style={[styles.flagCard, typing && { width: flagHeight * 1.5, height: flagHeight, padding: space.sm }]}>
               {flag ? (
                 <View style={styles.flagWrap}>
-                  <Image source={flag} contentFit="contain" style={styles.flag} accessibilityLabel={t(config.promptKey)} />
+                  <Image
+                    source={flag}
+                    contentFit="contain"
+                    style={styles.flag}
+                    accessible={!config.clue}
+                    accessibilityLabel={
+                      config.clue
+                        ? ''
+                        : revealedName
+                          ? t('mobile.a11y.flag_of', { name: config.answerLabel(targetCountry, i18n.language) })
+                          : t('mobile.a11y.flag_to_identify')
+                    }
+                  />
                   {config.missingFlag && !revealedName && <View style={[styles.missingBand, missingBandPosition(targetCountryISO)]} accessibilityLabel={t('games.missing_flag.missing_part')} />}
                 </View>
               ) : (
@@ -337,7 +361,7 @@ const AnswerInput = memo(function AnswerInput({
       onSubmitEditing={onSubmit}
       submitBehavior="submit"
       placeholder={placeholder}
-      placeholderTextColor={colors.textFaint}
+      placeholderTextColor={colors.textMuted}
       {...ANSWER_KEYBOARD_PROPS}
       autoCorrect={false}
       spellCheck={false}

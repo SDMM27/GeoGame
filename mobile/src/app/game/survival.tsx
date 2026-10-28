@@ -32,6 +32,7 @@ import {
 import { localizeQuestion } from '@shared/utils/quizQuestions'
 import { SURVIVAL_LATE_MS, othersStillIn, spectatorRows } from '@shared/utils/survivalSync'
 
+import { announce } from '@/a11y'
 import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
 import {
@@ -100,10 +101,18 @@ function Spectator({ round, roundIndex, rows, waiting, maxLives }: {
           {round.type === GAME_TYPES.PLACEMENT && (
             <Text variant="title" numberOfLines={2} style={{ textAlign: 'center' }}>{countryName}</Text>
           )}
-          {round.type === GAME_TYPES.FLAGS && flag && <Image source={flag} contentFit="contain" style={{ width: 144, height: 96 }} />}
+          {round.type === GAME_TYPES.FLAGS && flag && (
+            <Image
+              source={flag}
+              contentFit="contain"
+              style={{ width: 144, height: 96 }}
+              accessible
+              accessibilityLabel={revealed ? t('mobile.a11y.flag_of', { name: countryName }) : t('mobile.a11y.flag_to_identify')}
+            />
+          )}
           {round.type === GAME_TYPES.CAPITALS && (
             <View style={styles.spectatorCountry}>
-              {flag && <Image source={flag} contentFit="contain" style={{ width: 64, height: 44 }} />}
+              {flag && <Image source={flag} contentFit="contain" style={{ width: 64, height: 44 }} accessible={false} alt="" />}
               <Text variant="title" numberOfLines={2} style={{ flexShrink: 1, textAlign: 'center' }}>{countryName}</Text>
             </View>
           )}
@@ -246,6 +255,20 @@ function SurvivalRun({ modes, lives, timer, ramp, seed, snapshot = null, snapKey
   const rampName: string | null = matchSurvivalRamp(ramp)
   const answer = roundAnswer(round, i18n.language, t)
   const secondsLeft = timeLeftMs == null ? null : Math.ceil(timeLeftMs / 1000)
+
+  // Spoken: the result of each round (with the lives left), then the timer turning red
+  useEffect(() => {
+    if (!outcome) return
+    const parts = [outcome === 'correct' ? t('mobile.a11y.correct') : t('mobile.a11y.wrong_answer', { answer })]
+    parts.push(isOver ? t('mobile.a11y.game_over') : t('mobile.a11y.lives_left', { count: state.lives }))
+    announce(parts.join('. '))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [outcome, roundIndex])
+  const fiveLeft = secondsLeft === 5 && !outcome
+  useEffect(() => {
+    if (fiveLeft) announce(t('mobile.a11y.seconds_left', { count: 5 }))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fiveLeft, roundIndex])
 
   const outcomeBanner = outcome && !isOver && (
     <Animated.View

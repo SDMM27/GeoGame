@@ -122,7 +122,7 @@ export default function HomeScreen() {
       contentContainerStyle={{ paddingTop: insets.top + space.lg, paddingBottom: space.xxl * 2 }}
       showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
-        <Image source={require('@/assets/images/logo.png')} style={styles.logo} contentFit="contain" />
+        <Image source={require('@/assets/images/logo.png')} style={styles.logo} contentFit="contain" accessible accessibilityLabel="GeoGame" />
         <View style={{ flex: 1 }}>
           <Text variant="title">GeoGame</Text>
           <Text variant="caption">{t('mobile.home.greeting')}</Text>

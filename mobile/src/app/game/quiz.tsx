@@ -27,6 +27,7 @@ import {
 } from '@shared/utils/quizQuestions'
 
 import { useAccount } from '@/account/auth'
+import { announce } from '@/a11y'
 import { DailyLeaderboard } from '@/components/game/DailyLeaderboard'
 import { DailyPlayedElsewhere } from '@/components/game/DailyPlayedElsewhere'
 import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
@@ -92,7 +93,7 @@ function AnswerInput({
       onSubmitEditing={onSubmit}
       submitBehavior="submit"
       placeholder={t('quiz.input_placeholder')}
-      placeholderTextColor={colors.textFaint}
+      placeholderTextColor={colors.textMuted}
       autoCapitalize="sentences"
       autoCorrect={false}
       spellCheck={false}
@@ -104,8 +105,20 @@ function AnswerInput({
   )
 }
 
-function Feedback({ correct, title, lines }: { correct: boolean; title: string; lines: (string | null | false | undefined)[] }) {
+function Feedback({
+  correct,
+  title,
+  lines,
+  spoken,
+}: {
+  correct: boolean
+  title: string
+  lines: (string | null | false | undefined)[]
+  spoken: string
+}) {
   const tint = correct ? colors.accent : colors.danger
+  // Mounted when the answer is revealed.
+  useEffect(() => announce(spoken), []) // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <Animated.View entering={FadeInDown.springify().damping(18)} style={[styles.feedback, { borderColor: `${tint}66`, backgroundColor: `${tint}12` }]}>
       <Text variant="bodyStrong" color={tint}>
@@ -183,6 +196,7 @@ function DailyQuiz() {
   const answerFeedback = localized && (
     <Feedback
       correct={isSolved}
+      spoken={isSolved ? t('mobile.a11y.correct') : t('mobile.a11y.wrong_answer', { answer: localized.answer })}
       title={isSolved ? clean(t('quiz.daily_won', { attempts: attemptsCount })) : clean(t('quiz.daily_lost'))}
       lines={[
         isSolved && lastGuess?.typo && t('quiz.typo_accepted', { name: lastGuess.typo }),
@@ -384,7 +398,7 @@ function DifficultyPicker({
     <View style={{ gap: space.lg }}>
       {country ? (
         <View style={styles.countryTitle}>
-          {flag && <Image source={flag} contentFit="cover" style={styles.countryFlag} />}
+          {flag && <Image source={flag} contentFit="cover" style={styles.countryFlag} accessible={false} alt="" />}
           <Text variant="heading" style={{ flex: 1 }}>
             {t('quiz.history.country_title', { country: getCountryName(country, i18n.language) ?? country })}
           </Text>
@@ -611,6 +625,14 @@ function PracticeQuiz({
                     <Touchable
                       key={choice.id}
                       accessibilityRole="button"
+                      accessibilityLabel={
+                        isAnswered && choice.id === current.correctId
+                          ? `${choice.label}, ${t('mobile.a11y.choice_correct')}`
+                          : isAnswered && choice.id === selectedId
+                            ? `${choice.label}, ${t('mobile.a11y.choice_wrong')}`
+                            : choice.label
+                      }
+                      accessibilityState={{ selected: isAnswered && choice.id === selectedId }}
                       onPress={() => answer(choice.id)}
                       disabled={isAnswered || hidden.includes(choice.id)}
                       style={[styles.choice, choiceStyle(choice.id)]}>
@@ -640,6 +662,7 @@ function PracticeQuiz({
               {isAnswered && (
                 <Feedback
                   correct={isCorrect}
+                  spoken={isCorrect ? t('mobile.a11y.correct') : t('mobile.a11y.wrong_answer', { answer: localized.answer })}
                   title={clean(isCorrect ? t('quiz.correct') : t('quiz.wrong'))}
                   lines={[
                     isFree && result?.match?.match === 'typo' && t('quiz.typo_accepted', { name: result.match.name }),

@@ -74,7 +74,7 @@ function Field({ label, hint, ...props }: TextInputProps & { label: string; hint
   return (
     <View style={{ gap: space.sm }}>
       <Text variant="label">{label}</Text>
-      <TextInput placeholderTextColor={colors.textFaint} autoCorrect={false} style={styles.input} {...props} />
+      <TextInput placeholderTextColor={colors.textMuted} autoCorrect={false} style={styles.input} {...props} />
       {hint ? <Text variant="caption">{hint}</Text> : null}
     </View>
   )

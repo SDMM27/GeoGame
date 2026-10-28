@@ -62,7 +62,7 @@ function CountryChip({ feature, color, lang }: { feature: CountryFeature; color:
   const flag = getFlag(feature.properties.ISO_A2)
   return (
     <View style={[styles.chip, { borderColor: `${tint}88`, backgroundColor: `${tint}1A` }, color === 'missed' && styles.chipMissed]}>
-      {flag && <Image source={flag} contentFit="cover" style={styles.chipFlag} />}
+      {flag && <Image source={flag} contentFit="cover" style={styles.chipFlag} accessible={false} alt="" />}
       <Text variant="bodyStrong" color={color === 'missed' ? colors.textMuted : colors.text} style={{ fontSize: 13 }} numberOfLines={1}>
         {nameOf(feature, lang)}
       </Text>

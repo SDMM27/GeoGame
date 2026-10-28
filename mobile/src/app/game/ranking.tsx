@@ -4,7 +4,7 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { Image } from 'expo-image'
 import { useLocalSearchParams } from 'expo-router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, View } from 'react-native'
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated'
@@ -15,6 +15,7 @@ import { getCountryName } from '@shared/utils/getCountryName'
 import { useDailyPlayedElsewhere } from '@shared/hooks/useDailyPlayedElsewhere'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
 
+import { announce } from '@/a11y'
 import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
 import { useAccount } from '@/account/auth'
 import { RankingLeaderboard } from '@/components/game/RankingLeaderboard'
@@ -78,14 +79,19 @@ function CountryRow({
 }) {
   const flag = getFlag(country.properties.ISO_A2)
   const tint = state === 'correct' ? colors.accent : state === 'wrong' ? colors.danger : null
+  const { t } = useTranslation()
+  const name = getCountryName(country.properties.ISO_A2, lang) || country.properties.ADMIN
   return (
-    <View style={[styles.row, tint && { borderColor: tint, backgroundColor: `${tint}14` }]}>
+    <View
+      accessible={state ? true : undefined}
+      accessibilityLabel={state ? `${index + 1}. ${name}, ${t(state === 'correct' ? 'mobile.a11y.choice_correct' : 'mobile.a11y.choice_wrong')}` : undefined}
+      style={[styles.row, tint && { borderColor: tint, backgroundColor: `${tint}14` }]}>
       <Text variant="number" color={tint ?? ACCENT} style={styles.rowIndex}>
         {index + 1}
       </Text>
-      {flag && <Image source={flag} contentFit="cover" style={styles.flag} />}
+      {flag && <Image source={flag} contentFit="cover" style={styles.flag} accessible={false} alt="" />}
       <Text variant="bodyStrong" numberOfLines={1} style={{ flex: 1 }}>
-        {getCountryName(country.properties.ISO_A2, lang) || country.properties.ADMIN}
+        {name}
       </Text>
       {draggable && <MaterialCommunityIcons name="drag-horizontal-variant" size={22} color={colors.textMuted} />}
       {state && <MaterialCommunityIcons name={state === 'correct' ? 'check' : 'close'} size={20} color={tint!} />}
@@ -117,7 +123,7 @@ function CorrectRanking({
             <Text variant="bodyStrong" color={correct ? colors.accent : colors.danger} style={styles.rowIndex}>
               {index + 1}
             </Text>
-            {flag && <Image source={flag} contentFit="cover" style={styles.flag} />}
+            {flag && <Image source={flag} contentFit="cover" style={styles.flag} accessible={false} alt="" />}
             <View style={{ flex: 1, minWidth: 0 }}>
               <Text variant="bodyStrong" numberOfLines={1}>
                 {getCountryName(country.properties.ISO_A2, i18n.language) || country.properties.ADMIN}
@@ -255,6 +261,12 @@ export default function RankingScreen() {
   const isSubmitted = status === 'submitted'
   const stages = stageResults as StageResult[]
   const positionsLabel = (count: number) => t('units.position', { count })
+
+  // Spoken: the outcome of a validated order (the rows only show it with colours and icons)
+  useEffect(() => {
+    if (feedback) announce(feedback.every(Boolean) ? t('mobile.a11y.correct') : t('mobile.a11y.wrong'))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [feedback])
 
   if (elsewhere.checking || elsewhere.game) {
     return (

@@ -87,7 +87,7 @@ export function GuessInputBar({
           onSubmitEditing={onSubmit}
           submitBehavior="submit"
           placeholder={placeholder}
-          placeholderTextColor={colors.textFaint}
+          placeholderTextColor={colors.textMuted}
           {...ANSWER_KEYBOARD_PROPS}
           autoCorrect={false}
           spellCheck={false}

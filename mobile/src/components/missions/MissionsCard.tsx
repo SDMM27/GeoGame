@@ -57,7 +57,7 @@ function MissionRow({ entry, reward }: { entry: Entry; reward: Reward }) {
           </Text>
           <View style={styles.missionMeta}>
             {mission.tier ? (
-              <Text variant="caption" color={colors.textFaint} style={styles.missionTier}>
+              <Text variant="caption" color={colors.textMuted} style={styles.missionTier}>
                 {t(`missions.tier_${mission.tier}`)}
               </Text>
             ) : null}

@@ -198,7 +198,10 @@
     "skipped": "✗ SALTATI",
     "remaining": "◎ RIMANENTI",
     "flags": "BANDIERE",
-    "capitals": "CAPITALI"
+    "capitals": "CAPITALI",
+    "show_flag": "Bandiera",
+    "show_capital": "Capitale",
+    "capital_of_target": "Capitale: {{name}}"
   },
   "controls": {
     "left_click": "Clic sinistro",

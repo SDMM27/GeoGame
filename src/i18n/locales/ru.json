@@ -198,7 +198,10 @@
     "skipped": "✗ ПРОПУЩЕНО",
     "remaining": "◎ ОСТАЛОСЬ",
     "flags": "ФЛАГИ",
-    "capitals": "СТОЛИЦЫ"
+    "capitals": "СТОЛИЦЫ",
+    "show_flag": "Флаг",
+    "show_capital": "Столица",
+    "capital_of_target": "Столица: {{name}}"
   },
   "controls": {
     "left_click": "Левая кнопка",

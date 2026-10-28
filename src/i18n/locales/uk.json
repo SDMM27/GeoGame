@@ -198,7 +198,10 @@
     "skipped": "✗ ПРОПУЩЕНО",
     "remaining": "◎ ЗАЛИШИЛОСЬ",
     "flags": "ПРАПОРИ",
-    "capitals": "СТОЛИЦІ"
+    "capitals": "СТОЛИЦІ",
+    "show_flag": "Прапор",
+    "show_capital": "Столиця",
+    "capital_of_target": "Столиця: {{name}}"
   },
   "controls": {
     "left_click": "Ліва кнопка",

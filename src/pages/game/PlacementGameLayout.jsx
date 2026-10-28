@@ -6,7 +6,7 @@ import { ToastContainer } from 'react-toastify'
 import { GAME_TYPES } from '../../utils/gameTypes'
 import { setupGameRecord } from '../../utils/gameHistory'
 import { useRecordGame } from '../../auth'
-import { getCountryName } from '../../utils/getCountryName'
+import { getCapitalName, getCountryName } from '../../utils/getCountryName'
 import { createAppFillRenderer } from '../../components/map/appFillRenderer'
 import PhaseIndicator from '../../components/PhaseIndicator'
 import countries from '../../data/countriesWithDifficulty_FR.json'
@@ -17,6 +17,32 @@ import SmallCountryCircles from './SmallCountryCircles'
 import { HARDCORE_COUNTRY_STYLE, MAP_COLORS } from '../../utils/mapColors'
 
 const GEO_STYLE = { fillColor: 'transparent', color: MAP_COLORS.stroke, fillOpacity: 1, weight: 1 }
+
+// Optional flag / capital of the target, to learn them for the other games. Kept between games (same keys as the app).
+const SHOW_FLAG_KEY = 'geogame_placement_show_flag'
+const SHOW_CAPITAL_KEY = 'geogame_placement_show_capital'
+
+function readToggle(key) {
+  try {
+    return localStorage.getItem(key) === '1'
+  } catch {
+    return false
+  }
+}
+
+function useStoredToggle(key) {
+  const [on, setOn] = useState(() => readToggle(key))
+  const toggle = () => {
+    const next = !on
+    setOn(next)
+    try {
+      localStorage.setItem(key, next ? '1' : '0')
+    } catch {
+      // Private mode: the choice lasts for this game only
+    }
+  }
+  return [on, toggle]
+}
 
 function MapClickListener({ onClick }) {
   useMapEvents({ click: onClick })
@@ -91,6 +117,20 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
 
   const progressPct = stats.total ? (stats.found / stats.total) * 100 : 0
 
+  // Not in rooms (onGameFinished): every player gets the same clues there
+  const [showFlag, toggleFlag] = useStoredToggle(SHOW_FLAG_KEY)
+  const [showCapital, toggleCapital] = useStoredToggle(SHOW_CAPITAL_KEY)
+  const targetFeature = useMemo(
+    () => countries.features.find(f => f.properties.ADMIN === targetCountry),
+    [targetCountry]
+  )
+  // Ascension's state has no targetCountryISO: read it from the country
+  const targetIso = targetCountryISO ?? targetFeature?.properties.ISO_A2 ?? null
+  const flagIso = !onGameFinished && showFlag && targetIso && targetIso !== '-99' ? targetIso.toLowerCase() : null
+  const capital = !onGameFinished && showCapital
+    ? getCapitalName(targetIso, i18n.language) || targetFeature?.properties.capital || null
+    : null
+
   return (
     <div className="game-page">
       {isAscension && (
@@ -110,7 +150,11 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
             </div>
             <div className="hud-cell hud-cell--target">
               <span className="hud-target-label">{t('game_hud.target_country')}</span>
-              <span className="hud-target-name">{getCountryName(targetCountryISO, i18n.language) || targetCountry}</span>
+              <span className="hud-target-name">
+                {flagIso && <img className="hud-target-flag" src={`/flags/${flagIso}.png`} alt="" />}
+                {getCountryName(targetIso, i18n.language) || targetCountry}
+              </span>
+              {capital && <span className="hud-target-capital">{t('game_hud.capital_of_target', { name: capital })}</span>}
             </div>
             <div className="hud-cell">
               <span className="hud-value" style={{ color: 'var(--accent)' }}>{displayTimer}</span>
@@ -122,6 +166,36 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
               <div className="hud-progress-bar" style={{ width: `${progressPct}%` }} />
             </div>
             <span className="hud-progress-text">{stats.found} / {stats.total} {t('game_hud.countries')}</span>
+            {!onGameFinished && (
+              <div className="hud-target-toggles">
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={showFlag}
+                  aria-label={t('game_hud.show_flag')}
+                  title={t('game_hud.show_flag')}
+                  className={`hud-toggle${showFlag ? ' hud-toggle--on' : ''}`}
+                  onClick={toggleFlag}
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M5 21V4M5 4h11l-2 4 2 4H5" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={showCapital}
+                  aria-label={t('game_hud.show_capital')}
+                  title={t('game_hud.show_capital')}
+                  className={`hud-toggle${showCapital ? ' hud-toggle--on' : ''}`}
+                  onClick={toggleCapital}
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M3 21h18M5 21V10M19 21V10M9.5 21v-7M14.5 21v-7M3 10l9-6 9 6z" />
+                  </svg>
+                </button>
+              </div>
+            )}
           </div>
         </div>
         <div className="hud-stats">

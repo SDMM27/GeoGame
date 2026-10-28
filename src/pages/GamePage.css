@@ -51,7 +51,9 @@
 .hud-cell--target {
   flex: 1;
   align-items: center;
+  gap: 2px;
   padding: 0 10px;
+  text-align: center;
 }
 
 .hud-target-label {
@@ -59,13 +61,69 @@
   color: var(--text-muted);
   letter-spacing: 1px;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .hud-target-name {
+  display: inline-flex;
+  align-items: center;
   font-size: 1rem;
   font-weight: 700;
   color: var(--text-primary);
   white-space: nowrap;
+}
+
+.hud-target-flag {
+  height: 0.95em;
+  margin-right: 6px;
+  border-radius: 2px;
+}
+
+.hud-target-capital {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* Flag / capital switches: small icons in the card's bottom-right corner, after the progress */
+.hud-target-toggles {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.hud-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.hud-toggle svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.hud-toggle:hover {
+  color: var(--text-primary);
+}
+
+.hud-toggle--on,
+.hud-toggle--on:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-dim, transparent);
 }
 
 .hud-value {
@@ -309,12 +367,23 @@
     flex: 1;
   }
 
+  /* The target gets the room it needs; score and time share the rest */
+  .hud-cell--target {
+    flex: 2;
+    padding: 0 4px;
+  }
+
+  .hud-target-label {
+    letter-spacing: 0.5px;
+  }
+
   .hud-value {
     font-size: 1.1rem;
   }
 
   .hud-target-name {
     font-size: 0.88rem;
+    white-space: normal;
   }
 
   .hud-actions {
@@ -326,10 +395,14 @@
     flex-wrap: wrap;
   }
 
-  .hud-btn {
-    flex: 1 1 30%;
-    min-width: 110px;
-    padding: 10px 12px;
+  /* Three equal buttons that fit a phone: "Recommencer" no longer spills out */
+  .hud-btn,
+  .hud-btn--reveal {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 10px 4px;
+    font-size: 0.8rem;
+    white-space: nowrap;
   }
 
   .game-over-overlay {

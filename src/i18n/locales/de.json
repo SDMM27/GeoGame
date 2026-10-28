@@ -156,6 +156,10 @@
   },
   "labels": {
     "configuration": "Einstellungen",
+    "clues": "Hinweise",
+    "show_flag": "Flagge anzeigen",
+    "show_capital": "Hauptstadt anzeigen",
+    "clues_hint": "Sie erscheinen unter dem Namen des gesuchten Landes.",
     "total_countries": "Länder insgesamt",
     "country": "Land",
     "your_country": "Dein Land",
@@ -199,8 +203,6 @@
     "remaining": "◎ ÜBRIG",
     "flags": "FLAGGEN",
     "capitals": "HAUPTSTÄDTE",
-    "show_flag": "Flagge",
-    "show_capital": "Hauptstadt",
     "capital_of_target": "Hauptstadt: {{name}}"
   },
   "controls": {

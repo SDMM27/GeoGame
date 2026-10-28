@@ -156,6 +156,10 @@
   },
   "labels": {
     "configuration": "Настройки",
+    "clues": "Подсказки",
+    "show_flag": "Показывать флаг",
+    "show_capital": "Показывать столицу",
+    "clues_hint": "Они отображаются под названием искомой страны.",
     "total_countries": "стран всего",
     "country": "Страна",
     "your_country": "Твоя страна",
@@ -199,8 +203,6 @@
     "remaining": "◎ ОСТАЛОСЬ",
     "flags": "ФЛАГИ",
     "capitals": "СТОЛИЦЫ",
-    "show_flag": "Флаг",
-    "show_capital": "Столица",
     "capital_of_target": "Столица: {{name}}"
   },
   "controls": {

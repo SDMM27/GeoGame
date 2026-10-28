@@ -9,6 +9,8 @@ import {
   getDifficultyCaps,
 } from "./gameData";
 import MultiButton from "./MultiButton";
+import { GAME_TYPES } from "../../utils/gameTypes";
+import { usePlacementClues } from "../../utils/placementClues";
 
 export default function ActiveGameCard({ game, initialMode = "standard" }) {
   const navigate = useNavigate();
@@ -18,6 +20,7 @@ export default function ActiveGameCard({ game, initialMode = "standard" }) {
   const [ascensionPhases, setAscensionPhases] = useState(() => buildPresetPhases("Découverte"));
   const [selectionMode, setSelectionMode] = useState("difficulty");
   const [selectedContinent, setSelectedContinent] = useState(null);
+  const clues = usePlacementClues();
   const continents = useMemo(() => getContinentsForGame(game.id), [game.id]);
   const difficulties = getDifficultiesForGame(game.id);
   const ascensionCaps = useMemo(() => getDifficultyCaps(game.id), [game.id]);
@@ -184,6 +187,38 @@ export default function ActiveGameCard({ game, initialMode = "standard" }) {
                 </label>
               );
             })}
+          </div>
+        )}
+        {game.id === GAME_TYPES.PLACEMENT && (
+          <div className="clues-panel">
+            <span className="clues-title">{t('labels.clues')}</span>
+            <label className="clue-row">
+              <svg className="clue-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 21V4M5 4h11l-2 4 2 4H5" />
+              </svg>
+              <span className="clue-label">{t('labels.show_flag')}</span>
+              <input
+                className="clue-switch"
+                type="checkbox"
+                role="switch"
+                checked={clues.showFlag}
+                onChange={(event) => clues.setShowFlag(event.target.checked)}
+              />
+            </label>
+            <label className="clue-row">
+              <svg className="clue-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 21h18M5 21V10M19 21V10M9.5 21v-7M14.5 21v-7M3 10l9-6 9 6z" />
+              </svg>
+              <span className="clue-label">{t('labels.show_capital')}</span>
+              <input
+                className="clue-switch"
+                type="checkbox"
+                role="switch"
+                checked={clues.showCapital}
+                onChange={(event) => clues.setShowCapital(event.target.checked)}
+              />
+            </label>
+            <span className="clues-hint">{t('labels.clues_hint')}</span>
           </div>
         )}
         <button

@@ -156,6 +156,10 @@
   },
   "labels": {
     "configuration": "Configuration",
+    "clues": "Clues",
+    "show_flag": "Show the flag",
+    "show_capital": "Show the capital",
+    "clues_hint": "They appear under the name of the country to find.",
     "total_countries": "countries total",
     "country": "Country",
     "your_country": "Your country",
@@ -199,8 +203,6 @@
     "remaining": "◎ REMAINING",
     "flags": "FLAGS",
     "capitals": "CAPITALS",
-    "show_flag": "Flag",
-    "show_capital": "Capital",
     "capital_of_target": "Capital: {{name}}"
   },
   "controls": {

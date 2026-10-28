@@ -3,7 +3,7 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { Image } from 'expo-image'
 import { useLocalSearchParams } from 'expo-router'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import Animated, { FadeIn, FadeInDown, LinearTransition } from 'react-native-reanimated'
@@ -19,9 +19,10 @@ import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
 import { WorldMap, type WorldMapHandle } from '@/components/map/WorldMap'
 import { allCountries } from '@/components/map/geometry'
-import { Button, Text, Touchable } from '@/components/ui'
+import { Button, Text } from '@/components/ui'
 import { getFlag } from '@/flags'
 import { DIFFICULTY_COLORS } from '@/games'
+import { usePlacementClues } from '@/hooks/usePlacementClues'
 import { clean } from '@/i18n'
 import { RoomGate, RoomHudPill, Standings, useReportFound, type RoomPlay } from '@/multiplayer/RoomPlay'
 import { navigate } from '@/shims/react-router-dom'
@@ -32,20 +33,6 @@ const CONTINENT_VIEW: Record<string, { center: [number, number]; zoom: number }>
   Afrique: { center: [10, 20], zoom: 3.6 },
   Europe: { center: [50, 20], zoom: 4 },
   Océanie: { center: [-10, 170], zoom: 3.5 },
-}
-
-// Optional flag / capital under the target name, to learn them for the other games. Kept between games.
-const SHOW_FLAG_KEY = 'geogame_placement_show_flag'
-const SHOW_CAPITAL_KEY = 'geogame_placement_show_capital'
-
-function useStoredToggle(key: string) {
-  const [on, setOn] = useState(() => globalThis.localStorage?.getItem(key) === '1')
-  const toggle = () =>
-    setOn((prev) => {
-      globalThis.localStorage?.setItem(key, prev ? '0' : '1')
-      return !prev
-    })
-  return [on, toggle] as const
 }
 
 type Params ={ difficulty?: string; continent?: string; training?: string; ascension?: string; preset?: string; room?: string; gameType?: string }
@@ -131,8 +118,7 @@ function PlacementGame({
     state.targetCountryISO ?? allCountries.find((f) => f.properties.ADMIN === targetCountry)?.properties.ISO_A2 ?? null
   const targetName = getCountryName(targetCountryISO, i18n.language) || targetCountry
   // Not in rooms: every player gets the same clues there
-  const [showFlag, toggleFlag] = useStoredToggle(SHOW_FLAG_KEY)
-  const [showCapital, toggleCapital] = useStoredToggle(SHOW_CAPITAL_KEY)
+  const { showFlag, showCapital } = usePlacementClues()
   const targetFeature = allCountries.find((f) => f.properties.ADMIN === targetCountry)
   const flag = !play && showFlag ? getFlag(targetCountryISO) : null
   const capital =
@@ -178,35 +164,9 @@ function PlacementGame({
             </View>
           )}
           <View style={styles.findRow}>
-            <Text variant="label" style={{ flex: 1 }}>
+            <Text variant="label">
               {t('mobile.game.find')}
             </Text>
-            {!play && (
-              <>
-                <Touchable
-                  accessibilityRole="switch"
-                  accessibilityState={{ checked: showFlag }}
-                  accessibilityLabel={t('mobile.game.show_flag')}
-                  onPress={toggleFlag}
-                  style={[styles.toggle, showFlag && styles.toggleOn]}>
-                  <MaterialCommunityIcons name="flag-outline" size={16} color={showFlag ? colors.accent : colors.textMuted} />
-                  <Text variant="caption" color={showFlag ? colors.accent : colors.textMuted}>
-                    {t('mobile.game.show_flag')}
-                  </Text>
-                </Touchable>
-                <Touchable
-                  accessibilityRole="switch"
-                  accessibilityState={{ checked: showCapital }}
-                  accessibilityLabel={t('mobile.game.show_capital')}
-                  onPress={toggleCapital}
-                  style={[styles.toggle, showCapital && styles.toggleOn]}>
-                  <MaterialCommunityIcons name="city-variant-outline" size={16} color={showCapital ? colors.accent : colors.textMuted} />
-                  <Text variant="caption" color={showCapital ? colors.accent : colors.textMuted}>
-                    {t('mobile.game.show_capital')}
-                  </Text>
-                </Touchable>
-              </>
-            )}
           </View>
           <Animated.View key={targetCountry} entering={FadeIn.duration(220)} style={styles.targetRow}>
             {flag && <Image source={flag} contentFit="cover" style={styles.flag} />}
@@ -344,17 +304,6 @@ const styles = StyleSheet.create({
   },
   phaseRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: space.sm },
   findRow: { flexDirection: 'row', alignItems: 'center', gap: space.xs },
-  toggle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingVertical: 4,
-    paddingHorizontal: space.sm,
-    borderRadius: radius.sm,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  toggleOn: { borderColor: colors.accent, backgroundColor: `${colors.accent}14` },
   targetRow: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   flag: { width: 48, height: 32, borderRadius: 4 },
   footer: { flexDirection: 'row', alignItems: 'center', gap: space.md, marginTop: space.md },

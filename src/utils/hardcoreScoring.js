@@ -1,10 +1,13 @@
 // Hardcore mode (docs/plan-fonctionnalites.md, step 7): find the country on a map without borders, one tap per country.
 // A tap inside the country gives HARDCORE_MAX_POINTS; outside, the points fall with the distance to the country's
-// nearest edge, down to 0 at HARDCORE_ZERO_KM. Pure: shared by the website, the app and scripts/scoreCaps.mjs.
+// nearest edge, down to 0 at HARDCORE_ZERO_KM. A tap on the sea goes to the country with the nearest coast within
+// HARDCORE_TAP_TOLERANCE_PX on screen (small islands need no pixel-perfect tap), and is ignored farther out.
+// Pure: shared by the website, the app and scripts/scoreCaps.mjs.
 import { EARTH_RADIUS_KM, collectCoordinates } from './countryArea.js'
 
 export const HARDCORE_MAX_POINTS = 1000
 export const HARDCORE_ZERO_KM = 2000
+export const HARDCORE_TAP_TOLERANCE_PX = 16
 
 const RAD = Math.PI / 180
 
@@ -59,18 +62,78 @@ export function isInsideCountry({ lat, lng }, feature) {
   return collectCoordinates(feature?.geometry).some((polygon) => inPolygon(lat, lng, polygon))
 }
 
+// Bounding box of a polygon's outer ring, cached: [minLng, minLat, maxLng, maxLat].
+const boxes = new WeakMap()
+function polygonBox(polygon) {
+  let box = boxes.get(polygon)
+  if (!box) {
+    box = [Infinity, Infinity, -Infinity, -Infinity]
+    for (const [lng, lat] of polygon[0]) {
+      box[0] = Math.min(box[0], lng)
+      box[1] = Math.min(box[1], lat)
+      box[2] = Math.max(box[2], lng)
+      box[3] = Math.max(box[3], lat)
+    }
+    boxes.set(polygon, box)
+  }
+  return box
+}
+
+// Whether the polygon's box, widened by `maxKm`, can hold the point (or one of its copies one turn away).
+function nearBox(lat, lng, polygon, maxKm) {
+  const [minLng, minLat, maxLng, maxLat] = polygonBox(polygon)
+  const latDeg = maxKm / (EARTH_RADIUS_KM * RAD)
+  if (lat < minLat - latDeg || lat > maxLat + latDeg) return false
+  const lngDeg = latDeg / Math.max(0.01, Math.cos(Math.min(89, Math.abs(lat) + latDeg) * RAD))
+  return [lng, lng - 360, lng + 360].some((x) => x >= minLng - lngDeg && x <= maxLng + lngDeg)
+}
+
+// Kilometres from the point to the polygons' nearest edge, skipping those farther than `maxKm` (Infinity then).
+function edgesKm(lat, lng, polygons, maxKm = Infinity) {
+  let best = Infinity
+  for (const polygon of polygons) {
+    if (Number.isFinite(maxKm) && !nearBox(lat, lng, polygon, Math.min(best, maxKm))) continue
+    for (const ring of polygon) {
+      for (let i = 1; i < ring.length; i += 1) best = Math.min(best, segmentKm(lat, lng, ring[i - 1], ring[i]))
+    }
+  }
+  return best
+}
+
 /** Kilometres from { lat, lng } to a country feature: 0 inside, else to its nearest edge. Infinity without geometry. */
 export function distanceToCountryKm(point, feature) {
   const polygons = collectCoordinates(feature?.geometry)
   if (polygons.length === 0) return Infinity
   if (isInsideCountry(point, feature)) return 0
-  let best = Infinity
-  for (const polygon of polygons) {
-    for (const ring of polygon) {
-      for (let i = 1; i < ring.length; i += 1) best = Math.min(best, segmentKm(point.lat, point.lng, ring[i - 1], ring[i]))
+  return edgesKm(point.lat, point.lng, polygons)
+}
+
+/** Kilometres covered by one screen pixel at `lat` on a Web Mercator map at `zoom` (256 px tiles, as Leaflet). */
+export function kmPerPixel(lat, zoom) {
+  return (2 * Math.PI * EARTH_RADIUS_KM * Math.cos(lat * RAD)) / (256 * 2 ** zoom)
+}
+
+/**
+ * The country a tap goes to: the one whose land holds it, else the one with the nearest coast within `toleranceKm`.
+ * null on the open sea.
+ */
+export function findTappedCountry(point, features, toleranceKm) {
+  const landed = features.find((feature) =>
+    collectCoordinates(feature?.geometry).some(
+      (polygon) => nearBox(point.lat, point.lng, polygon, 0) && inPolygon(point.lat, point.lng, polygon)
+    )
+  )
+  if (landed) return landed
+  let nearest = null
+  let best = toleranceKm
+  for (const feature of features) {
+    const km = edgesKm(point.lat, point.lng, collectCoordinates(feature?.geometry), best)
+    if (km <= best) {
+      best = km
+      nearest = feature
     }
   }
-  return best
+  return nearest
 }
 
 /** Points of a tap `distanceKm` away from the country: the maximum inside, then falling (quadratically) to 0. */
@@ -90,4 +153,18 @@ export function scoreHardcoreTap(point, feature) {
     distanceKm: Number.isFinite(distanceKm) ? Math.round(distanceKm) : null,
     points: hardcorePoints(distanceKm),
   }
+}
+
+/**
+ * One tap on a map at `zoom`, the target being `feature` among all the map's `features`: scored as scoreHardcoreTap,
+ * a tap on the sea next to the target counting as inside. null for a tap on the open sea, which doesn't count.
+ */
+export function scoreHardcoreMapTap(point, feature, features, zoom) {
+  const result = scoreHardcoreTap(point, feature)
+  if (result.inside) return result
+  const toleranceKm = Number.isFinite(zoom) ? HARDCORE_TAP_TOLERANCE_PX * kmPerPixel(point.lat, zoom) : 0
+  const tapped = findTappedCountry(point, features, toleranceKm)
+  if (!tapped) return null
+  if (tapped.properties?.ADMIN === feature.properties?.ADMIN) return { inside: true, distanceKm: 0, points: HARDCORE_MAX_POINTS }
+  return result
 }

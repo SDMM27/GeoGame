@@ -10,7 +10,7 @@ import { matchKnownAnswer } from '../utils/answerLexicon'
 import { buildPhaseSequence } from '../utils/ascensionPresets'
 import { saveSnapshot } from '../utils/multiplayerSnapshot'
 import { reportEloAnswer, flushElo } from '../utils/eloReport'
-import { scoreHardcoreTap } from '../utils/hardcoreScoring'
+import { scoreHardcoreMapTap } from '../utils/hardcoreScoring'
 import { getCapitalName, getCountryName, getAllCountryNames, getAllCapitalNames } from '../utils/getCountryName'
 import { HOVER_STYLE, MAP_COLORS, HARDCORE_COUNTRY_STYLE } from '../utils/mapColors'
 
@@ -411,7 +411,9 @@ export default function useAscensionState(gameType, phases, isTraining, isAscens
     const feature = countries.features.find(c => c.properties.ADMIN === name)
     if (!feature) return
 
-    const result = scoreHardcoreTap(event.latlng, feature)
+    const result = scoreHardcoreMapTap(event.latlng, feature, countries.features, mapRefRef.current?.getZoom?.())
+    // The open sea: nothing to score
+    if (!result) return
     setScore(prev => prev + result.points)
     if (ratedRef.current) reportEloAnswer(GAME_TYPES.HARDCORE, name, { found: result.inside, errors: 0 })
     setStyleForCountry(name, {

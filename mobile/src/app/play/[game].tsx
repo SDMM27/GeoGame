@@ -3,7 +3,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, View } from 'react-native'
+import { ScrollView, StyleSheet, Switch, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { getTotalCapitalCountries, getTotalCapitalCountriesByContinent } from '@shared/hooks/useCapitalsGameState'
@@ -16,6 +16,7 @@ import { SheetCloseButton } from '@/components/SheetCloseButton'
 import { SurvivalSetupSheet } from '@/components/survival/SurvivalSetupSheet'
 import { Button, Segmented, Text, Touchable } from '@/components/ui'
 import { DIFFICULTIES, DIFFICULTY_COLORS, getGame } from '@/games'
+import { usePlacementClues } from '@/hooks/usePlacementClues'
 import { colors, radius, space } from '@/theme'
 
 type Phases = Record<string, number>
@@ -61,6 +62,37 @@ function Stepper({ value, max, onChange, color }: { value: number; max: number; 
   )
 }
 
+function ClueRow({
+  icon,
+  label,
+  value,
+  onChange,
+}: {
+  icon: keyof typeof MaterialCommunityIcons.glyphMap
+  label: string
+  value: boolean
+  onChange: (value: boolean) => void
+}) {
+  return (
+    <Touchable
+      accessibilityRole="switch"
+      accessibilityState={{ checked: value }}
+      onPress={() => onChange(!value)}
+      style={[styles.clueRow, value && { borderColor: colors.accent, backgroundColor: `${colors.accent}14` }]}>
+      <MaterialCommunityIcons name={icon} size={22} color={value ? colors.accent : colors.textMuted} />
+      <Text variant="bodyStrong" style={{ flex: 1 }}>
+        {label}
+      </Text>
+      <Switch
+        value={value}
+        onValueChange={onChange}
+        trackColor={{ true: colors.accent, false: colors.border }}
+        thumbColor={value ? colors.onAccent : colors.textMuted}
+      />
+    </Touchable>
+  )
+}
+
 export default function GameSheet() {
   const { game } = useLocalSearchParams<{ game: string }>()
   return game === 'survival' ? <SurvivalSetupSheet /> : <GameSetupSheet />
@@ -73,6 +105,7 @@ function GameSetupSheet() {
   const { game: gameId, multi, add, mode: initialMode } = useLocalSearchParams<{ game: string; multi?: string; add?: string; mode?: string }>()
   const game = getGame(gameId)!
   const counts = countFunctions(gameId)
+  const clues = usePlacementClues()
 
   // `mode`: the home page's Ascension entry opens the sheet on Ascension
   const [mode, setMode] = useState<Mode>(initialMode === 'ascension' && !game.noAscension ? 'ascension' : 'standard')
@@ -245,6 +278,15 @@ function GameSetupSheet() {
             </View>
           </>
         )}
+
+        {gameId === 'placement' && multi !== '1' && (
+          <View style={{ gap: space.sm }}>
+            <Text variant="label">{t('mobile.setup.clues')}</Text>
+            <ClueRow icon="flag-outline" label={t('mobile.setup.show_flag')} value={clues.showFlag} onChange={clues.setShowFlag} />
+            <ClueRow icon="city-variant-outline" label={t('mobile.setup.show_capital')} value={clues.showCapital} onChange={clues.setShowCapital} />
+            <Text variant="caption">{t('mobile.setup.clues_hint')}</Text>
+          </View>
+        )}
       </ScrollView>
 
       <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, space.lg) }]}>
@@ -322,6 +364,17 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bg,
     borderRadius: radius.md,
     borderWidth: 1,
+    borderColor: colors.border,
+    paddingVertical: space.sm,
+    paddingHorizontal: space.lg,
+  },
+  clueRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.md,
+    backgroundColor: colors.bg,
+    borderRadius: radius.md,
+    borderWidth: 1.5,
     borderColor: colors.border,
     paddingVertical: space.sm,
     paddingHorizontal: space.lg,

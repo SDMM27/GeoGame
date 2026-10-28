@@ -156,6 +156,10 @@
   },
   "labels": {
     "configuration": "Налаштування",
+    "clues": "Підказки",
+    "show_flag": "Показувати прапор",
+    "show_capital": "Показувати столицю",
+    "clues_hint": "Вони відображаються під назвою країни, яку треба знайти.",
     "total_countries": "країн усього",
     "country": "Країна",
     "your_country": "Твоя країна",
@@ -199,8 +203,6 @@
     "remaining": "◎ ЗАЛИШИЛОСЬ",
     "flags": "ПРАПОРИ",
     "capitals": "СТОЛИЦІ",
-    "show_flag": "Прапор",
-    "show_capital": "Столиця",
     "capital_of_target": "Столиця: {{name}}"
   },
   "controls": {

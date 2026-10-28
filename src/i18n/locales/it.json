@@ -156,6 +156,10 @@
   },
   "labels": {
     "configuration": "Impostazioni",
+    "clues": "Indizi",
+    "show_flag": "Mostra la bandiera",
+    "show_capital": "Mostra la capitale",
+    "clues_hint": "Compaiono sotto il nome del paese da trovare.",
     "total_countries": "paesi in totale",
     "country": "Paese",
     "your_country": "Il tuo paese",
@@ -199,8 +203,6 @@
     "remaining": "◎ RIMANENTI",
     "flags": "BANDIERE",
     "capitals": "CAPITALI",
-    "show_flag": "Bandiera",
-    "show_capital": "Capitale",
     "capital_of_target": "Capitale: {{name}}"
   },
   "controls": {

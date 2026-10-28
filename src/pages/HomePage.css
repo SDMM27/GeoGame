@@ -616,6 +616,108 @@
   border-color: var(--accent-border);
 }
 
+/* Clues (Find the country): two switches before the play buttons */
+.clues-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.clues-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.clue-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.clue-row:hover {
+  background: var(--bg-card);
+}
+
+.clue-row:has(.clue-switch:checked) {
+  border-color: var(--accent);
+}
+
+.clue-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: var(--text-muted);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.clue-row:has(.clue-switch:checked) .clue-icon {
+  stroke: var(--accent);
+}
+
+.clue-label {
+  flex: 1;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.clue-switch {
+  appearance: none;
+  position: relative;
+  flex-shrink: 0;
+  width: 36px;
+  height: 20px;
+  margin: 0;
+  background: var(--border-color);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.clue-switch::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  transition: transform 0.15s, background 0.15s;
+}
+
+.clue-switch:checked {
+  background: var(--accent);
+}
+
+.clue-switch:checked::after {
+  background: #fff;
+  transform: translateX(16px);
+}
+
+.clue-switch:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.clues-hint {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
 /* Difficulty Grid */
 .difficulty-grid {
   display: grid;

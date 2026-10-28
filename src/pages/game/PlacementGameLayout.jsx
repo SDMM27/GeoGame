@@ -15,34 +15,9 @@ import AscensionForm from '../AscensionForm'
 import ShareScoreButton from '../../components/ShareScoreButton'
 import SmallCountryCircles from './SmallCountryCircles'
 import { HARDCORE_COUNTRY_STYLE, MAP_COLORS } from '../../utils/mapColors'
+import { usePlacementClues } from '../../utils/placementClues'
 
 const GEO_STYLE = { fillColor: 'transparent', color: MAP_COLORS.stroke, fillOpacity: 1, weight: 1 }
-
-// Optional flag / capital of the target, to learn them for the other games. Kept between games (same keys as the app).
-const SHOW_FLAG_KEY = 'geogame_placement_show_flag'
-const SHOW_CAPITAL_KEY = 'geogame_placement_show_capital'
-
-function readToggle(key) {
-  try {
-    return localStorage.getItem(key) === '1'
-  } catch {
-    return false
-  }
-}
-
-function useStoredToggle(key) {
-  const [on, setOn] = useState(() => readToggle(key))
-  const toggle = () => {
-    const next = !on
-    setOn(next)
-    try {
-      localStorage.setItem(key, next ? '1' : '0')
-    } catch {
-      // Private mode: the choice lasts for this game only
-    }
-  }
-  return [on, toggle]
-}
 
 function MapClickListener({ onClick }) {
   useMapEvents({ click: onClick })
@@ -118,8 +93,7 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
   const progressPct = stats.total ? (stats.found / stats.total) * 100 : 0
 
   // Not in rooms (onGameFinished): every player gets the same clues there
-  const [showFlag, toggleFlag] = useStoredToggle(SHOW_FLAG_KEY)
-  const [showCapital, toggleCapital] = useStoredToggle(SHOW_CAPITAL_KEY)
+  const { showFlag, showCapital } = usePlacementClues()
   const targetFeature = useMemo(
     () => countries.features.find(f => f.properties.ADMIN === targetCountry),
     [targetCountry]
@@ -166,36 +140,6 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
               <div className="hud-progress-bar" style={{ width: `${progressPct}%` }} />
             </div>
             <span className="hud-progress-text">{stats.found} / {stats.total} {t('game_hud.countries')}</span>
-            {!onGameFinished && (
-              <div className="hud-target-toggles">
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={showFlag}
-                  aria-label={t('game_hud.show_flag')}
-                  title={t('game_hud.show_flag')}
-                  className={`hud-toggle${showFlag ? ' hud-toggle--on' : ''}`}
-                  onClick={toggleFlag}
-                >
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M5 21V4M5 4h11l-2 4 2 4H5" />
-                  </svg>
-                </button>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={showCapital}
-                  aria-label={t('game_hud.show_capital')}
-                  title={t('game_hud.show_capital')}
-                  className={`hud-toggle${showCapital ? ' hud-toggle--on' : ''}`}
-                  onClick={toggleCapital}
-                >
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M3 21h18M5 21V10M19 21V10M9.5 21v-7M14.5 21v-7M3 10l9-6 9 6z" />
-                  </svg>
-                </button>
-              </div>
-            )}
           </div>
         </div>
         <div className="hud-stats">

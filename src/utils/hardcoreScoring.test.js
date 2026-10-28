@@ -4,8 +4,11 @@ import geometries from '../data/countries.geo.json'
 import {
   HARDCORE_MAX_POINTS,
   distanceToCountryKm,
+  findTappedCountry,
   hardcorePoints,
   isInsideCountry,
+  kmPerPixel,
+  scoreHardcoreMapTap,
   scoreHardcoreTap,
 } from './hardcoreScoring'
 
@@ -14,6 +17,8 @@ const country = (name) => {
   const index = countries.features.findIndex((feature) => feature.properties.ADMIN === name)
   return { ...countries.features[index], geometry: geometries[index] }
 }
+
+const allCountries = countries.features.map((feature, index) => ({ ...feature, geometry: geometries[index] }))
 
 describe('isInsideCountry', () => {
   it('finds a tap on the land of the country', () => {
@@ -75,5 +80,57 @@ describe('scoreHardcoreTap', () => {
     expect(miss.inside).toBe(false)
     expect(miss.points).toBeGreaterThan(0)
     expect(miss.points).toBeLessThan(1000)
+  })
+})
+
+describe('kmPerPixel', () => {
+  it('follows the Web Mercator scale', () => {
+    expect(kmPerPixel(0, 0)).toBeCloseTo(156.5, 0)
+    expect(kmPerPixel(0, 1)).toBeCloseTo(kmPerPixel(0, 0) / 2)
+    expect(kmPerPixel(60, 0)).toBeCloseTo(kmPerPixel(0, 0) / 2)
+  })
+})
+
+describe('findTappedCountry', () => {
+  // A few km south of Malta, in the sea
+  const offMalta = { lat: 35.75, lng: 14.45 }
+
+  it('takes the land under the tap', () => {
+    expect(findTappedCountry({ lat: 48.86, lng: 2.35 }, allCountries, 0)?.properties.ADMIN).toBe('France')
+  })
+
+  it('takes the nearest coast within the tolerance', () => {
+    expect(findTappedCountry(offMalta, allCountries, 30)?.properties.ADMIN).toBe('Malte')
+    expect(findTappedCountry(offMalta, allCountries, 1)).toBeNull()
+  })
+
+  it('finds nothing on the open sea', () => {
+    expect(findTappedCountry({ lat: 30, lng: -40 }, allCountries, 50)).toBeNull()
+  })
+})
+
+describe('scoreHardcoreMapTap', () => {
+  const offMalta = { lat: 35.75, lng: 14.45 }
+
+  it('counts a tap on the sea next to the target as inside', () => {
+    expect(scoreHardcoreMapTap(offMalta, country('Malte'), allCountries, 6)).toEqual({ inside: true, distanceKm: 0, points: 1000 })
+  })
+
+  it('needs a closer tap when zoomed in', () => {
+    expect(scoreHardcoreMapTap(offMalta, country('Malte'), allCountries, 12)).toBeNull()
+  })
+
+  it('scores a tap next to another country as a miss', () => {
+    const result = scoreHardcoreMapTap(offMalta, country('Italie'), allCountries, 6)
+    expect(result.inside).toBe(false)
+    expect(result.points).toBeLessThan(1000)
+  })
+
+  it('scores a tap on the land of another country as a miss', () => {
+    expect(scoreHardcoreMapTap({ lat: 52.52, lng: 13.4 }, country('France'), allCountries, 6).inside).toBe(false)
+  })
+
+  it('ignores a tap on the open sea', () => {
+    expect(scoreHardcoreMapTap({ lat: 30, lng: -40 }, country('France'), allCountries, 3)).toBeNull()
   })
 })

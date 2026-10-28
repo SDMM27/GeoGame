@@ -10,7 +10,7 @@ import { getCountryName } from '../utils/getCountryName'
 import { GAME_TYPES } from '../utils/gameTypes'
 import { reportEloAnswer, flushElo } from '../utils/eloReport'
 import { HARDCORE_COUNTRY_STYLE, HOVER_STYLE, MAP_COLORS } from '../utils/mapColors'
-import { scoreHardcoreTap } from '../utils/hardcoreScoring'
+import { scoreHardcoreMapTap } from '../utils/hardcoreScoring'
 import { getLargestLandmassBounds } from '../utils/largestLandmass'
 import { NON_CLICKABLE_MAP_AREAS } from '../utils/mapInteraction'
 
@@ -274,7 +274,9 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
     const feature = countries.features.find((country) => country.properties.ADMIN === name)
     if (!feature) return
 
-    const result = scoreHardcoreTap(point, feature)
+    const result = scoreHardcoreMapTap(point, feature, countries.features, mapRef?.getZoom?.())
+    // The open sea: nothing to score
+    if (!result) return
     setScore((current) => current + result.points)
     if (ratedRef.current) reportEloAnswer(GAME_TYPES.HARDCORE, name, { found: result.inside, errors: 0 })
     setStyleForCountry(name, {
@@ -296,7 +298,7 @@ export default function useGameState(difficulty, isTraining, overrideCountries =
     toast[result.inside ? 'success' : 'error'](feedback, {
       containerId: 'topRightToast',
     })
-  }, [changeCountry, gameType, i18n.language, setStyleForCountry, t])
+  }, [changeCountry, gameType, i18n.language, mapRef, setStyleForCountry, t])
 
   const onMapClick = useCallback((event) => {
     if (gameType === GAME_TYPES.HARDCORE) handleHardcoreTap(event.latlng)

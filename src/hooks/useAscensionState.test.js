@@ -301,7 +301,9 @@ describe('useAscensionState — HARDCORE', () => {
     const ring = byName(name).geometry.coordinates[0]
     return { lat: (ring[0][1] + ring[2][1]) / 2, lng: (ring[0][0] + ring[2][0]) / 2 }
   }
-  const FAR = { lat: -80, lng: -170 }
+  // Sur la terre d'un autre pays, loin des cibles Facile (une tap en pleine mer ne compte pas)
+  const FAR = centre('Australie')
+  const OPEN_SEA = { lat: -80, lng: -170 }
 
   it('starts on a map target of the phase difficulty', () => {
     const { result } = renderAscension(GAME_TYPES.HARDCORE, { Facile: 2, Moyen: 1 })
@@ -328,6 +330,15 @@ describe('useAscensionState — HARDCORE', () => {
     expect(result.current.score).toBeLessThan(1000)
     expect(result.current.stats).toMatchObject({ found: 0, skipped: 1 })
     expect(result.current.shownCountriesRef.current.has(first)).toBe(true)
+  })
+
+  it('ignores a tap on the open sea', () => {
+    const { result } = renderAscension(GAME_TYPES.HARDCORE, { Facile: 2 })
+    const first = targetName(result)
+    act(() => result.current.onMapClick({ latlng: OPEN_SEA }))
+    expect(result.current.score).toBe(0)
+    expect(result.current.stats).toMatchObject({ found: 0, skipped: 0 })
+    expect(targetName(result)).toBe(first)
   })
 
   it('advances through the phases and ends the game', () => {

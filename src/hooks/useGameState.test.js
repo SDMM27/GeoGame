@@ -256,13 +256,23 @@ describe('useGameState — Hardcore', () => {
   it('reports a tap to Elo in a normal game', () => {
     const { result } = renderHook(() => useGameState('Facile', false, null, null, null, null, 'HARDCORE'))
     const name = result.current.targetCountry
-    act(() => result.current.onMapClick({ latlng: { lat: 0, lng: 0 } }))
+    // On the land of Australia: a tap on the open sea doesn't count
+    act(() => result.current.onMapClick({ latlng: { lat: -25, lng: 134 } }))
     expect(reportEloAnswer).toHaveBeenCalledWith('HARDCORE', name, expect.objectContaining({ errors: 0 }))
   })
 
   it('reports nothing with an imposed list of countries', () => {
     const { result } = renderHook(() => useGameState('Facile', false, ['France', 'Espagne'], null, null, null, 'HARDCORE'))
+    act(() => result.current.onMapClick({ latlng: { lat: -25, lng: 134 } }))
+    expect(reportEloAnswer).not.toHaveBeenCalled()
+  })
+
+  it('ignores a tap on the open sea', () => {
+    const { result } = renderHook(() => useGameState('Facile', false, null, null, null, null, 'HARDCORE'))
+    const name = result.current.targetCountry
     act(() => result.current.onMapClick({ latlng: { lat: 0, lng: 0 } }))
     expect(reportEloAnswer).not.toHaveBeenCalled()
+    expect(result.current.score).toBe(0)
+    expect(result.current.targetCountry).toBe(name)
   })
 })

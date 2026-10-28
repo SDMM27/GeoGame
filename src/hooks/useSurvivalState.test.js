@@ -44,10 +44,26 @@ describe('useSurvivalState', () => {
     const { result } = play({ modes: [PLACEMENT], lives: 3, seed: 5 })
     const answer = result.current.round.country.properties.ADMIN
     const wrong = answer === 'France' ? 'Spain' : 'France'
+    act(() => { vi.advanceTimersByTime(500) })
     act(() => { result.current.clickCountry(wrong) })
     expect(result.current.lives).toBe(2)
     expect(result.current.outcome).toBe('failed')
     expect(result.current.clickCountry(answer)).toBe(null)
+    expect(result.current.lives).toBe(2)
+  })
+
+  it('ignores a map tap right as a round starts (meant for the "Next" button the auto-advance just removed)', () => {
+    const { result } = play({ modes: [PLACEMENT], lives: 3, seed: 5 })
+    const answer = result.current.round.country.properties.ADMIN
+    const wrong = answer === 'France' ? 'Spain' : 'France'
+    let tap
+    act(() => { tap = result.current.clickCountry(wrong) })
+    expect(tap).toBe(null)
+    expect(result.current.lives).toBe(3)
+    expect(result.current.outcome).toBe(null)
+    act(() => { vi.advanceTimersByTime(500) })
+    act(() => { tap = result.current.clickCountry(wrong) })
+    expect(tap).toBe('wrong')
     expect(result.current.lives).toBe(2)
   })
 
@@ -195,6 +211,7 @@ describe('useSurvivalState', () => {
     const wrong = answer === 'France' ? 'Spain' : 'France'
     const other = answer === 'Italy' ? 'Germany' : 'Italy'
     let first, second
+    act(() => { vi.advanceTimersByTime(500) })
     act(() => {
       first = result.current.clickCountry(wrong)
       second = result.current.clickCountry(other)

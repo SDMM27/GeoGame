@@ -198,7 +198,10 @@
     "skipped": "✗ ÜBERSPRUNGEN",
     "remaining": "◎ ÜBRIG",
     "flags": "FLAGGEN",
-    "capitals": "HAUPTSTÄDTE"
+    "capitals": "HAUPTSTÄDTE",
+    "show_flag": "Flagge",
+    "show_capital": "Hauptstadt",
+    "capital_of_target": "Hauptstadt: {{name}}"
   },
   "controls": {
     "left_click": "Linksklick",

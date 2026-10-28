@@ -198,7 +198,10 @@
     "skipped": "✗ SKIPPED",
     "remaining": "◎ REMAINING",
     "flags": "FLAGS",
-    "capitals": "CAPITALS"
+    "capitals": "CAPITALS",
+    "show_flag": "Flag",
+    "show_capital": "Capital",
+    "capital_of_target": "Capital: {{name}}"
   },
   "controls": {
     "left_click": "Left click",

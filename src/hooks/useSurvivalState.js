@@ -16,6 +16,8 @@ import { buildSurvivalRounds, checkCapitalName, checkCountryName, livesLeft, nor
 // How long the answer stays on screen before the next round (a quiz answer comes with a fact to read).
 const NEXT_DELAY_MS = { correct: 900, failed: 2200 }
 const QUIZ_DELAY_MS = { correct: 2500, failed: 4500 }
+// A map tap this soon after a round starts is ignored: it was meant for the "Next" button the auto-advance just removed
+const TAP_GRACE_MS = 400
 
 const freshRound = (at) => ({ guesses: [], wrongPicks: [], outcome: null, timedOut: false, roundStartedAt: at })
 
@@ -98,7 +100,8 @@ function reducer(state, action) {
  * `timer`: seconds per round (0: none). `ramp`: how fast the difficulty rises ({ Facile, Moyen, Difficile }, see
  * SURVIVAL_RAMPS). `snapshot` / `snapshotKey` (multiplayer): resume the run after a refresh,
  * and save it as it goes (with `extraSnapshot`). `autoAdvance` false, `deadline` (local ms) and `deadlineRound` (the
- * round that deadline is for): see useSurvivalSync.
+ * round that deadline is for): see useSurvivalSync. `clockStopsOnAnswer`: elapsedMs leaves out the time the answers
+ * are shown (the Daily Challenge, where "Next" is up to the player).
  * `maxRounds` / `distinctCountries`: see buildSurvivalRounds (the Daily Challenge: 12 rounds, all different countries).
  * `paused`: nothing runs (no clock, no timer, no answer) until it turns false, which then starts the run from `snapshot`
  * (a snapshot saved by the caller: { index, errors, score, results, elapsedMs }, outcome of its round null).
@@ -116,6 +119,7 @@ export default function useSurvivalState({
   snapshotKey = null,
   extraSnapshot = null,
   autoAdvance = true,
+  clockStopsOnAnswer = false,
   deadline: sharedDeadline = null,
   deadlineRound = null,
 }) {
@@ -127,23 +131,29 @@ export default function useSurvivalState({
   )
   const [state, dispatch] = useReducer(reducer, null, () => initialState(rounds, lives, snapshot, Date.now()))
 
-  // Clock: from the first render, frozen at the end of the run (it also refreshes the round's countdown)
+  // Clock: from the first render, frozen at the end of the run (it also refreshes the round's countdown).
+  // `clockStopsOnAnswer`: also frozen while a round's answer is shown, and goes on from there at the next round.
   const startRef = useRef(Date.now() - (snapshot?.elapsedMs ?? 0))
   const [elapsedMs, setElapsedMs] = useState(snapshot?.elapsedMs ?? 0)
   const elapsedRef = useRef(elapsedMs)
+  const frozenRef = useRef(false)
+  const clockStopped = state.over || (clockStopsOnAnswer && Boolean(state.outcome))
   useEffect(() => {
     const tick = () => {
       elapsedRef.current = Date.now() - startRef.current
       setElapsedMs(elapsedRef.current)
     }
     if (paused) return undefined
-    if (state.over) {
-      tick()
+    if (clockStopped) {
+      if (!frozenRef.current) tick()
+      frozenRef.current = true
       return undefined
     }
+    if (frozenRef.current) startRef.current = Date.now() - elapsedRef.current
+    frozenRef.current = false
     const id = setInterval(tick, 250)
     return () => clearInterval(id)
-  }, [state.over, paused])
+  }, [clockStopped, paused])
 
   const round = rounds[state.index] ?? null
   const playing = Boolean(round) && !state.outcome && !state.over && !paused
@@ -233,11 +243,12 @@ export default function useSurvivalState({
   // Placement: the country clicked on the map
   const clickCountry = useCallback((name) => {
     if (!playing || round.type !== GAME_TYPES.PLACEMENT) return null
+    if (Date.now() - state.roundStartedAt < TAP_GRACE_MS) return null
     if (state.wrongPicks.includes(name)) return 'repeat'
     const right = name === round.country.properties.ADMIN
     if (!answer(right ? { type: 'right' } : { type: 'wrong', pick: name })) return null
     return right ? 'correct' : 'wrong'
-  }, [playing, round, state.wrongPicks, answer])
+  }, [playing, round, state.wrongPicks, state.roundStartedAt, answer])
 
   /**
    * A typed answer. Returns 'correct', 'wrong', 'unknown' (not a country: no life lost)

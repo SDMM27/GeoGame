@@ -30,14 +30,16 @@ function startedChallenge() {
 function answerRight(result) {
   const { round } = result.current
   const country = round.country.properties
+  // A map tap right as the round starts is ignored (meant for the "Next" button)
+  act(() => { vi.advanceTimersByTime(500) })
   act(() => {
     if (round.type === GAME_TYPES.PLACEMENT) result.current.clickCountry(country.ADMIN)
     else result.current.submitText(round.type === GAME_TYPES.CAPITALS ? country.capital : country.ADMIN)
   })
 }
 
-// Answer shown, then the next round
-const nextRound = () => act(() => { vi.advanceTimersByTime(2500) })
+// The answer stays shown until "Next"
+const nextRound = (result) => act(() => { result.current.next() })
 
 describe('useDailyChallengeState', () => {
   it('waits for the day (server time), then shows the rules without starting anything', () => {
@@ -85,18 +87,36 @@ describe('useDailyChallengeState', () => {
     const { result } = startedChallenge()
     answerRight(result)
     expect(result.current.outcome).toBe('correct')
-    nextRound()
+    nextRound(result)
     act(() => { result.current.giveUp() })
     expect(result.current.outcome).toBe('failed')
-    nextRound()
+    nextRound(result)
     act(() => { vi.advanceTimersByTime(CHALLENGE_TIMER * 1000) })
     expect(result.current.outcome).toBe('failed')
     expect(result.current.timedOut).toBe(true)
-    nextRound()
+    nextRound(result)
     expect(result.current.roundIndex).toBe(3)
     expect(result.current.results.slice(0, 4)).toEqual(['correct', 'failed', 'failed', null])
     expect(result.current.score).toBe(1)
     expect(result.current.phase).toBe('playing')
+  })
+
+  it('keeps the answer on screen until "Next", and leaves that time out of the total', () => {
+    const { result } = startedChallenge()
+    act(() => { vi.advanceTimersByTime(3000) })
+    act(() => { result.current.giveUp() })
+    const atAnswer = result.current.elapsedTime
+    expect(atAnswer).toBeGreaterThanOrEqual(3000)
+    act(() => { vi.advanceTimersByTime(30000) })
+    expect(result.current.roundIndex).toBe(0)
+    expect(result.current.outcome).toBe('failed')
+    expect(result.current.elapsedTime).toBe(atAnswer)
+    nextRound(result)
+    expect(result.current.roundIndex).toBe(1)
+    expect(result.current.timeLeftMs).toBe(CHALLENGE_TIMER * 1000)
+    act(() => { vi.advanceTimersByTime(2000) })
+    expect(result.current.elapsedTime).toBeGreaterThanOrEqual(atAnswer + 2000)
+    expect(result.current.elapsedTime).toBeLessThan(atAnswer + 2500)
   })
 
   it('ends after the 12th round with the score, the results and the time, and keeps them', () => {
@@ -104,7 +124,7 @@ describe('useDailyChallengeState', () => {
     for (let i = 0; i < CHALLENGE_ROUNDS; i++) {
       if (i % 4 === 3) act(() => { result.current.giveUp() })
       else answerRight(result)
-      nextRound()
+      nextRound(result)
     }
     expect(result.current.phase).toBe('done')
     expect(result.current.isComplete).toBe(true)
@@ -119,7 +139,7 @@ describe('useDailyChallengeState', () => {
     const first = startedChallenge()
     for (let i = 0; i < CHALLENGE_ROUNDS; i++) {
       act(() => { first.result.current.giveUp() })
-      nextRound()
+      nextRound(first.result)
     }
     expect(first.result.current.score).toBe(0)
     expect(first.result.current.phase).toBe('done')
@@ -137,9 +157,9 @@ describe('useDailyChallengeState', () => {
   it('keeps the run through a refresh, and counts the round that was on screen as failed', () => {
     const first = startedChallenge()
     answerRight(first.result)
-    nextRound()
+    nextRound(first.result)
     answerRight(first.result)
-    nextRound()
+    nextRound(first.result)
     expect(first.result.current.roundIndex).toBe(2)
     act(() => { vi.advanceTimersByTime(3000) })
     expect(stored()).toMatchObject({ pending: true, index: 2 })

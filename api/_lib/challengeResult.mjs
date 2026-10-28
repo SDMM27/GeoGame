@@ -18,6 +18,7 @@ const LOCALES = {
   de: require('../../src/i18n/locales/de.json'),
   it: require('../../src/i18n/locales/it.json'),
   uk: require('../../src/i18n/locales/uk.json'),
+  nl: require('../../src/i18n/locales/nl.json'),
 }
 
 // Keyed by the outcome from the friend's point of view: win = the friend beat the challenger.
@@ -31,6 +32,7 @@ const BODY = {
     de: '{{username}} hat dich bei {{game}} geschlagen 😤',
     it: '{{username}} ti ha battuto a {{game}} 😤',
     uk: '{{username}} переміг(ла) тебе в {{game}} 😤',
+    nl: '{{username}} heeft je verslagen in {{game}} 😤',
   },
   lose: {
     fr: '{{username}} a perdu contre toi sur {{game}} 💪',
@@ -41,6 +43,7 @@ const BODY = {
     de: '{{username}} hat bei {{game}} gegen dich verloren 💪',
     it: '{{username}} ha perso contro di te a {{game}} 💪',
     uk: '{{username}} програв(ла) тобі в {{game}} 💪',
+    nl: '{{username}} heeft van je verloren in {{game}} 💪',
   },
   tie: {
     fr: '{{username}} a fait égalité avec toi sur {{game}} 🤝',
@@ -51,6 +54,7 @@ const BODY = {
     de: '{{username}} hat bei {{game}} unentschieden gegen dich gespielt 🤝',
     it: '{{username}} ha pareggiato con te a {{game}} 🤝',
     uk: '{{username}} зіграв(ла) з тобою внічию в {{game}} 🤝',
+    nl: '{{username}} speelde gelijk met je in {{game}} 🤝',
   },
 }
 

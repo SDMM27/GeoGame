@@ -14,6 +14,7 @@ const LAZY_LOCALES = {
   it: () => import('./locales/it.json'),
   ru: () => import('./locales/ru.json'),
   uk: () => import('./locales/uk.json'),
+  nl: () => import('./locales/nl.json'),
 }
 
 const lazyBackend = {

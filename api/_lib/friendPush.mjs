@@ -16,6 +16,7 @@ const BODY = {
     de: '{{username}} möchte mit dir befreundet sein',
     it: '{{username}} vuole essere tuo amico',
     uk: '{{username}} хоче додати тебе в друзі',
+    nl: '{{username}} wil je als vriend toevoegen',
   },
   accepted: {
     fr: '{{username}} a accepté ta demande d’ami',
@@ -26,6 +27,7 @@ const BODY = {
     de: '{{username}} hat deine Freundschaftsanfrage angenommen',
     it: '{{username}} ha accettato la tua richiesta di amicizia',
     uk: 'Тепер ви з {{username}} друзі',
+    nl: 'Jij en {{username}} zijn nu vrienden',
   },
 }
 

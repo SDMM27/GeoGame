@@ -24,6 +24,7 @@ const LOCALES = {
   de: require('../../src/i18n/locales/de.json'),
   it: require('../../src/i18n/locales/it.json'),
   uk: require('../../src/i18n/locales/uk.json'),
+  nl: require('../../src/i18n/locales/nl.json'),
 }
 
 // Games with a daily challenge (src/utils/gameTypes.js) → id of their title in the locales (games.{id}.title).
@@ -50,6 +51,7 @@ const BODY = {
   de: '{{username}} hat {{game}} von heute geschafft. Na, komm und schlag mich! 😏',
   it: '{{username}} ha finito {{game}} di oggi. Allora, vieni a battermi! 😏',
   uk: '{{username}} пройшов(ла) {{game}} дня. Ну що, приходь мене перемогти! 😏',
+  nl: '{{username}} heeft {{game}} van vandaag uitgespeeld. Kom me maar verslaan! 😏',
 }
 
 // The Daily Challenge's title already says "of the day": no "du jour" after it.
@@ -62,6 +64,7 @@ const CHALLENGE_BODY = {
   de: '{{username}} hat die {{game}} geschafft. Na, komm und schlag mich! 😏',
   it: '{{username}} ha finito la {{game}}. Allora, vieni a battermi! 😏',
   uk: '{{username}} пройшов(ла) {{game}}. Ну що, приходь мене перемогти! 😏',
+  nl: '{{username}} heeft de {{game}} uitgespeeld. Kom me maar verslaan! 😏',
 }
 
 const RECENT_BODY = {
@@ -73,6 +76,7 @@ const RECENT_BODY = {
   de: '{{username}} hat gerade {{game}} gespielt{{score}}. Komm und schlag mich! 😏',
   it: '{{username}} ha appena giocato a {{game}}{{score}}. Vieni a battermi! 😏',
   uk: '{{username}} щойно зіграв(ла) в {{game}}{{score}}. Приходь мене перемогти! 😏',
+  nl: '{{username}} heeft net {{game}} gespeeld{{score}}. Kom me maar verslaan! 😏',
 }
 
 // `score`: points of the game just played, when it has some (mode 'recent' only).

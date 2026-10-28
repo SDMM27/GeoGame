@@ -7,12 +7,14 @@ import ptShared from '@shared/i18n/locales/pt.json'
 import deShared from '@shared/i18n/locales/de.json'
 import itShared from '@shared/i18n/locales/it.json'
 import ukShared from '@shared/i18n/locales/uk.json'
+import nlShared from '@shared/i18n/locales/nl.json'
 
 import { de } from './locales/de'
 import { es } from './locales/es'
 import { it } from './locales/it'
 import { pt } from './locales/pt'
 import { uk } from './locales/uk'
+import { nl } from './locales/nl'
 
 const fr = {
   tabs: { play: 'Jouer', multiplayer: 'Multi', leaderboards: 'Classements', profile: 'Profil' },
@@ -743,10 +745,10 @@ const ru: MobileStrings = {
 }
 
 // The website loads its languages other than French and English on demand; the app ships them all.
-const SHARED = { ru: ruShared, es: esShared, pt: ptShared, de: deShared, it: itShared, uk: ukShared }
+const SHARED = { ru: ruShared, es: esShared, pt: ptShared, de: deShared, it: itShared, uk: ukShared, nl: nlShared }
 for (const [lang, strings] of Object.entries(SHARED)) i18n.addResourceBundle(lang, 'translation', strings, true, true)
 
-const MOBILE: Record<string, MobileStrings> = { fr, en, es, pt, de, it, ru, uk }
+const MOBILE: Record<string, MobileStrings> = { fr, en, es, pt, de, it, ru, uk, nl }
 for (const [lang, strings] of Object.entries(MOBILE)) i18n.addResourceBundle(lang, 'translation', { mobile: strings }, true, true)
 
 // Website labels carry emoji/arrows ("🏆 Scores", "← Accueil"); strip them for native UI.

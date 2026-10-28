@@ -6,21 +6,21 @@ const cache = {}
 
 // Overrides for names where Intl.DisplayNames uses an unwanted form (e.g. "Congo-Kinshasa", "RAE de Hong Kong (China)", "Chine continentale")
 const nameOverrides = {
-  CN: { fr: 'Chine', en: 'China', ru: 'Китай', es: 'China', pt: 'China', de: 'China', it: 'Cina', uk: 'Китай' },
+  CN: { fr: 'Chine', en: 'China', ru: 'Китай', es: 'China', pt: 'China', de: 'China', it: 'Cina', uk: 'Китай', nl: 'China' },
   CD: {
     fr: 'République démocratique du Congo', en: 'Democratic Republic of the Congo', ru: 'Демократическая Республика Конго',
     es: 'República Democrática del Congo', pt: 'República Democrática do Congo', de: 'Demokratische Republik Kongo',
-    it: 'Repubblica Democratica del Congo', uk: 'Демократична Республіка Конго',
+    it: 'Repubblica Democratica del Congo', uk: 'Демократична Республіка Конго', nl: 'Democratische Republiek Congo',
   },
-  CG: { fr: 'Congo', en: 'Congo', ru: 'Конго', es: 'Congo', pt: 'Congo', de: 'Kongo', it: 'Congo', uk: 'Конго' },
-  HK: { es: 'Hong Kong', pt: 'Hong Kong', de: 'Hongkong', it: 'Hong Kong', uk: 'Гонконг' },
-  MO: { es: 'Macao', pt: 'Macau', de: 'Macau', it: 'Macao', uk: 'Макао' },
-  MM: { es: 'Myanmar', pt: 'Mianmar', de: 'Myanmar', it: 'Myanmar', uk: 'Мʼянма' },
+  CG: { fr: 'Congo', en: 'Congo', ru: 'Конго', es: 'Congo', pt: 'Congo', de: 'Kongo', it: 'Congo', uk: 'Конго', nl: 'Congo' },
+  HK: { es: 'Hong Kong', pt: 'Hong Kong', de: 'Hongkong', it: 'Hong Kong', uk: 'Гонконг', nl: 'Hongkong' },
+  MO: { es: 'Macao', pt: 'Macau', de: 'Macau', it: 'Macao', uk: 'Макао', nl: 'Macau' },
+  MM: { es: 'Myanmar', pt: 'Mianmar', de: 'Myanmar', it: 'Myanmar', uk: 'Мʼянма', nl: 'Myanmar' },
   CI: { es: 'Costa de Marfil', de: 'Elfenbeinküste' },
   CV: { de: 'Kap Verde' },
   BN: { de: 'Brunei' },
   TL: { es: 'Timor Oriental', de: 'Osttimor' },
-  PS: { es: 'Palestina', pt: 'Palestina', de: 'Palästina', it: 'Palestina', uk: 'Палестина' },
+  PS: { es: 'Palestina', pt: 'Palestina', de: 'Palästina', it: 'Palestina', uk: 'Палестина', nl: 'Palestina' },
 }
 
 // Languages other than French, whose names are accepted as answers too (French: the dataset's ADMIN and aliases)

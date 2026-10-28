@@ -4,8 +4,8 @@
 // label and consigne are the French texts; the pages show ranking.<key> and ranking.instruction_<key> instead.
 import { localeOf, toLanguage } from '../i18n/languages.js'
 
-const BILLION = { fr: 'Md', en: 'B', es: 'mil M', pt: 'bi', de: 'Mrd.', it: 'Mld', ru: 'млрд', uk: 'млрд' }
-const MILLION = { fr: 'M', en: 'M', es: 'M', pt: 'mi', de: 'Mio.', it: 'Mln', ru: 'млн', uk: 'млн' }
+const BILLION = { fr: 'Md', en: 'B', es: 'mil M', pt: 'bi', de: 'Mrd.', it: 'Mld', ru: 'млрд', uk: 'млрд', nl: 'mld' }
+const MILLION = { fr: 'M', en: 'M', es: 'M', pt: 'mi', de: 'Mio.', it: 'Mln', ru: 'млн', uk: 'млн', nl: 'mln' }
 const GDP = {
   fr: (n) => `${n} Mrd $`,
   en: (n) => `$${n}B`,
@@ -15,6 +15,7 @@ const GDP = {
   it: (n) => `${n} Mld $`,
   ru: (n) => `${n} млрд $`,
   uk: (n) => `${n} млрд $`,
+  nl: (n) => `${n} mld $`,
 }
 
 // French when the language is missing or unknown (the old behaviour)

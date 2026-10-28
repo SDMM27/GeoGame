@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import {
   ActivityIndicator,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text as RNText,
   View,
@@ -162,37 +163,40 @@ export function Segmented<T extends string>({
   value: T
   onChange: (value: T) => void
 }) {
+  // Segments share the width; when their labels don't fit (narrow phone, long translation, large font) the row scrolls.
   return (
     <View style={segmentStyles.track}>
-      {options.map((option) => {
-        const active = option.value === value
-        return (
-          <Touchable
-            key={option.value}
-            onPress={() => onChange(option.value)}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: active }}
-            style={[segmentStyles.item, active && segmentStyles.itemActive]}>
-            <Text variant="bodyStrong" color={active ? colors.text : colors.textMuted} style={{ fontSize: 14 }}>
-              {option.label}
-            </Text>
-          </Touchable>
-        )
-      })}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} bounces={false} contentContainerStyle={segmentStyles.row}>
+        {options.map((option) => {
+          const active = option.value === value
+          return (
+            <Touchable
+              key={option.value}
+              onPress={() => onChange(option.value)}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: active }}
+              style={[segmentStyles.item, active && segmentStyles.itemActive]}>
+              <Text variant="bodyStrong" numberOfLines={1} color={active ? colors.text : colors.textMuted} style={{ fontSize: 14 }}>
+                {option.label}
+              </Text>
+            </Touchable>
+          )
+        })}
+      </ScrollView>
     </View>
   )
 }
 
 const segmentStyles = StyleSheet.create({
   track: {
-    flexDirection: 'row',
     backgroundColor: colors.bg,
     borderRadius: radius.md,
     padding: 4,
     borderWidth: 1,
     borderColor: colors.border,
   },
-  item: { flex: 1, paddingVertical: 9, alignItems: 'center', borderRadius: radius.sm },
+  row: { flexGrow: 1 },
+  item: { flexGrow: 1, paddingVertical: 9, paddingHorizontal: 10, alignItems: 'center', borderRadius: radius.sm },
   itemActive: { backgroundColor: colors.surfaceHigh },
 })
 

@@ -2,7 +2,8 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { Image } from 'expo-image'
 import { router } from 'expo-router'
 import { useTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native'
+import { useRef, useState } from 'react'
+import { ScrollView, StyleSheet, View, useWindowDimensions, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -17,6 +18,7 @@ import { colors, gameColors, radius, space } from '@/theme'
 const DAILY_GAMES = GAMES.filter((game) => game.kind === 'daily')
 // Games with a setup sheet first: Placement, Flags, Capitals, Survival
 const SETUP_GAMES = GAMES.filter((game) => game.kind === 'setup' || game.kind === 'survival')
+const NARROW_CARD = 240
 
 function DailyCard({ game, width }: { game: GameDefinition; width: number }) {
   const { t } = useTranslation()
@@ -36,8 +38,15 @@ function DailyCard({ game, width }: { game: GameDefinition; width: number }) {
           accessibilityRole="button"
           onPress={() => router.push({ pathname: game.route as never, params: { mode: 'daily' } })}
           style={[styles.dailyPrimary, { backgroundColor: game.color }]}>
-          <MaterialCommunityIcons name="calendar-today" size={16} color={colors.bg} />
-          <Text variant="bodyStrong" color={colors.bg} style={{ fontSize: 14 }}>
+          {/* Narrow card: the label gets the icon's room and shrinks (native) rather than widening the card or breaking a word */}
+          {width >= NARROW_CARD && <MaterialCommunityIcons name="calendar-today" size={16} color={colors.bg} />}
+          <Text
+            variant="bodyStrong"
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.7}
+            color={colors.bg}
+            style={{ fontSize: 14, flexShrink: 1 }}>
             {t('mobile.home.daily')}
           </Text>
         </Touchable>
@@ -93,8 +102,19 @@ export default function HomeScreen() {
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   const { width } = useWindowDimensions()
+  // The next card peeks out on the right, and the dots below say how many there are
   const cardWidth = Math.min(300, width * 0.72)
+  const snap = cardWidth + space.md
   const { account } = useAccount()
+  const dailyScroll = useRef<ScrollView>(null)
+  const [dailyIndex, setDailyIndex] = useState(0)
+  const onDailyScroll = ({ nativeEvent }: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const x = nativeEvent.contentOffset.x
+    const end = nativeEvent.contentSize.width - nativeEvent.layoutMeasurement.width
+    // The last card can't snap to the left edge: reaching the end selects it
+    const index = x >= end - 2 ? DAILY_GAMES.length - 1 : Math.round(x / snap)
+    setDailyIndex(Math.max(0, Math.min(DAILY_GAMES.length - 1, index)))
+  }
 
   return (
     <ScrollView
@@ -115,15 +135,34 @@ export default function HomeScreen() {
         <Text variant="caption">{t('mobile.home.daily_subtitle')}</Text>
       </View>
       <ScrollView
+        ref={dailyScroll}
         horizontal
         showsHorizontalScrollIndicator={false}
-        snapToInterval={cardWidth + space.md}
+        snapToInterval={snap}
         decelerationRate="fast"
+        onScroll={onDailyScroll}
+        scrollEventThrottle={32}
         contentContainerStyle={{ paddingHorizontal: space.lg, gap: space.md }}>
         {DAILY_GAMES.map((game) => (
           <DailyCard key={game.id} game={game} width={cardWidth} />
         ))}
       </ScrollView>
+      <View style={styles.dots}>
+        {DAILY_GAMES.map((game, index) => {
+          const active = index === dailyIndex
+          return (
+            <Touchable
+              key={game.id}
+              accessibilityRole="button"
+              accessibilityLabel={t(game.titleKey)}
+              accessibilityState={{ selected: active }}
+              hitSlop={{ top: 12, bottom: 12, left: 4, right: 4 }}
+              onPress={() => dailyScroll.current?.scrollTo({ x: index * snap, animated: true })}
+              style={[styles.dot, active && { width: 20, backgroundColor: game.color }]}
+            />
+          )
+        })}
+      </View>
 
       <View style={{ paddingHorizontal: space.lg, marginTop: space.xxl }}>
         <MissionsCard uid={account?.uid} />
@@ -189,18 +228,21 @@ const styles = StyleSheet.create({
   },
   dailyIcon: { width: 48, height: 48, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },
   dailyActions: { flexDirection: 'row', gap: space.sm, marginTop: space.lg },
+  dots: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 6, marginTop: space.md },
+  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.border },
   dailyPrimary: {
     flex: 1,
     flexDirection: 'row',
     gap: 6,
     alignItems: 'center',
     justifyContent: 'center',
-    height: 44,
+    minHeight: 44,
+    paddingHorizontal: space.sm,
     borderRadius: radius.md,
   },
   dailySecondary: {
-    width: 52,
-    height: 44,
+    width: 44,
+    minHeight: 44,
     borderRadius: radius.md,
     alignItems: 'center',
     justifyContent: 'center',

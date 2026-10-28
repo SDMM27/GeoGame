@@ -1,7 +1,8 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
-import type { ReactNode } from 'react'
+import { useFocusEffect } from 'expo-router'
+import { useCallback, useEffect, useRef, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, View } from 'react-native'
+import { BackHandler, StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { navigate } from '@/shims/react-router-dom'
@@ -37,6 +38,21 @@ export function GameTopBar({ children, confirmQuit = true, onQuit }: { children?
       onConfirm: quit,
     })
   }
+
+  // Android back (button or edge swipe, easy to hit while panning the map) goes through the same confirmation as the close button.
+  const onCloseRef = useRef(onClose)
+  useEffect(() => {
+    onCloseRef.current = onClose
+  })
+  useFocusEffect(
+    useCallback(() => {
+      const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+        onCloseRef.current()
+        return true
+      })
+      return () => sub.remove()
+    }, []),
+  )
 
   return (
     <View pointerEvents="box-none" style={[styles.bar, { top: insets.top + space.sm }]}>

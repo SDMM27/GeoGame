@@ -66,7 +66,7 @@ describe('game data in every language', () => {
       for (const iso of ['FR', 'BR', 'DE', 'CD', 'CI', 'MM', 'HK']) expect(getCountryName(iso, lang), `${iso} ${lang}`).toBeTruthy()
     }
     // Intl's long forms ("RAE de Hong Kong (China)") are overridden in the languages added in 2026
-    for (const lang of ['es', 'pt', 'de', 'it', 'uk']) {
+    for (const lang of ['es', 'pt', 'de', 'it', 'uk', 'nl']) {
       for (const iso of ['MM', 'HK', 'MO', 'CD']) expect(getCountryName(iso, lang), `${iso} ${lang}`).not.toMatch(/[()]| - | – |RAE|RAS|ОАР/)
     }
   })

@@ -11,6 +11,7 @@ import de from '../i18n/locales/de.json'
 import itLocale from '../i18n/locales/it.json'
 import ru from '../i18n/locales/ru.json'
 import uk from '../i18n/locales/uk.json'
+import nl from '../i18n/locales/nl.json'
 import { LANGUAGE_CODES } from '../i18n/languages'
 import { GEO_FEATURES, MOUTHS } from '../data/geoFeatures'
 import {
@@ -29,7 +30,7 @@ import {
 } from './quizQuestions'
 import { mulberry32 } from './prng'
 
-const LOCALES = { fr, en, es, pt, de, it: itLocale, ru, uk }
+const LOCALES = { fr, en, es, pt, de, it: itLocale, ru, uk, nl }
 const LANGS = LANGUAGE_CODES
 
 // Traduction réelle, pour vérifier aussi que chaque clé de question existe

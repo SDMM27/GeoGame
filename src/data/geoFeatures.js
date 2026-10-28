@@ -4,12 +4,13 @@
 // Les noms français portent leur article (« le Nil ») pour s'insérer dans les phrases des questions.
 // `countries` : codes ISO A2 des pays concernés. `continent` : null quand il est ambigu (Caucase,
 // Canaries, Hawaï…), auquel cas aucune question « sur quel continent » n'est posée.
-// Noms en français, anglais et russe ici ; en espagnol, portugais, allemand, italien et ukrainien dans ./geoNames/<langue>.json
+// Noms en français, anglais et russe ici ; en espagnol, portugais, allemand, italien, ukrainien et néerlandais dans ./geoNames/<langue>.json
 // (par id, les villes par leur nom anglais), ajoutés en bas du fichier.
 
 import de from './geoNames/de.json'
 import es from './geoNames/es.json'
 import it from './geoNames/it.json'
+import nl from './geoNames/nl.json'
 import pt from './geoNames/pt.json'
 import uk from './geoNames/uk.json'
 
@@ -423,7 +424,7 @@ const ISLANDS = [
 
 export const GEO_FEATURES = [...RIVERS, ...MOUNTAINS, ...RANGES, ...LAKES, ...DESERTS, ...WATERFALLS, ...ISLANDS]
 
-for (const [lang, names] of Object.entries({ es, pt, de, it, uk })) {
+for (const [lang, names] of Object.entries({ es, pt, de, it, uk, nl })) {
   for (const [key, mouth] of Object.entries(MOUTHS)) mouth[lang] = names.mouths[key]
   for (const feature of GEO_FEATURES) {
     feature.name[lang] = names.features[feature.id]

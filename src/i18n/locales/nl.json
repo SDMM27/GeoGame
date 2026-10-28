@@ -1,0 +1,1443 @@
+{
+  "atlas": {
+    "title": "Atlas",
+    "subtitle": "Verken de wereldkaart: tik op een land om het profiel te bekijken.",
+    "search_placeholder": "Zoek een land…",
+    "no_results": "Geen land gevonden",
+    "capital": "Hoofdstad",
+    "continent": "Continent",
+    "population": "Bevolking",
+    "area": "Oppervlakte",
+    "density": "Bevolkingsdichtheid",
+    "gdp": "BBP",
+    "gdp_per_capita": "BBP per inwoner",
+    "neighbors": "Aangrenzende landen",
+    "no_neighbors": "Geen landgrens",
+    "rank": "#{{rank}} van {{total}}",
+    "rank_first": "#1 van {{total}}",
+    "difficulty": "Moeilijkheid in de spellen",
+    "per_km2": "inwoners/km²",
+    "billion_usd": "${{value}} mld",
+    "usd": "${{value}}",
+    "close": "Sluiten",
+    "unknown": "Onbekend",
+    "open": "Open de atlas",
+    "history": "Geschiedenis",
+    "history_quiz": "📜 Overhoor me over de geschiedenis"
+  },
+  "continents": {
+    "Europe": "Europa",
+    "Asie": "Azië",
+    "Afrique": "Afrika",
+    "Amériques": "Amerika",
+    "Océanie": "Oceanië"
+  },
+  "home": {
+    "subtitle": "Verken - Ontdek - Reis",
+    "greeting": "Klaar om te reizen?",
+    "daily_title": "Dagelijkse uitdagingen",
+    "daily_subtitle": "Elke dag nieuwe om middernacht",
+    "games_title": "Spellen",
+    "games_subtitle": "Kies een moeilijkheidsgraad of een continent",
+    "daily": "Dagelijks",
+    "infinite": "Eindeloos",
+    "multi": "Speel multiplayer"
+  },
+  "games": {
+    "daily_challenge": {
+      "title": "Dagelijkse uitdaging",
+      "description": "12 vragen per dag: landen, vlaggen, hoofdsteden. Dezelfde uitdaging voor iedereen."
+    },
+    "placement": {
+      "title": "Zoek het land",
+      "description": "Vind alle landen van de gekozen moeilijkheidsgraad."
+    },
+    "hardcore": {
+      "title": "Hardcore",
+      "description": "Vind landen op een kaart zonder grenzen."
+    },
+    "flags": {
+      "title": "Zoek de vlag",
+      "description": "Herken het land aan zijn vlag."
+    },
+    "capitals": {
+      "title": "Zoek de hoofdstad",
+      "description": "Vind de hoofdstad aan de hand van de vlag en de landnaam."
+    },
+    "border_guess": {
+      "title": "BorderGuess",
+      "description": "Raad een land alleen aan de hand van zijn grenzen."
+    },
+    "country_clue": {
+      "title": "Country Clue",
+      "description": "Vind het land met hints over afstand, richting en oppervlakte."
+    },
+    "voyage_voyage": {
+      "title": "Voyage Voyage",
+      "description": "Verbind twee landen via hun gedeelde grenzen. Vind het kortste pad!"
+    },
+    "ranking": {
+      "title": "Landenranglijst",
+      "description": "Rangschik landen van groot naar klein: bevolking, oppervlakte of BBP."
+    },
+    "placement_countries": {
+      "title": "Landen plaatsen",
+      "description": "Plaats het land op de juiste plek op de kaart."
+    },
+    "quiz": {
+      "title": "Geoquiz",
+      "description": "Elke dag een vraag om je vrienden uit te dagen, of blijf vragen beantwoorden."
+    },
+    "survival": {
+      "title": "Survival",
+      "description": "Speel achter elkaar rondes van verschillende spellen: elke fout kost je een leven."
+    },
+    "missing_flag": {
+      "title": "Ontbrekende vlag",
+      "description": "Herken het land aan zijn vlag waarvan een deel ontbreekt.",
+      "missing_part": "Ontbrekend deel van de vlag"
+    }
+  },
+  "modes": {
+    "daily": "Dagelijks",
+    "infinite": "Eindeloos",
+    "standard": "Standaard",
+    "ascension": "🚀 Ascension",
+    "continent": "🌍 Continent"
+  },
+  "buttons": {
+    "play": "Spelen",
+    "training": "Training",
+    "scores": "🏆 Scores",
+    "home": "← Start",
+    "reveal": "👁 Onthullen",
+    "restart": "↺ Opnieuw",
+    "validate": "Bevestigen",
+    "see": "👁 Bekijken",
+    "start_timer": "Start de timer",
+    "return_home": "Terug naar start",
+    "reveal_country": "Land onthullen",
+    "new_country": "Nieuw land",
+    "new_game": "Nieuw spel",
+    "new_path": "↺ Nieuw pad",
+    "see_results": "Resultaten bekijken",
+    "next_country_hint": "👁 Volgend land",
+    "all_countries_hint": "🗺 Alle landen",
+    "initials_hint": "🔤 Beginletters",
+    "next_round": "Volgende ronde",
+    "submit_ranking": "✓ Mijn ranglijst insturen",
+    "save_score": "Score opslaan",
+    "create_game": "Spel maken",
+    "join": "Meedoen",
+    "hide_history": "Geschiedenis verbergen",
+    "show_full_history": "Volledige geschiedenis tonen"
+  },
+  "difficulties": {
+    "Facile": "Makkelijk",
+    "Moyen": "Gemiddeld",
+    "Difficile": "Moeilijk",
+    "Impossible": "Onmogelijk",
+    "Hardcore": "Hardcore",
+    "hardcore_all": "💀 Hardcore - Alle landen",
+    "easy_range": "Makkelijk (3–5)",
+    "medium_range": "Gemiddeld (6–12)",
+    "hard_range": "Moeilijk (13–20)"
+  },
+  "selection": {
+    "by_difficulty": "Op moeilijkheid",
+    "by_continent": "Op continent"
+  },
+  "presets": {
+    "progressive": "Progressief",
+    "discovery": "Ontdekking",
+    "challenge": "Uitdaging",
+    "hardcore": "Hardcore",
+    "custom": "Aangepast"
+  },
+  "labels": {
+    "configuration": "Instellingen",
+    "clues": "Hints",
+    "show_flag": "Toon de vlag",
+    "show_capital": "Toon de hoofdstad",
+    "clues_hint": "Ze verschijnen onder de naam van het te vinden land.",
+    "total_countries": "landen in totaal",
+    "country": "Land",
+    "your_country": "Jouw land",
+    "your_guess": "Jouw gok",
+    "how_to_read_hints": "Hoe lees je de hints",
+    "no_attempts": "Nog geen pogingen.",
+    "attempts": "Pogingen",
+    "found": "Gevonden",
+    "missed": "Gemist",
+    "capital": "Hoofdstad:",
+    "new_game": "Nieuw spel",
+    "score": "Score:",
+    "time": "Tijd:",
+    "username": "Gebruikersnaam",
+    "your_username": "Jouw gebruikersnaam",
+    "phase": "Fase:",
+    "remaining": "resterend",
+    "start": "Start",
+    "arrival": "Aankomst",
+    "optimal": "optimaal:",
+    "hints": "Hints:",
+    "criterion": "Criterium",
+    "preset": "Preset:",
+    "total_time": "Totale tijd",
+    "all_countries": "Alle",
+    "game": "Spel",
+    "total": "Totaal",
+    "player": "Speler",
+    "countries_found": "Gevonden landen",
+    "you": "(Jij)",
+    "optimal_path": "Optimaal pad:",
+    "unknown": "Onbekend"
+  },
+  "game_hud": {
+    "target_country": "TE VINDEN LAND",
+    "score": "SCORE",
+    "time": "TIJD",
+    "countries": "landen",
+    "found": "✓ GEVONDEN",
+    "skipped": "✗ OVERGESLAGEN",
+    "remaining": "◎ RESTEREND",
+    "flags": "VLAGGEN",
+    "capitals": "HOOFDSTEDEN",
+    "capital_of_target": "Hoofdstad: {{name}}"
+  },
+  "controls": {
+    "left_click": "Linkermuisklik",
+    "select_country": "Kies een land",
+    "right_click": "Rechtermuisklik",
+    "move_map": "Verplaats de kaart",
+    "wheel": "Scrollwiel",
+    "zoom": "In- / uitzoomen"
+  },
+  "game_over": {
+    "completed": "✓ Klaar!",
+    "waiting_players": "Wachten op andere spelers..."
+  },
+  "borderguess": {
+    "daily_title": "BorderGuess van de dag",
+    "infinite_title": "Eindeloze BorderGuess",
+    "daily_subtitle": "Eén land per dag, voor iedereen hetzelfde. Dagelijkse puzzel.",
+    "infinite_subtitle": "Koppel zoveel silhouetten achter elkaar als je wilt, zonder tot morgen te wachten.",
+    "daily_description": "Eén land per dag, met voortgang lokaal opgeslagen.",
+    "infinite_description": "Koppel onbeperkt silhouetten achter elkaar, met elke ronde een nieuw land.",
+    "start_timer_hint": "Start de timer om de grenzen te onthullen.",
+    "map_caption": "Kijk alleen naar de grenzen van het land en geef dan je antwoord.",
+    "success_message": "Goed gedaan, het juiste antwoord was",
+    "answer_was": "Het juiste antwoord was",
+    "see_tomorrow": "Kom morgen terug voor een nieuw land.",
+    "start_new_game": "Begin met een nieuw land om verder te gaan."
+  },
+  "country_clue": {
+    "closer": "{{km}} km dichterbij",
+    "farther": "{{km}} km verder weg",
+    "same_distance": "Zelfde afstand",
+    "closest": "Dichtstbij",
+    "your_guesses": "Jouw gokken",
+    "daily_title": "Country Clue van de dag",
+    "infinite_title": "Eindeloze Country Clue",
+    "daily_subtitle": "Een mysterieus land om vandaag te vinden. Dagelijkse puzzel.",
+    "infinite_subtitle": "Een gratis versie geïnspireerd op Countryle, onbeperkt herhaalbaar.",
+    "daily_description": "Een mysterieus land per dag, met voortgang opgeslagen op dit apparaat.",
+    "infinite_description": "Koppel landenpuzzels achter elkaar zonder tot morgen te wachten.",
+    "intro_text": "Elke gok onthult de afstand, de richting, het halfrond en een oppervlakte-indicatie om je naar het juiste land te leiden.",
+    "hints_explanation": "De richting wijst naar het gezochte land. Het halfrond geeft de positie ten opzichte van de evenaar aan. Oppervlakte en Bevolking geven aan of het gezochte land groter/kleiner is of meer/minder inwoners heeft.",
+    "correct": "Goed gedaan.",
+    "guess_title": "Raad het land",
+    "metric_distance": "Afstand",
+    "metric_direction": "Richting",
+    "metric_hemisphere": "Halfrond",
+    "metric_area": "Oppervlakte",
+    "metric_population": "Bevolking",
+    "directions": {
+      "Nord": "Noord",
+      "Nord-Est": "Noordoost",
+      "Est": "Oost",
+      "Sud-Est": "Zuidoost",
+      "Sud": "Zuid",
+      "Sud-Ouest": "Zuidwest",
+      "Ouest": "West",
+      "Nord-Ouest": "Noordwest",
+      "Tout près": "Vlakbij"
+    },
+    "hint": {
+      "exact": "Precies",
+      "hemisphere_match": "Hetzelfde",
+      "hemisphere_higher": "Verder naar het noorden",
+      "hemisphere_lower": "Verder naar het zuiden",
+      "hemisphere_neutral": "Onbekend",
+      "area_match": "Vergelijkbaar",
+      "area_higher": "Groter",
+      "area_lower": "Kleiner",
+      "area_neutral": "Onbekend",
+      "population_match": "Vergelijkbaar",
+      "population_higher": "Meer inwoners",
+      "population_lower": "Minder inwoners",
+      "population_neutral": "Onbekend"
+    }
+  },
+  "voyage_voyage": {
+    "daily_description": "Eén route per dag, hetzelfde voor alle spelers.",
+    "infinite_description": "Elk spel een nieuwe route, onbeperkt.",
+    "confirm_new_path": "Dit pad opgeven en een nieuw genereren?",
+    "perfect_path": "Perfect! Optimaal pad gevonden",
+    "arrived_in": "Aangekomen in"
+  },
+  "ranking": {
+    "title": "Landenranglijst",
+    "daily_description": "Rangschik 5 landen op elk criterium van vandaag: bevolking, oppervlakte en BBP. 3 pogingen per criterium.",
+    "infinite_description": "Speel onbeperkt rankingrondes met een moeilijkheidsgraad naar keuze.",
+    "random": "Willekeurig",
+    "population": "Bevolking",
+    "area": "Oppervlakte",
+    "gdp": "BBP",
+    "drag_hint": "Sleep om te herschikken",
+    "choose_category": "Kies een categorie",
+    "total_error": "Totale fout:",
+    "correct_ranking": "Juiste rangschikking",
+    "placed_at": "geplaatst op #",
+    "difference_of": "verschil van",
+    "better_score_exists": "Je hebt al een score opgeslagen voor deze uitdaging.",
+    "stage_progress": "Criterium {{done}} / {{count}} klaar",
+    "next_criterion": "Volgend criterium →",
+    "found_at_attempt": "gevonden bij poging {{attempt}}",
+    "not_found": "niet gevonden · fout {{count}}",
+    "instruction_population": "Rangschik van meeste naar minste inwoners",
+    "instruction_area": "Rangschik van grootste naar kleinste",
+    "instruction_gdp": "Rangschik van rijkste naar armste"
+  },
+  "form": {
+    "title": "Game over!",
+    "ascension_title": "🚀 Ascension voltooid!",
+    "better_score_exists": "Deze gebruikersnaam heeft al een betere score op deze moeilijkheidsgraad:",
+    "use_different_name": "Sla je score op onder een andere naam.",
+    "better_daily_score": "Deze gebruikersnaam heeft al een score opgeslagen voor deze uitdaging:",
+    "use_different_name_daily": "Sla op onder een andere naam.",
+    "score_saved": "Score opgeslagen ✓",
+    "saving": "Opslaan...",
+    "better_ascension_time": "Deze gebruikersnaam heeft al een betere tijd:",
+    "training_mode_not_saved": "Trainingsmodus — score niet opgeslagen",
+    "custom_config_not_saved": "Aangepaste instellingen — score niet opgeslagen"
+  },
+  "messages": {
+    "please_enter_username": "Vul een gebruikersnaam in",
+    "score_saved": "Score opgeslagen!",
+    "save_error": "Fout bij het opslaan.",
+    "loading": "Laden...",
+    "page_load_error": "De pagina kon niet worden geladen. Controleer je verbinding.",
+    "reload": "Opnieuw laden"
+  },
+  "errors": {
+    "title": "Oeps, er ging iets mis",
+    "message": "Controleer je verbinding en laad de pagina opnieuw of ga terug naar start.",
+    "home": "Terug naar start"
+  },
+  "not_found": {
+    "title": "Pagina niet gevonden",
+    "message": "Deze pagina bestaat niet of is verplaatst.",
+    "home": "Terug naar start"
+  },
+  "units": {
+    "pt": "pt",
+    "pts": "pnt",
+    "attempt_one": "poging",
+    "attempt_other": "pogingen",
+    "step_one": "stap",
+    "step_other": "stappen",
+    "error_one": "fout",
+    "error_other": "fouten",
+    "position_one": "plaats",
+    "position_other": "plaatsen",
+    "countries_one": "{{count}} land",
+    "countries_other": "{{count}} landen"
+  },
+  "options": {
+    "all_games": "Alle spellen",
+    "all_presets": "Alle presets",
+    "all_continents": "Alle continenten",
+    "all_scores": "Alle scores"
+  },
+  "scoreboard": {
+    "title": "Scorebord",
+    "no_ascension_scores": "Geen Ascension-scores voor dit filter.",
+    "ascension_title": "Ascension-scorebord",
+    "preset": "Preset"
+  },
+  "leaderboard": {
+    "title": "Dagelijkse ranglijst",
+    "final_title": "🏆 Eindresultaten",
+    "no_scores_today": "Geen scores voor deze dag.",
+    "attempts": "Pogingen",
+    "time": "Tijd",
+    "hints_used": "Gebruikte hints:",
+    "no_hints": "geen",
+    "attempted_countries": "Geprobeerde landen",
+    "played_order": "Speelvolgorde"
+  },
+  "multiplayer": {
+    "title": "Multiplayer",
+    "subtitle": "Daag je vrienden uit op het spel van je keuze",
+    "join_title": "Doe mee aan een spel",
+    "code_placeholder": "CODE",
+    "create_title": "Maak een spel",
+    "create_subtitle": "Kies een spel en nodig je vrienden uit met de code",
+    "recent_title": "Recente spellen"
+  },
+  "lobby": {
+    "connecting": "Verbinden..."
+  },
+  "config": {
+    "title": "Het spel instellen",
+    "creating": "Aanmaken...",
+    "typing_tolerance_note": "⚠️ Bij typespellen (vlaggen, hoofdsteden) wordt de eerste aarzeling per land getolereerd en heeft die geen invloed op de score — typfouten gebeuren!"
+  },
+  "stats": {
+    "first_try": "🎯 Eén tik",
+    "stumbles": "🔄 Misstappen",
+    "not_found": "❌ Niet gevonden"
+  },
+  "placeholders": {
+    "country_name": "Typ de naam van het land...",
+    "capital_name": "Typ de hoofdstad...",
+    "country_examples": "bijv. Japan, Brazilië, Marokko...",
+    "country_examples_clue": "bijv. Canada, Japan, Marokko...",
+    "username": "Jouw gebruikersnaam...",
+    "room_code": "Code (bijv. AB3K7Z)",
+    "enter_country_on_path": "Vul een land op het pad in…"
+  },
+  "aria": {
+    "progress_phase": "Voortgang van de fase"
+  },
+  "toasts": {
+    "correct": "Goed gedaan!",
+    "wrong": "Fout!",
+    "found_country": "Goed gedaan! {{name}}!",
+    "typo_accepted": "Geaccepteerd! Het wordt gespeld als \"{{name}}\"",
+    "location_reveal": "Fout! {{name}} lag hier",
+    "all_countries_found": "Goed gedaan! Je hebt alle landen gevonden!",
+    "all_flags_found": "Goed gedaan! Je hebt alle vlaggen gevonden!",
+    "all_capitals_found": "Goed gedaan! Je hebt alle hoofdsteden gevonden!",
+    "already_proposed": "Dit land heb je al voorgesteld.",
+    "country_was": "Goed gedaan! Het was {{name}}",
+    "answer_reveal": "Het antwoord was {{name}}",
+    "hint_updated": "Hint bijgewerkt",
+    "ascension_phase_done": "Fase gehaald! Goed gedaan!",
+    "ascension_failed": "Fout! Game over."
+  },
+  "share": {
+    "copy_button": "📋 Resultaten kopiëren",
+    "copied": "✓ Resultaat gekopieerd!",
+    "share_image": "🖼️ Afbeelding delen",
+    "download_image": "⬇️ Afbeelding downloaden",
+    "pseudo_placeholder": "Jouw gebruikersnaam (optioneel)",
+    "anonymous": "Anoniem",
+    "played_by": "gespeeld door",
+    "can_you_beat": "Kun jij het beter?",
+    "score_attempts": "POGINGEN",
+    "details_found_attempts": "Gevonden in {{count}} poging(en)",
+    "details_not_found_attempts": "Niet gevonden ({{count}} poging(en))",
+    "details_ranking_error": "Totale fout: {{count}} plaats(en)",
+    "details_flags_timer": "{{found}}/{{total}} vlaggen gevonden · {{time}}",
+    "details_placement_timer": "{{found}}/{{total}} landen geplaatst · {{time}}",
+    "details_capitals_timer": "{{found}}/{{total}} hoofdsteden gevonden · {{time}}",
+    "details_voyage": "{{steps}} stap(pen) · optimaal: {{optimal}}"
+  },
+  "challenge": {
+    "button": "🔗 Daag een vriend uit",
+    "link_copied": "✓ Uitdagingslink gekopieerd!",
+    "share_cta": "🎯 Ik daag je uit! Verbeter mijn score:",
+    "nudge_title": "Daag een vriend uit",
+    "nudge_hint": "Je vriend krijgt een melding om jou te komen verslaan.",
+    "nudge_sent": "Melding verstuurd!",
+    "nudge_unreachable": "Kan {{username}} niet op de hoogte stellen",
+    "nudge_already_sent": "Vandaag al uitgedaagd",
+    "nudge_error": "Versturen mislukt. Probeer het opnieuw.",
+    "nudge_rate_limited": "Te veel uitdagingen verstuurd, probeer het later opnieuw.",
+    "nudge_not_played": "Speel eerst een spel voordat je een vriend uitdaagt.",
+    "a_friend": "Een vriend",
+    "banner_title": "🎯 {{name}} daagt je uit op het spel van vandaag!",
+    "their_score": "Score van {{name}}: {{score}}",
+    "your_score": "Jouw score: {{score}}",
+    "your_turn": "jouw beurt!",
+    "result_win": "🏆 Je hebt {{name}} verslagen!",
+    "result_lose": "😅 {{name}} blijft voor… Revanche morgen?",
+    "result_tie": "🤝 Perfect gelijkspel met {{name}}!",
+    "stale": "Deze uitdaging is van {{day}}: het spel van vandaag is sindsdien veranderd, dus vergelijken kan niet.",
+    "attempts_one": "{{count}} poging",
+    "attempts_other": "{{count}} pogingen",
+    "not_found": "land niet gevonden",
+    "points": "{{score}} pnt"
+  },
+  "quiz": {
+    "pick_difficulty": "Kies je moeilijkheidsgraad",
+    "pick_difficulty_hint": "Elke vraag heeft deze moeilijkheidsgraad. Je kunt stoppen wanneer je wilt.",
+    "score": "Score",
+    "correct_answers": "Juiste antwoorden",
+    "streak": "Reeks",
+    "best_streak": "Beste reeks",
+    "correct": "✓ Goed!",
+    "wrong": "✗ Fout antwoord",
+    "next": "Volgende vraag →",
+    "quit": "Stoppen",
+    "summary_title": "Game over",
+    "change_difficulty": "Moeilijkheid wijzigen",
+    "share_label": "PUNTEN",
+    "share_details": "{{correct}}/{{answered}} juiste antwoorden · beste reeks {{streak}}",
+    "questions": {
+      "feature_country_one": "In welk land ligt {{feature}}?",
+      "island_country_one": "Bij welk land hoort {{feature}}?",
+      "feature_country_many": "In welke van deze landen ligt {{feature}}?",
+      "feature_country_many_free": "Noem een land waar {{feature}} ligt",
+      "river_country_one": "Door welk land stroomt {{feature}}?",
+      "river_country_many": "Door welke van deze landen stroomt {{feature}}?",
+      "river_country_many_free": "Noem een land waar {{feature}} doorheen stroomt",
+      "country_river": "{{country}}: welke rivier stroomt door dit land?",
+      "country_mountain": "{{country}}: welke bergtop ligt in dit land?",
+      "country_range": "{{country}}: welk gebergte ligt in dit land?",
+      "country_lake": "{{country}}: welk meer of binnenzee ligt in dit land?",
+      "country_desert": "{{country}}: welke woestijn strekt zich uit in dit land?",
+      "country_waterfall": "{{country}}: welke waterval ligt in dit land?",
+      "country_island": "{{country}}: welk eiland hoort bij dit land?",
+      "feature_continent": "{{feature}}: op welk continent?",
+      "river_mouth": "In welk water stroomt {{feature}}?",
+      "river_city": "Welke rivier stroomt door {{city}}?",
+      "mountain_range": "Van welk gebergte maakt {{feature}} deel uit?",
+      "highest_point": "{{country}}: wat is het hoogste punt van dit land?",
+      "mountain_height": "Welke bergtop is {{height}} m hoog ({{countries}})?",
+      "range_highest": "{{feature}}: wat is de hoogste top?",
+      "longest_river": "Welke van deze rivieren is de langste?",
+      "highest_mountain": "Welke van deze bergtoppen is de hoogste?",
+      "neighbor": "Welke van deze landen grenst aan {{country}}?",
+      "not_neighbor": "Welke van deze landen grenst NIET aan {{country}}?",
+      "neighbor_free": "Noem een land dat aan {{country}} grenst"
+    },
+    "pick_mode": "Antwoordvorm",
+    "modes": {
+      "choices": "Meerkeuze",
+      "choices_hint": "4 opties, maar één is juist",
+      "free": "Vrij antwoord",
+      "free_hint": "Je typt het antwoord zelf"
+    },
+    "input_placeholder": "Jouw antwoord…",
+    "dont_know": "Ik weet het niet",
+    "typo_accepted": "Typfout geaccepteerd: {{name}}",
+    "answer_was": "Antwoord: {{answer}}",
+    "accepted_answers": "Mogelijke antwoorden: {{answer}}",
+    "daily_title": "Vraag van de dag",
+    "daily_rules": "Eén vraag, vandaag voor iedereen hetzelfde. Geen opties: je typt je antwoord. Je hebt {{attempts}} pogingen en maximaal {{hints}} hints, maar elke hint telt in de ranglijst als een poging. De vraag verschijnt zodra je de timer start.",
+    "attempts_left": "Resterende pogingen",
+    "attempts_used": "Pogingen",
+    "hints_label": "Hints",
+    "hint_n": "Hint {{n}}",
+    "hint_button": "💡 Hint ({{used}}/{{max}})",
+    "hint_cost": "Elke hint verlaagt de punten voor deze vraag",
+    "give_up": "Opgeven",
+    "already_tried": "Dit antwoord heb je al geprobeerd.",
+    "daily_won": "✓ Gevonden in {{attempts}}!",
+    "daily_lost": "✗ Deze keer niet gevonden",
+    "daily_come_back": "Kom morgen terug voor een nieuwe vraag.",
+    "daily_stat": "{{attempts}} · {{hints}} — {{time}}",
+    "attempts_count_one": "{{count}} poging",
+    "attempts_count_other": "{{count}} pogingen",
+    "hints_count_one": "{{count}} hint",
+    "hints_count_other": "{{count}} hints",
+    "guesses_title": "Geprobeerde antwoorden",
+    "play_infinite": "Eindeloze modus",
+    "hints": {
+      "continent": "Het is een land op dit continent: {{continent}}",
+      "height": "De top is {{height}} m hoog",
+      "river_length": "Hij is {{length}} km lang",
+      "located_in": "Ligt in: {{countries}}",
+      "one_of": "Een van de antwoorden:",
+      "letters_one": "{{count}} letter",
+      "letters_other": "{{count}} letters",
+      "digits_one": "Het is een getal van {{count}} cijfer",
+      "digits_other": "Het is een getal van {{count}} cijfers",
+      "between": "Tussen {{min}} en {{max}}"
+    },
+    "pick_theme": "Kies een thema",
+    "themes": {
+      "geo": "🌍 Aardrijkskunde",
+      "geo_hint": "Rivieren, bergen, landen…",
+      "history": "📜 Geschiedenis",
+      "history_hint": "Belangrijke data en gebeurtenissen"
+    },
+    "history": {
+      "title": "Geschiedenisquiz",
+      "country_title": "Geschiedenis: {{country}}",
+      "country_hint": "Alle vragen over dit land, van makkelijk tot moeilijk."
+    }
+  },
+  "daily_challenge": {
+    "rules": "12 vragen, vandaag voor iedereen hetzelfde: vind landen op de kaart, noem vlaggen en hoofdsteden. Eén poging per vraag, {{seconds}} s per vraag, geen levens. Je score is het aantal juiste antwoorden; de totale tijd beslist bij gelijkspel. Je kunt maar één keer per dag spelen.",
+    "level": "Niveau van vandaag: {{label}} ({{n}}/7)",
+    "levels": {
+      "1": "Heel makkelijk",
+      "2": "Makkelijk",
+      "3": "Toegankelijk",
+      "4": "Gemiddeld",
+      "5": "Pittig",
+      "6": "Moeilijk",
+      "7": "Meedogenloos"
+    },
+    "week_note": "Van maandag tot zondag wordt de uitdaging elke dag moeilijker. Zondag is meedogenloos!",
+    "start": "Start de uitdaging",
+    "continue": "Ga verder met de uitdaging",
+    "resumed_note": "Je bent tijdens een vraag weggegaan: die telt als gemist.",
+    "round": "Vraag {{n}}/{{total}}",
+    "correct_short": "goed",
+    "skip": "Overslaan",
+    "result_title": "Uitdaging voltooid!",
+    "score_label": "Juiste antwoorden",
+    "time_label": "Totale tijd",
+    "rounds_title": "Jouw 12 vragen",
+    "col_score": "Score",
+    "share_label": "JUISTE ANTWOORDEN",
+    "share_time": "Tijd: {{time}}",
+    "come_back": "Kom morgen terug voor een nieuwe uitdaging!"
+  },
+  "account": {
+    "title": "Mijn account",
+    "signin_tab": "Inloggen",
+    "signup_tab": "Registreren",
+    "signin_intro": "Log in om je gebruikersnaam te krijgen op zowel de website als de app.",
+    "signup_intro": "Maak je account aan om je gebruikersnaam te reserveren.",
+    "email": "E-mail",
+    "password": "Wachtwoord",
+    "username": "Gebruikersnaam",
+    "email_placeholder": "jij@voorbeeld.nl",
+    "password_placeholder": "Minstens 6 tekens",
+    "username_placeholder": "Jouw gebruikersnaam",
+    "username_hint": "3 tot 20 tekens",
+    "signin": "Inloggen",
+    "signup": "Mijn account aanmaken",
+    "forgot": "Wachtwoord vergeten?",
+    "reset_sent": "We hebben een e-mail gestuurd naar {{email}} om een nieuw wachtwoord te kiezen.",
+    "welcome": "Welkom {{username}}!",
+    "signed_in_as": "Ingelogd als",
+    "signout": "Uitloggen",
+    "prefill_hint": "Je gebruikersnaam wordt automatisch ingevuld als je een score opslaat of een spel binnengaat.",
+    "delete": "Mijn account verwijderen",
+    "delete_confirm": "Je account, gebruikersnaam, geschiedenis, ranglijstscores en vrienden worden definitief verwijderd. Vul je wachtwoord in om te bevestigen.",
+    "delete_button": "Definitief verwijderen",
+    "deleted": "Account verwijderd.",
+    "cancel": "Annuleren",
+    "errors": {
+      "invalid_email": "Ongeldig e-mailadres.",
+      "email_in_use": "Er bestaat al een account met dit e-mailadres.",
+      "weak_password": "Het wachtwoord moet minstens 6 tekens bevatten.",
+      "wrong_credentials": "Onjuist e-mailadres of wachtwoord.",
+      "too_many_requests": "Te veel pogingen. Probeer het over een paar minuten opnieuw.",
+      "network": "Geen verbinding. Controleer je netwerk.",
+      "not_enabled": "Het aanmaken van accounts is nog niet ingeschakeld.",
+      "username_length": "De gebruikersnaam moet 3 tot 20 tekens bevatten.",
+      "username_chars": "De gebruikersnaam mag alleen letters, cijfers, spaties, \"_\", \"-\" en \".\" bevatten.",
+      "username_forbidden": "Deze gebruikersnaam is niet toegestaan. Kies een andere.",
+      "username_taken": "Deze gebruikersnaam is al in gebruik.",
+      "generic": "Er ging iets mis. Probeer het opnieuw.",
+      "popup_blocked": "Het Google-venster is geblokkeerd. Sta pop-ups toe en probeer het opnieuw.",
+      "different_provider": "Dit e-mailadres wordt al gebruikt met een andere inlogmethode.",
+      "cancelled": "Inloggen geannuleerd."
+    },
+    "google": "Doorgaan met Google",
+    "or": "of",
+    "choose_title": "Kies je gebruikersnaam",
+    "choose_intro": "Je scores verschijnen onder deze naam. Hij wordt voor jouw account gereserveerd.",
+    "choose_submit": "Mijn gebruikersnaam bevestigen",
+    "delete_confirm_google": "Je account, gebruikersnaam, geschiedenis, ranglijstscores en vrienden worden definitief verwijderd. Bevestig met Google."
+  },
+  "profile": {
+    "member_since": "Lid sinds {{date}}",
+    "stats_title": "Statistieken",
+    "games": "Spellen",
+    "play_time": "Speeltijd",
+    "countries": "Gevonden landen",
+    "days": "Gespeelde dagen",
+    "streak_title": "Reeks dagelijkse uitdagingen",
+    "streak_current": "Huidige reeks",
+    "streak_best": "Beste",
+    "days_count_one": "{{count}} dag",
+    "days_count_other": "{{count}} dagen",
+    "streak_hint": "Doe elke dag minstens één dagelijkse uitdaging om je reeks vol te houden.",
+    "today_title": "Uitdagingen van vandaag",
+    "today_done": "{{done}}/{{total}}",
+    "by_game_title": "Per spel",
+    "records_title": "Records",
+    "records_perfect": "{{count}} / {{total}} perfecte scores",
+    "games_count_one": "{{count}} spel",
+    "games_count_other": "{{count}} spellen",
+    "best_score": "Beste {{score}} pnt",
+    "best_challenge": "Beste {{score}}",
+    "best_attempts_one": "Beste: {{count}} poging",
+    "best_attempts_other": "Beste: {{count}} pogingen",
+    "wins": "{{wins}}/{{dailies}} uitdagingen opgelost",
+    "achievements_title": "Prestaties",
+    "achievements_count": "{{unlocked}}/{{total}}",
+    "history_title": "Recente spellen",
+    "history_all": "Alles bekijken",
+    "history_full_title": "Geschiedenis",
+    "history_empty": "Nog geen spellen opgeslagen. Speel ingelogd en ze verschijnen hier.",
+    "all_games": "Alle spellen",
+    "modes": {
+      "standard": "Klassiek",
+      "ascension": "Ascension",
+      "daily": "Dagelijks",
+      "infinite": "Eindeloos",
+      "multi": "Multiplayer",
+      "survival": "Survival"
+    },
+    "solved": "Gevonden",
+    "failed": "Gemist",
+    "attempts_count_one": "{{count}} poging",
+    "attempts_count_other": "{{count}} pogingen",
+    "load_error": "Het profiel kon niet worden geladen. Controleer je verbinding.",
+    "not_found": "Speler niet gevonden.",
+    "settings_title": "Account",
+    "favorite": "Favoriete spel",
+    "sign_in_title": "Jouw spelersprofiel",
+    "sign_in_pitch": "Log in om je spelgeschiedenis te bewaren, je statistieken bij te houden, prestaties te ontgrendelen en met je vrienden te spelen.",
+    "show_less": "Minder tonen",
+    "details": {
+      "title": "Spelgegevens",
+      "played_at": "Gespeeld op",
+      "daily": "Dagelijkse uitdaging van",
+      "result": "Resultaat",
+      "score": "Score",
+      "found": "Gevonden landen",
+      "correct": "Juiste antwoorden",
+      "attempts": "Pogingen",
+      "optimal": "Optimale route",
+      "errors": "Fouten",
+      "total_error": "Totaal verschil",
+      "hints": "Hints",
+      "best_streak": "Beste reeks",
+      "lives": "Levens",
+      "time": "Tijd",
+      "room": "Kamer",
+      "open_room": "Open de kamer",
+      "close": "Sluiten"
+    }
+  },
+  "friends": {
+    "online": "Online",
+    "in_game": "Aan het spelen · {{game}}",
+    "in_game_short": "Aan het spelen",
+    "watch": "Kijken",
+    "title": "Vrienden",
+    "count_one": "{{count}} vriend",
+    "count_other": "{{count}} vrienden",
+    "add_title": "Een vriend toevoegen",
+    "add_placeholder": "Gebruikersnaam van je vriend",
+    "add": "Toevoegen",
+    "sent": "Verzoek verstuurd naar {{username}}!",
+    "now_friends": "Jij en {{username}} zijn nu vrienden!",
+    "requests_title": "Ontvangen verzoeken",
+    "outgoing_title": "Verstuurde verzoeken",
+    "accept": "Accepteren",
+    "decline": "Weigeren",
+    "cancel": "Annuleren",
+    "remove": "Verwijderen uit vrienden",
+    "remove_confirm": "{{username}} uit je vrienden verwijderen?",
+    "empty": "Je hebt nog geen vrienden. Voeg ze toe met hun gebruikersnaam!",
+    "today_title": "Dagelijkse uitdagingen van je vrienden",
+    "today_none": "Vandaag nog niet gespeeld",
+    "add_friend": "Toevoegen als vriend",
+    "request_sent": "Verzoek verstuurd",
+    "is_friend": "Vriend",
+    "accept_request": "Hun verzoek accepteren",
+    "see_all": "Mijn vrienden beheren",
+    "pending_badge_one": "{{count}} verzoek",
+    "pending_badge_other": "{{count}} verzoeken",
+    "invite_title": "Een vriend uitnodigen",
+    "invite_hint": "Stuur je link door: ze kunnen je met één tik toevoegen, zonder gebruikersnaam.",
+    "invite_share": "Mijn link delen",
+    "invite_copy": "Link kopiëren",
+    "invite_copied": "Link gekopieerd!",
+    "invite_message": "Speel met me mee op GeoGame en voeg me toe als vriend!",
+    "search_none": "Geen speler gevonden.",
+    "search_hint": "Typ minstens 2 letters om een speler te zoeken.",
+    "recent_title": "Onlangs ontmoet in spellen",
+    "community_link": "Ontdek de community",
+    "quick_add": "{{username}} toevoegen als vriend",
+    "pending_title": "Uitnodiging van {{username}}",
+    "pending_hint": "Je hebt hun link geopend voordat je was ingelogd. Wil je ze toevoegen?",
+    "pending_add": "{{username}} toevoegen",
+    "dismiss": "Sluiten",
+    "add_page": {
+      "intro": "{{username}} nodigt je uit om vrienden te worden op GeoGame.",
+      "login": "Log in of maak een account aan om te accepteren.",
+      "login_button": "Inloggen",
+      "not_found": "Deze uitnodigingslink is niet meer geldig.",
+      "own": "Dit is je eigen link: stuur hem naar een vriend!",
+      "view_profile": "Profiel bekijken"
+    },
+    "errors": {
+      "not_found": "Geen speler met deze gebruikersnaam.",
+      "self": "Dat ben jij!",
+      "already_friends": "Jullie zijn al vrienden.",
+      "already_sent": "Verzoek al verstuurd.",
+      "network": "Geen verbinding. Controleer je netwerk.",
+      "generic": "Er ging iets mis. Probeer het opnieuw."
+    }
+  },
+  "achievements": {
+    "first_game": {
+      "title": "Eerste stappen",
+      "desc": "Voltooi je eerste spel"
+    },
+    "games_50": {
+      "title": "Vaste speler",
+      "desc": "Speel 50 spellen"
+    },
+    "games_250": {
+      "title": "Verslaafd",
+      "desc": "Speel 250 spellen"
+    },
+    "all_games": {
+      "title": "Duizendpoot",
+      "desc": "Speel elk spel"
+    },
+    "streak_3": {
+      "title": "Lekker bezig",
+      "desc": "3 dagen op rij dagelijkse uitdagingen"
+    },
+    "streak_7": {
+      "title": "Perfecte week",
+      "desc": "7 dagen op rij dagelijkse uitdagingen"
+    },
+    "streak_30": {
+      "title": "Niet te stoppen",
+      "desc": "30 dagen op rij dagelijkse uitdagingen"
+    },
+    "daily_sweep": {
+      "title": "Schoon schip",
+      "desc": "Doe alle dagelijkse uitdagingen op dezelfde dag"
+    },
+    "first_try": {
+      "title": "Meteen raak",
+      "desc": "Los een dagelijkse uitdaging op bij de eerste poging"
+    },
+    "explorer": {
+      "title": "Ontdekkingsreiziger",
+      "desc": "Vind in totaal 500 landen"
+    },
+    "globetrotter": {
+      "title": "Wereldreiziger",
+      "desc": "Vind in totaal 5.000 landen"
+    },
+    "hardcore": {
+      "title": "Zonder vangnet",
+      "desc": "Voltooi een spel op Hardcore"
+    },
+    "ascension": {
+      "title": "Topprestatie",
+      "desc": "Voltooi een spel in de Ascension-modus"
+    },
+    "multiplayer": {
+      "title": "Teamgeest",
+      "desc": "Speel een multiplayerspel"
+    },
+    "friend": {
+      "title": "Sociaal",
+      "desc": "Voeg je eerste vriend toe"
+    },
+    "night_owl": {
+      "title": "Nachtuil",
+      "desc": "Speel tussen middernacht en 5 uur 's ochtends"
+    },
+    "games_10": {
+      "title": "Warming-up",
+      "desc": "Voltooi 10 spellen"
+    },
+    "games_100": {
+      "title": "Centurion",
+      "desc": "Speel 100 spellen"
+    },
+    "marathon": {
+      "title": "Marathonloper",
+      "desc": "Speel 10 spellen op één dag"
+    },
+    "early_bird": {
+      "title": "Vroege vogel",
+      "desc": "Speel tussen 5 en 7 uur 's ochtends"
+    },
+    "sweep_7": {
+      "title": "Koning van de dag",
+      "desc": "Doe alle dagelijkse uitdagingen op 7 verschillende dagen"
+    },
+    "daily_wins_25": {
+      "title": "Vaste klant",
+      "desc": "Slaag voor 25 dagelijkse uitdagingen"
+    },
+    "daily_wins_100": {
+      "title": "Dagelijkse legende",
+      "desc": "Slaag voor 100 dagelijkse uitdagingen"
+    },
+    "sharp_5": {
+      "title": "Scherpschutter",
+      "desc": "Los 5 dagelijkse uitdagingen op bij de eerste poging"
+    },
+    "perfect_ranking": {
+      "title": "Perfecte rangschikking",
+      "desc": "Rangschik de landen foutloos in de dagelijkse uitdaging"
+    },
+    "no_hint": {
+      "title": "Zonder vangnet",
+      "desc": "Los 10 dagelijkse quizzen op zonder hint"
+    },
+    "continent_trotter": {
+      "title": "Continentenhopper",
+      "desc": "Speel op alle 5 de continenten"
+    },
+    "cartographer": {
+      "title": "Cartograaf",
+      "desc": "Plaats 300 landen op de kaart"
+    },
+    "vexillologist": {
+      "title": "Vexilloloog",
+      "desc": "Herken 300 vlaggen"
+    },
+    "capital_expert": {
+      "title": "Hoofdstedenexpert",
+      "desc": "Vind 300 hoofdsteden"
+    },
+    "perfect_run": {
+      "title": "Foutloos",
+      "desc": "Vind elk land van een spel"
+    },
+    "master": {
+      "title": "Meestergeograaf",
+      "desc": "Vind elk land van een spel op Moeilijk of hoger"
+    },
+    "quiz_flawless": {
+      "title": "Foutloze quiz",
+      "desc": "Beantwoord 10 quizvragen op rij zonder fout"
+    },
+    "quiz_streak_10": {
+      "title": "Lekker bezig",
+      "desc": "10 juiste quizantwoorden op rij"
+    },
+    "quiz_streak_25": {
+      "title": "Brein in vuur en vlam",
+      "desc": "25 juiste quizantwoorden op rij"
+    },
+    "survival_10": {
+      "title": "Overlever",
+      "desc": "Haal 10 rondes in Survival"
+    },
+    "survival_25": {
+      "title": "Onbreekbaar",
+      "desc": "Haal 25 rondes in Survival"
+    },
+    "survival_50": {
+      "title": "Onsterfelijk",
+      "desc": "Haal 50 rondes in Survival"
+    },
+    "survival_one_life": {
+      "title": "Maar één leven",
+      "desc": "Haal 15 rondes in Survival met één enkel leven"
+    },
+    "multi_5": {
+      "title": "Vaste kamergast",
+      "desc": "Speel 5 multiplayerspellen"
+    },
+    "multi_25": {
+      "title": "Ziel van de kamer",
+      "desc": "Speel 25 multiplayerspellen"
+    },
+    "capital_tour": {
+      "title": "Grote hoofdstedentour",
+      "desc": "Vind alle hoofdsteden van een spel op alle 5 de moeilijkheidsgraden"
+    },
+    "flag_tour": {
+      "title": "Grote vlaggentour",
+      "desc": "Herken alle vlaggen van een spel op alle 5 de moeilijkheidsgraden"
+    },
+    "placement_tour": {
+      "title": "Grote plaatsingstour",
+      "desc": "Plaats alle landen van een spel op alle 5 de moeilijkheidsgraden"
+    },
+    "capital_impossible": {
+      "title": "Onmogelijke hoofdsteden",
+      "desc": "Vind alle hoofdsteden van een spel op Onmogelijk"
+    },
+    "flag_impossible": {
+      "title": "Onmogelijke vlaggen",
+      "desc": "Herken alle vlaggen van een spel op Onmogelijk"
+    },
+    "placement_impossible": {
+      "title": "Onmogelijke plaatsing",
+      "desc": "Plaats alle landen van een spel op Onmogelijk"
+    },
+    "impossible_trio": {
+      "title": "Onmogelijk trio",
+      "desc": "Speel een foutloos Onmogelijk-spel in Plaatsen, Vlaggen en Hoofdsteden"
+    },
+    "hardcore_trio": {
+      "title": "Hardcore trio",
+      "desc": "Speel een foutloos Hardcore-spel in Plaatsen, Vlaggen en Hoofdsteden"
+    },
+    "mythic": {
+      "title": "Mythisch",
+      "desc": "Ontgrendel elke vlag"
+    },
+    "legend_master": {
+      "title": "Legende",
+      "desc": "Vind elk land in één keer in de modi Vlaggen, Zoeken en Hardcore"
+    },
+    "world_champion": {
+      "title": "Wereldkampioen",
+      "desc": "Speel een foutloos spel in Plaatsen, Vlaggen en Hoofdsteden op alle 5 de moeilijkheidsgraden"
+    },
+    "tiers": {
+      "bronze": "Brons",
+      "silver": "Zilver",
+      "gold": "Goud",
+      "legend": "Legende"
+    }
+  },
+  "app_banner": {
+    "title": "GeoGame als app",
+    "subtitle": "Beeldvullend, met een pictogram op je startscherm. Installeer hem vanuit Safari.",
+    "open": "Openen",
+    "close": "Sluiten",
+    "subtitle_android": "Download de APK en sta de installatie toe wanneer Android erom vraagt.",
+    "download": "Downloaden"
+  },
+  "report": {
+    "button": "{{name}} melden",
+    "title": "{{name}} melden",
+    "reason": "Reden",
+    "reasons": {
+      "offensive_name": "Aanstootgevende of ongepaste naam",
+      "cheating": "Nepscore of valsspelen",
+      "other": "Anders"
+    },
+    "note": "Details (optioneel)",
+    "cancel": "Annuleren",
+    "submit": "Melden",
+    "sending": "Versturen…",
+    "sent": "Bedankt, je melding is verstuurd.",
+    "already": "Je hebt deze score al gemeld.",
+    "error": "De melding kon niet worden verstuurd. Probeer het opnieuw.",
+    "close": "Sluiten"
+  },
+  "score_save": {
+    "saving": "Opslaan in de ranglijst…",
+    "saved_as": "Score opgeslagen in de ranglijst als {{name}} ✓",
+    "updated_as": "Nieuw record opgeslagen als {{name}} ✓",
+    "record_kept": "Je record is nog steeds beter: {{record}}",
+    "taken": "Deze gebruikersnaam hoort bij een account. Log in om hem te gebruiken of kies een andere.",
+    "sign_in_hint": "Log in om je scores in je account op te slaan.",
+    "sign_in": "Inloggen",
+    "retry": "Opnieuw proberen",
+    "you": "Jij"
+  },
+  "mp_room": {
+    "add_players": "Spelers uit dit spel toevoegen",
+    "add_friend": "Vriend toevoegen",
+    "accept_friend": "Accepteren",
+    "request_sent": "Verzoek verstuurd",
+    "retry": "Opnieuw proberen",
+    "live": "Live",
+    "challenge": "Uitdaging",
+    "from_app": "Spel gemaakt in de mobiele app",
+    "code": "Spelcode",
+    "join_hint": "Kies je gebruikersnaam om mee te doen aan het spel.",
+    "watch": "Het lopende spel bekijken",
+    "spectator": "Je kijkt naar dit spel",
+    "spectator_hint": "De stand en voortgang worden live bijgewerkt. Je speelt niet mee in dit spel.",
+    "join": "Meedoen",
+    "players": "Spelers · {{count}}",
+    "you": "jij",
+    "host": "Host",
+    "waiting_host": "Wachten tot de host het spel start…",
+    "starting_in": "Start over",
+    "late_hint": "Het spel is al begonnen, maar je kunt nog meespelen.",
+    "joined_late": "Dit spel was al begonnen toen je binnenkwam: je kunt er niet aan deelnemen.",
+    "challenge_play_hint": "Speel wanneer je wilt: iedereen krijgt dezelfde landen.",
+    "play": "Spelen",
+    "standings": "Stand",
+    "playing": "Aan het spelen",
+    "not_played": "Nog niet gespeeld",
+    "no_players": "Nog niemand heeft gespeeld.",
+    "errors": "{{count}} fout",
+    "question": "Vraag {{n}} / {{total}}",
+    "see_results": "Bekijk de resultaten",
+    "finished": "Game over!",
+    "unsupported": "Dit spel kan nog niet op de website worden gespeeld.",
+    "launch": "Het spel starten",
+    "copy_link": "De link kopiëren",
+    "link_copied": "Link gekopieerd",
+    "not_found": "Spel niet gevonden. Controleer de code: oudere spellen zijn niet meer beschikbaar.",
+    "live_hint": "Iedereen begint tegelijk wanneer de host het spel start. Live voortgang.",
+    "challenge_hint": "Iedereen speelt wanneer hij wil met de code; de stand loopt vol naarmate er gespeeld wordt.",
+    "difficulty": "Moeilijkheid",
+    "answer_mode": "Antwoorden",
+    "countries_count": "Aantal landen",
+    "questions_count": "Aantal vragen",
+    "games": "Spellen",
+    "remove_game": "Dit spel verwijderen",
+    "game_n": "Spel {{n}}",
+    "add_another": "Nog een spel toevoegen",
+    "add_game": "Een spel toevoegen",
+    "cancel": "Annuleren",
+    "overall": "Algemeen",
+    "points": "{{count}} pnt",
+    "n_games": "{{count}} spellen",
+    "next_game": "Spel {{n}} starten",
+    "waiting_next": "Wachten op het volgende spel…",
+    "round_n": "Ronde {{n}} / {{total}}",
+    "next_round_soon": "Volgende ronde over een moment…"
+  },
+  "survival": {
+    "spectating": "Je kijkt naar de spelers die nog in het spel zitten",
+    "out_round": "uit in ronde {{n}}",
+    "back_to_room": "Terug naar de kamer",
+    "last_standing": "🏆 Als laatste over: jij wint!",
+    "ask_flag": "Noem het LAND van deze vlag",
+    "ask_capital": "Noem de HOOFDSTAD van dit land",
+    "choose_games": "Rondes",
+    "choose_lives": "Levens",
+    "pick_one_game": "Kies minstens één spel.",
+    "round_type": {
+      "PLACEMENT": "Zoek het land",
+      "FLAGS": "Vlag",
+      "CAPITALS": "Hoofdstad",
+      "BORDER_GUESS": "Grenzen",
+      "QUIZ": "Quiz"
+    },
+    "prompt": {
+      "PLACEMENT": "Klik op het land",
+      "FLAGS": "Welk land heeft deze vlag?",
+      "CAPITALS": "Wat is de hoofdstad?",
+      "BORDER_GUESS": "Welk land heeft deze vorm?",
+      "QUIZ": "Quizvraag"
+    },
+    "round": "Ronde {{n}}",
+    "rounds_short": "rondes",
+    "rounds_count_one": "{{count}} ronde",
+    "rounds_count_other": "{{count}} rondes",
+    "lives_count_one": "{{count}} leven",
+    "lives_count_other": "{{count}} levens",
+    "correct": "Goed gedaan!",
+    "answer_was": "Het was: {{answer}}",
+    "next": "Volgende →",
+    "give_up": "Overslaan (−1 ❤️)",
+    "life_lost": "Fout! −1 leven",
+    "not_a_country": "Dit land ken ik niet.",
+    "capital_placeholder": "Naam van de hoofdstad",
+    "game_over": "Geen levens meer!",
+    "victory": "Je hebt alle rondes overleefd!",
+    "rounds_survived": "Gehaalde rondes",
+    "time": "Tijd",
+    "lives_at_start": "Levens aan het begin",
+    "see_leaderboard": "Bekijk de Survival-ranglijst",
+    "leaderboard_title": "Survival-ranglijst",
+    "all_combinations": "Alle combinaties",
+    "all_six": "Alle 6 spellen",
+    "no_scores": "Geen scores voor dit filter.",
+    "col_player": "Speler",
+    "col_rounds": "Rondes",
+    "col_games": "Spellen",
+    "room_label": "Survival · {{lives}} ❤️",
+    "progress_lives": "{{lives}} ❤️",
+    "eliminated": "Uit",
+    "best": "Beste: {{rounds}}",
+    "missed_answer": "Gemist antwoord",
+    "choose_timer": "Tijd per ronde",
+    "timer_none": "Geen",
+    "timer_seconds_one": "{{count}} s",
+    "timer_seconds_other": "{{count}} s",
+    "time_up": "Tijd is om!",
+    "waiting_players": "Wachten op de andere spelers · {{done}}/{{total}}",
+    "choose_ramp": "Moeilijkheidscurve",
+    "ramp": {
+      "express": "Express",
+      "normal": "Normaal",
+      "gentle": "Rustig",
+      "expert": "Expert",
+      "hardcore": "Hardcore",
+      "custom": "Aangepast"
+    },
+    "ramp_summary": "{{facile}} makkelijke rondes, {{moyen}} gemiddelde, {{difficile}} moeilijke, daarna Onmogelijk.",
+    "ramp_custom_hint": "Aangepaste curve: dit spel telt niet mee voor de ranglijst."
+  },
+  "seo": {
+    "atlas": {
+      "title": "Interactieve wereldatlas: landenprofielen | GeoGame",
+      "description": "Verken de wereldkaart en ontdek elk land: hoofdstad, bevolking, oppervlakte, BBP en aangrenzende landen."
+    },
+    "home": {
+      "title": "GeoGame — Gratis aardrijkskundespellen: landen, vlaggen, hoofdsteden",
+      "description": "Gratis online aardrijkskundespellen: plaats landen op de kaart, herken vlaggen, vind hoofdsteden, dagelijkse uitdagingen, quizzen en multiplayer met vrienden."
+    },
+    "placement": {
+      "title": "Zoek het land — Wereldkaartspel | GeoGame",
+      "description": "Vind elk land op de wereldkaart, van makkelijk tot Hardcore, per continent of in Ascension-modus. Gratis aardrijkskundespel met ranglijsten."
+    },
+    "flags": {
+      "title": "Zoek de vlag — Wereldvlaggenquiz | GeoGame",
+      "description": "Herken de vlag van elk land ter wereld. Kies een moeilijkheidsgraad of continent en klim in de ranglijst van deze gratis vlaggenquiz."
+    },
+    "capitals": {
+      "title": "Zoek de hoofdstad — Wereldhoofdstedenquiz | GeoGame",
+      "description": "Vind de hoofdstad van elk land aan de hand van de vlag en de naam. Gratis hoofdstedenquiz, per moeilijkheidsgraad of continent."
+    },
+    "border_guess": {
+      "title": "BorderGuess — Raad het land aan zijn grenzen | GeoGame",
+      "description": "Raad een land alleen aan de vorm van zijn grenzen. Elke dag een nieuwe uitdaging, of eindeloze spellen."
+    },
+    "country_clue": {
+      "title": "Country Clue — Vind het mysterieuze land | GeoGame",
+      "description": "Vind het mysterieuze land met hints over afstand, richting en oppervlakte. Dagelijkse uitdaging en eindeloze modus."
+    },
+    "voyage_voyage": {
+      "title": "Voyage Voyage — Verbind twee landen via hun grenzen | GeoGame",
+      "description": "Verbind twee landen door hun gedeelde grenzen over te steken en vind het kortste pad. Elke dag een nieuwe reis."
+    },
+    "ranking": {
+      "title": "Landenranglijst — Rangschik de landen | GeoGame",
+      "description": "Rangschik landen van groot naar klein op bevolking, oppervlakte of BBP. Dagelijkse uitdaging en eindeloze modus."
+    },
+    "quiz": {
+      "title": "Geoquiz — Dagelijkse aardrijkskundequiz | GeoGame",
+      "description": "Elke dag een aardrijkskundevraag om je vrienden uit te dagen, of blijf vragen beantwoorden op de moeilijkheidsgraad van je keuze."
+    },
+    "daily_challenge": {
+      "title": "Dagelijkse uitdaging — 12 aardrijkskundevragen per dag | GeoGame",
+      "description": "Elke dag dezelfde 12 vragen voor iedereen: vind landen op de kaart, noem vlaggen en hoofdsteden. Versla je vrienden en klim in de ranglijst."
+    },
+    "survival": {
+      "title": "Survival — Koppel aardrijkskundespellen aan elkaar | GeoGame",
+      "description": "Speel achter elkaar rondes van verschillende aardrijkskundespellen: elke fout kost je een leven. Hoe ver kom jij?"
+    },
+    "multiplayer": {
+      "title": "Multiplayer — Aardrijkskundespellen met vrienden | GeoGame",
+      "description": "Maak een kamer en speel live tegen je vrienden: landen, vlaggen, hoofdsteden, grenzen en meer."
+    },
+    "scores": {
+      "title": "Ranglijsten — Topscores | GeoGame",
+      "description": "De topscores van GeoGame-spelers voor elk spel, elke moeilijkheidsgraad en elk continent."
+    },
+    "privacy": {
+      "title": "Privacybeleid | GeoGame",
+      "description": "Welke gegevens GeoGame verwerkt, waarom, hoe lang, en hoe je je rechten uitoefent (inzage, verwijdering, bezwaar)."
+    },
+    "terms": {
+      "title": "Gebruiksvoorwaarden | GeoGame",
+      "description": "De regels voor het gebruik van GeoGame: account, verwacht gedrag, openbare ranglijsten en verantwoordelijkheden."
+    }
+  },
+  "daily_elsewhere": {
+    "title": "Dagelijkse uitdaging al gespeeld",
+    "text": "Je hebt deze dagelijkse uitdaging al gespeeld met je account, op een ander apparaat.",
+    "your_result": "Jouw resultaat:",
+    "come_back": "Kom morgen terug voor een nieuwe uitdaging!",
+    "checking": "Je dagelijkse uitdaging controleren…"
+  },
+  "legal": {
+    "privacy": "Privacy",
+    "terms": "Gebruiksvoorwaarden",
+    "legal": "Juridische vermeldingen",
+    "delete_account": "Mijn account verwijderen",
+    "updated": "Laatst bijgewerkt: {{date}}",
+    "signup_notice": "Door een account aan te maken ga je akkoord met de <terms>gebruiksvoorwaarden</terms> en het <privacy>privacybeleid</privacy>. Je moet minstens 13 zijn (en toestemming van een ouder hebben onder de 15)."
+  },
+  "invites": {
+    "title": "Vrienden uitnodigen",
+    "invite": "Uitnodigen",
+    "sent": "Uitgenodigd",
+    "joined": "In het spel",
+    "retry": "Opnieuw proberen",
+    "no_friends": "Voeg vrienden toe via je account om ze rechtstreeks uit te nodigen.",
+    "sign_in": "Log in om je vrienden rechtstreeks uit te nodigen.",
+    "banner": "{{username}} nodigt je uit om {{game}} te spelen",
+    "later": "Later",
+    "decline": "Sluiten",
+    "received_title": "Uitnodigingen"
+  },
+  "nav": {
+    "play": "Spelen",
+    "multiplayer": "Multi",
+    "leaderboards": "Ranglijsten",
+    "profile": "Profiel",
+    "main": "Hoofdnavigatie",
+    "language": "Taal"
+  },
+  "community": {
+    "title": "Community",
+    "intro": "Ontdek andere spelers en voeg ze toe als vriend.",
+    "join_title": "Verschijn in de community",
+    "join_hint": "Je gebruikersnaam en badges zijn zichtbaar voor alle spelers in deze lijst. Je kunt er op elk moment uit stappen.",
+    "join": "Lid worden van de community",
+    "listed": "Je staat in de community.",
+    "leave": "De lijst verlaten",
+    "members_title": "Nieuwste leden",
+    "empty": "Nog niemand: wees de eerste!",
+    "more": "Meer tonen",
+    "need_account": "Maak een account aan om lid te worden van de community en spelers toe te voegen.",
+    "error": "De community kon niet worden geladen. Probeer het opnieuw.",
+    "weekly_title": "Top van de week",
+    "weekly_hint": "Dagelijkse uitdagingen van de afgelopen 7 dagen: 1 punt per gespeelde uitdaging, plus een podiumbonus. Elke dag bijgewerkt.",
+    "weekly_empty": "Nog geen ranglijst: speel de dagelijkse uitdagingen!"
+  },
+  "decorations": {
+    "title": "Personaliseren",
+    "hint": "Kies een lijst en een kleur voor je gebruikersnaam: ze verschijnen op je profiel en in de ranglijsten.",
+    "open": "Profiel personaliseren",
+    "close": "Sluiten",
+    "frames": "Lijst",
+    "colors": "Kleur van gebruikersnaam",
+    "preview": "Voorbeeld",
+    "saving": "Opslaan…",
+    "error": "Opslaan mislukt, probeer het opnieuw.",
+    "locked": "Niveau {{level}}",
+    "frame": {
+      "none": "Geen",
+      "silver": "Zilver",
+      "gold": "Goud",
+      "ocean": "Oceaan",
+      "jungle": "Jungle",
+      "volcano": "Vulkaan",
+      "sunrise": "Zonsopgang",
+      "glacier": "Gletsjer",
+      "amethyst": "Amethist",
+      "ruby": "Robijn",
+      "emerald": "Smaragd",
+      "crown": "Kroon"
+    },
+    "color": {
+      "default": "Standaard",
+      "mint": "Munt",
+      "sky": "Hemel",
+      "coral": "Koraal",
+      "amber": "Amber",
+      "lilac": "Lila",
+      "rose": "Roze",
+      "lime": "Limoen",
+      "peach": "Perzik",
+      "turquoise": "Turkoois",
+      "violet": "Violet",
+      "crimson": "Karmozijn",
+      "gilded": "Verguld"
+    }
+  },
+  "elo": {
+    "tab": "Elo",
+    "title": "Elo-ranglijst",
+    "explain": "Duels: één algemene rating, bijgewerkt na elk duel tussen twee ingelogde spelers. Solo: één rating per modus; solo verlies je nooit punten, en elk land levert maar één keer per seizoen iets op. Een seizoen duurt één kwartaal.",
+    "season": "Seizoen {{quarter}} · {{year}}",
+    "duel": "Duels",
+    "rating": "Elo",
+    "col_duel": "Spellen · winst",
+    "col_found": "Gevonden landen",
+    "duel_detail": "{{games}} spellen · {{wins}} gewonnen",
+    "profile_title": "Elo",
+    "unplayed": "Dit seizoen nog niet gespeeld",
+    "empty": "Niemand heeft dit seizoen al een rating.",
+    "found_count_one": "{{count}} land gevonden",
+    "found_count_other": "{{count}} landen gevonden"
+  },
+  "missions": {
+    "title": "Missies",
+    "daily": "Dagelijkse missies",
+    "weekly": "Wekelijkse missies",
+    "bonus": "Bonus: alle {{count}} missies",
+    "reward": "+{{xp}} XP",
+    "per_game": "+{{xp}} XP per spel, {{count}} per dag",
+    "sign_in": "Log in om XP te verdienen, niveaus te stijgen en lijsten en kleuren te ontgrendelen.",
+    "resets_daily": "Nieuwe missies om middernacht",
+    "resets_weekly": "Nieuwe missies op maandag",
+    "play_3": "Speel {{count}} spellen",
+    "dailies_3": "Speel {{count}} dagelijkse spellen",
+    "daily_challenge": "Speel de dagelijkse uitdaging",
+    "daily_wins_2": "Win {{count}} dagelijkse spellen",
+    "flags_20": "Vind {{count}} vlaggen",
+    "placement_20": "Plaats {{count}} landen op de kaart",
+    "capitals_15": "Vind {{count}} hoofdsteden",
+    "ascension_1": "Speel een Ascension-spel",
+    "survival_1": "Speel een Survival-spel",
+    "perfect_1": "Voltooi een spel zonder fouten (10 landen of meer)",
+    "types_3": "Speel {{count}} verschillende spellen",
+    "week_play_20": "Speel {{count}} spellen",
+    "week_daily_days_5": "Speel op {{count}} verschillende dagen een dagelijks spel",
+    "week_dailies_15": "Speel {{count}} dagelijkse spellen",
+    "week_daily_wins_10": "Win {{count}} dagelijkse spellen",
+    "week_found_200": "Vind in totaal {{count}} landen",
+    "week_perfect_3": "Voltooi {{count}} spellen zonder fouten (10 landen of meer)",
+    "week_types_6": "Speel {{count}} verschillende spellen",
+    "week_ascension_3": "Speel {{count}} Ascension-spellen",
+    "week_found_500": "Vind in totaal {{count}} landen",
+    "week_daily_days_7": "Speel op {{count}} verschillende dagen een dagelijks spel",
+    "week_daily_wins_20": "Win {{count}} dagelijkse spellen",
+    "play_5": "Speel {{count}} spellen",
+    "challenge_10": "Haal minstens 10/12 in de dagelijkse uitdaging",
+    "border_guess": "Speel de BorderGuess van vandaag",
+    "country_clue": "Speel de Country Clue van vandaag",
+    "daily_quiz": "Speel de Geoquiz van vandaag",
+    "quiz_infinite_1": "Speel een Geoquiz-spel in eindeloze modus",
+    "ranking": "Speel de Landenranglijst van vandaag",
+    "voyage": "Speel de Voyage Voyage van vandaag",
+    "missing_flag_1": "Speel een spel Ontbrekende vlag",
+    "hardcore_1": "Speel een Hardcore-spel",
+    "multi_1": "Speel een multiplayerspel",
+    "found_50": "Vind in totaal {{count}} landen",
+    "week_flags_60": "Vind {{count}} vlaggen",
+    "week_placement_60": "Plaats {{count}} landen op de kaart",
+    "week_capitals_40": "Vind {{count}} hoofdsteden",
+    "week_challenge_3": "Speel de dagelijkse uitdaging op {{count}} verschillende dagen",
+    "week_survival_5": "Speel {{count}} Survival-spellen",
+    "week_hardcore_3": "Speel {{count}} Hardcore-spellen",
+    "week_multi_3": "Speel {{count}} multiplayerspellen",
+    "week_difficult_3": "Voltooi {{count}} spellen op Moeilijk of hoger",
+    "week_missing_flag_3": "Speel {{count}} spellen Ontbrekende vlag",
+    "week_types_10": "Speel {{count}} verschillende spellen",
+    "week_found_1000": "Vind in totaal {{count}} landen",
+    "week_play_50": "Speel {{count}} spellen",
+    "week_perfect_hard_1": "Voltooi een spel zonder fouten op Moeilijk of hoger",
+    "week_challenge_10": "Haal minstens 10/12 in de dagelijkse uitdaging",
+    "tier_easy": "Makkelijk",
+    "tier_medium": "Gemiddeld",
+    "tier_hard": "Moeilijk",
+    "fragments_one": "+{{count}} fragment",
+    "fragments_other": "+{{count}} fragmenten"
+  },
+  "level": {
+    "label": "Niveau {{level}}",
+    "short": "Niv. {{level}}",
+    "progress": "{{into}} / {{needed}} XP",
+    "total": "{{total}} XP",
+    "up": "Niveau {{level}} bereikt!",
+    "gained": "+{{xp}} XP",
+    "fragments_one": "+{{count}} vlagfragment",
+    "fragments_other": "+{{count}} vlagfragmenten",
+    "flag_unlocked": "Vlag ontgrendeld: {{name}} ({{rarity}})"
+  },
+  "collection": {
+    "title": "Vlaggencollectie",
+    "progress": "{{count}} / {{total}} vlaggen",
+    "current": "Vlag in uitvoering",
+    "pieces": "{{count}} / {{total}} fragmenten",
+    "hint": "Wekelijkse missies en elk behaald niveau geven fragmenten; een vlag vraagt 2 (gewoon) tot 6 (legendarisch).",
+    "empty": "Voltooi missies om je eerste vlagfragmenten te verdienen.",
+    "complete": "Collectie compleet!",
+    "unlocked": "Ontgrendelde vlaggen",
+    "show_all": "Alles tonen",
+    "show_less": "Minder tonen",
+    "legend_progress": "Legende: {{count}} / {{total}} landen in één keer gevonden",
+    "legend_hardcore_soon": "Hardcore-modus komt binnenkort",
+    "mode_placement": "Zoeken",
+    "mode_flags": "Vlaggen",
+    "mode_hardcore": "Hardcore",
+    "rarity": {
+      "common": "Gewoon",
+      "uncommon": "Ongewoon",
+      "rare": "Zeldzaam",
+      "legendary": "Legendarisch"
+    }
+  }
+}

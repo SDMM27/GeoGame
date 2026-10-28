@@ -2,11 +2,12 @@
 // with it (new data collected, new provider, new retention), and update LEGAL_INFO.updated in legalInfo.js.
 // A document: { title, intro: [block], sections: [{ id, title, blocks: [block] }] }. A block is a paragraph (string)
 // or { list: [string] }. In strings: {editor}, {email} and {site} are replaced, [label](href) becomes a link.
-// Spanish, Portuguese, German, Italian and Ukrainian are in ./translations: update them too.
+// Spanish, Portuguese, German, Italian, Ukrainian and Dutch are in ./translations: update them too.
 
 import de from './translations/de'
 import es from './translations/es'
 import it from './translations/it'
+import nl from './translations/nl'
 import pt from './translations/pt'
 import uk from './translations/uk'
 
@@ -927,4 +928,4 @@ const ru = {
   },
 }
 
-export const LEGAL_DOCUMENTS = { fr, en, es, pt, de, it, ru, uk }
+export const LEGAL_DOCUMENTS = { fr, en, es, pt, de, it, ru, uk, nl }

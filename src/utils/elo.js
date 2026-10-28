@@ -1,5 +1,6 @@
-import { collection, doc, getDoc, getDocs, limit, orderBy, query, where } from 'firebase/firestore'
+import { collection, doc, getDoc, limit, orderBy, query, where } from 'firebase/firestore'
 import { firestore } from '../Firebase'
+import { getLeaderboardDocs } from './leaderboardQuery'
 import { ELO_KEYS, ratingOf, ratingsForSeason, seasonKeyAt } from './eloRating'
 import { LEADERBOARD_SIZE } from './leaderboards'
 import { serverNow } from './serverTime'
@@ -26,7 +27,7 @@ export function eloRow(id, data, key) {
 // The best players of the current season for a key, best first. Only the players who played it this season.
 export async function fetchEloLeaderboard(key) {
   const field = key === 'duel' ? 'duel.rating' : `solo.${key}.rating`
-  const snapshot = await getDocs(
+  const snapshot = await getLeaderboardDocs(
     query(collection(firestore, 'elo'), where('season', '==', currentSeason()), orderBy(field, 'desc'), limit(LEADERBOARD_SIZE))
   )
   return snapshot.docs.map((item) => eloRow(item.id, item.data(), key))

@@ -2,6 +2,7 @@ import { initializeApp } from "firebase/app";
 import {getFirestore, initializeFirestore, connectFirestoreEmulator, persistentLocalCache, persistentMultipleTabManager} from 'firebase/firestore';
 import { startAppCheck } from './appCheck';
 import { APP_CHECK_SITE_KEY } from './appCheckKey';
+import { canUsePersistentCache } from './utils/firestoreCache';
 
 // Firebase web configuration (public identifiers, not secrets: access is enforced by firestore.rules and App Check)
 const firebaseConfig = {
@@ -24,9 +25,17 @@ export const appCheck = USE_EMULATORS ? null : startAppCheck(app, APP_CHECK_SITE
 // more before the SDK falls back by itself: detect it quickly and switch to long polling.
 // initializeFirestore throws if Firestore already exists for this app (hot reload): reuse it then.
 // The cache is kept on disk (IndexedDB) so that a profile opened after the app was suspended or killed can show its
-// last known data at once while the connection comes back. Without IndexedDB (private mode...) it stays in memory.
+// last known data at once while the connection comes back. Without IndexedDB (private mode...) it stays in memory,
+// and on iPhone/iPad, where the persistent cache stalls every query after a back/forward navigation (utils/firestoreCache.js).
 function createFirestore() {
   const settings = { experimentalAutoDetectLongPolling: true };
+  if (!canUsePersistentCache()) {
+    try {
+      return initializeFirestore(app, settings);
+    } catch {
+      return getFirestore(app);
+    }
+  }
   try {
     return initializeFirestore(app, { ...settings, localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }) });
   } catch {

@@ -66,19 +66,28 @@ export default function DailyLeaderboard({ gameType, dailyKey, columnLabels, sec
 
   const days = useMemo(() => (dailyKey ? getLast7Days(dailyKey, i18n.language) : []), [dailyKey, i18n.language])
 
-  if (!dailyKey) return null
-
+  // Only the answer to the latest request is shown: a slow one for a day picked earlier is dropped.
   useEffect(() => {
-    const fetchScores = async () => {
-      setLoading(true)
-      try {
-        setScores(await fetchDailyScores(gameType, selectedDate))
-      } finally {
-        setLoading(false)
-      }
+    if (!dailyKey) return undefined
+    let cancelled = false
+    setLoading(true)
+    fetchDailyScores(gameType, selectedDate)
+      .then((result) => {
+        if (!cancelled) setScores(result)
+      })
+      .catch((error) => {
+        console.error(error)
+        if (!cancelled) setScores([])
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
     }
-    fetchScores()
-  }, [gameType, selectedDate, refreshKey])
+  }, [dailyKey, gameType, selectedDate, refreshKey])
+
+  if (!dailyKey) return null
 
   return (
     <div className="daily-lb">

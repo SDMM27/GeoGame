@@ -12,6 +12,7 @@ vi.mock('../i18n', () => {
     'games.ranking.title': 'Country Ranking',
     'games.voyage_voyage.title': 'Voyage Voyage',
     'games.daily_challenge.title': 'Challenge du jour',
+    'games.country_of_day.title': 'Le Pays du jour',
     'share.played_by': 'joué par',
     'share.can_you_beat': 'Peux-tu faire mieux ?',
     'share.anonymous': 'Anonyme',
@@ -176,6 +177,15 @@ describe('generateShareText', () => {
     expect(text).not.toContain('POINTS')
   })
 
+  it('shows the Country of the Day with its points and its steps line', () => {
+    const grid = '🧭 2/3 · 🏳️ 1/3 · 🏛️ 1/3 · 📍 ❌'
+    const text = generateShareText({ score: 330, gameType: 'COUNTRY_OF_DAY', difficulty: 'Daily', pseudo: 'X', scoreText: '330 pts', details: 'free', grid, siteUrl: 'https://example.test' })
+    expect(text).toContain('Pays du jour')
+    expect(text).toContain('🏆 330 pts | Daily')
+    expect(text).toContain(grid)
+    expect(text).toContain('https://example.test/country-of-the-day')
+  })
+
   it('omits details line when not provided', () => {
     const text = generateShareText({ score: 5, gameType: 'RANKING', difficulty: 'Daily', pseudo: 'X' })
     expect(text).not.toContain('📊')
@@ -209,6 +219,7 @@ describe('game link', () => {
     ['RANKING', '/ranking'],
     ['VOYAGE_VOYAGE', '/voyage-voyage'],
     ['QUIZ', '/quiz'],
+    ['COUNTRY_OF_DAY', '/country-of-the-day'],
   ])('maps %s to %s', (gameType, route) => {
     expect(getGameUrl(gameType, site)).toBe(`${site}${route}`)
   })

@@ -2,7 +2,7 @@
 // (the website's utils/countryInfo.js); its neighbors lead on to theirs.
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { Image } from 'expo-image'
-import { router } from 'expo-router'
+import { router, useLocalSearchParams } from 'expo-router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Keyboard, Platform, ScrollView, StyleSheet, TextInput, View, useWindowDimensions } from 'react-native'
@@ -18,6 +18,8 @@ import {
 } from '@shared/utils/countryInfo'
 
 import countryHistory from '@shared/data/countryHistory.json'
+import { isGameHidden } from '@shared/utils/gameAvailability'
+import { GAME_TYPES } from '@shared/utils/gameTypes'
 import { HISTORY_COUNTRIES } from '@shared/utils/quizQuestions'
 
 import { RankingSheet } from '@/components/atlas/RankingSheet'
@@ -106,7 +108,7 @@ function CountrySheet({
     ] as const
   ).filter(([, , level]) => level)
   const timeline = (info.iso ? (countryHistory as Record<string, TimelineEvent[]>)[info.iso] : null) ?? []
-  const hasHistoryQuiz = !!info.iso && (HISTORY_COUNTRIES as string[]).includes(info.iso)
+  const hasHistoryQuiz = !isGameHidden(GAME_TYPES.QUIZ) && !!info.iso && (HISTORY_COUNTRIES as string[]).includes(info.iso)
 
   return (
     // No spring on Android, where it made the sheet bounce many times: a short fade and slide instead.
@@ -310,6 +312,20 @@ export default function AtlasScreen() {
     setFromRanking(false)
     select(admin)
   }
+
+  // Opened on a country (the Country of the Day's "See in the Atlas"): selected once the map is there
+  const { country } = useLocalSearchParams<{ country?: string }>()
+  useEffect(() => {
+    if (!country || !findAtlasCountry(country)) return undefined
+    let tries = 0
+    const id = setInterval(() => {
+      tries += 1
+      if (!mapRef.current && tries < 20) return
+      clearInterval(id)
+      selectCountry(country)
+    }, 100)
+    return () => clearInterval(id)
+  }, [country]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const openRanking = (metric: Metric) => {
     Keyboard.dismiss()

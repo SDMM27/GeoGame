@@ -60,7 +60,9 @@ describe('vite-plugin-seo', () => {
 
   it('lists the indexable pages in the sitemap and points robots.txt to it', () => {
     const sitemap = renderSitemap('2026-10-09')
-    expect(sitemap).toContain(`<loc>${SITE_URL}/quiz</loc>`)
+    expect(sitemap).toContain(`<loc>${SITE_URL}/country-of-the-day</loc>`)
+    // The hidden Geo Quiz is no longer indexed
+    expect(sitemap).not.toContain('/quiz')
     expect(sitemap).not.toContain('/survival')
     expect(renderRobots()).toContain(`Sitemap: ${SITE_URL}/sitemap.xml`)
   })

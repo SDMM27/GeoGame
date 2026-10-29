@@ -25,6 +25,7 @@ export const colors = {
 // One color per game, used for icons and accents.
 export const gameColors = {
   daily_challenge: '#FF9F45',
+  country_of_day: '#2EC4B6',
   placement: '#7AA2FF',
   hardcore: '#FF7A6B',
   flags: '#FF7A6B',

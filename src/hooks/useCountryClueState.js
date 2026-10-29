@@ -92,7 +92,8 @@ function hashString(value) {
   return hash
 }
 
-function getDailyCountry(dateKey) {
+/** The country of the day (also read by the Country of the Day, which never plays the same one). */
+export function getCountryClueDailyCountry(dateKey) {
   if (dateKey >= STABLE_DAILY_PICK_SINCE) {
     return pickDaily(COUNTRY_CLUE_COUNTRIES, `country-clue:${dateKey}`, (country) => country.properties.ADMIN)
   }
@@ -351,7 +352,7 @@ export default function useCountryClueState(mode, options = {}) {
         return
       }
       const savedProgress = readDailyProgress(todayKey)
-      const selectedCountry = getCountryByName(savedProgress?.targetName) ?? getDailyCountry(todayKey)
+      const selectedCountry = getCountryByName(savedProgress?.targetName) ?? getCountryClueDailyCountry(todayKey)
       const hydratedGuesses = Array.isArray(savedProgress?.guesses)
         ? savedProgress.guesses
           .map((guess) => buildGuessRecord(guess, selectedCountry.properties.ADMIN, i18n.language))

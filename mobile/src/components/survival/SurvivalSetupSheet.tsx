@@ -100,7 +100,8 @@ export function SurvivalSetupSheet() {
         <Text variant="label">{t('survival.choose_games')}</Text>
         <View style={styles.grid}>
           {SURVIVAL_ROUND_TYPES.map((type: string) => {
-            const round = getGameByType(type)!
+            const round = getGameByType(type)
+            if (!round) return null
             const active = modes.includes(type)
             return (
               <Touchable

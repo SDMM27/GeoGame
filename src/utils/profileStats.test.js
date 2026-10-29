@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { DAILY_GAME_TYPES, computeStats, computeStreaks, dailyTypesOn, formatPlayTime, previousDayKey } from './profileStats'
+import { COUNTRY_OF_DAY_SINCE, DAILY_GAME_TYPES, computeStats, computeStreaks, dailyTypesOn, formatPlayTime, previousDayKey } from './profileStats'
 import { computeAchievements } from './achievements'
 import { splitFriendships } from './friends'
 
@@ -13,8 +13,17 @@ describe('previousDayKey', () => {
 describe('dailyTypesOn', () => {
   it('lists the dailies there were on a day: the Daily Challenge from its first day', () => {
     expect(DAILY_GAME_TYPES[0]).toBe('DAILY_CHALLENGE')
-    expect(dailyTypesOn('2026-10-15')).toEqual(DAILY_GAME_TYPES.filter((type) => type !== 'DAILY_CHALLENGE'))
-    expect(dailyTypesOn('2026-10-16')).toEqual(DAILY_GAME_TYPES)
+    const withQuiz = ['DAILY_CHALLENGE', 'BORDER_GUESS', 'COUNTRY_CLUE', 'VOYAGE_VOYAGE', 'RANKING', 'QUIZ']
+    expect(dailyTypesOn('2026-10-15')).toEqual(withQuiz.filter((type) => type !== 'DAILY_CHALLENGE'))
+    expect(dailyTypesOn('2026-10-16')).toEqual(withQuiz)
+  })
+
+  it('swaps the Geo Quiz for the Country of the Day on its first day', () => {
+    expect(DAILY_GAME_TYPES).toContain('COUNTRY_OF_DAY')
+    expect(DAILY_GAME_TYPES).not.toContain('QUIZ')
+    expect(dailyTypesOn(previousDayKey(COUNTRY_OF_DAY_SINCE))).toContain('QUIZ')
+    expect(dailyTypesOn(previousDayKey(COUNTRY_OF_DAY_SINCE))).not.toContain('COUNTRY_OF_DAY')
+    expect(dailyTypesOn(COUNTRY_OF_DAY_SINCE)).toEqual(DAILY_GAME_TYPES)
     expect(dailyTypesOn('2027-01-01')).toEqual(DAILY_GAME_TYPES)
   })
 })

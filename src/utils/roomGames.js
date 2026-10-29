@@ -1,5 +1,6 @@
 // The games a multiplayer room can hold. Same games and ids as the app (mobile/src/games.ts), same icons as the home page.
 import { GAME_TYPES } from './gameTypes'
+import { isGameHidden } from './gameAvailability'
 
 export const ROOM_GAMES = [
   { id: 'placement', type: GAME_TYPES.PLACEMENT, icon: '🌍' },
@@ -10,6 +11,9 @@ export const ROOM_GAMES = [
   { id: 'quiz', type: GAME_TYPES.QUIZ, icon: '🧠' },
   { id: 'survival', type: GAME_TYPES.SURVIVAL, icon: '❤️' },
 ]
+
+// What the pickers offer: ROOM_GAMES stays whole so that rooms already created with a hidden game keep working
+export const LISTED_ROOM_GAMES = ROOM_GAMES.filter((game) => !isGameHidden(game.type))
 
 export const roomGameIcon = (gameId) => ROOM_GAMES.find((game) => game.id === gameId)?.icon ?? '🎮'
 

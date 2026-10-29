@@ -1,7 +1,7 @@
 import i18n from '@shared/i18n'
 import { LANGUAGE_CODES } from '@shared/i18n/languages'
 
-import { DIFFICULTIES, DIFFICULTY_COLORS, GAMES, MULTI_GAMES, getGame, getGameByType } from './games'
+import { DIFFICULTIES, DIFFICULTY_COLORS, GAMES, LISTED_GAMES, MULTI_GAMES, getGame, getGameByType } from './games'
 import './i18n'
 import { gameColors } from './theme'
 
@@ -51,18 +51,37 @@ describe('lookups', () => {
   })
 
   it('keeps solo-only games out of multiplayer', () => {
-    expect(MULTI_GAMES.map((game) => game.id)).toEqual(['placement', 'flags', 'capitals', 'border_guess', 'country_clue', 'quiz', 'survival'])
+    // The hidden Geo Quiz is no longer offered in rooms
+    expect(MULTI_GAMES.map((game) => game.id)).toEqual(['placement', 'flags', 'capitals', 'border_guess', 'country_clue', 'survival'])
+    expect(getGame('country_of_day')?.multi).toBe(false)
     expect(getGame('voyage_voyage')?.multi).toBe(false)
     expect(getGame('ranking')?.multi).toBe(false)
     expect(getGame('daily_challenge')?.multi).toBe(false)
   })
 
-  it('puts the Daily Challenge first among the dailies, without an infinite mode', () => {
+  it('puts the Daily Challenge then the Country of the Day first among the dailies, without an infinite mode', () => {
     const dailies = GAMES.filter((game) => game.kind === 'daily')
     expect(dailies[0].id).toBe('daily_challenge')
     expect(dailies[0].route).toBe('/game/challenge')
+    expect(dailies[1].id).toBe('country_of_day')
+    expect(dailies[1].route).toBe('/game/country-of-the-day')
     expect(getGameByType('DAILY_CHALLENGE')?.id).toBe('daily_challenge')
-    expect(GAMES.filter((game) => game.dailyOnly).map((game) => game.id)).toEqual(['daily_challenge'])
+    expect(getGameByType('COUNTRY_OF_DAY')?.id).toBe('country_of_day')
+    expect(GAMES.filter((game) => game.dailyOnly).map((game) => game.id)).toEqual(['daily_challenge', 'country_of_day'])
+  })
+
+  it('lists six daily games, the hidden Geo Quiz excluded but still in the catalog', () => {
+    expect(LISTED_GAMES.filter((game) => game.kind === 'daily').map((game) => game.id)).toEqual([
+      'daily_challenge',
+      'country_of_day',
+      'border_guess',
+      'country_clue',
+      'voyage_voyage',
+      'ranking',
+    ])
+    expect(LISTED_GAMES.some((game) => game.id === 'quiz')).toBe(false)
+    expect(getGame('quiz')?.type).toBe('QUIZ')
+    expect(getGameByType('QUIZ')?.id).toBe('quiz')
   })
 
   it('offers setup sheets to all configurable solo games', () => {

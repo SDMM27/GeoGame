@@ -10,7 +10,7 @@ import { AppState, Linking, Platform } from 'react-native'
 
 import i18n from '@shared/i18n'
 
-import { GAMES } from '@/games'
+import { LISTED_GAMES } from '@/games'
 
 import { saveDevice } from './device'
 
@@ -76,11 +76,11 @@ export function usePushNotifications(uid: string | null | undefined) {
       router.push({ pathname: '/player/[uid]', params: { uid: data.uid } })
     } else if (data?.type === 'daily_nudge') {
       Notifications.clearLastNotificationResponseAsync()
-      // Straight to the daily challenge the friend finished.
+      // Straight to the daily challenge the friend finished (a hidden game, like the quiz, is not found: home).
       const game =
         data.mode === 'recent'
-          ? GAMES.find((item) => item.type === data.gameType)
-          : GAMES.find((item) => item.kind === 'daily' && item.type === data.gameType)
+          ? LISTED_GAMES.find((item) => item.type === data.gameType)
+          : LISTED_GAMES.find((item) => item.kind === 'daily' && item.type === data.gameType)
       if (game) router.navigate(data.mode === 'recent' ? (game.route as never) : { pathname: game.route as never, params: { mode: 'daily' } })
       else router.navigate('/')
     } else if (data?.type === 'challenge_result' && data.uid) {

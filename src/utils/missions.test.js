@@ -44,6 +44,9 @@ const everything = () => [
   ...Array.from({ length: 4 }, () => game({ gameType: 'PLACEMENT', mode: 'ascension', found: 20, total: 20 })),
   ...Array.from({ length: 4 }, () => game({ mode: 'multi' })),
   ...Array.from({ length: 2 }, () => game({ gameType: 'QUIZ', mode: 'infinite', found: undefined })),
+  ...Array.from({ length: 7 }, (_, index) =>
+    game({ gameType: 'COUNTRY_OF_DAY', mode: 'daily', solved: true, errors: 0, score: 400, found: undefined, dailyKey: `2026-10-${19 + index}` }),
+  ),
 ]
 
 describe('periods', () => {
@@ -63,6 +66,14 @@ describe('periods', () => {
 })
 
 describe('missions', () => {
+  it('never draws a mission about a hidden game', () => {
+    for (let day = 1; day <= 28; day += 1) {
+      const key = `2026-11-${String(day).padStart(2, '0')}`
+      const drawn = [...dailyMissions(key), ...weeklyMissions(key)]
+      expect(drawn.some((mission) => mission.game === GAME_TYPES.QUIZ)).toBe(false)
+    }
+  })
+
   it('draws the same distinct missions for everyone on a day or a week, and other ones on other days', () => {
     const today = dailyMissions('2026-10-19')
     expect(today).toHaveLength(DAILY_MISSIONS)

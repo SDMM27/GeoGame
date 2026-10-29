@@ -1,10 +1,13 @@
 // Profile statistics computed from a player's game history (see gameHistory.js). Pure functions.
 import { dailyKeyAt } from './dailyKey'
+import { isGameHidden } from './gameAvailability'
 import { GAME_TYPES } from './gameTypes'
 import { serverNow } from './serverTime'
 
-export const DAILY_GAME_TYPES = [
+// Every daily there has ever been, in display order.
+export const ALL_DAILY_GAME_TYPES = [
   GAME_TYPES.DAILY_CHALLENGE,
+  GAME_TYPES.COUNTRY_OF_DAY,
   GAME_TYPES.BORDER_GUESS,
   GAME_TYPES.COUNTRY_CLUE,
   GAME_TYPES.VOYAGE_VOYAGE,
@@ -12,15 +15,29 @@ export const DAILY_GAME_TYPES = [
   GAME_TYPES.QUIZ,
 ]
 
+// The dailies of today (the hidden games left out, see gameAvailability.js).
+export const DAILY_GAME_TYPES = ALL_DAILY_GAME_TYPES.filter((type) => !isGameHidden(type))
+
+// The Country of the Day took the Geo Quiz's place among the dailies on that day. Set it to the real launch day.
+export const COUNTRY_OF_DAY_SINCE = '2026-10-30'
+
 // First day of the dailies added after the others (the other ones have always been there).
 export const DAILY_GAME_SINCE = {
   [GAME_TYPES.DAILY_CHALLENGE]: '2026-10-16',
+  [GAME_TYPES.COUNTRY_OF_DAY]: COUNTRY_OF_DAY_SINCE,
+}
+
+// Day after the last one of the dailies taken away.
+export const DAILY_GAME_UNTIL = {
+  [GAME_TYPES.QUIZ]: COUNTRY_OF_DAY_SINCE,
 }
 
 // The dailies there were on a day ('2026-10-13'): "every daily done" on a day means those ones, so that a player keeps
-// the sweeps they made before a daily was added.
+// the sweeps they made before a daily was added or taken away.
 export function dailyTypesOn(day) {
-  return DAILY_GAME_TYPES.filter((type) => !DAILY_GAME_SINCE[type] || day >= DAILY_GAME_SINCE[type])
+  return ALL_DAILY_GAME_TYPES.filter(
+    (type) => (!DAILY_GAME_SINCE[type] || day >= DAILY_GAME_SINCE[type]) && (!DAILY_GAME_UNTIL[type] || day < DAILY_GAME_UNTIL[type])
+  )
 }
 
 // Same day as the daily challenges (server time by default).

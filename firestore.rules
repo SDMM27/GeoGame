@@ -677,10 +677,12 @@ service cloud.firestore {
                     resource.data.globalScore, resource.data.get('globalTimeMs', null));
     }
 
-    // Daily challenges (all with name and uid?), three shapes:
+    // Daily challenges (all with name and uid?), four shapes:
     //  - Country Ranking: { name, gameType: 'RANKING', dailyKey, score, totalError, attemptsUsed, playerOrder }
     //  - Daily Challenge: { name, gameType: 'DAILY_CHALLENGE', dailyKey, score, elapsedTime, results } (12 rounds, one
     //                     boolean each, score = right answers, saved even at 0; the shortest time breaks ties)
+    //  - Country of the Day: { name, gameType: 'COUNTRY_OF_DAY', dailyKey, mode, steps, score, elapsedTime } (the try
+    //                     each of the 4 steps was found on, 0 if missed; the score is recomputed from them, saved even at 0)
     //  - other games:     { name, gameType, dailyKey, attempts, elapsedTime, guesses, hints? } (fewer attempts wins)
     // A daily is saved once solved, so it took at least one attempt. Limits come from the games: quiz tries and hints,
     // the guessable names (Border Guess, Country Clue), the countries of a Voyage Voyage chain (whose elapsedTime holds
@@ -765,8 +767,48 @@ service cloud.firestore {
           && data.score <= data.results.size();
       }
 
+      function countryOfDayCaps() {
+        return {
+          // scoreCaps:begin countryOfDayCaps
+          'steps': 4,
+          'tries': 3,
+          'minTime': 400
+          // scoreCaps:end countryOfDayCaps
+        };
+      }
+
+      // Points of a step by the try it was found on (index 0: missed), for each mode
+      function countryOfDayPoints() {
+        return {
+          // scoreCaps:begin countryOfDayPoints
+          'choice': [0, 100, 60, 30],
+          'free': [0, 150, 90, 45]
+          // scoreCaps:end countryOfDayPoints
+        };
+      }
+
+      function validStepTries(steps, i, caps) {
+        return steps[i] is int && steps[i] >= 0 && steps[i] <= caps['tries'];
+      }
+
+      // The score must be the one the tries give: nothing else can be claimed
+      function validCountryOfDay(data) {
+        let caps = countryOfDayCaps();
+        return data.gameType == 'COUNTRY_OF_DAY'
+          && data.keys().hasOnly(['name', 'uid', 'gameType', 'dailyKey', 'mode', 'steps', 'score', 'elapsedTime'])
+          && data.keys().hasAll(['name', 'gameType', 'dailyKey', 'mode', 'steps', 'score', 'elapsedTime'])
+          && data.mode in ['choice', 'free']
+          && data.steps is list && data.steps.size() == caps['steps']
+          && validStepTries(data.steps, 0, caps) && validStepTries(data.steps, 1, caps)
+          && validStepTries(data.steps, 2, caps) && validStepTries(data.steps, 3, caps)
+          && data.score is int
+          && data.score == countryOfDayPoints()[data.mode][data.steps[0]] + countryOfDayPoints()[data.mode][data.steps[1]]
+                           + countryOfDayPoints()[data.mode][data.steps[2]] + countryOfDayPoints()[data.mode][data.steps[3]]
+          && inRange(data.elapsedTime, 1000000000) && data.elapsedTime >= caps['minTime'];
+      }
+
       function validAttempts(data) {
-        return data.gameType != 'RANKING' && data.gameType != 'DAILY_CHALLENGE'
+        return data.gameType != 'RANKING' && data.gameType != 'DAILY_CHALLENGE' && data.gameType != 'COUNTRY_OF_DAY'
           && data.keys().hasOnly(['name', 'uid', 'gameType', 'dailyKey', 'attempts', 'elapsedTime', 'guesses', 'hints'])
           && data.keys().hasAll(['name', 'gameType', 'dailyKey', 'attempts'])
           && data.attempts >= 1
@@ -782,7 +824,7 @@ service cloud.firestore {
           && validOwner(data)
           && validLabel(data.gameType)
           && validLabel(data.dailyKey)
-          && (validRanking(data) || validChallenge(data) || validAttempts(data));
+          && (validRanking(data) || validChallenge(data) || validCountryOfDay(data) || validAttempts(data));
       }
 
       // A daily is played once: its saved score is never replaced, so replaying it on another device
@@ -825,10 +867,11 @@ service cloud.firestore {
       return value == null || (value is string && value.size() <= 60);
     }
 
-    // Games of a survival run, in setup order: 'PLACEMENT+FLAGS+QUIZ' (survivalModesKey in src/utils/survivalConfig.js).
+    // Games of a survival run, in setup order: 'PLACEMENT+FLAGS+CAPITALS' (survivalModesKey in src/utils/survivalConfig.js).
+    // No QUIZ: the Geo Quiz is hidden (src/utils/gameAvailability.js), so no new run or room has quiz rounds.
     function validSurvivalModes(modes) {
       return modes is string && modes.size() <= 80
-        && modes.matches('^(PLACEMENT|FLAGS|CAPITALS|BORDER_GUESS|QUIZ)([+](PLACEMENT|FLAGS|CAPITALS|BORDER_GUESS|QUIZ))*$');
+        && modes.matches('^(PLACEMENT|FLAGS|CAPITALS|BORDER_GUESS)([+](PLACEMENT|FLAGS|CAPITALS|BORDER_GUESS))*$');
     }
 
     // Survival difficulty ramp: the rounds at each difficulty before Impossible (SURVIVAL_RAMP_MAX at most).

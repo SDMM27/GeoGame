@@ -46,51 +46,51 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   await fetch(`http://${process.env.FIRESTORE_EMULATOR_HOST}/emulator/v1/projects/${PROJECT}/databases/(default)/documents`, { method: 'DELETE' })
-  // Alice and Bob are friends; Alice found today's Quiz in 5 attempts and has a phone.
+  // Alice and Bob are friends; Alice found today's Border Guess in 5 attempts and has a phone.
   await db.doc('friendships/alice_bob').set({
     users: ['alice', 'bob'],
     usernames: { alice: 'Alice', bob: 'Bob' },
     requester: 'alice',
     status: 'accepted',
   })
-  await db.doc(`users/alice/games/daily_QUIZ_${TODAY}`).set({
-    gameType: 'QUIZ', mode: 'daily', dailyKey: TODAY, attempts: 5, solved: true, playedAt: Timestamp.fromMillis(NOW - 60000),
+  await db.doc(`users/alice/games/daily_BORDER_GUESS_${TODAY}`).set({
+    gameType: 'BORDER_GUESS', mode: 'daily', dailyKey: TODAY, attempts: 5, solved: true, playedAt: Timestamp.fromMillis(NOW - 60000),
   })
   await db.doc('users/alice/pushTokens/ExponentPushToken[alice]').set({ token: 'ExponentPushToken[alice]', lang: 'fr', platform: 'android' })
 })
 
 const nudge = (options = {}) =>
-  sendDailyNudge({ db, auth, idToken: tokens.alice, friendUid: 'bob', gameType: 'QUIZ', now: NOW, fetchImpl: fakeExpo(), ...options })
+  sendDailyNudge({ db, auth, idToken: tokens.alice, friendUid: 'bob', gameType: 'BORDER_GUESS', now: NOW, fetchImpl: fakeExpo(), ...options })
 
 const settle = (options = {}) => sendChallengeResult({ db, auth, idToken: tokens.bob, now: NOW + 1000, fetchImpl: fakeExpo(), ...options })
 
-const bobPlaysQuiz = (attempts, solved = true) =>
-  db.doc(`users/bob/games/daily_QUIZ_${TODAY}`).set({
-    gameType: 'QUIZ', mode: 'daily', dailyKey: TODAY, attempts, solved, playedAt: Timestamp.fromMillis(NOW + 500),
+const bobPlaysBorderGuess = (attempts, solved = true) =>
+  db.doc(`users/bob/games/daily_BORDER_GUESS_${TODAY}`).set({
+    gameType: 'BORDER_GUESS', mode: 'daily', dailyKey: TODAY, attempts, solved, playedAt: Timestamp.fromMillis(NOW + 500),
   })
 
 describe('sendChallengeResult', () => {
   it('keeps the challenger’s result on the nudge', async () => {
     expect((await nudge()).status).toBe(200)
-    expect((await db.doc('dailyNudges/alice_bob_QUIZ').get()).data()).toMatchObject({
-      from: 'alice', to: 'bob', gameType: 'QUIZ', mode: 'daily', resolved: false, challenger: { score: 5, solved: true, mode: 'daily' },
+    expect((await db.doc('dailyNudges/alice_bob_BORDER_GUESS').get()).data()).toMatchObject({
+      from: 'alice', to: 'bob', gameType: 'BORDER_GUESS', mode: 'daily', resolved: false, challenger: { score: 5, solved: true, mode: 'daily' },
     })
   })
 
   it('tells the challenger the friend beat them, once', async () => {
     await nudge()
-    await bobPlaysQuiz(3)
+    await bobPlaysBorderGuess(3)
     const fetchImpl = fakeExpo()
     expect(await settle({ fetchImpl })).toEqual({ status: 200, body: { notified: 1 } })
     expect(pushed(fetchImpl)).toEqual([
       expect.objectContaining({
         to: 'ExponentPushToken[alice]',
-        body: expect.stringContaining('Bob t’a battu sur Quiz Géo'),
-        data: { type: 'challenge_result', uid: 'bob', gameType: 'QUIZ', outcome: 'win' },
+        body: expect.stringContaining('Bob t’a battu sur BorderGuess'),
+        data: { type: 'challenge_result', uid: 'bob', gameType: 'BORDER_GUESS', outcome: 'win' },
         channelId: 'daily',
       }),
     ])
-    expect((await db.doc('dailyNudges/alice_bob_QUIZ').get()).data().resolved).toBe(true)
+    expect((await db.doc('dailyNudges/alice_bob_BORDER_GUESS').get()).data().resolved).toBe(true)
 
     // The next game doesn't tell it again
     const again = fakeExpo()
@@ -100,7 +100,7 @@ describe('sendChallengeResult', () => {
 
   it('tells a loss when the friend needed more attempts or didn’t find it', async () => {
     await nudge()
-    await bobPlaysQuiz(6, false)
+    await bobPlaysBorderGuess(6, false)
     const fetchImpl = fakeExpo()
     await settle({ fetchImpl })
     expect(pushed(fetchImpl)[0]).toMatchObject({ body: expect.stringContaining('Bob a perdu contre toi'), data: { outcome: 'lose' } })
@@ -111,7 +111,7 @@ describe('sendChallengeResult', () => {
     const fetchImpl = fakeExpo()
     expect(await settle({ fetchImpl })).toEqual({ status: 200, body: { notified: 0 } })
     expect(fetchImpl).not.toHaveBeenCalled()
-    expect((await db.doc('dailyNudges/alice_bob_QUIZ').get()).data().resolved).toBe(false)
+    expect((await db.doc('dailyNudges/alice_bob_BORDER_GUESS').get()).data().resolved).toBe(false)
   })
 
   it('compares a regular game with one of the same mode and difficulty, on points', async () => {
@@ -132,7 +132,7 @@ describe('sendChallengeResult', () => {
 
   it('says nothing to a former friend', async () => {
     await nudge()
-    await bobPlaysQuiz(3)
+    await bobPlaysBorderGuess(3)
     await db.doc('friendships/alice_bob').delete()
     const fetchImpl = fakeExpo()
     expect(await settle({ fetchImpl })).toEqual({ status: 200, body: { notified: 0 } })
@@ -141,7 +141,7 @@ describe('sendChallengeResult', () => {
 
   it('counts towards the hourly limit of the friend and retries after it', async () => {
     await nudge()
-    await bobPlaysQuiz(3)
+    await bobPlaysBorderGuess(3)
     await db.doc('invitePushLimits/bob').set({ start: NOW, count: SENDER_PUSH_LIMIT })
     const fetchImpl = fakeExpo()
     expect(await settle({ fetchImpl })).toEqual({ status: 200, body: { notified: 0 } })
@@ -150,8 +150,8 @@ describe('sendChallengeResult', () => {
   })
 
   it('ignores nudges sent before results existed, and unsigned callers', async () => {
-    await db.doc('dailyNudges/alice_bob_QUIZ').set({ from: 'alice', to: 'bob', day: TODAY, at: NOW })
-    await bobPlaysQuiz(3)
+    await db.doc('dailyNudges/alice_bob_BORDER_GUESS').set({ from: 'alice', to: 'bob', day: TODAY, at: NOW })
+    await bobPlaysBorderGuess(3)
     expect(await settle()).toEqual({ status: 200, body: { notified: 0 } })
     expect((await settle({ idToken: 'nope' })).status).toBe(401)
     expect((await settle({ idToken: undefined })).status).toBe(401)

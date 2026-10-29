@@ -128,6 +128,19 @@ export function saveChallengeScore({ name, uid, dailyKey, score, elapsedTime, re
   )
 }
 
+// Country of the Day score (points, then the total time): one per player and day, saved even at 0. `mode`: 'choice' or
+// 'free', `steps`: the try each of the 4 steps was found on (0: missed), from which the rules recompute the score.
+export function saveCountryOfDayScore({ name, uid, dailyKey, mode, steps, score, elapsedTime }) {
+  return saveBest(
+    'daily_scores',
+    { name, uid },
+    { gameType: GAME_TYPES.COUNTRY_OF_DAY, dailyKey },
+    { mode, steps, score, elapsedTime },
+    neverReplace,
+    (previous) => ({ score: previous.score, elapsedTime: previous.elapsedTime })
+  )
+}
+
 // Survival score: best one per player, set of games (`modes`, see survivalModesKey), lives, timer and preset ramp.
 export function saveSurvivalScore({ name, uid, modes, lives, timer, ramp, score, elapsedTime }) {
   return saveBest(
@@ -157,6 +170,18 @@ export async function fetchChallengeScores(dailyKey) {
     query(
       collection(firestore, 'daily_scores'),
       where('gameType', '==', GAME_TYPES.DAILY_CHALLENGE),
+      where('dailyKey', '==', dailyKey)
+    )
+  )
+  return sortChallengeScores(snapshot.docs.map(withId))
+}
+
+// Country of the Day scores of one day, best first (same order as the Daily Challenge: points, then time).
+export async function fetchCountryOfDayScores(dailyKey) {
+  const snapshot = await getLeaderboardDocs(
+    query(
+      collection(firestore, 'daily_scores'),
+      where('gameType', '==', GAME_TYPES.COUNTRY_OF_DAY),
       where('dailyKey', '==', dailyKey)
     )
   )

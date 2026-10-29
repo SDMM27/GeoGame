@@ -4,10 +4,12 @@
 // `sticky` (challenges): once unlocked it stays unlocked, even when the game left the capped history (see `remembered`).
 // `targetFrom`: the target is a number from `collection` (the size of the flag pool, of the mastery sets), not a constant.
 // `tier` ranks the badge (see TIERS): a player's best badges are the highest tiers they unlocked (src/utils/badges.js).
+import { isGameHidden } from './gameAvailability'
 import { GAME_TYPES } from './gameTypes'
 import { DAILY_GAME_TYPES, dailyTypesOn } from './profileStats'
 
-const ALL_GAME_TYPES = Object.values(GAME_TYPES)
+// The games there are to play (a hidden game can't count towards 'all_games')
+const ALL_GAME_TYPES = Object.values(GAME_TYPES).filter((type) => !isGameHidden(type))
 
 export const TIERS = ['bronze', 'silver', 'gold', 'legend']
 export const TIER_COLORS = { bronze: '#D08A4E', silver: '#B8C4D6', gold: '#F5B83D', legend: '#C792FF' }
@@ -25,6 +27,7 @@ const isSetupGame = (game) => game.mode === 'standard' || game.mode === 'ascensi
 // A setup game where every country was found.
 const isPerfect = (game) => game.total >= 10 && game.found === game.total
 // Daily game solved on the first guess (the Ranking has no "first try").
+const isCountryOfDay = (game) => isDaily(game) && game.gameType === GAME_TYPES.COUNTRY_OF_DAY
 const isFirstTry = (game) => isSolvedDaily(game) && game.attempts === 1 && game.gameType !== GAME_TYPES.RANKING
 
 // "<gameType>|<difficulty>" of every perfect game of the three setup games.
@@ -111,6 +114,7 @@ export const ACHIEVEMENTS = [
   },
   {
     id: 'no_hint',
+    game: GAME_TYPES.QUIZ,
     tier: 'silver',
     emoji: '🧠',
     icon: 'lightbulb-off-outline',
@@ -151,17 +155,31 @@ export const ACHIEVEMENTS = [
   },
   { id: 'ascension', tier: 'silver', emoji: '🏔️', icon: 'image-filter-hdr', target: 1, value: ({ games }) => flag(games, (game) => game.mode === 'ascension') },
 
-  // Quiz
+  // Country of the Day (score: its points, solved: the 4 steps found, errors: the wrong answers)
+  { id: 'country_of_day_7', tier: 'bronze', emoji: '🌐', icon: 'earth', target: 7, value: ({ games }) => count(games, isCountryOfDay) },
+  { id: 'country_of_day_30', tier: 'silver', emoji: '🧳', icon: 'bag-suitcase-outline', target: 30, value: ({ games }) => count(games, isCountryOfDay) },
+  { id: 'country_of_day_100', tier: 'legend', emoji: '🗺️', icon: 'map-legend', target: 100, value: ({ games }) => count(games, isCountryOfDay) },
+  {
+    id: 'country_of_day_flawless',
+    tier: 'gold',
+    emoji: '💯',
+    icon: 'star-circle-outline',
+    target: 1,
+    value: ({ games }) => flag(games, (game) => isCountryOfDay(game) && game.solved && game.errors === 0),
+  },
+
+  // Quiz (`game`: hidden with it, see computeAchievements)
   {
     id: 'quiz_flawless',
+    game: GAME_TYPES.QUIZ,
     tier: 'silver',
     emoji: '💎',
     icon: 'diamond-stone',
     target: 1,
     value: ({ games }) => flag(games, (game) => game.gameType === GAME_TYPES.QUIZ && game.answered >= 10 && game.correct === game.answered),
   },
-  { id: 'quiz_streak_10', tier: 'silver', emoji: '🔗', icon: 'link-variant', target: 10, value: ({ games }) => bestOf(games, GAME_TYPES.QUIZ, (game) => game.bestStreak) },
-  { id: 'quiz_streak_25', tier: 'legend', emoji: '🧬', icon: 'brain', target: 25, value: ({ games }) => bestOf(games, GAME_TYPES.QUIZ, (game) => game.bestStreak) },
+  { id: 'quiz_streak_10', game: GAME_TYPES.QUIZ, tier: 'silver', emoji: '🔗', icon: 'link-variant', target: 10, value: ({ games }) => bestOf(games, GAME_TYPES.QUIZ, (game) => game.bestStreak) },
+  { id: 'quiz_streak_25', game: GAME_TYPES.QUIZ, tier: 'legend', emoji: '🧬', icon: 'brain', target: 25, value: ({ games }) => bestOf(games, GAME_TYPES.QUIZ, (game) => game.bestStreak) },
 
   // Survival (the score is the number of rounds survived)
   { id: 'survival_10', tier: 'bronze', emoji: '❤️', icon: 'heart-outline', target: 10, value: ({ games }) => bestOf(games, GAME_TYPES.SURVIVAL, (game) => game.score) },
@@ -280,11 +298,13 @@ export function withRemembered(achievements, remembered = []) {
 // collection achievements have no progress (their target is at least 1, so 0 of 0 is never "unlocked").
 const NO_COLLECTION = { flagsUnlocked: 0, flagsTotal: 0, masteryFound: 0, masteryTotal: 0 }
 
+// The achievements of a hidden game (`game`, see gameAvailability.js) are only shown once unlocked.
 export function computeAchievements({ stats, games, friendsCount, remembered = [], collection = NO_COLLECTION }) {
   const list = ACHIEVEMENTS.filter((achievement) => friendsCount != null || achievement.id !== 'friend').map((achievement) => {
     const target = achievement.targetFrom ? Math.max(1, collection[achievement.targetFrom] ?? 0) : achievement.target
     const progress = Math.min(achievement.value({ stats, games, friendsCount, collection }), target)
     return { ...achievement, target, progress, unlocked: progress >= target }
   })
-  return withRemembered(sortAchievements(list), remembered)
+  const shown = withRemembered(sortAchievements(list), remembered)
+  return shown.filter((achievement) => achievement.unlocked || !isGameHidden(achievement.game))
 }

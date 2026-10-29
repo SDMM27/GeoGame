@@ -1,11 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { GAME_TYPES } from './gameTypes'
 import {
+  ALL_SURVIVAL_ROUND_TYPES,
   SURVIVAL_MAX_ROUNDS,
+  SURVIVAL_ROUND_TYPES,
   buildSurvivalRounds,
   checkCapitalName,
   checkCountryName,
   livesLeft,
+  normalizeSurvivalModes,
   parseSurvivalModes,
   survivalDifficulty,
   SURVIVAL_RAMPS,
@@ -16,16 +19,32 @@ import {
 import { sortSurvivalScores } from './leaderboards'
 
 const { PLACEMENT, FLAGS, CAPITALS, BORDER_GUESS, COUNTRY_CLUE, QUIZ } = GAME_TYPES
-const ALL = [PLACEMENT, FLAGS, CAPITALS, BORDER_GUESS, QUIZ]
+const ALL = [PLACEMENT, FLAGS, CAPITALS, BORDER_GUESS]
 const TIERS = ['Facile', 'Moyen', 'Difficile', 'Impossible']
 
 const roundKey = (round) => `${round.type}:${round.country?.properties.ADMIN ?? round.question.usedKeys.join(',')}`
 
 describe('survivalModesKey', () => {
   it('keeps the setup order and drops unknown or repeated games', () => {
-    expect(survivalModesKey([QUIZ, FLAGS, 'NOPE', FLAGS])).toBe('FLAGS+QUIZ')
-    expect(parseSurvivalModes('QUIZ+FLAGS+NOPE')).toEqual([FLAGS, QUIZ])
+    expect(survivalModesKey([CAPITALS, FLAGS, 'NOPE', FLAGS])).toBe('FLAGS+CAPITALS')
+    expect(parseSurvivalModes('CAPITALS+FLAGS+NOPE')).toEqual([FLAGS, CAPITALS])
     expect(parseSurvivalModes(null)).toEqual([])
+  })
+
+  it('hides the Geo Quiz from the choices but keeps it in the full list', () => {
+    expect(SURVIVAL_ROUND_TYPES).toEqual(ALL)
+    expect(ALL_SURVIVAL_ROUND_TYPES).toEqual([...ALL, QUIZ])
+    // The "all games" key no longer holds the quiz
+    expect(survivalModesKey(SURVIVAL_ROUND_TYPES)).toBe('PLACEMENT+FLAGS+CAPITALS+BORDER_GUESS')
+    expect(survivalModesKey([FLAGS, QUIZ])).toBe('FLAGS')
+  })
+
+  it('falls back to every available game when only hidden games are left', () => {
+    expect(normalizeSurvivalModes([QUIZ])).toEqual(SURVIVAL_ROUND_TYPES)
+    expect(parseSurvivalModes('QUIZ')).toEqual(SURVIVAL_ROUND_TYPES)
+    // Nothing chosen, or unknown games only: still nothing
+    expect(normalizeSurvivalModes([])).toEqual([])
+    expect(normalizeSurvivalModes(['NOPE'])).toEqual([])
   })
 
   it('has no Country Clue rounds', () => {
@@ -43,15 +62,15 @@ describe('buildSurvivalRounds', () => {
   })
 
   it('plays every chosen game once per cycle', () => {
-    const rounds = buildSurvivalRounds([FLAGS, BORDER_GUESS, QUIZ], 7, 30)
+    const rounds = buildSurvivalRounds([FLAGS, BORDER_GUESS, CAPITALS], 7, 30)
     for (let cycle = 0; cycle < 10; cycle++) {
       const types = rounds.slice(cycle * 3, cycle * 3 + 3).map((round) => round.type).sort()
-      expect(types).toEqual([BORDER_GUESS, FLAGS, QUIZ])
+      expect(types).toEqual([BORDER_GUESS, CAPITALS, FLAGS])
     }
   })
 
   it('never plays the same game twice in a row', () => {
-    const rounds = buildSurvivalRounds([FLAGS, CAPITALS, QUIZ], 12, 90)
+    const rounds = buildSurvivalRounds([FLAGS, CAPITALS, PLACEMENT], 12, 90)
     rounds.slice(1).forEach((round, index) => expect(round.type).not.toBe(rounds[index].type))
   })
 
@@ -73,7 +92,7 @@ describe('buildSurvivalRounds', () => {
       // A game without a new country (or question) at that difficulty asks an easier one: Border Guess has only a
       // few Impossible countries left once the tiny ones are removed
       expect(TIERS.indexOf(round.difficulty)).toBeLessThanOrEqual(expected)
-      if (round.type !== QUIZ && round.type !== BORDER_GUESS) expect(round.difficulty).toBe(survivalDifficulty(index, gentle))
+      if (round.type !== BORDER_GUESS) expect(round.difficulty).toBe(survivalDifficulty(index, gentle))
     })
   })
 
@@ -110,13 +129,12 @@ describe('buildSurvivalRounds', () => {
     for (const round of buildSurvivalRounds([CAPITALS], 9, 50)) expect(round.country.properties.capital).toBeTruthy()
   })
 
-  it('asks multiple-choice quiz questions', () => {
-    const quiz = buildSurvivalRounds([QUIZ], 11, 12)
-    expect(quiz).toHaveLength(12)
-    for (const round of quiz) {
-      expect(round.question.choices.length).toBeGreaterThan(1)
-      expect(round.question.choices.some((choice) => choice.id === round.question.correctId)).toBe(true)
-    }
+  it('plays no quiz rounds while the Geo Quiz is hidden', () => {
+    const rounds = buildSurvivalRounds([QUIZ, FLAGS], 11, 12)
+    expect(rounds).toHaveLength(12)
+    expect(rounds.every((round) => round.type === FLAGS)).toBe(true)
+    // A quiz-only link plays the available games instead
+    expect(buildSurvivalRounds([QUIZ], 11, 12).every((round) => round.type !== QUIZ)).toBe(true)
   })
 
   it('has no rounds without a game', () => {

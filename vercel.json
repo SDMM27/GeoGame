@@ -9,7 +9,7 @@
   ],
   "rewrites": [
     {
-      "source": "/:page(game|flag-game|capitals-game|border-guess|country-clue|voyage-voyage|ranking|quiz|challenge|survival|atlas|multiplayer|scores|privacy|terms)",
+      "source": "/:page(game|flag-game|capitals-game|border-guess|country-clue|voyage-voyage|ranking|country-of-the-day|challenge|survival|atlas|multiplayer|scores|privacy|terms)",
       "destination": "/:page/index.html"
     },
     { "source": "/((?!api/).*)", "destination": "/index.html" }

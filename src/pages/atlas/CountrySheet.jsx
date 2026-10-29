@@ -3,6 +3,8 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import countryHistory from '../../data/countryHistory.json'
+import { isGameHidden } from '../../utils/gameAvailability'
+import { GAME_TYPES } from '../../utils/gameTypes'
 import { HISTORY_COUNTRIES } from '../../utils/quizQuestions'
 import { formatMetric } from './formatMetric'
 
@@ -38,7 +40,7 @@ export default function CountrySheet({ info, onSelect, onClose, onRanking, onBac
     ['capitals', t('games.capitals.title'), info.difficulty.capitals],
   ].filter(([, , level]) => level)
   const timeline = info.iso ? countryHistory[info.iso] ?? [] : []
-  const hasHistoryQuiz = HISTORY_COUNTRIES.includes(info.iso)
+  const hasHistoryQuiz = !isGameHidden(GAME_TYPES.QUIZ) && HISTORY_COUNTRIES.includes(info.iso)
 
   return (
     <aside className="atlas-sheet" aria-label={info.name}>

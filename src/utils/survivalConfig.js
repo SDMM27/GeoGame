@@ -1,15 +1,20 @@
 // src/utils/survivalConfig.js
 // Survival mode settings, light enough for the setup screens (the rounds themselves: utils/survival.js).
 import { GAME_TYPES } from './gameTypes'
+import { isGameHidden } from './gameAvailability'
 
-// Games a survival round can be, in the order the setup shows them.
-export const SURVIVAL_ROUND_TYPES = [
+// Every game a survival round can be, in the order the setup shows them. Rounds tables and spectators of an old or running
+// game read this one: they still have to show the hidden games.
+export const ALL_SURVIVAL_ROUND_TYPES = [
   GAME_TYPES.PLACEMENT,
   GAME_TYPES.FLAGS,
   GAME_TYPES.CAPITALS,
   GAME_TYPES.BORDER_GUESS,
   GAME_TYPES.QUIZ,
 ]
+
+// The ones that can be chosen now (setup, default, "all games" key): without the hidden games.
+export const SURVIVAL_ROUND_TYPES = ALL_SURVIVAL_ROUND_TYPES.filter((type) => !isGameHidden(type))
 
 // Lives to choose from; each has its own leaderboard.
 export const SURVIVAL_LIVES = [1, 3, 5, 10]
@@ -53,10 +58,15 @@ export function normalizeSurvivalRamp(steps) {
 // A run that clears every round wins. firestore.rules caps the scores at this.
 export const SURVIVAL_MAX_ROUNDS = 300
 
-/** The chosen games in setup order, without unknown or repeated ones. */
+/**
+ * The chosen games in setup order, without unknown, hidden or repeated ones. An old link or room that only had hidden
+ * games (QUIZ alone) falls back to every available game.
+ */
 export function normalizeSurvivalModes(types) {
   const chosen = new Set(types ?? [])
-  return SURVIVAL_ROUND_TYPES.filter((type) => chosen.has(type))
+  const modes = SURVIVAL_ROUND_TYPES.filter((type) => chosen.has(type))
+  if (modes.length === 0 && ALL_SURVIVAL_ROUND_TYPES.some((type) => chosen.has(type))) return [...SURVIVAL_ROUND_TYPES]
+  return modes
 }
 
 /** One label per set of games, for the leaderboards: 'FLAGS+CAPITALS'. */

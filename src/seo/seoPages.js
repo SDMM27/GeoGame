@@ -19,7 +19,8 @@ export const SEO_PAGES = [
   { path: '/country-clue', key: 'country_clue', priority: '0.8', changefreq: 'daily' },
   { path: '/voyage-voyage', key: 'voyage_voyage', priority: '0.8', changefreq: 'daily' },
   { path: '/ranking', key: 'ranking', priority: '0.8', changefreq: 'daily' },
-  { path: '/quiz', key: 'quiz', priority: '0.8', changefreq: 'daily' },
+  { path: '/country-of-the-day', key: 'country_of_day', priority: '0.8', changefreq: 'daily' },
+  // /quiz (key 'quiz') is hidden: it redirects to the Country of the Day, see utils/gameAvailability.js
   // Without the options chosen on the home page, /survival sends the player back home: not in the sitemap.
   { path: '/survival', key: 'survival', sitemap: false },
   { path: '/atlas', key: 'atlas', priority: '0.7', changefreq: 'monthly' },

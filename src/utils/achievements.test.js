@@ -15,6 +15,17 @@ const unlockedIds = (games, friendsCount) =>
     .map((achievement) => achievement.id)
 
 describe('achievements', () => {
+  it('only shows the badges of a hidden game once unlocked', () => {
+    const ids = (games) => computeAchievements({ stats: computeStats(games, '2026-10-13'), games }).map((a) => a.id)
+    expect(ids([])).not.toContain('quiz_streak_10')
+    expect(ids([game({ gameType: 'QUIZ', mode: 'infinite', bestStreak: 12 })])).toContain('quiz_streak_10')
+  })
+
+  it('unlocks the Country of the Day badges', () => {
+    const days = Array.from({ length: 7 }, (_, i) => game({ gameType: 'COUNTRY_OF_DAY', mode: 'daily', dailyKey: `2026-10-0${i + 1}`, solved: i === 0, errors: i === 0 ? 0 : 2 }))
+    expect(unlockedIds(days)).toEqual(expect.arrayContaining(['country_of_day_7', 'country_of_day_flawless']))
+  })
+
   it('have unique ids, a known tier and a reachable target', () => {
     expect(new Set(ACHIEVEMENTS.map((achievement) => achievement.id)).size).toBe(ACHIEVEMENTS.length)
     for (const achievement of ACHIEVEMENTS) {

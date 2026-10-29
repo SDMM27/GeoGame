@@ -11,13 +11,13 @@ import { useAccount } from '@/account/auth'
 import { LanguageButton } from '@/components/LanguageButton'
 import { MissionsCard } from '@/components/missions/MissionsCard'
 import { Text, Touchable } from '@/components/ui'
-import { GAMES, type GameDefinition } from '@/games'
+import { LISTED_GAMES, type GameDefinition } from '@/games'
 import { startMultiGame } from '@/multiplayer/navigation'
 import { colors, gameColors, radius, space } from '@/theme'
 
-const DAILY_GAMES = GAMES.filter((game) => game.kind === 'daily')
+const DAILY_GAMES = LISTED_GAMES.filter((game) => game.kind === 'daily')
 // Games with a setup sheet first: Placement, Flags, Capitals, Survival
-const SETUP_GAMES = GAMES.filter((game) => game.kind === 'setup' || game.kind === 'survival')
+const SETUP_GAMES = LISTED_GAMES.filter((game) => game.kind === 'setup' || game.kind === 'survival')
 const NARROW_CARD = 240
 
 function DailyCard({ game, width }: { game: GameDefinition; width: number }) {

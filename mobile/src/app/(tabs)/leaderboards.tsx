@@ -1,5 +1,5 @@
 // Rankings tab: the website's leaderboards (solo per game / difficulty / continent, Ascension, daily challenges, Survival).
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { RefreshControl, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -29,6 +29,7 @@ import {
   survivalModesKey,
 } from '@shared/utils/survivalConfig'
 
+import { CountryOfDayLeaderboard } from '@/components/countryOfDay/CountryOfDayLeaderboard'
 import { ChallengeLeaderboard } from '@/components/game/ChallengeLeaderboard'
 import { DailyLeaderboard } from '@/components/game/DailyLeaderboard'
 import { RankingLeaderboard } from '@/components/game/RankingLeaderboard'
@@ -39,14 +40,14 @@ import { SoloLeaderboard } from '@/components/leaderboards/SoloLeaderboard'
 import { SurvivalLeaderboard } from '@/components/leaderboards/SurvivalLeaderboard'
 import { LanguageButton } from '@/components/LanguageButton'
 import { Segmented, Text } from '@/components/ui'
-import { GAMES, DIFFICULTY_COLORS, getGameByType } from '@/games'
+import { LISTED_GAMES, DIFFICULTY_COLORS, getGameByType } from '@/games'
 import { colors, space } from '@/theme'
 
 type Section = 'solo' | 'ascension' | 'elo' | 'daily' | 'survival'
 type SoloMode = 'difficulty' | 'continent'
 
-const SOLO_GAMES = GAMES.filter((game) => game.kind === 'setup')
-const DAILY_GAMES = GAMES.filter((game) => game.kind === 'daily')
+const SOLO_GAMES = LISTED_GAMES.filter((game) => game.kind === 'setup')
+const DAILY_GAMES = LISTED_GAMES.filter((game) => game.kind === 'daily')
 const ASCENSION_GAMES = SOLO_GAMES.filter((game) => !game.noAscension)
 // Survival: every set of games together, the six mixed, or one game alone
 const ALL_SURVIVAL_MODES = 'all'
@@ -81,8 +82,15 @@ export default function LeaderboardsScreen() {
     setRefreshKey((key) => key + 1)
   }, [])
   const onSettled = useCallback(() => setRefreshing(false), [])
+  // CountryOfDayLeaderboard has no onSettled: end the pull to refresh spinner ourselves
+  const refreshingCountryOfDay = refreshing && section === 'daily' && dailyGame === GAME_TYPES.COUNTRY_OF_DAY
+  useEffect(() => {
+    if (!refreshingCountryOfDay) return
+    const timer = setTimeout(onSettled, 1200)
+    return () => clearTimeout(timer)
+  }, [refreshingCountryOfDay, onSettled])
 
-  const gameChips = (games: typeof GAMES, withAll: boolean): Chip[] => [
+  const gameChips = (games: typeof LISTED_GAMES, withAll: boolean): Chip[] => [
     ...(withAll ? [{ value: ALL_GAMES, label: t('options.all_games'), icon: 'view-grid-outline' as const }] : []),
     ...games.map((game) => ({ value: game.type, label: t(game.titleKey), color: game.color, icon: game.icon })),
   ]
@@ -214,8 +222,8 @@ export default function LeaderboardsScreen() {
               { value: ALL_SURVIVAL_MODES, label: t('survival.all_combinations'), icon: 'view-grid-outline' },
               { value: ALL_SIX, label: t('survival.all_six'), icon: 'shuffle-variant' },
               ...SURVIVAL_ROUND_TYPES.map((type: string) => {
-                const game = getGameByType(type)!
-                return { value: type, label: t(`survival.round_type.${type}`), color: game.color, icon: game.icon }
+                const game = getGameByType(type)
+                return { value: type, label: t(`survival.round_type.${type}`), color: game?.color, icon: game?.icon }
               }),
             ]}
             value={survivalModes}
@@ -245,6 +253,8 @@ export default function LeaderboardsScreen() {
           />
           {dailyGame === GAME_TYPES.DAILY_CHALLENGE ? (
             <ChallengeLeaderboard dailyKey={day} refreshKey={refreshKey} maxRows={50} onSettled={onSettled} />
+          ) : dailyGame === GAME_TYPES.COUNTRY_OF_DAY ? (
+            <CountryOfDayLeaderboard dailyKey={day} refreshKey={refreshKey} maxRows={50} />
           ) : dailyGame === GAME_TYPES.RANKING ? (
             <RankingLeaderboard dailyKey={day} refreshKey={refreshKey} maxRows={50} onSettled={onSettled} />
           ) : (

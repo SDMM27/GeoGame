@@ -113,7 +113,17 @@ function dailyLimits() {
   // Daily Challenge: 12 rounds, a point per right answer (src/utils/dailyChallenge.js, which node can't import)
   const challengeRounds = Number(constantFrom('src/utils/dailyChallenge.js', /export const CHALLENGE_ROUNDS = (\d+)/, 'challenge rounds'))
 
+  // Country of the Day: 4 steps of 3 tries, points by the try a step was found on (src/utils/countryOfDay.js, which
+  // node can't import: it reads the hooks). The rules recompute the score from the tries.
+  const countryOfDaySource = 'src/utils/countryOfDay.js'
+  const countryOfDaySteps = constantFrom(countryOfDaySource, /export const COUNTRY_OF_DAY_STEPS = \[([^\]]+)\]/, 'country of day steps')
+    .split(',').filter((step) => step.trim()).length
+  const countryOfDayTries = Number(constantFrom(countryOfDaySource, /export const COUNTRY_OF_DAY_TRIES = (\d+)/, 'country of day tries'))
+  const pointsOf = (mode) => `[${constantFrom(countryOfDaySource, new RegExp(String.raw`^  ${mode}: \[([\d, ]+)\]`, 'm'), `country of day ${mode} points`)}]`
+
   return {
+    countryOfDay: { steps: countryOfDaySteps, tries: countryOfDayTries, minTime: countryOfDaySteps * MIN_MS_PER_COUNTRY },
+    countryOfDayPoints: { choice: pointsOf('choice'), free: pointsOf('free') },
     // Rounds (one point each) and the least time for all of them: nobody answers a round faster than MIN_MS_PER_COUNTRY
     challenge: { rounds: challengeRounds, minTime: challengeRounds * MIN_MS_PER_COUNTRY },
     attempts: { BORDER_GUESS: guessable, COUNTRY_CLUE: guessable, QUIZ: quizAttempts, VOYAGE_VOYAGE: voyageCountries },
@@ -152,6 +162,8 @@ export function computeLimits() {
     dailyWrong: daily.voyageWrong,
     rankingCaps: daily.ranking,
     challengeCaps: daily.challenge,
+    countryOfDayCaps: daily.countryOfDay,
+    countryOfDayPoints: daily.countryOfDayPoints,
   }
   return { maps, solo, ascension, daily }
 }
@@ -210,6 +222,9 @@ function print({ solo, ascension, daily }) {
     'RANKING playerOrder length <=': { value: daily.ranking.players, from: 'DAILY_COUNT, or one line per criterion' },
     'DAILY_CHALLENGE score / results length <=': { value: daily.challenge.rounds, from: 'CHALLENGE_ROUNDS (dailyChallenge.js)' },
     'DAILY_CHALLENGE elapsedTime >=': { value: daily.challenge.minTime, from: `${daily.challenge.rounds} rounds x ${MIN_MS_PER_COUNTRY} ms` },
+    'COUNTRY_OF_DAY steps x tries': { value: `${daily.countryOfDay.steps} x ${daily.countryOfDay.tries}`, from: 'COUNTRY_OF_DAY_STEPS / _TRIES (countryOfDay.js)' },
+    'COUNTRY_OF_DAY points by try (choice / free)': { value: `${daily.countryOfDayPoints.choice} / ${daily.countryOfDayPoints.free}`, from: 'COUNTRY_OF_DAY_POINTS (countryOfDay.js)' },
+    'COUNTRY_OF_DAY elapsedTime >=': { value: daily.countryOfDay.minTime, from: `${daily.countryOfDay.steps} steps x ${MIN_MS_PER_COUNTRY} ms` },
     'daily attempts >=': { value: 1, from: 'a daily is saved once solved: at least one guess or step' },
   })
 }

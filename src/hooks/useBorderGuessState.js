@@ -100,7 +100,7 @@ const BORDER_GUESS_EXCLUDED = new Set([
   'Îles Salomon',
 ])
 
-// Removed from the game after some days' countries were drawn with `hash % length` (see getDailyCountry): those days
+// Removed from the game after some days' countries were drawn with `hash % length` (see getBorderGuessDailyCountry): those days
 // keep drawing from the list as it was, so their country doesn't change.
 const REMOVED_AFTER_LEGACY_DAILIES = new Set([
   'Saint-Christophe-et-Niévès',
@@ -271,7 +271,8 @@ function hashString(value) {
   return hash
 }
 
-function getDailyCountry(dateKey) {
+/** The country of the day (also read by the Country of the Day, which never plays the same one). */
+export function getBorderGuessDailyCountry(dateKey) {
   if (dateKey >= STABLE_DAILY_PICK_SINCE) {
     return pickDaily(BORDER_GUESS_COUNTRIES, `border-guess:${dateKey}`, (country) => country.properties.ADMIN)
   }
@@ -440,7 +441,7 @@ export default function useBorderGuessState(mode, options = {}) {
         return
       }
       const savedProgress = readDailyProgress(todayKey)
-      const selectedCountry = getCountryByName(savedProgress?.targetName) ?? getDailyCountry(todayKey)
+      const selectedCountry = getCountryByName(savedProgress?.targetName) ?? getBorderGuessDailyCountry(todayKey)
 
       setDailyKey(todayKey)
       setCurrentCountry(selectedCountry)

@@ -101,6 +101,10 @@
       "title": "Drapeau incomplet",
       "description": "Identifie le pays malgré une bande manquante sur son drapeau.",
       "missing_part": "Partie manquante du drapeau"
+    },
+    "country_of_day": {
+      "title": "Le Pays du jour",
+      "description": "Un pays par jour : devine ses frontières, son drapeau, sa capitale, place-le, puis découvre sa fiche."
     }
   },
   "modes": {
@@ -1002,6 +1006,22 @@
       "silver": "Argent",
       "gold": "Or",
       "legend": "Légende"
+    },
+    "country_of_day_7": {
+      "title": "Curieux du monde",
+      "desc": "Joue 7 Pays du jour"
+    },
+    "country_of_day_30": {
+      "title": "Carnet de voyage",
+      "desc": "Joue 30 Pays du jour"
+    },
+    "country_of_day_100": {
+      "title": "Encyclopédie vivante",
+      "desc": "Joue 100 Pays du jour"
+    },
+    "country_of_day_flawless": {
+      "title": "Sans faute",
+      "desc": "Trouve les 4 étapes du Pays du jour du premier coup"
     }
   },
   "app_banner": {
@@ -1143,7 +1163,7 @@
     "see_leaderboard": "Voir le classement Survie",
     "leaderboard_title": "Classement Survie",
     "all_combinations": "Toutes les combinaisons",
-    "all_six": "Les 6 jeux",
+    "all_six": "Tous les jeux",
     "no_scores": "Aucun score pour ce filtre.",
     "col_player": "Joueur",
     "col_rounds": "Manches",
@@ -1211,6 +1231,10 @@
     "quiz": {
       "title": "Quiz Géo — Quiz de géographie quotidien | GeoGame",
       "description": "Une question de géographie par jour pour défier tes amis, ou enchaîne les questions à la difficulté de ton choix."
+    },
+    "country_of_day": {
+      "title": "Le Pays du jour — Le pays mystère quotidien | GeoGame",
+      "description": "Un pays mystère par jour : devine-le par sa silhouette, son drapeau et sa capitale, puis place-le sur la carte. Compare ton score à celui de tes amis."
     },
     "daily_challenge": {
       "title": "Challenge du jour — 12 questions de géographie par jour | GeoGame",
@@ -1409,7 +1433,10 @@
     "tier_medium": "Moyenne",
     "tier_hard": "Difficile",
     "fragments_one": "+{{count}} fragment",
-    "fragments_other": "+{{count}} fragments"
+    "fragments_other": "+{{count}} fragments",
+    "country_of_day": "Joue le Pays du jour",
+    "country_of_day_flawless": "Fais un sans-faute au Pays du jour",
+    "week_country_of_day_5": "Joue le Pays du jour {{count}} jours différents"
   },
   "level": {
     "label": "Niveau {{level}}",
@@ -1447,5 +1474,42 @@
     "new_flag": "Nouveau drapeau !",
     "view_collection": "Voir la collection",
     "tap_to_continue": "Toucher pour continuer"
+  },
+  "country_of_day": {
+    "intro": "Un pays par jour, le même pour tout le monde : devine-le en 4 étapes, puis apprends à le connaître.",
+    "mode_title": "Comment veux-tu jouer ?",
+    "mode_choice": "Choix multiples",
+    "mode_choice_desc": "4 réponses proposées à chaque étape",
+    "mode_free": "Réponse libre",
+    "mode_free_desc": "Tu tapes le pays et la capitale, 8 drapeaux au choix · points ×1,5",
+    "mode_locked": "Ce choix vaut pour toute la journée.",
+    "start": "C’est parti",
+    "continue": "Reprendre",
+    "step": "Étape {{n}}/{{total}}",
+    "step_borders": "Quel est ce pays ?",
+    "step_flag": "Quel est son drapeau ?",
+    "step_capital": "Quelle est sa capitale ?",
+    "step_placement": "Où se trouve-t-il ?",
+    "placement_hint": "Clique sur le pays sur la carte.",
+    "tries_left_one": "{{count}} essai restant",
+    "tries_left_other": "{{count}} essais restants",
+    "placeholder_country": "Nom du pays…",
+    "placeholder_capital": "Nom de la capitale…",
+    "submit": "Valider",
+    "unknown_country": "Ce pays n’existe pas dans le jeu",
+    "already_tried": "Déjà proposé",
+    "right": "Bravo !",
+    "wrong": "Raté, réessaie",
+    "missed": "La réponse était : {{answer}}",
+    "points": "+{{count}} pts",
+    "next": "Étape suivante",
+    "see_sheet": "Voir sa fiche",
+    "sheet_title": "À retenir",
+    "score": "{{score}} / {{max}} pts",
+    "mode_played": "Joué en {{mode}}",
+    "leaderboard": "Classement du jour",
+    "see_atlas": "Voir dans l’Atlas",
+    "come_back": "Reviens demain pour un nouveau pays !",
+    "share": "Partager mon résultat"
   }
 }

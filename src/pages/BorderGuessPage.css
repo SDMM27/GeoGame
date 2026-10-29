@@ -512,3 +512,18 @@
   border: 0;
   background: none;
 }
+
+/* Desktop: the reveal fills the whole column, like the silhouette did during the round */
+@media (min-width: 1024px) {
+  .border-guess-map-frame.border-guess-map-frame--reveal {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .border-guess-map-frame--reveal .border-guess-reveal,
+  .border-guess-map-frame--reveal .border-guess-reveal__map {
+    height: 100%;
+    border: 0;
+    border-radius: 0;
+  }
+}

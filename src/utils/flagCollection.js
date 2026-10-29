@@ -3,11 +3,13 @@
 // Firebase import and no JSON import: the data is passed in, and the API bundles this file.
 //
 // Flags
-// - Weekly missions, the weekly bonus and each level gained pay fragments (missions.js grantXp); daily missions pay XP
-//   only. A flag costs PIECES_BY_RARITY[rarity] pieces (the rarer, the more); the flags are drawn at random among
-//   those not unlocked yet, the rarer (harder) ones less often.
-// - Pace: a week pays 2 × 1 + 2 × 2 + 3 for the weekly missions + 2 for the weekly bonus = 11 fragments, plus about 1
-//   per level gained. The 239 flags cost 911 pieces in all (33 common × 2, 73 uncommon × 3, 86 rare × 4, 47 legendary × 6).
+// - Fragments come from (missions.js grantXp, paid by the server in the same call as the XP): the weekly missions and
+//   bonus, each level gained, the dailies of the day (all played, 3 won, all won) and the streak of days with a daily
+//   (every 7th day, the 30th and the 100th). The daily missions pay XP only. A flag costs PIECES_BY_RARITY[rarity]
+//   pieces (the rarer, the more); the flags are drawn at random among those not unlocked yet, the rarer ones less often.
+// - Pace: a week pays 2 × 1 + 2 × 2 + 3 for the weekly missions + 2 for the weekly bonus = 11 fragments, up to 3 a day
+//   (21 a week) for the dailies and 2 for a 7-day streak, plus about 1 per level gained: at most about 34 a week
+//   besides the levels. The 239 flags cost 911 pieces in all (33 common × 2, 73 uncommon × 3, 86 rare × 4, 47 legendary × 6).
 // - users/{uid}.flags, written by the server only: { unlocked: [iso, in the order they were unlocked],
 //   current: iso being rebuilt | null, pieces: 0..piecesFor(rarity of current) - 1 pieces of `current` }.
 //
@@ -19,12 +21,23 @@
 import { mulberry32 } from './prng.js'
 
 // Fragments paid with the missions (same moments as the XP; the weekly missions pay by tier, see WEEKLY_TIERS in
-// missions.js) and with each level gained.
+// missions.js), with each level gained, with the dailies of the day and with the streak.
 export const DAILY_MISSION_FRAGMENTS = 0
 export const DAILY_BONUS_FRAGMENTS = 0
 export const WEEKLY_TIER_FRAGMENTS = { easy: 1, medium: 2, hard: 3 }
 export const WEEKLY_BONUS_FRAGMENTS = 2
 export const LEVEL_UP_FRAGMENTS = 1
+// The dailies of a day (dailyTypesOn): once all are played, once 3 are won, once all are won (3 a day at most).
+export const DAILIES_ALL_FRAGMENTS = 1
+export const DAILIES_WON_FRAGMENTS = { 3: 1, all: 1 }
+// Streak of days with a daily played: every 7th day pays STREAK_WEEK_FRAGMENTS, and the days of
+// STREAK_MILESTONE_FRAGMENTS pay more on top.
+export const STREAK_WEEK_FRAGMENTS = 2
+export const STREAK_MILESTONE_FRAGMENTS = { 30: 5, 100: 10 }
+
+// Fragments the streak pays on reaching its `count`th day.
+export const streakFragments = (count) =>
+  (count > 0 && count % 7 === 0 ? STREAK_WEEK_FRAGMENTS : 0) + (STREAK_MILESTONE_FRAGMENTS[count] ?? 0)
 
 export const RARITIES = ['common', 'uncommon', 'rare', 'legendary']
 export const RARITY_COLORS = { common: '#9AA5B1', uncommon: '#4CAF7A', rare: '#4A90E2', legendary: '#C792FF' }

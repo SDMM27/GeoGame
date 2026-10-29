@@ -146,6 +146,41 @@ describe('paying XP', () => {
     expect((await db.doc('users/alice').get()).data().flags).toBeUndefined()
   })
 
+  it('builds the streak of a player who has none from their history, paying nothing, then pays the 7th day', async () => {
+    // A run of 6 days ending yesterday (2026-10-13 to 2026-10-18), and an older one that a gap cut off
+    const days = ['2026-10-13', '2026-10-14', '2026-10-15', '2026-10-16', '2026-10-17', '2026-10-18', '2026-10-10']
+    await addGames('alice', days.map((dailyKey) => ({ gameType: 'RANKING', mode: 'daily', dailyKey, solved: true, playedAt: Date.parse(`${dailyKey}T09:00:00Z`) })))
+    const first = await call('alice')
+    expect(first.body.xp.streak).toEqual({ day: '2026-10-18', count: 6 })
+    expect(first.body.rewards).toEqual([])
+    expect((await xpOf('alice')).streak).toEqual({ day: '2026-10-18', count: 6 })
+
+    // Today's game goes on from the stored streak
+    await addGames('alice', [{ gameType: 'RANKING', mode: 'daily', dailyKey: '2026-10-19', solved: true }])
+    const second = await call('alice')
+    expect(second.body.xp.streak).toEqual({ day: '2026-10-19', count: 7 })
+    expect(second.body.rewards).toEqual([{ kind: 'streak', fragments: 2, streak: 7 }])
+    expect(second.body.fragments).toBeGreaterThanOrEqual(2)
+    expect((await xpOf('alice')).streak).toEqual({ day: '2026-10-19', count: 7 })
+    expect((await call('alice')).body).toMatchObject({ rewards: [], fragments: 0 })
+  })
+
+  it('stores an empty streak for a player without any daily, so that the history is not read again', async () => {
+    await addGames('alice', [{}])
+    const { body } = await call('alice')
+    expect(body.xp.streak).toEqual({ day: null, count: 0 })
+    expect((await xpOf('alice')).streak).toEqual({ day: null, count: 0 })
+  })
+
+  it('pays the dailies of the day once, with the detail of the rewards', async () => {
+    const types = ['DAILY_CHALLENGE', 'BORDER_GUESS', 'COUNTRY_CLUE', 'VOYAGE_VOYAGE', 'RANKING', 'QUIZ']
+    await addGames('alice', types.map((gameType) => ({ gameType, mode: 'daily', dailyKey: '2026-10-19', solved: true, score: 12 })))
+    const { body } = await call('alice')
+    expect(body.rewards.map((reward) => reward.kind)).toEqual(['dailies_all', 'dailies_won_3', 'dailies_won_all'])
+    expect(body.xp.dayRewards).toEqual(['dailies_all', 'dailies_won_3', 'dailies_won_all'])
+    expect((await call('alice')).body.rewards).toEqual([])
+  })
+
   it('keeps the rest of the users document', async () => {
     await db.doc('users/alice').update({ decoration: { frame: 'gold', color: 'sky' } })
     await addGames('alice', [{}])

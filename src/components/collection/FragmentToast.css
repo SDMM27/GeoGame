@@ -47,6 +47,8 @@
 .fragment-toast-text strong { font-size: 0.9rem; }
 .fragment-toast-text small { color: var(--text-muted); font-size: 0.75rem; }
 
+.fragment-toast-text .fragment-toast-reason { color: var(--accent); }
+
 .fragment-toast-track { height: 4px; border-radius: 2px; background: var(--border-color); overflow: hidden; margin-top: 2px; }
 .fragment-toast-fill {
   height: 100%;

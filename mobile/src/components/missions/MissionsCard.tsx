@@ -1,5 +1,5 @@
-// Play tab: the daily and weekly missions of the signed-in player (paying XP, see @shared/utils/missions), or an
-// invitation to sign in for a visitor.
+// Play tab: the daily and weekly missions of the signed-in player (paying XP, see @shared/utils/missions), the dailies
+// of the day with their fragments and the streak, or an invitation to sign in for a visitor.
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { router } from 'expo-router'
 import type { TFunction } from 'i18next'
@@ -32,6 +32,8 @@ type Entry = {
 }
 
 type Reward = { xp: number; fragments: number }
+type Dailies = { total: number; played: number; won: number; tiers: { id: string; fragments: number; done: boolean; paid: boolean }[] }
+type Streak = { count: number; next: { count: number; fragments: number } }
 
 const DAILY_REWARD: Reward = { xp: DAILY_MISSION_XP, fragments: DAILY_MISSION_FRAGMENTS }
 
@@ -79,6 +81,50 @@ function MissionRow({ entry, reward }: { entry: Entry; reward: Reward }) {
   )
 }
 
+// Today's dailies (played, won, the 3 tiers of fragments) and the streak with its next milestone.
+function DailiesRow({ dailies, streak }: { dailies: Dailies; streak: Streak | null }) {
+  const { t } = useTranslation()
+  return (
+    <View style={styles.dailies}>
+      <View style={styles.dailiesLine}>
+        <Text variant="bodyStrong" style={{ fontSize: 14 }}>
+          {t('missions.dailies_title')}
+        </Text>
+        <Text variant="caption" style={{ fontSize: 12 }}>
+          {t('missions.dailies_played', { played: dailies.played, total: dailies.total })} · {t('missions.dailies_won', { won: dailies.won, total: dailies.total })}
+        </Text>
+      </View>
+      <View style={styles.tiers}>
+        {dailies.tiers.map((tier) => {
+          const finished = tier.done || tier.paid
+          return (
+            <View key={tier.id} style={[styles.tier, finished && { borderColor: colors.accent }]}>
+              <MaterialCommunityIcons name={finished ? 'check' : 'flag-variant-outline'} size={14} color={finished ? colors.accent : colors.textMuted} />
+              <Text variant="caption" color={finished ? colors.accent : colors.textMuted} style={{ fontSize: 12 }}>
+                {t(`missions.${tier.id}`)} · {t('missions.fragments', { count: tier.fragments })}
+              </Text>
+            </View>
+          )
+        })}
+      </View>
+      {streak ? (
+        <View style={styles.dailiesLine}>
+          <MaterialCommunityIcons name="fire" size={16} color={streak.count > 0 ? colors.warning : colors.textMuted} />
+          <Text variant="bodyStrong" style={{ fontSize: 14 }}>
+            {t('missions.streak_title')}
+          </Text>
+          <Text variant="caption" style={{ fontSize: 12 }}>
+            {streak.count > 0 ? t('missions.streak_days', { count: streak.count }) : t('missions.streak_none')}
+          </Text>
+          <Text variant="caption" style={{ fontSize: 12 }}>
+            {t('missions.streak_next', { day: streak.next.count })} · {t('missions.fragments', { count: streak.next.fragments })}
+          </Text>
+        </View>
+      ) : null}
+    </View>
+  )
+}
+
 function Bonus({ count, reward, paid }: { count: number; reward: Reward; paid: boolean }) {
   const { t } = useTranslation()
   return (
@@ -115,6 +161,7 @@ export function MissionsCard({ uid }: { uid: string | null | undefined }) {
     <View style={styles.card}>
       <Text variant="heading">{t('missions.title')}</Text>
       {missions.xp && <XpBar xp={missions.xp as Xp} />}
+      {missions.dailies ? <DailiesRow dailies={missions.dailies as Dailies} streak={missions.streak as Streak | null} /> : null}
       {missions.daily.length > 0 && (
         <>
           <View style={styles.group}>
@@ -157,6 +204,26 @@ const styles = StyleSheet.create({
   },
   invite: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   group: { gap: space.sm },
+  dailies: {
+    gap: space.sm,
+    padding: space.sm,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.bg,
+  },
+  dailiesLine: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', columnGap: space.sm, rowGap: 2 },
+  tiers: { flexDirection: 'row', flexWrap: 'wrap', gap: space.xs },
+  tier: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: space.sm,
+    paddingVertical: 3,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
   mission: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   missionIcon: { width: 36, height: 36, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
   missionTop: { gap: 2 },

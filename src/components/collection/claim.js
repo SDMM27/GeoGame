@@ -8,6 +8,18 @@ const RARITY_OF = new Map(FLAG_POOL.map((flag) => [flag.iso, flag.rarity]))
 export const rarityOf = (iso) => RARITY_OF.get(iso) ?? 'common'
 export const rarityColor = (rarity) => RARITY_COLORS[rarity]
 
+// Why a claim paid fragments beyond the missions and levels, one line per reward of the dailies and the streak:
+// "Tous les défis du jour : +1 fragment".
+export const rewardLines = (t, claim) =>
+  (claim.rewards ?? [])
+    .filter((reward) => reward.fragments > 0)
+    .map((reward) =>
+      t('missions.reward_line', {
+        reason: t(`missions.reward_${reward.kind}`, { days: reward.streak }),
+        reward: t('missions.fragments', { count: reward.fragments }),
+      })
+    )
+
 // The flags of the account after the claim (patched in the cache before the listeners run), or null when unknown.
 // claim.demoFlags is dev only (see __emitXpClaimed): it stands in for the cached account.
 export function flagsAfter(claim, uid) {

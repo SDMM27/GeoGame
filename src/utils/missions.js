@@ -12,15 +12,21 @@
 //   the history; what bounds a cheater is that the XP of a day and of a week is capped.
 // - XP makes a level: going from level n to n + 1 takes LEVEL_BASE + LEVEL_STEP × (n - 1) XP. Levels unlock items
 //   (decorations.js).
-// - Flag fragments (flagCollection.js) are paid in the same call as the XP: by the weekly missions and bonus, and by
-//   each level gained. The daily missions pay XP only.
+// - Flag fragments (flagCollection.js) are paid in the same call as the XP: by the weekly missions and bonus, by each
+//   level gained, by the dailies of the day (all played, 3 won, all won: once a day each) and by the streak (days in a
+//   row with a daily played, same definition as the profile: every 7th day, the 30th, the 100th). The daily missions
+//   pay XP only.
 import {
+  DAILIES_ALL_FRAGMENTS,
+  DAILIES_WON_FRAGMENTS,
   DAILY_BONUS_FRAGMENTS,
   DAILY_MISSION_FRAGMENTS,
   LEVEL_UP_FRAGMENTS,
   WEEKLY_BONUS_FRAGMENTS,
   WEEKLY_TIER_FRAGMENTS,
+  streakFragments,
 } from './flagCollection.js'
+import { dailyTypesOn, previousDayKey } from './dailyGames.js'
 import { isGameHidden } from './gameAvailability.js'
 import { GAME_TYPES } from './gameTypes.js'
 import { seededShuffle } from './prng.js'
@@ -205,7 +211,7 @@ const playedTime = (game) => (typeof game.playedAt === 'number' ? game.playedAt 
 
 /**
  * Missions of the day and week of `now` with their progress from `games` (any order, may hold older games):
- * { day, week, daily: [{ mission, progress, done }], weekly: [...], todayGames }.
+ * { day, week, daily: [{ mission, progress, done }], weekly: [...], todayGames, dailies: dailiesProgress() }.
  */
 export function missionsAt(games, now) {
   const day = missionDayAt(now)
@@ -224,12 +230,119 @@ export function missionsAt(games, now) {
     daily: dailyMissions(day).map(withProgress(ofDay)),
     weekly: weeklyMissions(week).map(withProgress(ofWeek)),
     todayGames: ofDay.length,
+    dailies: dailiesProgress(games, day),
+  }
+}
+
+// ---------- Dailies of the day and streak ----------
+
+// Of the 12 questions of the Daily Challenge, the answers right it takes to win it.
+export const CHALLENGE_WON_SCORE = 8
+// Dailies won for the middle tier (DAILY_TIERS).
+export const DAILIES_WON_MIN = 3
+
+/**
+ * Whether a daily game of the history was won. The history's `solved` isn't always a result: the Daily Challenge
+ * records `solved: true` on every finished game, so it is won from CHALLENGE_WON_SCORE good answers. Voyage Voyage
+ * records it too, but only ends when the path is found (there is no losing it), so its `solved` is honest. Border
+ * Guess and Country Clue record whether the country was found, the Country of the Day whether all 4 steps were found,
+ * the Ranking whether it scored.
+ */
+export function isDailyWon(game) {
+  if (game.gameType === GAME_TYPES.DAILY_CHALLENGE) return game.score >= CHALLENGE_WON_SCORE
+  return game.solved === true
+}
+
+// A daily of `day`, played that day. dailyKey is written by the player but playedAt is the server's time (rules), so a
+// made-up dailyKey can't fill the days of a streak or pay another day's dailies. A game not synced yet (no playedAt,
+// on the clients only) is taken at its word.
+function isDailyOf(game, day) {
+  if (!isDaily(game) || game.dailyKey !== day) return false
+  const time = playedTime(game)
+  return !Number.isFinite(time) || missionDayAt(time) === day
+}
+
+// The rewards of a day's dailies, in the order they are paid: `reached` reads { played, won, total } (distinct dailies).
+export const DAILY_TIERS = [
+  { id: 'dailies_all', fragments: DAILIES_ALL_FRAGMENTS, reached: ({ played, total }) => played >= total },
+  { id: 'dailies_won_3', fragments: DAILIES_WON_FRAGMENTS[3], reached: ({ won }) => won >= DAILIES_WON_MIN },
+  { id: 'dailies_won_all', fragments: DAILIES_WON_FRAGMENTS.all, reached: ({ won, total }) => won >= total },
+]
+
+/**
+ * The dailies of `day` ('2026-10-19', dailyTypesOn) in `games` (any day, any order): { day, total, played, won,
+ * tiers: [{ id, fragments, done }] } with the dailies played and won (a game counts for its dailyKey, once per game type).
+ */
+export function dailiesProgress(games, day) {
+  const types = dailyTypesOn(day)
+  const ofDay = games.filter((game) => isDailyOf(game, day) && types.includes(game.gameType))
+  const counts = {
+    played: distinct(ofDay.map((game) => game.gameType)),
+    won: distinct(ofDay.filter(isDailyWon).map((game) => game.gameType)),
+    total: types.length,
+  }
+  return {
+    day,
+    ...counts,
+    tiers: DAILY_TIERS.map(({ id, fragments, reached }) => ({ id, fragments, done: counts.total > 0 && reached(counts) })),
+  }
+}
+
+const DAY_KEY = /^\d{4}-\d{2}-\d{2}$/
+
+// The days with a daily played ('daily' mode, like computeStreaks in profileStats.js; on its own day, isDailyOf),
+// sorted and without repeats.
+export const dailyDays = (games) =>
+  [...new Set(games.filter((game) => DAY_KEY.test(game.dailyKey) && isDailyOf(game, game.dailyKey)).map((game) => game.dailyKey))].sort()
+
+/** The streak ending on the last of `days`: { day, count }, or null without any day. */
+export function streakFromDays(days) {
+  const sorted = [...new Set(days)].sort()
+  if (sorted.length === 0) return null
+  let count = 0
+  for (let index = sorted.length - 1; index >= 0; index -= 1) {
+    if (index < sorted.length - 1 && previousDayKey(sorted[index + 1]) !== sorted[index]) break
+    count += 1
+  }
+  return { day: sorted[sorted.length - 1], count }
+}
+
+/** The streak of a player who has no stored one, from their history: the one ending on the last day before `today`. Pays nothing. */
+export const seedStreak = (games, today) => streakFromDays(dailyDays(games).filter((day) => day < today)) ?? { day: null, count: 0 }
+
+/**
+ * Counts the days of `days` after the `streak` ({ day, count }, null when none) up to `today`, in order: the day after
+ * the streak's last one makes it longer, any other starts it again at 1. Returns the new streak and the rewards of the
+ * milestones reached: { streak, rewards: [{ kind: 'streak', fragments, streak: count }] }.
+ */
+export function advanceStreak(streak, days, today) {
+  let current = streak ?? { day: null, count: 0 }
+  const rewards = []
+  for (const day of [...new Set(days)].sort()) {
+    if (day > today || (current.day && day <= current.day)) continue
+    const count = current.day && previousDayKey(day) === current.day ? current.count + 1 : 1
+    current = { day, count }
+    const fragments = streakFragments(count)
+    if (fragments > 0) rewards.push({ kind: 'streak', fragments, streak: count })
+  }
+  return { streak: current, rewards }
+}
+
+/** Length of the streak on `today`: still alive when it ended today or yesterday (today's dailies may not be played yet), else 0. */
+export const streakNow = (streak, today) => (streak?.day && (streak.day === today || previousDayKey(today) === streak.day) ? streak.count : 0)
+
+/** The next day of a streak of `count` days that pays: { count, fragments }. */
+export function nextStreakReward(count) {
+  for (let next = Math.max(0, count) + 1; ; next += 1) {
+    const fragments = streakFragments(next)
+    if (fragments > 0) return { count: next, fragments }
   }
 }
 
 // ---------- XP state (users/{uid}.xp, written by the server only) ----------
 //   { total, level, day, dayMissions: [ids paid today, BONUS_ID], dayGames: games paid today,
-//     week, weekMissions: [ids paid this week, BONUS_ID] }
+//     dayRewards: [DAILY_TIERS ids paid today], week, weekMissions: [ids paid this week, BONUS_ID],
+//     streak: { day: last day counted | null, count: days in a row ending on it } | null before the server sets it }
 
 // XP from level n to n + 1.
 export const levelCost = (level) => LEVEL_BASE + LEVEL_STEP * (level - 1)
@@ -247,6 +360,13 @@ export function levelOf(total) {
 
 const idList = (value) => (Array.isArray(value) ? value.filter((id) => typeof id === 'string') : [])
 
+// users/{uid}.xp.streak read safely: null when the server never set it.
+function readStreak(raw) {
+  if (!raw || typeof raw !== 'object') return null
+  const day = DAY_KEY.test(raw.day) ? raw.day : null
+  return { day, count: day && Number.isInteger(raw.count) && raw.count > 0 ? raw.count : 0 }
+}
+
 /** users/{uid}.xp read safely (any document, even without it), as it stands on `day` / `week`. */
 export function readXp(data, day, week) {
   const raw = data?.xp ?? {}
@@ -259,15 +379,19 @@ export function readXp(data, day, week) {
     day,
     dayMissions: sameDay ? idList(raw.dayMissions) : [],
     dayGames: sameDay && Number.isInteger(raw.dayGames) ? raw.dayGames : 0,
+    dayRewards: sameDay ? idList(raw.dayRewards) : [],
     week,
     weekMissions: sameWeek ? idList(raw.weekMissions) : [],
+    streak: readStreak(raw.streak),
   }
 }
 
 /**
- * What `games` earn on top of the `state` already paid (readXp at `now`): { gained, fragments, state } with the new
- * state to store, `fragments` earned by the missions, bonuses and levels newly paid, and `levelUp` when the
- * level went up. Missions done but already paid pay nothing.
+ * What `games` earn on top of the `state` already paid (readXp at `now`): { gained, fragments, rewards, state } with the
+ * new state to store, `fragments` earned by the missions, bonuses, levels, dailies and streak newly paid, `rewards` the
+ * detail of the last two ([{ kind: 'dailies_all' | 'dailies_won_3' | 'dailies_won_all' | 'streak', fragments,
+ * streak?: days }]), and `levelUp` when the level went up. Missions done but already paid pay nothing. A player with no
+ * stored streak (state.streak null) should be given seedStreak() first (the server does), which pays nothing.
  */
 export function grantXp(state, games, now) {
   const progress = missionsAt(games, now)
@@ -299,10 +423,22 @@ export function grantXp(state, games, now) {
   const { level } = levelOf(total)
   // state.level is levelOf(stored total) (readXp), so each level gained is paid once.
   fragments += (level - state.level) * LEVEL_UP_FRAGMENTS
+
+  const rewards = []
+  const dayRewards = [...state.dayRewards]
+  for (const { id, fragments: tierFragments, done } of progress.dailies.tiers) {
+    if (!done || dayRewards.includes(id)) continue
+    dayRewards.push(id)
+    rewards.push({ kind: id, fragments: tierFragments })
+  }
+  const { streak, rewards: streakRewards } = advanceStreak(state.streak, dailyDays(games), progress.day)
+  rewards.push(...streakRewards)
+  fragments += rewards.reduce((sum, reward) => sum + reward.fragments, 0)
   return {
     gained,
     fragments,
+    rewards,
     levelUp: level > state.level,
-    state: { total, level, day: progress.day, dayMissions, dayGames, week: progress.week, weekMissions },
+    state: { total, level, day: progress.day, dayMissions, dayGames, dayRewards, week: progress.week, weekMissions, streak },
   }
 }

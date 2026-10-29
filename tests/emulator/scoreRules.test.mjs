@@ -239,7 +239,7 @@ describe('daily scores', () => {
     await assertSucceeds(as('alice').collection('daily_scores').add(dailies({ dailyKey: 'a', mapAssist: false })))
     await assertFails(as('alice').collection('daily_scores').add(dailies({ dailyKey: 'b', mapAssist: 'yes' })))
     await assertFails(as('alice').collection('daily_scores').add(dailies({ dailyKey: 'c', mapAssist: 1 })))
-    await assertFails(as('alice').collection('daily_scores').add(quiz({ dailyKey: 'd', attempts: 2, mapAssist: true })))
+    await assertFails(as('alice').collection('daily_scores').add(dailies({ gameType: 'QUIZ', dailyKey: 'd', attempts: 2, mapAssist: true })))
   })
 
   it('accepts a quiz up to 5 attempts and 3 hints, no more', async () => {

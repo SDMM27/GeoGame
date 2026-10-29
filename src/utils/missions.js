@@ -70,6 +70,7 @@ const isDifficult = (game) => DIFFICULTY_TYPES.includes(game.gameType) && isHard
 // never holds two missions of the same family (they would measure almost the same thing). Titles are in i18n under
 // `missions.<id>`, with {{count}} the target. `emoji` is used by the website, `icon` (MaterialCommunityIcons) by the app.
 // `game`: the mission is only about that game, and isn't drawn while it is hidden (gameAvailability.js).
+// `sinceWeek`: a weekly mission added mid-week is only drawn from that week on, so the week under way keeps its draw.
 export const DAILY_POOL = [
   { id: 'play_3', family: 'volume', emoji: '🎮', icon: 'gamepad-variant-outline', target: 3, value: (games) => games.length },
   { id: 'play_5', family: 'volume', emoji: '🕹️', icon: 'controller-classic-outline', target: 5, value: (games) => games.length },
@@ -107,7 +108,7 @@ export const WEEKLY_POOL = [
   { id: 'week_flags_60', family: 'flags', tier: 'easy', emoji: '🚩', icon: 'flag-variant-outline', target: 60, value: (games) => sumFound(games, GAME_TYPES.FLAGS) },
   { id: 'week_placement_60', family: 'placement', tier: 'easy', emoji: '🌍', icon: 'earth', target: 60, value: (games) => sumFound(games, GAME_TYPES.PLACEMENT) },
   { id: 'week_capitals_40', family: 'capitals', tier: 'easy', emoji: '🏛️', icon: 'bank-outline', target: 40, value: (games) => sumFound(games, GAME_TYPES.CAPITALS) },
-  { id: 'week_country_of_day_5', family: 'country_of_day', tier: 'easy', emoji: '🌐', icon: 'earth', target: 5, value: (games) => distinct(games.filter(isCountryOfDay).map((game) => game.dailyKey)) },
+  { id: 'week_country_of_day_5', family: 'country_of_day', tier: 'easy', sinceWeek: '2026-W45', emoji: '🌐', icon: 'earth', target: 5, value: (games) => distinct(games.filter(isCountryOfDay).map((game) => game.dailyKey)) },
   { id: 'week_challenge_3', family: 'challenge', tier: 'easy', emoji: '🎯', icon: 'bullseye-arrow', target: 3, value: (games) => distinct(games.filter(isChallenge).map((game) => game.dailyKey)) },
   // Medium
   { id: 'week_daily_days_5', family: 'daily_days', tier: 'medium', emoji: '🔥', icon: 'fire', target: 5, value: (games) => distinct(games.filter(isDaily).map((game) => game.dailyKey)) },
@@ -179,7 +180,8 @@ function pickDistinctFamilies(shuffled, size, families) {
 }
 
 // The missions that can be drawn: none about a hidden game
-const drawable = (pool) => pool.filter((mission) => !isGameHidden(mission.game))
+const drawable = (pool, week = null) =>
+  pool.filter((mission) => !isGameHidden(mission.game) && !(week && mission.sinceWeek && week < mission.sinceWeek))
 
 export const dailyMissions = (day) => pickDistinctFamilies(seededShuffle(drawable(DAILY_POOL), seedOf(`missions:day:${day}`)), DAILY_MISSIONS, new Set())
 
@@ -190,7 +192,7 @@ export function weeklyMissions(week) {
   const drawn = {}
   for (const tier of Object.keys(WEEKLY_MISSIONS_BY_TIER).reverse()) {
     const shuffled = seededShuffle(
-      drawable(WEEKLY_POOL).filter((mission) => mission.tier === tier),
+      drawable(WEEKLY_POOL, week).filter((mission) => mission.tier === tier),
       seedOf(`missions:week:${week}:${tier}`),
     )
     drawn[tier] = pickDistinctFamilies(shuffled, WEEKLY_MISSIONS_BY_TIER[tier], families)

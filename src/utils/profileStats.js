@@ -18,8 +18,8 @@ export const ALL_DAILY_GAME_TYPES = [
 // The dailies of today (the hidden games left out, see gameAvailability.js).
 export const DAILY_GAME_TYPES = ALL_DAILY_GAME_TYPES.filter((type) => !isGameHidden(type))
 
-// The Country of the Day took the Geo Quiz's place among the dailies on that day. Set it to the real launch day.
-export const COUNTRY_OF_DAY_SINCE = '2026-10-30'
+// The Country of the Day took the Geo Quiz's place among the dailies on that day (its launch).
+export const COUNTRY_OF_DAY_SINCE = '2026-10-29'
 
 // First day of the dailies added after the others (the other ones have always been there).
 export const DAILY_GAME_SINCE = {

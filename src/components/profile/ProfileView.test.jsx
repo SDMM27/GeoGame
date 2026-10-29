@@ -13,7 +13,7 @@ const today = dayKey()
 const games = [
   { id: '1', gameType: 'FLAGS', mode: 'standard', difficulty: 'Moyen', score: 120, found: 30, total: 40, elapsedTime: 90000, playedAt: now },
   { id: '2', gameType: 'BORDER_GUESS', mode: 'daily', dailyKey: today, solved: true, attempts: 3, elapsedTime: 30000, playedAt: now },
-  { id: '3', gameType: 'QUIZ', mode: 'daily', dailyKey: today, solved: false, attempts: 5, playedAt: now },
+  { id: '3', gameType: 'COUNTRY_OF_DAY', mode: 'daily', dailyKey: today, solved: false, attempts: 5, score: 160, playedAt: now },
 ]
 
 function renderView(list = games) {
@@ -38,7 +38,7 @@ describe('ProfileView', () => {
     expect(screen.getByText(`2/${dailyTypesOn(today).length}`)).toBeInTheDocument()
     expect(screen.getByText('120 pts · 30/40')).toBeInTheDocument()
     expect(screen.getByText('Trouvé · 3 essais')).toBeInTheDocument()
-    expect(screen.getByText('Raté')).toBeInTheDocument()
+    expect(screen.getByText('160 pts')).toBeInTheDocument()
     expect(screen.getByText('Classique · Moyen')).toBeInTheDocument()
   })
 

@@ -66,6 +66,13 @@ describe('periods', () => {
 })
 
 describe('missions', () => {
+  it('keeps the draw of the week the Country of the Day came out, and offers its mission from the next one', () => {
+    const ids = (week) => weeklyMissions(week).map((mission) => mission.id)
+    expect(ids('2026-W44')).toEqual(['week_found_200', 'week_challenge_3', 'week_hardcore_3', 'week_daily_wins_10', 'week_types_10'])
+    const later = Array.from({ length: 20 }, (_, i) => ids(`2027-W${String(i + 1).padStart(2, '0')}`)).flat()
+    expect(later).toContain('week_country_of_day_5')
+  })
+
   it('never draws a mission about a hidden game', () => {
     for (let day = 1; day <= 28; day += 1) {
       const key = `2026-11-${String(day).padStart(2, '0')}`

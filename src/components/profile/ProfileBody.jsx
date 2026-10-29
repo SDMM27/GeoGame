@@ -17,6 +17,7 @@ import './ProfileBody.css'
 
 export const GAME_META = {
   [GAME_TYPES.DAILY_CHALLENGE]: { emoji: '🎯', titleKey: 'games.daily_challenge.title', color: '#FF9F45' },
+  [GAME_TYPES.COUNTRY_OF_DAY]: { emoji: '🌐', titleKey: 'games.country_of_day.title', color: '#2EC4B6' },
   [GAME_TYPES.PLACEMENT]: { emoji: '🌍', titleKey: 'games.placement.title', color: '#7AA2FF' },
   [GAME_TYPES.FLAGS]: { emoji: '🚩', titleKey: 'games.flags.title', color: '#FF7A6B' },
   [GAME_TYPES.MISSING_FLAG]: { emoji: '🧩', titleKey: 'games.missing_flag.title', color: '#C792FF' },

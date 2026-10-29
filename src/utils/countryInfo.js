@@ -40,6 +40,16 @@ export const countryDisplayName = (feature, lang) =>
 
 export const findAtlasCountry = (admin) => BY_ADMIN.get(admin) ?? null
 
+/** The countries sharing a land border with `feature`, by name in `lang`: [{ admin, iso, name }] ([] for an island). */
+export function getNeighbors(feature, lang) {
+  const iso = feature?.properties?.ISO_A2?.toUpperCase()
+  return (iso ? countryBorders[iso] ?? [] : [])
+    .map((code) => BY_ISO.get(code))
+    .filter(Boolean)
+    .map((neighbor) => ({ admin: neighbor.properties.ADMIN, iso: neighbor.properties.ISO_A2, name: countryDisplayName(neighbor, lang) }))
+    .sort((a, b) => a.name.localeCompare(b.name, lang))
+}
+
 /**
  * The info sheet of a country (a feature of the dataset), in `lang`:
  * { admin, name, iso, flag, continent, capital, population, populationRank, areaKm2, areaRank, density, gdp (billion $),
@@ -55,11 +65,6 @@ export function getCountryInfo(feature, lang) {
   const population = p.population > 0 ? p.population : null
   const areaKm2 = getCountryAreaKm2(feature) || null
   const gdp = p.gdp > 0 ? p.gdp : null
-  const neighbors = (iso ? countryBorders[iso] ?? [] : [])
-    .map((code) => BY_ISO.get(code))
-    .filter(Boolean)
-    .map((neighbor) => ({ admin: neighbor.properties.ADMIN, iso: neighbor.properties.ISO_A2, name: countryDisplayName(neighbor, lang) }))
-    .sort((a, b) => a.name.localeCompare(b.name, lang))
   return {
     admin: p.ADMIN,
     name: countryDisplayName(feature, lang),
@@ -75,7 +80,7 @@ export function getCountryInfo(feature, lang) {
     gdp,
     gdpRank: rankOf(gdpRanks),
     gdpPerCapita: gdp && population ? (gdp * 1e9) / population : null,
-    neighbors,
+    neighbors: getNeighbors(feature, lang),
     difficulty: { placement: p.Difficulty ?? null, flags: p.DifficultyFlag ?? null, capitals: p.DifficultyCapitals ?? null },
     center: getGeographicCenter(feature),
   }

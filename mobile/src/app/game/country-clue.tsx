@@ -128,6 +128,12 @@ function CountryClueGame({ mode, play }: { mode: string; play?: RoomPlay }) {
   if (elsewhere.checking || elsewhere.game) {
     return (
       <DailyPlayedElsewhere title={t('games.country_clue.title')} game={elsewhere.game} accent={ACCENT}>
+        {elsewhere.game && (
+          <View style={{ gap: space.md }}>
+            <AnswerCard iso={currentCountryISO} name={answer} capital={capital} solved={elsewhere.game.solved !== false} />
+            <GuessesMap guesses={[{ name: answerName, correct: true }]} />
+          </View>
+        )}
         {dailyKey && <DailyLeaderboard gameType={GAME_TYPES.COUNTRY_CLUE} dailyKey={dailyKey} />}
       </DailyPlayedElsewhere>
     )

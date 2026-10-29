@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react'
-import { MapContainer, GeoJSON, CircleMarker, Tooltip, useMapEvents } from 'react-leaflet'
+import React, { useEffect, useMemo, useState } from 'react'
+import { MapContainer, GeoJSON, CircleMarker, Tooltip, useMap, useMapEvents } from 'react-leaflet'
 import { COUNTRY_CENTER_MAP, getCountryByName } from '../hooks/useCountryClueState'
 import { getCountryMetrics } from '../utils/borderGuessMap'
 import 'leaflet/dist/leaflet.css'
@@ -61,7 +61,18 @@ function CountryLayer({ name, correct, zoom, lngOffset = 0 }) {
   )
 }
 
-export default function CountryClueMap({ guesses, answerName, isLost }) {
+// Zooms in on the answer, for a map that shows nothing else
+function FitAnswer({ name }) {
+  const map = useMap()
+  useEffect(() => {
+    const feature = getCountryByName(name)
+    if (!feature) return
+    map.fitBounds(getCountryMetrics(feature).bounds, { padding: [40, 40], maxZoom: 5, animate: false })
+  }, [map, name])
+  return null
+}
+
+export default function CountryClueMap({ guesses, answerName, isLost, focusAnswer = false }) {
   const [zoom, setZoom] = useState(2)
 
   return (
@@ -77,6 +88,7 @@ export default function CountryClueMap({ guesses, answerName, isLost }) {
       >
         <LandLayer borders />
         <ZoomTracker onZoom={setZoom} />
+        {focusAnswer && <FitAnswer name={answerName} />}
         {LNG_OFFSETS.flatMap(offset =>
           guesses.map((guess) => (
             <CountryLayer key={`${guess.value}-${offset}`} name={guess.value} correct={guess.isCorrect} zoom={zoom} lngOffset={offset} />

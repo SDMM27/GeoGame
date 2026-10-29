@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ATLAS_COUNTRIES, findAtlasCountry, getCountryInfo, mainPartBounds, searchAtlasCountries } from './countryInfo'
+import { ATLAS_COUNTRIES, findAtlasCountry, getCountryInfo, getNeighbors, mainPartBounds, searchAtlasCountries } from './countryInfo'
 
 describe('getCountryInfo', () => {
   it('gathers what the data says about a country', () => {
@@ -40,5 +40,18 @@ describe('mainPartBounds', () => {
     const feature = { geometry: { type: 'MultiPolygon', coordinates: [square(-5, 42, 8), square(-54, 2, 1)] } }
     expect(mainPartBounds(feature)).toEqual([[42, -5], [50, 3]])
     expect(mainPartBounds({ geometry: null })).toBe(null)
+  })
+})
+
+describe('getNeighbors', () => {
+  it('lists the land neighbours by name, sorted', () => {
+    const neighbors = getNeighbors(findAtlasCountry('France'), 'en')
+    expect(neighbors.map((n) => n.iso)).toEqual(expect.arrayContaining(['ES', 'BE']))
+    expect(neighbors.map((n) => n.name)).toEqual([...neighbors.map((n) => n.name)].sort((a, b) => a.localeCompare(b, 'en')))
+  })
+
+  it('is empty for an island', () => {
+    expect(getNeighbors(findAtlasCountry('Japon'), 'fr')).toEqual([])
+    expect(getNeighbors(null, 'fr')).toEqual([])
   })
 })

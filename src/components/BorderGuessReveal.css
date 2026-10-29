@@ -1,0 +1,28 @@
+.border-guess-reveal__map {
+  height: 380px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.leaflet-tooltip.border-guess-reveal__label {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #eef1f8;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-shadow: 0 0 3px #060e1f, 0 0 3px #060e1f, 0 0 6px #060e1f;
+  pointer-events: none;
+}
+
+.leaflet-tooltip.border-guess-reveal__label::before {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .border-guess-reveal__map {
+    height: 280px;
+  }
+}

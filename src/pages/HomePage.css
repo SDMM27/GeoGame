@@ -119,6 +119,40 @@
   border-color: color-mix(in srgb, var(--game) 45%, transparent);
 }
 
+.daily-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* Today's daily: won, played (not won) or still to do */
+.daily-card-status {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+}
+
+.daily-card-status--won {
+  border-color: transparent;
+  background: var(--success-dim);
+  color: var(--success);
+}
+
+.daily-card-status--played {
+  border-color: transparent;
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+}
+
+.daily-card--done {
+  border-color: color-mix(in srgb, var(--game) 35%, transparent);
+}
+
 .daily-card-title {
   margin: 14px 0 4px;
   font-size: 1.2rem;

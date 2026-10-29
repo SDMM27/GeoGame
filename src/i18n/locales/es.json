@@ -42,6 +42,9 @@
     "greeting": "¿Listo para viajar?",
     "daily_title": "Retos del día",
     "daily_subtitle": "Nuevos cada día a medianoche",
+    "daily_status_won": "Superado",
+    "daily_status_played": "Jugado",
+    "daily_status_todo": "Pendiente",
     "games_title": "Juegos",
     "games_subtitle": "Elige tu dificultad o tu continente",
     "daily": "Reto del día",
@@ -1527,5 +1530,14 @@
     "see_atlas": "Ver en el Atlas",
     "come_back": "¡Vuelve mañana para un nuevo país!",
     "share": "Compartir mi resultado"
+  },
+  "map_assist": {
+    "toggle": "Mapa de ayuda",
+    "hint": "Muestra en un mapa los países que ya has propuesto. En la clasificación del día, quedas por detrás de los jugadores sin mapa.",
+    "hint_free": "Muestra en un mapa los países que ya has propuesto. Sin penalización en el modo infinito.",
+    "applied": "Mapa usado: clasificado con los jugadores ayudados.",
+    "stat": "con mapa",
+    "leaderboard_used": "Con mapa de ayuda",
+    "leaderboard_tier": "Con mapa de ayuda"
   }
 }

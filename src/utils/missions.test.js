@@ -358,6 +358,11 @@ describe('dailiesProgress', () => {
     expect(doneOf(games)).toEqual([false, false, false])
   })
 
+  it('tells each daily of the day played whether it was won', () => {
+    const games = [lost('RANKING'), daily('RANKING'), lost('BORDER_GUESS'), daily('DAILY_CHALLENGE', { score: 3 }), daily('FLAGS')]
+    expect(dailiesProgress(games, TODAY).status).toEqual({ RANKING: 'won', BORDER_GUESS: 'played', DAILY_CHALLENGE: 'played' })
+  })
+
   it('ignores the dailies of another day, other modes, and games that are not dailies of the day', () => {
     const games = [
       daily('RANKING', { dailyKey: '2026-10-28' }),

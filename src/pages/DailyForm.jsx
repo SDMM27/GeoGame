@@ -7,13 +7,13 @@ import { useScoreSave } from '../hooks/useScoreSave'
 import LeaderboardSave from '../components/LeaderboardSave'
 import './DailyLeaderboard.css'
 
-export default function DailyForm({ attempts, elapsedTime, guesses, gameType, dailyKey, statText, hints }) {
+export default function DailyForm({ attempts, elapsedTime, guesses, gameType, dailyKey, statText, hints, mapAssist }) {
   const { t } = useTranslation()
   const savedKey = `daily-saved:${gameType}:${dailyKey}`
   const saver = useScoreSave(
     useAccount(),
     async (player) => {
-      const result = await saveDailyScore({ ...player, gameType, dailyKey, attempts, elapsedTime, guesses, hints })
+      const result = await saveDailyScore({ ...player, gameType, dailyKey, attempts, elapsedTime, guesses, hints, mapAssist })
       if (result.status === 'saved' || result.status === 'updated') localStorage.setItem(savedKey, '1')
       return result
     },

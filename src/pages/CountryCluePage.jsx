@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
@@ -19,6 +19,9 @@ import { getCountryName } from '../utils/getCountryName'
 import { localeOf } from '../i18n/languages'
 import { clueProgress } from '../utils/clueProgress'
 import ClueProgressBadges from '../components/ClueProgressBadges'
+import MapAssistToggle from '../components/MapAssistToggle'
+import { readMapAssistPref, writeMapAssistPref } from '../utils/mapAssist'
+import { formatTime } from '../utils/formatTime'
 import 'react-toastify/dist/ReactToastify.css'
 import './CountryCluePage.css'
 
@@ -93,8 +96,21 @@ export default function CountryCluePage() {
     hasStarted,
     startGame,
     elapsedTime,
+    mapAssistUsed,
+    markMapAssistUsed,
   } = useCountryClueState(mode)
   const progressByGuess = clueProgress(guesses)
+  const [mapAssistOn, setMapAssistOn] = useState(() => readMapAssistPref(GAME_TYPES.COUNTRY_CLUE))
+  // The map displayed during the game is what puts a daily score in the map tier: turning it off afterwards does not remove it.
+  const showAssistMap = mapAssistOn && !isComplete && (mode !== 'daily' || hasStarted)
+  useEffect(() => {
+    if (showAssistMap && !mapAssistUsed) markMapAssistUsed()
+  }, [showAssistMap, mapAssistUsed]) // eslint-disable-line react-hooks/exhaustive-deps
+  const score = guesses.length
+  const toggleMapAssist = (on) => {
+    setMapAssistOn(on)
+    writeMapAssistPref(GAME_TYPES.COUNTRY_CLUE, on)
+  }
   const elsewhere = useDailyPlayedElsewhere(useAccount(), {
     gameType: GAME_TYPES.COUNTRY_CLUE,
     dailyKey,
@@ -128,6 +144,9 @@ export default function CountryCluePage() {
     filteredCountrySuggestions.length > 0 &&
     !filteredCountrySuggestions.some((countryName) => countryName === trimmedInputValue)
 
+  const attemptsLabel = `${guesses.length} ${guesses.length === 1 ? t('units.attempt_one') : t('units.attempt_other')}`
+  const mapAssistStatText = `${attemptsLabel} · 🗺️ ${t('map_assist.stat')} — ${elapsedTime != null ? formatTime(elapsedTime) : '—'}`
+
   const onKeyDown = (event) => {
     if (event.key === 'Enter') {
       handleSubmit()
@@ -160,7 +179,7 @@ export default function CountryCluePage() {
           <ChallengeBanner
             gameType="COUNTRY_CLUE"
             dailyKey={dailyKey}
-            result={isComplete ? { score: guesses.length, solved: isSolved } : null}
+            result={isComplete ? { score, solved: isSolved, mapAssist: mapAssistUsed } : null}
           />
         )}
         <section className="country-clue-hero">
@@ -229,20 +248,28 @@ export default function CountryCluePage() {
               </button>
             </div>
 
+            {!isComplete && (
+              <MapAssistToggle checked={mapAssistOn} onChange={toggleMapAssist} used={mapAssistUsed} penalized={mode === 'daily'} />
+            )}
+
+            {showAssistMap && (
+              <CountryClueMap guesses={guesses} answerName={answerName} isLost={false} />
+            )}
+
             {isComplete && (
               <CountryClueMap guesses={guesses} answerName={answerName} isLost={isLost} />
             )}
 
             {isComplete && (
               <ShareScoreButton
-                score={guesses.length}
+                score={score}
                 gameType="COUNTRY_CLUE"
                 difficulty={mode === 'daily' ? 'Daily' : 'Infini'}
                 scoreLabel={t('share.score_attempts')}
-                details={isSolved
+                details={(isSolved
                   ? t('share.details_found_attempts', { count: guesses.length })
-                  : t('share.details_not_found_attempts', { count: guesses.length })}
-                challenge={mode === 'daily' ? { route: '/country-clue', dailyKey, solved: isSolved } : null}
+                  : t('share.details_not_found_attempts', { count: guesses.length })) + (mode === 'daily' && mapAssistUsed ? ' · 🗺️' : '')}
+                challenge={mode === 'daily' ? { route: '/country-clue', dailyKey, solved: isSolved, mapAssist: mapAssistUsed } : null}
                 nudge={mode === 'daily'}
               />
             )}
@@ -292,6 +319,8 @@ export default function CountryCluePage() {
                     guesses={guesses.map((g) => g.value)}
                     gameType={GAME_TYPES.COUNTRY_CLUE}
                     dailyKey={dailyKey}
+                    mapAssist={mapAssistUsed}
+                    statText={mapAssistUsed ? mapAssistStatText : undefined}
                   />
                 )}
                 <DailyLeaderboard gameType={GAME_TYPES.COUNTRY_CLUE} dailyKey={dailyKey} />

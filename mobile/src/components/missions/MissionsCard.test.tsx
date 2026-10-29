@@ -3,7 +3,6 @@ import { act, create } from 'react-test-renderer'
 import { MissionsCard } from './MissionsCard'
 
 const mockUseMissions = jest.fn()
-jest.mock('@shared/hooks/useMissions', () => ({ useMissions: (uid: unknown) => mockUseMissions(uid) }))
 // ui.tsx pulls reanimated (native worklets): plain React Native stand-ins are enough here
 jest.mock('@/components/ui', () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -34,7 +33,7 @@ describe('MissionsCard', () => {
     mockUseMissions.mockReturnValue({ loading: false, xp: null, daily: [], weekly: [] })
     let tree!: ReturnType<typeof create>
     act(() => {
-      tree = create(<MissionsCard uid={null} />)
+      tree = create(<MissionsCard uid={null} missions={mockUseMissions(null)} />)
     })
     expect(texts(tree)).toContain('missions.sign_in')
     expect(texts(tree)).not.toContain('missions.daily')
@@ -51,7 +50,7 @@ describe('MissionsCard', () => {
     })
     let tree!: ReturnType<typeof create>
     act(() => {
-      tree = create(<MissionsCard uid="u1" />)
+      tree = create(<MissionsCard uid="u1" missions={mockUseMissions('u1')} />)
     })
     const out = texts(tree)
     expect(out).toContain('level.label')
@@ -85,7 +84,7 @@ describe('MissionsCard', () => {
     })
     let tree!: ReturnType<typeof create>
     act(() => {
-      tree = create(<MissionsCard uid="u1" />)
+      tree = create(<MissionsCard uid="u1" missions={mockUseMissions('u1')} />)
     })
     const out = texts(tree)
     expect(out).toContain('missions.dailies_played {\\"played\\":4,\\"total\\":6}')
@@ -106,7 +105,7 @@ describe('MissionsCard', () => {
     })
     let tree!: ReturnType<typeof create>
     act(() => {
-      tree = create(<MissionsCard uid="u1" />)
+      tree = create(<MissionsCard uid="u1" missions={mockUseMissions('u1')} />)
     })
     const out = texts(tree)
     // Daily: 60 XP, bonus 40 XP, never a fragment chip

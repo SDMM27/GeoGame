@@ -42,6 +42,9 @@
     "greeting": "Pronto a viaggiare?",
     "daily_title": "Sfide del giorno",
     "daily_subtitle": "Nuove ogni giorno a mezzanotte",
+    "daily_status_won": "Superato",
+    "daily_status_played": "Giocato",
+    "daily_status_todo": "Da fare",
     "games_title": "Giochi",
     "games_subtitle": "Scegli la difficoltà o il continente",
     "daily": "Sfida del giorno",
@@ -1527,5 +1530,14 @@
     "see_atlas": "Vedi nell’Atlante",
     "come_back": "Torna domani per un nuovo paese!",
     "share": "Condividi il mio risultato"
+  },
+  "map_assist": {
+    "toggle": "Mappa di aiuto",
+    "hint": "Mostra su una mappa i paesi già proposti. Nella classifica del giorno, passi dietro ai giocatori senza mappa.",
+    "hint_free": "Mostra su una mappa i paesi già proposti. Nessuna penalità in modalità infinita.",
+    "applied": "Mappa usata: classificato con i giocatori aiutati.",
+    "stat": "con mappa",
+    "leaderboard_used": "Con mappa di aiuto",
+    "leaderboard_tier": "Con mappa di aiuto"
   }
 }

@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useRef } from 'react'
+﻿import React, { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import { GeoJSON, MapContainer, useMap } from 'react-leaflet'
@@ -19,6 +19,10 @@ import { useAccount, useRecordGame } from '../auth'
 import { useDailyPlayedElsewhere } from '../hooks/useDailyPlayedElsewhere'
 import DailyPlayedElsewhere from '../components/DailyPlayedElsewhere'
 import BorderGuessReveal from '../components/BorderGuessReveal'
+import MapAssistToggle from '../components/MapAssistToggle'
+import CountryClueMap from './CountryClueMap'
+import { readMapAssistPref, writeMapAssistPref } from '../utils/mapAssist'
+import { formatTime } from '../utils/formatTime'
 import 'leaflet/dist/leaflet.css'
 import 'react-toastify/dist/ReactToastify.css'
 import './BorderGuessPage.css'
@@ -103,6 +107,8 @@ export default function BorderGuessPage() {
     hasStarted,
     startGame,
     elapsedTime,
+    mapAssistUsed,
+    markMapAssistUsed,
   } = useBorderGuessState(mode)
   const elsewhere = useDailyPlayedElsewhere(useAccount(), {
     gameType: GAME_TYPES.BORDER_GUESS,
@@ -116,6 +122,18 @@ export default function BorderGuessPage() {
       ? { gameType: GAME_TYPES.BORDER_GUESS, mode: 'daily', dailyKey, solved: isSolved, attempts: guesses.length, elapsedTime }
       : null
   )
+
+  const [mapAssistOn, setMapAssistOn] = useState(() => readMapAssistPref(GAME_TYPES.BORDER_GUESS))
+  // The map displayed during the game is what puts a daily score in the map tier: turning it off afterwards does not remove it.
+  const showAssistMap = mapAssistOn && !isComplete && (mode !== 'daily' || hasStarted)
+  useEffect(() => {
+    if (showAssistMap && !mapAssistUsed) markMapAssistUsed()
+  }, [showAssistMap, mapAssistUsed]) // eslint-disable-line react-hooks/exhaustive-deps
+  const score = guesses.length
+  const toggleMapAssist = (on) => {
+    setMapAssistOn(on)
+    writeMapAssistPref(GAME_TYPES.BORDER_GUESS, on)
+  }
 
   const inputRef = useRef(null)
   useDesktopAutofocus(inputRef, !isComplete && (mode !== 'daily' || hasStarted), `${currentCountryISO}-${guesses.length}`)
@@ -132,6 +150,9 @@ export default function BorderGuessPage() {
     !isComplete &&
     filteredCountrySuggestions.length > 0 &&
     !filteredCountrySuggestions.some((countryName) => countryName === trimmedInputValue)
+
+  const attemptsLabel = `${guesses.length} ${guesses.length === 1 ? t('units.attempt_one') : t('units.attempt_other')}`
+  const mapAssistStatText = `${attemptsLabel} · 🗺️ ${t('map_assist.stat')} — ${elapsedTime != null ? formatTime(elapsedTime) : '—'}`
 
   const onKeyDown = (event) => {
     if (event.key === 'Enter') {
@@ -163,7 +184,7 @@ export default function BorderGuessPage() {
           <ChallengeBanner
             gameType="BORDER_GUESS"
             dailyKey={dailyKey}
-            result={isComplete ? { score: guesses.length, solved: isSolved } : null}
+            result={isComplete ? { score, solved: isSolved, mapAssist: mapAssistUsed } : null}
           />
         )}
         <section className="border-guess-panel border-guess-panel--hero">
@@ -262,18 +283,28 @@ export default function BorderGuessPage() {
               </button>
             </div>
 
+            {!isComplete && (
+              <MapAssistToggle checked={mapAssistOn} onChange={toggleMapAssist} used={mapAssistUsed} penalized={mode === 'daily'} />
+            )}
+
+            {showAssistMap && (
+              <div className="border-guess-assist-map">
+                <CountryClueMap guesses={guesses} answerName={answerName} isLost={false} />
+              </div>
+            )}
+
             <GuessHistory guesses={guesses} t={t} i18n={i18n} />
 
             {isComplete && (
               <ShareScoreButton
-                score={guesses.length}
+                score={score}
                 gameType="BORDER_GUESS"
                 difficulty={mode === 'daily' ? 'Daily' : 'Infini'}
                 scoreLabel={t('share.score_attempts')}
-                details={isSolved
+                details={(isSolved
                   ? t('share.details_found_attempts', { count: guesses.length })
-                  : t('share.details_not_found_attempts', { count: guesses.length })}
-                challenge={mode === 'daily' ? { route: '/border-guess', dailyKey, solved: isSolved } : null}
+                  : t('share.details_not_found_attempts', { count: guesses.length })) + (mode === 'daily' && mapAssistUsed ? ' · 🗺️' : '')}
+                challenge={mode === 'daily' ? { route: '/border-guess', dailyKey, solved: isSolved, mapAssist: mapAssistUsed } : null}
                 nudge={mode === 'daily'}
               />
             )}
@@ -297,6 +328,8 @@ export default function BorderGuessPage() {
                     guesses={guesses.map((g) => g.value)}
                     gameType={GAME_TYPES.BORDER_GUESS}
                     dailyKey={dailyKey}
+                    mapAssist={mapAssistUsed}
+                    statText={mapAssistUsed ? mapAssistStatText : undefined}
                   />
                 )}
                 <DailyLeaderboard gameType={GAME_TYPES.BORDER_GUESS} dailyKey={dailyKey} />

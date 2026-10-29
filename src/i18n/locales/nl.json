@@ -42,6 +42,9 @@
     "greeting": "Klaar om te reizen?",
     "daily_title": "Dagelijkse uitdagingen",
     "daily_subtitle": "Elke dag nieuwe om middernacht",
+    "daily_status_won": "Gehaald",
+    "daily_status_played": "Gespeeld",
+    "daily_status_todo": "Te doen",
     "games_title": "Spellen",
     "games_subtitle": "Kies een moeilijkheidsgraad of een continent",
     "daily": "Dagelijks",
@@ -1527,5 +1530,14 @@
     "see_atlas": "Bekijk in de Atlas",
     "come_back": "Kom morgen terug voor een nieuw land!",
     "share": "Mijn resultaat delen"
+  },
+  "map_assist": {
+    "toggle": "Hulpkaart",
+    "hint": "Toont de al geraden landen op een kaart. In het dagklassement kom je achter de spelers zonder kaart.",
+    "hint_free": "Toont de al geraden landen op een kaart. Geen straf in de oneindige modus.",
+    "applied": "Kaart gebruikt: je staat bij de geholpen spelers.",
+    "stat": "met kaart",
+    "leaderboard_used": "Met hulpkaart",
+    "leaderboard_tier": "Met hulpkaart"
   }
 }

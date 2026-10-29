@@ -42,6 +42,9 @@
     "greeting": "Ready to travel?",
     "daily_title": "Daily challenges",
     "daily_subtitle": "New ones every day at midnight",
+    "daily_status_won": "Won",
+    "daily_status_played": "Played",
+    "daily_status_todo": "To do",
     "games_title": "Games",
     "games_subtitle": "Pick a difficulty or a continent",
     "daily": "Daily",
@@ -1527,5 +1530,14 @@
     "see_atlas": "See in the Atlas",
     "come_back": "Come back tomorrow for a new country!",
     "share": "Share my result"
+  },
+  "map_assist": {
+    "toggle": "Help map",
+    "hint": "Shows the countries you already guessed on a map. On the daily leaderboard, you rank behind players without the map.",
+    "hint_free": "Shows the countries you already guessed on a map. No penalty in infinite mode.",
+    "applied": "Map used: ranked with the assisted players.",
+    "stat": "with map",
+    "leaderboard_used": "With help map",
+    "leaderboard_tier": "With help map"
   }
 }

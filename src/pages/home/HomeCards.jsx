@@ -11,12 +11,21 @@ const Chevron = () => (
   </svg>
 );
 
-export function DailyCard({ game }) {
+// `status`: today's daily 'won', 'played' or 'todo' (from the signed-in player's history), null when unknown (visitor, loading).
+export function DailyCard({ game, status = null }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   return (
-    <article className="daily-card" style={{ "--game": gameColor(game.id) }}>
-      <span className="home-icon" aria-hidden="true">{game.icon}</span>
+    <article className={`daily-card${status && status !== "todo" ? " daily-card--done" : ""}`} style={{ "--game": gameColor(game.id) }}>
+      <div className="daily-card-top">
+        <span className="home-icon" aria-hidden="true">{game.icon}</span>
+        {status && (
+          <span className={`daily-card-status daily-card-status--${status}`}>
+            {status !== "todo" && <span aria-hidden="true">✓ </span>}
+            {t(`home.daily_status_${status}`)}
+          </span>
+        )}
+      </div>
       <h3 className="daily-card-title">{t(game.titleKey)}</h3>
       <p className="daily-card-desc">{t(game.descKey)}</p>
       <div className="daily-card-actions">

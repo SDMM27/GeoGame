@@ -24,7 +24,7 @@ import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
 import { GuessInputBar } from '@/components/game/GuessInputBar'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
 import { type CountryFeature } from '@/components/map/geometry'
-import { VOYAGE_COLORS, VoyageMap, type VoyageColor } from '@/components/map/VoyageMap'
+import { ExpandableVoyageMap, VOYAGE_COLORS, type VoyageColor } from '@/components/map/VoyageMap'
 import { Button, Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible'
@@ -249,13 +249,12 @@ export default function VoyageScreen() {
                 )}
               </View>
 
-              <VoyageMap
+              <ExpandableVoyageMap
                 style={{ height: mapHeight }}
                 start={startCountry}
                 target={targetCountry}
                 guesses={guessHistory as Guess[]}
                 hints={hintFeatures}
-                interactive
               />
             </>
           )}
@@ -375,6 +374,16 @@ export default function VoyageScreen() {
           }}
           onSaved={() => setLeaderboardVersion((version) => version + 1)}
           onHome={() => navigate('/')}>
+          {/* The route as played, guesses and errors included: the sheet covers the game's own map */}
+          {startCountry && targetCountry && (
+            <ExpandableVoyageMap
+              style={{ height: Math.round(windowHeight * 0.3) }}
+              start={startCountry}
+              target={targetCountry}
+              guesses={guessHistory as Guess[]}
+              hints={hintFeatures}
+            />
+          )}
           {!isPerfect && <OptimalPath path={optimalPath as CountryFeature[]} chain={chain} />}
           <DailyLeaderboard
             gameType={GAME_TYPES.VOYAGE_VOYAGE}

@@ -42,6 +42,9 @@
     "greeting": "Prêt à voyager ?",
     "daily_title": "Défis du jour",
     "daily_subtitle": "Nouveaux chaque jour à minuit",
+    "daily_status_won": "Réussi",
+    "daily_status_played": "Joué",
+    "daily_status_todo": "À faire",
     "games_title": "Jeux",
     "games_subtitle": "Choisis ta difficulté ou ton continent",
     "daily": "Défi du jour",
@@ -1527,5 +1530,14 @@
     "see_atlas": "Voir dans l’Atlas",
     "come_back": "Reviens demain pour un nouveau pays !",
     "share": "Partager mon résultat"
+  },
+  "map_assist": {
+    "toggle": "Carte d'aide",
+    "hint": "Affiche les pays déjà proposés sur une carte. Au classement du jour, tu passes derrière les joueurs sans carte.",
+    "hint_free": "Affiche les pays déjà proposés sur une carte. Sans pénalité en mode infini.",
+    "applied": "Carte utilisée : classé avec les joueurs aidés.",
+    "stat": "avec carte",
+    "leaderboard_used": "Avec carte d'aide",
+    "leaderboard_tier": "Avec carte d'aide"
   }
 }

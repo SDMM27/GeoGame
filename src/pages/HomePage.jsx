@@ -8,6 +8,8 @@ import LegalLinks from "../components/LegalLinks";
 import MissionsCard from "./home/MissionsCard";
 import GameConfigModal from "./home/GameConfigModal";
 import { DailyCard, HomeRow } from "./home/HomeCards";
+import { useAccount } from "../auth";
+import { useMissions } from "../hooks/useMissions";
 import { gameColor } from "../utils/roomGames";
 import { GAMES } from "./home/gameData";
 import "./HomePage.css";
@@ -20,6 +22,10 @@ export default function HomePage() {
   const { t } = useTranslation();
   const [configGameId, setConfigGameId] = useState(null);
   const [configInitialMode, setConfigInitialMode] = useState("standard");
+  const { account } = useAccount();
+  // Loaded once for the missions card and the dailies played today (one history read)
+  const missions = useMissions(account?.uid ?? null);
+  const dailyStatus = missions.dailies?.status ?? null;
   const configGame = GAMES.find((game) => game.id === configGameId) ?? null;
   const closeConfig = useCallback(() => { setConfigGameId(null); setConfigInitialMode("standard"); }, []);
 
@@ -40,13 +46,13 @@ export default function HomePage() {
           </div>
           <div className="daily-row">
             {DAILY_GAMES.map((game) => (
-              <DailyCard key={game.id} game={game} />
+              <DailyCard key={game.id} game={game} status={dailyStatus && (dailyStatus[game.id.toUpperCase()] ?? "todo")} />
             ))}
           </div>
         </section>
 
         <section className="home-section">
-          <MissionsCard />
+          <MissionsCard missions={missions} />
         </section>
 
         <section className="home-section" aria-labelledby="home-ascension">

@@ -42,6 +42,9 @@
     "greeting": "Bereit für die Reise?",
     "daily_title": "Tägliche Challenges",
     "daily_subtitle": "Jeden Tag um Mitternacht neu",
+    "daily_status_won": "Geschafft",
+    "daily_status_played": "Gespielt",
+    "daily_status_todo": "Offen",
     "games_title": "Spiele",
     "games_subtitle": "Wähle deine Schwierigkeit oder deinen Kontinent",
     "daily": "Tageschallenge",
@@ -1527,5 +1530,14 @@
     "see_atlas": "Im Atlas ansehen",
     "come_back": "Komm morgen für ein neues Land wieder!",
     "share": "Mein Ergebnis teilen"
+  },
+  "map_assist": {
+    "toggle": "Hilfskarte",
+    "hint": "Zeigt die bereits geratenen Länder auf einer Karte. In der Tagesrangliste landest du hinter den Spielern ohne Karte.",
+    "hint_free": "Zeigt die bereits geratenen Länder auf einer Karte. Keine Strafe im Endlosmodus.",
+    "applied": "Karte benutzt: du wirst bei den unterstützten Spielern eingestuft.",
+    "stat": "mit Karte",
+    "leaderboard_used": "Mit Hilfskarte",
+    "leaderboard_tier": "Mit Hilfskarte"
   }
 }

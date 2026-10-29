@@ -9,7 +9,7 @@ export function isAttemptsGame(gameType) {
   return LOWER_IS_BETTER.has(gameType)
 }
 
-export function buildChallengeUrl({ route, pseudo, score, dailyKey, solved, origin }) {
+export function buildChallengeUrl({ route, pseudo, score, dailyKey, solved, mapAssist, origin }) {
   const base = origin ?? (typeof window !== 'undefined' ? window.location.origin : '')
   const params = new URLSearchParams({ mode: 'daily' })
   const name = pseudo?.trim()
@@ -17,6 +17,7 @@ export function buildChallengeUrl({ route, pseudo, score, dailyKey, solved, orig
   params.set('score', String(Math.round((score ?? 0) * 10) / 10))
   if (dailyKey) params.set('day', dailyKey)
   if (solved === false) params.set('solved', '0')
+  if (mapAssist === true) params.set('map', '1')
   return `${base}${route}?${params.toString()}`
 }
 
@@ -32,6 +33,7 @@ export function parseChallenge(search) {
     score,
     day: day && DAY_PATTERN.test(day) ? day : null,
     solved: params.get('solved') !== '0',
+    mapAssist: params.get('map') === '1',
   }
 }
 
@@ -50,6 +52,8 @@ export function compareToChallenge(gameType, mine, theirs) {
   if (isAttemptsGame(gameType)) {
     if (mine.solved !== theirs.solved) return mine.solved ? 'win' : 'lose'
     if (!mine.solved) return 'tie'
+    // Same rule as the daily leaderboard: solving without the map beats solving with it, whatever the attempts.
+    if (Boolean(mine.mapAssist) !== Boolean(theirs.mapAssist)) return mine.mapAssist ? 'lose' : 'win'
     if (mine.score === theirs.score) return 'tie'
     return mine.score < theirs.score ? 'win' : 'lose'
   }

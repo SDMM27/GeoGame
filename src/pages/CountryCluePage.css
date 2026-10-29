@@ -308,6 +308,8 @@
   height: 460px;
   border-radius: 16px;
   overflow: hidden;
+  /* Keeps Leaflet's panes (z-index 400+) under the sticky input block and its suggestions */
+  isolation: isolate;
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 

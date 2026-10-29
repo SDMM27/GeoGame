@@ -11,6 +11,7 @@ const read = (path) => JSON.parse(readFileSync(path, 'utf8'))
 const source = read('src/data/countriesWithDifficulty_FR.json').features
 const meta = read('src/data/countries.meta.json').features
 const geometries = read('src/data/countries.geo.json')
+const officialAreas = read('src/data/countryAreas.json')
 
 describe('generated geographic data', () => {
   it('lists the same countries, in the same order, with the same properties as the source', () => {
@@ -25,11 +26,11 @@ describe('generated geographic data', () => {
     })
   })
 
-  it('has the area and centre of the full-resolution geometry', () => {
+  it('has the official area (else the one of the full-resolution geometry) and the centre of the geometry', () => {
     source.forEach((feature, index) => {
       const { areaKm2, center } = meta[index].properties
       const { lat, lng } = getGeographicCenter(feature)
-      expect(areaKm2, `${HINT} (${feature.properties.ADMIN})`).toBeCloseTo(getCountryAreaKm2(feature), 3)
+      expect(areaKm2, `${HINT} (${feature.properties.ADMIN})`).toBeCloseTo(officialAreas[feature.properties.ISO_A2] ?? getCountryAreaKm2(feature), 3)
       expect(center[0], HINT).toBeCloseTo(lng, 6)
       expect(center[1], HINT).toBeCloseTo(lat, 6)
     })

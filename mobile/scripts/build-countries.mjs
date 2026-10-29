@@ -16,6 +16,8 @@ const tmp = join(root, '.countries-tmp.json')
 const out = join(root, 'assets', 'data', 'countries.json')
 
 const data = JSON.parse(readFileSync(source, 'utf8'))
+// Official total areas by ISO_A2 (see scripts/build-geo-data.mjs); the drawn area still picks the simplification
+const officialAreas = JSON.parse(readFileSync(join(root, '..', 'src', 'data', 'countryAreas.json'), 'utf8'))
 for (const feature of data.features) {
   const { lat, lng } = getGeographicCenter(feature)
   feature.properties.areaKm2 = getCountryAreaKm2(feature)
@@ -49,6 +51,9 @@ for (const feature of simplified.features) {
   const { geometry } = feature
   if (geometry?.type === 'Polygon') rewind(geometry.coordinates)
   else if (geometry?.type === 'MultiPolygon') geometry.coordinates.forEach(rewind)
+}
+for (const feature of simplified.features) {
+  feature.properties.areaKm2 = officialAreas[feature.properties.ISO_A2] ?? feature.properties.areaKm2
 }
 writeFileSync(out, JSON.stringify(simplified))
 

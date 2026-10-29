@@ -9,7 +9,7 @@ import { useAccount } from '../../auth'
 import useInvites, { acceptInvite } from '../../hooks/useInvites'
 import { dismissInvite } from '../../utils/invites'
 import { getRecentRooms } from '../../utils/recentRooms'
-import { ROOM_GAMES, gameColor, roomGameIcon } from '../../utils/roomGames'
+import { LISTED_ROOM_GAMES, gameColor, roomGameIcon } from '../../utils/roomGames'
 import '../../components/multiplayer/Invites.css'
 import './MultiplayerHomePage.css'
 
@@ -85,7 +85,7 @@ export default function MultiplayerHomePage() {
             <p>{t('multiplayer.create_subtitle')}</p>
           </div>
           <div className="mp-rows">
-            {ROOM_GAMES.map((game) => (
+            {LISTED_ROOM_GAMES.map((game) => (
               <button
                 key={game.id}
                 type="button"

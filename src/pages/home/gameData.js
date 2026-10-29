@@ -1,4 +1,5 @@
 import { GAME_TYPES } from "../../utils/gameTypes";
+import { isGameHidden } from "../../utils/gameAvailability";
 import { getTotalCountries, getTotalCountriesByContinent } from "../../hooks/useGameState";
 import { getTotalFlagCountries, getTotalFlagCountriesByContinent, getTotalMissingFlagCountries, getTotalMissingFlagCountriesByContinent } from "../../hooks/useFlagGameState";
 import { getTotalCapitalCountries, getTotalCapitalCountriesByContinent } from "../../hooks/useCapitalsGameState";
@@ -72,6 +73,18 @@ export const GAMES = [
     titleKey: "games.daily_challenge.title",
     descKey: "games.daily_challenge.description",
     route: "/challenge",
+    active: true,
+  },
+  {
+    id: GAME_TYPES.COUNTRY_OF_DAY,
+    kind: "daily",
+    // Only a daily game: no infinite mode
+    dailyOnly: true,
+    multiId: null,
+    icon: "🌍",
+    titleKey: "games.country_of_day.title",
+    descKey: "games.country_of_day.description",
+    route: "/country-of-the-day",
     active: true,
   },
   {
@@ -154,7 +167,8 @@ export const GAMES = [
     titleKey: "games.quiz.title",
     descKey: "games.quiz.description",
     route: "/quiz",
-    active: true,
+    // Hidden since the Country of the Day took its place (utils/gameAvailability.js)
+    active: !isGameHidden(GAME_TYPES.QUIZ),
   },
   {
     id: "placement",

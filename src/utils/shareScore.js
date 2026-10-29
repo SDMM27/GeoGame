@@ -13,6 +13,7 @@ export const GAME_LABELS = {
   VOYAGE_VOYAGE: 'Voyage Voyage',
   QUIZ: 'Quiz Géo',
   DAILY_CHALLENGE: 'Challenge du jour',
+  COUNTRY_OF_DAY: 'Le Pays du jour',
 }
 
 // Maps game type keys → i18n locale paths
@@ -28,6 +29,7 @@ const GAME_TYPE_LOCALE_KEYS = {
   VOYAGE_VOYAGE: 'games.voyage_voyage.title',
   QUIZ: 'games.quiz.title',
   DAILY_CHALLENGE: 'games.daily_challenge.title',
+  COUNTRY_OF_DAY: 'games.country_of_day.title',
 }
 
 // Route of each game on the site: the shared link opens the game that was played.
@@ -43,6 +45,7 @@ export const GAME_ROUTES = {
   RANKING: '/ranking',
   VOYAGE_VOYAGE: '/voyage-voyage',
   QUIZ: '/quiz',
+  COUNTRY_OF_DAY: '/country-of-the-day',
 }
 
 // `site` : origin without trailing slash. Unknown game types fall back to the origin alone.

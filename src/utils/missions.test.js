@@ -44,6 +44,9 @@ const everything = () => [
   ...Array.from({ length: 4 }, () => game({ gameType: 'PLACEMENT', mode: 'ascension', found: 20, total: 20 })),
   ...Array.from({ length: 4 }, () => game({ mode: 'multi' })),
   ...Array.from({ length: 2 }, () => game({ gameType: 'QUIZ', mode: 'infinite', found: undefined })),
+  ...Array.from({ length: 7 }, (_, index) =>
+    game({ gameType: 'COUNTRY_OF_DAY', mode: 'daily', solved: true, errors: 0, score: 400, found: undefined, dailyKey: `2026-10-${19 + index}` }),
+  ),
 ]
 
 describe('periods', () => {
@@ -63,6 +66,21 @@ describe('periods', () => {
 })
 
 describe('missions', () => {
+  it('keeps the draw of the week the Country of the Day came out, and offers its mission from the next one', () => {
+    const ids = (week) => weeklyMissions(week).map((mission) => mission.id)
+    expect(ids('2026-W44')).toEqual(['week_found_200', 'week_challenge_3', 'week_hardcore_3', 'week_daily_wins_10', 'week_types_10'])
+    const later = Array.from({ length: 20 }, (_, i) => ids(`2027-W${String(i + 1).padStart(2, '0')}`)).flat()
+    expect(later).toContain('week_country_of_day_5')
+  })
+
+  it('never draws a mission about a hidden game', () => {
+    for (let day = 1; day <= 28; day += 1) {
+      const key = `2026-11-${String(day).padStart(2, '0')}`
+      const drawn = [...dailyMissions(key), ...weeklyMissions(key)]
+      expect(drawn.some((mission) => mission.game === GAME_TYPES.QUIZ)).toBe(false)
+    }
+  })
+
   it('draws the same distinct missions for everyone on a day or a week, and other ones on other days', () => {
     const today = dailyMissions('2026-10-19')
     expect(today).toHaveLength(DAILY_MISSIONS)

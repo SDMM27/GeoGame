@@ -23,7 +23,12 @@
     "unknown": "Onbekend",
     "open": "Open de atlas",
     "history": "Geschiedenis",
-    "history_quiz": "📜 Overhoor me over de geschiedenis"
+    "history_quiz": "📜 Overhoor me over de geschiedenis",
+    "rankings": "Ranglijsten",
+    "rankings_button": "🏆 Ranglijsten",
+    "see_ranking": "Bekijk de ranglijst",
+    "ranking": "Ranglijst",
+    "back_to_ranking": "← Ranglijst"
   },
   "continents": {
     "Europe": "Europa",
@@ -96,6 +101,10 @@
       "title": "Ontbrekende vlag",
       "description": "Herken het land aan zijn vlag waarvan een deel ontbreekt.",
       "missing_part": "Ontbrekend deel van de vlag"
+    },
+    "country_of_day": {
+      "title": "Land van de dag",
+      "description": "Elke dag één land: raad zijn grenzen, vlag en hoofdstad, zet het op de kaart en ontdek zijn fiche."
     }
   },
   "modes": {
@@ -997,6 +1006,22 @@
       "silver": "Zilver",
       "gold": "Goud",
       "legend": "Legende"
+    },
+    "country_of_day_7": {
+      "title": "Wereldnieuwsgierig",
+      "desc": "Speel 7 Landen van de dag"
+    },
+    "country_of_day_30": {
+      "title": "Reisdagboek",
+      "desc": "Speel 30 Landen van de dag"
+    },
+    "country_of_day_100": {
+      "title": "Wandelende encyclopedie",
+      "desc": "Speel 100 Landen van de dag"
+    },
+    "country_of_day_flawless": {
+      "title": "Foutloos",
+      "desc": "Haal alle 4 stappen van het Land van de dag in één keer"
     }
   },
   "app_banner": {
@@ -1138,7 +1163,7 @@
     "see_leaderboard": "Bekijk de Survival-ranglijst",
     "leaderboard_title": "Survival-ranglijst",
     "all_combinations": "Alle combinaties",
-    "all_six": "Alle 6 spellen",
+    "all_six": "Alle spellen",
     "no_scores": "Geen scores voor dit filter.",
     "col_player": "Speler",
     "col_rounds": "Rondes",
@@ -1206,6 +1231,10 @@
     "quiz": {
       "title": "Geoquiz — Dagelijkse aardrijkskundequiz | GeoGame",
       "description": "Elke dag een aardrijkskundevraag om je vrienden uit te dagen, of blijf vragen beantwoorden op de moeilijkheidsgraad van je keuze."
+    },
+    "country_of_day": {
+      "title": "Land van de dag — Het dagelijkse mysterieland | GeoGame",
+      "description": "Elke dag een mysterieus land: raad het aan de hand van de omtrek, vlag en hoofdstad en plaats het op de kaart. Vergelijk je score met vrienden."
     },
     "daily_challenge": {
       "title": "Dagelijkse uitdaging — 12 aardrijkskundevragen per dag | GeoGame",
@@ -1404,7 +1433,10 @@
     "tier_medium": "Gemiddeld",
     "tier_hard": "Moeilijk",
     "fragments_one": "+{{count}} fragment",
-    "fragments_other": "+{{count}} fragmenten"
+    "fragments_other": "+{{count}} fragmenten",
+    "country_of_day": "Speel het Land van de dag",
+    "country_of_day_flawless": "Speel het Land van de dag foutloos",
+    "week_country_of_day_5": "Speel het Land van de dag op {{count}} verschillende dagen"
   },
   "level": {
     "label": "Niveau {{level}}",
@@ -1442,5 +1474,42 @@
     "new_flag": "Nieuwe vlag!",
     "view_collection": "Collectie bekijken",
     "tap_to_continue": "Tik om door te gaan"
+  },
+  "country_of_day": {
+    "intro": "Elke dag één land, voor iedereen hetzelfde: raad het in 4 stappen en leer het daarna kennen.",
+    "mode_title": "Hoe wil je spelen?",
+    "mode_choice": "Meerkeuze",
+    "mode_choice_desc": "4 antwoorden om uit te kiezen bij elke stap",
+    "mode_free": "Vrij antwoord",
+    "mode_free_desc": "Je typt het land en de hoofdstad, 8 vlaggen om uit te kiezen · punten ×1,5",
+    "mode_locked": "Deze keuze geldt voor de hele dag.",
+    "start": "Daar gaan we",
+    "continue": "Verdergaan",
+    "step": "Stap {{n}}/{{total}}",
+    "step_borders": "Welk land is dit?",
+    "step_flag": "Wat is zijn vlag?",
+    "step_capital": "Wat is zijn hoofdstad?",
+    "step_placement": "Waar ligt het?",
+    "placement_hint": "Klik op het land op de kaart.",
+    "tries_left_one": "Nog {{count}} poging",
+    "tries_left_other": "Nog {{count}} pogingen",
+    "placeholder_country": "Naam van het land…",
+    "placeholder_capital": "Naam van de hoofdstad…",
+    "submit": "Bevestigen",
+    "unknown_country": "Dit land zit niet in het spel",
+    "already_tried": "Al geprobeerd",
+    "right": "Goed zo!",
+    "wrong": "Fout, probeer opnieuw",
+    "missed": "Het antwoord was: {{answer}}",
+    "points": "+{{count}} ptn",
+    "next": "Volgende stap",
+    "see_sheet": "Bekijk de fiche",
+    "sheet_title": "Om te onthouden",
+    "score": "{{score}} / {{max}} ptn",
+    "mode_played": "Gespeeld als {{mode}}",
+    "leaderboard": "Klassement van de dag",
+    "see_atlas": "Bekijk in de Atlas",
+    "come_back": "Kom morgen terug voor een nieuw land!",
+    "share": "Mijn resultaat delen"
   }
 }

@@ -332,19 +332,58 @@ describe('daily scores', () => {
   })
 })
 
+const countryOfDays = (overrides = {}) =>
+  clean({
+    name: 'Alice',
+    uid: 'alice',
+    gameType: 'COUNTRY_OF_DAY',
+    dailyKey: '2026-11-05',
+    mode: 'free',
+    steps: [2, 1, 1, 0],
+    score: 390,
+    elapsedTime: 95000,
+    ...overrides,
+  })
+
+describe('Country of the Day scores', () => {
+  it('accepts the score its tries give, in both modes, even 0', async () => {
+    await assertSucceeds(as('alice').collection('daily_scores').add(countryOfDays()))
+    await assertSucceeds(as('alice').collection('daily_scores').add(countryOfDays({ dailyKey: 'b', mode: 'choice', steps: [1, 1, 1, 1], score: 400 })))
+    await assertSucceeds(as('alice').collection('daily_scores').add(countryOfDays({ dailyKey: 'c', steps: [0, 0, 0, 0], score: 0 })))
+  })
+
+  it('refuses a score the tries do not give', async () => {
+    await assertFails(as('alice').collection('daily_scores').add(countryOfDays({ score: 600 })))
+    await assertFails(as('alice').collection('daily_scores').add(countryOfDays({ mode: 'choice' })))
+  })
+
+  it('refuses broken tries, modes, times or fields', async () => {
+    await assertFails(as('alice').collection('daily_scores').add(countryOfDays({ steps: [4, 1, 1, 0], score: 285 })))
+    await assertFails(as('alice').collection('daily_scores').add(countryOfDays({ steps: [1, 1, 1], score: 450 })))
+    await assertFails(as('alice').collection('daily_scores').add(countryOfDays({ steps: [1.5, 1, 1, 0], score: 300 })))
+    await assertFails(as('alice').collection('daily_scores').add(countryOfDays({ mode: 'hard' })))
+    await assertFails(as('alice').collection('daily_scores').add(countryOfDays({ elapsedTime: 100 })))
+    await assertFails(as('alice').collection('daily_scores').add(countryOfDays({ attempts: 1 })))
+    await assertFails(as('alice').collection('daily_scores').add(dailies({ gameType: 'COUNTRY_OF_DAY' })))
+  })
+})
+
 const survivals = (overrides = {}) =>
-  clean({ name: 'Alice', uid: 'alice', modes: 'FLAGS+QUIZ', lives: 3, timer: 30, ramp: 'normal', score: 12, elapsedTime: 90000, ...overrides })
+  clean({ name: 'Alice', uid: 'alice', modes: 'FLAGS+CAPITALS', lives: 3, timer: 30, ramp: 'normal', score: 12, elapsedTime: 90000, ...overrides })
 
 describe('survival scores', () => {
   it('accepts a run of any set of games and lives, signed in or as a visitor', async () => {
     await assertSucceeds(as('alice').collection('survival_scores').add(survivals()))
-    await assertSucceeds(as('alice').collection('survival_scores').add(survivals({ modes: 'PLACEMENT+FLAGS+CAPITALS+BORDER_GUESS+QUIZ', lives: 10, timer: 0 })))
+    await assertSucceeds(as('alice').collection('survival_scores').add(survivals({ modes: 'PLACEMENT+FLAGS+CAPITALS+BORDER_GUESS', lives: 10, timer: 0 })))
     await assertSucceeds(anonymous().collection('survival_scores').add(survivals({ name: 'Zoe', uid: undefined, modes: 'CAPITALS', lives: 1 })))
   })
 
   it('refuses unknown games, lives or timers', async () => {
     await assertFails(as('alice').collection('survival_scores').add(survivals({ modes: 'FLAGS+CHEAT' })))
     await assertFails(as('alice').collection('survival_scores').add(survivals({ modes: 'FLAGS+COUNTRY_CLUE' })))
+    // The hidden Geo Quiz: no new run with quiz rounds
+    await assertFails(as('alice').collection('survival_scores').add(survivals({ modes: 'FLAGS+QUIZ' })))
+    await assertFails(as('alice').collection('survival_scores').add(survivals({ modes: 'QUIZ' })))
     await assertFails(as('alice').collection('survival_scores').add(survivals({ timer: 45 })))
     await assertFails(as('alice').collection('survival_scores').add(survivals({ timer: undefined })))
     // A custom ramp is not ranked

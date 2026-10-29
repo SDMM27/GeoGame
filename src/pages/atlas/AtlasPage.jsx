@@ -13,6 +13,7 @@ import { getFocusCountry } from '../../utils/borderGuessMap'
 import { ATLAS_COUNTRIES, countryDisplayName, findAtlasCountry, getCountryInfo, searchAtlasCountries } from '../../utils/countryInfo'
 import { getShiftedFeatures } from '../game/shiftedFeatures'
 import CountrySheet from './CountrySheet'
+import RankingPanel from './RankingPanel'
 import { MAP_COLORS } from '../../utils/mapColors'
 import { getSmallCountryCircleDescriptors } from '../../utils/largestLandmass'
 import { NON_CLICKABLE_MAP_AREAS } from '../../utils/mapInteraction'
@@ -95,6 +96,8 @@ export default function AtlasPage() {
     () => (isoParam && ATLAS_COUNTRIES.find((feature) => feature.properties.ISO_A2 === isoParam)?.properties.ADMIN) || null
   )
   selectedRef.current = selected
+  const [ranking, setRanking] = useState(null) // metric of the open ranking panel
+  const [backMetric, setBackMetric] = useState(null) // metric of the ranking the sheet was opened from
   const info = useMemo(() => (selected ? getCountryInfo(findAtlasCountry(selected), i18n.language) : null), [selected, i18n.language])
 
   const restyle = useCallback((admin, style) => {
@@ -133,8 +136,21 @@ export default function AtlasPage() {
   }, [selected, map, restyle]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const close = () => {
+    setRanking(null)
+    setBackMetric(null)
     setSelected(null)
     setParams({}, { replace: true })
+  }
+
+  // A ranking row opens the country's sheet, which can lead back to the ranking
+  const selectFromRanking = (admin) => {
+    setBackMetric(ranking)
+    setRanking(null)
+    select(admin)
+  }
+  const openRanking = (metric) => {
+    setBackMetric(null)
+    setRanking(metric)
   }
 
   const onEachFeature = (copy) => (feature, layer) => {
@@ -179,11 +195,25 @@ export default function AtlasPage() {
           </MapContainer>
           <div className="atlas-overlay">
             <h1 className="atlas-title">🗺️ {t('atlas.title')}</h1>
-            <Search onSelect={select} />
-            {!info && <p className="atlas-hint">{t('atlas.subtitle')}</p>}
+            <Search onSelect={(admin) => { setRanking(null); setBackMetric(null); select(admin) }} />
+            <button type="button" className="atlas-rankings-button" onClick={() => openRanking('population')}>
+              {t('atlas.rankings_button')}
+            </button>
+            {!info && !ranking && <p className="atlas-hint">{t('atlas.subtitle')}</p>}
           </div>
         </div>
-        {info && <CountrySheet info={info} onSelect={select} onClose={close} />}
+        {ranking && (
+          <RankingPanel metric={ranking} onMetric={setRanking} selected={selected} onSelect={selectFromRanking} onClose={() => setRanking(null)} />
+        )}
+        {!ranking && info && (
+          <CountrySheet
+            info={info}
+            onSelect={select}
+            onClose={close}
+            onRanking={openRanking}
+            onBack={backMetric ? () => { setRanking(backMetric); setBackMetric(null) } : null}
+          />
+        )}
       </div>
     </div>
   )

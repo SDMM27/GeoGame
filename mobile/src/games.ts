@@ -1,6 +1,7 @@
 import type { ComponentProps } from 'react'
 import type MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 
+import { isGameHidden } from '@shared/utils/gameAvailability'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
 import { gameColors } from '@/theme'
 
@@ -36,6 +37,18 @@ export const GAMES: GameDefinition[] = [
     icon: 'target',
     color: gameColors.daily_challenge,
     route: '/game/challenge',
+    kind: 'daily',
+    multi: false,
+    dailyOnly: true,
+  },
+  {
+    id: 'country_of_day',
+    type: GAME_TYPES.COUNTRY_OF_DAY,
+    titleKey: 'games.country_of_day.title',
+    descKey: 'games.country_of_day.description',
+    icon: 'earth',
+    color: gameColors.country_of_day,
+    route: '/game/country-of-the-day',
     kind: 'daily',
     multi: false,
     dailyOnly: true,
@@ -164,7 +177,10 @@ export const GAMES: GameDefinition[] = [
   },
 ]
 
-export const MULTI_GAMES = GAMES.filter((game) => game.multi)
+// The games the app lists: the hidden ones stay in GAMES for history, rooms and scores.
+export const LISTED_GAMES = GAMES.filter((game) => !isGameHidden(game.type))
+
+export const MULTI_GAMES = LISTED_GAMES.filter((game) => game.multi)
 
 export function getGame(id: string) {
   return GAMES.find((game) => game.id === id)

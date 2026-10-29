@@ -23,7 +23,12 @@
     "unknown": "Unknown",
     "open": "Open the atlas",
     "history": "History",
-    "history_quiz": "📜 Test me on its history"
+    "history_quiz": "📜 Test me on its history",
+    "rankings": "Rankings",
+    "rankings_button": "🏆 Rankings",
+    "see_ranking": "See the ranking",
+    "ranking": "Ranking",
+    "back_to_ranking": "← Ranking"
   },
   "continents": {
     "Europe": "Europe",
@@ -96,6 +101,10 @@
       "title": "Missing Flag",
       "description": "Identify the country with a band missing from its flag.",
       "missing_part": "Missing part of the flag"
+    },
+    "country_of_day": {
+      "title": "Country of the Day",
+      "description": "One country a day: guess its borders, its flag, its capital, place it, then read its fact sheet."
     }
   },
   "modes": {
@@ -997,6 +1006,22 @@
       "silver": "Silver",
       "gold": "Gold",
       "legend": "Legend"
+    },
+    "country_of_day_7": {
+      "title": "World curious",
+      "desc": "Play 7 Countries of the Day"
+    },
+    "country_of_day_30": {
+      "title": "Travel journal",
+      "desc": "Play 30 Countries of the Day"
+    },
+    "country_of_day_100": {
+      "title": "Walking encyclopedia",
+      "desc": "Play 100 Countries of the Day"
+    },
+    "country_of_day_flawless": {
+      "title": "Flawless",
+      "desc": "Get all 4 steps of the Country of the Day on the first try"
     }
   },
   "app_banner": {
@@ -1138,7 +1163,7 @@
     "see_leaderboard": "See the Survival leaderboard",
     "leaderboard_title": "Survival leaderboard",
     "all_combinations": "All combinations",
-    "all_six": "All 6 games",
+    "all_six": "All games",
     "no_scores": "No scores for this filter.",
     "col_player": "Player",
     "col_rounds": "Rounds",
@@ -1206,6 +1231,10 @@
     "quiz": {
       "title": "Geo Quiz — Daily geography quiz | GeoGame",
       "description": "One geography question a day to challenge your friends, or keep answering questions at the difficulty of your choice."
+    },
+    "country_of_day": {
+      "title": "Country of the Day — The daily mystery country | GeoGame",
+      "description": "One mystery country a day: guess it from its outline, flag and capital, then place it on the map. Compare your score with your friends."
     },
     "daily_challenge": {
       "title": "Daily Challenge — 12 geography questions a day | GeoGame",
@@ -1404,7 +1433,10 @@
     "tier_medium": "Medium",
     "tier_hard": "Hard",
     "fragments_one": "+{{count}} fragment",
-    "fragments_other": "+{{count}} fragments"
+    "fragments_other": "+{{count}} fragments",
+    "country_of_day": "Play the Country of the Day",
+    "country_of_day_flawless": "Get a perfect Country of the Day",
+    "week_country_of_day_5": "Play the Country of the Day on {{count}} different days"
   },
   "level": {
     "label": "Level {{level}}",
@@ -1442,5 +1474,42 @@
     "new_flag": "New flag!",
     "view_collection": "View collection",
     "tap_to_continue": "Tap to continue"
+  },
+  "country_of_day": {
+    "intro": "One country a day, the same for everyone: guess it in 4 steps, then get to know it.",
+    "mode_title": "How do you want to play?",
+    "mode_choice": "Multiple choice",
+    "mode_choice_desc": "4 answers to pick from at each step",
+    "mode_free": "Free answer",
+    "mode_free_desc": "Type the country and the capital, 8 flags to pick from · points ×1.5",
+    "mode_locked": "This choice holds for the whole day.",
+    "start": "Let’s go",
+    "continue": "Resume",
+    "step": "Step {{n}}/{{total}}",
+    "step_borders": "Which country is this?",
+    "step_flag": "Which is its flag?",
+    "step_capital": "What is its capital?",
+    "step_placement": "Where is it?",
+    "placement_hint": "Click the country on the map.",
+    "tries_left_one": "{{count}} try left",
+    "tries_left_other": "{{count}} tries left",
+    "placeholder_country": "Country name…",
+    "placeholder_capital": "Capital name…",
+    "submit": "Submit",
+    "unknown_country": "This country isn’t in the game",
+    "already_tried": "Already tried",
+    "right": "Well done!",
+    "wrong": "Wrong, try again",
+    "missed": "The answer was: {{answer}}",
+    "points": "+{{count}} pts",
+    "next": "Next step",
+    "see_sheet": "See its fact sheet",
+    "sheet_title": "Good to know",
+    "score": "{{score}} / {{max}} pts",
+    "mode_played": "Played in {{mode}}",
+    "leaderboard": "Today’s leaderboard",
+    "see_atlas": "See in the Atlas",
+    "come_back": "Come back tomorrow for a new country!",
+    "share": "Share my result"
   }
 }

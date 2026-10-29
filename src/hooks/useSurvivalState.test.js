@@ -2,7 +2,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, renderHook } from '@testing-library/react'
 import useSurvivalState from './useSurvivalState'
 import { GAME_TYPES } from '../utils/gameTypes'
-import { buildSurvivalRounds } from '../utils/survival'
 import { loadSnapshot } from '../utils/multiplayerSnapshot'
 import { reportEloAnswer, flushElo } from '../utils/eloReport'
 
@@ -121,15 +120,10 @@ describe('useSurvivalState', () => {
     expect(result.current.roundIndex).toBe(3)
   })
 
-  it('answers a quiz question once', () => {
-    const seed = 4
-    const [first] = buildSurvivalRounds([QUIZ], seed, 1)
-    const wrongId = first.question.choices.find((choice) => choice.id !== first.question.correctId).id
-    const { result } = play({ modes: [QUIZ], lives: 3, seed })
-    act(() => { result.current.chooseAnswer(wrongId) })
-    expect(result.current.lives).toBe(2)
-    expect(result.current.outcome).toBe('failed')
-    expect(result.current.wrongPicks).toEqual([wrongId])
+  it('plays the available games when the room only had the hidden Geo Quiz', () => {
+    const { result } = play({ modes: [QUIZ], lives: 3, seed: 4 })
+    expect(result.current.rounds.length).toBeGreaterThan(0)
+    expect(result.current.rounds.every((round) => round.type !== QUIZ)).toBe(true)
   })
 
   it('saves and resumes a multiplayer run', () => {

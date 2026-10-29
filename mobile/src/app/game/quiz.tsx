@@ -3,7 +3,7 @@
 // multiple choice or free answer. Game rules come from the website hooks (useDailyQuizState, useQuizState).
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { Image } from 'expo-image'
-import { router, useLocalSearchParams } from 'expo-router'
+import { Redirect, router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, View } from 'react-native'
@@ -14,6 +14,7 @@ import useDailyQuizState from '@shared/hooks/useDailyQuizState'
 import useQuizState from '@shared/hooks/useQuizState'
 import { formatTime } from '@shared/utils/formatTime'
 import { useDailyPlayedElsewhere } from '@shared/hooks/useDailyPlayedElsewhere'
+import { isGameHidden } from '@shared/utils/gameAvailability'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
 import { getCountryName } from '@shared/utils/getCountryName'
 import {
@@ -766,6 +767,8 @@ function PracticeQuiz({
 
 export default function QuizScreen() {
   const { mode = 'daily', room, theme, country } = useLocalSearchParams<{ mode?: string; room?: string; theme?: string; country?: string }>()
+  // Hidden quiz (every theme): old links and rooms go to the Country of the Day
+  if (isGameHidden(GAME_TYPES.QUIZ)) return <Redirect href="/game/country-of-the-day" />
   if (room) return <RoomGate code={room}>{(play) => <PracticeQuiz play={play} />}</RoomGate>
   // /game/quiz?mode=infinite&theme=history[&country=FR] : arrivée depuis la fiche d'un pays de l'atlas
   const presetCountry = country && (HISTORY_COUNTRIES as string[]).includes(country) ? country : null

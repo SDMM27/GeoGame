@@ -30,7 +30,7 @@ const DAILY_ROUTES = {
   COUNTRY_CLUE: '/game/country-clue',
   VOYAGE_VOYAGE: '/game/voyage',
   RANKING: '/game/ranking',
-  QUIZ: '/game/quiz',
+  COUNTRY_OF_DAY: '/game/country-of-the-day',
 }
 
 // Same screens as the app opens for a tapped notification (mobile/src/notifications/push.ts).

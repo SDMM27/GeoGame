@@ -23,7 +23,12 @@
     "unknown": "Desconocido",
     "open": "Abrir el atlas",
     "history": "Historia",
-    "history_quiz": "📜 Ponerme a prueba sobre su historia"
+    "history_quiz": "📜 Ponerme a prueba sobre su historia",
+    "rankings": "Clasificaciones",
+    "rankings_button": "🏆 Clasificaciones",
+    "see_ranking": "Ver la clasificación",
+    "ranking": "Clasificación",
+    "back_to_ranking": "← Clasificación"
   },
   "continents": {
     "Europe": "Europa",
@@ -96,6 +101,10 @@
       "title": "Bandera incompleta",
       "description": "Identifica el país aunque falte una franja de su bandera.",
       "missing_part": "Parte que falta de la bandera"
+    },
+    "country_of_day": {
+      "title": "El País del día",
+      "description": "Un país al día: adivina sus fronteras, su bandera, su capital, sitúalo y descubre su ficha."
     }
   },
   "modes": {
@@ -997,6 +1006,22 @@
       "silver": "Plata",
       "gold": "Oro",
       "legend": "Leyenda"
+    },
+    "country_of_day_7": {
+      "title": "Curioso del mundo",
+      "desc": "Juega 7 Países del día"
+    },
+    "country_of_day_30": {
+      "title": "Cuaderno de viaje",
+      "desc": "Juega 30 Países del día"
+    },
+    "country_of_day_100": {
+      "title": "Enciclopedia andante",
+      "desc": "Juega 100 Países del día"
+    },
+    "country_of_day_flawless": {
+      "title": "Sin fallos",
+      "desc": "Acierta los 4 pasos del País del día a la primera"
     }
   },
   "app_banner": {
@@ -1138,7 +1163,7 @@
     "see_leaderboard": "Ver la clasificación de Supervivencia",
     "leaderboard_title": "Clasificación de Supervivencia",
     "all_combinations": "Todas las combinaciones",
-    "all_six": "Los 6 juegos",
+    "all_six": "Todos los juegos",
     "no_scores": "No hay puntuaciones para este filtro.",
     "col_player": "Jugador",
     "col_rounds": "Rondas",
@@ -1206,6 +1231,10 @@
     "quiz": {
       "title": "Quiz Geo — Quiz de geografía diario | GeoGame",
       "description": "Una pregunta de geografía al día para retar a tus amigos, o una serie de preguntas con la dificultad que elijas."
+    },
+    "country_of_day": {
+      "title": "El País del día — El país misterioso diario | GeoGame",
+      "description": "Un país misterioso al día: adivínalo por su silueta, su bandera y su capital, y colócalo en el mapa. Compara tu puntuación con tus amigos."
     },
     "daily_challenge": {
       "title": "Desafío del día — 12 preguntas de geografía al día | GeoGame",
@@ -1404,7 +1433,10 @@
     "tier_medium": "Media",
     "tier_hard": "Difícil",
     "fragments_one": "+{{count}} fragmento",
-    "fragments_other": "+{{count}} fragmentos"
+    "fragments_other": "+{{count}} fragmentos",
+    "country_of_day": "Juega al País del día",
+    "country_of_day_flawless": "Haz un pleno en el País del día",
+    "week_country_of_day_5": "Juega al País del día {{count}} días distintos"
   },
   "level": {
     "label": "Nivel {{level}}",
@@ -1442,5 +1474,42 @@
     "new_flag": "¡Nueva bandera!",
     "view_collection": "Ver colección",
     "tap_to_continue": "Toca para continuar"
+  },
+  "country_of_day": {
+    "intro": "Un país al día, el mismo para todos: adivínalo en 4 pasos y aprende a conocerlo.",
+    "mode_title": "¿Cómo quieres jugar?",
+    "mode_choice": "Opción múltiple",
+    "mode_choice_desc": "4 respuestas para elegir en cada paso",
+    "mode_free": "Respuesta libre",
+    "mode_free_desc": "Escribes el país y la capital, 8 banderas para elegir · puntos ×1,5",
+    "mode_locked": "Esta elección vale para todo el día.",
+    "start": "¡Vamos!",
+    "continue": "Continuar",
+    "step": "Paso {{n}}/{{total}}",
+    "step_borders": "¿Qué país es?",
+    "step_flag": "¿Cuál es su bandera?",
+    "step_capital": "¿Cuál es su capital?",
+    "step_placement": "¿Dónde está?",
+    "placement_hint": "Haz clic en el país en el mapa.",
+    "tries_left_one": "Queda {{count}} intento",
+    "tries_left_other": "Quedan {{count}} intentos",
+    "placeholder_country": "Nombre del país…",
+    "placeholder_capital": "Nombre de la capital…",
+    "submit": "Validar",
+    "unknown_country": "Este país no está en el juego",
+    "already_tried": "Ya propuesto",
+    "right": "¡Bravo!",
+    "wrong": "Fallo, inténtalo de nuevo",
+    "missed": "La respuesta era: {{answer}}",
+    "points": "+{{count}} pts",
+    "next": "Paso siguiente",
+    "see_sheet": "Ver su ficha",
+    "sheet_title": "Para recordar",
+    "score": "{{score}} / {{max}} pts",
+    "mode_played": "Jugado en {{mode}}",
+    "leaderboard": "Clasificación del día",
+    "see_atlas": "Ver en el Atlas",
+    "come_back": "¡Vuelve mañana para un nuevo país!",
+    "share": "Compartir mi resultado"
   }
 }

@@ -54,7 +54,7 @@ beforeEach(async () => {
     createdAt: Timestamp.now(),
     acceptedAt: Timestamp.now(),
   })
-  await db.doc(`users/alice/games/daily_QUIZ_${TODAY}`).set({ gameType: 'QUIZ', mode: 'daily', dailyKey: TODAY })
+  await db.doc(`users/alice/games/daily_COUNTRY_OF_DAY_${TODAY}`).set({ gameType: 'COUNTRY_OF_DAY', mode: 'daily', dailyKey: TODAY })
   await db.doc('users/bob/pushTokens/ExponentPushToken[bob]').set({ token: 'ExponentPushToken[bob]', lang: 'fr', platform: 'android' })
   await db.doc('users/bob/pushTokens/web1').set({
     token: 'web1',
@@ -65,7 +65,7 @@ beforeEach(async () => {
 })
 
 const send = (uid, options = {}) =>
-  sendDailyNudge({ db, auth, idToken: tokens[uid], friendUid: 'bob', gameType: 'QUIZ', now: NOW, fetchImpl: fakeExpo(), ...options })
+  sendDailyNudge({ db, auth, idToken: tokens[uid], friendUid: 'bob', gameType: 'COUNTRY_OF_DAY', now: NOW, fetchImpl: fakeExpo(), ...options })
 
 describe('sendDailyNudge', () => {
   it('tells the friend to come and beat the player, on the app and the web app', async () => {
@@ -77,15 +77,15 @@ describe('sendDailyNudge', () => {
     expect(JSON.parse(options.body)).toEqual([
       expect.objectContaining({
         to: 'ExponentPushToken[bob]',
-        body: expect.stringContaining('Alice a fini Quiz Géo du jour. Bah alors, viens me battre'),
-        data: { type: 'daily_nudge', uid: 'alice', gameType: 'QUIZ' },
+        body: expect.stringContaining('Alice a terminé le Pays du jour. Bah alors, viens me battre'),
+        data: { type: 'daily_nudge', uid: 'alice', gameType: 'COUNTRY_OF_DAY' },
         channelId: 'daily',
       }),
     ])
     expect(JSON.parse(webPush.sendNotification.mock.calls[0][1])).toMatchObject({
       title: 'GeoGame',
-      body: expect.stringContaining('Alice just finished today’s'),
-      data: { type: 'daily_nudge', uid: 'alice', gameType: 'QUIZ' },
+      body: expect.stringContaining('Alice just finished the Country of the Day.'),
+      data: { type: 'daily_nudge', uid: 'alice', gameType: 'COUNTRY_OF_DAY' },
     })
   })
 
@@ -113,11 +113,11 @@ describe('sendDailyNudge', () => {
       status: 'accepted',
     })
     expect(await send('carol', { fetchImpl })).toEqual({ status: 409, body: { error: 'not_played' } })
-    // Alice played the Quiz, not the Border Guess, and yesterday's doesn't count
+    // Alice played the Country of the Day, not the Border Guess, and yesterday's doesn't count
     expect(await send('alice', { fetchImpl, gameType: 'BORDER_GUESS' })).toEqual({ status: 409, body: { error: 'not_played' } })
     expect(await send('alice', { fetchImpl, now: NOW + 24 * 60 * 60 * 1000 })).toEqual({ status: 409, body: { error: 'not_played' } })
     // A game that isn't a daily one doesn't count either
-    await db.doc(`users/alice/games/daily_QUIZ_${TODAY}`).set({ gameType: 'QUIZ', mode: 'standard' })
+    await db.doc(`users/alice/games/daily_COUNTRY_OF_DAY_${TODAY}`).set({ gameType: 'COUNTRY_OF_DAY', mode: 'standard' })
     expect(await send('alice', { fetchImpl })).toEqual({ status: 409, body: { error: 'not_played' } })
     expect(fetchImpl).not.toHaveBeenCalled()
   })
@@ -135,7 +135,7 @@ describe('sendDailyNudge', () => {
 
     // And the same game the next day, once played
     const tomorrow = NOW + 24 * 60 * 60 * 1000
-    await db.doc('users/alice/games/daily_QUIZ_2026-10-11').set({ gameType: 'QUIZ', mode: 'daily', dailyKey: '2026-10-11' })
+    await db.doc('users/alice/games/daily_COUNTRY_OF_DAY_2026-10-11').set({ gameType: 'COUNTRY_OF_DAY', mode: 'daily', dailyKey: '2026-10-11' })
     expect((await send('alice', { fetchImpl, now: tomorrow })).status).toBe(200)
   })
 
@@ -160,8 +160,8 @@ describe('sendDailyNudge', () => {
 
 describe('nudgeMessage', () => {
   it('speaks the device language, English otherwise, with the translated game', () => {
-    expect(nudgeMessage('fr', 'Alice', 'QUIZ')).toContain('Alice a fini Quiz Géo du jour')
-    expect(nudgeMessage('ja', 'Alice', 'QUIZ')).toContain('Alice just finished today’s')
+    expect(nudgeMessage('fr', 'Alice', 'COUNTRY_OF_DAY')).toContain('Alice a terminé le Pays du jour.')
+    expect(nudgeMessage('ja', 'Alice', 'COUNTRY_OF_DAY')).toContain('Alice just finished the Country of the Day.')
     expect(nudgeMessage('de', 'Alice', 'BORDER_GUESS')).toContain('Alice hat')
   })
 

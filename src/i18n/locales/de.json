@@ -23,7 +23,12 @@
     "unknown": "Unbekannt",
     "open": "Atlas öffnen",
     "history": "Geschichte",
-    "history_quiz": "📜 Mein Wissen über die Geschichte testen"
+    "history_quiz": "📜 Mein Wissen über die Geschichte testen",
+    "rankings": "Ranglisten",
+    "rankings_button": "🏆 Ranglisten",
+    "see_ranking": "Rangliste ansehen",
+    "ranking": "Rangliste",
+    "back_to_ranking": "← Rangliste"
   },
   "continents": {
     "Europe": "Europa",
@@ -96,6 +101,10 @@
       "title": "Unvollständige Flagge",
       "description": "Erkenne das Land trotz eines fehlenden Streifens in der Flagge.",
       "missing_part": "Fehlender Teil der Flagge"
+    },
+    "country_of_day": {
+      "title": "Land des Tages",
+      "description": "Ein Land pro Tag: Errate seine Grenzen, seine Flagge, seine Hauptstadt, finde es auf der Karte und entdecke seinen Steckbrief."
     }
   },
   "modes": {
@@ -997,6 +1006,22 @@
       "silver": "Silber",
       "gold": "Gold",
       "legend": "Legende"
+    },
+    "country_of_day_7": {
+      "title": "Weltneugierig",
+      "desc": "Spiele 7 Länder des Tages"
+    },
+    "country_of_day_30": {
+      "title": "Reisetagebuch",
+      "desc": "Spiele 30 Länder des Tages"
+    },
+    "country_of_day_100": {
+      "title": "Wandelndes Lexikon",
+      "desc": "Spiele 100 Länder des Tages"
+    },
+    "country_of_day_flawless": {
+      "title": "Fehlerfrei",
+      "desc": "Löse alle 4 Schritte des Landes des Tages beim ersten Versuch"
     }
   },
   "app_banner": {
@@ -1138,7 +1163,7 @@
     "see_leaderboard": "Survival-Rangliste ansehen",
     "leaderboard_title": "Survival-Rangliste",
     "all_combinations": "Alle Kombinationen",
-    "all_six": "Alle 6 Spiele",
+    "all_six": "Alle Spiele",
     "no_scores": "Keine Punktzahlen für diesen Filter.",
     "col_player": "Spieler",
     "col_rounds": "Runden",
@@ -1206,6 +1231,10 @@
     "quiz": {
       "title": "Geo-Quiz — Tägliches Geografie-Quiz | GeoGame",
       "description": "Eine Geografie-Frage pro Tag, um deine Freunde herauszufordern, oder Fragen am Stück in der Schwierigkeit deiner Wahl."
+    },
+    "country_of_day": {
+      "title": "Land des Tages — Das tägliche Rätselland | GeoGame",
+      "description": "Jeden Tag ein Rätselland: Errate es an Umriss, Flagge und Hauptstadt und setze es auf die Karte. Vergleiche deine Punkte mit Freunden."
     },
     "daily_challenge": {
       "title": "Tages-Challenge — 12 Geografiefragen pro Tag | GeoGame",
@@ -1404,7 +1433,10 @@
     "tier_medium": "Mittel",
     "tier_hard": "Schwer",
     "fragments_one": "+{{count}} Fragment",
-    "fragments_other": "+{{count}} Fragmente"
+    "fragments_other": "+{{count}} Fragmente",
+    "country_of_day": "Spiele das Land des Tages",
+    "country_of_day_flawless": "Schaffe das Land des Tages fehlerfrei",
+    "week_country_of_day_5": "Spiele das Land des Tages an {{count}} verschiedenen Tagen"
   },
   "level": {
     "label": "Level {{level}}",
@@ -1442,5 +1474,42 @@
     "new_flag": "Neue Flagge!",
     "view_collection": "Sammlung ansehen",
     "tap_to_continue": "Tippen zum Fortfahren"
+  },
+  "country_of_day": {
+    "intro": "Ein Land pro Tag, für alle dasselbe: Errate es in 4 Schritten und lerne es dann kennen.",
+    "mode_title": "Wie möchtest du spielen?",
+    "mode_choice": "Multiple Choice",
+    "mode_choice_desc": "4 Antworten zur Auswahl bei jedem Schritt",
+    "mode_free": "Freie Antwort",
+    "mode_free_desc": "Du tippst Land und Hauptstadt, 8 Flaggen zur Auswahl · Punkte ×1,5",
+    "mode_locked": "Diese Wahl gilt für den ganzen Tag.",
+    "start": "Los geht’s",
+    "continue": "Fortsetzen",
+    "step": "Schritt {{n}}/{{total}}",
+    "step_borders": "Welches Land ist das?",
+    "step_flag": "Welche ist seine Flagge?",
+    "step_capital": "Was ist seine Hauptstadt?",
+    "step_placement": "Wo liegt es?",
+    "placement_hint": "Klicke auf der Karte auf das Land.",
+    "tries_left_one": "Noch {{count}} Versuch",
+    "tries_left_other": "Noch {{count}} Versuche",
+    "placeholder_country": "Name des Landes…",
+    "placeholder_capital": "Name der Hauptstadt…",
+    "submit": "Bestätigen",
+    "unknown_country": "Dieses Land gibt es im Spiel nicht",
+    "already_tried": "Schon versucht",
+    "right": "Bravo!",
+    "wrong": "Falsch, versuch es nochmal",
+    "missed": "Die Antwort war: {{answer}}",
+    "points": "+{{count}} Pkt.",
+    "next": "Nächster Schritt",
+    "see_sheet": "Steckbrief ansehen",
+    "sheet_title": "Gut zu wissen",
+    "score": "{{score}} / {{max}} Pkt.",
+    "mode_played": "Gespielt als {{mode}}",
+    "leaderboard": "Rangliste des Tages",
+    "see_atlas": "Im Atlas ansehen",
+    "come_back": "Komm morgen für ein neues Land wieder!",
+    "share": "Mein Ergebnis teilen"
   }
 }

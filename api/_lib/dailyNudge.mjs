@@ -34,7 +34,7 @@ export const NUDGE_GAMES = {
   COUNTRY_CLUE: 'country_clue',
   VOYAGE_VOYAGE: 'voyage_voyage',
   RANKING: 'ranking',
-  QUIZ: 'quiz',
+  COUNTRY_OF_DAY: 'country_of_day',
 }
 
 // Games that can be nudged after a regular game (no daily challenge needed).
@@ -67,6 +67,21 @@ const CHALLENGE_BODY = {
   nl: '{{username}} heeft de {{game}} uitgespeeld. Kom me maar verslaan! 😏',
 }
 
+// The Country of the Day's title says "of the day" too, with its article in some languages ("Le Pays du jour"):
+// that article is put in lower case (lowerArticle) instead of adding one.
+const COUNTRY_OF_DAY_BODY = {
+  fr: '{{username}} a terminé {{game}}. Bah alors, viens me battre ! 😏',
+  en: '{{username}} just finished the {{game}}. Come and beat me! 😏',
+  ru: '{{username}} прошёл(а) «{{game}}». Ну что, приходи побеждать! 😏',
+  es: '{{username}} ha terminado {{game}}. ¿Y bien? ¡Ven a ganarme! 😏',
+  pt: '{{username}} terminou {{game}}. E aí, vem me vencer! 😏',
+  de: '{{username}} hat das {{game}} geschafft. Na, komm und schlag mich! 😏',
+  it: '{{username}} ha finito {{game}}. Allora, vieni a battermi! 😏',
+  uk: '{{username}} пройшов(ла) «{{game}}». Ну що, приходь мене перемогти! 😏',
+  nl: '{{username}} heeft het {{game}} uitgespeeld. Kom me maar verslaan! 😏',
+}
+const lowerArticle = (title) => title.replace(/^(Le|La|El|O|Il) /, (article) => article.toLowerCase())
+
 const RECENT_BODY = {
   fr: '{{username}} vient de jouer à {{game}}{{score}}. Viens me battre ! 😏',
   en: '{{username}} just played {{game}}{{score}}. Come and beat me! 😏',
@@ -84,10 +99,12 @@ export function nudgeMessage(lang, username, gameType, { recent = false, score =
   const locale = LOCALES[lang] ? lang : 'en'
   const game = LOCALES[locale].games?.[RECENT_GAMES[gameType]]?.title ?? gameType
   const points = recent && Number.isFinite(score) ? ` (${Math.round(score)} pts)` : ''
-  const bodies = recent ? RECENT_BODY : gameType === 'DAILY_CHALLENGE' ? CHALLENGE_BODY : BODY
+  const bodies = recent
+    ? RECENT_BODY
+    : gameType === 'DAILY_CHALLENGE' ? CHALLENGE_BODY : gameType === 'COUNTRY_OF_DAY' ? COUNTRY_OF_DAY_BODY : BODY
   return bodies[locale]
     .replace('{{username}}', username)
-    .replace('{{game}}', game)
+    .replace('{{game}}', bodies === COUNTRY_OF_DAY_BODY ? lowerArticle(game) : game)
     .replace('{{score}}', points)
 }
 

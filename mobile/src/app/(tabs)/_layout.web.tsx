@@ -4,6 +4,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { Tabs } from 'expo-router/js-tabs'
 import type { ComponentProps } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { colors, fonts } from '@/theme'
 
@@ -18,14 +19,17 @@ const TABS: { name: string; labelKey: string; icon: IconName; iconSelected: Icon
 
 export default function TabsLayout() {
   const { t } = useTranslation()
+  const insets = useSafeAreaInsets()
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.accent,
         tabBarInactiveTintColor: colors.textMuted,
-        tabBarStyle: { backgroundColor: colors.bg, borderTopColor: colors.border },
-        tabBarLabelStyle: { fontFamily: fonts.bodyBold, fontSize: 11 },
+        // The default 49px bar clips the bottom of the Inter labels ("Jouer", "Profil"): taller bar, explicit line
+        // height. A custom height replaces the default one, so the iPhone home indicator inset is added back here.
+        tabBarStyle: { backgroundColor: colors.bg, borderTopColor: colors.border, height: 56 + insets.bottom },
+        tabBarLabelStyle: { fontFamily: fonts.bodyBold, fontSize: 11, lineHeight: 14 },
         sceneStyle: { backgroundColor: colors.bg },
       }}>
       {TABS.map((tab) => (

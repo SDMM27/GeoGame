@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ATLAS_COUNTRIES, findAtlasCountry, getCountryInfo, getNeighbors, mainPartBounds, searchAtlasCountries } from './countryInfo'
+import { ATLAS_COUNTRIES, findAtlasCountry, getAtlasRanking, getCountryInfo, getNeighbors, mainPartBounds, searchAtlasCountries } from './countryInfo'
 
 describe('getCountryInfo', () => {
   it('gathers what the data says about a country', () => {
@@ -23,6 +23,21 @@ describe('getCountryInfo', () => {
   it('ranks the most populated country first', () => {
     const ranked = ATLAS_COUNTRIES.map((feature) => getCountryInfo(feature, 'fr')).filter((info) => info.populationRank?.rank === 1)
     expect(ranked).toHaveLength(1)
+  })
+})
+
+describe('getAtlasRanking', () => {
+  it('ranks the countries with a value, largest first, with the ranks of the info sheet', () => {
+    for (const metric of ['population', 'area', 'gdp', 'gdpPerCapita', 'density']) {
+      const ranking = getAtlasRanking(metric, 'fr')
+      expect(ranking.length).toBeGreaterThan(150)
+      expect(ranking.map((row) => row.rank)).toEqual(ranking.map((_, index) => index + 1))
+      expect(ranking.every((row, index) => index === 0 || row.value <= ranking[index - 1].value)).toBe(true)
+    }
+    const france = getCountryInfo(findAtlasCountry('France'), 'fr')
+    const row = getAtlasRanking('gdpPerCapita', 'fr').find((r) => r.admin === 'France')
+    expect(france.gdpPerCapitaRank).toEqual({ rank: row.rank, total: getAtlasRanking('gdpPerCapita', 'fr').length })
+    expect(getAtlasRanking('area', 'en')[0].name).toBe('Russia')
   })
 })
 

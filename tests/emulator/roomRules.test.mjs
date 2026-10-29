@@ -161,8 +161,11 @@ describe('creating a room', () => {
   })
 
   it('creates a survival room, with known games and lives only', async () => {
-    const survival = game({ id: 'survival', type: 'SURVIVAL', difficulty: null, modes: 'FLAGS+BORDER_GUESS+QUIZ', lives: 3, timer: 30, ramp: { Facile: 2, Moyen: 0, Difficile: 6 } })
+    const survival = game({ id: 'survival', type: 'SURVIVAL', difficulty: null, modes: 'FLAGS+BORDER_GUESS+CAPITALS', lives: 3, timer: 30, ramp: { Facile: 2, Moyen: 0, Difficile: 6 } })
     await assertSucceeds(createRoom({ games: [survival], game: survival }))
+    // The hidden Geo Quiz can no longer be a survival round
+    const quizRounds = game({ id: 'survival', type: 'SURVIVAL', difficulty: null, modes: 'FLAGS+QUIZ', lives: 3 })
+    await assertFails(createRoom({ games: [quizRounds], game: quizRounds }, 'host', { room: 'XYZ784' }))
     const cheat = game({ id: 'survival', type: 'SURVIVAL', difficulty: null, modes: 'FLAGS+CHEAT', lives: 3 })
     await assertFails(createRoom({ games: [cheat], game: cheat }, 'host', { room: 'XYZ789' }))
     const lives = game({ id: 'survival', type: 'SURVIVAL', difficulty: null, modes: 'FLAGS', lives: 99 })

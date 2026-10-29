@@ -14,7 +14,7 @@ import { getTotalFlagCountries } from '../../hooks/useFlagGameState'
 import { getTotalCapitalCountries } from '../../hooks/useCapitalsGameState'
 import { parseSurvivalModes, survivalModesKey } from '../../utils/survivalConfig'
 import SurvivalOptions, { SURVIVAL_ROUND_ICONS, defaultSurvivalOptions, rampLabel, timerLabel } from '../SurvivalOptions'
-import { ROOM_GAMES, roomGameIcon } from '../../utils/roomGames'
+import { LISTED_ROOM_GAMES, ROOM_GAMES, roomGameIcon } from '../../utils/roomGames'
 import './RoomConfig.css'
 
 const DEFAULT_ASCENSION_PRESET = ASCENSION_PRESETS.find(p => p.name === 'Découverte') ?? ASCENSION_PRESETS[0]
@@ -188,7 +188,7 @@ export function GameEditor({ draft, onChange }) {
   return (
     <>
       <div className="rc-game-grid">
-        {ROOM_GAMES.map(g => (
+        {LISTED_ROOM_GAMES.map(g => (
           <button
             key={g.id}
             type="button"
@@ -258,7 +258,7 @@ export default function RoomConfig({ onSubmit, submitting, initialGameId, initia
   const [games, setGames] = useState([])
   const [draft, setDraft] = useState(() => {
     const fresh = newDraft()
-    if (!ROOM_GAMES.some(g => g.id === initialGameId)) return fresh
+    if (!LISTED_ROOM_GAMES.some(g => g.id === initialGameId)) return fresh
     return {
       ...fresh,
       gameId: initialGameId,

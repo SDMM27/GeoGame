@@ -1,7 +1,8 @@
 // Splits the full-resolution country dataset into two files the website can load separately:
 //
 //   src/data/countries.meta.json  properties only (names, difficulty, ISO, continent, population,
-//                                 capital...) + areaKm2 and center computed from the FULL geometry.
+//                                 capital...) + areaKm2 (official total area from countryAreas.json, else
+//                                 computed from the FULL geometry) and center.
 //                                 Small enough to stay in the main bundle: the games pick their
 //                                 questions from it synchronously.
 //   src/data/countries.geo.json   simplified geometries, in the same order as the features of the
@@ -45,13 +46,16 @@ const roundPolygon = (polygon) =>
   polygon.map((ring) => ring.map(([lng, lat]) => [Number(round(lng).toFixed(3)), Number(round(lat).toFixed(3))]))
 
 const source = JSON.parse(readFileSync(join(dataDir, 'countriesWithDifficulty_FR.json'), 'utf8'))
+// Official total areas (inland water included) by ISO_A2: the map outlines leave out the lakes and are too coarse to rank
+// the large countries (they put Canada 4th)
+const officialAreas = JSON.parse(readFileSync(join(dataDir, 'countryAreas.json'), 'utf8'))
 
 // 1. Metadata, with the values that need the full-resolution geometry
 const meta = source.features.map((feature) => {
   const { lat, lng } = getGeographicCenter(feature)
   return {
     type: 'Feature',
-    properties: { ...feature.properties, areaKm2: getCountryAreaKm2(feature), center: [lng, lat] },
+    properties: { ...feature.properties, areaKm2: officialAreas[feature.properties.ISO_A2] ?? getCountryAreaKm2(feature), center: [lng, lat] },
     geometry: null,
   }
 })
@@ -62,7 +66,7 @@ const tmp = mkdtempSync(join(tmpdir(), 'geogame-geo-'))
 const originalPolygons = []
 const exploded = source.features.map((feature, index) => {
   polygonsOf(feature.geometry).forEach((polygon) => originalPolygons.push({ index, polygon }))
-  return { type: 'Feature', properties: { i: index, small: meta[index].properties.areaKm2 < SMALL_COUNTRY_KM2 }, geometry: feature.geometry }
+  return { type: 'Feature', properties: { i: index, small: getCountryAreaKm2(feature) < SMALL_COUNTRY_KM2 }, geometry: feature.geometry }
 })
 
 // Small countries get a much finer tolerance: at 1 km an island such as Dominica keeps ~20 vertices

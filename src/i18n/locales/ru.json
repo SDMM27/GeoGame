@@ -23,7 +23,12 @@
     "unknown": "Нет данных",
     "open": "Открыть атлас",
     "history": "История",
-    "history_quiz": "📜 Проверить знания истории"
+    "history_quiz": "📜 Проверить знания истории",
+    "rankings": "Рейтинги",
+    "rankings_button": "🏆 Рейтинги",
+    "see_ranking": "Открыть рейтинг",
+    "ranking": "Рейтинг",
+    "back_to_ranking": "← Рейтинг"
   },
   "continents": {
     "Europe": "Европа",

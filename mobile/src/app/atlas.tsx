@@ -12,8 +12,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import {
   countryDisplayName,
   findAtlasCountry,
-  formatCompactNumber,
-  formatNumber,
   getCountryInfo,
   mainPartBounds,
   searchAtlasCountries,
@@ -22,6 +20,8 @@ import {
 import countryHistory from '@shared/data/countryHistory.json'
 import { HISTORY_COUNTRIES } from '@shared/utils/quizQuestions'
 
+import { RankingSheet } from '@/components/atlas/RankingSheet'
+import { formatMetric, type Metric } from '@/components/atlas/format'
 import { WorldMap, type MapLayer, type WorldMapHandle } from '@/components/map/WorldMap'
 import { Button, Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
@@ -47,16 +47,18 @@ type Info = {
   areaKm2: number | null
   areaRank: Rank
   density: number | null
+  densityRank: Rank
   gdp: number | null
   gdpRank: Rank
   gdpPerCapita: number | null
+  gdpPerCapitaRank: Rank
   neighbors: Neighbor[]
   difficulty: { placement: string | null; flags: string | null; capitals: string | null }
 }
 
 type TimelineEvent = { year: string; text: Record<string, string> }
 
-function Fact({ label, value, rank }: { label: string; value: string; rank?: Rank }) {
+function Fact({ label, value, rank, onRank }: { label: string; value: string; rank?: Rank; onRank?: () => void }) {
   const { t } = useTranslation()
   return (
     <View style={styles.fact}>
@@ -65,15 +67,32 @@ function Fact({ label, value, rank }: { label: string; value: string; rank?: Ran
         {value}
       </Text>
       {rank && (
-        <Text variant="caption" color={colors.highlight}>
-          {t(rank.rank === 1 ? 'atlas.rank_first' : 'atlas.rank', rank)}
-        </Text>
+        <Touchable accessibilityRole="button" accessibilityLabel={t('atlas.see_ranking')} onPress={onRank} style={styles.rankLink}>
+          <Text variant="caption" color={colors.highlight}>
+            {t(rank.rank === 1 ? 'atlas.rank_first' : 'atlas.rank', rank)}
+          </Text>
+          <MaterialCommunityIcons name="chevron-right" size={14} color={colors.highlight} />
+        </Touchable>
       )}
     </View>
   )
 }
 
-function CountrySheet({ info, onSelect, onClose, maxHeight }: { info: Info; onSelect: (admin: string) => void; onClose: () => void; maxHeight: number }) {
+function CountrySheet({
+  info,
+  onSelect,
+  onClose,
+  onRanking,
+  onBack,
+  maxHeight,
+}: {
+  info: Info
+  onSelect: (admin: string) => void
+  onClose: () => void
+  onRanking: (metric: Metric) => void
+  onBack?: () => void
+  maxHeight: number
+}) {
   const { t, i18n } = useTranslation()
   const insets = useSafeAreaInsets()
   const lang = i18n.language
@@ -95,6 +114,13 @@ function CountrySheet({ info, onSelect, onClose, maxHeight }: { info: Info; onSe
       entering={Platform.OS === 'android' ? FadeInDown.duration(220) : SlideInDown.springify().damping(20)}
       style={[styles.sheet, { maxHeight }]}>
       <ScrollView contentContainerStyle={{ padding: space.lg, gap: space.lg, paddingBottom: insets.bottom + space.lg }}>
+        {onBack && (
+          <Touchable accessibilityRole="button" onPress={onBack} style={styles.back}>
+            <Text variant="label" color={colors.highlight}>
+              {t('atlas.back_to_ranking')}
+            </Text>
+          </Touchable>
+        )}
         <View style={styles.sheetHeader}>
           {flag && <Image source={flag} contentFit="cover" style={styles.flag} accessible={false} alt="" />}
           <View style={{ flex: 1 }}>
@@ -110,16 +136,35 @@ function CountrySheet({ info, onSelect, onClose, maxHeight }: { info: Info; onSe
 
         <View style={styles.facts}>
           <Fact label={t('atlas.capital')} value={info.capital ?? unknown} />
-          <Fact label={t('atlas.population')} value={info.population ? formatCompactNumber(info.population, lang) : unknown} rank={info.populationRank} />
-          <Fact label={t('atlas.area')} value={info.areaKm2 ? `${formatNumber(info.areaKm2, lang)} km²` : unknown} rank={info.areaRank} />
+          <Fact
+            label={t('atlas.population')}
+            value={info.population ? formatMetric('population', info.population, t, lang) : unknown}
+            rank={info.populationRank}
+            onRank={() => onRanking('population')}
+          />
+          <Fact
+            label={t('atlas.area')}
+            value={info.areaKm2 ? formatMetric('area', info.areaKm2, t, lang) : unknown}
+            rank={info.areaRank}
+            onRank={() => onRanking('area')}
+          />
           <Fact
             label={t('atlas.density')}
-            value={info.density ? `${formatNumber(info.density, lang, info.density < 10 ? 1 : 0)} ${t('atlas.per_km2')}` : unknown}
+            value={info.density ? formatMetric('density', info.density, t, lang) : unknown}
+            rank={info.densityRank}
+            onRank={() => onRanking('density')}
           />
-          <Fact label={t('atlas.gdp')} value={info.gdp ? t('atlas.billion_usd', { value: formatNumber(info.gdp, lang) }) : unknown} rank={info.gdpRank} />
+          <Fact
+            label={t('atlas.gdp')}
+            value={info.gdp ? formatMetric('gdp', info.gdp, t, lang) : unknown}
+            rank={info.gdpRank}
+            onRank={() => onRanking('gdp')}
+          />
           <Fact
             label={t('atlas.gdp_per_capita')}
-            value={info.gdpPerCapita ? t('atlas.usd', { value: formatNumber(info.gdpPerCapita, lang) }) : unknown}
+            value={info.gdpPerCapita ? formatMetric('gdpPerCapita', info.gdpPerCapita, t, lang) : unknown}
+            rank={info.gdpPerCapitaRank}
+            onRank={() => onRanking('gdpPerCapita')}
           />
         </View>
 
@@ -196,6 +241,10 @@ export default function AtlasScreen() {
   const mapRef = useRef<WorldMapHandle>(null)
   const [selected, setSelected] = useState<string | null>(null)
   const [query, setQuery] = useState('')
+  // The open ranking's metric (the ranking sheet is open when set), and whether the country sheet came from a ranking row
+  const [ranking, setRanking] = useState<Metric | null>(null)
+  const [lastMetric, setLastMetric] = useState<Metric>('population')
+  const [fromRanking, setFromRanking] = useState(false)
   const sheetHeight = Math.round(height * 0.55)
   // Back button / search row over the top of the map
   const topBarHeight = insets.top + space.sm + 44
@@ -255,14 +304,35 @@ export default function AtlasScreen() {
     [frame]
   )
 
+  // Any selection other than a ranking row leaves the ranking
+  const selectCountry = (admin: string) => {
+    setRanking(null)
+    setFromRanking(false)
+    select(admin)
+  }
+
+  const openRanking = (metric: Metric) => {
+    Keyboard.dismiss()
+    setQuery('')
+    setLastMetric(metric)
+    setRanking(metric)
+  }
+
+  const pickFromRanking = (admin: string) => {
+    setRanking(null)
+    setFromRanking(true)
+    select(admin)
+  }
+
   const close = () => {
     setSelected(null)
+    setFromRanking(false)
     mapRef.current?.geoJson.resetStyle()
   }
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.ocean }}>
-      <WorldMap ref={mapRef} onCountryPress={(layer) => select(layer.feature.properties.ADMIN)} onResize={() => pendingFrame.current && frame()} />
+      <WorldMap ref={mapRef} onCountryPress={(layer) => selectCountry(layer.feature.properties.ADMIN)} onResize={() => pendingFrame.current && frame()} />
 
       <View pointerEvents="box-none" style={[styles.top, { top: insets.top + space.sm }]}>
         <View style={styles.searchRow}>
@@ -278,10 +348,13 @@ export default function AtlasScreen() {
               placeholderTextColor={colors.textMuted}
               autoCorrect={false}
               returnKeyType="search"
-              onSubmitEditing={() => results[0] && select(results[0].properties.ADMIN)}
+              onSubmitEditing={() => results[0] && selectCountry(results[0].properties.ADMIN)}
               style={styles.searchInput}
             />
           </View>
+          <Touchable accessibilityRole="button" accessibilityLabel={clean(t('atlas.rankings_button'))} onPress={() => openRanking(lastMetric)} style={styles.iconButton}>
+            <MaterialCommunityIcons name="trophy-outline" size={20} color={colors.text} />
+          </Touchable>
         </View>
         {query.trim() !== '' && (
           <Animated.View entering={FadeIn.duration(150)} style={styles.results}>
@@ -293,7 +366,7 @@ export default function AtlasScreen() {
               results.map((feature: any) => {
                 const flag = getFlag(feature.properties.ISO_A2)
                 return (
-                  <Touchable key={feature.properties.ADMIN} onPress={() => select(feature.properties.ADMIN)} style={styles.result}>
+                  <Touchable key={feature.properties.ADMIN} onPress={() => selectCountry(feature.properties.ADMIN)} style={styles.result}>
                     {flag && <Image source={flag} contentFit="cover" style={styles.chipFlag} accessible={false} alt="" />}
                     <Text variant="body">{countryDisplayName(feature, i18n.language)}</Text>
                   </Touchable>
@@ -302,14 +375,38 @@ export default function AtlasScreen() {
             )}
           </Animated.View>
         )}
-        {!info && query.trim() === '' && (
+        {!info && !ranking && query.trim() === '' && (
           <Text variant="caption" style={styles.hint}>
             {t('atlas.subtitle')}
           </Text>
         )}
       </View>
 
-      {info && <CountrySheet key={info.admin} info={info} onSelect={select} onClose={close} maxHeight={sheetHeight} />}
+      {ranking ? (
+        <RankingSheet
+          metric={ranking}
+          selected={selected}
+          onMetric={(metric) => {
+            setLastMetric(metric)
+            setRanking(metric)
+          }}
+          onPick={pickFromRanking}
+          onClose={() => setRanking(null)}
+          maxHeight={sheetHeight}
+        />
+      ) : (
+        info && (
+          <CountrySheet
+            key={info.admin}
+            info={info}
+            onSelect={selectCountry}
+            onClose={close}
+            onRanking={openRanking}
+            onBack={fromRanking ? () => setRanking(lastMetric) : undefined}
+            maxHeight={sheetHeight}
+          />
+        )
+      )}
     </View>
   )
 }
@@ -367,6 +464,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
+  rankLink: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start' },
+  back: { alignSelf: 'flex-start' },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
   chip: {
     flexDirection: 'row',

@@ -23,7 +23,12 @@
     "unknown": "Sconosciuto",
     "open": "Apri l'atlante",
     "history": "Storia",
-    "history_quiz": "📜 Mettimi alla prova sulla sua storia"
+    "history_quiz": "📜 Mettimi alla prova sulla sua storia",
+    "rankings": "Classifiche",
+    "rankings_button": "🏆 Classifiche",
+    "see_ranking": "Vedi la classifica",
+    "ranking": "Classifica",
+    "back_to_ranking": "← Classifica"
   },
   "continents": {
     "Europe": "Europa",

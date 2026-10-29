@@ -23,7 +23,12 @@
     "unknown": "Unbekannt",
     "open": "Atlas öffnen",
     "history": "Geschichte",
-    "history_quiz": "📜 Mein Wissen über die Geschichte testen"
+    "history_quiz": "📜 Mein Wissen über die Geschichte testen",
+    "rankings": "Ranglisten",
+    "rankings_button": "🏆 Ranglisten",
+    "see_ranking": "Rangliste ansehen",
+    "ranking": "Rangliste",
+    "back_to_ranking": "← Rangliste"
   },
   "continents": {
     "Europe": "Europa",

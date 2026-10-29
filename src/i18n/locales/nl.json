@@ -23,7 +23,12 @@
     "unknown": "Onbekend",
     "open": "Open de atlas",
     "history": "Geschiedenis",
-    "history_quiz": "📜 Overhoor me over de geschiedenis"
+    "history_quiz": "📜 Overhoor me over de geschiedenis",
+    "rankings": "Ranglijsten",
+    "rankings_button": "🏆 Ranglijsten",
+    "see_ranking": "Bekijk de ranglijst",
+    "ranking": "Ranglijst",
+    "back_to_ranking": "← Ranglijst"
   },
   "continents": {
     "Europe": "Europa",

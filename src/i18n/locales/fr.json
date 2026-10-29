@@ -23,7 +23,12 @@
     "unknown": "Non renseigné",
     "open": "Ouvrir l’atlas",
     "history": "Histoire",
-    "history_quiz": "📜 Me tester sur son histoire"
+    "history_quiz": "📜 Me tester sur son histoire",
+    "rankings": "Classements",
+    "rankings_button": "🏆 Classements",
+    "see_ranking": "Voir le classement",
+    "ranking": "Classement",
+    "back_to_ranking": "← Classement"
   },
   "continents": {
     "Europe": "Europe",

@@ -13,21 +13,50 @@ export const ATLAS_COUNTRIES = countries.features.filter((feature) => feature.pr
 const BY_ISO = new Map(ATLAS_COUNTRIES.map((feature) => [feature.properties.ISO_A2.toUpperCase(), feature]))
 const BY_ADMIN = new Map(countries.features.map((feature) => [feature.properties.ADMIN, feature]))
 
-// 1 for the largest value
-function ranks(value) {
-  const sorted = ATLAS_COUNTRIES.map((feature) => [feature.properties.ADMIN, value(feature)])
-    .filter(([, v]) => v != null && v > 0)
-    .sort((a, b) => b[1] - a[1])
-  return { byName: new Map(sorted.map(([name], index) => [name, index + 1])), total: sorted.length }
+// What the atlas ranks countries by, each read from a country's feature (null when the data has no value)
+const populationOf = (feature) => (feature.properties.population > 0 ? feature.properties.population : null)
+const gdpOf = (feature) => (feature.properties.gdp > 0 ? feature.properties.gdp : null)
+const areaOf = (feature) => getCountryAreaKm2(feature) || null
+export const RANKING_METRICS = {
+  population: populationOf,
+  area: areaOf,
+  gdp: gdpOf,
+  gdpPerCapita: (feature) => (gdpOf(feature) && populationOf(feature) ? (gdpOf(feature) * 1e9) / populationOf(feature) : null),
+  density: (feature) => (populationOf(feature) && areaOf(feature) ? populationOf(feature) / areaOf(feature) : null),
 }
 
-let rankCache = null
-const getRanks = () =>
-  (rankCache ??= {
-    population: ranks((feature) => feature.properties.population),
-    area: ranks((feature) => getCountryAreaKm2(feature)),
-    gdp: ranks((feature) => feature.properties.gdp),
-  })
+// Not a country: it would top the areas (and the data gives it a population)
+const UNRANKED = new Set(['AQ'])
+
+// The countries with a value, largest first: [{ feature, value, rank }] (1 for the largest)
+function rankBy(metric) {
+  return ATLAS_COUNTRIES.filter((feature) => !UNRANKED.has(feature.properties.ISO_A2)).map((feature) => ({ feature, value: RANKING_METRICS[metric](feature) }))
+    .filter(({ value }) => value != null && value > 0)
+    .sort((a, b) => b.value - a.value)
+    .map((entry, index) => ({ ...entry, rank: index + 1 }))
+}
+
+const rankCache = new Map()
+function getRanks(metric) {
+  if (!rankCache.has(metric)) {
+    const sorted = rankBy(metric)
+    rankCache.set(metric, { sorted, byName: new Map(sorted.map(({ feature, rank }) => [feature.properties.ADMIN, rank])), total: sorted.length })
+  }
+  return rankCache.get(metric)
+}
+
+/**
+ * The atlas ranking of the countries by `metric` (a key of RANKING_METRICS), largest first, named in `lang`:
+ * [{ admin, iso, name, value, rank }]. Countries the data has no value for are left out.
+ */
+export const getAtlasRanking = (metric, lang) =>
+  getRanks(metric).sorted.map(({ feature, value, rank }) => ({
+    admin: feature.properties.ADMIN,
+    iso: feature.properties.ISO_A2,
+    name: countryDisplayName(feature, lang),
+    value,
+    rank,
+  }))
 
 export function flagEmoji(iso) {
   if (!iso || iso.length !== 2) return ''
@@ -53,18 +82,20 @@ export function getNeighbors(feature, lang) {
 /**
  * The info sheet of a country (a feature of the dataset), in `lang`:
  * { admin, name, iso, flag, continent, capital, population, populationRank, areaKm2, areaRank, density, gdp (billion $),
- *   gdpRank, gdpPerCapita ($), neighbors: [{ admin, iso, name }], difficulty: { placement, flags, capitals }, center }.
+ *   gdpRank, gdpPerCapita ($), gdpPerCapitaRank, densityRank, neighbors: [{ admin, iso, name }], difficulty: { placement, flags, capitals }, center }.
  * Ranks are { rank, total } among the countries with an ISO code, 1 for the largest.
  */
 export function getCountryInfo(feature, lang) {
   if (!feature) return null
   const p = feature.properties
   const iso = p.ISO_A2 ? p.ISO_A2.toUpperCase() : null
-  const { population: popRanks, area: areaRanks, gdp: gdpRanks } = getRanks()
-  const rankOf = (table) => (table.byName.has(p.ADMIN) ? { rank: table.byName.get(p.ADMIN), total: table.total } : null)
-  const population = p.population > 0 ? p.population : null
-  const areaKm2 = getCountryAreaKm2(feature) || null
-  const gdp = p.gdp > 0 ? p.gdp : null
+  const rankOf = (metric) => {
+    const table = getRanks(metric)
+    return table.byName.has(p.ADMIN) ? { rank: table.byName.get(p.ADMIN), total: table.total } : null
+  }
+  const population = RANKING_METRICS.population(feature)
+  const areaKm2 = RANKING_METRICS.area(feature)
+  const gdp = RANKING_METRICS.gdp(feature)
   return {
     admin: p.ADMIN,
     name: countryDisplayName(feature, lang),
@@ -73,13 +104,15 @@ export function getCountryInfo(feature, lang) {
     continent: p.continent ?? null,
     capital: (iso && getCapitalName(iso, lang)) || p.capital || null,
     population,
-    populationRank: rankOf(popRanks),
+    populationRank: rankOf('population'),
     areaKm2,
-    areaRank: rankOf(areaRanks),
-    density: population && areaKm2 ? population / areaKm2 : null,
+    areaRank: rankOf('area'),
+    density: RANKING_METRICS.density(feature),
+    densityRank: rankOf('density'),
     gdp,
-    gdpRank: rankOf(gdpRanks),
-    gdpPerCapita: gdp && population ? (gdp * 1e9) / population : null,
+    gdpRank: rankOf('gdp'),
+    gdpPerCapita: RANKING_METRICS.gdpPerCapita(feature),
+    gdpPerCapitaRank: rankOf('gdpPerCapita'),
     neighbors: getNeighbors(feature, lang),
     difficulty: { placement: p.Difficulty ?? null, flags: p.DifficultyFlag ?? null, capitals: p.DifficultyCapitals ?? null },
     center: getGeographicCenter(feature),

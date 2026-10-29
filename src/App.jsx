@@ -5,6 +5,8 @@ import HomePage from "./pages/HomePage";
 import RouteFallback from "./components/RouteFallback";
 import RouteMeta from "./components/RouteMeta";
 import XpToast from "./components/XpToast";
+import FragmentToast from "./components/collection/FragmentToast";
+import FlagUnlockOverlay from "./components/collection/FlagUnlockOverlay";
 import PresenceHeartbeat from "./components/PresenceHeartbeat";
 import InviteBanner from "./components/multiplayer/InviteBanner";
 import RouteErrorBoundary, { ErrorBoundary } from "./components/RouteErrorBoundary";
@@ -44,6 +46,8 @@ export default function App() {
         <RouteMeta />
         <InviteBanner />
         <XpToast />
+        <FragmentToast />
+        <FlagUnlockOverlay />
         <PresenceHeartbeat />
         <RouteErrorBoundary>
           <Suspense fallback={<RouteFallback />}>

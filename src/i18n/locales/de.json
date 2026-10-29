@@ -1438,6 +1438,9 @@
       "uncommon": "Ungewöhnlich",
       "rare": "Selten",
       "legendary": "Legendär"
-    }
+    },
+    "new_flag": "Neue Flagge!",
+    "view_collection": "Sammlung ansehen",
+    "tap_to_continue": "Tippen zum Fortfahren"
   }
 }

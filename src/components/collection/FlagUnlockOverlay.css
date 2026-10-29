@@ -1,0 +1,292 @@
+.flag-reveal {
+  --w: clamp(240px, 30vw, 300px);
+  --h: calc(var(--w) * 2 / 3);
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+}
+
+.flag-reveal--leaving { animation: flag-reveal-out 0.22s ease-in forwards; }
+
+.flag-reveal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(6, 10, 22, 0.94);
+  animation: flag-reveal-fade 0.25s ease-out both;
+}
+
+.flag-reveal-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 100%;
+  padding: 0 24px 56px;
+  pointer-events: none;
+}
+
+.flag-reveal-content button { pointer-events: auto; }
+
+.flag-reveal-stage {
+  position: relative;
+  width: var(--w);
+  height: var(--h);
+  margin-bottom: 48px;
+}
+
+/* Everything centered on the flag */
+.flag-reveal-glow, .flag-reveal-rays, .flag-reveal-ring, .flag-reveal-particle, .flag-reveal-twinkle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+}
+
+.flag-reveal-glow {
+  width: calc(var(--w) * 1.6);
+  aspect-ratio: 1;
+  margin: calc(var(--w) * -0.8) 0 0 calc(var(--w) * -0.8);
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--rarity) 0%, transparent 68%);
+  opacity: 0.32;
+  animation: flag-reveal-fade 0.25s ease-out both, flag-reveal-glow 2.8s ease-in-out infinite alternate;
+}
+
+.flag-reveal-rays {
+  width: 560px;
+  height: 560px;
+  margin: -280px 0 0 -280px;
+  background: repeating-conic-gradient(from 0deg, var(--rarity) 0deg 7deg, transparent 7deg 30deg);
+  -webkit-mask-image: radial-gradient(circle, #000 15%, transparent 68%);
+  mask-image: radial-gradient(circle, #000 15%, transparent 68%);
+  opacity: var(--rays);
+  animation: flag-reveal-spin 20s linear infinite;
+}
+
+.flag-reveal-box {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  animation: flag-reveal-pulse 0.6s var(--landed) both;
+}
+
+.flag-reveal-pieces {
+  position: absolute;
+  inset: 0;
+  animation: flag-reveal-hide 0.06s var(--landed) forwards;
+}
+
+.flag-reveal-piece {
+  position: absolute;
+  background-repeat: no-repeat;
+  animation:
+    flag-reveal-fly var(--flight) var(--delay) cubic-bezier(0.34, 1.56, 0.64, 1) both,
+    flag-reveal-appear 0.18s var(--delay) both;
+}
+
+.flag-reveal-flag {
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--rarity);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--bg-card-hover);
+  opacity: 0;
+  animation: flag-reveal-show 0.06s var(--landed) forwards;
+}
+
+.flag-reveal-flag img { display: block; width: 100%; height: 100%; object-fit: fill; }
+
+.flag-reveal-flash { position: absolute; inset: 0; background: #fff; opacity: 0; animation: flag-reveal-flash 0.35s var(--landed) both; }
+
+.flag-reveal-shine {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  width: 50px;
+  height: calc(100% + 80px);
+  background: rgba(255, 255, 255, 0.4);
+  opacity: 0;
+  animation: flag-reveal-shine 0.65s calc(var(--landed) + 80ms) ease-in-out both;
+}
+
+.flag-reveal-ring {
+  width: var(--w);
+  height: var(--w);
+  margin: calc(var(--w) / -2) 0 0 calc(var(--w) / -2);
+  border: 3px solid var(--rarity);
+  border-radius: 50%;
+  opacity: 0;
+  animation: flag-reveal-ring 0.75s var(--landed) cubic-bezier(0.215, 0.61, 0.355, 1) both;
+}
+
+.flag-reveal-ring--second { animation-duration: 0.85s; animation-delay: calc(var(--landed) + 200ms); }
+
+.flag-reveal-particle {
+  --tint: var(--rarity);
+  width: var(--size);
+  height: var(--size);
+  margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+  border-radius: 50%;
+  background: var(--tint);
+  opacity: 0;
+  animation:
+    flag-reveal-travel 0.9s var(--landed) cubic-bezier(0.215, 0.61, 0.355, 1) both,
+    flag-reveal-burst 0.9s var(--landed) linear both;
+}
+
+.flag-reveal-particle--white { --tint: #fff; }
+
+/* Four-point star: two thin bars crossing */
+.flag-reveal-sparkle { background: none; border-radius: 0; }
+.flag-reveal-sparkle::before, .flag-reveal-sparkle::after { content: ''; position: absolute; background: var(--tint, var(--rarity)); border-radius: 1px; }
+.flag-reveal-sparkle::before { left: 0; right: 0; top: calc(50% - 1px); height: 2px; }
+.flag-reveal-sparkle::after { top: 0; bottom: 0; left: calc(50% - 1px); width: 2px; }
+
+.flag-reveal-twinkle {
+  --tint: var(--rarity);
+  width: var(--size);
+  height: var(--size);
+  margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+  translate: var(--x) var(--y);
+  opacity: 0;
+  animation: flag-reveal-twinkle 1.4s var(--twinkle-delay) ease-in-out infinite both;
+}
+
+.flag-reveal-texts {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+  opacity: 0;
+  animation: flag-reveal-rise 0.4s calc(var(--landed) + 250ms) cubic-bezier(0.215, 0.61, 0.355, 1) both;
+}
+
+.flag-reveal-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid color-mix(in srgb, var(--rarity) 50%, transparent);
+  background: color-mix(in srgb, var(--rarity) 15%, transparent);
+  color: var(--rarity);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.flag-reveal-new { color: var(--text-muted); font-weight: 600; }
+.flag-reveal-name { margin: 0; font-family: var(--font-display); font-size: 2.1rem; line-height: 1.15; letter-spacing: -0.02em; font-weight: 700; }
+.flag-reveal-texts small { color: var(--text-muted); }
+
+.flag-reveal-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+  align-self: stretch;
+  margin-top: 1.5rem;
+  animation: flag-reveal-rise 0.35s ease-out both;
+}
+
+.flag-reveal-view {
+  padding: 0.75rem 1.4rem;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--rarity);
+  color: #0b1020;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.flag-reveal-continue {
+  align-self: center;
+  padding: 0.5rem 1.2rem;
+  border: 0;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.flag-reveal-continue:hover { color: var(--text-primary); }
+.flag-reveal-view:focus-visible, .flag-reveal-continue:focus-visible { outline: 2px solid var(--rarity); outline-offset: 3px; }
+
+.flag-reveal-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+@keyframes flag-reveal-fade { from { opacity: 0; } }
+@keyframes flag-reveal-out { to { opacity: 0; } }
+@keyframes flag-reveal-glow { to { transform: scale(1.08); } }
+@keyframes flag-reveal-spin { to { transform: rotate(360deg); } }
+@keyframes flag-reveal-hide { to { opacity: 0; } }
+@keyframes flag-reveal-show { to { opacity: 1; } }
+@keyframes flag-reveal-appear { from { opacity: 0; } to { opacity: 1; } }
+
+@keyframes flag-reveal-fly {
+  from { transform: translate(var(--fx), var(--fy)) rotate(var(--fr)) scale(0.5); }
+  to { transform: none; }
+}
+
+@keyframes flag-reveal-pulse {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.08); animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1); }
+  100% { transform: scale(1); }
+}
+
+@keyframes flag-reveal-flash {
+  0% { opacity: 0.85; }
+  100% { opacity: 0; }
+}
+
+@keyframes flag-reveal-shine {
+  0% { opacity: 1; transform: translateX(-90px) rotate(20deg); }
+  99% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(calc(var(--w) + 30px)) rotate(20deg); }
+}
+
+@keyframes flag-reveal-ring {
+  0% { opacity: 0; transform: scale(0.7); }
+  5% { opacity: 0.9; }
+  100% { opacity: 0; transform: scale(2.8); }
+}
+
+@keyframes flag-reveal-travel {
+  from { translate: 0 0; }
+  to { translate: var(--dx) var(--dy); }
+}
+
+@keyframes flag-reveal-burst {
+  0% { opacity: 0; scale: 0.3; }
+  8% { opacity: 1; }
+  20% { scale: 1; }
+  70% { opacity: 0.8; }
+  100% { opacity: 0; scale: 0.4; }
+}
+
+@keyframes flag-reveal-twinkle {
+  0%, 100% { opacity: 0; transform: scale(0.4) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.2) rotate(45deg); }
+}
+
+@keyframes flag-reveal-rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* No flight, rays or burst: the flag fades in */
+@media (prefers-reduced-motion: reduce) {
+  .flag-reveal-glow { animation: flag-reveal-fade 0.25s ease-out both; }
+  .flag-reveal-rays, .flag-reveal-pieces, .flag-reveal-ring, .flag-reveal-particle, .flag-reveal-twinkle, .flag-reveal-flash, .flag-reveal-shine { display: none; }
+  .flag-reveal-box { animation: none; }
+  .flag-reveal-flag { animation: flag-reveal-show 0.3s both; }
+  .flag-reveal-texts { animation: flag-reveal-fade 0.4s 0.25s both; }
+  .flag-reveal-buttons { animation: flag-reveal-fade 0.35s both; }
+}

@@ -1,25 +1,30 @@
 // A short toast for the XP the server just paid ("+60 XP", "Niveau 4 atteint !"), mounted once for the whole site.
+// Flags and fragments have their own rewards (collection/); the fragments line stays only when FragmentToast has no data.
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { onXpClaimed } from '../utils/xp'
-import { FLAG_POOL } from '../utils/flagCollectionData'
-import { RARITY_COLORS } from '../utils/flagCollection'
-import { getCountryName } from '../utils/getCountryName'
+import { useAccount } from '../auth'
+import { flagsAfter } from './collection/claim'
 import './XpToast.css'
 
 const TOAST_MS = 3500
 
 export default function XpToast() {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
+  const { account } = useAccount()
+  const uid = account?.uid
   const [toast, setToast] = useState(null)
 
   useEffect(
     () =>
-      onXpClaimed(({ gained, levelUp, level, fragments = 0, unlockedFlags = [] }) => {
-        if (!(gained > 0) && !levelUp && !(fragments > 0) && unlockedFlags.length === 0) return
-        setToast({ id: Date.now(), gained, levelUp, level, fragments, unlockedFlags })
+      onXpClaimed((claim) => {
+        const { gained, levelUp, level, fragments = 0, unlockedFlags = [] } = claim
+        // Fragments get a card of their own (FragmentToast) when the current flag is known
+        const text = fragments > 0 && unlockedFlags.length === 0 && !flagsAfter(claim, uid)?.current ? fragments : 0
+        if (!(gained > 0) && !levelUp && !(text > 0)) return
+        setToast({ id: Date.now(), gained, levelUp, level, fragments: text })
       }),
-    []
+    [uid]
   )
 
   useEffect(() => {
@@ -34,15 +39,6 @@ export default function XpToast() {
       {toast.gained > 0 && <strong>{t('level.gained', { xp: toast.gained })}</strong>}
       {toast.levelUp && <span>{t('level.up', { level: toast.level })}</span>}
       {toast.fragments > 0 && <span>{t('level.fragments', { count: toast.fragments })}</span>}
-      {toast.unlockedFlags.map((iso) => {
-        const rarity = FLAG_POOL.find((flag) => flag.iso === iso)?.rarity ?? 'common'
-        return (
-          <span key={iso} className="xp-toast-flag" style={{ color: RARITY_COLORS[rarity] }}>
-            <img src={`/flags/${iso.toLowerCase()}.png`} alt="" />
-            {t('level.flag_unlocked', { name: getCountryName(iso, i18n.language) ?? iso, rarity: t(`collection.rarity.${rarity}`) })}
-          </span>
-        )
-      })}
     </div>
   )
 }

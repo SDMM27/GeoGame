@@ -9,14 +9,9 @@ jest.mock('@shared/utils/xp', () => ({
     return () => {}
   },
 }))
-jest.mock('@shared/utils/flagCollectionData', () => ({ FLAG_POOL: [{ iso: 'fr', rarity: 'rare' }] }))
-jest.mock('@shared/utils/getCountryName', () => ({ getCountryName: () => 'France' }))
-jest.mock('@/flags', () => ({ getFlag: () => 7 }))
 const mockToast = { success: jest.fn() }
-const mockShowFlagToast = jest.fn()
 jest.mock('@/shims/react-toastify', () => ({
   toast: { success: (text: string) => mockToast.success(text) },
-  showFlagToast: (...args: unknown[]) => mockShowFlagToast(...args),
 }))
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -28,25 +23,18 @@ jest.mock('react-i18next', () => ({
 describe('XpToasts', () => {
   beforeEach(() => {
     mockToast.success.mockReset()
-    mockShowFlagToast.mockReset()
     act(() => {
       create(<XpToasts />)
     })
   })
 
-  it('announces the XP, the fragments and the level', () => {
+  it('announces the XP and the level', () => {
     mockListener?.({ gained: 20, levelUp: true, level: 3, fragments: 2, unlockedFlags: [] })
-    expect(mockToast.success.mock.calls.map(([text]) => text)).toEqual([
-      'level.gained {"xp":20}',
-      'level.fragments {"count":2}',
-      'level.up {"level":3}',
-    ])
-    expect(mockShowFlagToast).not.toHaveBeenCalled()
+    expect(mockToast.success.mock.calls.map(([text]) => text)).toEqual(['level.gained {"xp":20}', 'level.up {"level":3}'])
   })
 
-  it('announces each unlocked flag in its rarity color, and no fragments toast for none', () => {
-    mockListener?.({ gained: 0, levelUp: false, level: 1, fragments: 0, unlockedFlags: ['fr'] })
+  it('leaves the fragments and the flags to their own reward', () => {
+    mockListener?.({ gained: 0, levelUp: false, level: 1, fragments: 2, unlockedFlags: ['fr'] })
     expect(mockToast.success).not.toHaveBeenCalled()
-    expect(mockShowFlagToast).toHaveBeenCalledWith('level.flag_unlocked {"name":"France","rarity":"collection.rarity.rare"}', 7, '#4A90E2')
   })
 })

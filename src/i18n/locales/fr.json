@@ -1438,6 +1438,9 @@
       "uncommon": "Peu commun",
       "rare": "Rare",
       "legendary": "Légendaire"
-    }
+    },
+    "new_flag": "Nouveau drapeau !",
+    "view_collection": "Voir la collection",
+    "tap_to_continue": "Toucher pour continuer"
   }
 }

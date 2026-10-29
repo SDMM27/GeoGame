@@ -258,6 +258,8 @@ export const nl: MobileStrings = {
     outline_to_identify: 'Omtrek van het te raden land',
     outline_of: 'Omtrek: {{name}}',
     world_map: 'Wereldkaart',
+    open_map: 'Kaart schermvullend openen',
+    close_map: 'Kaart sluiten',
     choice_correct: 'goed antwoord',
     choice_wrong: 'fout antwoord',
     map_found: 'Gevonden: {{name}}',

@@ -625,7 +625,14 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
 
   return (
     <GestureDetector gesture={gesture}>
-      <View accessible accessibilityRole="image" accessibilityLabel={t('mobile.a11y.world_map')} style={mapStyles.container} onLayout={onLayout}>
+      <View
+        accessible
+        accessibilityRole="image"
+        accessibilityLabel={t('mobile.a11y.world_map')}
+        style={mapStyles.container}
+        onLayout={onLayout}
+        // Web: data-geomap, where public/index.html keeps Safari's page zoom out of the map's pinch
+        {...({ dataSet: { geomap: '' } } as object)}>
         <Canvas style={StyleSheet.absoluteFill}>
           <Group transform={transform}>
             {scene}

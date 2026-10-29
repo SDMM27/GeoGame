@@ -1,9 +1,14 @@
 // Voyage Voyage map: like the website, only the start, the target, the guesses and the hints are drawn,
 // over a graticule; every other country stays hidden.
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native'
+import { useTranslation } from 'react-i18next'
+import { Modal, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import { colors, radius } from '@/theme'
+import { Touchable } from '@/components/ui'
+import { colors, radius, space } from '@/theme'
 import { allCountries, type CountryFeature } from './geometry'
 import { WorldMap, type LeafletStyle, type Overlay, type WorldMapHandle } from './WorldMap'
 
@@ -43,21 +48,45 @@ const CENTERS = new Map(
   allCountries.map((feature) => [feature.properties.ADMIN, feature.properties.center as [number, number] | undefined])
 )
 
-export function VoyageMap({
-  start,
-  target,
-  guesses,
-  hints,
-  interactive,
-  style,
-}: {
+type VoyageMapProps = {
   start: CountryFeature
   target: CountryFeature
   guesses: { feature: CountryFeature; color: VoyageColor }[]
   hints: CountryFeature[]
   interactive: boolean
   style?: StyleProp<ViewStyle>
-}) {
+  // A tap anywhere on the map (and the corner button) calls this
+  onExpand?: () => void
+}
+
+// The small map of the screen: framed on the route, and a tap opens it full screen to zoom and pan in.
+// Pinching a map a third of the screen tall inside a scrolling page was cramped and fought the scroll.
+export function ExpandableVoyageMap(props: Omit<VoyageMapProps, 'interactive' | 'onExpand'>) {
+  const { t } = useTranslation()
+  const insets = useSafeAreaInsets()
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      <VoyageMap {...props} interactive={false} onExpand={() => setOpen(true)} />
+      <Modal visible={open} animationType="fade" statusBarTranslucent onRequestClose={() => setOpen(false)}>
+        {/* A Modal is a separate root on Android: the map's gestures need their own handler root */}
+        <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.ocean }}>
+          <VoyageMap {...props} style={styles.fullScreen} interactive />
+          <Touchable
+            accessibilityRole="button"
+            accessibilityLabel={t('mobile.a11y.close_map')}
+            onPress={() => setOpen(false)}
+            style={[styles.close, { top: insets.top + space.md }]}>
+            <MaterialCommunityIcons name="close" size={22} color={colors.text} />
+          </Touchable>
+        </GestureHandlerRootView>
+      </Modal>
+    </>
+  )
+}
+
+export function VoyageMap({ start, target, guesses, hints, interactive, style, onExpand }: VoyageMapProps) {
+  const { t } = useTranslation()
   const mapRef = useRef<WorldMapHandle>(null)
   const [ready, setReady] = useState(false)
   const framed = useRef(false)
@@ -122,7 +151,14 @@ export function VoyageMap({
         showSmallCountryMarkers={false}
         overlays={overlays}
         onReady={() => setReady(true)}
+        onCountryPress={onExpand && (() => onExpand())}
+        onMapPress={onExpand && (() => onExpand())}
       />
+      {onExpand && (
+        <Touchable accessibilityRole="button" accessibilityLabel={t('mobile.a11y.open_map')} onPress={onExpand} style={styles.expand}>
+          <MaterialCommunityIcons name="arrow-expand" size={18} color={colors.text} />
+        </Touchable>
+      )}
     </View>
   )
 }
@@ -135,5 +171,31 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.ocean,
+  },
+  fullScreen: { flex: 1, height: undefined, borderRadius: 0, borderWidth: 0 },
+  expand: {
+    position: 'absolute',
+    top: space.sm,
+    right: space.sm,
+    width: 36,
+    height: 36,
+    borderRadius: radius.pill,
+    backgroundColor: `${colors.surfaceHigh}E6`,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  close: {
+    position: 'absolute',
+    right: space.lg,
+    width: 42,
+    height: 42,
+    borderRadius: radius.pill,
+    backgroundColor: colors.surfaceHigh,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 })

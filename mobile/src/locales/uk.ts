@@ -258,6 +258,8 @@ export const uk: MobileStrings = {
     outline_to_identify: 'Контур країни, який потрібно вгадати',
     outline_of: 'Контур: {{name}}',
     world_map: 'Карта світу',
+    open_map: 'Відкрити карту на весь екран',
+    close_map: 'Закрити карту',
     choice_correct: 'правильна відповідь',
     choice_wrong: 'неправильна відповідь',
     map_found: 'Знайдено: {{name}}',

@@ -65,6 +65,33 @@
         viewport.addEventListener('scroll', fit)
         fit()
       })()
+
+      // Pinch zoom stays allowed on the page, but a pinch on a map (WorldMap, data-geomap) zooms the
+      // map only: Safari on iPhone zoomed the whole page along with it, which hid part of the screen.
+      ;(function () {
+        function onMap(target) {
+          return !!(target && target.closest && target.closest('[data-geomap]'))
+        }
+        document.addEventListener(
+          'touchmove',
+          function (event) {
+            if (event.touches.length < 2) return
+            for (var i = 0; i < event.touches.length; i++) {
+              if (onMap(event.touches[i].target)) return event.preventDefault()
+            }
+          },
+          { passive: false }
+        )
+        ;['gesturestart', 'gesturechange'].forEach(function (type) {
+          document.addEventListener(
+            type,
+            function (event) {
+              if (onMap(event.target)) event.preventDefault()
+            },
+            { passive: false }
+          )
+        })
+      })()
     </script>
   </head>
   <body>

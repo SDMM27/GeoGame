@@ -258,6 +258,8 @@ export const it: MobileStrings = {
     outline_to_identify: 'Contorno del paese da indovinare',
     outline_of: 'Contorno: {{name}}',
     world_map: 'Mappa del mondo',
+    open_map: 'Apri la mappa a schermo intero',
+    close_map: 'Chiudi la mappa',
     choice_correct: 'risposta corretta',
     choice_wrong: 'risposta sbagliata',
     map_found: 'Trovato: {{name}}',

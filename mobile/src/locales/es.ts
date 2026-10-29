@@ -258,6 +258,8 @@ export const es: MobileStrings = {
     outline_to_identify: 'Contorno del país por identificar',
     outline_of: 'Contorno: {{name}}',
     world_map: 'Mapa del mundo',
+    open_map: 'Abrir el mapa a pantalla completa',
+    close_map: 'Cerrar el mapa',
     choice_correct: 'respuesta correcta',
     choice_wrong: 'respuesta incorrecta',
     map_found: 'Encontrado: {{name}}',

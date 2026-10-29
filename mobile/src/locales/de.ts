@@ -258,6 +258,8 @@ export const de: MobileStrings = {
     outline_to_identify: 'Umriss des gesuchten Landes',
     outline_of: 'Umriss: {{name}}',
     world_map: 'Weltkarte',
+    open_map: 'Karte im Vollbild öffnen',
+    close_map: 'Karte schließen',
     choice_correct: 'richtige Antwort',
     choice_wrong: 'falsche Antwort',
     map_found: 'Gefunden: {{name}}',

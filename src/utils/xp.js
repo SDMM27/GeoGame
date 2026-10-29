@@ -27,6 +27,9 @@ export function onXpClaimed(listener) {
   return () => claimListeners.delete(listener)
 }
 
+// Dev only: lets a debugger or a screenshot script replay a claim (the website build has no __DEV__).
+if (typeof __DEV__ !== 'undefined' && __DEV__) globalThis.__emitXpClaimed = (claim) => claimListeners.forEach((listener) => listener(claim))
+
 let pushApi = null
 let inFlight = null
 

@@ -1438,6 +1438,9 @@
       "uncommon": "Incomum",
       "rare": "Rara",
       "legendary": "Lendária"
-    }
+    },
+    "new_flag": "Nova bandeira!",
+    "view_collection": "Ver coleção",
+    "tap_to_continue": "Toque para continuar"
   }
 }

@@ -3,6 +3,7 @@ import React from 'react'
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, fireEvent, cleanup } from '@testing-library/react'
 import { FlagCollectionView } from './FlagCollection'
+import { onReplayFlag } from '../collection/replay'
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key, opts) => (opts ? `${key} ${JSON.stringify(opts)}` : key), i18n: { language: 'en' } }),
@@ -22,7 +23,7 @@ const mastery = {
   total: 40,
 }
 const view = (flags) => render(<FlagCollectionView flags={flags} mastery={mastery} />)
-const grid = () => [...document.querySelectorAll('.flag-collection-item img')].map((img) => img.getAttribute('alt'))
+const grid = () => [...document.querySelectorAll('.flag-collection-item button')].map((button) => button.getAttribute('aria-label').split(' · ')[0])
 
 afterEach(cleanup)
 
@@ -71,6 +72,15 @@ describe('FlagCollectionView', () => {
     view({ unlocked: ['F00', 'F06', 'F01', 'F02', 'F03'], current: null, pieces: 0 })
     expect(grid()).toEqual(['name-F03', 'name-F02', 'name-F06', 'name-F01', 'name-F00'])
     expect(document.querySelector('.flag-collection-item').getAttribute('title')).toBe('name-F03 · collection.rarity.legendary')
+  })
+
+  it('replays the flag clicked in the collection', () => {
+    const replayed = vi.fn()
+    const off = onReplayFlag(replayed)
+    view({ unlocked: ['F02', 'F03'], current: null, pieces: 0 })
+    fireEvent.click(screen.getByRole('button', { name: 'name-F02 · collection.rarity.rare' }))
+    expect(replayed).toHaveBeenCalledWith('F02')
+    off()
   })
 
   it('shows the first 24 flags and all of them on demand', () => {

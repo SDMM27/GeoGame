@@ -23,6 +23,8 @@ import { InviteBanner } from '@/components/InviteBanner'
 import { NotificationPrompt } from '@/components/NotificationPrompt'
 import { PresenceHeartbeat } from '@/components/PresenceHeartbeat'
 import { PushNotifications } from '@/components/PushNotifications'
+import { FlagUnlockOverlay } from '@/components/collection/FlagUnlockOverlay'
+import { FragmentToast } from '@/components/collection/FragmentToast'
 import { ConfirmHost } from '@/components/ConfirmHost'
 import { ToastHost } from '@/components/ToastHost'
 import { UpdateBanner } from '@/components/UpdateBanner'
@@ -128,7 +130,9 @@ export default function RootLayout() {
         <PresenceHeartbeat />
         <ConfirmHost />
         <ToastHost />
+        <FragmentToast />
         <XpToasts />
+        <FlagUnlockOverlay />
       </ThemeProvider>
     </GestureHandlerRootView>
   )

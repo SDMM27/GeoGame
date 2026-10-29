@@ -9,6 +9,8 @@ import { pieceGrid, piecesFor, RARITIES, RARITY_COLORS } from '@shared/utils/fla
 import { getCountryName } from '@shared/utils/getCountryName'
 import { onPublicDataPatched } from '@shared/utils/publicProfile'
 
+import { FlagPiece } from '@/components/collection/FlagPiece'
+import { replayFlag } from '@/components/collection/replay'
 import { Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
 import { colors, radius, space } from '@/theme'
@@ -34,7 +36,6 @@ export function sortFlags(unlocked: string[], lang: string): string[] {
 
 // The pieces of a flag (cost pieces, cut by pieceGrid), left to right then top to bottom; the pieces not won yet are covered.
 function PieceFlag({ iso, pieces, cost }: { iso: string; pieces: number; cost: number }) {
-  const source = getFlag(iso)
   const { cols, rows } = pieceGrid(cost)
   const quarters = Array.from({ length: cost }, (_, index) => index)
   return (
@@ -53,23 +54,7 @@ function PieceFlag({ iso, pieces, cost }: { iso: string; pieces: number; cost: n
             },
           ]}
         >
-          {source != null && (
-            <Image
-              accessible={false}
-              alt=""
-              source={source}
-              resizeMode="stretch"
-              style={[
-                styles.quarterImage,
-                {
-                  left: `${-(index % cols) * 100}%`,
-                  top: `${-Math.floor(index / cols) * 100}%`,
-                  width: `${cols * 100}%`,
-                  height: `${rows * 100}%`,
-                },
-              ]}
-            />
-          )}
+          <FlagPiece iso={iso} index={index} cols={cols} rows={rows} />
           {index >= pieces && <View style={styles.cover} />}
         </View>,
       )}
@@ -92,7 +77,6 @@ function Dot({ rarity, count }: { rarity: Rarity; count: number }) {
 export function FlagCollectionView({ collection }: { collection: Collection }) {
   const { t, i18n } = useTranslation()
   const [showAll, setShowAll] = useState(false)
-  const [selected, setSelected] = useState<string | null>(null)
   const { flags, mastery } = collection
   const total = FLAG_POOL.length
   const sorted = useMemo(() => sortFlags(flags.unlocked, i18n.language), [flags.unlocked, i18n.language])
@@ -159,19 +143,14 @@ export function FlagCollectionView({ collection }: { collection: Collection }) {
                   testID={`flag-${iso}`}
                   accessibilityRole="button"
                   accessibilityLabel={getCountryName(iso, i18n.language) as string}
-                  onPress={() => setSelected(selected === iso ? null : iso)}
-                  style={[styles.cell, { borderColor: COLORS[RARITY_OF.get(iso) ?? 'common'] }, selected === iso && styles.cellSelected]}
+                  onPress={() => replayFlag(iso)}
+                  style={[styles.cell, { borderColor: COLORS[RARITY_OF.get(iso) ?? 'common'] }]}
                 >
                   {source != null && <Image source={source} style={styles.cellImage} resizeMode="cover" accessible={false} alt="" />}
                 </Touchable>
               )
             })}
           </View>
-          {selected && (
-            <Text variant="bodyStrong" color={COLORS[RARITY_OF.get(selected) ?? 'common']}>
-              {getCountryName(selected, i18n.language) as string} · {t(`collection.rarity.${RARITY_OF.get(selected) ?? 'common'}`)}
-            </Text>
-          )}
           {sorted.length > FIRST && (
             <Touchable accessibilityRole="button" onPress={() => setShowAll(!showAll)}>
               <Text variant="caption" color={colors.highlight}>
@@ -235,12 +214,10 @@ const styles = StyleSheet.create({
   current: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   pieceFlag: { width: 96, height: 64, borderRadius: radius.sm, overflow: 'hidden', backgroundColor: colors.surfaceHigh },
   quarter: { position: 'absolute', overflow: 'hidden' },
-  quarterImage: { position: 'absolute' },
   cover: { ...StyleSheet.absoluteFill, backgroundColor: colors.borderStrong },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
   cell: { width: CELL, height: CELL * 0.7, borderRadius: 6, borderWidth: 2, overflow: 'hidden', backgroundColor: colors.surfaceHigh },
   cellImage: { width: CELL - 4, height: CELL * 0.7 - 4 },
-  cellSelected: { transform: [{ scale: 1.1 }] },
   legend: { gap: 6, paddingTop: space.sm, borderTopWidth: 1, borderTopColor: colors.border },
   modeRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
 })

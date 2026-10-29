@@ -1,0 +1,84 @@
+.fragment-toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  max-width: calc(100vw - 32px);
+  padding: 0.6rem 0.9rem;
+  border-radius: var(--radius-lg);
+  background: var(--bg-card-hover);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-card);
+  color: var(--text-primary);
+  animation: fragment-toast-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+}
+
+.fragment-toast-flag {
+  position: relative;
+  flex-shrink: 0;
+  width: 60px;
+  height: 40px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--bg-card);
+}
+
+.fragment-toast-piece { position: absolute; }
+.fragment-toast-piece--covered { background: var(--border-strong); }
+
+.fragment-toast-piece--new {
+  animation: fragment-toast-pop 0.66s var(--delay, 0.25s) both;
+}
+
+.fragment-toast-piece--new::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--rarity);
+  animation: fragment-toast-glow 0.66s var(--delay, 0.25s) both;
+}
+
+.fragment-toast-text { display: flex; flex-direction: column; gap: 3px; min-width: 120px; }
+.fragment-toast-text strong { font-size: 0.9rem; }
+.fragment-toast-text small { color: var(--text-muted); font-size: 0.75rem; }
+
+.fragment-toast-track { height: 4px; border-radius: 2px; background: var(--border-color); overflow: hidden; margin-top: 2px; }
+.fragment-toast-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--rarity);
+  animation: fragment-toast-fill 0.6s 0.4s both ease-out;
+}
+
+@keyframes fragment-toast-in {
+  from { opacity: 0; transform: translate(-50%, 16px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes fragment-toast-pop {
+  0% { opacity: 0; transform: scale(0); }
+  25% { opacity: 1; transform: scale(1.15); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fragment-toast-glow {
+  0% { opacity: 0; }
+  25% { opacity: 0.8; }
+  100% { opacity: 0; }
+}
+
+@keyframes fragment-toast-fill {
+  from { width: var(--from); }
+  to { width: var(--to); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fragment-toast, .fragment-toast-piece--new, .fragment-toast-fill { animation: none; }
+  .fragment-toast-piece--new::after { display: none; }
+  .fragment-toast-fill { width: var(--to); }
+}

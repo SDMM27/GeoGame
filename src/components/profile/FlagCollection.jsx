@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { FLAG_POOL, fetchCollection } from '../../utils/flagCollectionData'
 import { MASTERY_MODES, RARITIES, RARITY_COLORS, pieceGrid, piecesFor } from '../../utils/flagCollection'
 import { getCountryName } from '../../utils/getCountryName'
+import { replayFlag } from '../collection/replay'
 import './FlagCollection.css'
 
 const SHOWN_FIRST = 24
@@ -73,7 +74,9 @@ export function FlagCollectionView({ flags, mastery }) {
               const rarity = rarityOf.get(iso)
               return (
                 <li key={iso} className="flag-collection-item" style={{ borderColor: RARITY_COLORS[rarity] }} title={`${name} · ${t(`collection.rarity.${rarity}`)}`}>
-                  <img src={`/flags/${iso.toLowerCase()}.png`} alt={name} loading="lazy" />
+                  <button type="button" aria-label={`${name} · ${t(`collection.rarity.${rarity}`)}`} onClick={() => replayFlag(iso)}>
+                    <img src={`/flags/${iso.toLowerCase()}.png`} alt="" loading="lazy" />
+                  </button>
                 </li>
               )
             })}

@@ -19,7 +19,8 @@ export default defineConfig(async ({ mode }) => {
   const { default: seo } = await import('./scripts/vite-plugin-seo.mjs')
   return {
     plugins: [react(), seo(), ...analyze],
-    define: { __USE_EMULATORS__: JSON.stringify(process.env.VITE_USE_EMULATORS === '1') },
+    // __DEV__: dev server only, so utils/xp exposes __emitXpClaimed to preview the rewards
+    define: { __DEV__: JSON.stringify(mode === 'development'), __USE_EMULATORS__: JSON.stringify(process.env.VITE_USE_EMULATORS === '1') },
     resolve: {
       alias: [
         // The full-resolution dataset (~90 MB) never goes into the bundle. The games import it under its

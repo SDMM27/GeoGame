@@ -1,5 +1,7 @@
 import { act, create } from 'react-test-renderer'
 
+import { onReplayFlag } from '@/components/collection/replay'
+
 import { FlagCollectionView, sortFlags, type Collection } from './FlagCollection'
 
 // A pool of 30 fake flags: f00..f29, the rarity cycling through the four
@@ -113,11 +115,12 @@ describe('FlagCollectionView', () => {
     expect(text(tree)).toContain('collection.show_less')
   })
 
-  it('shows the name and rarity of a tapped flag', () => {
+  it('plays the unlock reveal again for a tapped flag', () => {
     const tree = render(collection(['f03', 'f00']))
+    const replayed: string[] = []
+    const stop = onReplayFlag((iso) => replayed.push(iso))
     act(() => cells(tree)[0].props.onPress())
-    const out = text(tree)
-    expect(out).toContain('F03')
-    expect(out).toContain('collection.rarity.legendary')
+    stop()
+    expect(replayed).toEqual(['f03'])
   })
 })

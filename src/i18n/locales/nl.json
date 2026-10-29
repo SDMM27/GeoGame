@@ -1438,6 +1438,9 @@
       "uncommon": "Ongewoon",
       "rare": "Zeldzaam",
       "legendary": "Legendarisch"
-    }
+    },
+    "new_flag": "Nieuwe vlag!",
+    "view_collection": "Collectie bekijken",
+    "tap_to_continue": "Tik om door te gaan"
   }
 }

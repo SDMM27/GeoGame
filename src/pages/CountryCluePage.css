@@ -311,10 +311,16 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.country-clue-result + .country-clue-map-container {
+  margin-top: 14px;
+}
+
 .country-clue-flag {
-  display: inline-block;
+  display: block;
+  height: 40px;
+  width: auto;
   margin-bottom: 8px;
-  font-size: 2rem;
+  border-radius: 4px;
 }
 
 .country-clue-actions {

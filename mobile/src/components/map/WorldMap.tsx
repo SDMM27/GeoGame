@@ -586,7 +586,8 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
     })
 
   const tap = Gesture.Tap()
-    .enabled(interactive)
+    // A static map still names the country it is tapped on when the screen asks for it
+    .enabled(interactive || !!onCountryPress)
     .maxDuration(400)
     .maxDistance(TAP_MAX_MOVE_PX)
     .onBegin(() => {

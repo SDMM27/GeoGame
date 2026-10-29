@@ -21,6 +21,7 @@ import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
 import { BorderGuessRow, type BorderGuess } from '@/components/game/GuessCards'
 import { GuessInputBar } from '@/components/game/GuessInputBar'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
+import { BorderGuessReveal } from '@/components/map/BorderGuessReveal'
 import { CountrySilhouette } from '@/components/map/CountrySilhouette'
 import { Button, Text } from '@/components/ui'
 import { useAnnounceResult } from '@/hooks/useAnnounceResult'
@@ -90,6 +91,14 @@ function BorderGuessGame({ mode, play }: { mode: string; play?: RoomPlay }) {
   if (elsewhere.checking || elsewhere.game) {
     return (
       <DailyPlayedElsewhere title={t('games.border_guess.title')} game={elsewhere.game} accent={ACCENT}>
+        {elsewhere.game && currentCountry && (
+          <View style={{ gap: space.sm }}>
+            <Text variant="bodyStrong">
+              {t('borderguess.answer_was')} {answer}
+            </Text>
+            <BorderGuessReveal country={currentCountry} />
+          </View>
+        )}
         {dailyKey && <DailyLeaderboard gameType={GAME_TYPES.BORDER_GUESS} dailyKey={dailyKey} />}
       </DailyPlayedElsewhere>
     )
@@ -251,6 +260,7 @@ function BorderGuessGame({ mode, play }: { mode: string; play?: RoomPlay }) {
           }}
           onSaved={() => setLeaderboardVersion((version) => version + 1)}
           onHome={() => navigate('/')}>
+          {currentCountry && <BorderGuessReveal country={currentCountry} />}
           <Text variant="caption" style={{ textAlign: 'center' }}>
             {t('borderguess.see_tomorrow')}
           </Text>

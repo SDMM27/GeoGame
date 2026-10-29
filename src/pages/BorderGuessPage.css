@@ -504,3 +504,11 @@
     pointer-events: none;
   }
 }
+
+/* Once the game is over the frame holds the reveal (map + neighbours line), which sizes itself */
+.border-guess-map-frame.border-guess-map-frame--reveal {
+  height: auto;
+  overflow: visible;
+  border: 0;
+  background: none;
+}

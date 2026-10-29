@@ -82,7 +82,6 @@ export default function CountryCluePage() {
     isLost,
     isComplete,
     answerName,
-    answerFlag,
     answerCapital,
     currentCountryISO,
     filteredCountrySuggestions,
@@ -138,6 +137,16 @@ export default function CountryCluePage() {
   if (elsewhere.checking || elsewhere.game) {
     return (
       <DailyPlayedElsewhere title={title} game={elsewhere.game}>
+        {elsewhere.game && (
+          <section className="daily-form">
+            <div className={`country-clue-result country-clue-result--${elsewhere.game.solved === false ? 'lose' : 'win'}`}>
+              {currentCountryISO && <img className="country-clue-flag" src={`/flags/${currentCountryISO.toLowerCase()}.png`} alt="" />}
+              <h3>{translatedAnswerName}</h3>
+              <p>{t('labels.capital')} <strong>{answerCapital || t('labels.unknown')}</strong>.</p>
+            </div>
+            <CountryClueMap guesses={[]} answerName={answerName} isLost focusAnswer />
+          </section>
+        )}
         <DailyLeaderboard gameType={GAME_TYPES.COUNTRY_CLUE} dailyKey={dailyKey} />
       </DailyPlayedElsewhere>
     )
@@ -254,14 +263,14 @@ export default function CountryCluePage() {
             <div className={`country-clue-result${isSolved ? ' country-clue-result--win' : isLost ? ' country-clue-result--lose' : ''}`}>
               {isSolved && (
                 <>
-                  <span className="country-clue-flag" aria-hidden="true">{answerFlag}</span>
+                  {currentCountryISO && <img className="country-clue-flag" src={`/flags/${currentCountryISO.toLowerCase()}.png`} alt="" />}
                   <h3>{translatedAnswerName}</h3>
                   <p>{t('country_clue.correct')} {t('labels.capital')} <strong>{answerCapital || t('labels.unknown')}</strong>.</p>
                 </>
               )}
               {isLost && (
                 <>
-                  <span className="country-clue-flag" aria-hidden="true">{answerFlag}</span>
+                  {currentCountryISO && <img className="country-clue-flag" src={`/flags/${currentCountryISO.toLowerCase()}.png`} alt="" />}
                   <h3>{translatedAnswerName}</h3>
                   <p>{t('labels.capital')} <strong>{answerCapital || t('labels.unknown')}</strong>.</p>
                 </>

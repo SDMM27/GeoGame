@@ -1,13 +1,14 @@
 name: EAS Update
 
 # Publishes an over-the-air update of the app (EAS Update) from GitHub, without a local build:
-#  - automatically to the preview channel after each merge on master that changes the app (mobile/) or the code it
-#    shares with the website (src/);
+#  - automatically to both channels after each merge on master that changes the app (mobile/) or the code it shares
+#    with the website (src/): preview for the APKs of GeoGame-releases, production for the Play Store builds;
 #  - by hand from the Actions tab → "EAS Update" → Run workflow, choosing the branch and the channel.
 # An installed APK only receives the updates made for its native runtime version (the fingerprint of its native code,
 # see runtimeVersion in mobile/app.json). When a change alters it (a native module added or upgraded, a config plugin…),
 # no APK can receive the update: the apk job then builds one and publishes it as the latest release of
-# GeoGame-releases, where the website's download link and the app's "new version" banner point.
+# GeoGame-releases, where the website's download link and the app's "new version" banner point. The Play Store builds
+# can't be built and submitted from here: the update job only warns that a new store build is needed.
 # Needs the repository secrets EXPO_TOKEN (expo.dev → Account settings → Access tokens) and RELEASES_TOKEN (a GitHub
 # fine-grained token with Contents: read and write on SDMM27/GeoGame-releases).
 on:
@@ -19,9 +20,9 @@ on:
       channel:
         description: Update channel (preview for the installed APKs, production for the store builds)
         required: true
-        default: preview
+        default: both
         type: choice
-        options: [preview, production]
+        options: [both, preview, production]
       message:
         description: Update message
         required: true
@@ -44,8 +45,8 @@ jobs:
       run:
         working-directory: mobile
     outputs:
-      channel: ${{ steps.publish.outputs.channel }}
-      runtime: ${{ steps.publish.outputs.runtime }}
+      # The runtime of the preview update, empty when only production was published
+      preview_runtime: ${{ steps.publish.outputs.preview_runtime }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -59,21 +60,32 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
       - run: npm ci
       # The EAS environment of the same name provides the EXPO_PUBLIC_* variables, as when run locally.
+      # One update per channel, each built with its own EAS environment.
       - id: publish
         run: |
-          eas update --channel "$CHANNEL" --environment "$CHANNEL" --message "$MESSAGE" --json > update.json
-          cat update.json
-          echo "channel=$CHANNEL" >> "$GITHUB_OUTPUT"
-          echo "runtime=$(jq -r 'map(select(.platform == "android"))[0].runtimeVersion' update.json)" >> "$GITHUB_OUTPUT"
+          if [ "$CHANNELS" = both ]; then CHANNELS="preview production"; fi
+          for channel in $CHANNELS; do
+            eas update --channel "$channel" --environment "$channel" --message "$MESSAGE" --json > "update-$channel.json"
+            cat "update-$channel.json"
+            runtime=$(jq -r 'map(select(.platform == "android"))[0].runtimeVersion' "update-$channel.json")
+            if [ "$channel" = preview ]; then echo "preview_runtime=$runtime" >> "$GITHUB_OUTPUT"; fi
+            # A Play Store build only gets the updates of its own native runtime: say when none can receive this one.
+            if [ "$channel" = production ]; then
+              eas build:list --platform android --build-profile production --runtime-version "$runtime" --status finished --limit 1 --json > store.json
+              if [ "$(jq length store.json)" -eq 0 ]; then
+                echo "::warning::No Play Store build has the native runtime $runtime: this production update reaches no one until a new store build (eas build --profile production, then eas submit) is published."
+              fi
+            fi
+          done
         env:
-          # After a merge there are no inputs: preview channel, and the merge's commit message.
-          CHANNEL: ${{ inputs.channel || 'preview' }}
+          # After a merge there are no inputs: both channels, and the merge's commit message.
+          CHANNELS: ${{ inputs.channel || 'both' }}
           MESSAGE: ${{ inputs.message || github.event.head_commit.message }}
 
   apk:
     name: Build an APK if the native runtime changed
     needs: update
-    if: needs.update.outputs.channel == 'preview'
+    if: needs.update.outputs.preview_runtime != ''
     runs-on: ubuntu-latest
     # The build runs on EAS servers and can wait a long time in the free queue.
     timeout-minutes: 180
@@ -114,6 +126,6 @@ jobs:
           gh release create "v$version-${runtime:0:7}" geogame.apk latest.json --repo SDMM27/GeoGame-releases \
             --title "GeoGame $version (${runtime:0:7})" --notes "$MESSAGE" --latest
         env:
-          RUNTIME: ${{ needs.update.outputs.runtime }}
+          RUNTIME: ${{ needs.update.outputs.preview_runtime }}
           GH_TOKEN: ${{ secrets.RELEASES_TOKEN }}
           MESSAGE: ${{ inputs.message || github.event.head_commit.message }}

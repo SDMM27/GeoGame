@@ -18,6 +18,7 @@ import { GAME_TYPES } from '../utils/gameTypes'
 import { useAccount, useRecordGame } from '../auth'
 import { useDailyPlayedElsewhere } from '../hooks/useDailyPlayedElsewhere'
 import DailyPlayedElsewhere from '../components/DailyPlayedElsewhere'
+import BorderGuessReveal from '../components/BorderGuessReveal'
 import 'leaflet/dist/leaflet.css'
 import 'react-toastify/dist/ReactToastify.css'
 import './BorderGuessPage.css'
@@ -143,6 +144,12 @@ export default function BorderGuessPage() {
   if (elsewhere.checking || elsewhere.game) {
     return (
       <DailyPlayedElsewhere title={title} game={elsewhere.game}>
+        {elsewhere.game && currentCountry && (
+          <section className="daily-form">
+            <h2 className="daily-form__title">{t('borderguess.answer_was')} {localizedAnswerName}</h2>
+            <BorderGuessReveal country={currentCountry} />
+          </section>
+        )}
         <DailyLeaderboard gameType={GAME_TYPES.BORDER_GUESS} dailyKey={dailyKey} />
       </DailyPlayedElsewhere>
     )
@@ -175,8 +182,10 @@ export default function BorderGuessPage() {
 
         <section className="border-guess-layout">
           <div className="border-guess-panel border-guess-panel--map">
-            <div className="border-guess-map-frame">
-              {mode === 'daily' && !hasStarted ? (
+            <div className={`border-guess-map-frame${isComplete && currentCountry ? ' border-guess-map-frame--reveal' : ''}`}>
+              {isComplete && currentCountry ? (
+                <BorderGuessReveal country={currentCountry} />
+              ) : mode === 'daily' && !hasStarted ? (
                 <div className="daily-map-placeholder">
                   {t('borderguess.start_timer_hint')}
                 </div>
@@ -200,9 +209,11 @@ export default function BorderGuessPage() {
                 </MapContainer>
               ) : null}
             </div>
-            <p className="border-guess-map-caption">
-              {t('borderguess.map_caption')}
-            </p>
+            {!isComplete && (
+              <p className="border-guess-map-caption">
+                {t('borderguess.map_caption')}
+              </p>
+            )}
           </div>
 
           <div className="border-guess-panel border-guess-panel--side">

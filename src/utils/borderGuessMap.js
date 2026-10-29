@@ -63,7 +63,9 @@ export function normalizeWrappedCountry(country) {
   const positiveShifted = longitudes.map((lng) => (lng > 0 ? lng - 360 : lng))
   const positiveShiftedSpan = Math.max(...positiveShifted) - Math.min(...positiveShifted)
 
-  if (negativeShiftedSpan < rawSpan && negativeShiftedSpan <= positiveShiftedSpan) {
+  // Shifting every longitude by 360 can shave a rounding error off the span: only a real gain counts.
+  const EPSILON = 1e-6
+  if (negativeShiftedSpan < rawSpan - EPSILON && negativeShiftedSpan <= positiveShiftedSpan) {
     return {
       ...country,
       geometry: {
@@ -73,7 +75,7 @@ export function normalizeWrappedCountry(country) {
     }
   }
 
-  if (positiveShiftedSpan < rawSpan) {
+  if (positiveShiftedSpan < rawSpan - EPSILON) {
     return {
       ...country,
       geometry: {

@@ -809,13 +809,15 @@ service cloud.firestore {
 
       function validAttempts(data) {
         return data.gameType != 'RANKING' && data.gameType != 'DAILY_CHALLENGE' && data.gameType != 'COUNTRY_OF_DAY'
-          && data.keys().hasOnly(['name', 'uid', 'gameType', 'dailyKey', 'attempts', 'elapsedTime', 'guesses', 'hints'])
+          && data.keys().hasOnly(['name', 'uid', 'gameType', 'dailyKey', 'attempts', 'elapsedTime', 'guesses', 'hints', 'mapAssist'])
           && data.keys().hasAll(['name', 'gameType', 'dailyKey', 'attempts'])
           && data.attempts >= 1
           && inRange(data.attempts, dailyAttempts().get(data.gameType, -1))
           && (data.get('elapsedTime', null) == null
               || inRange(data.elapsedTime, dailyWrong().get(data.gameType, 1000000000)))
           && (data.get('hints', null) == null || inRange(data.hints, dailyHints().get(data.gameType, -1)))
+          && (data.get('mapAssist', null) == null || data.mapAssist is bool)
+          && (data.get('mapAssist', false) == false || data.gameType in ['BORDER_GUESS', 'COUNTRY_CLUE'])
           && data.get('guesses', []) is list && data.get('guesses', []).size() <= 600;
       }
 

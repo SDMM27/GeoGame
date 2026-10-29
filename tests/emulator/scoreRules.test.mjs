@@ -233,6 +233,15 @@ describe('daily scores', () => {
     await assertSucceeds(as('alice').collection('daily_scores').add(dailies({ hints: 0 })))
   })
 
+  it('accepts the map assist flag on Border Guess and Country Clue only, as a boolean', async () => {
+    await assertSucceeds(as('alice').collection('daily_scores').add(dailies({ mapAssist: true })))
+    await assertSucceeds(as('alice').collection('daily_scores').add(dailies({ gameType: 'COUNTRY_CLUE', mapAssist: true })))
+    await assertSucceeds(as('alice').collection('daily_scores').add(dailies({ dailyKey: 'a', mapAssist: false })))
+    await assertFails(as('alice').collection('daily_scores').add(dailies({ dailyKey: 'b', mapAssist: 'yes' })))
+    await assertFails(as('alice').collection('daily_scores').add(dailies({ dailyKey: 'c', mapAssist: 1 })))
+    await assertFails(as('alice').collection('daily_scores').add(quiz({ dailyKey: 'd', attempts: 2, mapAssist: true })))
+  })
+
   it('accepts a quiz up to 5 attempts and 3 hints, no more', async () => {
     const quiz = (overrides) => dailies({ gameType: 'QUIZ', ...overrides })
     await assertSucceeds(as('alice').collection('daily_scores').add(quiz({ attempts: 1, hints: 0 })))

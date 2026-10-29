@@ -103,6 +103,27 @@ describe('useBorderGuessState — défi du jour', () => {
     expect(second.result.current.guesses).toHaveLength(1)
   })
 
+  it('saves the use of the map assist with the progress of the day and restores it', () => {
+    const first = renderHook(() => useBorderGuessState('daily'))
+    act(() => first.result.current.startGame())
+    expect(first.result.current.mapAssistUsed).toBe(false)
+    act(() => first.result.current.markMapAssistUsed())
+    expect(first.result.current.mapAssistUsed).toBe(true)
+    first.unmount()
+
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)).mapAssistUsed).toBe(true)
+    const second = renderHook(() => useBorderGuessState('daily'))
+    expect(second.result.current.mapAssistUsed).toBe(true)
+  })
+
+  it('ignores the map assist once the game is complete', () => {
+    const { result } = renderHook(() => useBorderGuessState('daily'))
+    act(() => result.current.startGame())
+    guess(result, result.current.answerName)
+    act(() => result.current.markMapAssistUsed())
+    expect(result.current.mapAssistUsed).toBe(false)
+  })
+
   it('reveals the country on give-up', () => {
     const { result } = renderHook(() => useBorderGuessState('daily'))
     act(() => result.current.revealCountry())
@@ -190,6 +211,26 @@ describe('useBorderGuessState — Elo', () => {
     guess(result, NAMES.find((n) => n !== answer))
     act(() => result.current.revealCountry())
     expect(reportEloAnswer).toHaveBeenCalledWith('BORDER_GUESS', answer, { found: false, errors: 1 })
+  })
+
+  it('reports nothing for an infinite round played with the map assist', () => {
+    const { result } = renderHook(() => useBorderGuessState('infinite'))
+    const answer = result.current.answerName
+    act(() => result.current.markMapAssistUsed())
+    guess(result, answer)
+    const next = renderHook(() => useBorderGuessState('infinite'))
+    act(() => next.result.current.markMapAssistUsed())
+    act(() => next.result.current.revealCountry())
+    expect(reportEloAnswer).not.toHaveBeenCalled()
+  })
+
+  it('rates the next infinite round again after one played with the map assist', () => {
+    const { result } = renderHook(() => useBorderGuessState('infinite'))
+    act(() => result.current.markMapAssistUsed())
+    act(() => result.current.startNextInfiniteRound())
+    expect(result.current.mapAssistUsed).toBe(false)
+    guess(result, result.current.answerName)
+    expect(reportEloAnswer).toHaveBeenCalledTimes(1)
   })
 
   it('reports nothing for the daily or in a room', () => {

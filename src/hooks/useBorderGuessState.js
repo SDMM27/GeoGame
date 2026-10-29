@@ -396,6 +396,7 @@ export default function useBorderGuessState(mode, options = {}) {
   const [hasStarted, setHasStarted] = useState(false)
   const [startedAt, setStartedAt] = useState(null)
   const [elapsedTime, setElapsedTime] = useState(null)
+  const [mapAssistUsed, setMapAssistUsed] = useState(false)
   const initialGuessesUsedRef = useRef(false)
   const todayKey = useDailyKey(mode === 'daily' && !overrideCountry)
   // Only the free mode is rated: the daily has one country for everyone, rooms are rated as duels.
@@ -422,6 +423,7 @@ export default function useBorderGuessState(mode, options = {}) {
     setHasStarted(true)
     setStartedAt(Date.now())
     setElapsedTime(null)
+    setMapAssistUsed(false)
   }, [overrideCountry]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -438,6 +440,7 @@ export default function useBorderGuessState(mode, options = {}) {
         setHasStarted(false)
         setStartedAt(null)
         setElapsedTime(null)
+        setMapAssistUsed(false)
         return
       }
       const savedProgress = readDailyProgress(todayKey)
@@ -455,6 +458,7 @@ export default function useBorderGuessState(mode, options = {}) {
       setHasStarted(alreadyPlaying)
       setStartedAt(savedProgress?.startedAt ?? null)
       setElapsedTime(savedProgress?.elapsedTime ?? null)
+      setMapAssistUsed(savedProgress?.mapAssistUsed === true)
       return
     }
 
@@ -466,6 +470,7 @@ export default function useBorderGuessState(mode, options = {}) {
     setHasStarted(false)
     setStartedAt(null)
     setElapsedTime(null)
+    setMapAssistUsed(false)
   }, [mode, todayKey])
 
   useEffect(() => {
@@ -478,8 +483,9 @@ export default function useBorderGuessState(mode, options = {}) {
       status,
       startedAt,
       elapsedTime,
+      mapAssistUsed,
     })
-  }, [currentCountry, dailyKey, guesses, mode, status, startedAt, elapsedTime])
+  }, [currentCountry, dailyKey, guesses, mode, status, startedAt, elapsedTime, mapAssistUsed])
 
   const availableCountrySuggestions = useMemo(() => {
     const lang = i18n.language
@@ -546,7 +552,7 @@ export default function useBorderGuessState(mode, options = {}) {
       const finalElapsed = startedAt != null ? Date.now() - startedAt : null
       setElapsedTime(finalElapsed)
       setStatus('won')
-      if (rated) reportEloAnswer(GAME_TYPES.BORDER_GUESS, answerName, { found: true, errors: guesses.length })
+      if (rated && !mapAssistUsed) reportEloAnswer(GAME_TYPES.BORDER_GUESS, answerName, { found: true, errors: guesses.length })
       toast.success(t('toasts.country_was', { name: getCountryName(currentCountry.properties.ISO_A2, i18n.language) || answerName }), { containerId: 'topRightToast' })
       return
     }
@@ -565,14 +571,20 @@ export default function useBorderGuessState(mode, options = {}) {
     setGuesses([])
     setStatus('playing')
     setInputValue('')
+    setMapAssistUsed(false)
   }
 
   const revealCountry = () => {
     if (!currentCountry || isComplete) return
     setStatus('lost')
     setInputValue('')
-    if (rated) reportEloAnswer(GAME_TYPES.BORDER_GUESS, answerName, { found: false, errors: guesses.length })
+    if (rated && !mapAssistUsed) reportEloAnswer(GAME_TYPES.BORDER_GUESS, answerName, { found: false, errors: guesses.length })
     toast.info(t('toasts.answer_reveal', { name: getCountryName(currentCountry.properties.ISO_A2, i18n.language) || answerName }), { containerId: 'topRightToast' })
+  }
+
+  const markMapAssistUsed = () => {
+    if (isComplete) return
+    setMapAssistUsed(true)
   }
 
   const goHome = () => navigate('/')
@@ -600,5 +612,7 @@ export default function useBorderGuessState(mode, options = {}) {
     startGame,
     startedAt,
     elapsedTime,
+    mapAssistUsed,
+    markMapAssistUsed,
   }
 }

@@ -5,7 +5,7 @@ import { buildChallengeUrl } from '../utils/challenge'
 import NudgeFriends from './NudgeFriends'
 import './ShareScoreButton.css'
 
-// `challenge` ({ route, dailyKey, solved }) : à fournir en mode daily pour afficher
+// `challenge` ({ route, dailyKey, solved, mapAssist }) : à fournir en mode daily pour afficher
 // le bouton « Défier un ami », qui partage un lien vers le même défi du jour.
 // `nudge` : false pour masquer « Défie un ami » quand la partie n'est pas enregistrée (modes infinis), le serveur
 // refuserait la notification faute de partie récente.
@@ -40,6 +40,7 @@ export default function ShareScoreButton({ score, gameType, difficulty, scoreLab
       score,
       dailyKey: challenge.dailyKey,
       solved: challenge.solved,
+      mapAssist: challenge.mapAssist,
     })
     try {
       const result = await shareScoreText({ score, gameType, difficulty, pseudo, scoreLabel, scoreText, details, grid, challengeUrl })

@@ -91,13 +91,14 @@ export function saveAscensionScore({ name, uid, gameType, presetName, timer, sco
 // (firestore.rules refuses it too).
 const neverReplace = () => false
 
-// Daily-challenge score: one per player, game and day.
-export function saveDailyScore({ name, uid, gameType, dailyKey, attempts, elapsedTime, guesses, hints }) {
+// Daily-challenge score: one per player, game and day. `mapAssist` is only written when true (a missing one means
+// no map), so a game without the map saves under rules that don't know the field yet.
+export function saveDailyScore({ name, uid, gameType, dailyKey, attempts, elapsedTime, guesses, hints, mapAssist }) {
   return saveBest(
     'daily_scores',
     { name, uid },
     { gameType, dailyKey },
-    { attempts, elapsedTime, guesses, ...(hints != null && { hints }) },
+    { attempts, elapsedTime, guesses, ...(hints != null && { hints }), ...(mapAssist === true && { mapAssist }) },
     neverReplace,
     (previous) => ({ attempts: previous.attempts, elapsedTime: previous.elapsedTime })
   )

@@ -293,3 +293,13 @@
   font-size: 0.85rem;
   cursor: pointer;
 }
+
+.daily-lb__tier {
+  margin: 10px 0 4px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--border-color);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}

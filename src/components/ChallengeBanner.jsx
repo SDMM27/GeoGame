@@ -7,7 +7,7 @@ import { CHALLENGE_ROUNDS } from '../utils/dailyChallenge'
 import './ChallengeBanner.css'
 
 // Bandeau affiché quand la page est ouverte depuis un lien de défi.
-// `result` ({ score, solved }) : à fournir une fois la partie terminée pour afficher la comparaison.
+// `result` ({ score, solved, mapAssist }) : à fournir une fois la partie terminée pour afficher la comparaison.
 export default function ChallengeBanner({ gameType, dailyKey, result }) {
   const { t } = useTranslation()
   const location = useLocation()
@@ -17,10 +17,11 @@ export default function ChallengeBanner({ gameType, dailyKey, result }) {
   const name = challenge.challenger ?? t('challenge.a_friend')
   const isStale = Boolean(challenge.day && dailyKey && challenge.day !== dailyKey)
 
-  const formatScore = ({ score, solved }) => {
+  const formatScore = ({ score, solved, mapAssist }) => {
     if (gameType === GAME_TYPES.DAILY_CHALLENGE) return `${score}/${CHALLENGE_ROUNDS}`
     if (!isAttemptsGame(gameType)) return t('challenge.points', { score })
-    return solved ? t('challenge.attempts', { count: score }) : t('challenge.not_found')
+    if (!solved) return t('challenge.not_found')
+    return `${t('challenge.attempts', { count: score })}${mapAssist ? ' 🗺️' : ''}`
   }
 
   const outcome = result && !isStale ? compareToChallenge(gameType, result, challenge) : null

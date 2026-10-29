@@ -128,6 +128,33 @@ describe('useCountryClueState — défi du jour', () => {
     expect(second.result.current.hasStarted).toBe(true)
   })
 
+  it('saves the use of the map assist with the progress of the day and restores it', () => {
+    const first = renderHook(() => useCountryClueState('daily'))
+    act(() => first.result.current.startGame())
+    expect(first.result.current.mapAssistUsed).toBe(false)
+    act(() => first.result.current.markMapAssistUsed())
+    expect(first.result.current.mapAssistUsed).toBe(true)
+    first.unmount()
+
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)).mapAssistUsed).toBe(true)
+    const second = renderHook(() => useCountryClueState('daily'))
+    expect(second.result.current.mapAssistUsed).toBe(true)
+  })
+
+  it('ignores the map assist once the game is complete, and resets it for the next infinite round', () => {
+    const done = renderHook(() => useCountryClueState('daily'))
+    act(() => done.result.current.startGame())
+    guess(done.result, done.result.current.answerName)
+    act(() => done.result.current.markMapAssistUsed())
+    expect(done.result.current.mapAssistUsed).toBe(false)
+
+    const { result } = renderHook(() => useCountryClueState('infinite'))
+    act(() => result.current.markMapAssistUsed())
+    expect(result.current.mapAssistUsed).toBe(true)
+    act(() => result.current.startNextInfiniteRound())
+    expect(result.current.mapAssistUsed).toBe(false)
+  })
+
   it('keeps the saved country even if the daily draw changes', () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ targetName: 'Japon', guesses: [], status: 'won', startedAt: 1, elapsedTime: 5000 }))
     const { result } = renderHook(() => useCountryClueState('daily'))

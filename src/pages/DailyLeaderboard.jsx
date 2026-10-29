@@ -18,7 +18,7 @@ function AccordionRow({ score, index, account, secondaryFormatter, guessesTitle 
     <div className={`daily-lb__row${index < 3 ? ' daily-lb__row--top' : ''}${mineClass(score, account)}`}>
       <div className="daily-lb__row-main" onClick={() => setOpen((prev) => !prev)}>
         <span className="daily-lb__rank">{index < 3 ? MEDAL[index] : `#${index + 1}`}</span>
-        <span className="daily-lb__name"><PlayerName entry={score} account={account} reportIn="daily_scores" /></span>
+        <span className="daily-lb__name"><PlayerName entry={score} account={account} reportIn="daily_scores" />{score.mapAssist === true && <> <span title={t('map_assist.leaderboard_used')}>🗺️</span></>}</span>
         <span className="daily-lb__attempts">
           {score.hints > 0
             ? <>{score.attempts + score.hints} <span className="daily-lb__attempts-detail">({score.attempts}+{score.hints})</span></>
@@ -29,6 +29,9 @@ function AccordionRow({ score, index, account, secondaryFormatter, guessesTitle 
       </div>
       {open && (
         <div className="daily-lb__accordion">
+          {score.mapAssist === true && (
+            <p className="daily-lb__accordion-hints">🗺️ {t('map_assist.leaderboard_used')}</p>
+          )}
           {score.hints != null && (
             <p className="daily-lb__accordion-hints">
               {t('leaderboard.hints_used')} <strong>{score.hints === 0 ? t('leaderboard.no_hints') : `${score.hints}`}</strong>
@@ -89,6 +92,9 @@ export default function DailyLeaderboard({ gameType, dailyKey, columnLabels, sec
 
   if (!dailyKey) return null
 
+  // The scores come sorted with the map-assisted ones last: the separator goes before the first of them.
+  const firstAssistedIndex = scores.findIndex((score) => score.mapAssist === true)
+
   return (
     <div className="daily-lb">
       <h2 className="daily-lb__title">{t('leaderboard.title')}</h2>
@@ -136,7 +142,12 @@ export default function DailyLeaderboard({ gameType, dailyKey, columnLabels, sec
             <span>{columnLabels?.secondary ?? t('leaderboard.time')}</span>
           </div>
           {scores.map((score, index) => (
-            <AccordionRow key={`${score.name}-${score.dailyKey}-${index}`} score={score} index={index} account={account} secondaryFormatter={secondaryFormatter} guessesTitle={guessesTitle} />
+            <React.Fragment key={`${score.name}-${score.dailyKey}-${index}`}>
+              {score.mapAssist === true && index === firstAssistedIndex && (
+                <div className="daily-lb__tier">{t('map_assist.leaderboard_tier')}</div>
+              )}
+              <AccordionRow score={score} index={index} account={account} secondaryFormatter={secondaryFormatter} guessesTitle={guessesTitle} />
+            </React.Fragment>
           ))}
         </>
       )}

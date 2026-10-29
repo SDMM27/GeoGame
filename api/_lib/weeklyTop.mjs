@@ -22,7 +22,7 @@ export function weekKeys(now, days = WEEK_DAYS) {
 
 // Same orders as the daily leaderboards (src/utils/dailyScores.js, rankingScores.js), best first.
 const attemptsOf = (score) => (score.attempts ?? 0) + (score.hints ?? 0)
-const byDailyOrder = (a, b) => attemptsOf(a) - attemptsOf(b) || (a.elapsedTime ?? Infinity) - (b.elapsedTime ?? Infinity)
+const byDailyOrder = (a, b) => (a.mapAssist === true) - (b.mapAssist === true) || attemptsOf(a) - attemptsOf(b) || (a.elapsedTime ?? Infinity) - (b.elapsedTime ?? Infinity)
 const byRankingOrder = (a, b) => (b.score ?? 0) - (a.score ?? 0) || (a.totalError ?? Infinity) - (b.totalError ?? Infinity)
 
 // `scores`: the daily_scores documents of the week. Returns [{ uid, name, points, played, golds }] best first.

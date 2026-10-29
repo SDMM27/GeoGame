@@ -8,7 +8,7 @@ describe('buildChallengeUrl / parseChallenge', () => {
     })
     expect(url.startsWith('https://geo.test/border-guess?mode=daily&')).toBe(true)
     expect(parseChallenge(new URL(url).search)).toEqual({
-      challenger: 'Sacha & co', score: 4, day: '2026-10-05', solved: true,
+      challenger: 'Sacha & co', score: 4, day: '2026-10-05', solved: true, mapAssist: false,
     })
   })
 
@@ -17,6 +17,15 @@ describe('buildChallengeUrl / parseChallenge', () => {
     const parsed = parseChallenge(url.split('?')[1])
     expect(parsed.challenger).toBeNull()
     expect(parsed.solved).toBe(false)
+  })
+
+  it('carries the map assist flag only when it is used', () => {
+    const withMap = buildChallengeUrl({ route: '/border-guess', score: 4, dailyKey: '2026-10-05', solved: true, mapAssist: true, origin: '' })
+    expect(withMap).toContain('map=1')
+    expect(parseChallenge(withMap.split('?')[1]).mapAssist).toBe(true)
+    const without = buildChallengeUrl({ route: '/border-guess', score: 4, dailyKey: '2026-10-05', solved: true, mapAssist: false, origin: '' })
+    expect(without).not.toContain('map=')
+    expect(parseChallenge(without.split('?')[1]).mapAssist).toBe(false)
   })
 
   it('rounds decimal scores to one digit', () => {
@@ -46,6 +55,13 @@ describe('resolveMode', () => {
 })
 
 describe('compareToChallenge', () => {
+  it('attempt games: solving without the map beats solving with it, whatever the attempts', () => {
+    expect(compareToChallenge('BORDER_GUESS', { score: 10, solved: true }, { score: 3, solved: true, mapAssist: true })).toBe('win')
+    expect(compareToChallenge('COUNTRY_CLUE', { score: 3, solved: true, mapAssist: true }, { score: 10, solved: true })).toBe('lose')
+    expect(compareToChallenge('BORDER_GUESS', { score: 3, solved: true, mapAssist: true }, { score: 5, solved: true, mapAssist: true })).toBe('win')
+    expect(compareToChallenge('BORDER_GUESS', { score: 4, solved: true, mapAssist: true }, { score: 4, solved: false })).toBe('win')
+  })
+
   it('attempt games: fewer attempts wins, solving beats not solving', () => {
     expect(compareToChallenge('BORDER_GUESS', { score: 3, solved: true }, { score: 5, solved: true })).toBe('win')
     expect(compareToChallenge('BORDER_GUESS', { score: 5, solved: true }, { score: 3, solved: true })).toBe('lose')

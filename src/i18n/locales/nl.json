@@ -1530,5 +1530,14 @@
     "see_atlas": "Bekijk in de Atlas",
     "come_back": "Kom morgen terug voor een nieuw land!",
     "share": "Mijn resultaat delen"
+  },
+  "map_assist": {
+    "toggle": "Hulpkaart",
+    "hint": "Toont de al geraden landen op een kaart. In het dagklassement kom je achter de spelers zonder kaart.",
+    "hint_free": "Toont de al geraden landen op een kaart. Geen straf in de oneindige modus.",
+    "applied": "Kaart gebruikt: je staat bij de geholpen spelers.",
+    "stat": "met kaart",
+    "leaderboard_used": "Met hulpkaart",
+    "leaderboard_tier": "Met hulpkaart"
   }
 }

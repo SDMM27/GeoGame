@@ -4,7 +4,6 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAccount } from '../../auth'
-import { useMissions } from '../../hooks/useMissions'
 import {
   DAILY_BONUS_XP,
   DAILY_MISSION_XP,
@@ -115,10 +114,10 @@ function MissionList({ title, entries, reward, bonusCount, bonusXp, bonusFragmen
   )
 }
 
-export default function MissionsCard() {
+// `missions`: useMissions of the signed-in player (the home page loads it, it also marks the dailies played).
+export default function MissionsCard({ missions }) {
   const { t } = useTranslation()
   const { account } = useAccount()
-  const missions = useMissions(account?.uid ?? null)
 
   if (!account) {
     return (

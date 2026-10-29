@@ -6,7 +6,7 @@ import type { TFunction } from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 
-import { useMissions } from '@shared/hooks/useMissions'
+import type { useMissions } from '@shared/hooks/useMissions'
 import {
   DAILY_BONUS_XP,
   DAILY_MISSION_XP,
@@ -140,9 +140,9 @@ function Bonus({ count, reward, paid }: { count: number; reward: Reward; paid: b
   )
 }
 
-export function MissionsCard({ uid }: { uid: string | null | undefined }) {
+// `missions`: useMissions(uid), loaded by the home screen (it also marks the dailies played).
+export function MissionsCard({ uid, missions }: { uid: string | null | undefined; missions: ReturnType<typeof useMissions> }) {
   const { t } = useTranslation()
-  const missions = useMissions(uid)
 
   if (!uid) {
     return (

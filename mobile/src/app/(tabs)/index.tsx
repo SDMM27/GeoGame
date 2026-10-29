@@ -7,6 +7,8 @@ import { ScrollView, StyleSheet, View, useWindowDimensions, type NativeScrollEve
 import Animated, { FadeInDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
+import { useMissions } from '@shared/hooks/useMissions'
+
 import { useAccount } from '@/account/auth'
 import { LanguageButton } from '@/components/LanguageButton'
 import { MissionsCard } from '@/components/missions/MissionsCard'
@@ -20,12 +22,29 @@ const DAILY_GAMES = LISTED_GAMES.filter((game) => game.kind === 'daily')
 const SETUP_GAMES = LISTED_GAMES.filter((game) => game.kind === 'setup' || game.kind === 'survival')
 const NARROW_CARD = 240
 
-function DailyCard({ game, width }: { game: GameDefinition; width: number }) {
+type DailyStatus = 'won' | 'played' | 'todo'
+
+// `status`: today's daily from the signed-in player's history, null when unknown (visitor, loading).
+function DailyCard({ game, width, status }: { game: GameDefinition; width: number; status: DailyStatus | null }) {
   const { t } = useTranslation()
+  const done = status === 'won' || status === 'played'
   return (
-    <View style={[styles.dailyCard, { width }]}>
-      <View style={[styles.dailyIcon, { backgroundColor: `${game.color}22` }]}>
-        <MaterialCommunityIcons name={game.icon} size={26} color={game.color} />
+    <View style={[styles.dailyCard, { width }, done && { borderColor: `${game.color}59` }]}>
+      <View style={styles.dailyTop}>
+        <View style={[styles.dailyIcon, { backgroundColor: `${game.color}22` }]}>
+          <MaterialCommunityIcons name={game.icon} size={26} color={game.color} />
+        </View>
+        {status && (
+          <View style={[styles.dailyStatus, status === 'won' && styles.dailyStatusWon, status === 'played' && styles.dailyStatusPlayed]}>
+            {done && <MaterialCommunityIcons name="check" size={14} color={status === 'won' ? colors.accent : colors.text} />}
+            <Text
+              variant="caption"
+              style={{ fontSize: 12, fontWeight: '700' }}
+              color={status === 'won' ? colors.accent : done ? colors.text : colors.textMuted}>
+              {t(`mobile.home.daily_status_${status}`)}
+            </Text>
+          </View>
+        )}
       </View>
       <Text variant="heading" style={{ marginTop: space.md }}>
         {t(game.titleKey)}
@@ -106,6 +125,9 @@ export default function HomeScreen() {
   const cardWidth = Math.min(300, width * 0.72)
   const snap = cardWidth + space.md
   const { account } = useAccount()
+  // Loaded once for the missions card and the dailies played today (one history read)
+  const missions = useMissions(account?.uid ?? null)
+  const dailyStatus = missions.dailies?.status ?? null
   const dailyScroll = useRef<ScrollView>(null)
   const [dailyIndex, setDailyIndex] = useState(0)
   const onDailyScroll = ({ nativeEvent }: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -144,7 +166,7 @@ export default function HomeScreen() {
         scrollEventThrottle={32}
         contentContainerStyle={{ paddingHorizontal: space.lg, gap: space.md }}>
         {DAILY_GAMES.map((game) => (
-          <DailyCard key={game.id} game={game} width={cardWidth} />
+          <DailyCard key={game.id} game={game} width={cardWidth} status={dailyStatus && ((dailyStatus[game.type] as DailyStatus | undefined) ?? 'todo')} />
         ))}
       </ScrollView>
       <View style={styles.dots}>
@@ -165,7 +187,7 @@ export default function HomeScreen() {
       </View>
 
       <View style={{ paddingHorizontal: space.lg, marginTop: space.xxl }}>
-        <MissionsCard uid={account?.uid} />
+        <MissionsCard uid={account?.uid} missions={missions} />
       </View>
 
       {/* Ascension first: a short climb from easy countries, the mode the home page puts forward */}
@@ -226,6 +248,19 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     padding: space.lg,
   },
+  dailyTop: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: space.sm },
+  dailyStatus: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  dailyStatusWon: { borderColor: 'transparent', backgroundColor: `${colors.accent}26` },
+  dailyStatusPlayed: { borderColor: 'transparent', backgroundColor: colors.surfaceHigh },
   dailyIcon: { width: 48, height: 48, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },
   dailyActions: { flexDirection: 'row', gap: space.sm, marginTop: space.lg },
   dots: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 6, marginTop: space.md },

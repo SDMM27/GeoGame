@@ -271,7 +271,8 @@ export const DAILY_TIERS = [
 
 /**
  * The dailies of `day` ('2026-10-19', dailyTypesOn) in `games` (any day, any order): { day, total, played, won,
- * tiers: [{ id, fragments, done }] } with the dailies played and won (a game counts for its dailyKey, once per game type).
+ * status: { [gameType]: 'won' | 'played' }, tiers: [{ id, fragments, done }] } with the dailies played and won (a game
+ * counts for its dailyKey, once per game type; `status` leaves out the ones not played).
  */
 export function dailiesProgress(games, day) {
   const types = dailyTypesOn(day)
@@ -281,9 +282,14 @@ export function dailiesProgress(games, day) {
     won: distinct(ofDay.filter(isDailyWon).map((game) => game.gameType)),
     total: types.length,
   }
+  const status = {}
+  for (const game of ofDay) {
+    if (status[game.gameType] !== 'won') status[game.gameType] = isDailyWon(game) ? 'won' : 'played'
+  }
   return {
     day,
     ...counts,
+    status,
     tiers: DAILY_TIERS.map(({ id, fragments, reached }) => ({ id, fragments, done: counts.total > 0 && reached(counts) })),
   }
 }

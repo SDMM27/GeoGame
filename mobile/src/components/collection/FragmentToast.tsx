@@ -21,13 +21,13 @@ import { pieceGrid, piecesFor } from '@shared/utils/flagCollection'
 import { onXpClaimed } from '@shared/utils/xp'
 
 import { useAccount } from '@/account/auth'
-import { flagsAfter, haptic, rarityColor, rarityOf, type Claim } from '@/components/collection/claim'
+import { flagsAfter, haptic, rarityColor, rarityOf, rewardLines, type Claim } from '@/components/collection/claim'
 import { FlagPiece } from '@/components/collection/FlagPiece'
 import { Text } from '@/components/ui'
 import { toast } from '@/shims/react-toastify'
 import { colors, radius, space } from '@/theme'
 
-type Card = { id: number; iso: string; pieces: number; added: number; fragments: number }
+type Card = { id: number; iso: string; pieces: number; added: number; fragments: number; lines: string[] }
 
 const W = 60
 const H = 40
@@ -50,11 +50,12 @@ export function FragmentToast() {
         const flags = flagsAfter(claim, uid)
         if (!flags?.current) {
           toast.success(t('level.fragments', { count: fragments }))
+          rewardLines(t, claim).forEach((line) => toast.success(line))
           return
         }
         const cost = piecesFor(rarityOf(flags.current))
         nextId.current += 1
-        setCard({ id: nextId.current, iso: flags.current, pieces: flags.pieces, added: Math.min(fragments, flags.pieces, cost), fragments })
+        setCard({ id: nextId.current, iso: flags.current, pieces: flags.pieces, added: Math.min(fragments, flags.pieces, cost), fragments, lines: rewardLines(t, claim) })
         haptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light))
         if (timer.current) clearTimeout(timer.current)
         timer.current = setTimeout(() => setCard(null), DURATION)
@@ -131,6 +132,11 @@ function FragmentText({ card }: { card: Card }) {
   return (
     <View style={styles.texts}>
       <Text variant="bodyStrong">{t('level.fragments', { count: card.fragments })}</Text>
+      {card.lines.map((line) => (
+        <Text key={line} variant="caption" color={colors.accent} style={{ fontSize: 12 }}>
+          {line}
+        </Text>
+      ))}
       <Text variant="caption" style={{ fontSize: 12 }}>
         {t('collection.pieces', { count: card.pieces, total: cost })}
       </Text>

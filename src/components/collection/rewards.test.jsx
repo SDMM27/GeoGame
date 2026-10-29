@@ -100,6 +100,23 @@ describe('FragmentToast', () => {
     expect(screen.queryByTestId('fragment-flag')).toBeNull()
   })
 
+  it('says why the dailies and the streak paid fragments', () => {
+    render(<FragmentToast />)
+    claim({
+      fragments: 3,
+      rewards: [
+        { kind: 'dailies_all', fragments: 1 },
+        { kind: 'streak', fragments: 2, streak: 7 },
+      ],
+      demoFlags,
+    })
+    const text = screen.getByRole('status').textContent
+    expect(text).toContain('missions.reward_line')
+    expect(text).toContain('missions.reward_dailies_all')
+    expect(text).toContain('missions.reward_streak {\\"days\\":7}')
+    expect(text).toContain('missions.fragments {\\"count\\":2}')
+  })
+
   it('stays out of the way when a flag is unlocked or the data is missing', () => {
     render(<FragmentToast />)
     claim({ fragments: 2, unlockedFlags: ['AA'], demoFlags })
@@ -119,5 +136,8 @@ describe('XpToast', () => {
     expect(screen.getByText(/level\.fragments/)).toBeTruthy()
     claim({ gained: 10, fragments: 1, demoFlags })
     expect(screen.queryByText(/level\.fragments/)).toBeNull()
+    // The reasons follow the fragments line
+    claim({ gained: 0, fragments: 1, rewards: [{ kind: 'dailies_won_3', fragments: 1 }] })
+    expect(screen.getByRole('status').textContent).toContain('missions.reward_dailies_won_3')
   })
 })

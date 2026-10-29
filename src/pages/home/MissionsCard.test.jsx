@@ -1,4 +1,5 @@
-// The missions card: rewards by tier on the weekly rows, XP only on the daily ones, the bonus with its count.
+// The missions card: rewards by tier on the weekly rows, XP only on the daily ones, the bonus with its count, the dailies
+// of the day with their fragments and the streak.
 import React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -17,7 +18,51 @@ const entry = (id, target, tier) => ({ mission: { id, emoji: '🎮', target, tie
 
 afterEach(cleanup)
 
+const render_ = (missions) => {
+  mockUseMissions.mockReturnValue({ loading: false, xp: { level: 2, into: 30, needed: 150 }, daily: [], weekly: [], ...missions })
+  return render(
+    <MemoryRouter>
+      <MissionsCard />
+    </MemoryRouter>
+  )
+}
+
 describe('MissionsCard', () => {
+  it("shows today's dailies played and won with the fragments of the 3 tiers, and the streak", () => {
+    const tier = (id, done, paid = false) => ({ id, fragments: 1, done, paid })
+    const { container } = render_({
+      dailies: { total: 6, played: 6, won: 3, tiers: [tier('dailies_all', true, true), tier('dailies_won_3', true), tier('dailies_won_all', false)] },
+      streak: { count: 5, next: { count: 7, fragments: 2 } },
+    })
+    const row = container.querySelector('.missions-dailies')
+    expect(row.textContent).toContain('missions.dailies_played {"played":6,"total":6}')
+    expect(row.textContent).toContain('missions.dailies_won {"won":3,"total":6}')
+    const tiers = [...row.querySelectorAll('.missions-dailies-tier')]
+    expect(tiers.map((li) => li.textContent)).toEqual([
+      '✓ missions.dailies_allmissions.fragments {"count":1}',
+      '✓ missions.dailies_won_3missions.fragments {"count":1}',
+      'missions.dailies_won_allmissions.fragments {"count":1}',
+    ])
+    expect(tiers.map((li) => li.classList.contains('missions-dailies-tier--done'))).toEqual([true, true, false])
+    expect(row.querySelector('.missions-streak').textContent).toContain('missions.streak_days {"count":5}')
+    expect(row.querySelector('.missions-streak').textContent).toContain('missions.streak_next {"day":7} · missions.fragments {"count":2}')
+  })
+
+  it('invites to start a streak when there is none, and shows nothing for the dailies before they load', () => {
+    const { container, rerender } = render_({
+      dailies: { total: 6, played: 0, won: 0, tiers: [] },
+      streak: { count: 0, next: { count: 7, fragments: 2 } },
+    })
+    expect(container.querySelector('.missions-streak').textContent).toContain('missions.streak_none')
+    mockUseMissions.mockReturnValue({ loading: true, xp: null, daily: [], weekly: [], dailies: null, streak: null })
+    rerender(
+      <MemoryRouter>
+        <MissionsCard />
+      </MemoryRouter>
+    )
+    expect(container.querySelector('.missions-dailies')).toBeNull()
+  })
+
   it('pays XP only for the daily missions, and XP plus fragments by tier for the weekly ones', () => {
     mockUseMissions.mockReturnValue({
       loading: false,

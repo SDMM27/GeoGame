@@ -93,6 +93,22 @@ describe('FragmentToast', () => {
     expect(texts(tree)).toContain('collection.pieces {\\"count\\":3,\\"total\\":4}')
   })
 
+  it('says why the dailies and the streak paid fragments', () => {
+    let tree!: ReturnType<typeof create>
+    act(() => {
+      tree = create(<FragmentToast />)
+    })
+    const rewards = [
+      { kind: 'dailies_won_all', fragments: 1 },
+      { kind: 'streak', fragments: 2, streak: 7 },
+    ]
+    act(() => mockListener?.(claim({ fragments: 3, rewards, demoFlags: { unlocked: [], current: 'fr', pieces: 3 } })))
+    const out = texts(tree)
+    expect(out).toContain('missions.reward_line')
+    expect(out).toContain('missions.reward_dailies_won_all')
+    expect(out).toMatch(/missions.reward_streak .*days.*7/)
+  })
+
   it('ignores a claim without fragments', () => {
     let tree!: ReturnType<typeof create>
     act(() => {

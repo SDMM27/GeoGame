@@ -1,4 +1,5 @@
-// Home page: the day's and week's missions with their progress, and the player's level. Visitors get an invitation.
+// Home page: the day's and week's missions with their progress, the dailies of the day with their fragments, the streak,
+// and the player's level. Visitors get an invitation.
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -57,6 +58,41 @@ function MissionRow({ entry, reward }) {
   )
 }
 
+// Today's dailies (played, won, the 3 tiers of fragments) and the streak with its next milestone.
+function DailiesRow({ dailies, streak }) {
+  const { t } = useTranslation()
+  return (
+    <div className="missions-dailies">
+      <div className="missions-dailies-line">
+        <strong>{t('missions.dailies_title')}</strong>
+        <small>
+          {t('missions.dailies_played', { played: dailies.played, total: dailies.total })} · {t('missions.dailies_won', { won: dailies.won, total: dailies.total })}
+        </small>
+      </div>
+      <ul className="missions-dailies-tiers">
+        {dailies.tiers.map((tier) => {
+          const finished = tier.done || tier.paid
+          return (
+            <li key={tier.id} className={`missions-dailies-tier${finished ? ' missions-dailies-tier--done' : ''}`}>
+              <span>{finished ? '✓ ' : ''}{t(`missions.${tier.id}`)}</span>
+              <small>{t('missions.fragments', { count: tier.fragments })}</small>
+            </li>
+          )
+        })}
+      </ul>
+      {streak && (
+        <div className="missions-dailies-line missions-streak">
+          <strong>{t('missions.streak_title')}</strong>
+          <span>{streak.count > 0 ? t('missions.streak_days', { count: streak.count }) : t('missions.streak_none')}</span>
+          <small>
+            {t('missions.streak_next', { day: streak.next.count })} · {t('missions.fragments', { count: streak.next.fragments })}
+          </small>
+        </div>
+      )}
+    </div>
+  )
+}
+
 function MissionList({ title, entries, reward, bonusCount, bonusXp, bonusFragments, bonusDone, hint }) {
   const { t } = useTranslation()
   const allDone = bonusDone || (entries.length > 0 && entries.every((entry) => entry.done || entry.paid))
@@ -108,6 +144,7 @@ export default function MissionsCard() {
           </div>
         )}
       </div>
+      {missions.dailies && <DailiesRow dailies={missions.dailies} streak={missions.streak} />}
       {missions.loading && !missions.daily.length ? (
         <p className="missions-loading">…</p>
       ) : (

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { useAccount } from '../../auth'
 import { onXpClaimed } from '../../utils/xp'
 import { pieceGrid, piecesFor } from '../../utils/flagCollection'
-import { flagsAfter, pieceStyle, rarityColor, rarityOf } from './claim'
+import { flagsAfter, pieceStyle, rarityColor, rarityOf, rewardLines } from './claim'
 import './FragmentToast.css'
 
 const DURATION = 3200
@@ -27,11 +27,11 @@ export default function FragmentToast() {
         if (!flags?.current) return
         const cost = piecesFor(rarityOf(flags.current))
         nextId.current += 1
-        setCard({ id: nextId.current, iso: flags.current, pieces: flags.pieces, added: Math.min(fragments, flags.pieces, cost), fragments })
+        setCard({ id: nextId.current, iso: flags.current, pieces: flags.pieces, added: Math.min(fragments, flags.pieces, cost), fragments, lines: rewardLines(t, claim) })
         clearTimeout(timer.current)
         timer.current = setTimeout(() => setCard(null), DURATION)
       }),
-    [uid]
+    [uid, t]
   )
   useEffect(() => () => clearTimeout(timer.current), [])
 
@@ -65,6 +65,9 @@ export default function FragmentToast() {
       </div>
       <div className="fragment-toast-text">
         <strong>{t('level.fragments', { count: card.fragments })}</strong>
+        {card.lines.map((line) => (
+          <small key={line} className="fragment-toast-reason">{line}</small>
+        ))}
         <small>{t('collection.pieces', { count: card.pieces, total: cost })}</small>
         <div className="fragment-toast-track">
           <div

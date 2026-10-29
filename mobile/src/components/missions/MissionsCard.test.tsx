@@ -63,6 +63,38 @@ describe('MissionsCard', () => {
     expect(out).not.toContain('missions.sign_in')
   })
 
+  it("shows today's dailies with the fragments of the tiers, and the streak", () => {
+    mockUseMissions.mockReturnValue({
+      loading: false,
+      xp: { total: 130, level: 2, into: 30, needed: 150 },
+      daily: [entry('play_3', 0, 3)],
+      weekly: [],
+      dailyBonus: false,
+      weeklyBonus: false,
+      dailies: {
+        total: 6,
+        played: 4,
+        won: 2,
+        tiers: [
+          { id: 'dailies_all', fragments: 1, done: false, paid: false },
+          { id: 'dailies_won_3', fragments: 1, done: false, paid: false },
+          { id: 'dailies_won_all', fragments: 1, done: false, paid: false },
+        ],
+      },
+      streak: { count: 5, next: { count: 7, fragments: 2 } },
+    })
+    let tree!: ReturnType<typeof create>
+    act(() => {
+      tree = create(<MissionsCard uid="u1" />)
+    })
+    const out = texts(tree)
+    expect(out).toContain('missions.dailies_played {\\"played\\":4,\\"total\\":6}')
+    expect(out).toContain('missions.dailies_won {\\"won\\":2,\\"total\\":6}')
+    expect(out).toContain('missions.dailies_won_3')
+    expect(out).toContain('missions.streak_days {\\"count\\":5}')
+    expect(out).toContain('missions.streak_next {\\"day\\":7}')
+  })
+
   it('pays XP only for the daily missions, and XP plus fragments by tier for the weekly ones', () => {
     mockUseMissions.mockReturnValue({
       loading: false,

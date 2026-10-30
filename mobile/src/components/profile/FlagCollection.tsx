@@ -63,13 +63,14 @@ function PieceFlag({ iso, pieces, cost }: { iso: string; pieces: number; cost: n
   )
 }
 
-function Dot({ rarity, count }: { rarity: Rarity; count: number }) {
+// A rarity spelled out with its colour (the border of its flags below) and how many of its flags are unlocked.
+function RarityCount({ rarity, count }: { rarity: Rarity; count: number }) {
   const { t } = useTranslation()
   return (
-    <View style={styles.dotItem} accessibilityLabel={`${t(`collection.rarity.${rarity}`)} ${count}`}>
+    <View style={styles.rarityItem}>
       <View style={[styles.dot, { backgroundColor: COLORS[rarity] }]} />
       <Text variant="caption" style={{ fontSize: 12 }}>
-        {count}
+        {t(`collection.rarity.${rarity}`)} · {count}
       </Text>
     </View>
   )
@@ -96,17 +97,11 @@ export function FlagCollectionView({ collection, sectionId = 'collection' }: { c
     ['hardcore', mastery.hardcore],
   ] as const
 
+  // The title already says "flags" and leaves little room on a phone: only the numbers fit next to it.
   const summary = (
-    <>
-      <Text variant="caption" numberOfLines={1} style={{ flexShrink: 1 }}>
-        {t('collection.progress', { count: flags.unlocked.length, total })}
-      </Text>
-      <View style={styles.dots}>
-        {RARITY_ORDER.map((rarity) => (
-          <Dot key={rarity} rarity={rarity} count={counts[rarity]} />
-        ))}
-      </View>
-    </>
+    <Text variant="caption" numberOfLines={1} accessibilityLabel={t('collection.progress', { count: flags.unlocked.length, total })}>
+      {flags.unlocked.length} / {total}
+    </Text>
   )
 
   return (
@@ -137,6 +132,11 @@ export function FlagCollectionView({ collection, sectionId = 'collection' }: { c
         {sorted.length > 0 && (
           <>
             <Text variant="label">{t('collection.unlocked')}</Text>
+            <View style={styles.rarities}>
+              {RARITY_ORDER.map((rarity) => (
+                <RarityCount key={rarity} rarity={rarity} count={counts[rarity]} />
+              ))}
+            </View>
             <View style={styles.grid}>
               {shown.map((iso) => {
                 const source = getFlag(iso)
@@ -211,8 +211,8 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     padding: space.lg,
   },
-  dots: { flexDirection: 'row', gap: space.md },
-  dotItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  rarities: { flexDirection: 'row', flexWrap: 'wrap', columnGap: space.md, rowGap: space.xs },
+  rarityItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   dot: { width: 10, height: 10, borderRadius: radius.pill },
   current: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   pieceFlag: { width: 96, height: 64, borderRadius: radius.sm, overflow: 'hidden', backgroundColor: colors.surfaceHigh },

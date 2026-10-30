@@ -30,19 +30,7 @@ export function FlagCollectionView({ flags, mastery, sectionId = 'collection' })
   const cost = piecesFor(rarityOf.get(flags.current))
   const { cols, rows } = pieceGrid(cost)
 
-  const summary = (
-    <>
-      <strong className="flag-collection-progress">{t('collection.progress', { count: flags.unlocked.length, total })}</strong>
-      <ul className="flag-collection-counts">
-        {counts.map(({ rarity, count }) => (
-          <li key={rarity} title={t(`collection.rarity.${rarity}`)}>
-            <span className="flag-collection-dot" style={{ background: RARITY_COLORS[rarity] }} aria-hidden="true" />
-            {count}
-          </li>
-        ))}
-      </ul>
-    </>
-  )
+  const summary = <strong className="flag-collection-progress">{t('collection.progress', { count: flags.unlocked.length, total })}</strong>
 
   return (
     <CollapsibleSection id={sectionId} title={t('collection.title')} summary={summary} defaultOpen>
@@ -72,6 +60,14 @@ export function FlagCollectionView({ flags, mastery, sectionId = 'collection' })
 
         {sorted.length > 0 && (
           <>
+            <ul className="flag-collection-counts">
+              {counts.map(({ rarity, count }) => (
+                <li key={rarity}>
+                  <span className="flag-collection-dot" style={{ background: RARITY_COLORS[rarity] }} aria-hidden="true" />
+                  {t(`collection.rarity.${rarity}`)} · {count}
+                </li>
+              ))}
+            </ul>
             <ul className="flag-collection-grid">
               {shown.map(({ iso, name }) => {
                 const rarity = rarityOf.get(iso)

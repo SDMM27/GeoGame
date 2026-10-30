@@ -8,11 +8,9 @@
   border: 1px solid var(--border-color);
 }
 
-.flag-collection-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.6rem; flex-wrap: wrap; }
-.flag-collection-head h2 { margin: 0; font-size: 1.1rem; }
-.flag-collection-head strong { color: var(--accent); font-size: 0.9rem; }
+.flag-collection-progress { color: var(--accent); font-size: 0.9rem; }
 
-.flag-collection-counts { display: flex; flex-wrap: wrap; gap: 0.8rem; margin: 0; padding: 0; list-style: none; color: var(--text-muted); font-size: 0.8rem; }
+.flag-collection-counts { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0; padding: 0; list-style: none; color: var(--text-muted); font-size: 0.8rem; }
 .flag-collection-counts li { display: inline-flex; align-items: center; gap: 0.3rem; }
 .flag-collection-dot { width: 10px; height: 10px; border-radius: 50%; }
 

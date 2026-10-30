@@ -6,11 +6,12 @@ import { FLAG_POOL, fetchCollection } from '../../utils/flagCollectionData'
 import { MASTERY_MODES, RARITIES, RARITY_COLORS, pieceGrid, piecesFor } from '../../utils/flagCollection'
 import { getCountryName } from '../../utils/getCountryName'
 import { replayFlag } from '../collection/replay'
+import CollapsibleSection from '../CollapsibleSection'
 import './FlagCollection.css'
 
 const SHOWN_FIRST = 24
 
-export function FlagCollectionView({ flags, mastery }) {
+export function FlagCollectionView({ flags, mastery, sectionId = 'collection' }) {
   const { t, i18n } = useTranslation()
   const [showAll, setShowAll] = useState(false)
   const total = FLAG_POOL.length
@@ -29,12 +30,9 @@ export function FlagCollectionView({ flags, mastery }) {
   const cost = piecesFor(rarityOf.get(flags.current))
   const { cols, rows } = pieceGrid(cost)
 
-  return (
-    <section className="flag-collection">
-      <div className="flag-collection-head">
-        <h2>{t('collection.title')}</h2>
-        <strong>{t('collection.progress', { count: flags.unlocked.length, total })}</strong>
-      </div>
+  const summary = (
+    <>
+      <strong className="flag-collection-progress">{t('collection.progress', { count: flags.unlocked.length, total })}</strong>
       <ul className="flag-collection-counts">
         {counts.map(({ rarity, count }) => (
           <li key={rarity} title={t(`collection.rarity.${rarity}`)}>
@@ -43,70 +41,76 @@ export function FlagCollectionView({ flags, mastery }) {
           </li>
         ))}
       </ul>
+    </>
+  )
 
-      {flags.current ? (
-        <div className="flag-collection-current">
-          <div className="flag-pieces" data-testid="flag-pieces">
-            <img src={`/flags/${flags.current.toLowerCase()}.png`} alt="" />
-            {Array.from({ length: cost }, (_, piece) => (
-              <span
-                key={piece}
-                className={`flag-piece${piece < flags.pieces ? '' : ' flag-piece--hidden'}`}
-                style={{ left: `${(piece % cols) * (100 / cols)}%`, top: `${Math.floor(piece / cols) * (100 / rows)}%`, width: `${100 / cols}%`, height: `${100 / rows}%` }}
-              />
-            ))}
+  return (
+    <CollapsibleSection id={sectionId} title={t('collection.title')} summary={summary} defaultOpen>
+      <div className="flag-collection">
+        {flags.current ? (
+          <div className="flag-collection-current">
+            <div className="flag-pieces" data-testid="flag-pieces">
+              <img src={`/flags/${flags.current.toLowerCase()}.png`} alt="" />
+              {Array.from({ length: cost }, (_, piece) => (
+                <span
+                  key={piece}
+                  className={`flag-piece${piece < flags.pieces ? '' : ' flag-piece--hidden'}`}
+                  style={{ left: `${(piece % cols) * (100 / cols)}%`, top: `${Math.floor(piece / cols) * (100 / rows)}%`, width: `${100 / cols}%`, height: `${100 / rows}%` }}
+                />
+              ))}
+            </div>
+            <div className="flag-collection-current-text">
+              <small>{t('collection.current')}</small>
+              <strong>?</strong>
+              <span>{t('collection.pieces', { count: flags.pieces, total: cost })}</span>
+              <small className="flag-collection-hint">{t('collection.hint')}</small>
+            </div>
           </div>
-          <div className="flag-collection-current-text">
-            <small>{t('collection.current')}</small>
-            <strong>?</strong>
-            <span>{t('collection.pieces', { count: flags.pieces, total: cost })}</span>
-            <small className="flag-collection-hint">{t('collection.hint')}</small>
-          </div>
-        </div>
-      ) : (
-        <p className="flag-collection-note">{complete ? t('collection.complete') : t('collection.empty')}</p>
-      )}
+        ) : (
+          <p className="flag-collection-note">{complete ? t('collection.complete') : t('collection.empty')}</p>
+        )}
 
-      {sorted.length > 0 && (
-        <>
-          <ul className="flag-collection-grid">
-            {shown.map(({ iso, name }) => {
-              const rarity = rarityOf.get(iso)
-              return (
-                <li key={iso} className="flag-collection-item" style={{ borderColor: RARITY_COLORS[rarity] }} title={`${name} · ${t(`collection.rarity.${rarity}`)}`}>
-                  <button type="button" aria-label={`${name} · ${t(`collection.rarity.${rarity}`)}`} onClick={() => replayFlag(iso)}>
-                    <img src={`/flags/${iso.toLowerCase()}.png`} alt="" loading="lazy" />
-                  </button>
+        {sorted.length > 0 && (
+          <>
+            <ul className="flag-collection-grid">
+              {shown.map(({ iso, name }) => {
+                const rarity = rarityOf.get(iso)
+                return (
+                  <li key={iso} className="flag-collection-item" style={{ borderColor: RARITY_COLORS[rarity] }} title={`${name} · ${t(`collection.rarity.${rarity}`)}`}>
+                    <button type="button" aria-label={`${name} · ${t(`collection.rarity.${rarity}`)}`} onClick={() => replayFlag(iso)}>
+                      <img src={`/flags/${iso.toLowerCase()}.png`} alt="" loading="lazy" />
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+            {sorted.length > SHOWN_FIRST && (
+              <button type="button" className="flag-collection-toggle" onClick={() => setShowAll((value) => !value)}>
+                {showAll ? t('collection.show_less') : t('collection.show_all')}
+              </button>
+            )}
+          </>
+        )}
+
+        {mastery && (
+          <div className="flag-collection-legend">
+            <strong>{t('collection.legend_progress', { count: mastery.found, total: mastery.total })}</strong>
+            <ul>
+              {MASTERY_MODES.map((mode) => (
+                <li key={mode}>
+                  <span>{t(`collection.mode_${mode}`)}</span>
+                  <span>{mastery[mode].found} / {mastery[mode].total}</span>
                 </li>
-              )
-            })}
-          </ul>
-          {sorted.length > SHOWN_FIRST && (
-            <button type="button" className="flag-collection-toggle" onClick={() => setShowAll((value) => !value)}>
-              {showAll ? t('collection.show_less') : t('collection.show_all')}
-            </button>
-          )}
-        </>
-      )}
-
-      {mastery && (
-        <div className="flag-collection-legend">
-          <strong>{t('collection.legend_progress', { count: mastery.found, total: mastery.total })}</strong>
-          <ul>
-            {MASTERY_MODES.map((mode) => (
-              <li key={mode}>
-                <span>{t(`collection.mode_${mode}`)}</span>
-                <span>{mastery[mode].found} / {mastery[mode].total}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </section>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </CollapsibleSection>
   )
 }
 
-export default function FlagCollection({ uid }) {
+export default function FlagCollection({ uid, own = false }) {
   const [collection, setCollection] = useState(null)
 
   useEffect(() => {
@@ -121,5 +125,5 @@ export default function FlagCollection({ uid }) {
   }, [uid])
 
   if (!collection) return null
-  return <FlagCollectionView flags={collection.flags} mastery={collection.mastery} />
+  return <FlagCollectionView flags={collection.flags} mastery={collection.mastery} sectionId={own ? 'own.collection' : 'player.collection'} />
 }

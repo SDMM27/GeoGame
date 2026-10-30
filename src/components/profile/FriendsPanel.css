@@ -1,3 +1,4 @@
+.friends-badge { padding: 0.15rem 0.6rem; border-radius: var(--radius-pill); background: var(--accent); color: var(--bg-primary); font-size: 0.8rem; font-weight: 700; }
 .friends-add { display: flex; gap: 0.5rem; }
 .friends-add input {
   flex: 1;

@@ -60,8 +60,7 @@ export default function PlayerPage() {
               </div>
             </header>
             <FriendAction account={account} player={player} friendships={friendships} />
-            <FlagCollection uid={player.uid} />
-            <ProfileBody uid={player.uid} />
+            <ProfileBody uid={player.uid} collection={<FlagCollection uid={player.uid} />} />
           </>
         )}
       </main>

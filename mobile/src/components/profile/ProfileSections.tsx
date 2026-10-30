@@ -14,12 +14,16 @@ import { formatSeason } from '@shared/utils/elo'
 import { describeBest, describeDetails, describeMode, describeResult, formatPlayedAt } from '@shared/utils/profileFormat'
 import { dailyTypesOn, dayKey, formatPlayTime } from '@shared/utils/profileStats'
 
+import { CollapsibleSection } from '@/components/CollapsibleSection'
 import { Button, Segmented, Text, Touchable } from '@/components/ui'
 import { getGameByType } from '@/games'
 import { colors, fonts, radius, space } from '@/theme'
 import { RING_WIDTH_DOUBLE, ringBorder } from './decorationStyle'
 
 export type Decoration = { frame: string; color: string }
+
+// Whose profile: it keeps the folded state of the sections apart (see ProfileView).
+type Scope = 'own' | 'player'
 
 type IconName = ComponentProps<typeof MaterialCommunityIcons>['name']
 
@@ -215,18 +219,18 @@ export function DailyChips({
   )
 }
 
-export function AchievementsSection({ achievements }: { achievements: Achievement[] }) {
+export function AchievementsSection({ achievements, scope }: { achievements: Achievement[]; scope: Scope }) {
   const { t } = useTranslation()
   const [expanded, setExpanded] = useState(false)
   const unlocked = achievements.filter((item) => item.unlocked).length
   const visible = expanded ? achievements : achievements.slice(0, 6)
   return (
-    <View style={{ gap: space.md }}>
-      <SectionTitle
-        title={t('profile.achievements_title')}
-        right={<Text variant="bodyStrong" color={colors.textMuted}>{t('profile.achievements_count', { unlocked, total: achievements.length })}</Text>}
-      />
-      <View style={styles.grid}>
+    <CollapsibleSection
+      id={`${scope}.achievements`}
+      title={t('profile.achievements_title')}
+      summary={t('profile.achievements_count', { unlocked, total: achievements.length })}
+      defaultOpen={scope === 'player'}>
+      <View style={[styles.grid, { marginBottom: space.md }]}>
         {visible.map((achievement) => (
           <View
             key={achievement.id}
@@ -262,17 +266,18 @@ export function AchievementsSection({ achievements }: { achievements: Achievemen
           <LinkButton label={expanded ? t('profile.show_less') : t('profile.history_all')} onPress={() => setExpanded((value) => !value)} />
         </View>
       )}
-    </View>
+    </CollapsibleSection>
   )
 }
 
-export function ByGameSection({ stats }: { stats: ProfileStats }) {
+export function ByGameSection({ stats, scope }: { stats: ProfileStats; scope: Scope }) {
   const { t } = useTranslation()
   const entries = Object.entries(stats.byGame).sort((a, b) => b[1].played - a[1].played)
   if (entries.length === 0) return null
+  const top = getGameByType(entries[0][0])
+  const summary = top ? `${t(top.titleKey)} · ${t('profile.games_count', { count: entries[0][1].played })}` : undefined
   return (
-    <View style={{ gap: space.md }}>
-      <SectionTitle title={t('profile.by_game_title')} />
+    <CollapsibleSection id={`${scope}.by_game`} title={t('profile.by_game_title')} summary={summary}>
       <View style={styles.list}>
         {entries.map(([type, gameStats], index) => {
           const game = getGameByType(type)
@@ -305,7 +310,7 @@ export function ByGameSection({ stats }: { stats: ProfileStats }) {
           )
         })}
       </View>
-    </View>
+    </CollapsibleSection>
   )
 }
 
@@ -313,7 +318,7 @@ type RecordCell = { key: string; mode: string; score: number | null; perfect: nu
 type RecordsGrid = { rows: { game: string; difficulties: RecordCell[]; continents: RecordCell[] }[]; perfectCount: number; total: number }
 
 // Best solo score of each game by difficulty or continent: perfect ones in gold, the others with how close they are.
-export function RecordsSection({ uid }: { uid: string }) {
+export function RecordsSection({ uid, scope }: { uid: string; scope: Scope }) {
   const { t } = useTranslation()
   const { loading, error, grid, reload } = usePlayerRecords(uid) as { loading: boolean; error: boolean; grid: RecordsGrid | null; reload: () => void }
   const [by, setBy] = useState<'difficulties' | 'continents'>('difficulties')
@@ -327,16 +332,13 @@ export function RecordsSection({ uid }: { uid: string }) {
   )
   if (loading || error || !grid) return null
   const labelKey = by === 'difficulties' ? 'difficulties' : 'continents'
+  const summary = (
+    <Text variant="bodyStrong" color={grid.perfectCount > 0 ? colors.warning : colors.textMuted} numberOfLines={1} style={{ fontSize: 13, flexShrink: 1 }}>
+      {t('profile.records_perfect', { count: grid.perfectCount, total: grid.total })}
+    </Text>
+  )
   return (
-    <View style={{ gap: space.md }}>
-      <SectionTitle
-        title={t('profile.records_title')}
-        right={
-          <Text variant="bodyStrong" color={grid.perfectCount > 0 ? colors.warning : colors.textMuted} style={{ fontSize: 13 }}>
-            {t('profile.records_perfect', { count: grid.perfectCount, total: grid.total })}
-          </Text>
-        }
-      />
+    <CollapsibleSection id={`${scope}.records`} title={t('profile.records_title')} summary={summary} defaultOpen={scope === 'player'}>
       <Segmented
         value={by}
         onChange={setBy}
@@ -400,20 +402,21 @@ export function RecordsSection({ uid }: { uid: string }) {
           )
         })}
       </View>
-    </View>
+    </CollapsibleSection>
   )
 }
 
 type EloEntry = { key: string; rating: number; played: boolean; games?: number; wins?: number; found?: number }
 
 // Elo ratings of the current season: duels, then each solo mode.
-export function EloSection({ uid }: { uid: string }) {
+export function EloSection({ uid, scope }: { uid: string; scope: Scope }) {
   const { t } = useTranslation()
   const { loading, error, season, entries } = usePlayerElo(uid) as { loading: boolean; error: boolean; season: string; entries: EloEntry[] }
   if (loading || error) return null
+  const played = entries.filter((entry) => entry.played)
+  const summary = played.length > 0 ? `${Math.max(...played.map((entry) => entry.rating))} · ${formatSeason(season, t)}` : t('elo.unplayed')
   return (
-    <View style={{ gap: space.md }}>
-      <SectionTitle title={t('elo.profile_title')} right={<Text variant="caption">{formatSeason(season, t)}</Text>} />
+    <CollapsibleSection id={`${scope}.elo`} title={t('elo.profile_title')} summary={summary}>
       <View style={styles.list}>
         {entries.map((entry, index) => {
           const game = entry.key === 'duel' ? undefined : getGameByType(entry.key)
@@ -442,7 +445,7 @@ export function EloSection({ uid }: { uid: string }) {
           )
         })}
       </View>
-    </View>
+    </CollapsibleSection>
   )
 }
 
@@ -549,12 +552,15 @@ export function ProfileBody({
   uid,
   friendsCount,
   own,
+  collection,
   onSeeHistory,
 }: {
   uid: string
   friendsCount?: number
   /** The signed-in player's profile: it keeps their public badges up to date. */
   own?: boolean
+  /** Shown right after the streak card. */
+  collection?: ReactNode
   onSeeHistory: () => void
 }) {
   const { t } = useTranslation()
@@ -563,13 +569,22 @@ export function ProfileBody({
   useFocusEffect(useCallback(() => reload(), [reload]))
 
   if (profile.loading) return <ActivityIndicator color={colors.accent} style={{ marginVertical: space.xxl }} />
-  if (profile.error) return <Text variant="caption">{t('profile.load_error')}</Text>
+  if (profile.error) {
+    return (
+      <View style={{ gap: space.xl }}>
+        <Text variant="caption">{t('profile.load_error')}</Text>
+        {collection}
+      </View>
+    )
+  }
   return (
     <ProfileView
       games={profile.games as HistoryGame[]}
       stats={profile.stats as ProfileStats}
       achievements={profile.achievements as Achievement[]}
       uid={uid}
+      own={own}
+      collection={collection}
       onSeeHistory={onSeeHistory}
     />
   )
@@ -581,6 +596,8 @@ export function ProfileView({
   stats,
   achievements,
   uid,
+  own = false,
+  collection,
   onSeeHistory,
 }: {
   games: HistoryGame[]
@@ -588,24 +605,34 @@ export function ProfileView({
   achievements: Achievement[]
   /** Whose Elo ratings to show (loaded on their own); none when left out. */
   uid?: string
+  /** Your own profile: more sections start folded. */
+  own?: boolean
+  /** Shown right after the streak card. */
+  collection?: ReactNode
   onSeeHistory: () => void
 }) {
   const { t } = useTranslation()
+  const scope: Scope = own ? 'own' : 'player'
   return (
     <View style={{ gap: space.xl }}>
       <StatTiles stats={stats} />
       <StreakCard stats={stats} />
-      {uid ? <RecordsSection uid={uid} /> : null}
-      <AchievementsSection achievements={achievements} />
-      {uid ? <EloSection uid={uid} /> : null}
-      <View style={{ gap: space.md }}>
-        <SectionTitle
-          title={t('profile.history_title')}
-          right={games.length > 5 ? <LinkButton label={t('profile.history_all')} onPress={onSeeHistory} /> : undefined}
-        />
+      {collection}
+      {uid ? <RecordsSection uid={uid} scope={scope} /> : null}
+      <AchievementsSection achievements={achievements} scope={scope} />
+      {uid ? <EloSection uid={uid} scope={scope} /> : null}
+      <CollapsibleSection
+        id={`${scope}.history`}
+        title={t('profile.history_title')}
+        summary={games.length > 0 ? (describeResult(games[0], t) as string) : undefined}>
         {games.length === 0 ? <Text variant="caption">{t('profile.history_empty')}</Text> : <HistoryList games={games.slice(0, 5)} />}
-      </View>
-      <ByGameSection stats={stats} />
+        {games.length > 5 ? (
+          <View style={{ alignItems: 'center', marginTop: space.md }}>
+            <LinkButton label={t('profile.history_all')} onPress={onSeeHistory} />
+          </View>
+        ) : null}
+      </CollapsibleSection>
+      <ByGameSection stats={stats} scope={scope} />
     </View>
   )
 }

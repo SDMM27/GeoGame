@@ -1,0 +1,27 @@
+.collapsible { display: flex; flex-direction: column; gap: 0.75rem; }
+
+/* The whole header is the button's hit area (::after); a summary with controls of its own sits above it */
+.collapsible-head { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 44px; }
+.collapsible-head h2 { margin: 0; font-size: 1.2rem; font-weight: 700; flex-shrink: 0; max-width: 60%; }
+.collapsible-toggle {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  min-height: 44px; padding: 0;
+  background: none; border: none; color: inherit;
+  font: inherit; text-align: left; cursor: pointer;
+}
+.collapsible-toggle::after { content: ''; position: absolute; inset: 0; }
+.collapsible-toggle:focus-visible { outline: none; }
+.collapsible-toggle:focus-visible::after { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: var(--radius-sm); }
+.collapsible-chevron { flex-shrink: 0; width: 0.5rem; height: 0.5rem; margin: 0 0.2rem; border-right: 2px solid var(--text-muted); border-bottom: 2px solid var(--text-muted); transform: rotate(-45deg); transition: transform 0.18s ease; }
+.collapsible-toggle[aria-expanded='true'] .collapsible-chevron { transform: rotate(45deg); }
+
+.collapsible-summary { display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 0.25rem 0.5rem; min-width: 0; color: var(--text-muted); font-size: 0.9rem; text-align: right; overflow-wrap: anywhere; }
+.collapsible-summary a, .collapsible-summary button, .collapsible-summary [tabindex] { position: relative; z-index: 1; }
+
+.collapsible-body { display: flex; flex-direction: column; gap: 0.75rem; animation: collapsible-in 0.18s ease; }
+@keyframes collapsible-in { from { opacity: 0; } to { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .collapsible-chevron { transition: none; }
+  .collapsible-body { animation: none; }
+}

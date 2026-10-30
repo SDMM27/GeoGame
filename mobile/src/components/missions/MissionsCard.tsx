@@ -20,6 +20,7 @@ import {
 
 import { DAILY_BONUS_FRAGMENTS, DAILY_MISSION_FRAGMENTS, WEEKLY_BONUS_FRAGMENTS } from '@shared/utils/flagCollection'
 
+import { CollapsibleSection } from '@/components/CollapsibleSection'
 import { XpBar, type Xp } from '@/components/profile/XpBar'
 import { Text, Touchable } from '@/components/ui'
 import { colors, radius, space } from '@/theme'
@@ -140,6 +141,8 @@ function Bonus({ count, reward, paid }: { count: number; reward: Reward; paid: b
   )
 }
 
+const doneCount = (entries: Entry[]) => entries.filter((entry) => entry.done).length
+
 // `missions`: useMissions(uid), loaded by the home screen (it also marks the dailies played).
 export function MissionsCard({ uid, missions }: { uid: string | null | undefined; missions: ReturnType<typeof useMissions> }) {
   const { t } = useTranslation()
@@ -157,37 +160,47 @@ export function MissionsCard({ uid, missions }: { uid: string | null | undefined
     )
   }
 
+  const daily = missions.daily as Entry[]
+  const weekly = missions.weekly as Entry[]
+
   return (
     <View style={styles.card}>
       <Text variant="heading">{t('missions.title')}</Text>
       {missions.xp && <XpBar xp={missions.xp as Xp} />}
       {missions.dailies ? <DailiesRow dailies={missions.dailies as Dailies} streak={missions.streak as Streak | null} /> : null}
-      {missions.daily.length > 0 && (
-        <>
-          <View style={styles.group}>
-            <Text variant="label">{t('missions.daily')}</Text>
-            {(missions.daily as Entry[]).map((entry) => (
-              <MissionRow key={entry.mission.id} entry={entry} reward={DAILY_REWARD} />
-            ))}
-            <Bonus count={DAILY_MISSIONS} reward={{ xp: DAILY_BONUS_XP, fragments: DAILY_BONUS_FRAGMENTS }} paid={Boolean(missions.dailyBonus)} />
-            <Text variant="caption" style={{ fontSize: 12 }}>
-              {t('missions.per_game', { xp: GAME_XP, count: GAMES_PER_DAY })}
-            </Text>
-            <Text variant="caption" style={{ fontSize: 12 }}>
-              {t('missions.resets_daily')}
-            </Text>
+      {daily.length > 0 && (
+        // Open while a daily mission is left; the player's own choice wins
+        <CollapsibleSection
+          id="home.missions"
+          title={t('missions.details')}
+          summary={t('missions.summary', { daily: doneCount(daily), dailyTotal: daily.length, weekly: doneCount(weekly), weeklyTotal: weekly.length })}
+          defaultOpen={daily.some((entry) => !entry.done)}>
+          <View style={{ gap: space.lg }}>
+            <View style={styles.group}>
+              <Text variant="label">{t('missions.daily')}</Text>
+              {daily.map((entry) => (
+                <MissionRow key={entry.mission.id} entry={entry} reward={DAILY_REWARD} />
+              ))}
+              <Bonus count={DAILY_MISSIONS} reward={{ xp: DAILY_BONUS_XP, fragments: DAILY_BONUS_FRAGMENTS }} paid={Boolean(missions.dailyBonus)} />
+              <Text variant="caption" style={{ fontSize: 12 }}>
+                {t('missions.per_game', { xp: GAME_XP, count: GAMES_PER_DAY })}
+              </Text>
+              <Text variant="caption" style={{ fontSize: 12 }}>
+                {t('missions.resets_daily')}
+              </Text>
+            </View>
+            <View style={styles.group}>
+              <Text variant="label">{t('missions.weekly')}</Text>
+              {weekly.map((entry) => (
+                <MissionRow key={entry.mission.id} entry={entry} reward={WEEKLY_TIERS[entry.mission.tier ?? 'easy']} />
+              ))}
+              <Bonus count={WEEKLY_MISSIONS} reward={{ xp: WEEKLY_BONUS_XP, fragments: WEEKLY_BONUS_FRAGMENTS }} paid={Boolean(missions.weeklyBonus)} />
+              <Text variant="caption" style={{ fontSize: 12 }}>
+                {t('missions.resets_weekly')}
+              </Text>
+            </View>
           </View>
-          <View style={styles.group}>
-            <Text variant="label">{t('missions.weekly')}</Text>
-            {(missions.weekly as Entry[]).map((entry) => (
-              <MissionRow key={entry.mission.id} entry={entry} reward={WEEKLY_TIERS[entry.mission.tier ?? 'easy']} />
-            ))}
-            <Bonus count={WEEKLY_MISSIONS} reward={{ xp: WEEKLY_BONUS_XP, fragments: WEEKLY_BONUS_FRAGMENTS }} paid={Boolean(missions.weeklyBonus)} />
-            <Text variant="caption" style={{ fontSize: 12 }}>
-              {t('missions.resets_weekly')}
-            </Text>
-          </View>
-        </>
+        </CollapsibleSection>
       )}
     </View>
   )

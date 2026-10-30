@@ -10,6 +10,7 @@ import { getCountryName } from '@shared/utils/getCountryName'
 import { onPublicDataPatched } from '@shared/utils/publicProfile'
 
 import { FlagPiece } from '@/components/collection/FlagPiece'
+import { CollapsibleSection } from '@/components/CollapsibleSection'
 import { replayFlag } from '@/components/collection/replay'
 import { Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
@@ -74,7 +75,7 @@ function Dot({ rarity, count }: { rarity: Rarity; count: number }) {
   )
 }
 
-export function FlagCollectionView({ collection }: { collection: Collection }) {
+export function FlagCollectionView({ collection, sectionId = 'collection' }: { collection: Collection; sectionId?: string }) {
   const { t, i18n } = useTranslation()
   const [showAll, setShowAll] = useState(false)
   const { flags, mastery } = collection
@@ -95,91 +96,94 @@ export function FlagCollectionView({ collection }: { collection: Collection }) {
     ['hardcore', mastery.hardcore],
   ] as const
 
-  return (
-    <View style={styles.card}>
-      <View style={styles.header}>
-        <Text variant="heading" style={{ flex: 1 }}>
-          {t('collection.title')}
-        </Text>
-        <Text variant="caption">{t('collection.progress', { count: flags.unlocked.length, total })}</Text>
-      </View>
+  const summary = (
+    <>
+      <Text variant="caption" numberOfLines={1} style={{ flexShrink: 1 }}>
+        {t('collection.progress', { count: flags.unlocked.length, total })}
+      </Text>
       <View style={styles.dots}>
         {RARITY_ORDER.map((rarity) => (
           <Dot key={rarity} rarity={rarity} count={counts[rarity]} />
         ))}
       </View>
+    </>
+  )
 
-      {complete ? (
-        <Text variant="bodyStrong" color={colors.accent}>
-          {t('collection.complete')}
-        </Text>
-      ) : nothing ? (
-        <Text variant="caption">{t('collection.empty')}</Text>
-      ) : flags.current ? (
-        <View style={styles.current}>
-          <PieceFlag iso={flags.current} pieces={flags.pieces} cost={cost} />
-          <View style={{ flex: 1, gap: 2 }}>
-            <Text variant="label">{t('collection.current')}</Text>
-            <Text variant="bodyStrong">?</Text>
-            <Text variant="caption" color={colors.accent}>
-              {t('collection.pieces', { count: flags.pieces, total: cost })}
-            </Text>
-            <Text variant="caption" style={{ fontSize: 12 }}>
-              {t('collection.hint')}
-            </Text>
-          </View>
-        </View>
-      ) : null}
-
-      {sorted.length > 0 && (
-        <>
-          <Text variant="label">{t('collection.unlocked')}</Text>
-          <View style={styles.grid}>
-            {shown.map((iso) => {
-              const source = getFlag(iso)
-              return (
-                <Touchable
-                  key={iso}
-                  testID={`flag-${iso}`}
-                  accessibilityRole="button"
-                  accessibilityLabel={getCountryName(iso, i18n.language) as string}
-                  onPress={() => replayFlag(iso)}
-                  style={[styles.cell, { borderColor: COLORS[RARITY_OF.get(iso) ?? 'common'] }]}
-                >
-                  {source != null && <Image source={source} style={styles.cellImage} resizeMode="cover" accessible={false} alt="" />}
-                </Touchable>
-              )
-            })}
-          </View>
-          {sorted.length > FIRST && (
-            <Touchable accessibilityRole="button" onPress={() => setShowAll(!showAll)}>
-              <Text variant="caption" color={colors.highlight}>
-                {t(showAll ? 'collection.show_less' : 'collection.show_all')}
+  return (
+    <CollapsibleSection id={sectionId} title={t('collection.title')} summary={summary} defaultOpen>
+      <View style={styles.card}>
+        {complete ? (
+          <Text variant="bodyStrong" color={colors.accent}>
+            {t('collection.complete')}
+          </Text>
+        ) : nothing ? (
+          <Text variant="caption">{t('collection.empty')}</Text>
+        ) : flags.current ? (
+          <View style={styles.current}>
+            <PieceFlag iso={flags.current} pieces={flags.pieces} cost={cost} />
+            <View style={{ flex: 1, gap: 2 }}>
+              <Text variant="label">{t('collection.current')}</Text>
+              <Text variant="bodyStrong">?</Text>
+              <Text variant="caption" color={colors.accent}>
+                {t('collection.pieces', { count: flags.pieces, total: cost })}
               </Text>
-            </Touchable>
-          )}
-        </>
-      )}
-
-      <View style={styles.legend}>
-        <Text variant="label">{t('collection.legend_progress', { count: mastery.found, total: mastery.total })}</Text>
-        {modes.map(([mode, progress]) => (
-          <View key={mode} style={styles.modeRow}>
-            <Text variant="caption" style={{ flex: 1 }}>
-              {t(`collection.mode_${mode}`)}
-            </Text>
-            <Text variant="caption">
-              {progress.found}/{progress.total}
-            </Text>
+              <Text variant="caption" style={{ fontSize: 12 }}>
+                {t('collection.hint')}
+              </Text>
+            </View>
           </View>
-        ))}
+        ) : null}
+
+        {sorted.length > 0 && (
+          <>
+            <Text variant="label">{t('collection.unlocked')}</Text>
+            <View style={styles.grid}>
+              {shown.map((iso) => {
+                const source = getFlag(iso)
+                return (
+                  <Touchable
+                    key={iso}
+                    testID={`flag-${iso}`}
+                    accessibilityRole="button"
+                    accessibilityLabel={getCountryName(iso, i18n.language) as string}
+                    onPress={() => replayFlag(iso)}
+                    style={[styles.cell, { borderColor: COLORS[RARITY_OF.get(iso) ?? 'common'] }]}
+                  >
+                    {source != null && <Image source={source} style={styles.cellImage} resizeMode="cover" accessible={false} alt="" />}
+                  </Touchable>
+                )
+              })}
+            </View>
+            {sorted.length > FIRST && (
+              <Touchable accessibilityRole="button" onPress={() => setShowAll(!showAll)}>
+                <Text variant="caption" color={colors.highlight}>
+                  {t(showAll ? 'collection.show_less' : 'collection.show_all')}
+                </Text>
+              </Touchable>
+            )}
+          </>
+        )}
+
+        <View style={styles.legend}>
+          <Text variant="label">{t('collection.legend_progress', { count: mastery.found, total: mastery.total })}</Text>
+          {modes.map(([mode, progress]) => (
+            <View key={mode} style={styles.modeRow}>
+              <Text variant="caption" style={{ flex: 1 }}>
+                {t(`collection.mode_${mode}`)}
+              </Text>
+              <Text variant="caption">
+                {progress.found}/{progress.total}
+              </Text>
+            </View>
+          ))}
+        </View>
       </View>
-    </View>
+    </CollapsibleSection>
   )
 }
 
 // Renders nothing while the collection loads.
-export function FlagCollection({ uid }: { uid: string }) {
+export function FlagCollection({ uid, own = false }: { uid: string; own?: boolean }) {
   const [collection, setCollection] = useState<{ uid: string; value: Collection } | null>(null)
   useEffect(() => {
     let cancelled = false
@@ -194,7 +198,7 @@ export function FlagCollection({ uid }: { uid: string }) {
       stop()
     }
   }, [uid])
-  return collection?.uid === uid ? <FlagCollectionView collection={collection.value} /> : null
+  return collection?.uid === uid ? <FlagCollectionView collection={collection.value} sectionId={own ? 'own.collection' : 'player.collection'} /> : null
 }
 
 const CELL = 44
@@ -207,8 +211,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     padding: space.lg,
   },
-  header: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
-  dots: { flexDirection: 'row', gap: space.lg },
+  dots: { flexDirection: 'row', gap: space.md },
   dotItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   dot: { width: 10, height: 10, borderRadius: radius.pill },
   current: { flexDirection: 'row', alignItems: 'center', gap: space.md },

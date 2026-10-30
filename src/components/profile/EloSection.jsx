@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { usePlayerElo } from '../../hooks/usePlayerElo'
 import { formatSeason } from '../../utils/elo'
 import { GAME_TYPES } from '../../utils/gameTypes'
+import CollapsibleSection from '../CollapsibleSection'
 
 const ELO_META = {
   duel: { emoji: '⚔️', titleKey: 'elo.duel', color: '#7AA2FF' },
@@ -16,16 +17,19 @@ const ELO_META = {
   [GAME_TYPES.SURVIVAL]: { emoji: '❤️', titleKey: 'games.survival.title', color: '#FF5C7A' },
 }
 
-export default function EloSection({ uid }) {
+export default function EloSection({ uid, scope }) {
   const { t } = useTranslation()
   const { loading, error, season, entries } = usePlayerElo(uid)
   if (loading || error) return null
+  const played = entries.filter((entry) => entry.played)
+  const summary = played.length > 0 ? (
+    <>
+      <strong>{Math.max(...played.map((entry) => entry.rating))}</strong>
+      <span>{formatSeason(season, t)}</span>
+    </>
+  ) : t('elo.unplayed')
   return (
-    <section className="profile-section">
-      <div className="profile-section-title">
-        <h2>{t('elo.profile_title')}</h2>
-        <span className="profile-muted">{formatSeason(season, t)}</span>
-      </div>
+    <CollapsibleSection id={`${scope}.elo`} title={t('elo.profile_title')} summary={summary}>
       <ul className="profile-list">
         {entries.map((entry) => {
           const meta = ELO_META[entry.key]
@@ -46,6 +50,6 @@ export default function EloSection({ uid }) {
           )
         })}
       </ul>
-    </section>
+    </CollapsibleSection>
   )
 }

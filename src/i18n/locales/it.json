@@ -1376,6 +1376,8 @@
   },
   "missions": {
     "title": "Missioni",
+    "details": "Dettaglio delle missioni",
+    "summary": "Giorno {{daily}}/{{dailyTotal}} · Settimana {{weekly}}/{{weeklyTotal}}",
     "daily": "Missioni del giorno",
     "weekly": "Missioni della settimana",
     "bonus": "Bonus: tutte e {{count}} le missioni",

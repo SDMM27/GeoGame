@@ -122,6 +122,15 @@ describe('FlagCollectionView', () => {
     expect(text(tree)).toContain('collection.show_less')
   })
 
+  it('names each rarity with its count, inside the card rather than in the header', () => {
+    // f00 and f04 common, f03 legendary
+    const out = text(render(collection(['f00', 'f03', 'f04'])))
+    expect(out).toContain('collection.rarity.common')
+    expect(out).toContain('collection.rarity.legendary')
+    expect(out).toContain('collection.progress {\\"count\\":3,\\"total\\":30}')
+    expect(out.indexOf('collection.rarity.common')).toBeGreaterThan(out.indexOf('collection.unlocked'))
+  })
+
   it('plays the unlock reveal again for a tapped flag', () => {
     const tree = render(collection(['f03', 'f00']))
     const replayed: string[] = []

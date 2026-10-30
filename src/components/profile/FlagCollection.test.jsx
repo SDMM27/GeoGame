@@ -74,6 +74,13 @@ describe('FlagCollectionView', () => {
     expect(document.querySelector('.flag-collection-item').getAttribute('title')).toBe('name-F03 · collection.rarity.legendary')
   })
 
+  it('names each rarity with its count', () => {
+    // F03 legendary, F00 and F04 common
+    view({ unlocked: ['F00', 'F03', 'F04'], current: null, pieces: 0 })
+    const counts = [...document.querySelectorAll('.flag-collection-counts li')].map((item) => item.textContent)
+    expect(counts).toEqual(['collection.rarity.common · 2', 'collection.rarity.uncommon · 0', 'collection.rarity.rare · 0', 'collection.rarity.legendary · 1'])
+  })
+
   it('replays the flag clicked in the collection', () => {
     const replayed = vi.fn()
     const off = onReplayFlag(replayed)

@@ -15,6 +15,13 @@ jest.mock('@shared/utils/flagCollectionData', () => {
 jest.mock('@shared/utils/publicProfile', () => ({ onPublicDataPatched: () => () => {} }))
 // Name = the iso upper-cased, so the sort is easy to read
 jest.mock('@shared/utils/getCountryName', () => ({ getCountryName: (iso: string) => iso.toUpperCase() }))
+// Reanimated and worklets need native code: their jest mocks (no useReducedMotion needed here)
+/* eslint-disable @typescript-eslint/no-require-imports */
+jest.mock('react-native-reanimated', () => require('react-native-reanimated/mock'))
+jest.mock('react-native-worklets', () => require('react-native-worklets/lib/module/mock'))
+/* eslint-enable @typescript-eslint/no-require-imports */
+// The icon font loads asynchronously and updates state outside act
+jest.mock('@expo/vector-icons/MaterialCommunityIcons', () => () => null)
 jest.mock('@/flags', () => ({ getFlag: () => 1 }))
 jest.mock('@/components/ui', () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -109,7 +116,7 @@ describe('FlagCollectionView', () => {
     expect(cells(tree)).toHaveLength(24)
     expect(cells(tree)[0].props.testID).toBe('flag-f03')
     expect(text(tree)).toContain('collection.show_all')
-    const toggle = tree.root.findAll((node) => node.props.accessibilityRole === 'button' && !node.props.testID && typeof node.props.onPress === 'function' && typeof node.type !== 'string')[0]
+    const toggle = tree.root.findAll((node) => node.props.accessibilityRole === 'button' && !node.props.accessibilityState && !node.props.testID && typeof node.props.onPress === 'function' && typeof node.type !== 'string')[0]
     act(() => toggle.props.onPress())
     expect(cells(tree)).toHaveLength(30)
     expect(text(tree)).toContain('collection.show_less')

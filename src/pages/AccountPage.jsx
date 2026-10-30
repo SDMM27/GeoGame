@@ -22,6 +22,7 @@ import ProfileBody, { Avatar } from '../components/profile/ProfileBody'
 import DecorationPicker from '../components/profile/DecorationPicker'
 import FlagCollection from '../components/profile/FlagCollection'
 import LevelBadge from '../components/profile/LevelBadge'
+import CollapsibleSection from '../components/CollapsibleSection'
 import { useFriendships } from '../hooks/usePlayerProfile'
 import { useDecoration } from '../hooks/useDecoration'
 import { decorationStyle } from '../utils/decorations'
@@ -261,44 +262,45 @@ function AccountSettings({ account }) {
   }
 
   return (
-    <section className="account-card">
-      <h2 className="account-section-title">{t('profile.settings_title')}</h2>
-      <p className="account-label">{t('account.signed_in_as')}</p>
-      <p className="account-email">{account.email}</p>
-      <p className="account-intro">{t('account.prefill_hint')}</p>
-      <button type="button" className="account-submit account-submit--secondary" onClick={() => signOut(auth)}>
-        {t('account.signout')}
-      </button>
-
-      {deleting ? (
-        <form onSubmit={handleDelete} className="account-form account-delete">
-          <p className="account-intro">{t(account.hasPassword ? 'account.delete_confirm' : 'account.delete_confirm_google')}</p>
-          {account.hasPassword && (
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder={t('account.password')}
-              autoComplete="current-password"
-              required
-            />
-          )}
-          {error && <p className="account-error">{t(`account.errors.${error}`)}</p>}
-          <div className="account-row">
-            <button type="button" className="account-link" onClick={() => setDeleting(false)}>
-              {t('account.cancel')}
-            </button>
-            <button type="submit" className="account-submit account-submit--danger" disabled={submitting}>
-              {t('account.delete_button')}
-            </button>
-          </div>
-        </form>
-      ) : (
-        <button type="button" className="account-link account-link--danger" onClick={() => setDeleting(true)}>
-          {t('account.delete')}
+    <CollapsibleSection id="own.settings" title={t('profile.settings_title')} summary={account.email}>
+      <div className="account-card">
+        <p className="account-label">{t('account.signed_in_as')}</p>
+        <p className="account-email">{account.email}</p>
+        <p className="account-intro">{t('account.prefill_hint')}</p>
+        <button type="button" className="account-submit account-submit--secondary" onClick={() => signOut(auth)}>
+          {t('account.signout')}
         </button>
-      )}
-    </section>
+
+        {deleting ? (
+          <form onSubmit={handleDelete} className="account-form account-delete">
+            <p className="account-intro">{t(account.hasPassword ? 'account.delete_confirm' : 'account.delete_confirm_google')}</p>
+            {account.hasPassword && (
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder={t('account.password')}
+                autoComplete="current-password"
+                required
+              />
+            )}
+            {error && <p className="account-error">{t(`account.errors.${error}`)}</p>}
+            <div className="account-row">
+              <button type="button" className="account-link" onClick={() => setDeleting(false)}>
+                {t('account.cancel')}
+              </button>
+              <button type="submit" className="account-submit account-submit--danger" disabled={submitting}>
+                {t('account.delete_button')}
+              </button>
+            </div>
+          </form>
+        ) : (
+          <button type="button" className="account-link account-link--danger" onClick={() => setDeleting(true)}>
+            {t('account.delete')}
+          </button>
+        )}
+      </div>
+    </CollapsibleSection>
   )
 }
 
@@ -324,9 +326,13 @@ function Profile({ account }) {
         </div>
       </header>
       <DecorationPicker account={account} />
-      <FlagCollection uid={account.uid} />
-      <FriendsPanel account={account} friendships={friendships} />
-      <ProfileBody uid={account.uid} own friendsCount={friendships.loading ? undefined : friendships.friends.length} />
+      <ProfileBody
+        uid={account.uid}
+        own
+        friendsCount={friendships.loading ? undefined : friendships.friends.length}
+        collection={<FlagCollection uid={account.uid} own />}
+        friends={<FriendsPanel account={account} friendships={friendships} />}
+      />
       <AccountSettings account={account} />
     </>
   )

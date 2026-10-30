@@ -29,7 +29,8 @@ import { API_ORIGIN, legalUrl } from '@/links'
 import { DecorationPicker } from '@/components/profile/DecorationPicker'
 import { FlagCollection } from '@/components/profile/FlagCollection'
 import { LevelBar } from '@/components/profile/LevelBar'
-import { Avatar, ProfileBody, SectionTitle } from '@/components/profile/ProfileSections'
+import { Avatar, ProfileBody } from '@/components/profile/ProfileSections'
+import { CollapsibleSection } from '@/components/CollapsibleSection'
 import { Button, Pill, Segmented, Text, Touchable } from '@/components/ui'
 import { forgetDevice, useDailyReminder, useWebPushPermission } from '@/notifications/push'
 import { colors, fonts, radius, space } from '@/theme'
@@ -311,59 +312,60 @@ function AccountSettings({ account }: { account: Account }) {
   }
 
   return (
-    <View style={{ gap: space.md }}>
-      <SectionTitle title={t('profile.settings_title')} />
-      <View style={styles.card}>
-        <View style={{ gap: 2 }}>
-          <Text variant="label">{t('account.signed_in_as')}</Text>
-          <Text variant="bodyStrong">{account.email}</Text>
-        </View>
-        <Text variant="caption">{t('account.prefill_hint')}</Text>
-        <Button
-          label={t('account.signout')}
-          variant="secondary"
-          onPress={signOutDevice}
-          icon={<MaterialCommunityIcons name="logout" size={20} color={colors.text} />}
-        />
-      </View>
-
-      <NotificationsCard uid={account.uid} />
-
-      {deleting ? (
+    <CollapsibleSection id="own.settings" title={t('profile.settings_title')} summary={account.email ?? undefined}>
+      <View style={{ gap: space.md }}>
         <View style={styles.card}>
-          <Text variant="caption">{t(account.hasPassword ? 'account.delete_confirm' : 'account.delete_confirm_google')}</Text>
-          {account.hasPassword && (
-            <Field
-              label={t('account.password')}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              autoCapitalize="none"
-              autoComplete="current-password"
-              textContentType="password"
-            />
-          )}
-          {error && <Message kind="error" text={t(`account.errors.${error}`)} />}
-          <View style={{ flexDirection: 'row', gap: space.sm }}>
-            <Button label={t('account.cancel')} variant="ghost" onPress={() => setDeleting(false)} style={{ flex: 1 }} />
-            <Button
-              label={t('account.delete_button')}
-              variant="danger"
-              onPress={onDelete}
-              loading={submitting}
-              disabled={account.hasPassword && !password}
-              style={{ flex: 1, paddingHorizontal: space.md }}
-            />
+          <View style={{ gap: 2 }}>
+            <Text variant="label">{t('account.signed_in_as')}</Text>
+            <Text variant="bodyStrong">{account.email}</Text>
           </View>
+          <Text variant="caption">{t('account.prefill_hint')}</Text>
+          <Button
+            label={t('account.signout')}
+            variant="secondary"
+            onPress={signOutDevice}
+            icon={<MaterialCommunityIcons name="logout" size={20} color={colors.text} />}
+          />
         </View>
-      ) : (
-        <Touchable accessibilityRole="button" onPress={() => setDeleting(true)} style={styles.link}>
-          <Text variant="bodyStrong" color={colors.danger} style={{ fontSize: 14 }}>
-            {t('account.delete')}
-          </Text>
-        </Touchable>
-      )}
-    </View>
+
+        <NotificationsCard uid={account.uid} />
+
+        {deleting ? (
+          <View style={styles.card}>
+            <Text variant="caption">{t(account.hasPassword ? 'account.delete_confirm' : 'account.delete_confirm_google')}</Text>
+            {account.hasPassword && (
+              <Field
+                label={t('account.password')}
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                autoCapitalize="none"
+                autoComplete="current-password"
+                textContentType="password"
+              />
+            )}
+            {error && <Message kind="error" text={t(`account.errors.${error}`)} />}
+            <View style={{ flexDirection: 'row', gap: space.sm }}>
+              <Button label={t('account.cancel')} variant="ghost" onPress={() => setDeleting(false)} style={{ flex: 1 }} />
+              <Button
+                label={t('account.delete_button')}
+                variant="danger"
+                onPress={onDelete}
+                loading={submitting}
+                disabled={account.hasPassword && !password}
+                style={{ flex: 1, paddingHorizontal: space.md }}
+              />
+            </View>
+          </View>
+        ) : (
+          <Touchable accessibilityRole="button" onPress={() => setDeleting(true)} style={styles.link}>
+            <Text variant="bodyStrong" color={colors.danger} style={{ fontSize: 14 }}>
+              {t('account.delete')}
+            </Text>
+          </Touchable>
+        )}
+      </View>
+    </CollapsibleSection>
   )
 }
 
@@ -450,12 +452,12 @@ function Profile({ account }: { account: Account }) {
         </View>
       </View>
       <LevelBar uid={account.uid} />
-      <FlagCollection uid={account.uid} />
       <DecorationPicker uid={account.uid} username={username} />
       <FriendsCard count={friendships.friends.length} pending={friendships.incoming.length} />
       <ProfileBody
         uid={account.uid}
         own
+        collection={<FlagCollection uid={account.uid} own />}
         friendsCount={friendships.loading ? undefined : friendships.friends.length}
         onSeeHistory={() => router.push({ pathname: '/history', params: { uid: account.uid } })}
       />

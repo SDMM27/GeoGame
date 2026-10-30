@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { usePlayerRecords } from '../../hooks/usePlayerRecords'
 import { GAME_TYPES } from '../../utils/gameTypes'
+import CollapsibleSection from '../CollapsibleSection'
 
 const RECORD_META = {
   [GAME_TYPES.PLACEMENT]: { emoji: '🌍', titleKey: 'games.placement.title', color: '#7AA2FF' },
@@ -12,19 +13,18 @@ const RECORD_META = {
   [GAME_TYPES.CAPITALS]: { emoji: '🏛️', titleKey: 'games.capitals.title', color: '#F5B83D' },
 }
 
-export default function RecordsSection({ uid }) {
+export default function RecordsSection({ uid, scope }) {
   const { t } = useTranslation()
   const { loading, error, grid } = usePlayerRecords(uid)
   const [by, setBy] = useState('difficulties')
   if (loading || error || !grid) return null
+  const summary = (
+    <strong className={`profile-records-count${grid.perfectCount > 0 ? ' perfect' : ''}`}>
+      {t('profile.records_perfect', { count: grid.perfectCount, total: grid.total })}
+    </strong>
+  )
   return (
-    <section className="profile-section">
-      <div className="profile-section-title">
-        <h2>{t('profile.records_title')}</h2>
-        <strong className={`profile-records-count${grid.perfectCount > 0 ? ' perfect' : ''}`}>
-          {t('profile.records_perfect', { count: grid.perfectCount, total: grid.total })}
-        </strong>
-      </div>
+    <CollapsibleSection id={`${scope}.records`} title={t('profile.records_title')} summary={summary} defaultOpen={scope === 'player'}>
       <div className="profile-filters">
         {['difficulties', 'continents'].map((value) => (
           <button key={value} type="button" className={by === value ? 'active' : ''} onClick={() => setBy(value)}>
@@ -73,6 +73,6 @@ export default function RecordsSection({ uid }) {
           )
         })}
       </div>
-    </section>
+    </CollapsibleSection>
   )
 }

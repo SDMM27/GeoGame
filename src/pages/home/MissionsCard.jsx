@@ -15,6 +15,7 @@ import {
   WEEKLY_TIERS,
 } from '../../utils/missions'
 import { DAILY_BONUS_FRAGMENTS, DAILY_MISSION_FRAGMENTS, WEEKLY_BONUS_FRAGMENTS } from '../../utils/flagCollection'
+import CollapsibleSection from '../../components/CollapsibleSection'
 import { LevelChip, XpBar } from '../../components/profile/LevelBadge'
 import './MissionsCard.css'
 
@@ -114,6 +115,8 @@ function MissionList({ title, entries, reward, bonusCount, bonusXp, bonusFragmen
   )
 }
 
+const doneCount = (entries) => entries.filter((entry) => entry.done).length
+
 // `missions`: useMissions of the signed-in player (the home page loads it, it also marks the dailies played).
 export default function MissionsCard({ missions }) {
   const { t } = useTranslation()
@@ -131,6 +134,13 @@ export default function MissionsCard({ missions }) {
     )
   }
 
+  const daily = missions.daily
+  // Open while there is something left to do (or nothing loaded yet); the player's own choice wins
+  const defaultOpen = daily.length === 0 || daily.some((entry) => !entry.done)
+  const summary = daily.length > 0
+    ? t('missions.summary', { daily: doneCount(daily), dailyTotal: daily.length, weekly: doneCount(missions.weekly), weeklyTotal: missions.weekly.length })
+    : null
+
   return (
     <article className="missions-card">
       <div className="missions-head">
@@ -144,33 +154,35 @@ export default function MissionsCard({ missions }) {
         )}
       </div>
       {missions.dailies && <DailiesRow dailies={missions.dailies} streak={missions.streak} />}
-      {missions.loading && !missions.daily.length ? (
-        <p className="missions-loading">…</p>
-      ) : (
-        <div className="missions-groups">
-          <MissionList
-            title={t('missions.daily')}
-            entries={missions.daily}
-            reward={dailyReward}
-            bonusCount={DAILY_MISSIONS}
-            bonusXp={DAILY_BONUS_XP}
-            bonusFragments={DAILY_BONUS_FRAGMENTS}
-            bonusDone={missions.dailyBonus}
-            hint={t('missions.resets_daily')}
-          />
-          <MissionList
-            title={t('missions.weekly')}
-            entries={missions.weekly}
-            reward={weeklyReward}
-            bonusCount={WEEKLY_MISSIONS}
-            bonusXp={WEEKLY_BONUS_XP}
-            bonusFragments={WEEKLY_BONUS_FRAGMENTS}
-            bonusDone={missions.weeklyBonus}
-            hint={t('missions.resets_weekly')}
-          />
-        </div>
-      )}
-      <p className="missions-hint">{t('missions.per_game', { xp: GAME_XP, count: GAMES_PER_DAY })}</p>
+      <CollapsibleSection id="home.missions" title={t('missions.details')} summary={summary} defaultOpen={defaultOpen}>
+        {missions.loading && !daily.length ? (
+          <p className="missions-loading">…</p>
+        ) : (
+          <div className="missions-groups">
+            <MissionList
+              title={t('missions.daily')}
+              entries={missions.daily}
+              reward={dailyReward}
+              bonusCount={DAILY_MISSIONS}
+              bonusXp={DAILY_BONUS_XP}
+              bonusFragments={DAILY_BONUS_FRAGMENTS}
+              bonusDone={missions.dailyBonus}
+              hint={t('missions.resets_daily')}
+            />
+            <MissionList
+              title={t('missions.weekly')}
+              entries={missions.weekly}
+              reward={weeklyReward}
+              bonusCount={WEEKLY_MISSIONS}
+              bonusXp={WEEKLY_BONUS_XP}
+              bonusFragments={WEEKLY_BONUS_FRAGMENTS}
+              bonusDone={missions.weeklyBonus}
+              hint={t('missions.resets_weekly')}
+            />
+          </div>
+        )}
+        <p className="missions-hint">{t('missions.per_game', { xp: GAME_XP, count: GAMES_PER_DAY })}</p>
+      </CollapsibleSection>
     </article>
   )
 }

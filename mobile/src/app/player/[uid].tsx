@@ -74,10 +74,10 @@ export default function PlayerScreen() {
             </View>
           </View>
           <LevelBar uid={player.uid} />
-          <FlagCollection uid={player.uid} />
           <FriendAction player={player} />
           <ProfileBody
             uid={player.uid}
+            collection={<FlagCollection uid={player.uid} />}
             onSeeHistory={() => router.push({ pathname: '/history', params: { uid: player.uid, username: player.username } })}
           />
         </>

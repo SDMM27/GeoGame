@@ -9,6 +9,11 @@ jest.mock('@/components/ui', () => {
   const { Pressable, Text } = require('react-native')
   return { Text, Touchable: Pressable, Pill: ({ label }: { label: string }) => <Text>{label}</Text> }
 })
+// Reanimated and worklets need native code: their jest mocks (no useReducedMotion needed here)
+/* eslint-disable @typescript-eslint/no-require-imports */
+jest.mock('react-native-reanimated', () => require('react-native-reanimated/mock'))
+jest.mock('react-native-worklets', () => require('react-native-worklets/lib/module/mock'))
+/* eslint-enable @typescript-eslint/no-require-imports */
 // The icon font loads asynchronously and updates state outside act
 jest.mock('@expo/vector-icons/MaterialCommunityIcons', () => () => null)
 jest.mock('expo-router', () => ({ router: { push: jest.fn() } }))
@@ -25,6 +30,8 @@ const entry = (id: string, progress: number, target: number, paid = false, tier?
 })
 
 const texts = (tree: ReturnType<typeof create>) => JSON.stringify(tree.toJSON())
+const header = (tree: ReturnType<typeof create>) =>
+  tree.root.findAll((node) => typeof node.type !== 'string' && node.props.accessibilityState && typeof node.props.onPress === 'function')[0]
 
 describe('MissionsCard', () => {
   beforeEach(() => mockUseMissions.mockReset())
@@ -92,6 +99,50 @@ describe('MissionsCard', () => {
     expect(out).toContain('missions.dailies_won_3')
     expect(out).toContain('missions.streak_days {\\"count\\":5}')
     expect(out).toContain('missions.streak_next {\\"day\\":7}')
+  })
+
+  it('folds the lists once every daily mission is done, keeping the summary, and opens them on press', () => {
+    mockUseMissions.mockReturnValue({
+      loading: false,
+      xp: { total: 130, level: 2, into: 30, needed: 150 },
+      daily: [entry('play_3', 3, 3, true)],
+      weekly: [entry('week_a', 5, 5, true, 'easy'), entry('week_b', 0, 5, false, 'hard')],
+      dailyBonus: true,
+      weeklyBonus: false,
+    })
+    let tree!: ReturnType<typeof create>
+    act(() => {
+      tree = create(<MissionsCard uid="u1" missions={mockUseMissions('u1')} />)
+    })
+    expect(header(tree).props.accessibilityState).toEqual({ expanded: false })
+    expect(texts(tree)).toContain('missions.summary {\\"daily\\":1,\\"dailyTotal\\":1,\\"weekly\\":1,\\"weeklyTotal\\":2}')
+    expect(texts(tree)).not.toContain('missions.play_3')
+    act(() => header(tree).props.onPress())
+    expect(texts(tree)).toContain('missions.play_3')
+    expect(texts(tree)).toContain('missions.week_b')
+  })
+
+  it('stays open while a daily mission is left, and keeps what the player chose on the next render', () => {
+    const missions = {
+      loading: false,
+      xp: { total: 130, level: 2, into: 30, needed: 150 },
+      daily: [entry('play_3', 0, 3)],
+      weekly: [],
+      dailyBonus: false,
+      weeklyBonus: false,
+    }
+    let tree!: ReturnType<typeof create>
+    act(() => {
+      tree = create(<MissionsCard uid="u1" missions={missions} />)
+    })
+    expect(texts(tree)).toContain('missions.play_3')
+    act(() => header(tree).props.onPress())
+    expect(texts(tree)).not.toContain('missions.play_3')
+    act(() => tree.unmount())
+    act(() => {
+      tree = create(<MissionsCard uid="u1" missions={missions} />)
+    })
+    expect(texts(tree)).not.toContain('missions.play_3')
   })
 
   it('pays XP only for the daily missions, and XP plus fragments by tier for the weekly ones', () => {

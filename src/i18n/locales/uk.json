@@ -1410,6 +1410,8 @@
   },
   "missions": {
     "title": "Місії",
+    "details": "Деталі місій",
+    "summary": "День {{daily}}/{{dailyTotal}} · Тиждень {{weekly}}/{{weeklyTotal}}",
     "daily": "Місії дня",
     "weekly": "Місії тижня",
     "bonus": "Бонус: усі місії ({{count}})",

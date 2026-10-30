@@ -10,6 +10,7 @@ import { decorationStyle } from '../../utils/decorations'
 import { GAME_TYPES } from '../../utils/gameTypes'
 import { describeBest, describeDetails, describeMode, describeResult, formatPlayedAt } from '../../utils/profileFormat'
 import { dailyTypesOn, dayKey, formatPlayTime } from '../../utils/profileStats'
+import CollapsibleSection from '../CollapsibleSection'
 import BadgeStrip from './BadgeStrip'
 import EloSection from './EloSection'
 import RecordsSection from './RecordsSection'
@@ -137,20 +138,19 @@ function StreakCard({ stats }) {
   )
 }
 
-function Achievements({ achievements }) {
+function Achievements({ achievements, scope }) {
   const { t } = useTranslation()
   const [expanded, setExpanded] = useState(false)
   const unlocked = achievements.filter((item) => item.unlocked).length
   const visible = expanded ? achievements : achievements.slice(0, 8)
+  const summary = (
+    <>
+      <span>{t('profile.achievements_count', { unlocked, total: achievements.length })}</span>
+      <BadgeStrip badges={readBadges({ badges: badgeSummary(achievements) })} />
+    </>
+  )
   return (
-    <section className="profile-section">
-      <div className="profile-section-title">
-        <h2>
-          {t('profile.achievements_title')}
-          <BadgeStrip badges={readBadges({ badges: badgeSummary(achievements) })} />
-        </h2>
-        <span className="profile-muted">{t('profile.achievements_count', { unlocked, total: achievements.length })}</span>
-      </div>
+    <CollapsibleSection id={`${scope}.achievements`} title={t('profile.achievements_title')} summary={summary} defaultOpen={scope === 'player'}>
       <div className="profile-achievements">
         {visible.map((achievement) => (
           <div
@@ -178,7 +178,7 @@ function Achievements({ achievements }) {
           {expanded ? t('profile.show_less') : t('profile.history_all')}
         </button>
       )}
-    </section>
+    </CollapsibleSection>
   )
 }
 
@@ -249,7 +249,7 @@ function GameDetail({ game, meta, onClose }) {
   )
 }
 
-function History({ games }) {
+function History({ games, scope }) {
   const { t } = useTranslation()
   const [expanded, setExpanded] = useState(false)
   const [filter, setFilter] = useState(null)
@@ -258,15 +258,16 @@ function History({ games }) {
   const visible = expanded ? filtered : filtered.slice(0, 8)
 
   return (
-    <section className="profile-section">
-      <div className="profile-section-title">
-        <h2>{t(expanded ? 'profile.history_full_title' : 'profile.history_title')}</h2>
-        {games.length > 8 && (
-          <button type="button" className="profile-link" onClick={() => setExpanded((value) => !value)}>
-            {expanded ? t('profile.show_less') : t('profile.history_all')}
-          </button>
-        )}
-      </div>
+    <CollapsibleSection
+      id={`${scope}.history`}
+      title={t(expanded ? 'profile.history_full_title' : 'profile.history_title')}
+      summary={games.length > 0 ? describeResult(games[0], t) : null}
+    >
+      {games.length > 8 && (
+        <button type="button" className="profile-link" onClick={() => setExpanded((value) => !value)}>
+          {expanded ? t('profile.show_less') : t('profile.history_all')}
+        </button>
+      )}
       {expanded && types.length > 1 && (
         <div className="profile-filters">
           <button type="button" className={!filter ? 'active' : ''} onClick={() => setFilter(null)}>
@@ -288,19 +289,18 @@ function History({ games }) {
           ))}
         </ul>
       )}
-    </section>
+    </CollapsibleSection>
   )
 }
 
-function ByGame({ stats }) {
+function ByGame({ stats, scope }) {
   const { t } = useTranslation()
   const entries = Object.entries(stats.byGame).sort((a, b) => b[1].played - a[1].played)
   if (entries.length === 0) return null
+  const top = GAME_META[entries[0][0]]
+  const summary = top && `${top.emoji} ${t(top.titleKey)} · ${t('profile.games_count', { count: entries[0][1].played })}`
   return (
-    <section className="profile-section">
-      <div className="profile-section-title">
-        <h2>{t('profile.by_game_title')}</h2>
-      </div>
+    <CollapsibleSection id={`${scope}.by_game`} title={t('profile.by_game_title')} summary={summary}>
       <ul className="profile-list">
         {entries.map(([type, gameStats]) => {
           const meta = GAME_META[type]
@@ -325,30 +325,42 @@ function ByGame({ stats }) {
           )
         })}
       </ul>
-    </section>
+    </CollapsibleSection>
   )
 }
 
-export default function ProfileBody({ uid, friendsCount, own = false }) {
+export default function ProfileBody({ uid, friendsCount, own = false, friends, collection }) {
   const { t } = useTranslation()
   const { loading, error, games, stats, achievements } = usePlayerProfile(uid, { friendsCount, own })
 
   if (loading) return <p className="profile-muted profile-center">…</p>
-  if (error) return <p className="profile-muted">{t('profile.load_error')}</p>
-  return <ProfileView games={games} stats={stats} achievements={achievements} uid={uid} />
+  if (error) {
+    return (
+      <div className="profile-body">
+        <p className="profile-muted">{t('profile.load_error')}</p>
+        {friends}
+        {collection}
+      </div>
+    )
+  }
+  return <ProfileView games={games} stats={stats} achievements={achievements} uid={uid} own={own} friends={friends} collection={collection} />
 }
 
 // The sections themselves, from already loaded data (the Elo ratings load on their own, for `uid`).
-export function ProfileView({ games, stats, achievements, uid }) {
+// `friends` and `collection` (nodes) are shown, in that order, right after the streak. `own` picks which sections start folded.
+export function ProfileView({ games, stats, achievements, uid, own = false, friends, collection }) {
+  const scope = own ? 'own' : 'player'
   return (
     <div className="profile-body">
       <StatTiles stats={stats} />
       <StreakCard stats={stats} />
-      {uid && <RecordsSection uid={uid} />}
-      <Achievements achievements={achievements} />
-      {uid && <EloSection uid={uid} />}
-      <History games={games} />
-      <ByGame stats={stats} />
+      {friends}
+      {collection}
+      {uid && <RecordsSection uid={uid} scope={scope} />}
+      <Achievements achievements={achievements} scope={scope} />
+      {uid && <EloSection uid={uid} scope={scope} />}
+      <History games={games} scope={scope} />
+      <ByGame stats={stats} scope={scope} />
     </div>
   )
 }

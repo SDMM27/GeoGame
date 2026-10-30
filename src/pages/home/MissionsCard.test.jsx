@@ -2,8 +2,8 @@
 // of the day with their fragments and the streak.
 import React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { afterEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, render } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import MissionsCard from './MissionsCard'
 
 vi.mock('react-i18next', () => ({
@@ -14,6 +14,7 @@ vi.mock('../../components/profile/LevelBadge', () => ({ LevelChip: () => null, X
 
 const entry = (id, target, tier) => ({ mission: { id, emoji: '🎮', target, tier }, progress: 0, done: false, paid: false })
 
+beforeEach(() => localStorage.clear())
 afterEach(cleanup)
 
 const render_ = (missions) => {
@@ -58,6 +59,27 @@ describe('MissionsCard', () => {
       </MemoryRouter>
     )
     expect(container.querySelector('.missions-dailies')).toBeNull()
+  })
+
+  it('folds the lists once every daily mission is done, keeping the summary', () => {
+    const done = { ...entry('play_3', 3), done: true }
+    const { container } = render_({ daily: [done], weekly: [{ ...entry('week_a', 5, 'easy'), done: true }, entry('week_b', 5, 'hard')] })
+    const toggle = screen.getByRole('button', { name: 'missions.details' })
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.getByText('missions.summary {"daily":1,"dailyTotal":1,"weekly":1,"weeklyTotal":2}')).toBeTruthy()
+    expect(container.querySelector('.missions-group')).toBeNull()
+    fireEvent.click(toggle)
+    expect(container.querySelectorAll('.missions-group')).toHaveLength(2)
+  })
+
+  it('stays open while a daily mission is left, and a choice of the player wins over that default', () => {
+    const { container, unmount } = render_({ daily: [entry('play_3', 0, 3)], weekly: [] })
+    expect(container.querySelectorAll('.missions-group')).toHaveLength(2)
+    fireEvent.click(screen.getByRole('button', { name: 'missions.details' }))
+    expect(container.querySelector('.missions-group')).toBeNull()
+    unmount()
+    const again = render_({ daily: [entry('play_3', 0, 3)], weekly: [] })
+    expect(again.container.querySelector('.missions-group')).toBeNull()
   })
 
   it('pays XP only for the daily missions, and XP plus fragments by tier for the weekly ones', () => {

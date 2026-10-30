@@ -10,6 +10,7 @@ import { acceptFriendRequest, friendErrorKey, removeFriendship, SEARCH_MIN, send
 import { clearPendingInvite, getPendingInvite, inviteUrl } from '../../utils/inviteLink'
 import { shareInviteLink } from '../../utils/shareInvite'
 import { GAMES } from '../../pages/home/gameData'
+import CollapsibleSection from '../CollapsibleSection'
 import FriendCandidates from './FriendCandidates'
 import { Avatar, DailyChips } from './ProfileBody'
 import './FriendsPanel.css'
@@ -149,13 +150,13 @@ export default function FriendsPanel({ account, friendships }) {
     if (window.confirm(t('friends.remove_confirm', { username: friend.username }))) removeFriendship(friend.id)
   }
 
-  return (
-    <section className="profile-section">
-      <div className="profile-section-title">
-        <h2>{t('friends.title')}</h2>
-        <span className="profile-muted">{friendships.friends.length}</span>
-      </div>
+  const pending = friendships.incoming.length
+  const summary = pending > 0
+    ? <span className="friends-badge">{t('friends.pending_badge', { count: pending })}</span>
+    : t('friends.count', { count: friendships.friends.length })
 
+  return (
+    <CollapsibleSection id="own.friends" title={t('friends.title')} summary={summary}>
       <form className="friends-add" onSubmit={handleAdd}>
         <input
           value={username}
@@ -241,6 +242,6 @@ export default function FriendsPanel({ account, friendships }) {
           </ul>
         </div>
       )}
-    </section>
+    </CollapsibleSection>
   )
 }

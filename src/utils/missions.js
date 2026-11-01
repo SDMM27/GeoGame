@@ -77,6 +77,7 @@ const isDifficult = (game) => DIFFICULTY_TYPES.includes(game.gameType) && isHard
 // `missions.<id>`, with {{count}} the target. `emoji` is used by the website, `icon` (MaterialCommunityIcons) by the app.
 // `game`: the mission is only about that game, and isn't drawn while it is hidden (gameAvailability.js).
 // `sinceWeek`: a weekly mission added mid-week is only drawn from that week on, so the week under way keeps its draw.
+// `untilWeek`: a weekly mission retired is drawn up to the week before, so the past weeks keep theirs (and their titles).
 export const DAILY_POOL = [
   { id: 'play_3', family: 'volume', emoji: '🎮', icon: 'gamepad-variant-outline', target: 3, value: (games) => games.length },
   { id: 'play_5', family: 'volume', emoji: '🕹️', icon: 'controller-classic-outline', target: 5, value: (games) => games.length },
@@ -107,34 +108,57 @@ export const DAILY_POOL = [
 
 export const WEEKLY_POOL = [
   // Easy
-  { id: 'week_play_20', family: 'volume', tier: 'easy', emoji: '🕹️', icon: 'controller-classic-outline', target: 20, value: (games) => games.length },
-  { id: 'week_dailies_15', family: 'dailies', tier: 'easy', emoji: '📆', icon: 'calendar-multiselect', target: 15, value: (games) => count(games, isDaily) },
-  { id: 'week_types_6', family: 'types', tier: 'easy', emoji: '🧩', icon: 'puzzle-outline', target: 6, value: (games) => distinct(games.map((game) => game.gameType)) },
-  { id: 'week_found_200', family: 'found', tier: 'easy', emoji: '🗺️', icon: 'map-marker-multiple-outline', target: 200, value: allFound },
-  { id: 'week_flags_60', family: 'flags', tier: 'easy', emoji: '🚩', icon: 'flag-variant-outline', target: 60, value: (games) => sumFound(games, GAME_TYPES.FLAGS) },
-  { id: 'week_placement_60', family: 'placement', tier: 'easy', emoji: '🌍', icon: 'earth', target: 60, value: (games) => sumFound(games, GAME_TYPES.PLACEMENT) },
-  { id: 'week_capitals_40', family: 'capitals', tier: 'easy', emoji: '🏛️', icon: 'bank-outline', target: 40, value: (games) => sumFound(games, GAME_TYPES.CAPITALS) },
+  { id: 'week_play_20', family: 'volume', tier: 'easy', untilWeek: '2026-W45', emoji: '🕹️', icon: 'controller-classic-outline', target: 20, value: (games) => games.length },
+  { id: 'week_dailies_15', family: 'dailies', tier: 'easy', untilWeek: '2026-W45', emoji: '📆', icon: 'calendar-multiselect', target: 15, value: (games) => count(games, isDaily) },
+  { id: 'week_types_6', family: 'types', tier: 'easy', untilWeek: '2026-W45', emoji: '🧩', icon: 'puzzle-outline', target: 6, value: (games) => distinct(games.map((game) => game.gameType)) },
+  { id: 'week_found_200', family: 'found', tier: 'easy', untilWeek: '2026-W45', emoji: '🗺️', icon: 'map-marker-multiple-outline', target: 200, value: allFound },
+  { id: 'week_flags_60', family: 'flags', tier: 'easy', untilWeek: '2026-W45', emoji: '🚩', icon: 'flag-variant-outline', target: 60, value: (games) => sumFound(games, GAME_TYPES.FLAGS) },
+  { id: 'week_placement_60', family: 'placement', tier: 'easy', untilWeek: '2026-W45', emoji: '🌍', icon: 'earth', target: 60, value: (games) => sumFound(games, GAME_TYPES.PLACEMENT) },
+  { id: 'week_capitals_40', family: 'capitals', tier: 'easy', untilWeek: '2026-W45', emoji: '🏛️', icon: 'bank-outline', target: 40, value: (games) => sumFound(games, GAME_TYPES.CAPITALS) },
   { id: 'week_country_of_day_5', family: 'country_of_day', tier: 'easy', sinceWeek: '2026-W45', emoji: '🌐', icon: 'earth', target: 5, value: (games) => distinct(games.filter(isCountryOfDay).map((game) => game.dailyKey)) },
-  { id: 'week_challenge_3', family: 'challenge', tier: 'easy', emoji: '🎯', icon: 'bullseye-arrow', target: 3, value: (games) => distinct(games.filter(isChallenge).map((game) => game.dailyKey)) },
+  { id: 'week_challenge_3', family: 'challenge', tier: 'easy', untilWeek: '2026-W45', emoji: '🎯', icon: 'bullseye-arrow', target: 3, value: (games) => distinct(games.filter(isChallenge).map((game) => game.dailyKey)) },
+  { id: 'week_play_30', family: 'volume', tier: 'easy', sinceWeek: '2026-W45', emoji: '🕹️', icon: 'controller-classic-outline', target: 30, value: (games) => games.length },
+  { id: 'week_dailies_25', family: 'dailies', tier: 'easy', sinceWeek: '2026-W45', emoji: '📆', icon: 'calendar-multiselect', target: 25, value: (games) => count(games, isDaily) },
+  { id: 'week_types_8', family: 'types', tier: 'easy', sinceWeek: '2026-W45', emoji: '🧩', icon: 'puzzle-outline', target: 8, value: (games) => distinct(games.map((game) => game.gameType)) },
+  { id: 'week_found_easy_500', family: 'found', tier: 'easy', sinceWeek: '2026-W45', emoji: '🗺️', icon: 'map-marker-multiple-outline', target: 500, value: allFound },
+  { id: 'week_flags_250', family: 'flags', tier: 'easy', sinceWeek: '2026-W45', emoji: '🚩', icon: 'flag-variant-outline', target: 250, value: (games) => sumFound(games, GAME_TYPES.FLAGS) },
+  { id: 'week_placement_250', family: 'placement', tier: 'easy', sinceWeek: '2026-W45', emoji: '🌍', icon: 'earth', target: 250, value: (games) => sumFound(games, GAME_TYPES.PLACEMENT) },
+  { id: 'week_capitals_250', family: 'capitals', tier: 'easy', sinceWeek: '2026-W45', emoji: '🏛️', icon: 'bank-outline', target: 250, value: (games) => sumFound(games, GAME_TYPES.CAPITALS) },
+  { id: 'week_challenge_5', family: 'challenge', tier: 'easy', sinceWeek: '2026-W45', emoji: '🎯', icon: 'bullseye-arrow', target: 5, value: (games) => distinct(games.filter(isChallenge).map((game) => game.dailyKey)) },
   // Medium
-  { id: 'week_daily_days_5', family: 'daily_days', tier: 'medium', emoji: '🔥', icon: 'fire', target: 5, value: (games) => distinct(games.filter(isDaily).map((game) => game.dailyKey)) },
-  { id: 'week_daily_wins_10', family: 'daily_wins', tier: 'medium', emoji: '🏅', icon: 'medal-outline', target: 10, value: (games) => count(games, (game) => isDaily(game) && game.solved) },
-  { id: 'week_ascension_3', family: 'ascension', tier: 'medium', emoji: '🏔️', icon: 'summit', target: 3, value: (games) => count(games, (game) => game.mode === 'ascension') },
-  { id: 'week_found_500', family: 'found', tier: 'medium', emoji: '🌐', icon: 'map-search-outline', target: 500, value: allFound },
-  { id: 'week_survival_5', family: 'survival', tier: 'medium', emoji: '❤️', icon: 'heart-pulse', target: 5, value: (games) => count(games, ofType(GAME_TYPES.SURVIVAL)) },
-  { id: 'week_hardcore_3', family: 'hardcore', tier: 'medium', emoji: '🔥', icon: 'skull-outline', target: 3, value: (games) => count(games, ofType(GAME_TYPES.HARDCORE)) },
-  { id: 'week_multi_3', family: 'multi', tier: 'medium', emoji: '👥', icon: 'account-group-outline', target: 3, value: (games) => count(games, isMulti) },
-  { id: 'week_difficult_3', family: 'difficulty', tier: 'medium', emoji: '💪', icon: 'arm-flex-outline', target: 3, value: (games) => count(games, isDifficult) },
-  { id: 'week_missing_flag_3', family: 'flags', tier: 'medium', emoji: '🏳️', icon: 'flag-outline', target: 3, value: (games) => count(games, ofType(GAME_TYPES.MISSING_FLAG)) },
+  { id: 'week_daily_days_5', family: 'daily_days', tier: 'medium', untilWeek: '2026-W45', emoji: '🔥', icon: 'fire', target: 5, value: (games) => distinct(games.filter(isDaily).map((game) => game.dailyKey)) },
+  { id: 'week_daily_wins_10', family: 'daily_wins', tier: 'medium', untilWeek: '2026-W45', emoji: '🏅', icon: 'medal-outline', target: 10, value: (games) => count(games, (game) => isDaily(game) && game.solved) },
+  { id: 'week_ascension_3', family: 'ascension', tier: 'medium', untilWeek: '2026-W45', emoji: '🏔️', icon: 'summit', target: 3, value: (games) => count(games, (game) => game.mode === 'ascension') },
+  { id: 'week_found_500', family: 'found', tier: 'medium', untilWeek: '2026-W45', emoji: '🌐', icon: 'map-search-outline', target: 500, value: allFound },
+  { id: 'week_survival_5', family: 'survival', tier: 'medium', untilWeek: '2026-W45', emoji: '❤️', icon: 'heart-pulse', target: 5, value: (games) => count(games, ofType(GAME_TYPES.SURVIVAL)) },
+  { id: 'week_hardcore_3', family: 'hardcore', tier: 'medium', untilWeek: '2026-W45', emoji: '🔥', icon: 'skull-outline', target: 3, value: (games) => count(games, ofType(GAME_TYPES.HARDCORE)) },
+  { id: 'week_multi_3', family: 'multi', tier: 'medium', untilWeek: '2026-W45', emoji: '👥', icon: 'account-group-outline', target: 3, value: (games) => count(games, isMulti) },
+  { id: 'week_difficult_3', family: 'difficulty', tier: 'medium', untilWeek: '2026-W45', emoji: '💪', icon: 'arm-flex-outline', target: 3, value: (games) => count(games, isDifficult) },
+  { id: 'week_missing_flag_3', family: 'flags', tier: 'medium', untilWeek: '2026-W45', emoji: '🏳️', icon: 'flag-outline', target: 3, value: (games) => count(games, ofType(GAME_TYPES.MISSING_FLAG)) },
+  { id: 'week_daily_days_6', family: 'daily_days', tier: 'medium', sinceWeek: '2026-W45', emoji: '🔥', icon: 'fire', target: 6, value: (games) => distinct(games.filter(isDaily).map((game) => game.dailyKey)) },
+  { id: 'week_daily_wins_18', family: 'daily_wins', tier: 'medium', sinceWeek: '2026-W45', emoji: '🏅', icon: 'medal-outline', target: 18, value: (games) => count(games, (game) => isDaily(game) && game.solved) },
+  { id: 'week_ascension_5', family: 'ascension', tier: 'medium', sinceWeek: '2026-W45', emoji: '🏔️', icon: 'summit', target: 5, value: (games) => count(games, (game) => game.mode === 'ascension') },
+  { id: 'week_found_medium_1000', family: 'found', tier: 'medium', sinceWeek: '2026-W45', emoji: '🌐', icon: 'map-search-outline', target: 1000, value: allFound },
+  { id: 'week_survival_10', family: 'survival', tier: 'medium', sinceWeek: '2026-W45', emoji: '❤️', icon: 'heart-pulse', target: 10, value: (games) => count(games, ofType(GAME_TYPES.SURVIVAL)) },
+  { id: 'week_hardcore_5', family: 'hardcore', tier: 'medium', sinceWeek: '2026-W45', emoji: '🔥', icon: 'skull-outline', target: 5, value: (games) => count(games, ofType(GAME_TYPES.HARDCORE)) },
+  { id: 'week_multi_5', family: 'multi', tier: 'medium', sinceWeek: '2026-W45', emoji: '👥', icon: 'account-group-outline', target: 5, value: (games) => count(games, isMulti) },
+  { id: 'week_difficult_6', family: 'difficulty', tier: 'medium', sinceWeek: '2026-W45', emoji: '💪', icon: 'arm-flex-outline', target: 6, value: (games) => count(games, isDifficult) },
+  { id: 'week_missing_flag_8', family: 'flags', tier: 'medium', sinceWeek: '2026-W45', emoji: '🏳️', icon: 'flag-outline', target: 8, value: (games) => count(games, ofType(GAME_TYPES.MISSING_FLAG)) },
   // Hard
   { id: 'week_daily_days_7', family: 'daily_days', tier: 'hard', emoji: '🗓️', icon: 'calendar-star', target: 7, value: (games) => distinct(games.filter(isDaily).map((game) => game.dailyKey)) },
-  { id: 'week_daily_wins_20', family: 'daily_wins', tier: 'hard', emoji: '🏆', icon: 'trophy-outline', target: 20, value: (games) => count(games, (game) => isDaily(game) && game.solved) },
-  { id: 'week_perfect_3', family: 'perfect', tier: 'hard', emoji: '💠', icon: 'star-four-points-outline', target: 3, value: (games) => count(games, isPerfect) },
-  { id: 'week_types_10', family: 'types', tier: 'hard', emoji: '🧭', icon: 'compass-outline', target: 10, value: (games) => distinct(games.map((game) => game.gameType)) },
-  { id: 'week_found_1000', family: 'found', tier: 'hard', emoji: '🌏', icon: 'earth-arrow-right', target: 1000, value: allFound },
-  { id: 'week_play_50', family: 'volume', tier: 'hard', emoji: '🎮', icon: 'gamepad-variant-outline', target: 50, value: (games) => games.length },
-  { id: 'week_perfect_hard_1', family: 'perfect', tier: 'hard', emoji: '👑', icon: 'crown-outline', target: 1, value: (games) => count(games, (game) => isPerfect(game) && isHardDifficulty(game)) },
-  { id: 'week_challenge_10', family: 'challenge', tier: 'hard', emoji: '🥇', icon: 'bullseye', target: 1, value: (games) => count(games, isChallengeOf10) },
+  { id: 'week_daily_wins_20', family: 'daily_wins', tier: 'hard', untilWeek: '2026-W45', emoji: '🏆', icon: 'trophy-outline', target: 20, value: (games) => count(games, (game) => isDaily(game) && game.solved) },
+  { id: 'week_perfect_3', family: 'perfect', tier: 'hard', untilWeek: '2026-W45', emoji: '💠', icon: 'star-four-points-outline', target: 3, value: (games) => count(games, isPerfect) },
+  { id: 'week_types_10', family: 'types', tier: 'hard', untilWeek: '2026-W45', emoji: '🧭', icon: 'compass-outline', target: 10, value: (games) => distinct(games.map((game) => game.gameType)) },
+  { id: 'week_found_1000', family: 'found', tier: 'hard', untilWeek: '2026-W45', emoji: '🌏', icon: 'earth-arrow-right', target: 1000, value: allFound },
+  { id: 'week_play_50', family: 'volume', tier: 'hard', untilWeek: '2026-W45', emoji: '🎮', icon: 'gamepad-variant-outline', target: 50, value: (games) => games.length },
+  { id: 'week_perfect_hard_1', family: 'perfect', tier: 'hard', untilWeek: '2026-W45', emoji: '👑', icon: 'crown-outline', target: 1, value: (games) => count(games, (game) => isPerfect(game) && isHardDifficulty(game)) },
+  { id: 'week_challenge_10', family: 'challenge', tier: 'hard', untilWeek: '2026-W45', emoji: '🥇', icon: 'bullseye', target: 1, value: (games) => count(games, isChallengeOf10) },
+  { id: 'week_daily_wins_30', family: 'daily_wins', tier: 'hard', sinceWeek: '2026-W45', emoji: '🏆', icon: 'trophy-outline', target: 30, value: (games) => count(games, (game) => isDaily(game) && game.solved) },
+  { id: 'week_perfect_6', family: 'perfect', tier: 'hard', sinceWeek: '2026-W45', emoji: '💠', icon: 'star-four-points-outline', target: 6, value: (games) => count(games, isPerfect) },
+  { id: 'week_found_2500', family: 'found', tier: 'hard', sinceWeek: '2026-W45', emoji: '🌏', icon: 'earth-arrow-right', target: 2500, value: allFound },
+  { id: 'week_play_70', family: 'volume', tier: 'hard', sinceWeek: '2026-W45', emoji: '🎮', icon: 'gamepad-variant-outline', target: 70, value: (games) => games.length },
+  { id: 'week_perfect_hard_3', family: 'perfect', tier: 'hard', sinceWeek: '2026-W45', emoji: '👑', icon: 'crown-outline', target: 3, value: (games) => count(games, (game) => isPerfect(game) && isHardDifficulty(game)) },
+  { id: 'week_challenge_10_days_5', family: 'challenge', tier: 'hard', sinceWeek: '2026-W45', emoji: '🥇', icon: 'bullseye', target: 5, value: (games) => distinct(games.filter(isChallengeOf10).map((game) => game.dailyKey)) },
 ]
 
 // ---------- Periods (Paris time, like dailyKey.js, which can't be imported here: it reads the server clock) ----------
@@ -187,7 +211,10 @@ function pickDistinctFamilies(shuffled, size, families) {
 
 // The missions that can be drawn: none about a hidden game
 const drawable = (pool, week = null) =>
-  pool.filter((mission) => !isGameHidden(mission.game) && !(week && mission.sinceWeek && week < mission.sinceWeek))
+  pool.filter(
+    (mission) =>
+      !isGameHidden(mission.game) && !(week && ((mission.sinceWeek && week < mission.sinceWeek) || (mission.untilWeek && week >= mission.untilWeek))),
+  )
 
 export const dailyMissions = (day) => pickDistinctFamilies(seededShuffle(drawable(DAILY_POOL), seedOf(`missions:day:${day}`)), DAILY_MISSIONS, new Set())
 

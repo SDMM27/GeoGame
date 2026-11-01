@@ -92,6 +92,20 @@ describe('missions', () => {
     expect(later).toContain('week_country_of_day_5')
   })
 
+  it('draws only the raised weekly targets from the week of 2 November, and the past weeks keep the old ones', () => {
+    const drawn = (first, last) => Array.from({ length: last - first + 1 }, (_, i) => weeklyMissions(`2026-W${first + i}`)).flat()
+    expect(drawn(10, 44).some((mission) => mission.sinceWeek === '2026-W45')).toBe(false)
+    const raised = Array.from({ length: 52 }, (_, i) => weeklyMissions(`2027-W${String(i + 1).padStart(2, '0')}`)).flat()
+    expect([...drawn(45, 52), ...raised].some((mission) => mission.untilWeek)).toBe(false)
+    expect(raised.map((mission) => mission.id)).not.toContain('week_types_10')
+  })
+
+  it('counts the days of 10/12 at the daily challenge, not the games', () => {
+    const { value } = WEEKLY_POOL.find((mission) => mission.id === 'week_challenge_10_days_5')
+    const challenge = (dailyKey, score) => ({ gameType: 'DAILY_CHALLENGE', mode: 'daily', dailyKey, score })
+    expect(value([challenge('2026-11-02', 10), challenge('2026-11-02', 12), challenge('2026-11-03', 11), challenge('2026-11-04', 9)])).toBe(2)
+  })
+
   it('never draws a mission about a hidden game', () => {
     for (let day = 1; day <= 28; day += 1) {
       const key = `2026-11-${String(day).padStart(2, '0')}`

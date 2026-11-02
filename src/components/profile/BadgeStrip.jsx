@@ -15,7 +15,7 @@ function cardPosition(rect) {
 }
 
 // A player's best badges (see utils/badges.js), small, next to their name. The tier gives the color.
-// Hover, focus or tap a badge to see the challenge behind it.
+// Hover, focus or tap a badge to see the challenge behind it. A gold trophy comes first for a league champion (`wins`).
 export default function BadgeStrip({ badges }) {
   const { t } = useTranslation()
   const [shown, setShown] = useState(null) // { badge, style }
@@ -38,12 +38,18 @@ export default function BadgeStrip({ badges }) {
     }
   }, [shown])
 
-  if (!badges?.top?.length) return null
+  const wins = badges?.wins ?? 0
+  if (!badges?.top?.length && wins <= 0) return null
   const show = (badge, element) => setShown({ badge, style: cardPosition(element.getBoundingClientRect()) })
 
   return (
     <span className="badge-strip" ref={stripRef}>
-      {badges.top.map((badge) => {
+      {wins > 0 && (
+        <span className="badge-strip__chip badge-strip__chip--champion" style={{ '--tier': TIER_COLORS.gold }} role="img" aria-label={t('league.champion_wins', { count: wins })} title={t('league.champion_wins', { count: wins })}>
+          🏆{wins > 1 && <span className="badge-strip__wins">×{wins}</span>}
+        </span>
+      )}
+      {(badges.top ?? []).map((badge) => {
         const label = `${t(`achievements.${badge.id}.title`)} · ${t(`achievements.tiers.${badge.tier}`)}`
         return (
           <button

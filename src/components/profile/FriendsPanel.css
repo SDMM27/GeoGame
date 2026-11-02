@@ -67,8 +67,8 @@
 .friends-pending p { margin: 0.2rem 0 0; }
 .friends-pending { flex-direction: column; align-items: flex-start; border-color: var(--accent); }
 .friends-pending__actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-.friends-community { align-self: flex-start; color: var(--accent); font-weight: 600; text-decoration: none; }
-.friends-community:hover { text-decoration: underline; }
+.friends-league { align-self: flex-start; color: var(--accent); font-weight: 600; text-decoration: none; }
+.friends-league:hover { text-decoration: underline; }
 
 @media (max-width: 600px) {
   .friends-invite { flex-direction: column; align-items: stretch; }

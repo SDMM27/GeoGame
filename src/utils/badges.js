@@ -22,16 +22,18 @@ export function badgeSummary(achievements) {
   return { top: unlocked.slice(0, BADGES_SHOWN).map((achievement) => achievement.id), count: unlocked.length }
 }
 
-// What a users/{uid} document holds, cleaned up: [{ id, tier, emoji, icon }] best first, and the total.
+// What a users/{uid} document holds, cleaned up: [{ id, tier, emoji, icon }] best first, the total, and `wins`: the
+// weeks won in the league (league.wins, written by the server only: api/_lib/weeklyTop.mjs).
 export function readBadges(data) {
+  const wins = Number.isInteger(data?.league?.wins) && data.league.wins > 0 ? data.league.wins : 0
   const raw = data?.badges
-  if (!raw || !Array.isArray(raw.top)) return { top: [], count: 0 }
+  if (!raw || !Array.isArray(raw.top)) return { top: [], count: 0, wins }
   const top = raw.top
     .filter((id) => KNOWN_IDS.has(id))
     .map((id) => BY_ID[id])
     .slice(0, BADGES_SHOWN)
     .map(({ id, tier, emoji, icon }) => ({ id, tier, emoji, icon }))
-  return { top, count: Number.isFinite(raw.count) ? raw.count : top.length }
+  return { top, count: Number.isFinite(raw.count) ? raw.count : top.length, wins }
 }
 
 const sameSummary = (a, b) =>

@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import { usePlayerSearch, useRecentPlayers } from '@shared/hooks/useCommunity'
+import { usePlayerSearch, useRecentPlayers } from '@shared/hooks/usePlayerSearch'
 import useFriendsPresence from '@shared/hooks/useFriendsPresence'
 import { useFriendships, useFriendsToday } from '@shared/hooks/usePlayerProfile'
 import { USERNAME_MAX } from '@shared/utils/account'
@@ -188,10 +188,10 @@ export default function FriendsScreen() {
           </View>
         )}
 
-        <Touchable accessibilityRole="button" onPress={() => router.push('/community')} style={styles.communityLink}>
+        <Touchable accessibilityRole="button" onPress={() => router.push('/league')} style={styles.leagueLink}>
           <MaterialCommunityIcons name="account-group-outline" size={22} color={colors.accent} />
           <Text variant="bodyStrong" color={colors.accent} style={{ flex: 1 }}>
-            {t('friends.community_link')}
+            {t('friends.league_link')}
           </Text>
           <MaterialCommunityIcons name="chevron-right" size={22} color={colors.accent} />
         </Touchable>
@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bodyMedium,
     fontSize: 16,
   },
-  communityLink: { flexDirection: 'row', alignItems: 'center', gap: space.md, padding: space.lg, borderRadius: radius.xl, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
+  leagueLink: { flexDirection: 'row', alignItems: 'center', gap: space.md, padding: space.lg, borderRadius: radius.xl, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   list: { borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.sm, paddingHorizontal: space.md, paddingVertical: space.md },
   divider: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },

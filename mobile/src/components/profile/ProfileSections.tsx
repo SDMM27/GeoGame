@@ -5,6 +5,7 @@ import { useCallback, useRef, useState, type ComponentProps, type ReactNode } fr
 import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native'
 
+import { useBadges } from '@shared/hooks/useBadges'
 import { usePlayerElo } from '@shared/hooks/usePlayerElo'
 import { usePlayerRecords } from '@shared/hooks/usePlayerRecords'
 import { usePlayerProfile } from '@shared/hooks/usePlayerProfile'
@@ -15,6 +16,7 @@ import { describeBest, describeDetails, describeMode, describeResult, formatPlay
 import { dailyTypesOn, dayKey, formatPlayTime } from '@shared/utils/profileStats'
 
 import { CollapsibleSection } from '@/components/CollapsibleSection'
+import { BadgeStrip } from '@/components/profile/BadgeStrip'
 import { Button, Segmented, Text, Touchable } from '@/components/ui'
 import { getGameByType } from '@/games'
 import { colors, fonts, radius, space } from '@/theme'
@@ -219,8 +221,10 @@ export function DailyChips({
   )
 }
 
-export function AchievementsSection({ achievements, scope }: { achievements: Achievement[]; scope: Scope }) {
+export function AchievementsSection({ achievements, scope, uid }: { achievements: Achievement[]; scope: Scope; uid?: string }) {
   const { t } = useTranslation()
+  const byUid: Record<string, { wins?: number } | undefined> = useBadges([uid])
+  const wins = (uid ? byUid[uid]?.wins : 0) ?? 0
   const [expanded, setExpanded] = useState(false)
   const unlocked = achievements.filter((item) => item.unlocked).length
   const visible = expanded ? achievements : achievements.slice(0, 6)
@@ -228,8 +232,22 @@ export function AchievementsSection({ achievements, scope }: { achievements: Ach
     <CollapsibleSection
       id={`${scope}.achievements`}
       title={t('profile.achievements_title')}
-      summary={t('profile.achievements_count', { unlocked, total: achievements.length })}
+      summary={
+        wins > 0 ? (
+          <>
+            <Text variant="caption">{t('profile.achievements_count', { unlocked, total: achievements.length })}</Text>
+            <BadgeStrip badges={{ top: [], count: 0, wins }} />
+          </>
+        ) : (
+          t('profile.achievements_count', { unlocked, total: achievements.length })
+        )
+      }
       defaultOpen={scope === 'player'}>
+      {wins > 0 && (
+        <Text variant="caption" style={{ marginBottom: space.sm }}>
+          {t('league.champion_wins', { count: wins })}
+        </Text>
+      )}
       <View style={[styles.grid, { marginBottom: space.md }]}>
         {visible.map((achievement) => (
           <View
@@ -619,7 +637,7 @@ export function ProfileView({
       <StreakCard stats={stats} />
       {collection}
       {uid ? <RecordsSection uid={uid} scope={scope} /> : null}
-      <AchievementsSection achievements={achievements} scope={scope} />
+      <AchievementsSection achievements={achievements} scope={scope} uid={uid} />
       {uid ? <EloSection uid={uid} scope={scope} /> : null}
       <CollapsibleSection
         id={`${scope}.history`}

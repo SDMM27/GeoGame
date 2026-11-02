@@ -11,6 +11,8 @@ import { useMissions } from '@shared/hooks/useMissions'
 
 import { useAccount } from '@/account/auth'
 import { LanguageButton } from '@/components/LanguageButton'
+import { LeagueCard } from '@/components/league/LeagueCard'
+import { LeagueVictoryOverlay } from '@/components/league/LeagueVictoryOverlay'
 import { MissionsCard } from '@/components/missions/MissionsCard'
 import { Text, Touchable } from '@/components/ui'
 import { LISTED_GAMES, type GameDefinition } from '@/games'
@@ -190,6 +192,10 @@ export default function HomeScreen() {
         <MissionsCard uid={account?.uid} missions={missions} />
       </View>
 
+      <View style={{ paddingHorizontal: space.lg, marginTop: space.md }}>
+        <LeagueCard uid={account?.username ? account.uid : undefined} />
+      </View>
+
       {/* Ascension first: a short climb from easy countries, the mode the home page puts forward */}
       <View style={{ paddingHorizontal: space.lg, marginTop: space.xxl }}>
         <Touchable
@@ -233,6 +239,8 @@ export default function HomeScreen() {
           <MaterialCommunityIcons name="chevron-right" size={22} color={colors.textFaint} />
         </Touchable>
       </View>
+
+      <LeagueVictoryOverlay uid={account?.username ? account.uid : undefined} />
     </ScrollView>
   )
 }

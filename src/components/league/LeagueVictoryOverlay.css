@@ -1,0 +1,173 @@
+.league-victory {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+}
+
+.league-victory-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(6, 10, 22, 0.94);
+  animation: league-victory-fade 0.25s ease-out both;
+}
+
+.league-victory-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 100%;
+  padding: 0 24px 40px;
+  pointer-events: none;
+}
+
+.league-victory-content button { pointer-events: auto; }
+
+.league-victory-stage {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  margin-bottom: 32px;
+}
+
+/* Everything centered on the icon */
+.league-victory-glow, .league-victory-ring, .league-victory-particle, .league-victory-icon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+}
+
+.league-victory-glow {
+  width: 300px;
+  aspect-ratio: 1;
+  margin: -150px 0 0 -150px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--tone) 0%, transparent 68%);
+  opacity: 0.3;
+  animation: league-victory-fade 0.25s ease-out both;
+}
+
+.league-victory-icon {
+  translate: -50% -50%;
+  font-size: 96px;
+  line-height: 1;
+  animation: league-victory-pop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
+}
+
+.league-victory-ring {
+  width: 160px;
+  height: 160px;
+  margin: -80px 0 0 -80px;
+  border: 3px solid var(--tone);
+  border-radius: 50%;
+  opacity: 0;
+  animation: league-victory-ring 0.85s 0.35s cubic-bezier(0.215, 0.61, 0.355, 1) both;
+}
+
+.league-victory-particle {
+  width: var(--size);
+  height: var(--size);
+  margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+  border-radius: 50%;
+  background: var(--tone);
+  opacity: 0;
+  animation:
+    league-victory-travel 0.95s 0.35s cubic-bezier(0.215, 0.61, 0.355, 1) both,
+    league-victory-burst 0.95s 0.35s linear both;
+}
+
+.league-victory-particle--white { background: #fff; }
+
+.league-victory-texts {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+  animation: league-victory-rise 0.4s 0.5s cubic-bezier(0.215, 0.61, 0.355, 1) both;
+}
+
+.league-victory-title { margin: 0; font-family: var(--font-display); font-size: 2rem; line-height: 1.15; letter-spacing: -0.02em; font-weight: 700; }
+
+.league-victory-reward,
+.league-victory-champion {
+  padding: 5px 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid color-mix(in srgb, var(--tone) 50%, transparent);
+  background: color-mix(in srgb, var(--tone) 15%, transparent);
+  color: var(--tone);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.league-victory-texts small { color: var(--text-muted); }
+
+.league-victory-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+  align-self: stretch;
+  margin-top: 1.5rem;
+  animation: league-victory-rise 0.35s 0.8s ease-out both;
+}
+
+.league-victory-cta {
+  padding: 0.75rem 1.4rem;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--tone);
+  color: #0b1020;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.league-victory-close {
+  align-self: center;
+  padding: 0.5rem 1.2rem;
+  border: 0;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.league-victory-close:hover { color: var(--text-primary); }
+.league-victory-cta:focus-visible, .league-victory-close:focus-visible { outline: 2px solid var(--tone); outline-offset: 3px; }
+
+@keyframes league-victory-fade { from { opacity: 0; } }
+@keyframes league-victory-pop { from { opacity: 0; scale: 0.4; } }
+@keyframes league-victory-rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+
+@keyframes league-victory-ring {
+  0% { opacity: 0; transform: scale(0.7); }
+  5% { opacity: 0.9; }
+  100% { opacity: 0; transform: scale(2.8); }
+}
+
+@keyframes league-victory-travel {
+  from { translate: 0 0; }
+  to { translate: var(--dx) var(--dy); }
+}
+
+@keyframes league-victory-burst {
+  0% { opacity: 0; scale: 0.3; }
+  8% { opacity: 1; }
+  20% { scale: 1; }
+  70% { opacity: 0.8; }
+  100% { opacity: 0; scale: 0.4; }
+}
+
+/* No burst: everything just fades in */
+@media (prefers-reduced-motion: reduce) {
+  .league-victory-ring, .league-victory-particle { display: none; }
+  .league-victory-icon { animation: league-victory-fade 0.3s both; }
+  .league-victory-texts { animation: league-victory-fade 0.4s both; }
+  .league-victory-buttons { animation: league-victory-fade 0.35s both; }
+}

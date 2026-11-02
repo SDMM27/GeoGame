@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useRecordGame } from '../../../auth'
+import { roomGameRecord } from '../../../utils/gameHistory'
 import { GAME_TYPES } from '../../../utils/gameTypes'
 import { loadSnapshot, snapshotKey } from '../../../utils/multiplayerSnapshot'
 import { serverNow } from '../../../utils/serverTime'
@@ -25,6 +27,9 @@ export default function RoomGame({ room, progress, results, playerId, onDone }) 
   const doneRef = useRef(false)
   const foundRef = useRef(0)
   const pseudo = room.players[playerId]?.pseudo ?? '?'
+  // The player's history (missions, achievements), once the game is finished
+  const [record, setRecord] = useState(null)
+  useRecordGame(record)
 
   // Announce the player as soon as the game starts
   useEffect(() => {
@@ -52,6 +57,7 @@ export default function RoomGame({ room, progress, results, playerId, onDone }) 
       elapsedTime: Math.round(elapsedTime ?? 0),
       total,
     }
+    setRecord(roomGameRecord(game, room.id, { ...result, weightedScore: weightedScore ?? 0, attempts: attempts ?? 0 }))
     Promise.all([
       submitResult(room.id, playerId, pseudo, result, gameIndex),
       reportProgress(room.id, playerId, { gameIndex, found: solved, total, finished: true }),

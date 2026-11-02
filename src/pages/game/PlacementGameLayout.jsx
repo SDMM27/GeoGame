@@ -38,7 +38,7 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
   } = state
   const [renderer] = useState(createAppFillRenderer)
 
-  // Multiplayer games (onGameFinished) belong to their room, not to the history.
+  // Multiplayer games (onGameFinished) are recorded by their room (RoomGame).
   useRecordGame(
     isGameOver && !onGameFinished
       ? setupGameRecord({ gameType, isTraining, isAscension, presetName, difficulty, continent, score, stats, timer })

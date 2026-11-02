@@ -25,6 +25,7 @@ import {
   where,
 } from 'firebase/firestore'
 import { firestore } from '../Firebase'
+import { GAME_TYPES } from './gameTypes'
 
 export const HISTORY_LIMIT = 300
 
@@ -106,6 +107,22 @@ export function setupGameRecord({ gameType, isTraining, roomCode, isAscension, p
     continent,
     presetName,
     roomCode,
+  }
+}
+
+// A game of a multiplayer room on the website, from the result sent to the room (same records as the app).
+export function roomGameRecord(game, roomCode, { weightedScore, countriesSolved, attempts, elapsedTime, total }) {
+  const base = { gameType: game.type, mode: 'multi', roomCode, elapsedTime }
+  switch (game.type) {
+    case GAME_TYPES.SURVIVAL:
+      return { ...base, score: weightedScore, total }
+    case GAME_TYPES.QUIZ:
+      return { ...base, score: weightedScore, correct: countriesSolved, answered: countriesSolved + attempts, difficulty: game.quizDifficulty }
+    case GAME_TYPES.BORDER_GUESS:
+    case GAME_TYPES.COUNTRY_CLUE:
+      return { ...base, found: countriesSolved, total }
+    default:
+      return { ...base, score: weightedScore, found: countriesSolved, total, difficulty: game.difficulty }
   }
 }
 

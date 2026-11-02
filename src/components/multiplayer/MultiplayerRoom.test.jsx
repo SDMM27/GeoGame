@@ -8,7 +8,8 @@ import { joinRoom, launchRoom } from '../../utils/multiplayerRoom'
 // The room uses router links and the search params (invite links).
 const render = (ui) => renderUi(<MemoryRouter>{ui}</MemoryRouter>)
 
-vi.mock('../../auth', () => ({ useAccount: () => ({ account: null }) }))
+const { useRecordGame } = vi.hoisted(() => ({ useRecordGame: vi.fn() }))
+vi.mock('../../auth', () => ({ useAccount: () => ({ account: null }), useRecordGame }))
 vi.mock('../../utils/multiplayerRoom', async (importOriginal) => ({
   ...(await importOriginal()),
   joinRoom: vi.fn().mockResolvedValue(undefined),
@@ -20,7 +21,14 @@ vi.mock('../../utils/multiplayerRoom', async (importOriginal) => ({
 }))
 vi.mock('../../Firebase', () => ({ firestore: {} }))
 vi.mock('../../pages/GamePage', () => ({ MultiplayerPlacementGame: () => null }))
-vi.mock('../../pages/FlagGamePage', () => ({ MultiplayerFlagsGame: () => <div>flags-game</div> }))
+vi.mock('../../pages/FlagGamePage', () => ({
+  MultiplayerFlagsGame: ({ onGameFinished }) => (
+    <div>
+      flags-game
+      <button onClick={() => onGameFinished({ weightedScore: 90, countriesSolved: 8, attempts: 1, elapsedTime: 5000 })}>finish</button>
+    </div>
+  ),
+}))
 vi.mock('../../pages/CapitalsGamePage', () => ({ MultiplayerCapitalsGame: () => null }))
 vi.mock('../../pages/QuizPage', () => ({ PracticeQuiz: () => null }))
 vi.mock('./MultiplayerBorderGuess', () => ({ default: () => null }))
@@ -63,6 +71,15 @@ describe('MultiplayerRoom', () => {
     expect(screen.getByText(/120/)).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: /▶/ }))
     expect(screen.getByText('flags-game')).toBeInTheDocument()
+  })
+
+  it('records a finished game in the history of the player', () => {
+    const room = makeRoom({ players: { host: { pseudo: 'Alice' }, web: { pseudo: 'Bob' } } })
+    render(<MultiplayerRoom room={room} progress={{}} gameResults={{}} playerId="web" />)
+    fireEvent.click(screen.getByRole('button', { name: /▶/ }))
+    expect(useRecordGame).toHaveBeenLastCalledWith(null)
+    fireEvent.click(screen.getByRole('button', { name: 'finish' }))
+    expect(useRecordGame).toHaveBeenLastCalledWith(expect.objectContaining({ gameType: 'FLAGS', mode: 'multi', roomCode: 'ABC234', score: 90, found: 8 }))
   })
 
   it('lets the host launch a live room', async () => {

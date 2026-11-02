@@ -33,7 +33,7 @@ function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, s
     currentPhase, phaseCountRemaining, totalPhaseCount, phaseStats,
   } = state
 
-  // Multiplayer games (onGameFinished) belong to their room, not to the history.
+  // Multiplayer games (onGameFinished) are recorded by their room (RoomGame).
   useRecordGame(
     isGameOver && !onGameFinished
       ? setupGameRecord({ gameType: GAME_TYPES.CAPITALS, isTraining, isAscension, presetName, difficulty, continent, score, stats, timer })

@@ -32,7 +32,7 @@ function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state
     currentPhase, phaseCountRemaining, totalPhaseCount, phaseStats,
   } = state
 
-  // Multiplayer games (onGameFinished) belong to their room, not to the history.
+  // Multiplayer games (onGameFinished) are recorded by their room (RoomGame).
   useRecordGame(
     isGameOver && !onGameFinished
       ? setupGameRecord({ gameType, isTraining, isAscension, presetName, difficulty, continent, score, stats, timer })

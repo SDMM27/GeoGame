@@ -463,6 +463,8 @@
     "share_cta": "🎯 Ich fordere dich heraus! Schlag meine Punktzahl:",
     "nudge_title": "Fordere einen Freund heraus",
     "nudge_hint": "Er bekommt eine Benachrichtigung, um dich zu schlagen.",
+    "nudge_search": "Freund suchen…",
+    "nudge_search_none": "Kein Freund gefunden.",
     "nudge_sent": "Benachrichtigung gesendet!",
     "nudge_unreachable": "{{username}} kann nicht benachrichtigt werden",
     "nudge_already_sent": "Heute schon herausgefordert",

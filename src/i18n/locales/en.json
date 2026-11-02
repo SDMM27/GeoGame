@@ -463,6 +463,8 @@
     "share_cta": "🎯 I challenge you! Beat my score:",
     "nudge_title": "Challenge a friend",
     "nudge_hint": "They get a notification to come and beat you.",
+    "nudge_search": "Search a friend…",
+    "nudge_search_none": "No friend found.",
     "nudge_sent": "Notification sent!",
     "nudge_unreachable": "Can’t notify {{username}}",
     "nudge_already_sent": "Already challenged today",

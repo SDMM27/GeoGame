@@ -463,6 +463,8 @@
     "share_cta": "🎯 ¡Te reto! Supera mi puntuación:",
     "nudge_title": "Reta a un amigo",
     "nudge_hint": "Recibe una notificación para venir a ganarte.",
+    "nudge_search": "Buscar un amigo…",
+    "nudge_search_none": "No se ha encontrado ningún amigo.",
     "nudge_sent": "¡Notificación enviada!",
     "nudge_unreachable": "No se puede notificar a {{username}}",
     "nudge_already_sent": "Ya retado hoy",

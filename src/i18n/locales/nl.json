@@ -463,6 +463,8 @@
     "share_cta": "🎯 Ik daag je uit! Verbeter mijn score:",
     "nudge_title": "Daag een vriend uit",
     "nudge_hint": "Je vriend krijgt een melding om jou te komen verslaan.",
+    "nudge_search": "Zoek een vriend…",
+    "nudge_search_none": "Geen vriend gevonden.",
     "nudge_sent": "Melding verstuurd!",
     "nudge_unreachable": "Kan {{username}} niet op de hoogte stellen",
     "nudge_already_sent": "Vandaag al uitgedaagd",

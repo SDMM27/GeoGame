@@ -463,6 +463,8 @@
     "share_cta": "🎯 Te desafio! Supere minha pontuação:",
     "nudge_title": "Desafie um amigo",
     "nudge_hint": "Ele recebe uma notificação para vir te vencer.",
+    "nudge_search": "Buscar um amigo…",
+    "nudge_search_none": "Nenhum amigo encontrado.",
     "nudge_sent": "Notificação enviada!",
     "nudge_unreachable": "Não é possível notificar {{username}}",
     "nudge_already_sent": "Já desafiado hoje",

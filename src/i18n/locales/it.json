@@ -463,6 +463,8 @@
     "share_cta": "🎯 Ti sfido! Batti il mio punteggio:",
     "nudge_title": "Sfida un amico",
     "nudge_hint": "Riceve una notifica per venire a batterti.",
+    "nudge_search": "Cerca un amico…",
+    "nudge_search_none": "Nessun amico trovato.",
     "nudge_sent": "Notifica inviata!",
     "nudge_unreachable": "Impossibile notificare {{username}}",
     "nudge_already_sent": "Già sfidato oggi",

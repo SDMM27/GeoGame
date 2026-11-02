@@ -2,8 +2,24 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('./pushApi', () => ({ callPush: vi.fn() }))
 
-import { nudgeFriend } from './dailyNudge'
+import { filterNudgeFriends, nudgeFriend } from './dailyNudge'
 import { callPush } from './pushApi'
+
+describe('filterNudgeFriends', () => {
+  const friends = [{ username: 'Zoé' }, { username: 'adam' }, { username: 'Élodie' }, { username: 'Léo' }]
+  const names = (list) => list.map((friend) => friend.username)
+
+  it('sorts friends alphabetically without changing the list it is given', () => {
+    expect(names(filterNudgeFriends(friends))).toEqual(['adam', 'Élodie', 'Léo', 'Zoé'])
+    expect(friends[0].username).toBe('Zoé')
+  })
+
+  it('ignores case and accents', () => {
+    expect(names(filterNudgeFriends(friends, 'ELO'))).toEqual(['Élodie'])
+    expect(names(filterNudgeFriends(friends, ' zoe '))).toEqual(['Zoé'])
+    expect(filterNudgeFriends(friends, 'nobody')).toEqual([])
+  })
+})
 
 describe('nudgeFriend', () => {
   beforeEach(() => callPush.mockReset())

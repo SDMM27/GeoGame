@@ -6,7 +6,7 @@ import countries from '../data/countriesWithDifficulty_FR.json'
 import { checkAnswer, normalize } from '../utils/normalizeAnswer'
 import { hasCountryGeometry, collectCoordinates, getRingAreaKm2, getCountryAreaKm2, getGeographicCenter, EARTH_RADIUS_KM } from '../utils/countryArea'
 import { getCountryName, getAllCountryNames } from '../utils/getCountryName'
-import { LANGUAGE_CODES, localeOf } from '../i18n/languages'
+import { LANGUAGE_CODES, localeOf, toLanguage } from '../i18n/languages'
 import countryAliases from '../data/countryAliases.json'
 import useDailyKey from './useDailyKey'
 import { STABLE_DAILY_PICK_SINCE, pickDaily } from '../utils/dailyPick'
@@ -136,8 +136,9 @@ function getPopulationHint(guessName, targetName) {
 function formatPopulation(pop, lang) {
   if (!pop) return 'n/a'
   const locale = localeOf(lang, 'fr')
-  if (pop >= 1000000) return `${(pop / 1000000).toLocaleString(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} M`
-  if (pop >= 1000) return `${Math.round(pop / 1000).toLocaleString(locale)} k`
+  const unitGap = toLanguage(lang, 'fr') === 'en' ? '' : ' '
+  if (pop >= 1000000) return `${(pop / 1000000).toLocaleString(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}${unitGap}M`
+  if (pop >= 1000) return `${Math.round(pop / 1000).toLocaleString(locale)}${unitGap}k`
   return pop.toLocaleString(locale)
 }
 
@@ -268,11 +269,19 @@ function isoToFlag(isoA2) {
     .join('')
 }
 
-function buildGuessRecord(guessInput, targetName, lang) {
+// Computed on read, in the current language: labels saved by older versions or another language are never shown
+function withLabels(guess, lang) {
+  return {
+    ...guess,
+    areaLabel: formatArea(COUNTRY_AREA_MAP.get(guess.value) ?? null, lang),
+    populationLabel: formatPopulation(COUNTRY_POPULATION_MAP.get(guess.value) ?? null, lang),
+  }
+}
+
+function buildGuessRecord(guessInput, targetName) {
   const guessedName = guessInput?.value
   const normalizedInput = guessInput?.normalizedInput ?? normalize(guessedName ?? '')
   const isCorrect = Boolean(guessInput?.isCorrect || (guessedName && guessedName === targetName))
-  const area = guessedName ? COUNTRY_AREA_MAP.get(guessedName) ?? null : null
   const direction = isCorrect ? 'Tout près' : getDirectionLabel(guessedName, targetName)
 
   return {
@@ -289,11 +298,9 @@ function buildGuessRecord(guessInput, targetName, lang) {
     areaHint: isCorrect
       ? { label: 'Exact', arrow: '◎', tone: 'match' }
       : getAreaHint(guessedName, targetName),
-    areaLabel: formatArea(area, lang),
     populationHint: isCorrect
       ? { label: 'Exact', arrow: '◎', tone: 'match' }
       : getPopulationHint(guessedName, targetName),
-    populationLabel: formatPopulation(guessedName ? COUNTRY_POPULATION_MAP.get(guessedName) : null, lang),
   }
 }
 
@@ -358,7 +365,7 @@ export default function useCountryClueState(mode, options = {}) {
       const selectedCountry = getCountryByName(savedProgress?.targetName) ?? getCountryClueDailyCountry(todayKey)
       const hydratedGuesses = Array.isArray(savedProgress?.guesses)
         ? savedProgress.guesses
-          .map((guess) => buildGuessRecord(guess, selectedCountry.properties.ADMIN, i18n.language))
+          .map((guess) => buildGuessRecord(guess, selectedCountry.properties.ADMIN))
           .filter((guess) => guess.value)
         : []
 
@@ -402,6 +409,11 @@ export default function useCountryClueState(mode, options = {}) {
       mapAssistUsed,
     })
   }, [currentCountry, dailyKey, guesses, mode, status, startedAt, elapsedTime, mapAssistUsed])
+
+  const labelledGuesses = useMemo(
+    () => guesses.map((guess) => withLabels(guess, i18n.language)),
+    [guesses, i18n.language]
+  )
 
   const availableCountrySuggestions = useMemo(() => {
     const lang = i18n.language
@@ -469,8 +481,7 @@ export default function useCountryClueState(mode, options = {}) {
           normalizedInput: normalizedGuess,
           isCorrect,
         },
-        answerName,
-        i18n.language
+        answerName
       ),
     ]
 
@@ -515,7 +526,7 @@ export default function useCountryClueState(mode, options = {}) {
   return {
     inputValue,
     setInputValue,
-    guesses,
+    guesses: labelledGuesses,
     isSolved,
     isLost,
     isComplete,

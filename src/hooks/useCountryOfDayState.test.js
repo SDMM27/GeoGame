@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { findCountryOfDay } from '../utils/countryOfDay'
-import { EMPTY_PROGRESS, answerCountryOfDay, nextCountryOfDayStep, resumeCountryOfDay } from './useCountryOfDayState'
+import { EMPTY_PROGRESS, answerCountryOfDay, giveUpCountryOfDayStep, nextCountryOfDayStep, resumeCountryOfDay } from './useCountryOfDayState'
 
 const france = findCountryOfDay('France')
 const start = (mode) => ({ ...EMPTY_PROGRESS, mode, startedAt: 1000 })
@@ -69,6 +69,34 @@ describe('answerCountryOfDay', () => {
 
   it('ignores answers before the mode is chosen', () => {
     expect(answerCountryOfDay(EMPTY_PROGRESS, france, { admin: 'France' }).outcome).toBe('ignored')
+  })
+})
+
+describe('giveUpCountryOfDayStep', () => {
+  it('ends the step, worth nothing, and the game goes on', () => {
+    const { progress: played } = play(start('choice'), [{ admin: 'Espagne' }])
+    const progress = giveUpCountryOfDayStep(played)
+    expect(progress.resolved).toBe(true)
+    expect(progress.steps[0]).toBe(0)
+    expect(progress.wrong[0]).toEqual(['Espagne'])
+    expect(progress.elapsedTime).toBe(null)
+    expect(answerCountryOfDay(progress, france, { admin: 'France' }).outcome).toBe('ignored')
+    expect(nextCountryOfDayStep(progress).index).toBe(1)
+  })
+
+  it('stops the clock on the last step', () => {
+    let progress = start('choice')
+    for (let i = 0; i < 3; i++) progress = nextCountryOfDayStep(giveUpCountryOfDayStep(progress, 2000))
+    expect(progress.elapsedTime).toBe(null)
+    progress = giveUpCountryOfDayStep(progress, 61000)
+    expect(progress.elapsedTime).toBe(60000)
+    expect(nextCountryOfDayStep(progress).done).toBe(true)
+  })
+
+  it('does nothing before the mode is chosen or once the step is over', () => {
+    expect(giveUpCountryOfDayStep(EMPTY_PROGRESS)).toBe(EMPTY_PROGRESS)
+    const over = giveUpCountryOfDayStep(start('choice'))
+    expect(giveUpCountryOfDayStep(over)).toBe(over)
   })
 })
 

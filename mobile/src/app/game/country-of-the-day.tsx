@@ -29,7 +29,7 @@ import { BorderGuessRow, type BorderGuess } from '@/components/game/GuessCards'
 import { GuessInputBar } from '@/components/game/GuessInputBar'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
 import { CountrySilhouette } from '@/components/map/CountrySilhouette'
-import { Text } from '@/components/ui'
+import { Button, Text } from '@/components/ui'
 import { getFlag } from '@/flags'
 import { navigate } from '@/shims/react-router-dom'
 import { colors, gameColors, radius, space } from '@/theme'
@@ -48,7 +48,7 @@ function Playing({ game }: { game: Game }) {
   const { t, i18n } = useTranslation()
   const insets = useSafeAreaInsets()
   const { height: windowHeight } = useWindowDimensions()
-  const { country, mode, step, stepIndex, choices, wrong, triesLeft, resolved, found, steps, score, answer, next } = game
+  const { country, mode, step, stepIndex, choices, wrong, triesLeft, resolved, found, steps, score, answer, giveUp, next } = game
   const [text, setText] = useState('')
   const [note, setNote] = useState<Note | null>(null)
   const lang = i18n.language
@@ -83,6 +83,7 @@ function Playing({ game }: { game: Game }) {
       onNext={next}
     />
   )
+  const giveUpButton = !resolved && <Button label={t('country_of_day.give_up')} variant="secondary" onPress={giveUp} />
   const header = (
     <View style={{ gap: 2 }}>
       <View style={styles.headerRow}>
@@ -131,6 +132,7 @@ function Playing({ game }: { game: Game }) {
           {identity}
           {!resolved && <Text variant="caption">{t('country_of_day.placement_hint')}</Text>}
           {noteText && <Text variant="caption" color={colors.danger}>{noteText}</Text>}
+          {giveUpButton}
           {feedback}
         </PlacementStep>
         {hud}
@@ -172,6 +174,7 @@ function Playing({ game }: { game: Game }) {
               </View>
             ))}
           {noteText && <Text variant="caption" color={colors.danger}>{noteText}</Text>}
+          {giveUpButton}
           {feedback}
         </ScrollView>
         {typed && !resolved && (

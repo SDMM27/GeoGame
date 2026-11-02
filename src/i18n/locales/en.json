@@ -1545,6 +1545,7 @@
     "right": "Well done!",
     "wrong": "Wrong, try again",
     "missed": "The answer was: {{answer}}",
+    "give_up": "Give up",
     "points": "+{{count}} pts",
     "next": "Next step",
     "see_sheet": "See its fact sheet",

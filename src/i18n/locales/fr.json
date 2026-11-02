@@ -1545,6 +1545,7 @@
     "right": "Bravo !",
     "wrong": "Raté, réessaie",
     "missed": "La réponse était : {{answer}}",
+    "give_up": "Donner ma langue au chat",
     "points": "+{{count}} pts",
     "next": "Étape suivante",
     "see_sheet": "Voir sa fiche",

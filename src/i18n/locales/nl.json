@@ -1545,6 +1545,7 @@
     "right": "Goed zo!",
     "wrong": "Fout, probeer opnieuw",
     "missed": "Het antwoord was: {{answer}}",
+    "give_up": "Opgeven",
     "points": "+{{count}} ptn",
     "next": "Volgende stap",
     "see_sheet": "Bekijk de fiche",

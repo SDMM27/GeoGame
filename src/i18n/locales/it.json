@@ -1545,6 +1545,7 @@
     "right": "Bravo!",
     "wrong": "Sbagliato, riprova",
     "missed": "La risposta era: {{answer}}",
+    "give_up": "Mi arrendo",
     "points": "+{{count}} pt",
     "next": "Tappa successiva",
     "see_sheet": "Vedi la scheda",

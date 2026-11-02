@@ -1,5 +1,17 @@
 // "Come beat me": push notification to a friend, once the player has finished a daily challenge (api/daily-nudge).
+import { normalize } from './normalizeAnswer'
 import { callPush } from './pushApi'
+
+// From this many friends, the end-of-game row gets a search field.
+export const NUDGE_SEARCH_MIN_FRIENDS = 7
+
+// Friends in alphabetical order, narrowed by the search field (case and accents ignored).
+export function filterNudgeFriends(friends, query = '') {
+  const search = normalize(query)
+  return friends
+    .filter((friend) => normalize(friend.username).includes(search))
+    .sort((a, b) => a.username.localeCompare(b.username))
+}
 
 // 'sent' | 'unreachable' (friend has notifications off or no device) | 'already_sent' (today, for this game)
 // | 'not_played' | 'rate_limited' | 'error'

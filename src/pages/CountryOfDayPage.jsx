@@ -184,7 +184,7 @@ function StepBody({ game, lang }) {
 
 function Playing({ game }) {
   const { t, i18n } = useTranslation()
-  const { step, stepIndex, mode, resolved, found, triesLeft, steps, country, next } = game
+  const { step, stepIndex, mode, resolved, found, triesLeft, steps, country, giveUp, next } = game
   const lang = i18n.language
   const last = stepIndex === COUNTRY_OF_DAY_STEPS.length - 1
   const answerLabel =
@@ -219,11 +219,17 @@ function Playing({ game }) {
               {found && <p>{t('country_of_day.points', { count: stepPoints(steps[stepIndex], mode) })}</p>}
             </div>
           )}
-          {resolved && (
-            <div className="quiz-actions">
-              <button className="quiz-btn quiz-btn--primary" onClick={next}>{t(last ? 'country_of_day.see_sheet' : 'country_of_day.next')}</button>
-            </div>
-          )}
+          {resolved
+            ? (
+              <div className="quiz-actions">
+                <button className="quiz-btn quiz-btn--primary" onClick={next}>{t(last ? 'country_of_day.see_sheet' : 'country_of_day.next')}</button>
+              </div>
+            )
+            : (
+              <div className="quiz-actions">
+                <button className="quiz-btn" onClick={giveUp}>{t('country_of_day.give_up')}</button>
+              </div>
+            )}
         </section>
       </main>
     </div>

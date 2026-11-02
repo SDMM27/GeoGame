@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { fetchBadges } from '../utils/badges'
 
-// { [uid]: { top: [{ id, tier, emoji, icon }], count } } for the accounts among `uids` (visitors have none).
+// { [uid]: { top: [{ id, tier, emoji, icon }], count, wins } } for the accounts among `uids` (visitors have none).
 // Loaded once per account for a few minutes (see fetchBadges), so a lobby that fills up doesn't read them again.
 export function useBadges(uids) {
   const key = [...new Set(uids.filter(Boolean))].sort().join(',')

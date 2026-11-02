@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAccount } from '../auth'
 import { useFriendships } from '../hooks/usePlayerProfile'
-import { nudgeFriend } from '../utils/dailyNudge'
+import { NUDGE_SEARCH_MIN_FRIENDS, filterNudgeFriends, nudgeFriend } from '../utils/dailyNudge'
 import './NudgeFriends.css'
 
 // End of a game: one click sends a friend a "come and beat me" push notification (api/daily-nudge).
@@ -13,6 +13,7 @@ export default function NudgeFriends({ gameType, recent = false }) {
   const signedIn = Boolean(account?.username)
   const { friends } = useFriendships(signedIn ? account.uid : null)
   const [states, setStates] = useState({})
+  const [query, setQuery] = useState('')
 
   if (!signedIn || !friends?.length) return null
 
@@ -25,13 +26,25 @@ export default function NudgeFriends({ gameType, recent = false }) {
   const failedFriend = friends.find((friend) => states[friend.uid] && !['sending', 'sent'].includes(states[friend.uid]))
   const failure = failedFriend ? states[failedFriend.uid] : null
   const anySent = Object.values(states).includes('sent')
+  const shown = filterNudgeFriends(friends, query)
 
   return (
     <div className="nudge-friends">
       <strong>{t('challenge.nudge_title')}</strong>
       <span className="nudge-hint">{t('challenge.nudge_hint')}</span>
+      {friends.length >= NUDGE_SEARCH_MIN_FRIENDS && (
+        <input
+          type="search"
+          className="nudge-search"
+          aria-label={t('challenge.nudge_search')}
+          placeholder={t('challenge.nudge_search')}
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+        />
+      )}
+      {!shown.length && <span className="nudge-hint">{t('challenge.nudge_search_none')}</span>}
       <div className="nudge-chips">
-        {friends.map((friend) => {
+        {shown.map((friend) => {
           const state = states[friend.uid]
           return (
             <button

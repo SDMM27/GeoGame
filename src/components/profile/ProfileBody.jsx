@@ -3,6 +3,7 @@ import React, { useEffect, useId, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useBadges } from '../../hooks/useBadges'
 import { usePlayerProfile } from '../../hooks/usePlayerProfile'
 import { TIER_COLORS } from '../../utils/achievements'
 import { badgeSummary, readBadges } from '../../utils/badges'
@@ -138,19 +139,21 @@ function StreakCard({ stats }) {
   )
 }
 
-function Achievements({ achievements, scope }) {
+function Achievements({ achievements, scope, uid }) {
   const { t } = useTranslation()
+  const wins = useBadges([uid])[uid]?.wins ?? 0
   const [expanded, setExpanded] = useState(false)
   const unlocked = achievements.filter((item) => item.unlocked).length
   const visible = expanded ? achievements : achievements.slice(0, 8)
   const summary = (
     <>
       <span>{t('profile.achievements_count', { unlocked, total: achievements.length })}</span>
-      <BadgeStrip badges={readBadges({ badges: badgeSummary(achievements) })} />
+      <BadgeStrip badges={{ ...readBadges({ badges: badgeSummary(achievements) }), wins }} />
     </>
   )
   return (
     <CollapsibleSection id={`${scope}.achievements`} title={t('profile.achievements_title')} summary={summary} defaultOpen={scope === 'player'}>
+      {wins > 0 && <p className="profile-muted">🏆 {t('league.champion_wins', { count: wins })}</p>}
       <div className="profile-achievements">
         {visible.map((achievement) => (
           <div
@@ -357,7 +360,7 @@ export function ProfileView({ games, stats, achievements, uid, own = false, frie
       {friends}
       {collection}
       {uid && <RecordsSection uid={uid} scope={scope} />}
-      <Achievements achievements={achievements} scope={scope} />
+      <Achievements achievements={achievements} scope={scope} uid={uid} />
       {uid && <EloSection uid={uid} scope={scope} />}
       <History games={games} scope={scope} />
       <ByGame stats={stats} scope={scope} />

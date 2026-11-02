@@ -289,6 +289,16 @@ describe('XP', () => {
   })
 })
 
+describe('league wins', () => {
+  it('refuses the player writing their own league title, alone or along with something they may write', async () => {
+    const league = { wins: 99, lastWin: '2026-W41' }
+    await assertFails(as('alice').doc('users/alice').update({ league }))
+    await assertFails(as('alice').doc('users/alice').update({ league, badges: { top: [], count: 0 } }))
+    await assertFails(as('alice').doc('users/alice').update({ 'league.wins': 99 }))
+    await assertFails(claim(as('bob'), 'bob', 'Bob', { user: { league } }))
+  })
+})
+
 describe('flag collection and mastery', () => {
   const flags = { unlocked: ['FR', 'JP'], current: 'BR', pieces: 2 }
 

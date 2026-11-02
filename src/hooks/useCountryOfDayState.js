@@ -119,6 +119,16 @@ export function answerCountryOfDay(progress, country, answer, now = Date.now()) 
   }
 }
 
+/** The game after giving up the step on screen: over like a step missed 3 times, worth nothing, its answer shown. Exported for the tests. */
+export function giveUpCountryOfDayStep(progress, now = Date.now()) {
+  if (!progress.mode || progress.done || progress.resolved) return progress
+  return {
+    ...progress,
+    resolved: true,
+    elapsedTime: progress.index === LAST_STEP ? Math.max(0, now - (progress.startedAt ?? now)) : progress.elapsedTime,
+  }
+}
+
 /** The game after next(): the following step, or done after the last one (nothing when the step on screen isn't over). */
 export function nextCountryOfDayStep(progress) {
   if (!progress.resolved || progress.done) return progress
@@ -174,6 +184,8 @@ export default function useCountryOfDayState() {
     return outcome
   }, [known, progress, country, update])
 
+  const giveUp = useCallback(() => update(giveUpCountryOfDayStep(progress)), [progress, update])
+
   const next = useCallback(() => update(nextCountryOfDayStep(progress)), [progress, update])
 
   const step = COUNTRY_OF_DAY_STEPS[progress.index]
@@ -200,6 +212,7 @@ export default function useCountryOfDayState() {
     resolved: progress.resolved,
     found: progress.steps[progress.index] > 0,
     answer,
+    giveUp,
     next,
     steps: progress.steps,
     // For the history: the wrong answers, all the answers, and the 4 steps found

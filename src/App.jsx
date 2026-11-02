@@ -1,5 +1,5 @@
 import React, { lazy, Suspense } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react"
 import HomePage from "./pages/HomePage";
 import RouteFallback from "./components/RouteFallback";
@@ -32,7 +32,7 @@ const AtlasPage = lazyWithGeometries(() => import("./pages/atlas/AtlasPage"));
 const AccountPage = lazy(() => import("./pages/AccountPage"));
 const PlayerPage = lazy(() => import("./pages/PlayerPage"));
 const AddFriendPage = lazy(() => import("./pages/AddFriendPage"));
-const CommunityPage = lazy(() => import("./pages/CommunityPage"));
+const LeaguePage = lazy(() => import("./pages/LeaguePage"));
 const ScoresPage = lazy(() => import("./pages/ScoresPage"));
 const LegalPage = lazy(() => import("./pages/legal/LegalPage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
@@ -71,7 +71,8 @@ export default function App() {
               <Route path="/account" element={<AccountPage />} />
               <Route path="/player/:uid" element={<PlayerPage />} />
               <Route path="/add/:username" element={<AddFriendPage />} />
-              <Route path="/community" element={<CommunityPage />} />
+              <Route path="/league" element={<LeaguePage />} />
+              <Route path="/community" element={<Navigate to="/league" replace />} />
               <Route path="/multiplayer" element={<MultiplayerHomePage />} />
               <Route path="/multiplayer/create" element={<MultiplayerCreatePage />} />
               <Route path="/multiplayer/room/:roomId" element={<MultiplayerRoomPage />} />

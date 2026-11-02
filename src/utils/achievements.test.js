@@ -185,11 +185,19 @@ describe('badges', () => {
   })
 
   it('read what a user document holds, ignoring what is unknown or malformed', () => {
-    expect(readBadges(undefined)).toEqual({ top: [], count: 0 })
-    expect(readBadges({ badges: 'x' })).toEqual({ top: [], count: 0 })
+    expect(readBadges(undefined)).toEqual({ top: [], count: 0, wins: 0 })
+    expect(readBadges({ badges: 'x' })).toEqual({ top: [], count: 0, wins: 0 })
     const read = readBadges({ badges: { top: ['survival_50', 'nope', 'games_10', 'games_50', 'first_game'], count: 4 } })
     expect(read.top.map((badge) => badge.id)).toEqual(['survival_50', 'games_10', 'games_50'])
     expect(read.top[0]).toMatchObject({ tier: 'legend', emoji: '🛡️' })
     expect(read.count).toBe(4)
+    expect(read.wins).toBe(0)
+  })
+
+  it('reads the league wins of a user document, 0 when invalid', () => {
+    expect(readBadges({ league: { wins: 3 } })).toEqual({ top: [], count: 0, wins: 3 })
+    expect(readBadges({ badges: { top: [], count: 0 }, league: { wins: 2 } }).wins).toBe(2)
+    for (const wins of [-1, 1.5, '3', null, undefined, NaN]) expect(readBadges({ league: { wins } }).wins).toBe(0)
+    expect(readBadges({ league: 'x' }).wins).toBe(0)
   })
 })

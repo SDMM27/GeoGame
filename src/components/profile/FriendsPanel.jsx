@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { usePlayerSearch, useRecentPlayers } from '../../hooks/useCommunity'
+import { usePlayerSearch, useRecentPlayers } from '../../hooks/usePlayerSearch'
 import useFriendsPresence from '../../hooks/useFriendsPresence'
 import { useFriendsToday } from '../../hooks/usePlayerProfile'
 import { USERNAME_MAX } from '../../utils/account'
@@ -184,8 +184,8 @@ export default function FriendsPanel({ account, friendships }) {
       )}
 
       <InviteCard account={account} />
-      <Link to="/community" className="friends-community">
-        {t('friends.community_link')} →
+      <Link to="/league" className="friends-league">
+        {t('friends.league_link')} →
       </Link>
 
       {friendships.incoming.length > 0 && (

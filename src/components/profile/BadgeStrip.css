@@ -21,6 +21,9 @@
   cursor: pointer;
 }
 
+.badge-strip__chip--champion { width: auto; min-width: 20px; padding: 0 5px; gap: 2px; border-radius: 10px; cursor: default; }
+.badge-strip__wins { font-size: 0.7rem; font-weight: 700; color: var(--tier); }
+
 /* The challenge behind a badge, shown on hover / tap (positioned from the chip in BadgeStrip.jsx) */
 .badge-card {
   position: fixed;

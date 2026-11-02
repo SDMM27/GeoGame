@@ -2,10 +2,10 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ActivityIndicator, StyleSheet, View } from 'react-native'
+import { ActivityIndicator, ScrollView, StyleSheet, TextInput, View } from 'react-native'
 
 import { useFriendships } from '@shared/hooks/usePlayerProfile'
-import { nudgeFriend } from '@shared/utils/dailyNudge'
+import { NUDGE_SEARCH_MIN_FRIENDS, filterNudgeFriends, nudgeFriend } from '@shared/utils/dailyNudge'
 
 import { useAccount } from '@/account/auth'
 import { colors, radius, space } from '@/theme'
@@ -22,6 +22,7 @@ export function NudgeFriends({ gameType, recent = false }: { gameType: string; r
   const { account } = useAccount()
   const { friends } = useFriendships(account?.uid) as { friends: Friend[] }
   const [states, setStates] = useState<Record<string, State>>({})
+  const [query, setQuery] = useState('')
 
   if (!friends.length) return null
 
@@ -42,13 +43,30 @@ export function NudgeFriends({ gameType, recent = false }: { gameType: string; r
           ? t(`mobile.nudge.${failure}`)
           : t('mobile.nudge.error')
       : null
+  const shown: Friend[] = filterNudgeFriends(friends, query)
 
   return (
     <View style={styles.card}>
       <Text variant="bodyStrong">{t('mobile.nudge.title')}</Text>
       <Text variant="caption">{t('mobile.nudge.hint')}</Text>
-      <View style={styles.chips}>
-        {friends.map((friend) => {
+      {friends.length >= NUDGE_SEARCH_MIN_FRIENDS && (
+        <View style={styles.search}>
+          <MaterialCommunityIcons name="magnify" size={18} color={colors.textMuted} />
+          <TextInput
+            value={query}
+            onChangeText={setQuery}
+            placeholder={t('challenge.nudge_search')}
+            placeholderTextColor={colors.textMuted}
+            autoCorrect={false}
+            autoCapitalize="none"
+            returnKeyType="search"
+            style={styles.searchInput}
+          />
+        </View>
+      )}
+      {!shown.length && <Text variant="caption">{t('challenge.nudge_search_none')}</Text>}
+      <ScrollView horizontal keyboardShouldPersistTaps="handled" showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
+        {shown.map((friend) => {
           const state = states[friend.uid]
           const done = state === 'sent'
           return (
@@ -60,7 +78,7 @@ export function NudgeFriends({ gameType, recent = false }: { gameType: string; r
               accessibilityLabel={`${t('mobile.nudge.title')} ${friend.username}`}
               style={[styles.chip, done && { borderColor: colors.accent }]}>
               <Avatar username={friend.username} size={28} />
-              <Text variant="bodyStrong" numberOfLines={1} style={{ flexShrink: 1 }}>
+              <Text variant="bodyStrong" numberOfLines={1}>
                 {friend.username}
               </Text>
               {state === 'sending' ? (
@@ -73,7 +91,7 @@ export function NudgeFriends({ gameType, recent = false }: { gameType: string; r
             </Touchable>
           )
         })}
-      </View>
+      </ScrollView>
       {Object.values(states).includes('sent') && !failureText && (
         <Text variant="caption" color={colors.accent}>
           {t('mobile.nudge.sent')}
@@ -90,12 +108,23 @@ export function NudgeFriends({ gameType, recent = false }: { gameType: string; r
 
 const styles = StyleSheet.create({
   card: { gap: space.sm, padding: space.lg, borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm, marginTop: space.xs },
+  search: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.sm,
+    height: 44,
+    paddingHorizontal: space.md,
+    borderRadius: radius.md,
+    backgroundColor: colors.bg,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  searchInput: { flex: 1, color: colors.text, fontSize: 16 },
+  chips: { flexDirection: 'row', gap: space.sm, marginTop: space.xs },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: space.sm,
-    maxWidth: '100%',
     paddingVertical: space.sm,
     paddingHorizontal: space.md,
     borderRadius: radius.pill,

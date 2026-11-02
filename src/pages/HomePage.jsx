@@ -6,6 +6,8 @@ import NavBar from "../components/NavBar";
 import AppBanner from "../components/AppBanner";
 import LegalLinks from "../components/LegalLinks";
 import MissionsCard from "./home/MissionsCard";
+import LeagueCard from "./home/LeagueCard";
+import LeagueVictoryOverlay from "../components/league/LeagueVictoryOverlay";
 import GameConfigModal from "./home/GameConfigModal";
 import { DailyCard, HomeRow } from "./home/HomeCards";
 import { useAccount } from "../auth";
@@ -55,6 +57,10 @@ export default function HomePage() {
           <MissionsCard missions={missions} />
         </section>
 
+        <section className="home-section">
+          <LeagueCard />
+        </section>
+
         <section className="home-section" aria-labelledby="home-ascension">
           <button
             type="button"
@@ -100,6 +106,7 @@ export default function HomePage() {
         </section>
       </main>
       <LegalLinks />
+      <LeagueVictoryOverlay />
       {configGame && <GameConfigModal game={configGame} initialMode={configInitialMode} onClose={closeConfig} />}
     </div>
   );

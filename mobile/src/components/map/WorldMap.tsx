@@ -132,7 +132,7 @@ function clampY(ty: number, scale: number, height: number) {
 }
 
 // One tile of the base map, at the level of detail of the current zoom (see getBaseTiles)
-const BaseTile = memo(function BaseTile({
+export const BaseTile = memo(function BaseTile({
   levels,
   level,
   border,

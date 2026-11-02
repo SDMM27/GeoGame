@@ -1,0 +1,25 @@
+{
+  "ottoman-empire": {
+    "1481": {
+      "label": "1481",
+      "title": "Im Jahr 1481",
+      "text": "Beim Tod Mehmeds II., des Eroberers von Konstantinopel, beherrscht das Reich den Balkan und Anatolien."
+    },
+    "1520": {
+      "label": "1520",
+      "title": "Bis 1520",
+      "text": "Selim I. nimmt Syrien, Ägypten und das nördliche Mesopotamien ein."
+    },
+    "1566": {
+      "label": "1566",
+      "title": "Bis 1566",
+      "text": "Unter Süleyman dem Prächtigen: Ungarn, der Irak und die nordafrikanische Küste. Mehrere dieser Gebiete sind Tributstaaten, etwa Siebenbürgen oder Tripolis."
+    },
+    "1683": {
+      "label": "1683",
+      "title": "Bis 1683",
+      "text": "Zypern, Kreta, Podolien und die Küsten Arabiens. In diesem Jahr markiert das Scheitern vor Wien den Beginn des Rückzugs aus Europa."
+    },
+    "_note": "Die Grenzen folgen dem Atlas von Shepherd (1923): Sie sind ungefähr, und die Karte endet südlich von Ägypten und Libyen."
+  }
+}

@@ -21,6 +21,7 @@ import FriendsPanel from '../components/profile/FriendsPanel'
 import ProfileBody, { Avatar } from '../components/profile/ProfileBody'
 import DecorationPicker from '../components/profile/DecorationPicker'
 import FlagCollection from '../components/profile/FlagCollection'
+import ScrollCollection from '../components/profile/ScrollCollection'
 import LevelBadge from '../components/profile/LevelBadge'
 import CollapsibleSection from '../components/CollapsibleSection'
 import { useFriendships } from '../hooks/usePlayerProfile'
@@ -330,7 +331,12 @@ function Profile({ account }) {
         uid={account.uid}
         own
         friendsCount={friendships.loading ? undefined : friendships.friends.length}
-        collection={<FlagCollection uid={account.uid} own />}
+        collection={
+          <>
+            <FlagCollection uid={account.uid} own />
+            <ScrollCollection uid={account.uid} own />
+          </>
+        }
         friends={<FriendsPanel account={account} friendships={friendships} />}
       />
       <AccountSettings account={account} />

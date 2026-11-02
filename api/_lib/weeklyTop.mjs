@@ -9,12 +9,14 @@
 // and writes weeklyTop/last in one transaction (so asking again pays nothing more).
 import { Timestamp } from 'firebase-admin/firestore'
 
+import { SCROLLS } from '../../src/data/scrolls.js'
 import countriesMeta from '../../src/data/countries.meta.json' with { type: 'json' }
 import { previousDayKey } from '../../src/utils/dailyGames.js'
 import { addFragments, flagPool, readFlags } from '../../src/utils/flagCollection.js'
 import { GAME_TYPES } from '../../src/utils/gameTypes.js'
 import { LEAGUE_MIN_PLAYED, LEAGUE_REWARDS } from '../../src/utils/leagueRewards.js'
 import { missionDayAt, weekDays, weekKeyOf } from '../../src/utils/missions.js'
+import { LEAGUE_WIN_SEALS, payScrolls } from '../../src/utils/scrollCollection.js'
 
 // weeklyTop/current.entries: the top kept for the app versions that only know it.
 export const TOP_SIZE = 20
@@ -99,7 +101,10 @@ async function closeLastWeek({ db, today, now }) {
       if (!user.exists || !user.data().username) continue
       const reward = rewarded.find((player) => player.uid === user.id).reward
       const update = { flags: addFragments(readFlags(user.data(), POOL), reward, POOL, user.id).state }
-      if (user.id === champion) update.league = { wins: winsOf(user.data()) + 1, lastWin: week }
+      if (user.id === champion) {
+        update.league = { wins: winsOf(user.data()) + 1, lastWin: week }
+        update.scrolls = payScrolls(user.data(), LEAGUE_WIN_SEALS, SCROLLS, user.id).state
+      }
       transaction.update(user.ref, update)
       paid.set(user.id, reward)
     }

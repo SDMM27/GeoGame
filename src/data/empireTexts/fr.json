@@ -1,0 +1,25 @@
+{
+  "ottoman-empire": {
+    "1481": {
+      "label": "1481",
+      "title": "En 1481",
+      "text": "À la mort de Mehmed II, conquérant de Constantinople, l'empire tient les Balkans et l'Anatolie."
+    },
+    "1520": {
+      "label": "1520",
+      "title": "Jusqu'en 1520",
+      "text": "Sélim Ier prend la Syrie, l'Égypte et le nord de la Mésopotamie."
+    },
+    "1566": {
+      "label": "1566",
+      "title": "Jusqu'en 1566",
+      "text": "Sous Soliman le Magnifique : la Hongrie, l'Irak et le littoral nord-africain. Plusieurs de ces régions sont des États tributaires, comme la Transylvanie ou Tripoli."
+    },
+    "1683": {
+      "label": "1683",
+      "title": "Jusqu'en 1683",
+      "text": "Chypre, la Crète, la Podolie et les côtes d'Arabie. Cette année-là, l'échec devant Vienne marque le début du recul en Europe."
+    },
+    "_note": "Le tracé suit l'atlas de Shepherd (1923) : ses limites sont approximatives, et la carte s'arrête au sud de l'Égypte et de la Libye."
+  }
+}

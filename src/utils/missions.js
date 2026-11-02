@@ -16,6 +16,8 @@
 //   level gained, by the dailies of the day (all played, 3 won, all won: once a day each) and by the streak (days in a
 //   row with a daily played, same definition as the profile: every 7th day, the 30th, the 100th). The daily missions
 //   pay XP only.
+// - Scroll seals (scrollCollection.js) are paid in the same call too: by the weekly bonus (not the daily one) and by each
+//   LEVEL_SEAL_EVERY levels reached.
 import {
   DAILIES_ALL_FRAGMENTS,
   DAILIES_WON_FRAGMENTS,
@@ -26,6 +28,7 @@ import {
   WEEKLY_TIER_FRAGMENTS,
   streakFragments,
 } from './flagCollection.js'
+import { LEVEL_SEAL_EVERY, WEEKLY_BONUS_SEALS } from './scrollCollection.js'
 import { dailyTypesOn, previousDayKey } from './dailyGames.js'
 import { isGameHidden } from './gameAvailability.js'
 import { GAME_TYPES } from './gameTypes.js'
@@ -420,8 +423,9 @@ export function readXp(data, day, week) {
 }
 
 /**
- * What `games` earn on top of the `state` already paid (readXp at `now`): { gained, fragments, rewards, state } with the
- * new state to store, `fragments` earned by the missions, bonuses, levels, dailies and streak newly paid, `rewards` the
+ * What `games` earn on top of the `state` already paid (readXp at `now`): { gained, fragments, seals, rewards, state } with
+ * the new state to store, `seals` earned by the weekly bonus and by the multiples of LEVEL_SEAL_EVERY levels crossed,
+ * `fragments` earned by the missions, bonuses, levels, dailies and streak newly paid, `rewards` the
  * detail of the last two ([{ kind: 'dailies_all' | 'dailies_won_3' | 'dailies_won_all' | 'streak', fragments,
  * streak?: days }]), and `levelUp` when the level went up. Missions done but already paid pay nothing. A player with no
  * stored streak (state.streak null) should be given seedStreak() first (the server does), which pays nothing.
@@ -456,6 +460,10 @@ export function grantXp(state, games, now) {
   const { level } = levelOf(total)
   // state.level is levelOf(stored total) (readXp), so each level gained is paid once.
   fragments += (level - state.level) * LEVEL_UP_FRAGMENTS
+  const seals =
+    (!state.weekMissions.includes(BONUS_ID) && weekMissions.includes(BONUS_ID) ? WEEKLY_BONUS_SEALS : 0) +
+    Math.floor(level / LEVEL_SEAL_EVERY) -
+    Math.floor(state.level / LEVEL_SEAL_EVERY)
 
   const rewards = []
   const dayRewards = [...state.dayRewards]
@@ -470,6 +478,7 @@ export function grantXp(state, games, now) {
   return {
     gained,
     fragments,
+    seals,
     rewards,
     levelUp: level > state.level,
     state: { total, level, day: progress.day, dayMissions, dayGames, dayRewards, week: progress.week, weekMissions, streak },

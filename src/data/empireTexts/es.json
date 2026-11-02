@@ -1,0 +1,25 @@
+{
+  "ottoman-empire": {
+    "1481": {
+      "label": "1481",
+      "title": "En 1481",
+      "text": "A la muerte de Mehmed II, conquistador de Constantinopla, el imperio domina los Balcanes y Anatolia."
+    },
+    "1520": {
+      "label": "1520",
+      "title": "Hasta 1520",
+      "text": "Selim I toma Siria, Egipto y el norte de Mesopotamia."
+    },
+    "1566": {
+      "label": "1566",
+      "title": "Hasta 1566",
+      "text": "Bajo Solimán el Magnífico: Hungría, Irak y el litoral norteafricano. Varias de estas regiones son estados tributarios, como Transilvania o Trípoli."
+    },
+    "1683": {
+      "label": "1683",
+      "title": "Hasta 1683",
+      "text": "Chipre, Creta, Podolia y las costas de Arabia. Ese año, el fracaso ante Viena marca el comienzo del retroceso en Europa."
+    },
+    "_note": "El trazado sigue el atlas de Shepherd (1923): sus límites son aproximados, y el mapa se detiene al sur de Egipto y Libia."
+  }
+}

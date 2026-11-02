@@ -16,6 +16,10 @@ export type Claim = {
   fragments?: number
   rewards?: Reward[]
   unlockedFlags?: string[]
+  // Scroll seals paid, the account's scrolls after the claim, and the scrolls opened (starter gift included)
+  seals?: number
+  scrolls?: { unlocked: string[]; seals: number } | null
+  unlockedScrolls?: string[]
   // Dev only (see __emitXpClaimed): stands in for the cached account, to preview the overlays without a server.
   demoFlags?: FlagsState
 }

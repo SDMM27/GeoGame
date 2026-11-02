@@ -88,6 +88,12 @@ function biggestPiece(geometry: Geometry): CountryShape['marker'] {
   return polygons.map((polygon) => ringBox(polygon[0])).reduce((a, c) => (c.span > a.span ? c : a), { x: 0, y: 0, span: -1 })
 }
 
+// Any GeoJSON feature (a territory that is not a country) as a Skia path in map space
+export function featurePath(feature: Feature<Geometry>): SkPath | null {
+  const d = pathGenerator(feature)
+  return d ? Skia.Path.MakeFromSVGString(d) : null
+}
+
 let shapeCache: Map<string, CountryShape> | null = null
 
 function buildShape(feature: CountryFeature): CountryShape | null {

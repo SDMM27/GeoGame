@@ -1,0 +1,25 @@
+{
+  "ottoman-empire": {
+    "1481": {
+      "label": "1481",
+      "title": "In 1481",
+      "text": "Bij de dood van Mehmed II, de veroveraar van Constantinopel, beheerst het rijk de Balkan en Anatolië."
+    },
+    "1520": {
+      "label": "1520",
+      "title": "Tot 1520",
+      "text": "Selim I verovert Syrië, Egypte en het noorden van Mesopotamië."
+    },
+    "1566": {
+      "label": "1566",
+      "title": "Tot 1566",
+      "text": "Onder Süleyman de Prachtlievende: Hongarije, Irak en de Noord-Afrikaanse kust. Verscheidene van deze gebieden zijn vazalstaten, zoals Transsylvanië of Tripoli."
+    },
+    "1683": {
+      "label": "1683",
+      "title": "Tot 1683",
+      "text": "Cyprus, Kreta, Podolië en de kusten van Arabië. Dat jaar markeert de mislukte aanval op Wenen het begin van de terugtocht uit Europa."
+    },
+    "_note": "De grenzen volgen de atlas van Shepherd (1923): ze zijn bij benadering, en de kaart eindigt ten zuiden van Egypte en Libië."
+  }
+}

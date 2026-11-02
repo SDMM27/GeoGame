@@ -25,6 +25,8 @@ import { PresenceHeartbeat } from '@/components/PresenceHeartbeat'
 import { PushNotifications } from '@/components/PushNotifications'
 import { FlagUnlockOverlay } from '@/components/collection/FlagUnlockOverlay'
 import { FragmentToast } from '@/components/collection/FragmentToast'
+import { ScrollUnlockOverlay } from '@/components/collection/ScrollUnlockOverlay'
+import { SealToast } from '@/components/collection/SealToast'
 import { ConfirmHost } from '@/components/ConfirmHost'
 import { ToastHost } from '@/components/ToastHost'
 import { UpdateBanner } from '@/components/UpdateBanner'
@@ -131,8 +133,11 @@ export default function RootLayout() {
         <ConfirmHost />
         <ToastHost />
         <FragmentToast />
+        <SealToast />
         <XpToasts />
+        {/* The flag overlay first: a claim that unlocks both plays the flags, then the scrolls */}
         <FlagUnlockOverlay />
+        <ScrollUnlockOverlay />
       </ThemeProvider>
     </GestureHandlerRootView>
   )

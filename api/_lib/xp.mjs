@@ -10,9 +10,13 @@
 // missions.js). Besides the XP, the claim pays flag fragments for the weekly missions, the levels, the dailies of the day
 // (dayRewards: the tiers paid today) and the streak of days with a daily ({ day, count }). A player who has no streak yet
 // gets it built once from their last STREAK_SEED_DAYS days (nothing is paid for it), then the claims keep it up to date.
+// The claim also pays scroll seals (the weekly bonus, every 5th level) into users/{uid}.scrolls (scrollCollection.js),
+// and grants the starter scroll to any account on its first claim.
 import countriesMeta from '../../src/data/countries.meta.json' with { type: 'json' }
 import { addFragments, flagPool, readFlags } from '../../src/utils/flagCollection.js'
+import { SCROLLS } from '../../src/data/scrolls.js'
 import { grantXp, missionDayAt, readXp, seedStreak, weekKeyOf } from '../../src/utils/missions.js'
+import { payScrolls } from '../../src/utils/scrollCollection.js'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 // The games of the current week (Paris) are within the last 8 days whatever the time zone offset.
@@ -42,9 +46,10 @@ const toGame = (snapshot) => {
   return { ...data, playedAt: data.playedAt?.toMillis?.() }
 }
 
-/** Pays what the player's recent games earn: { xp, gained, levelUp, flags, fragments, rewards,
- *  unlockedFlags }: the fragments (missions, levels, dailies, streak) go to the flag collection in the same transaction
- *  as the XP; `rewards` details the ones of the dailies and the streak (grantXp). */
+/** Pays what the player's recent games earn: { xp, gained, levelUp, flags, fragments, rewards, unlockedFlags, seals,
+ *  scrolls, unlockedScrolls }: the fragments (missions, levels, dailies, streak) go to the flag collection and the seals
+ *  (weekly bonus, levels) to the scroll collection in the same transaction as the XP; `rewards` details the fragments of
+ *  the dailies and the streak (grantXp); `unlockedScrolls` includes the starter scroll when it was just granted. */
 export async function claimXp({ db, uid, now = Date.now(), Timestamp }) {
   const userRef = db.doc(`users/${uid}`)
   const snapshot = await userRef
@@ -72,14 +77,16 @@ export async function claimXp({ db, uid, now = Date.now(), Timestamp }) {
       )
       before = { ...before, streak: seedStreak(seed.docs.map(toGame), day) }
     }
-    const { gained, fragments, rewards, levelUp, state } = grantXp(before, games, now)
+    const { gained, fragments, seals, rewards, levelUp, state } = grantXp(before, games, now)
     const collected = addFragments(readFlags(user.data(), POOL), fragments, POOL, uid)
+    const paid = payScrolls(user.data(), seals, SCROLLS, uid)
     const changes = {}
     const stored = user.data().xp
     if (gained > 0 || fragments > 0 || stored?.day !== day || stored?.week !== week || JSON.stringify(stored?.streak) !== JSON.stringify(state.streak)) changes.xp = state
     if (fragments > 0) changes.flags = collected.state
+    if (paid.changed) changes.scrolls = paid.state
     if (Object.keys(changes).length > 0) transaction.update(userRef, changes)
-    return reply(200, { xp: state, gained, levelUp, flags: collected.state, fragments, rewards, unlockedFlags: collected.unlocked })
+    return reply(200, { xp: state, gained, levelUp, flags: collected.state, fragments, rewards, unlockedFlags: collected.unlocked, seals, scrolls: paid.state, unlockedScrolls: paid.unlocked })
   })
 }
 

@@ -1,0 +1,62 @@
+{
+  "continents-1858": {
+    "body": "Nel 1858 il geografo Antonio Snider-Pellegrini nota che le coste dell'America e dell'Africa combaciano. Disegna quindi due globi: i continenti uniti, poi separati. Spiega la separazione con una catastrofe legata al Diluvio biblico, e la sua idea non ha seguito. Più di mezzo secolo dopo, Alfred Wegener propone la deriva dei continenti, e la scienza finisce per confermare che essi avevano davvero formato un unico blocco: la Pangea.",
+    "detail": "Sul globo di sinistra, la parola scritta sull'America non è «America» ma «Atlantide», cioè Atlantide.",
+    "credit": "Antonio Snider-Pellegrini, 1858. Pubblico dominio, tramite Wikimedia Commons."
+  },
+  "egypt-ortelius": {
+    "body": "Abraham Ortelius, cartografo di Anversa, pubblica nel 1570 quello che è considerato il primo atlante moderno. Vi aggiunge a poco a poco carte dell'Antichità, come questa, uscita nel 1584. Non è dunque una carta egizia: è l'antico Egitto così come uno studioso del Rinascimento lo ricostruiva a partire dagli autori greci e romani. Il Nilo struttura tutto il paese, diviso in province, i nomoi, con i loro nomi in latino.",
+    "detail": "In basso a sinistra, cerca le piramidi e le palme. In alto a sinistra, un medaglione mostra la pianta di Alessandria.",
+    "credit": "Abraham Ortelius, 1584. Pubblico dominio, tramite Digital Commonwealth e Wikimedia Commons."
+  },
+  "turin-papyrus": {
+    "body": "Disegnato verso il 1150 a.C., questo papiro è una delle più antiche carte geografiche conosciute, ed è spesso descritto come la più antica carta geologica. È attribuito allo scriba Amennakhte e legato a una spedizione del regno di Ramses IV. Mostra una valle del deserto orientale, il Wadi Hammamat, con le sue strade, le sue cave di pietra e i suoi giacimenti d'oro. Oggi è conservato in frammenti al Museo Egizio di Torino.",
+    "detail": "A sinistra, la parte rosa: sono le colline, colorate secondo la loro roccia. Il resto del rotolo contiene soprattutto testo.",
+    "credit": "Archivio Museo Egizio, Torino, C 1879 + C 1969 + C 1899. Immagine con licenza CC0."
+  },
+  "rome-395": {
+    "body": "Nel 395, alla morte dell'imperatore Teodosio I, l'Impero romano viene diviso tra i suoi due figli: Onorio riceve l'Occidente, Arcadio l'Oriente. La divisione diventa definitiva. L'Impero d'Occidente scompare nel 476, mentre quello d'Oriente, detto anche bizantino, dura fino al 1453. Questa carta fu disegnata nel 1923 dallo storico americano William R. Shepherd: i Romani non ne hanno lasciata nessuna di questo tipo.",
+    "detail": "I colori mostrano le grandi divisioni dell'impero, e l'elenco in alto a destra ne enumera le province. Trova Costantinopoli, la capitale dell'Oriente.",
+    "credit": "William R. Shepherd, Historical Atlas, 1923. Pubblico dominio, tramite Wikimedia Commons."
+  },
+  "caliphate-750": {
+    "body": "In poco più di un secolo dalla morte di Maometto nel 632, le conquiste arabe creano un impero che si estende dalla penisola iberica all'Indo. Nel 750 gli Abbasidi rovesciano la dinastia degli Omayyadi e fondano presto una nuova capitale, Baghdad. Queste conquiste furono imposte con le armi, ma quest'area divenne anche un grande crocevia di commerci e di sapere.",
+    "detail": "Le tre tonalità della legenda mostrano le tappe dell'espansione: fino al 632, fino al 656, poi fino al 750. Le date sulla carta sono quelle delle conquiste.",
+    "credit": "William R. Shepherd, Historical Atlas, edizione del 1926. Pubblico dominio, tramite Wikimedia Commons."
+  },
+  "holy-roman-empire": {
+    "body": "Il Sacro Romano Impero non era un paese unificato, ma un insieme di ducati, principati, vescovati e città sotto l'autorità, spesso contestata, di un imperatore. Tra il 1138 e il 1254 lo guida la dinastia degli Hohenstaufen, con figure come Federico Barbarossa e Federico II. Tentano anche di dominare l'Italia, cosa che li oppone ai papi e alle città lombarde. La dinastia finisce per perdere il potere, e l'impero resta frammentato.",
+    "detail": "Confronta il nord della carta, coperto di ducati, con il Regno delle Due Sicilie all'estremo sud, passato agli Hohenstaufen nel 1194.",
+    "credit": "William R. Shepherd, Historical Atlas, edizione del 1926. Pubblico dominio, tramite Wikimedia Commons."
+  },
+  "mongol-dominions": {
+    "body": "Gengis Khan unisce le tribù mongole nel 1206. I suoi successori costruiscono il più grande impero continuo della storia, a prezzo di conquiste molto sanguinose. Verso il 1300 è già diviso in quattro: l'Orda d'Oro, il khanato di Chagatai, gli Ilkhan di Persia e la Cina degli Yuan. Le vie che collegò facilitarono anche gli scambi tra l'Asia e l'Europa.",
+    "detail": "La linea rossa segna i confini dei domini mongoli verso il 1300. L'area grigia mostra l'impero governato da Tamerlano fino al 1405.",
+    "credit": "William R. Shepherd, Historical Atlas, 1923. Pubblico dominio, tramite Wikimedia Commons."
+  },
+  "tabula-rogeriana": {
+    "body": "Nel 1154, dopo una quindicina d'anni di lavoro, lo studioso arabo al-Idrisi completa una descrizione del mondo per Ruggero II, re normanno di Sicilia. Riunisce il sapere del mondo musulmano e dell'Europa, in 70 carte distribuite in sette zone climatiche. L'originale è perduto. Questa versione assembla le sezioni dei manoscritti conservati: è la ricostruzione del ricercatore tedesco Konrad Miller, della fine degli anni Venti del Novecento.",
+    "detail": "Il sud è in alto. Capovolgi mentalmente la carta per ritrovare il Mediterraneo e la forma dell'Italia.",
+    "credit": "Al-Idrisi, 1154; ricostruzione di Konrad Miller. Pubblico dominio, tramite la Library of Congress e Wikimedia Commons."
+  },
+  "waldseemuller-1507": {
+    "body": "Stampata nel 1507, questa carta di Martin Waldseemüller è la prima a usare il nome «America», in onore del navigatore Amerigo Vespucci. Mostra inoltre il nuovo continente separato dall'Asia, prima ancora che gli europei avessero visto l'oceano Pacifico. L'unico esemplare noto è stato riscoperto nel 1901 in un castello tedesco. La Library of Congress lo ha acquistato per 10 milioni di dollari, in una vendita conclusa nel 2003.",
+    "detail": "Cerca la parola «America» nel sud del nuovo continente, poi i ritratti di Tolomeo e di Vespucci, in alto.",
+    "credit": "Martin Waldseemüller, 1507. Pubblico dominio, tramite la Library of Congress e Wikimedia Commons."
+  },
+  "ottoman-empire": {
+    "body": "Nel 1453 gli Ottomani conquistano Costantinopoli. Il loro impero si estende poi su tre continenti: l'Egitto e i luoghi santi dell'islam con Selim I, l'Ungheria e l'Iraq con Solimano il Magnifico. Riunisce popoli, lingue e religioni molto diversi, e molte di queste regioni furono sottomesse con la guerra. Nel 1683, il fallimento davanti a Vienna segna l'inizio del suo arretramento in Europa.",
+    "detail": "La legenda segue l'espansione in quattro colori, dal 1481 al 1683. Le date sono quelle delle conquiste, e gli Stati tributari sono in rosa chiaro.",
+    "credit": "William R. Shepherd, Historical Atlas, 1923. Pubblico dominio, tramite Wikimedia Commons."
+  },
+  "russia-growth": {
+    "body": "Verso il 1300 il principato di Mosca è un piccolo territorio che paga tributo all'Orda d'Oro. In cinque secoli i suoi sovrani lo estendono dal Baltico agli Urali e al mar Nero, spesso con la guerra e a spese di altri popoli. Sotto Caterina II la Russia annette la Crimea e partecipa alle tre spartizioni della Polonia. Questa carta americana del 1923 riprende i nomi della sua epoca, come «Little Russia» per una parte dell'Ucraina: queste parole e questi confini sono quelli del passato, non quelli di oggi.",
+    "detail": "Trova la piccola macchia scura di Mosca verso il 1300, al centro, poi segui i colori della legenda fino alle spartizioni della Polonia, a sinistra.",
+    "credit": "William R. Shepherd, Historical Atlas, 1923. Pubblico dominio, tramite Wikimedia Commons."
+  },
+  "british-empire-1886": {
+    "body": "Questa carta è un manifesto di propaganda. Pubblicata nel 1886 sul giornale The Graphic e illustrata da Walter Crane, sostiene l'idea di una federazione dell'Impero britannico. I territori sono in rosso, e le linee tracciano le rotte marittime. Le parole «libertà» e «fraternità» contrastano con la realtà del dominio coloniale, e i popoli colonizzati sono rappresentati attraverso gli stereotipi dell'epoca.",
+    "detail": "In basso al centro, Britannia siede in trono sul mondo, circondata da figure che dovrebbero rappresentare i popoli dell'impero. Guarda come vengono mostrati.",
+    "credit": "Walter Crane, 1886, statistiche di J. C. R. Colomb. Pubblico dominio, tramite la Boston Public Library e Wikimedia Commons."
+  }
+}

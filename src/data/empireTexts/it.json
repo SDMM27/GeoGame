@@ -1,0 +1,25 @@
+{
+  "ottoman-empire": {
+    "1481": {
+      "label": "1481",
+      "title": "Nel 1481",
+      "text": "Alla morte di Maometto II, conquistatore di Costantinopoli, l'impero domina i Balcani e l'Anatolia."
+    },
+    "1520": {
+      "label": "1520",
+      "title": "Fino al 1520",
+      "text": "Selim I conquista la Siria, l'Egitto e il nord della Mesopotamia."
+    },
+    "1566": {
+      "label": "1566",
+      "title": "Fino al 1566",
+      "text": "Sotto Solimano il Magnifico: l'Ungheria, l'Iraq e il litorale nordafricano. Molte di queste regioni sono stati tributari, come la Transilvania o Tripoli."
+    },
+    "1683": {
+      "label": "1683",
+      "title": "Fino al 1683",
+      "text": "Cipro, Creta, la Podolia e le coste dell'Arabia. In quell'anno, il fallimento davanti a Vienna segna l'inizio del ritiro dall'Europa."
+    },
+    "_note": "Il tracciato segue l'atlante di Shepherd (1923): i suoi confini sono approssimativi, e la mappa si ferma a sud dell'Egitto e della Libia."
+  }
+}

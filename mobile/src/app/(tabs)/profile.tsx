@@ -28,6 +28,7 @@ import { reauthenticateWithGoogle, signInWithGoogle } from '@/account/google'
 import { API_ORIGIN, legalUrl } from '@/links'
 import { DecorationPicker } from '@/components/profile/DecorationPicker'
 import { FlagCollection } from '@/components/profile/FlagCollection'
+import { ScrollCollection } from '@/components/profile/ScrollCollection'
 import { LevelBar } from '@/components/profile/LevelBar'
 import { Avatar, ProfileBody } from '@/components/profile/ProfileSections'
 import { CollapsibleSection } from '@/components/CollapsibleSection'
@@ -457,7 +458,12 @@ function Profile({ account }: { account: Account }) {
       <ProfileBody
         uid={account.uid}
         own
-        collection={<FlagCollection uid={account.uid} own />}
+        collection={
+          <>
+            <FlagCollection uid={account.uid} own />
+            <ScrollCollection uid={account.uid} own />
+          </>
+        }
         friendsCount={friendships.loading ? undefined : friendships.friends.length}
         onSeeHistory={() => router.push({ pathname: '/history', params: { uid: account.uid } })}
       />

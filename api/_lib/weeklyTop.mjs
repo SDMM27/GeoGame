@@ -6,7 +6,8 @@
 // best one. Visitors (scores without a uid) don't count. Ties go to the most podium wins, then to the most games played.
 //
 // Each daily run writes weeklyTop/current (the week under way) and, once the previous week is over, pays its rewards
-// and writes weeklyTop/last in one transaction (so asking again pays nothing more).
+// and writes weeklyTop/last in one transaction (so asking again pays nothing more). It is also refreshed after each daily
+// score (api/league-refresh.mjs), throttled by refreshWeeklyTopThrottled.
 import { Timestamp } from 'firebase-admin/firestore'
 
 import countriesMeta from '../../src/data/countries.meta.json' with { type: 'json' }
@@ -127,4 +128,22 @@ export async function refreshWeeklyTop({ db, now = Date.now() }) {
     updatedAt: Timestamp.fromMillis(now),
   })
   return { players: players.length, scores: scores.length, closed }
+}
+
+// The recompute reads all of the week's daily_scores: after a score, at most once per window, whoever asks first.
+export const REFRESH_INTERVAL_MS = 30 * 1000
+
+// Same as refreshWeeklyTop, unless one ran less than REFRESH_INTERVAL_MS ago: { skipped: true, retryIn } then, with the ms
+// left in the window. The lock is claimed before the scores are read, so a refresh that blocks a retry made after `retryIn`
+// started after the caller's score was saved and includes it: one retry is enough.
+export async function refreshWeeklyTopThrottled({ db, now = Date.now() }) {
+  const ref = db.doc('weeklyTop/refresh')
+  const retryIn = await db.runTransaction(async (transaction) => {
+    const at = (await transaction.get(ref)).data()?.at?.toMillis()
+    if (at != null && now - at < REFRESH_INTERVAL_MS) return at + REFRESH_INTERVAL_MS - now
+    transaction.set(ref, { at: Timestamp.fromMillis(now) })
+    return null
+  })
+  if (retryIn != null) return { skipped: true, retryIn }
+  return { skipped: false, ...(await refreshWeeklyTop({ db, now })) }
 }

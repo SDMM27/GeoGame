@@ -1307,7 +1307,7 @@
     "intro": "Gioca le sfide del giorno per salire in classifica nella settimana e vincere frammenti di bandiera.",
     "days_left_one": "Manca {{count}} giorno",
     "days_left_other": "Mancano {{count}} giorni",
-    "updated_hint": "La classifica viene aggiornata una volta al giorno. Ogni settimana va da lunedì a domenica.",
+    "updated_hint": "La classifica viene aggiornata dopo ogni partita. Ogni settimana va da lunedì a domenica.",
     "last_rank": "Settimana scorsa: n. {{rank}} con {{points}} pt",
     "last_reward_one": "+{{count}} frammento di bandiera vinto",
     "last_reward_other": "+{{count}} frammenti di bandiera vinti",

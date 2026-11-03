@@ -7,6 +7,7 @@ import { LEADERBOARD_SIZE, ascensionLeaderboard, ascensionQuery, soloLeaderboard
 import { GAME_TYPES } from './gameTypes'
 import { normalizeUsername } from './account'
 import { containsProfanity } from './profanity'
+import { refreshLeague } from './leagueRefresh'
 
 // Every save takes the player as { name, uid? }:
 //  - signed in: uid and the account's username. One entry per account, owned by it (see firestore.rules).
@@ -49,10 +50,12 @@ async function saveBest(collectionName, player, filters, data, isBetterThan, toE
     if (!isBetterThan(entry, previous)) return { status: 'blocked', existing: toExisting(previous) }
     // Firestore rules only allow replacing a score with a better one, never deleting it.
     await setDoc(existing.docs[0].ref, entry)
+    if (collectionName === 'daily_scores' && uid) refreshLeague()
     return { status: 'updated' }
   }
 
   await addDoc(ref, entry)
+  if (collectionName === 'daily_scores' && uid) refreshLeague()
   return { status: 'saved' }
 }
 

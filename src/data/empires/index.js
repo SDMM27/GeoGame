@@ -18,6 +18,49 @@ export const EMPIRES = {
     ],
     load: () => import('./ottoman-empire.json'),
   },
+  'rome-395': {
+    center: [40, 18],
+    zoom: 3,
+    stages: [
+      { id: 'gaul', color: '#7FB069' },
+      { id: 'italy', color: '#8E7CC3' },
+      { id: 'illyricum', color: '#EBA046' },
+      { id: 'east', color: '#D9596B' },
+    ],
+    load: () => import('./rome-395.json'),
+  },
+  'caliphate-750': {
+    center: [30, 35],
+    zoom: 3,
+    stages: [
+      { id: '632', color: '#8E7CC3' },
+      { id: '656', color: '#7FB069' },
+      { id: '750', color: '#D9596B' },
+    ],
+    load: () => import('./caliphate-750.json'),
+  },
+  'mongol-dominions': {
+    center: [45, 85],
+    zoom: 3,
+    cumulative: false,
+    stages: [
+      { id: '1300', color: '#D9596B' },
+      { id: '1405', color: '#8E7CC3' },
+    ],
+    load: () => import('./mongol-dominions.json'),
+  },
+  'russia-growth': {
+    center: [56, 38],
+    zoom: 3,
+    stages: [
+      { id: '1300', color: '#8E7CC3' },
+      { id: '1462', color: '#7FB069' },
+      { id: '1584', color: '#EBD35B' },
+      { id: '1725', color: '#EBA046' },
+      { id: '1796', color: '#D9596B' },
+    ],
+    load: () => import('./russia-growth.json'),
+  },
 }
 
 export const hasEmpireMap = (id) => Object.hasOwn(EMPIRES, id)

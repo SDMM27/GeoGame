@@ -1,0 +1,237 @@
+{
+  "entry": {
+    "center": [
+      40,
+      18
+    ],
+    "zoom": 3,
+    "stages": [
+      {
+        "id": "gaul",
+        "color": "#7FB069"
+      },
+      {
+        "id": "italy",
+        "color": "#8E7CC3"
+      },
+      {
+        "id": "illyricum",
+        "color": "#EBA046"
+      },
+      {
+        "id": "east",
+        "color": "#D9596B"
+      }
+    ],
+    "cumulative": true
+  },
+  "texts": {
+    "fr": {
+      "gaul": {
+        "label": "Gaules",
+        "title": "Préfecture des Gaules",
+        "text": "Après la mort de Théodose Ier en 395, la moitié occidentale de l'Empire revient à Honorius. Elle compte la préfecture des Gaules : Bretagne, Gaules, Espagne et Maurétanie Tingitane."
+      },
+      "italy": {
+        "label": "Italie",
+        "title": "Préfecture d'Italie",
+        "text": "Elle comprend l'Italie, l'Afrique du Nord et une partie des provinces du Danube. Avec les Gaules, elle forme la moitié occidentale, sous Honorius."
+      },
+      "illyricum": {
+        "label": "Illyrie",
+        "title": "Préfecture d'Illyrie",
+        "text": "Les diocèses de Macédoine et de Dacie forment, sur la carte, une préfecture à part, entre les deux moitiés de l'Empire ; leur rattachement fut disputé entre les deux cours."
+      },
+      "east": {
+        "label": "Orient",
+        "title": "Préfecture d'Orient",
+        "text": "De la Thrace à l'Égypte, avec Constantinople : c'est la moitié orientale de l'Empire, confiée à Arcadius."
+      },
+      "_note": "Le tracé suit l'atlas de Shepherd (The Roman Empire about 395, 1923) ; il est approximatif. La carte s'arrête aux limites de l'Empire : le reste du monde n'y figure pas, et les régions pâles ou ombrées (reliefs) sont parfois mal rendues."
+    },
+    "en": {
+      "gaul": {
+        "label": "Gaul",
+        "title": "Prefecture of Gaul",
+        "text": "After the death of Theodosius I in 395, the western half of the Empire passed to Honorius. It includes the Prefecture of Gaul: Britain, Gaul, Spain and Mauretania Tingitana."
+      },
+      "italy": {
+        "label": "Italy",
+        "title": "Prefecture of Italy",
+        "text": "It covers Italy, North Africa and part of the Danube provinces. Together with Gaul it forms the western half, under Honorius."
+      },
+      "illyricum": {
+        "label": "Illyricum",
+        "title": "Prefecture of Illyricum",
+        "text": "The dioceses of Macedonia and Dacia form a prefecture of their own on the map, between the two halves of the Empire; which court held them was disputed."
+      },
+      "east": {
+        "label": "East",
+        "title": "Prefecture of the East",
+        "text": "From Thrace to Egypt, with Constantinople: this is the eastern half of the Empire, held by Arcadius."
+      },
+      "_note": "The outline follows the atlas of Shepherd (The Roman Empire about 395, 1923) and is approximate. The map stops at the limits of the Empire: the rest of the world is not shown, and pale or shaded (relief) areas are sometimes poorly rendered."
+    },
+    "ru": {
+      "gaul": {
+        "label": "Галлия",
+        "title": "Префектура Галлия",
+        "text": "После смерти Феодосия I в 395 году западная половина империи досталась Гонорию. В неё входит префектура Галлия: Британия, Галлия, Испания и Мавретания Тингитанская."
+      },
+      "italy": {
+        "label": "Италия",
+        "title": "Префектура Италия",
+        "text": "Она охватывает Италию, Северную Африку и часть придунайских провинций. Вместе с Галлией она образует западную половину под властью Гонория."
+      },
+      "illyricum": {
+        "label": "Иллирик",
+        "title": "Префектура Иллирик",
+        "text": "Диоцезы Македония и Дакия образуют на карте отдельную префектуру между двумя половинами империи; кому они подчинялись, было предметом спора между двумя дворами."
+      },
+      "east": {
+        "label": "Восток",
+        "title": "Префектура Восток",
+        "text": "От Фракии до Египта, с Константинополем: это восточная половина империи, которой правил Аркадий."
+      },
+      "_note": "Контур следует атласу Шепарда (The Roman Empire about 395, 1923) и приблизителен. Карта кончается на границах империи: остальной мир на ней не показан, а светлые или затенённые (рельеф) области иногда переданы плохо."
+    },
+    "es": {
+      "gaul": {
+        "label": "Galia",
+        "title": "Prefectura de las Galias",
+        "text": "Tras la muerte de Teodosio I en 395, la mitad occidental del Imperio pasó a Honorio. Incluye la prefectura de las Galias: Britania, Galia, Hispania y Mauritania Tingitana."
+      },
+      "italy": {
+        "label": "Italia",
+        "title": "Prefectura de Italia",
+        "text": "Abarca Italia, el norte de África y parte de las provincias del Danubio. Junto con las Galias forma la mitad occidental, bajo Honorio."
+      },
+      "illyricum": {
+        "label": "Iliria",
+        "title": "Prefectura de Iliria",
+        "text": "Las diócesis de Macedonia y Dacia forman en el mapa una prefectura aparte, entre las dos mitades del Imperio; la corte de la que dependían fue objeto de disputa."
+      },
+      "east": {
+        "label": "Oriente",
+        "title": "Prefectura de Oriente",
+        "text": "De Tracia a Egipto, con Constantinopla: es la mitad oriental del Imperio, en manos de Arcadio."
+      },
+      "_note": "El trazado sigue el atlas de Shepherd (The Roman Empire about 395, 1923) y es aproximado. El mapa se detiene en los límites del Imperio: el resto del mundo no aparece, y las zonas pálidas o sombreadas (relieve) a veces se reproducen mal."
+    },
+    "pt": {
+      "gaul": {
+        "label": "Gália",
+        "title": "Prefeitura das Gálias",
+        "text": "Após a morte de Teodósio I em 395, a metade ocidental do Império coube a Honório. Inclui a prefeitura das Gálias: Britânia, Gália, Hispânia e Mauritânia Tingitana."
+      },
+      "italy": {
+        "label": "Itália",
+        "title": "Prefeitura da Itália",
+        "text": "Abrange a Itália, o norte de África e parte das províncias do Danúbio. Com as Gálias, forma a metade ocidental, sob Honório."
+      },
+      "illyricum": {
+        "label": "Ilíria",
+        "title": "Prefeitura da Ilíria",
+        "text": "As dioceses da Macedónia e da Dácia formam no mapa uma prefeitura à parte, entre as duas metades do Império; a corte de que dependiam foi motivo de disputa."
+      },
+      "east": {
+        "label": "Oriente",
+        "title": "Prefeitura do Oriente",
+        "text": "Da Trácia ao Egito, com Constantinopla: é a metade oriental do Império, nas mãos de Arcádio."
+      },
+      "_note": "O traçado segue o atlas de Shepherd (The Roman Empire about 395, 1923) e é aproximado. O mapa termina nos limites do Império: o resto do mundo não aparece, e as zonas pálidas ou sombreadas (relevo) por vezes são mal reproduzidas."
+    },
+    "de": {
+      "gaul": {
+        "label": "Gallien",
+        "title": "Präfektur Gallien",
+        "text": "Nach dem Tod von Theodosius I. im Jahr 395 fiel die westliche Reichshälfte an Honorius. Zu ihr gehört die Präfektur Gallien: Britannien, Gallien, Spanien und Mauretania Tingitana."
+      },
+      "italy": {
+        "label": "Italien",
+        "title": "Präfektur Italien",
+        "text": "Sie umfasst Italien, Nordafrika und einen Teil der Donauprovinzen. Zusammen mit Gallien bildet sie die westliche Hälfte unter Honorius."
+      },
+      "illyricum": {
+        "label": "Illyricum",
+        "title": "Präfektur Illyricum",
+        "text": "Die Diözesen Makedonien und Dakien bilden auf der Karte eine eigene Präfektur zwischen den beiden Reichshälften; zu welchem Hof sie gehörten, war umstritten."
+      },
+      "east": {
+        "label": "Osten",
+        "title": "Präfektur Orient",
+        "text": "Von Thrakien bis Ägypten, mit Konstantinopel: Das ist die östliche Reichshälfte unter Arcadius."
+      },
+      "_note": "Der Umriss folgt dem Atlas von Shepherd (The Roman Empire about 395, 1923) und ist ungefähr. Die Karte endet an den Reichsgrenzen: Der Rest der Welt ist nicht abgebildet, und blasse oder schattierte (Relief) Bereiche sind manchmal schlecht wiedergegeben."
+    },
+    "it": {
+      "gaul": {
+        "label": "Gallia",
+        "title": "Prefettura delle Gallie",
+        "text": "Dopo la morte di Teodosio I nel 395, la metà occidentale dell'Impero passò a Onorio. Comprende la prefettura delle Gallie: Britannia, Gallia, Spagna e Mauretania Tingitana."
+      },
+      "italy": {
+        "label": "Italia",
+        "title": "Prefettura d'Italia",
+        "text": "Comprende l'Italia, l'Africa settentrionale e parte delle province danubiane. Insieme alle Gallie forma la metà occidentale, sotto Onorio."
+      },
+      "illyricum": {
+        "label": "Illirico",
+        "title": "Prefettura dell'Illirico",
+        "text": "Le diocesi di Macedonia e di Dacia formano sulla carta una prefettura a sé, tra le due metà dell'Impero; da quale corte dipendessero fu oggetto di contesa."
+      },
+      "east": {
+        "label": "Oriente",
+        "title": "Prefettura d'Oriente",
+        "text": "Dalla Tracia all'Egitto, con Costantinopoli: è la metà orientale dell'Impero, affidata ad Arcadio."
+      },
+      "_note": "Il tracciato segue l'atlante di Shepherd (The Roman Empire about 395, 1923) ed è approssimativo. La carta si ferma ai confini dell'Impero: il resto del mondo non è raffigurato, e le zone chiare o ombreggiate (rilievo) sono a volte rese male."
+    },
+    "uk": {
+      "gaul": {
+        "label": "Галлія",
+        "title": "Префектура Галлія",
+        "text": "Після смерті Феодосія I у 395 році західна половина імперії дісталася Гонорію. До неї входить префектура Галлія: Британія, Галлія, Іспанія та Мавретанія Тінгітанська."
+      },
+      "italy": {
+        "label": "Італія",
+        "title": "Префектура Італія",
+        "text": "Вона охоплює Італію, Північну Африку та частину придунайських провінцій. Разом із Галлією вона утворює західну половину під владою Гонорія."
+      },
+      "illyricum": {
+        "label": "Іллірик",
+        "title": "Префектура Іллірик",
+        "text": "Діоцези Македонія та Дакія утворюють на карті окрему префектуру між двома половинами імперії; якому дворові вони підпорядковувалися, було предметом суперечки."
+      },
+      "east": {
+        "label": "Схід",
+        "title": "Префектура Схід",
+        "text": "Від Фракії до Єгипту, з Константинополем: це східна половина імперії, якою правив Аркадій."
+      },
+      "_note": "Контур відповідає атласу Шепарда (The Roman Empire about 395, 1923) і є приблизним. Карта закінчується на межах імперії: решта світу на ній не показана, а світлі або затінені (рельєф) ділянки подекуди передані погано."
+    },
+    "nl": {
+      "gaul": {
+        "label": "Gallië",
+        "title": "Prefectuur Gallië",
+        "text": "Na de dood van Theodosius I in 395 viel de westelijke helft van het Rijk aan Honorius toe. Daartoe behoort de prefectuur Gallië: Britannia, Gallië, Hispania en Mauretania Tingitana."
+      },
+      "italy": {
+        "label": "Italië",
+        "title": "Prefectuur Italië",
+        "text": "Ze omvat Italië, Noord-Afrika en een deel van de Donauprovincies. Samen met Gallië vormt ze de westelijke helft, onder Honorius."
+      },
+      "illyricum": {
+        "label": "Illyricum",
+        "title": "Prefectuur Illyricum",
+        "text": "De diocesen Macedonië en Dacië vormen op de kaart een eigen prefectuur tussen de twee helften van het Rijk; onder welk hof ze vielen, was omstreden."
+      },
+      "east": {
+        "label": "Oosten",
+        "title": "Prefectuur Oriëns",
+        "text": "Van Thracië tot Egypte, met Constantinopel: dit is de oostelijke helft van het Rijk, onder Arcadius."
+      },
+      "_note": "De omtrek volgt de atlas van Shepherd (The Roman Empire about 395, 1923) en is bij benadering. De kaart eindigt bij de grenzen van het Rijk: de rest van de wereld staat er niet op, en bleke of geschaduwde (reliëf) gebieden zijn soms slecht weergegeven."
+    }
+  }
+}

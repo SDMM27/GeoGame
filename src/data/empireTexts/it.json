@@ -21,5 +21,87 @@
       "text": "Cipro, Creta, la Podolia e le coste dell'Arabia. In quell'anno, il fallimento davanti a Vienna segna l'inizio del ritiro dall'Europa."
     },
     "_note": "Il tracciato segue l'atlante di Shepherd (1923): i suoi confini sono approssimativi, e la mappa si ferma a sud dell'Egitto e della Libia."
+  },
+  "rome-395": {
+    "gaul": {
+      "label": "Gallia",
+      "title": "Prefettura delle Gallie",
+      "text": "Dopo la morte di Teodosio I nel 395, la metà occidentale dell'Impero passò a Onorio. Comprende la prefettura delle Gallie: Britannia, Gallia, Spagna e Mauretania Tingitana."
+    },
+    "italy": {
+      "label": "Italia",
+      "title": "Prefettura d'Italia",
+      "text": "Comprende l'Italia, l'Africa settentrionale e parte delle province danubiane. Insieme alle Gallie forma la metà occidentale, sotto Onorio."
+    },
+    "illyricum": {
+      "label": "Illirico",
+      "title": "Prefettura dell'Illirico",
+      "text": "Le diocesi di Macedonia e di Dacia formano sulla carta una prefettura a sé, tra le due metà dell'Impero; da quale corte dipendessero fu oggetto di contesa."
+    },
+    "east": {
+      "label": "Oriente",
+      "title": "Prefettura d'Oriente",
+      "text": "Dalla Tracia all'Egitto, con Costantinopoli: è la metà orientale dell'Impero, affidata ad Arcadio."
+    },
+    "_note": "Il tracciato segue l'atlante di Shepherd (The Roman Empire about 395, 1923) ed è approssimativo. La carta si ferma ai confini dell'Impero: il resto del mondo non è raffigurato, e le zone chiare o ombreggiate (rilievo) sono a volte rese male."
+  },
+  "caliphate-750": {
+    "632": {
+      "label": "632",
+      "title": "Conquiste fino alla morte di Maometto",
+      "text": "Alla morte di Maometto nel 632 l'Arabia era passata sotto l'autorità della nuova comunità musulmana, con la persuasione come con le armi."
+    },
+    "656": {
+      "label": "632-656",
+      "title": "Sotto i primi tre califfi",
+      "text": "Gli eserciti arabi conquistarono con la forza la Siria, l'Egitto, la Mesopotamia e la Persia e raggiunsero la Cirenaica, sottraendo terre agli imperi bizantino e persiano."
+    },
+    "750": {
+      "label": "661-750",
+      "title": "Sotto i califfi omayyadi",
+      "text": "Nuove campagne portarono il califfato fino al Maghreb, alla Spagna, all'Asia centrale e al Sind, formando un vasto impero."
+    },
+    "_note": "Il tracciato segue l'atlante di Shepherd (The Califate in 750) ed è approssimativo. La carta copre solo il mondo mediterraneo e l'Asia occidentale: il resto del mondo non è rappresentato."
+  },
+  "mongol-dominions": {
+    "1300": {
+      "label": "Mongoli, 1300",
+      "title": "I domini mongoli intorno al 1300",
+      "text": "Nato dalle conquiste di Gengis Khan, l'impero mongolo si estende ora dalla Cina alla Russia e alla Persia, diviso in quattro khanati. Queste conquiste furono estremamente sanguinose."
+    },
+    "1405": {
+      "label": "Timur, 1405",
+      "title": "L'impero di Timur nel 1405",
+      "text": "Da Samarcanda, Timur (Tamerlano) conquistò la Persia e l'Asia centrale e condusse campagne fino all'India. Le sue guerre causarono molte morti, e il suo impero non gli sopravvisse."
+    },
+    "_note": "Il tracciato segue l'atlante di Shepherd (Mongol dominions, 1300-1405); è approssimativo."
+  },
+  "russia-growth": {
+    "1300": {
+      "label": "1300",
+      "title": "Verso il 1300",
+      "text": "Il principato di Mosca è allora un piccolo territorio che paga tributo all'Orda d'Oro."
+    },
+    "1462": {
+      "label": "1462",
+      "title": "Nel 1462",
+      "text": "Il granducato di Mosca, che la carta chiama «Grande Russia», è cresciuto intorno alla sua capitale."
+    },
+    "1584": {
+      "label": "1584",
+      "title": "Fino al 1584",
+      "text": "Con Ivan III, Basilio III e Ivan IV, Mosca annette Novgorod, Tver', Rjazan', poi i khanati di Kazan' e di Astrachan'. Questa crescita avvenne spesso con la guerra e a spese di altri popoli."
+    },
+    "1725": {
+      "label": "1725",
+      "title": "Fino al 1725",
+      "text": "La parte dell'Ucraina a est del Dnepr, ceduta dalla Polonia nel 1667, poi l'Ingria, l'Estonia e la Livonia, tolte alla Svezia con Pietro il Grande."
+    },
+    "1796": {
+      "label": "1796",
+      "title": "Fino al 1796",
+      "text": "Con Caterina II la Russia annette la Crimea (1783) e la costa settentrionale del mar Nero. Con le tre spartizioni della Polonia (1772-1795) prende terre oggi in Bielorussia, Lituania, Lettonia e Ucraina."
+    },
+    "_note": "Il tracciato segue un atlante americano del 1923 (Shepherd): i suoi limiti sono approssimativi e copre solo la Russia europea, non la Siberia. Questi confini appartengono al passato e non dicono nulla di quelli di oggi."
   }
 }

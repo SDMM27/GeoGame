@@ -21,5 +21,87 @@
       "text": "Cyprus, Kreta, Podolië en de kusten van Arabië. Dat jaar markeert de mislukte aanval op Wenen het begin van de terugtocht uit Europa."
     },
     "_note": "De grenzen volgen de atlas van Shepherd (1923): ze zijn bij benadering, en de kaart eindigt ten zuiden van Egypte en Libië."
+  },
+  "rome-395": {
+    "gaul": {
+      "label": "Gallië",
+      "title": "Prefectuur Gallië",
+      "text": "Na de dood van Theodosius I in 395 viel de westelijke helft van het Rijk aan Honorius toe. Daartoe behoort de prefectuur Gallië: Britannia, Gallië, Hispania en Mauretania Tingitana."
+    },
+    "italy": {
+      "label": "Italië",
+      "title": "Prefectuur Italië",
+      "text": "Ze omvat Italië, Noord-Afrika en een deel van de Donauprovincies. Samen met Gallië vormt ze de westelijke helft, onder Honorius."
+    },
+    "illyricum": {
+      "label": "Illyricum",
+      "title": "Prefectuur Illyricum",
+      "text": "De diocesen Macedonië en Dacië vormen op de kaart een eigen prefectuur tussen de twee helften van het Rijk; onder welk hof ze vielen, was omstreden."
+    },
+    "east": {
+      "label": "Oosten",
+      "title": "Prefectuur Oriëns",
+      "text": "Van Thracië tot Egypte, met Constantinopel: dit is de oostelijke helft van het Rijk, onder Arcadius."
+    },
+    "_note": "De omtrek volgt de atlas van Shepherd (The Roman Empire about 395, 1923) en is bij benadering. De kaart eindigt bij de grenzen van het Rijk: de rest van de wereld staat er niet op, en bleke of geschaduwde (reliëf) gebieden zijn soms slecht weergegeven."
+  },
+  "caliphate-750": {
+    "632": {
+      "label": "632",
+      "title": "Veroveringen tot de dood van Mohammed",
+      "text": "Bij de dood van Mohammed in 632 stond Arabië onder het gezag van de nieuwe moslimgemeenschap, zowel door overtuiging als met wapengeweld."
+    },
+    "656": {
+      "label": "632-656",
+      "title": "Onder de eerste drie kaliefen",
+      "text": "Arabische legers veroverden met geweld Syrië, Egypte, Mesopotamië en Perzië en bereikten Cyrenaica, ten koste van het Byzantijnse en het Perzische Rijk."
+    },
+    "750": {
+      "label": "661-750",
+      "title": "Onder de Omajjaden-kaliefen",
+      "text": "Nieuwe veldtochten brachten het kalifaat tot in de Maghreb, Spanje, Centraal-Azië en Sind en vormden een uitgestrekt rijk."
+    },
+    "_note": "De omtrek volgt de atlas van Shepherd (The Califate in 750) en is bij benadering. De kaart toont alleen de Middellandse Zee-wereld en West-Azië: de rest van de wereld staat er niet op."
+  },
+  "mongol-dominions": {
+    "1300": {
+      "label": "Mongolen, 1300",
+      "title": "De Mongoolse gebieden rond 1300",
+      "text": "Ontstaan uit de veroveringen van Dzjengis Khan strekt het Mongoolse rijk zich nu uit van China tot Rusland en Perzië, verdeeld over vier khanaten. Deze veroveringen waren uiterst dodelijk."
+    },
+    "1405": {
+      "label": "Timoer, 1405",
+      "title": "Het rijk van Timoer in 1405",
+      "text": "Vanuit Samarkand veroverde Timoer (Tamerlan) Perzië en Centraal-Azië en trok met zijn veldtochten tot in India. Zijn oorlogen eisten veel levens en zijn rijk overleefde hem niet."
+    },
+    "_note": "De omtrek volgt de atlas van Shepherd (Mongol dominions, 1300-1405) en is bij benadering."
+  },
+  "russia-growth": {
+    "1300": {
+      "label": "1300",
+      "title": "Rond 1300",
+      "text": "Het vorstendom Moskou is dan een klein gebied dat schatting betaalt aan de Gouden Horde."
+    },
+    "1462": {
+      "label": "1462",
+      "title": "In 1462",
+      "text": "Het groothertogdom Moskou, dat de kaart „Groot-Rusland” noemt, is gegroeid rond zijn hoofdstad."
+    },
+    "1584": {
+      "label": "1584",
+      "title": "Tot 1584",
+      "text": "Onder Ivan III, Vasili III en Ivan IV annexeert Moskou Novgorod, Tver, Rjazan en daarna de khanaten Kazan en Astrachan. Deze groei verliep vaak door oorlog en ten koste van andere volken."
+    },
+    "1725": {
+      "label": "1725",
+      "title": "Tot 1725",
+      "text": "Het deel van Oekraïne ten oosten van de Dnjepr, in 1667 door Polen afgestaan, en daarna Ingermanland, Estland en Lijfland, onder Peter de Grote op Zweden veroverd."
+    },
+    "1796": {
+      "label": "1796",
+      "title": "Tot 1796",
+      "text": "Onder Catharina II annexeert Rusland de Krim (1783) en de noordkust van de Zwarte Zee. Met de drie delingen van Polen (1772-1795) neemt het land dat nu in Wit-Rusland, Litouwen, Letland en Oekraïne ligt."
+    },
+    "_note": "De omtrek volgt een Amerikaanse atlas uit 1923 (Shepherd): de grenzen zijn bij benadering, en hij omvat alleen Europees Rusland, niet Siberië. Deze grenzen horen bij het verleden en zeggen niets over die van vandaag."
   }
 }

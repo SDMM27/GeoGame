@@ -21,5 +21,87 @@
       "text": "Cyprus, Crete, Podolia and the coasts of Arabia. That year, the failure before Vienna marks the start of the retreat in Europe."
     },
     "_note": "The outline follows Shepherd's atlas (1923): its limits are approximate, and the map stops south of Egypt and Libya."
+  },
+  "rome-395": {
+    "gaul": {
+      "label": "Gaul",
+      "title": "Prefecture of Gaul",
+      "text": "After the death of Theodosius I in 395, the western half of the Empire passed to Honorius. It includes the Prefecture of Gaul: Britain, Gaul, Spain and Mauretania Tingitana."
+    },
+    "italy": {
+      "label": "Italy",
+      "title": "Prefecture of Italy",
+      "text": "It covers Italy, North Africa and part of the Danube provinces. Together with Gaul it forms the western half, under Honorius."
+    },
+    "illyricum": {
+      "label": "Illyricum",
+      "title": "Prefecture of Illyricum",
+      "text": "The dioceses of Macedonia and Dacia form a prefecture of their own on the map, between the two halves of the Empire; which court held them was disputed."
+    },
+    "east": {
+      "label": "East",
+      "title": "Prefecture of the East",
+      "text": "From Thrace to Egypt, with Constantinople: this is the eastern half of the Empire, held by Arcadius."
+    },
+    "_note": "The outline follows the atlas of Shepherd (The Roman Empire about 395, 1923) and is approximate. The map stops at the limits of the Empire: the rest of the world is not shown, and pale or shaded (relief) areas are sometimes poorly rendered."
+  },
+  "caliphate-750": {
+    "632": {
+      "label": "632",
+      "title": "Conquests up to the death of Muhammad",
+      "text": "By the death of Muhammad in 632, Arabia had come under the authority of the new Muslim community, through persuasion as well as force of arms."
+    },
+    "656": {
+      "label": "632-656",
+      "title": "Under the first three caliphs",
+      "text": "Arab armies conquered Syria, Egypt, Mesopotamia and Persia by force, and reached Cyrenaica, taking land from the Byzantine and Persian empires."
+    },
+    "750": {
+      "label": "661-750",
+      "title": "Under the Umayyad caliphs",
+      "text": "Further campaigns carried the caliphate to the Maghreb, Spain, Central Asia and Sind, forming a vast empire."
+    },
+    "_note": "The outline follows Shepherd's atlas (The Califate in 750) and is approximate. The map covers only the Mediterranean world and western Asia: the rest of the world is not shown."
+  },
+  "mongol-dominions": {
+    "1300": {
+      "label": "Mongols, 1300",
+      "title": "The Mongol dominions around 1300",
+      "text": "Born of Genghis Khan's conquests, the Mongol empire now stretches from China to Russia and Persia, divided among four khanates. These conquests were extremely deadly."
+    },
+    "1405": {
+      "label": "Timur, 1405",
+      "title": "Timur's empire in 1405",
+      "text": "From Samarkand, Timur (Tamerlane) conquered Persia and Central Asia, and campaigned as far as India. His wars killed many people, and his empire did not outlive him."
+    },
+    "_note": "The outline follows Shepherd's atlas (Mongol dominions, 1300-1405); it is approximate."
+  },
+  "russia-growth": {
+    "1300": {
+      "label": "1300",
+      "title": "Around 1300",
+      "text": "The Principality of Moscow is then a small territory paying tribute to the Golden Horde."
+    },
+    "1462": {
+      "label": "1462",
+      "title": "In 1462",
+      "text": "The Grand Principality of Moscow, which the map calls \"Great Russia\", has grown around its capital."
+    },
+    "1584": {
+      "label": "1584",
+      "title": "Until 1584",
+      "text": "Under Ivan III, Vasili III and Ivan IV, Moscow annexes Novgorod, Tver, Ryazan, then the khanates of Kazan and Astrakhan. This growth came often through war and at the expense of other peoples."
+    },
+    "1725": {
+      "label": "1725",
+      "title": "Until 1725",
+      "text": "The part of Ukraine east of the Dnieper, ceded by Poland in 1667, then Ingria, Estonia and Livonia, taken from Sweden under Peter the Great."
+    },
+    "1796": {
+      "label": "1796",
+      "title": "Until 1796",
+      "text": "Under Catherine II, Russia annexes Crimea (1783) and the north coast of the Black Sea. Through the three partitions of Poland (1772-1795), it takes lands now in Belarus, Lithuania, Latvia and Ukraine."
+    },
+    "_note": "The outline follows an American atlas of 1923 (Shepherd): its limits are approximate, and it covers Russia in Europe only, not Siberia. These borders belong to the past and say nothing of today's."
   }
 }

@@ -21,5 +21,87 @@
       "text": "Chipre, Creta, Podolia y las costas de Arabia. Ese año, el fracaso ante Viena marca el comienzo del retroceso en Europa."
     },
     "_note": "El trazado sigue el atlas de Shepherd (1923): sus límites son aproximados, y el mapa se detiene al sur de Egipto y Libia."
+  },
+  "rome-395": {
+    "gaul": {
+      "label": "Galia",
+      "title": "Prefectura de las Galias",
+      "text": "Tras la muerte de Teodosio I en 395, la mitad occidental del Imperio pasó a Honorio. Incluye la prefectura de las Galias: Britania, Galia, Hispania y Mauritania Tingitana."
+    },
+    "italy": {
+      "label": "Italia",
+      "title": "Prefectura de Italia",
+      "text": "Abarca Italia, el norte de África y parte de las provincias del Danubio. Junto con las Galias forma la mitad occidental, bajo Honorio."
+    },
+    "illyricum": {
+      "label": "Iliria",
+      "title": "Prefectura de Iliria",
+      "text": "Las diócesis de Macedonia y Dacia forman en el mapa una prefectura aparte, entre las dos mitades del Imperio; la corte de la que dependían fue objeto de disputa."
+    },
+    "east": {
+      "label": "Oriente",
+      "title": "Prefectura de Oriente",
+      "text": "De Tracia a Egipto, con Constantinopla: es la mitad oriental del Imperio, en manos de Arcadio."
+    },
+    "_note": "El trazado sigue el atlas de Shepherd (The Roman Empire about 395, 1923) y es aproximado. El mapa se detiene en los límites del Imperio: el resto del mundo no aparece, y las zonas pálidas o sombreadas (relieve) a veces se reproducen mal."
+  },
+  "caliphate-750": {
+    "632": {
+      "label": "632",
+      "title": "Conquistas hasta la muerte de Mahoma",
+      "text": "A la muerte de Mahoma en 632, Arabia había quedado bajo la autoridad de la nueva comunidad musulmana, tanto por persuasión como por las armas."
+    },
+    "656": {
+      "label": "632-656",
+      "title": "Con los tres primeros califas",
+      "text": "Los ejércitos árabes conquistaron por la fuerza Siria, Egipto, Mesopotamia y Persia, y llegaron a la Cirenaica, tomando tierras a los imperios bizantino y persa."
+    },
+    "750": {
+      "label": "661-750",
+      "title": "Con los califas omeyas",
+      "text": "Nuevas campañas llevaron el califato hasta el Magreb, España, Asia central y el Sind, formando un vasto imperio."
+    },
+    "_note": "El trazado sigue el atlas de Shepherd (The Califate in 750) y es aproximado. El mapa solo cubre el mundo mediterráneo y Asia occidental: el resto del mundo no aparece."
+  },
+  "mongol-dominions": {
+    "1300": {
+      "label": "Mongoles, 1300",
+      "title": "Los dominios mongoles hacia 1300",
+      "text": "Nacido de las conquistas de Gengis Kan, el imperio mongol se extiende entonces de China a Rusia y Persia, repartido en cuatro kanatos. Estas conquistas fueron extremadamente mortíferas."
+    },
+    "1405": {
+      "label": "Timur, 1405",
+      "title": "El imperio de Timur en 1405",
+      "text": "Desde Samarcanda, Timur (Tamerlán) conquistó Persia y Asia central, y llegó con sus campañas hasta la India. Sus guerras causaron muchas muertes, y su imperio no le sobrevivió."
+    },
+    "_note": "El trazado sigue el atlas de Shepherd (Mongol dominions, 1300-1405); es aproximado."
+  },
+  "russia-growth": {
+    "1300": {
+      "label": "1300",
+      "title": "Hacia 1300",
+      "text": "El principado de Moscú es entonces un pequeño territorio que paga tributo a la Horda de Oro."
+    },
+    "1462": {
+      "label": "1462",
+      "title": "En 1462",
+      "text": "El gran principado de Moscú, que el mapa llama «Gran Rusia», ha crecido alrededor de su capital."
+    },
+    "1584": {
+      "label": "1584",
+      "title": "Hasta 1584",
+      "text": "Con Iván III, Basilio III e Iván IV, Moscú anexiona Nóvgorod, Tver, Riazán y después los janatos de Kazán y Astracán. Este crecimiento fue a menudo por la guerra y a costa de otros pueblos."
+    },
+    "1725": {
+      "label": "1725",
+      "title": "Hasta 1725",
+      "text": "La parte de Ucrania al este del Dniéper, cedida por Polonia en 1667, y luego Ingria, Estonia y Livonia, tomadas a Suecia con Pedro el Grande."
+    },
+    "1796": {
+      "label": "1796",
+      "title": "Hasta 1796",
+      "text": "Con Catalina II, Rusia anexiona Crimea (1783) y la costa norte del mar Negro. Con los tres repartos de Polonia (1772-1795) toma tierras hoy en Bielorrusia, Lituania, Letonia y Ucrania."
+    },
+    "_note": "El trazado sigue un atlas estadounidense de 1923 (Shepherd): sus límites son aproximados y solo cubre la Rusia europea, no Siberia. Estas fronteras pertenecen al pasado y no dicen nada de las de hoy."
   }
 }

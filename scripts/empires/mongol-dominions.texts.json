@@ -1,0 +1,58 @@
+{
+  "entry": {
+    "center": [45, 85],
+    "zoom": 3,
+    "stages": [
+      { "id": "1300", "color": "#D9596B" },
+      { "id": "1405", "color": "#8E7CC3" }
+    ],
+    "cumulative": false
+  },
+  "texts": {
+    "fr": {
+      "1300": { "label": "Mongols, 1300", "title": "Les domaines mongols vers 1300", "text": "Né des conquêtes de Gengis Khan, l'empire mongol s'étend alors de la Chine à la Russie et à la Perse, partagé entre quatre khanats. Ces conquêtes ont été extrêmement meurtrières." },
+      "1405": { "label": "Timur, 1405", "title": "L'empire de Timur en 1405", "text": "Depuis Samarcande, Timur (Tamerlan) a conquis la Perse et l'Asie centrale, et mené des campagnes jusqu'en Inde. Ses guerres ont fait de nombreux morts, et son empire ne lui a pas survécu." },
+      "_note": "Le tracé suit l'atlas de Shepherd (Mongol dominions, 1300-1405) ; il est approximatif."
+    },
+    "en": {
+      "1300": { "label": "Mongols, 1300", "title": "The Mongol dominions around 1300", "text": "Born of Genghis Khan's conquests, the Mongol empire now stretches from China to Russia and Persia, divided among four khanates. These conquests were extremely deadly." },
+      "1405": { "label": "Timur, 1405", "title": "Timur's empire in 1405", "text": "From Samarkand, Timur (Tamerlane) conquered Persia and Central Asia, and campaigned as far as India. His wars killed many people, and his empire did not outlive him." },
+      "_note": "The outline follows Shepherd's atlas (Mongol dominions, 1300-1405); it is approximate."
+    },
+    "ru": {
+      "1300": { "label": "Монголы, 1300", "title": "Монгольские владения около 1300 года", "text": "Возникшая из завоеваний Чингисхана Монгольская империя простирается от Китая до Руси и Персии и поделена между четырьмя ханствами. Эти завоевания были крайне кровопролитными." },
+      "1405": { "label": "Тимур, 1405", "title": "Держава Тимура в 1405 году", "text": "Из Самарканда Тимур (Тамерлан) завоевал Персию и Среднюю Азию и дошёл походами до Индии. Его войны унесли множество жизней, а его держава ненадолго пережила его." },
+      "_note": "Контур следует атласу Шеперда (Mongol dominions, 1300-1405) и приблизителен."
+    },
+    "es": {
+      "1300": { "label": "Mongoles, 1300", "title": "Los dominios mongoles hacia 1300", "text": "Nacido de las conquistas de Gengis Kan, el imperio mongol se extiende entonces de China a Rusia y Persia, repartido en cuatro kanatos. Estas conquistas fueron extremadamente mortíferas." },
+      "1405": { "label": "Timur, 1405", "title": "El imperio de Timur en 1405", "text": "Desde Samarcanda, Timur (Tamerlán) conquistó Persia y Asia central, y llegó con sus campañas hasta la India. Sus guerras causaron muchas muertes, y su imperio no le sobrevivió." },
+      "_note": "El trazado sigue el atlas de Shepherd (Mongol dominions, 1300-1405); es aproximado."
+    },
+    "pt": {
+      "1300": { "label": "Mongóis, 1300", "title": "Os domínios mongóis por volta de 1300", "text": "Nascido das conquistas de Gengis Cã, o império mongol estende-se então da China à Rússia e à Pérsia, repartido em quatro canatos. Estas conquistas foram extremamente mortíferas." },
+      "1405": { "label": "Timur, 1405", "title": "O império de Timur em 1405", "text": "A partir de Samarcanda, Timur (Tamerlão) conquistou a Pérsia e a Ásia Central, e fez campanhas até à Índia. As suas guerras causaram muitas mortes, e o seu império não lhe sobreviveu." },
+      "_note": "O traçado segue o atlas de Shepherd (Mongol dominions, 1300-1405); é aproximado."
+    },
+    "de": {
+      "1300": { "label": "Mongolen, 1300", "title": "Die mongolischen Herrschaftsgebiete um 1300", "text": "Aus den Eroberungen Dschingis Khans entstanden, reicht das Mongolenreich nun von China bis nach Russland und Persien und ist auf vier Khanate aufgeteilt. Diese Eroberungen waren äußerst blutig." },
+      "1405": { "label": "Timur, 1405", "title": "Timurs Reich im Jahr 1405", "text": "Von Samarkand aus eroberte Timur (Tamerlan) Persien und Zentralasien und zog bis nach Indien. Seine Kriege forderten viele Todesopfer, und sein Reich überdauerte ihn nicht." },
+      "_note": "Der Verlauf folgt dem Atlas von Shepherd (Mongol dominions, 1300-1405) und ist ungefähr."
+    },
+    "it": {
+      "1300": { "label": "Mongoli, 1300", "title": "I domini mongoli intorno al 1300", "text": "Nato dalle conquiste di Gengis Khan, l'impero mongolo si estende ora dalla Cina alla Russia e alla Persia, diviso in quattro khanati. Queste conquiste furono estremamente sanguinose." },
+      "1405": { "label": "Timur, 1405", "title": "L'impero di Timur nel 1405", "text": "Da Samarcanda, Timur (Tamerlano) conquistò la Persia e l'Asia centrale e condusse campagne fino all'India. Le sue guerre causarono molte morti, e il suo impero non gli sopravvisse." },
+      "_note": "Il tracciato segue l'atlante di Shepherd (Mongol dominions, 1300-1405); è approssimativo."
+    },
+    "uk": {
+      "1300": { "label": "Монголи, 1300", "title": "Монгольські володіння близько 1300 року", "text": "Виникла із завоювань Чингісхана, Монгольська імперія простягається від Китаю до Русі та Персії й поділена між чотирма ханствами. Ці завоювання були надзвичайно кривавими." },
+      "1405": { "label": "Тимур, 1405", "title": "Держава Тимура в 1405 році", "text": "Із Самарканда Тимур (Тамерлан) підкорив Персію та Середню Азію і дійшов походами до Індії. Його війни забрали безліч життів, а його держава ненадовго пережила його." },
+      "_note": "Контур слідує атласу Шепперда (Mongol dominions, 1300-1405) і є приблизним."
+    },
+    "nl": {
+      "1300": { "label": "Mongolen, 1300", "title": "De Mongoolse gebieden rond 1300", "text": "Ontstaan uit de veroveringen van Dzjengis Khan strekt het Mongoolse rijk zich nu uit van China tot Rusland en Perzië, verdeeld over vier khanaten. Deze veroveringen waren uiterst dodelijk." },
+      "1405": { "label": "Timoer, 1405", "title": "Het rijk van Timoer in 1405", "text": "Vanuit Samarkand veroverde Timoer (Tamerlan) Perzië en Centraal-Azië en trok met zijn veldtochten tot in India. Zijn oorlogen eisten veel levens en zijn rijk overleefde hem niet." },
+      "_note": "De omtrek volgt de atlas van Shepherd (Mongol dominions, 1300-1405) en is bij benadering."
+    }
+  }
+}

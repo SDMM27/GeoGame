@@ -1307,7 +1307,7 @@
     "intro": "Jogue os desafios do dia para subir no ranking da semana e ganhar fragmentos de bandeira.",
     "days_left_one": "Falta {{count}} dia",
     "days_left_other": "Faltam {{count}} dias",
-    "updated_hint": "O ranking é atualizado uma vez por dia. Cada semana vai de segunda a domingo.",
+    "updated_hint": "O ranking é atualizado após cada partida. Cada semana vai de segunda a domingo.",
     "last_rank": "Semana passada: nº {{rank}} com {{points}} pts",
     "last_reward_one": "+{{count}} fragmento de bandeira ganho",
     "last_reward_other": "+{{count}} fragmentos de bandeira ganhos",

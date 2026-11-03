@@ -1307,7 +1307,7 @@
     "intro": "Play the daily challenges to climb the weekly ranking and win flag fragments.",
     "days_left_one": "{{count}} day left",
     "days_left_other": "{{count}} days left",
-    "updated_hint": "The ranking is updated once a day. Each week runs from Monday to Sunday.",
+    "updated_hint": "The ranking is updated after each game. Each week runs from Monday to Sunday.",
     "last_rank": "Last week: #{{rank}} with {{points}} pts",
     "last_reward_one": "+{{count}} flag fragment won",
     "last_reward_other": "+{{count}} flag fragments won",

@@ -1307,7 +1307,7 @@
     "intro": "Spiele die täglichen Challenges, um in der Wochenrangliste aufzusteigen und Flaggenfragmente zu gewinnen.",
     "days_left_one": "Noch {{count}} Tag",
     "days_left_other": "Noch {{count}} Tage",
-    "updated_hint": "Die Rangliste wird einmal täglich aktualisiert. Jede Woche läuft von Montag bis Sonntag.",
+    "updated_hint": "Die Rangliste wird nach jedem Spiel aktualisiert. Jede Woche läuft von Montag bis Sonntag.",
     "last_rank": "Letzte Woche: Platz {{rank}} mit {{points}} Pkt.",
     "last_reward_one": "+{{count}} Flaggenfragment gewonnen",
     "last_reward_other": "+{{count}} Flaggenfragmente gewonnen",

@@ -1307,7 +1307,7 @@
     "intro": "Joue les défis du jour pour grimper dans le classement de la semaine et gagner des fragments de drapeaux.",
     "days_left_one": "Fin dans {{count}} jour",
     "days_left_other": "Fin dans {{count}} jours",
-    "updated_hint": "Classement mis à jour une fois par jour. Chaque semaine va du lundi au dimanche.",
+    "updated_hint": "Classement mis à jour après chaque partie. Chaque semaine va du lundi au dimanche.",
     "last_rank": "Semaine dernière : n° {{rank}} avec {{points}} pts",
     "last_reward_one": "+{{count}} fragment de drapeau gagné",
     "last_reward_other": "+{{count}} fragments de drapeaux gagnés",

@@ -1307,7 +1307,7 @@
     "intro": "Speel de dagelijkse uitdagingen om in de weekranglijst te stijgen en vlagfragmenten te verdienen.",
     "days_left_one": "Nog {{count}} dag",
     "days_left_other": "Nog {{count}} dagen",
-    "updated_hint": "De ranglijst wordt één keer per dag bijgewerkt. Elke week loopt van maandag tot zondag.",
+    "updated_hint": "De ranglijst wordt na elke partij bijgewerkt. Elke week loopt van maandag tot zondag.",
     "last_rank": "Vorige week: nr. {{rank}} met {{points}} pnt",
     "last_reward_one": "+{{count}} vlagfragment verdiend",
     "last_reward_other": "+{{count}} vlagfragmenten verdiend",

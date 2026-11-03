@@ -5,7 +5,7 @@ import { getFirestore } from 'firebase-admin/firestore'
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import handler from '../../api/weekly-top.mjs'
-import { LEAGUE_MIN_PLAYED, LEAGUE_REWARDS, computeWeeklyTop, refreshWeeklyTop } from '../../api/_lib/weeklyTop.mjs'
+import { LEAGUE_MIN_PLAYED, LEAGUE_REWARDS, computeWeeklyTop, refreshWeeklyTop, refreshWeeklyTopThrottled } from '../../api/_lib/weeklyTop.mjs'
 import countriesMeta from '../../src/data/countries.meta.json'
 import { flagPool, piecesOf, readFlags } from '../../src/utils/flagCollection.js'
 
@@ -124,6 +124,23 @@ describe('refreshWeeklyTop', () => {
     const top = (await db.doc('weeklyTop/current').get()).data()
     expect(top.entries).toHaveLength(20)
     expect(top.players).toHaveLength(25)
+  })
+})
+
+describe('refreshWeeklyTopThrottled', () => {
+  const updatedAt = async () => (await db.doc('weeklyTop/current').get()).data().updatedAt.toMillis()
+
+  it('refreshes once per window and tells when to retry', async () => {
+    await db.collection('daily_scores').add(daily('alice', 'QUIZ', '2026-10-14'))
+    expect(await refreshWeeklyTopThrottled({ db, now: NOW })).toMatchObject({ skipped: false, players: 1 })
+    expect(await updatedAt()).toBe(NOW)
+
+    await db.collection('daily_scores').add(daily('bob', 'QUIZ', '2026-10-14'))
+    expect(await refreshWeeklyTopThrottled({ db, now: NOW + 10 * 1000 })).toEqual({ skipped: true, retryIn: 20000 })
+    expect(await updatedAt()).toBe(NOW)
+
+    expect(await refreshWeeklyTopThrottled({ db, now: NOW + 31 * 1000 })).toMatchObject({ skipped: false, players: 2 })
+    expect(await updatedAt()).toBe(NOW + 31 * 1000)
   })
 })
 

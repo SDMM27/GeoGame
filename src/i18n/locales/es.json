@@ -1307,7 +1307,7 @@
     "intro": "Juega los retos del día para subir en la clasificación semanal y ganar fragmentos de bandera.",
     "days_left_one": "Queda {{count}} día",
     "days_left_other": "Quedan {{count}} días",
-    "updated_hint": "La clasificación se actualiza una vez al día. Cada semana va de lunes a domingo.",
+    "updated_hint": "La clasificación se actualiza después de cada partida. Cada semana va de lunes a domingo.",
     "last_rank": "Semana pasada: n.º {{rank}} con {{points}} pts",
     "last_reward_one": "+{{count}} fragmento de bandera ganado",
     "last_reward_other": "+{{count}} fragmentos de bandera ganados",

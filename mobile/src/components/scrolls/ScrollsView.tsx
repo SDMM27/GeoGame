@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 
-import { formatScrollDate, scrollById, scrollsByEra, SCROLLS } from '@shared/utils/scrollCollectionData'
+import { formatScrollDate, scrollById, scrollsByEra, SCROLLS, SEALS_PER_SCROLL } from '@shared/utils/scrollCollectionData'
 
 import { ScrollImage, parchment } from '@/components/scrolls/ScrollImage'
 import { ScrollSeal } from '@/components/scrolls/ScrollSeal'
@@ -69,6 +69,10 @@ export function ScrollsView({ scrolls, requested = null }: { scrolls: Scrolls; r
     <>
       <View style={{ gap: space.xl }}>
         <Text variant="caption">{t('scrolls.progress', { count: scrolls.unlocked.length, total: SCROLLS.length })}</Text>
+        <View style={styles.howTo}>
+          <Text variant="bodyStrong">{t('scrolls.seals', { count: scrolls.seals, total: SEALS_PER_SCROLL })}</Text>
+          <Text variant="caption">{t('scrolls.hint', { total: SEALS_PER_SCROLL })}</Text>
+        </View>
         <ScrollGrid unlocked={scrolls.unlocked} onOpen={(id) => owned(id) && setOpenId(id)} />
       </View>
       {open && <ScrollSheet scroll={open} onClose={() => setOpenId(null)} />}
@@ -78,6 +82,7 @@ export function ScrollsView({ scrolls, requested = null }: { scrolls: Scrolls; r
 
 const styles = StyleSheet.create({
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space.md },
+  howTo: { gap: space.xs, padding: space.md, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface },
   tile: { width: '47.5%', borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, overflow: 'hidden' },
   thumb: { width: '100%', aspectRatio: 4 / 3, backgroundColor: parchment.mid },
   tileText: { padding: space.sm, gap: 2 },

@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { onPublicDataPatched } from '@shared/utils/publicProfile'
 import { fetchScrolls } from '@shared/utils/scrollCollectionData'
+import { claimXp } from '@shared/utils/xp'
 
 import { useAccount } from '@/account/auth'
 import { ScrollsView, type Scrolls } from '@/components/scrolls/ScrollsView'
@@ -31,6 +32,8 @@ export default function ParchmentsScreen() {
         if (!cancelled) setScrolls({ uid, value })
       })
     load()
+    // A claim pays what is due, the free first scroll included, and patches the account, which reloads the screen
+    claimXp(uid)
     const stop = onPublicDataPatched((patched: string) => patched === uid && load())
     return () => {
       cancelled = true

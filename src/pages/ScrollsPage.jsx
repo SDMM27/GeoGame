@@ -7,8 +7,9 @@ import NavBar from '../components/NavBar'
 import ScrollGrid from '../components/scrolls/ScrollGrid'
 import ScrollSheet from '../components/scrolls/ScrollSheet'
 import { useAccount } from '../auth'
-import { SCROLLS, fetchScrolls, scrollById } from '../utils/scrollCollectionData'
+import { SCROLLS, SEALS_PER_SCROLL, fetchScrolls, scrollById } from '../utils/scrollCollectionData'
 import { onPublicDataPatched } from '../utils/publicProfile'
+import { claimXp } from '../utils/xp'
 import './AccountPage.css'
 
 // The grid and the sheet from loaded data. A sheet opens only for an owned scroll: `requested` is ignored otherwise.
@@ -20,6 +21,10 @@ export function ScrollsView({ scrolls, requested = null }) {
   return (
     <>
       <p className="account-pitch">{t('scrolls.progress', { count: scrolls.unlocked.length, total: SCROLLS.length })}</p>
+      <div className="league-card">
+        <strong>{t('scrolls.seals', { count: scrolls.seals, total: SEALS_PER_SCROLL })}</strong>
+        <p className="profile-muted">{t('scrolls.hint', { total: SEALS_PER_SCROLL })}</p>
+      </div>
       <ScrollGrid unlocked={scrolls.unlocked} onOpen={(id) => owned(id) && setOpenId(id)} />
       {open && <ScrollSheet scroll={open} onClose={() => setOpenId(null)} />}
     </>
@@ -41,6 +46,8 @@ export default function ScrollsPage() {
         if (!cancelled) setScrolls(result)
       })
     load()
+    // A claim pays what is due, the free first scroll included, and patches the account, which reloads the page
+    claimXp(uid)
     const stop = onPublicDataPatched((patched) => patched === uid && load())
     return () => {
       cancelled = true

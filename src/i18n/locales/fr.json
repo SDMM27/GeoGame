@@ -1534,6 +1534,7 @@
     "mode_placement": "Trouver",
     "mode_flags": "Drapeaux",
     "mode_hardcore": "Hardcore",
+    "mode_capitals": "Capitales",
     "rarity": {
       "common": "Commun",
       "uncommon": "Peu commun",

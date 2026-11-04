@@ -1534,6 +1534,7 @@
     "mode_placement": "Platzierung",
     "mode_flags": "Flaggen",
     "mode_hardcore": "Hardcore",
+    "mode_capitals": "Hauptstädte",
     "rarity": {
       "common": "Gewöhnlich",
       "uncommon": "Ungewöhnlich",

@@ -39,8 +39,9 @@ const mastery = {
   placement: { found: 5, total: 10 },
   flags: { found: 2, total: 8 },
   hardcore: { found: 0, total: 10 },
-  found: 7,
-  total: 28,
+  capitals: { found: 3, total: 9 },
+  found: 10,
+  total: 37,
 }
 const isos = (count: number) => Array.from({ length: count }, (_, i) => `f${String(i).padStart(2, '0')}`)
 const collection = (unlocked: string[], current: string | null = null, pieces = 0): Collection => ({
@@ -98,8 +99,9 @@ describe('FlagCollectionView', () => {
     const out = text(render(collection([])))
     expect(out).toContain('collection.empty')
     expect(out).not.toContain('collection.unlocked')
-    expect(out).toContain('collection.legend_progress {\\"count\\":7,\\"total\\":28}')
+    expect(out).toContain('collection.legend_progress {\\"count\\":10,\\"total\\":37}')
     expect(out).toContain('collection.mode_hardcore')
+    expect(out).toContain('collection.mode_capitals')
     expect(out).not.toContain('collection.legend_hardcore_soon')
   })
 

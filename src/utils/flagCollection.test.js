@@ -155,6 +155,8 @@ describe('mastery', () => {
     feature('BB', undefined, { Difficulty: 'Moyen' }),
     feature('CC', 'Difficile'),
     feature(undefined, undefined, { Difficulty: 'Facile', ADMIN: 'Zone' }),
+    feature('DD', undefined, { capital: 'Dville', DifficultyCapitals: 'Moyen' }),
+    feature('EE', undefined, { capital: 'Eville' }),
   ]
 
   it('targets the countries each mode can ask', () => {
@@ -162,17 +164,19 @@ describe('mastery', () => {
       placement: ['Country AA', 'Country BB', 'Zone'],
       flags: ['Country AA', 'Country CC'],
       hardcore: ['Country AA', 'Country BB', 'Zone'],
+      capitals: ['Country DD'],
     })
   })
 
   it('counts only the names of the targets', () => {
     const sets = masterySets(features)
-    expect(masteryProgress({ placement: ['Country AA', 'Nowhere'], flags: ['Country CC', 'Country CC'] }, sets)).toEqual({
+    expect(masteryProgress({ placement: ['Country AA', 'Nowhere'], flags: ['Country CC', 'Country CC'], capitals: ['Country DD'] }, sets)).toEqual({
       placement: { found: 1, total: 3 },
       flags: { found: 1, total: 2 },
       hardcore: { found: 0, total: 3 },
-      found: 2,
-      total: 8,
+      capitals: { found: 1, total: 1 },
+      found: 3,
+      total: 9,
     })
     expect(masteryProgress(undefined, sets).found).toBe(0)
   })
@@ -181,5 +185,6 @@ describe('mastery', () => {
     const sets = masterySets(countriesMeta.features)
     expect(sets.placement).toHaveLength(236)
     expect(sets.flags).toHaveLength(229)
+    expect(sets.capitals).toHaveLength(229)
   })
 })

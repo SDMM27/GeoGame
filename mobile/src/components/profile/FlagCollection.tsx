@@ -20,7 +20,7 @@ type Rarity = 'common' | 'uncommon' | 'rare' | 'legendary'
 type Progress = { found: number; total: number }
 export type Collection = {
   flags: { unlocked: string[]; current: string | null; pieces: number }
-  mastery: { placement: Progress; flags: Progress; hardcore: Progress; found: number; total: number }
+  mastery: { placement: Progress; flags: Progress; hardcore: Progress; capitals: Progress; found: number; total: number }
 }
 
 const RARITY_OF = new Map<string, Rarity>((FLAG_POOL as { iso: string; rarity: Rarity }[]).map((flag) => [flag.iso, flag.rarity]))
@@ -95,6 +95,7 @@ export function FlagCollectionView({ collection, sectionId = 'collection' }: { c
     ['placement', mastery.placement],
     ['flags', mastery.flags],
     ['hardcore', mastery.hardcore],
+    ['capitals', mastery.capitals],
   ] as const
 
   // The title already says "flags" and leaves little room on a phone: only the numbers fit next to it.

@@ -1534,6 +1534,7 @@
     "mode_placement": "Ubicación",
     "mode_flags": "Banderas",
     "mode_hardcore": "Hardcore",
+    "mode_capitals": "Capitales",
     "rarity": {
       "common": "Común",
       "uncommon": "Poco común",

@@ -19,8 +19,9 @@ const mastery = {
   placement: { found: 1, total: 10 },
   flags: { found: 2, total: 20 },
   hardcore: { found: 0, total: 10 },
-  found: 3,
-  total: 40,
+  capitals: { found: 4, total: 9 },
+  found: 7,
+  total: 49,
 }
 const view = (flags) => render(<FlagCollectionView flags={flags} mastery={mastery} />)
 const grid = () => [...document.querySelectorAll('.flag-collection-item button')].map((button) => button.getAttribute('aria-label').split(' · ')[0])
@@ -103,9 +104,10 @@ describe('FlagCollectionView', () => {
   it('shows no toggle for 24 flags or fewer, and the legend progress per mode', () => {
     view({ unlocked: ['F00'], current: null, pieces: 0 })
     expect(screen.queryByText('collection.show_all')).toBeNull()
-    expect(screen.getByText(/collection\.legend_progress/).textContent).toContain('"count":3')
+    expect(screen.getByText(/collection\.legend_progress/).textContent).toContain('"count":7')
     expect(screen.getByText('1 / 10')).toBeTruthy()
     expect(screen.getByText('collection.mode_hardcore')).toBeTruthy()
+    expect(screen.getByText('collection.mode_capitals')).toBeTruthy()
     expect(screen.queryByText('collection.legend_hardcore_soon')).toBeNull()
   })
 })

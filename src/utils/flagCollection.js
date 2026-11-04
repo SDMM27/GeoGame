@@ -15,7 +15,7 @@
 //
 // Mastery (the "Légende" badge)
 // - mastery/{uid}, written by the server only (api/_lib/elo.mjs rateSolo): { placement: [ADMIN names], flags: [...],
-//   hardcore: [...], updatedAt }, the countries the player found at the first try (found, no error) in that mode,
+//   hardcore: [...], capitals: [...], updatedAt }, the countries the player found at the first try (found, no error) in that mode,
 //   for good (not per season). In Hardcore (no borders, one tap per country), "first try" is a tap inside the country.
 //   Like Elo, the answers are reported by the client, so the badge is as honest as Elo.
 import { mulberry32 } from './prng.js'
@@ -130,12 +130,13 @@ export function addFragments(state, count, pool, seed) {
 
 // ---------- Mastery ----------
 
-export const MASTERY_MODES = ['placement', 'flags', 'hardcore']
+export const MASTERY_MODES = ['placement', 'flags', 'hardcore', 'capitals']
 
 /**
  * The countries (ADMIN names) to find at the first try for each mode, from GeoGame GeoJSON `features`: Placement and
  * hardcore have every country with a Difficulty; Flags has the flags of the pool that the Flags game can ask (it
- * needs a DifficultyFlag). Returns { placement, flags, hardcore } arrays of names.
+ * needs a DifficultyFlag); Capitals has the countries the Capitals game can ask (a capital and a DifficultyCapitals).
+ * Returns { placement, flags, hardcore, capitals } arrays of names.
  */
 export function masterySets(features) {
   const placement = features.filter(({ properties }) => properties?.Difficulty).map(({ properties }) => properties.ADMIN)
@@ -143,10 +144,13 @@ export function masterySets(features) {
   const flags = features
     .filter(({ properties }) => pooled.has(properties?.ISO_A2) && properties.DifficultyFlag)
     .map(({ properties }) => properties.ADMIN)
-  return { placement, flags, hardcore: [...placement] }
+  const capitals = features
+    .filter(({ properties }) => properties?.capital && properties.DifficultyCapitals)
+    .map(({ properties }) => properties.ADMIN)
+  return { placement, flags, hardcore: [...placement], capitals }
 }
 
-/** Progress of a mastery document against masterySets(): { placement: { found, total }, flags, hardcore, found, total }. */
+/** Progress of a mastery document against masterySets(): { placement: { found, total }, flags, hardcore, capitals, found, total }. */
 export function masteryProgress(masteryDoc, sets) {
   const progress = { found: 0, total: 0 }
   for (const mode of MASTERY_MODES) {

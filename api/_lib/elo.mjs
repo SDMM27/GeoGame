@@ -10,8 +10,8 @@
 // The bookkeeping (eloGains, eloDuels, eloDuelPairs, eloDuelAccounts) carries `at` (ms) for the daily cleanup
 // (cleanupExpired.mjs).
 //
-// mastery/{uid} = { placement: [ADMIN names], flags: [...], hardcore: [...], updatedAt }: the countries found at the first
-// try (found, no error) in Placement, Flags and Hardcore (a tap inside the country), forever (flagCollection.js, for
+// mastery/{uid} = { placement: [ADMIN names], flags: [...], hardcore: [...], capitals: [...], updatedAt }: the countries
+// found at the first try (found, no error) in Placement, Flags, Hardcore (a tap inside the country) and Capitals, forever (flagCollection.js, for
 // the "Légende" badge). Like Elo, the answers are reported by the client, so the badge is as honest as Elo.
 //
 // Solo answers are reported by the client, so they can be made up; what bounds a cheater is that a country pays once
@@ -50,7 +50,7 @@ const reply = (status, body) => ({ status, body })
 const COUNTRIES = new Map(countriesMeta.features.map(({ properties }) => [properties.ADMIN, properties]))
 
 // Mastery key of the solo modes that have one.
-const MASTERY_KEYS = { [GAME_TYPES.PLACEMENT]: 'placement', [GAME_TYPES.FLAGS]: 'flags', [GAME_TYPES.HARDCORE]: 'hardcore' }
+const MASTERY_KEYS = { [GAME_TYPES.PLACEMENT]: 'placement', [GAME_TYPES.FLAGS]: 'flags', [GAME_TYPES.HARDCORE]: 'hardcore', [GAME_TYPES.CAPITALS]: 'capitals' }
 
 // A country name as a document id piece ('/' is the only character an id can't hold).
 const countryKey = (name) => name.replace(/\//g, '_')

@@ -1534,6 +1534,7 @@
     "mode_placement": "Find",
     "mode_flags": "Flags",
     "mode_hardcore": "Hardcore",
+    "mode_capitals": "Capitals",
     "rarity": {
       "common": "Common",
       "uncommon": "Uncommon",

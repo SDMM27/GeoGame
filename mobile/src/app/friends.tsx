@@ -124,6 +124,29 @@ export default function FriendsScreen() {
         contentContainerStyle={{ paddingTop: insets.top + space.lg, paddingHorizontal: space.lg, paddingBottom: space.xxl * 2, gap: space.xl }}>
         <ScreenHeader title={t('friends.title')} />
 
+        {/* Requests first: a friend request notification lands here. */}
+        {friendships.incoming.length > 0 && (
+          <View style={{ gap: space.md }}>
+            <SectionTitle title={t('friends.requests_title')} />
+            <View style={[styles.list, { borderColor: colors.accent }]}>
+              {friendships.incoming.map((request: Friendship, index: number) => (
+                <View key={request.id} style={[styles.row, index > 0 && styles.divider]}>
+                  <Touchable accessibilityRole="button" onPress={() => openPlayer(request.uid)} style={styles.who}>
+                    <Avatar username={request.username} size={40} />
+                    <Text variant="bodyStrong" numberOfLines={1} style={{ flex: 1 }}>
+                      {request.username}
+                    </Text>
+                  </Touchable>
+                  <Button label={t('friends.accept')} onPress={() => acceptFriendRequest(request.id)} style={styles.smallButton} />
+                  <Touchable accessibilityRole="button" accessibilityLabel={t('friends.decline')} onPress={() => removeFriendship(request.id)} style={styles.iconButton}>
+                    <MaterialCommunityIcons name="close" size={20} color={colors.textMuted} />
+                  </Touchable>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+
         <View style={styles.card}>
           <Text variant="heading">{t('friends.add_title')}</Text>
           <View style={{ flexDirection: 'row', gap: space.sm }}>
@@ -200,28 +223,6 @@ export default function FriendsScreen() {
           <ActivityIndicator color={colors.accent} />
         ) : (
           <>
-            {friendships.incoming.length > 0 && (
-              <View style={{ gap: space.md }}>
-                <SectionTitle title={t('friends.requests_title')} />
-                <View style={styles.list}>
-                  {friendships.incoming.map((request: Friendship, index: number) => (
-                    <View key={request.id} style={[styles.row, index > 0 && styles.divider]}>
-                      <Touchable accessibilityRole="button" onPress={() => openPlayer(request.uid)} style={styles.who}>
-                        <Avatar username={request.username} size={40} />
-                        <Text variant="bodyStrong" numberOfLines={1} style={{ flex: 1 }}>
-                          {request.username}
-                        </Text>
-                      </Touchable>
-                      <Button label={t('friends.accept')} onPress={() => acceptFriendRequest(request.id)} style={styles.smallButton} />
-                      <Touchable accessibilityRole="button" accessibilityLabel={t('friends.decline')} onPress={() => removeFriendship(request.id)} style={styles.iconButton}>
-                        <MaterialCommunityIcons name="close" size={20} color={colors.textMuted} />
-                      </Touchable>
-                    </View>
-                  ))}
-                </View>
-              </View>
-            )}
-
             <View style={{ gap: space.md }}>
               <SectionTitle
                 title={t('friends.title')}

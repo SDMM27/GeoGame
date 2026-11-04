@@ -1,0 +1,116 @@
+/* Scrolls: images, collection grid, sheet and reveal. The parchment colors are local: the theme has none. */
+.scroll-image { display: block; background: #d8c8a0; }
+.scroll-image--placeholder {
+  background:
+    radial-gradient(ellipse at 30% 25%, rgba(255, 255, 255, 0.35), transparent 60%),
+    linear-gradient(135deg, #e3d4ad 0%, #d1bd8e 55%, #bda774 100%);
+  box-shadow: inset 0 0 0 2px rgba(120, 90, 40, 0.25), inset 0 0 18px rgba(120, 90, 40, 0.3);
+}
+
+.scroll-grid-groups { display: flex; flex-direction: column; gap: 1.5rem; }
+.scroll-era { display: flex; flex-direction: column; gap: 0.6rem; }
+.scroll-era h3 { margin: 0; font-size: 1rem; color: var(--text-muted); font-weight: 700; }
+
+.scroll-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.75rem; margin: 0; padding: 0; list-style: none; }
+
+.scroll-tile {
+  display: flex;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md, 12px);
+  background: var(--bg-card);
+  overflow: hidden;
+}
+.scroll-tile button {
+  display: flex; flex-direction: column; gap: 0.3rem; width: 100%; padding: 0 0 0.5rem;
+  background: none; border: none; color: inherit; font: inherit; text-align: left; cursor: pointer;
+}
+.scroll-tile button:hover { background: var(--bg-card-hover); }
+.scroll-tile button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.scroll-tile strong { padding: 0 0.6rem; font-size: 0.85rem; line-height: 1.25; }
+.scroll-tile small { padding: 0 0.6rem; color: var(--text-muted); }
+.scroll-tile-image { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+
+.scroll-tile--sealed { flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; min-height: 120px; padding: 0.75rem; text-align: center; border-style: dashed; background: var(--bg-card-hover); color: var(--text-muted); }
+.scroll-tile--sealed small { padding: 0; }
+.scroll-seal {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #d8664f, #b3402e 60%, #7d2518);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45), inset 0 0 0 3px rgba(255, 255, 255, 0.12);
+}
+
+/* Map viewer */
+.scroll-map-wrap { display: flex; flex-direction: column; gap: 0.35rem; }
+.scroll-map { position: relative; width: 100%; max-height: 62vh; overflow: hidden; border-radius: 10px; background: #1a1610; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
+.scroll-map:active { cursor: grabbing; }
+.scroll-map:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.scroll-map-stage { position: absolute; inset: 0; transform-origin: 0 0; will-change: transform; }
+.scroll-map-image { width: 100%; height: 100%; object-fit: contain; pointer-events: none; -webkit-user-drag: none; }
+.scroll-map-controls { position: absolute; right: 8px; bottom: 8px; display: flex; gap: 6px; }
+.scroll-map-controls button { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border-strong); background: var(--bg-glass); color: var(--text-primary); font-size: 1.1rem; line-height: 1; cursor: pointer; }
+.scroll-map-controls button:hover { background: var(--bg-card-hover); }
+.scroll-map-hint { color: var(--text-muted); }
+
+/* Trial: the empire on the world map */
+.scroll-sheet-views { display: flex; gap: 6px; padding-right: 2.6rem; }
+.scroll-sheet-views button { flex: 1; padding: 0.5rem 0.6rem; border-radius: var(--radius-pill); border: 1px solid var(--border-strong); background: none; color: var(--text-primary); font-weight: 700; cursor: pointer; }
+.scroll-sheet-views button[aria-pressed='true'] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.empire-map { display: flex; flex-direction: column; gap: 0.6rem; }
+.empire-map-canvas { width: 100%; height: min(52vh, 420px); border-radius: 8px; }
+.empire-map-steps input { width: 100%; accent-color: var(--accent); }
+.empire-map-steps ol { display: flex; justify-content: space-between; margin: 0; padding: 0; list-style: none; }
+.empire-map-steps button { display: flex; align-items: center; gap: 5px; padding: 2px 4px; border: none; background: none; color: var(--text-muted); font-weight: 700; cursor: pointer; }
+.empire-map-steps li.is-on button { color: var(--text-primary); }
+.empire-map-steps i { width: 10px; height: 10px; border-radius: 50%; }
+.empire-map-info { padding: 0.6rem 0.8rem; border-left: 3px solid; border-radius: 6px; background: var(--bg-card); }
+.empire-map-info p { margin: 0.2rem 0 0; }
+.empire-map-note { color: var(--text-muted); font-size: 0.75rem; line-height: 1.4; }
+
+/* Sheet */
+.scroll-sheet { position: fixed; inset: 0; z-index: 1500; display: flex; align-items: center; justify-content: center; padding: 1rem; color: var(--text-primary); animation: scroll-fade 0.2s ease-out; }
+.scroll-sheet-backdrop { position: absolute; inset: 0; background: rgba(6, 10, 22, 0.9); }
+.scroll-sheet-panel { position: relative; display: flex; flex-direction: column; gap: 0.9rem; width: min(760px, 100%); max-height: 100%; overflow-y: auto; padding: 1rem; border-radius: var(--radius-lg); background: var(--bg-card); border: 1px solid var(--border-strong); box-shadow: var(--shadow-card); }
+.scroll-sheet-close { position: absolute; top: 0.5rem; right: 0.5rem; z-index: 2; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border-strong); background: var(--bg-glass); color: var(--text-primary); font-size: 1.3rem; line-height: 1; cursor: pointer; }
+.scroll-sheet-head h2 { margin: 0; font-size: 1.4rem; }
+.scroll-sheet-head p { margin: 0.15rem 0 0; }
+.scroll-sheet-date { color: var(--accent); font-weight: 700; }
+.scroll-sheet-family { color: var(--text-muted); font-size: 0.9rem; }
+.scroll-sheet-body { margin: 0; line-height: 1.55; }
+.scroll-sheet-detail { padding: 0.7rem 0.9rem; border-radius: 10px; background: var(--bg-card-hover); border-left: 3px solid var(--warning); }
+.scroll-sheet-detail p { margin: 0.25rem 0 0; line-height: 1.5; }
+.scroll-sheet-credit { color: var(--text-muted); }
+
+/* Reveal: a sealed scroll that opens onto its map */
+.scroll-reveal { position: fixed; inset: 0; z-index: 2000; display: flex; align-items: center; justify-content: center; color: var(--text-primary); }
+.scroll-reveal--leaving { animation: scroll-out 0.22s ease-in forwards; }
+.scroll-reveal-backdrop { position: absolute; inset: 0; background: rgba(6, 10, 22, 0.94); animation: scroll-fade 0.25s ease-out both; }
+.scroll-reveal-content { position: relative; display: flex; flex-direction: column; align-items: center; gap: 1rem; max-width: 100%; padding: 0 24px 40px; text-align: center; }
+.scroll-reveal-new { color: var(--text-muted); font-weight: 700; }
+
+.scroll-reveal-scroll {
+  position: relative; width: min(320px, 80vw); aspect-ratio: 4 / 3; padding: 0; border: none; background: none; cursor: pointer;
+  animation: scroll-rise 0.5s ease-out both;
+}
+.scroll-reveal-scroll:disabled { cursor: default; }
+.scroll-reveal-map { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 8px; box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5); opacity: 0; transform: scaleX(0.4); transition: opacity 0.45s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+.scroll-reveal--open .scroll-reveal-map { opacity: 1; transform: none; }
+.scroll-reveal-closed { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: linear-gradient(135deg, #e3d4ad, #cdb887 60%, #b79f6c); box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5), inset 0 0 22px rgba(120, 90, 40, 0.35); transition: opacity 0.3s ease; }
+.scroll-reveal--open .scroll-reveal-closed { opacity: 0; pointer-events: none; }
+.scroll-reveal-closed .scroll-seal { width: 72px; height: 72px; animation: scroll-seal-pulse 1.6s ease-in-out infinite; }
+
+.scroll-reveal-texts { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; min-height: 4.5rem; }
+.scroll-reveal-title { margin: 0; font-size: 1.6rem; }
+.scroll-reveal-buttons { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; }
+.scroll-reveal-view { padding: 0.55rem 1.2rem; border-radius: var(--radius-pill); border: none; background: var(--accent); color: var(--on-accent); font-weight: 700; cursor: pointer; }
+.scroll-reveal-continue { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0.4rem 0.8rem; }
+.scroll-reveal-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+@keyframes scroll-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes scroll-out { to { opacity: 0; } }
+@keyframes scroll-rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@keyframes scroll-seal-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-sheet, .scroll-reveal-backdrop, .scroll-reveal-scroll, .scroll-reveal--leaving, .scroll-reveal-closed .scroll-seal { animation: none; }
+  .scroll-reveal-map, .scroll-reveal-closed { transition: none; }
+  .scroll-map-stage { will-change: auto; }
+}

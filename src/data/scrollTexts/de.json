@@ -1,0 +1,62 @@
+{
+  "continents-1858": {
+    "body": "1858 bemerkt der Geograf Antonio Snider-Pellegrini, dass die Küsten Amerikas und Afrikas zueinander passen. Er zeichnet deshalb zwei Globen: die Kontinente vereint, dann getrennt. Die Trennung erklärt er mit einer Katastrophe im Zusammenhang mit der biblischen Sintflut, und seine Idee bleibt ohne Folgen. Mehr als ein halbes Jahrhundert später schlägt Alfred Wegener die Kontinentalverschiebung vor, und die Wissenschaft bestätigt schließlich, dass sie tatsächlich einen einzigen Block bildeten: Pangaea.",
+    "detail": "Auf dem linken Globus steht auf Amerika nicht das Wort „America“, sondern „Atlantide“, also Atlantis.",
+    "credit": "Antonio Snider-Pellegrini, 1858. Gemeinfrei, über Wikimedia Commons."
+  },
+  "egypt-ortelius": {
+    "body": "Abraham Ortelius, ein Kartograf aus Antwerpen, veröffentlicht 1570 den ersten modernen Atlas. Nach und nach fügt er Karten der Antike hinzu, wie diese hier von 1584. Es ist also keine ägyptische Karte: Es ist das alte Ägypten, so wie ein Gelehrter der Renaissance es nach griechischen und römischen Autoren rekonstruierte. Der Nil prägt das ganze Land, das in Provinzen, die Gaue, unterteilt ist, mit ihren Namen auf Latein.",
+    "detail": "Suche unten links die Pyramiden und die Palmen. Oben links zeigt ein Medaillon den Plan von Alexandria.",
+    "credit": "Abraham Ortelius, 1584. Gemeinfrei, über Digital Commonwealth und Wikimedia Commons."
+  },
+  "turin-papyrus": {
+    "body": "Dieser um 1150 v. Chr. gezeichnete Papyrus gehört zu den ältesten bekannten geografischen Karten und wird oft als älteste geologische Karte beschrieben. Er wird dem Schreiber Amennachte zugeschrieben und mit einer Expedition unter der Herrschaft Ramses’ IV. in Verbindung gebracht. Er zeigt ein Tal in der Ostwüste, das Wadi Hammamat, mit seinen Wegen, Steinbrüchen und Goldvorkommen. Heute ist er nur in Fragmenten erhalten, die im Ägyptischen Museum in Turin aufbewahrt werden.",
+    "detail": "Links der rosa Teil: Das sind die Hügel, gefärbt nach ihrem Gestein. Der Rest der Rolle enthält vor allem Text.",
+    "credit": "Archivio Museo Egizio, Turin, C 1879 + C 1969 + C 1899. Bild unter CC0-Lizenz."
+  },
+  "rome-395": {
+    "body": "Beim Tod von Kaiser Theodosius I. im Jahr 395 wird das Römische Reich unter seinen beiden Söhnen aufgeteilt: Honorius erhält den Westen, Arcadius den Osten. Die Teilung wird endgültig. Das Weströmische Reich verschwindet 476, während das Oströmische, auch byzantinisch genannt, bis 1453 besteht. Diese Karte wurde 1923 vom amerikanischen Historiker William R. Shepherd gezeichnet: Die Römer haben keine dieser Art hinterlassen.",
+    "detail": "Die Farben zeigen die großen Teile des Reiches, und die Liste oben rechts nennt seine Provinzen. Finde Konstantinopel, die Hauptstadt des Ostens.",
+    "credit": "William R. Shepherd, Historical Atlas, 1923. Gemeinfrei, über Wikimedia Commons."
+  },
+  "caliphate-750": {
+    "body": "In etwas mehr als einem Jahrhundert nach Mohammeds Tod im Jahr 632 schaffen die arabischen Eroberungen ein Reich, das von der Iberischen Halbinsel bis zum Indus reicht. 750 stürzen die Abbasiden die Dynastie der Umayyaden und gründen bald eine neue Hauptstadt, Bagdad. Diese Eroberungen wurden mit Waffengewalt durchgesetzt, doch dieser Raum wurde auch zu einem großen Knotenpunkt des Handels und des Wissens.",
+    "detail": "Die drei Farbtöne der Legende zeigen die Etappen der Ausdehnung: bis 632, bis 656, dann bis 750. Die Jahreszahlen auf der Karte sind die der Eroberungen.",
+    "credit": "William R. Shepherd, Historical Atlas, Ausgabe von 1926. Gemeinfrei, über Wikimedia Commons."
+  },
+  "holy-roman-empire": {
+    "body": "Das Heilige Römische Reich war kein einheitliches Land, sondern ein Verbund aus Herzogtümern, Fürstentümern, Bistümern und Städten unter der oft umstrittenen Autorität eines Kaisers. Von 1138 bis 1254 wird es von der Dynastie der Staufer geführt, mit Gestalten wie Friedrich Barbarossa und Friedrich II. Sie versuchen auch, Italien zu beherrschen, was sie in Gegensatz zu den Päpsten und den lombardischen Städten bringt. Die Dynastie verliert schließlich die Macht, und das Reich bleibt zersplittert.",
+    "detail": "Vergleiche den Norden der Karte, der voller Herzogtümer ist, mit dem Königreich beider Sizilien ganz im Süden, das 1194 an die Staufer fiel.",
+    "credit": "William R. Shepherd, Historical Atlas, Ausgabe von 1926. Gemeinfrei, über Wikimedia Commons."
+  },
+  "mongol-dominions": {
+    "body": "Dschingis Khan eint 1206 die mongolischen Stämme. Seine Nachfolger errichten das größte zusammenhängende Reich der Geschichte, um den Preis äußerst blutiger Eroberungen. Um 1300 ist es bereits in vier Teile geteilt: die Goldene Horde, das Khanat Tschagatai, die Ilchane von Persien und das China der Yuan. Die Wege, die es verband, erleichterten auch den Austausch zwischen Asien und Europa.",
+    "detail": "Die rote Linie markiert die Grenzen der mongolischen Herrschaftsgebiete um 1300. Die graue Fläche zeigt das Reich, das Timur bis 1405 beherrschte.",
+    "credit": "William R. Shepherd, Historical Atlas, 1923. Gemeinfrei, über Wikimedia Commons."
+  },
+  "tabula-rogeriana": {
+    "body": "1154 vollendet der arabische Gelehrte al-Idrisi nach etwa fünfzehn Jahren Arbeit eine Beschreibung der Welt für Roger II., den normannischen König von Sizilien. Sie vereint das Wissen der muslimischen Welt und Europas auf 70 Karten, verteilt auf sieben Klimazonen. Das Original ist verloren. Diese Fassung setzt die Abschnitte aus den erhaltenen Handschriften zusammen: Es ist die Rekonstruktion des deutschen Forschers Konrad Miller aus den späten 1920er-Jahren.",
+    "detail": "Süden ist oben. Dreh die Karte im Kopf um, um das Mittelmeer und die Form Italiens zu finden.",
+    "credit": "Al-Idrisi, 1154; Rekonstruktion von Konrad Miller. Gemeinfrei, über die Library of Congress und Wikimedia Commons."
+  },
+  "waldseemuller-1507": {
+    "body": "Diese 1507 gedruckte Karte von Martin Waldseemüller verwendet als erste den Namen „America“, zu Ehren des Seefahrers Amerigo Vespucci. Sie zeigt außerdem den neuen Kontinent getrennt von Asien, noch bevor Europäer den Pazifischen Ozean gesehen hatten. Das einzige bekannte Exemplar wurde 1901 in einem deutschen Schloss wiederentdeckt. Die Library of Congress kaufte es für 10 Millionen Dollar, ein Verkauf, der 2003 abgeschlossen wurde.",
+    "detail": "Suche das Wort „America“ im Süden des neuen Kontinents, dann oben die Porträts von Ptolemäus und Vespucci.",
+    "credit": "Martin Waldseemüller, 1507. Gemeinfrei, über die Library of Congress und Wikimedia Commons."
+  },
+  "ottoman-empire": {
+    "body": "1453 erobern die Osmanen Konstantinopel. Ihr Reich erstreckt sich danach über drei Kontinente: Ägypten und die heiligen Stätten des Islam unter Selim I., Ungarn und der Irak unter Süleyman dem Prächtigen. Es vereinte sehr unterschiedliche Völker, Sprachen und Religionen, und viele dieser Gebiete wurden durch Krieg unterworfen. 1683 markiert das Scheitern vor Wien den Beginn seines Rückzugs aus Europa.",
+    "detail": "Die Legende zeigt die Ausdehnung in vier Farben, von 1481 bis 1683. Die Jahreszahlen sind die der Eroberungen, und die Tributstaaten sind hellrosa.",
+    "credit": "William R. Shepherd, Historical Atlas, 1923. Gemeinfrei, über Wikimedia Commons."
+  },
+  "russia-growth": {
+    "body": "Um 1300 ist das Fürstentum Moskau ein kleines Gebiet, das der Goldenen Horde Tribut zahlt. In fünf Jahrhunderten dehnen seine Herrscher es von der Ostsee bis zum Ural und zum Schwarzen Meer aus, oft durch Krieg und auf Kosten anderer Völker. Unter Katharina II. annektiert Russland die Krim und beteiligt sich an den drei Teilungen Polens. Diese amerikanische Karte von 1923 übernimmt die Namen ihrer Zeit, etwa „Little Russia“ für einen Teil der Ukraine: Diese Wörter und Grenzen gehören der Vergangenheit an, nicht der Gegenwart.",
+    "detail": "Finde den kleinen dunklen Fleck Moskaus um 1300, in der Mitte, und folge dann den Farben der Legende bis zu den Teilungen Polens, links.",
+    "credit": "William R. Shepherd, Historical Atlas, 1923. Gemeinfrei, über Wikimedia Commons."
+  },
+  "british-empire-1886": {
+    "body": "Diese Karte ist ein Propagandaplakat. 1886 in der Zeitung The Graphic veröffentlicht und von Walter Crane illustriert, wirbt sie für die Idee einer Föderation des Britischen Empires. Die Gebiete sind rot, und die Linien zeichnen die Seewege nach. Die Wörter „Freiheit“ und „Brüderlichkeit“ stehen im Gegensatz zur Wirklichkeit der Kolonialherrschaft, und die kolonisierten Völker werden durch die Stereotype der Zeit dargestellt.",
+    "detail": "Unten in der Mitte thront Britannia über der Welt, umgeben von Figuren, die die Völker des Empires darstellen sollen. Sieh dir an, wie sie gezeigt werden.",
+    "credit": "Walter Crane, 1886, Statistiken von J. C. R. Colomb. Gemeinfrei, über die Boston Public Library und Wikimedia Commons."
+  }
+}

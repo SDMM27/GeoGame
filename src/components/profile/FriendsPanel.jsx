@@ -156,40 +156,10 @@ export default function FriendsPanel({ account, friendships }) {
     : t('friends.count', { count: friendships.friends.length })
 
   return (
-    <CollapsibleSection id="own.friends" title={t('friends.title')} summary={summary}>
-      <form className="friends-add" onSubmit={handleAdd}>
-        <input
-          value={username}
-          onChange={(e) => {
-            setUsername(e.target.value)
-            setMessage(null)
-          }}
-          placeholder={t('friends.add_placeholder')}
-          maxLength={USERNAME_MAX}
-          aria-label={t('friends.add_title')}
-        />
-        <button type="submit" disabled={sending || !username.trim()}>{t('friends.add')}</button>
-      </form>
-      {message && <p className={message.kind === 'error' ? 'account-error' : 'account-notice'}>{message.text}</p>}
-      {typed && !search.searching && found.length === 0 && <p className="profile-muted">{t('friends.search_none')}</p>}
-      <FriendCandidates players={found} account={account} friendships={friendships} onMessage={setMessage} />
-
-      <PendingInvite account={account} friendships={friendships} onMessage={setMessage} />
-
-      {!typed && recent.length > 0 && (
-        <div className="friends-group">
-          <small className="profile-label">{t('friends.recent_title')}</small>
-          <FriendCandidates players={recent} account={account} friendships={friendships} onMessage={setMessage} />
-        </div>
-      )}
-
-      <InviteCard account={account} />
-      <Link to="/league" className="friends-league">
-        {t('friends.league_link')} →
-      </Link>
-
+    <>
+      {/* Requests sit outside the foldable section, so they are seen without unfolding or scrolling. */}
       {friendships.incoming.length > 0 && (
-        <div className="friends-group">
+        <div className="friends-group friends-requests">
           <small className="profile-label">{t('friends.requests_title')}</small>
           <ul className="profile-list">
             {friendships.incoming.map((request) => (
@@ -207,41 +177,74 @@ export default function FriendsPanel({ account, friendships }) {
         </div>
       )}
 
-      {friendships.friends.length === 0 ? (
-        <p className="profile-muted">{t('friends.empty')}</p>
-      ) : (
-        <div className="friends-group">
-          <small className="profile-label">{t('friends.today_title')}</small>
-          <ul className="profile-list">
-            {friendships.friends.map((friend) => (
-              <li key={friend.id} className="friends-row">
-                <PlayerName friend={friend} />
-                <FriendStatus presence={presence[friend.uid]} onWatch={(room) => navigate(`/multiplayer/room/${room}?watch=1`)} />
-                <DailyChips today={today[friend.uid] ?? {}} small />
-                <button type="button" className="friends-btn friends-btn--icon" title={t('friends.remove')} aria-label={t('friends.remove')} onClick={() => handleRemove(friend)}>
-                  ✕
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <CollapsibleSection id="own.friends" title={t('friends.title')} summary={summary}>
+        <form className="friends-add" onSubmit={handleAdd}>
+          <input
+            value={username}
+            onChange={(e) => {
+              setUsername(e.target.value)
+              setMessage(null)
+            }}
+            placeholder={t('friends.add_placeholder')}
+            maxLength={USERNAME_MAX}
+            aria-label={t('friends.add_title')}
+          />
+          <button type="submit" disabled={sending || !username.trim()}>{t('friends.add')}</button>
+        </form>
+        {message && <p className={message.kind === 'error' ? 'account-error' : 'account-notice'}>{message.text}</p>}
+        {typed && !search.searching && found.length === 0 && <p className="profile-muted">{t('friends.search_none')}</p>}
+        <FriendCandidates players={found} account={account} friendships={friendships} onMessage={setMessage} />
 
-      {friendships.outgoing.length > 0 && (
-        <div className="friends-group">
-          <small className="profile-label">{t('friends.outgoing_title')}</small>
-          <ul className="profile-list">
-            {friendships.outgoing.map((request) => (
-              <li key={request.id} className="friends-row">
-                <PlayerName friend={request} />
-                <button type="button" className="friends-btn" onClick={() => removeFriendship(request.id)}>
-                  {t('friends.cancel')}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </CollapsibleSection>
+        <PendingInvite account={account} friendships={friendships} onMessage={setMessage} />
+
+        {!typed && recent.length > 0 && (
+          <div className="friends-group">
+            <small className="profile-label">{t('friends.recent_title')}</small>
+            <FriendCandidates players={recent} account={account} friendships={friendships} onMessage={setMessage} />
+          </div>
+        )}
+
+        <InviteCard account={account} />
+        <Link to="/league" className="friends-league">
+          {t('friends.league_link')} →
+        </Link>
+
+        {friendships.friends.length === 0 ? (
+          <p className="profile-muted">{t('friends.empty')}</p>
+        ) : (
+          <div className="friends-group">
+            <small className="profile-label">{t('friends.today_title')}</small>
+            <ul className="profile-list">
+              {friendships.friends.map((friend) => (
+                <li key={friend.id} className="friends-row">
+                  <PlayerName friend={friend} />
+                  <FriendStatus presence={presence[friend.uid]} onWatch={(room) => navigate(`/multiplayer/room/${room}?watch=1`)} />
+                  <DailyChips today={today[friend.uid] ?? {}} small />
+                  <button type="button" className="friends-btn friends-btn--icon" title={t('friends.remove')} aria-label={t('friends.remove')} onClick={() => handleRemove(friend)}>
+                    ✕
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {friendships.outgoing.length > 0 && (
+          <div className="friends-group">
+            <small className="profile-label">{t('friends.outgoing_title')}</small>
+            <ul className="profile-list">
+              {friendships.outgoing.map((request) => (
+                <li key={request.id} className="friends-row">
+                  <PlayerName friend={request} />
+                  <button type="button" className="friends-btn" onClick={() => removeFriendship(request.id)}>
+                    {t('friends.cancel')}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </CollapsibleSection>
+    </>
   )
 }

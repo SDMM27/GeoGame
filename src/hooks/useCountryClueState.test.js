@@ -4,13 +4,13 @@ import { toast } from 'react-toastify'
 import useCountryClueState from './useCountryClueState'
 import { FIXTURE_COUNTRIES, byName } from './testUtils/countriesFixture'
 
-const mocks = vi.hoisted(() => ({ navigate: vi.fn(), dailyKey: '2026-10-08' }))
+const mocks = vi.hoisted(() => ({ navigate: vi.fn(), dailyKey: '2026-10-08', language: 'fr' }))
 
 vi.mock('../data/countriesWithDifficulty_FR.json', async () => import('./testUtils/countriesFixture'))
 vi.mock('react-router-dom', () => ({ useNavigate: () => mocks.navigate }))
 vi.mock('react-toastify', () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }))
 vi.mock('react-i18next', () => {
-  const value = { t: (key) => key, i18n: { language: 'fr' } }
+  const value = { t: (key) => key, i18n: { get language() { return mocks.language } } }
   return { useTranslation: () => value }
 })
 vi.mock('./useDailyKey', () => ({ default: (enabled = true) => (enabled ? mocks.dailyKey : null) }))
@@ -29,6 +29,7 @@ beforeEach(() => {
   vi.clearAllMocks()
   localStorage.clear()
   mocks.dailyKey = '2026-10-08'
+  mocks.language = 'fr'
 })
 
 describe('useCountryClueState — défi du jour', () => {
@@ -168,6 +169,66 @@ describe('useCountryClueState — défi du jour', () => {
     act(() => result.current.revealCountry())
     expect(result.current.isLost).toBe(true)
     expect(JSON.parse(localStorage.getItem(STORAGE_KEY)).status).toBe('lost')
+  })
+})
+
+describe('useCountryClueState — libellés surface et population', () => {
+  const brazil = () => useCountryClueState('daily', { overrideCountry: byName('Brésil') })
+
+  it('keeps the French format', () => {
+    const { result } = renderHook(brazil)
+    guess(result, 'France')
+    const [record] = result.current.guesses
+    expect(record.populationLabel).toBe('68,0 M')
+    expect(record.areaLabel).toMatch(/^\d{1,3}( \d{3})* km²$/)
+  })
+
+  it('uses the English format', () => {
+    mocks.language = 'en'
+    const { result } = renderHook(brazil)
+    guess(result, 'France')
+    const [record] = result.current.guesses
+    expect(record.populationLabel).toBe('68.0M')
+    expect(record.areaLabel).toMatch(/^\d{1,3}(,\d{3})* km²$/)
+  })
+
+  it('follows a language change during the game', () => {
+    const { result, rerender } = renderHook(brazil)
+    guess(result, 'France')
+    mocks.language = 'en'
+    rerender()
+    expect(result.current.guesses[0].populationLabel).toBe('68.0M')
+  })
+
+  it('ignores the labels of a saved daily game', () => {
+    mocks.language = 'en'
+    const first = renderHook(() => useCountryClueState('daily'))
+    const target = first.result.current.answerName
+    first.unmount()
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      targetName: target,
+      guesses: [{ value: 'France', areaLabel: '356 198 km²', populationLabel: '83,5 M' }],
+      status: 'playing',
+    }))
+    const { result } = renderHook(() => useCountryClueState('daily'))
+    expect(result.current.guesses[0].populationLabel).toBe('68.0M')
+    expect(result.current.guesses[0].areaLabel).not.toBe('356 198 km²')
+  })
+
+  it('ignores the labels of a multiplayer snapshot', () => {
+    mocks.language = 'en'
+    const initialGuesses = [{ value: 'France', normalizedInput: 'france', isCorrect: false, areaLabel: '356 198 km²', populationLabel: '83,5 M' }]
+    const { result } = renderHook(() => useCountryClueState('daily', { overrideCountry: byName('Brésil'), initialGuesses }))
+    expect(result.current.guesses[0].populationLabel).toBe('68.0M')
+    expect(result.current.guesses[0].areaLabel).not.toBe('356 198 km²')
+  })
+
+  it('stops saving the labels', () => {
+    const { result } = renderHook(() => useCountryClueState('daily'))
+    guess(result, otherThan(result.current.answerName))
+    const [saved] = JSON.parse(localStorage.getItem(STORAGE_KEY)).guesses
+    expect(saved).not.toHaveProperty('areaLabel')
+    expect(saved).not.toHaveProperty('populationLabel')
   })
 })
 

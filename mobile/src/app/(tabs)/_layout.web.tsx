@@ -6,6 +6,9 @@ import type { ComponentProps } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
+import { useFriendships } from '@shared/hooks/usePlayerProfile'
+
+import { useAccount } from '@/account/auth'
 import { colors, fonts } from '@/theme'
 
 type IconName = ComponentProps<typeof MaterialCommunityIcons>['name']
@@ -20,6 +23,9 @@ const TABS: { name: string; labelKey: string; icon: IconName; iconSelected: Icon
 export default function TabsLayout() {
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
+  const { account } = useAccount()
+  // Friend requests waiting for an answer: a badge on the Profile tab, which leads to the friends screen.
+  const requests = useFriendships(account?.uid).incoming.length
   return (
     <Tabs
       screenOptions={{
@@ -38,6 +44,8 @@ export default function TabsLayout() {
           name={tab.name}
           options={{
             title: t(tab.labelKey),
+            tabBarBadge: tab.name === 'profile' && requests > 0 ? requests : undefined,
+            tabBarBadgeStyle: { backgroundColor: colors.accent, color: colors.onAccent, fontFamily: fonts.bodyBold },
             tabBarIcon: ({ color, focused, size }) => (
               <MaterialCommunityIcons name={focused ? tab.iconSelected : tab.icon} color={color} size={size} />
             ),

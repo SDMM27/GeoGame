@@ -9,6 +9,7 @@ import { pieceGrid, piecesFor } from '../../utils/flagCollection'
 import { FLAG_POOL } from '../../utils/flagCollectionData'
 import { getCountryName } from '../../utils/getCountryName'
 import { flagsAfter, pieceStyle, rarityColor, rarityOf } from './claim'
+import { setFlagOverlayOpen } from './busy'
 import { onReplayFlag } from './replay'
 import './FlagUnlockOverlay.css'
 
@@ -36,6 +37,8 @@ export default function FlagUnlockOverlay() {
       onXpClaimed((claim) => {
         const isos = claim.unlockedFlags ?? []
         if (isos.length === 0) return
+        // Right away, so that the scroll reveal of the same claim waits for this overlay (busy.js)
+        setFlagOverlayOpen(true)
         const flags = flagsAfter(claim, uid)
         const first = nextId.current
         nextId.current += isos.length
@@ -63,10 +66,13 @@ export default function FlagUnlockOverlay() {
   // Focus goes back to where it was once the last flag is closed
   const open = queue.length > 0
   useEffect(() => {
+    setFlagOverlayOpen(open)
     if (!open) return undefined
     opener.current = document.activeElement
     return () => opener.current?.focus?.()
   }, [open])
+
+  useEffect(() => () => setFlagOverlayOpen(false), [])
 
   const item = queue[0]
   if (!item) return null

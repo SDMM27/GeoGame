@@ -1,0 +1,286 @@
+{
+  "entry": {
+    "center": [
+      56,
+      38
+    ],
+    "zoom": 3,
+    "stages": [
+      {
+        "id": "1300",
+        "color": "#8E7CC3"
+      },
+      {
+        "id": "1462",
+        "color": "#7FB069"
+      },
+      {
+        "id": "1584",
+        "color": "#EBD35B"
+      },
+      {
+        "id": "1725",
+        "color": "#EBA046"
+      },
+      {
+        "id": "1796",
+        "color": "#D9596B"
+      }
+    ],
+    "cumulative": true
+  },
+  "texts": {
+    "fr": {
+      "1300": {
+        "label": "1300",
+        "title": "Vers 1300",
+        "text": "La principauté de Moscou est alors un petit territoire qui verse tribut à la Horde d'Or."
+      },
+      "1462": {
+        "label": "1462",
+        "title": "En 1462",
+        "text": "Le grand-duché de Moscou, que la carte appelle « Grande Russie », s'est étendu autour de sa capitale."
+      },
+      "1584": {
+        "label": "1584",
+        "title": "Jusqu'en 1584",
+        "text": "Sous Ivan III, Vassili III et Ivan IV, Moscou annexe Novgorod, Tver, Riazan, puis les khanats de Kazan et d'Astrakhan. Cette croissance se fait souvent par la guerre et aux dépens d'autres peuples."
+      },
+      "1725": {
+        "label": "1725",
+        "title": "Jusqu'en 1725",
+        "text": "L'Ukraine à l'est du Dniepr, cédée par la Pologne en 1667, puis l'Ingrie, l'Estonie et la Livonie, prises à la Suède sous Pierre le Grand."
+      },
+      "1796": {
+        "label": "1796",
+        "title": "Jusqu'en 1796",
+        "text": "Sous Catherine II, la Russie annexe la Crimée (1783) et la côte nord de la mer Noire. Par les trois partages de la Pologne (1772-1795), elle prend des terres aujourd'hui en Biélorussie, en Lituanie, en Lettonie et en Ukraine."
+      },
+      "_note": "Le tracé suit un atlas américain de 1923 (Shepherd) : ses limites sont approximatives, et il ne couvre que la Russie d'Europe, pas la Sibérie. Ces frontières appartiennent au passé et ne disent rien de celles d'aujourd'hui."
+    },
+    "en": {
+      "1300": {
+        "label": "1300",
+        "title": "Around 1300",
+        "text": "The Principality of Moscow is then a small territory paying tribute to the Golden Horde."
+      },
+      "1462": {
+        "label": "1462",
+        "title": "In 1462",
+        "text": "The Grand Principality of Moscow, which the map calls \"Great Russia\", has grown around its capital."
+      },
+      "1584": {
+        "label": "1584",
+        "title": "Until 1584",
+        "text": "Under Ivan III, Vasili III and Ivan IV, Moscow annexes Novgorod, Tver, Ryazan, then the khanates of Kazan and Astrakhan. This growth came often through war and at the expense of other peoples."
+      },
+      "1725": {
+        "label": "1725",
+        "title": "Until 1725",
+        "text": "The part of Ukraine east of the Dnieper, ceded by Poland in 1667, then Ingria, Estonia and Livonia, taken from Sweden under Peter the Great."
+      },
+      "1796": {
+        "label": "1796",
+        "title": "Until 1796",
+        "text": "Under Catherine II, Russia annexes Crimea (1783) and the north coast of the Black Sea. Through the three partitions of Poland (1772-1795), it takes lands now in Belarus, Lithuania, Latvia and Ukraine."
+      },
+      "_note": "The outline follows an American atlas of 1923 (Shepherd): its limits are approximate, and it covers Russia in Europe only, not Siberia. These borders belong to the past and say nothing of today's."
+    },
+    "ru": {
+      "1300": {
+        "label": "1300",
+        "title": "Около 1300",
+        "text": "Московское княжество — тогда небольшая территория, платящая дань Золотой Орде."
+      },
+      "1462": {
+        "label": "1462",
+        "title": "1462 год",
+        "text": "Великое княжество Московское, которое карта называет «Великой Россией», выросло вокруг своей столицы."
+      },
+      "1584": {
+        "label": "1584",
+        "title": "До 1584",
+        "text": "При Иване III, Василии III и Иване IV Москва присоединяет Новгород, Тверь, Рязань, затем Казанское и Астраханское ханства. Этот рост шёл часто войной и за счёт других народов."
+      },
+      "1725": {
+        "label": "1725",
+        "title": "До 1725",
+        "text": "Левобережная Украина, к востоку от Днепра, уступленная Польшей в 1667 году, затем Ингрия, Эстляндия и Лифляндия, отнятые у Швеции при Петре Великом."
+      },
+      "1796": {
+        "label": "1796",
+        "title": "До 1796",
+        "text": "При Екатерине II Россия аннексирует Крым (1783) и северное побережье Чёрного моря. Тремя разделами Польши (1772–1795) она берёт земли, которые сегодня находятся в Беларуси, Литве, Латвии и Украине."
+      },
+      "_note": "Контур следует американскому атласу 1923 года (Шепард): его границы приблизительны, и он охватывает только европейскую часть России, без Сибири. Эти границы принадлежат прошлому и ничего не говорят о нынешних."
+    },
+    "es": {
+      "1300": {
+        "label": "1300",
+        "title": "Hacia 1300",
+        "text": "El principado de Moscú es entonces un pequeño territorio que paga tributo a la Horda de Oro."
+      },
+      "1462": {
+        "label": "1462",
+        "title": "En 1462",
+        "text": "El gran principado de Moscú, que el mapa llama «Gran Rusia», ha crecido alrededor de su capital."
+      },
+      "1584": {
+        "label": "1584",
+        "title": "Hasta 1584",
+        "text": "Con Iván III, Basilio III e Iván IV, Moscú anexiona Nóvgorod, Tver, Riazán y después los janatos de Kazán y Astracán. Este crecimiento fue a menudo por la guerra y a costa de otros pueblos."
+      },
+      "1725": {
+        "label": "1725",
+        "title": "Hasta 1725",
+        "text": "La parte de Ucrania al este del Dniéper, cedida por Polonia en 1667, y luego Ingria, Estonia y Livonia, tomadas a Suecia con Pedro el Grande."
+      },
+      "1796": {
+        "label": "1796",
+        "title": "Hasta 1796",
+        "text": "Con Catalina II, Rusia anexiona Crimea (1783) y la costa norte del mar Negro. Con los tres repartos de Polonia (1772-1795) toma tierras hoy en Bielorrusia, Lituania, Letonia y Ucrania."
+      },
+      "_note": "El trazado sigue un atlas estadounidense de 1923 (Shepherd): sus límites son aproximados y solo cubre la Rusia europea, no Siberia. Estas fronteras pertenecen al pasado y no dicen nada de las de hoy."
+    },
+    "pt": {
+      "1300": {
+        "label": "1300",
+        "title": "Por volta de 1300",
+        "text": "O principado de Moscou é então um pequeno território que paga tributo à Horda de Ouro."
+      },
+      "1462": {
+        "label": "1462",
+        "title": "Em 1462",
+        "text": "O grão-principado de Moscou, que o mapa chama de «Grande Rússia», cresceu em torno da sua capital."
+      },
+      "1584": {
+        "label": "1584",
+        "title": "Até 1584",
+        "text": "Com Ivan III, Basílio III e Ivan IV, Moscou anexa Novgorod, Tver, Riazan e depois os canatos de Cazã e de Astracã. Esse crescimento deu-se muitas vezes pela guerra e à custa de outros povos."
+      },
+      "1725": {
+        "label": "1725",
+        "title": "Até 1725",
+        "text": "A parte da Ucrânia a leste do Dnieper, cedida pela Polônia em 1667, e depois a Íngria, a Estônia e a Livônia, tomadas da Suécia com Pedro, o Grande."
+      },
+      "1796": {
+        "label": "1796",
+        "title": "Até 1796",
+        "text": "Com Catarina II, a Rússia anexa a Crimeia (1783) e a costa norte do mar Negro. Pelas três partilhas da Polônia (1772-1795), toma terras hoje na Bielorrússia, na Lituânia, na Letônia e na Ucrânia."
+      },
+      "_note": "O traçado segue um atlas americano de 1923 (Shepherd): seus limites são aproximados e cobre apenas a Rússia europeia, não a Sibéria. Essas fronteiras pertencem ao passado e não dizem nada sobre as de hoje."
+    },
+    "de": {
+      "1300": {
+        "label": "1300",
+        "title": "Um 1300",
+        "text": "Das Fürstentum Moskau ist damals ein kleines Gebiet, das der Goldenen Horde Tribut zahlt."
+      },
+      "1462": {
+        "label": "1462",
+        "title": "1462",
+        "text": "Das Großfürstentum Moskau, das die Karte „Great Russia“ nennt, ist rund um seine Hauptstadt gewachsen."
+      },
+      "1584": {
+        "label": "1584",
+        "title": "Bis 1584",
+        "text": "Unter Iwan III., Wassili III. und Iwan IV. annektiert Moskau Nowgorod, Twer, Rjasan, dann die Khanate Kasan und Astrachan. Dieses Wachstum geschah oft durch Krieg und auf Kosten anderer Völker."
+      },
+      "1725": {
+        "label": "1725",
+        "title": "Bis 1725",
+        "text": "Der Teil der Ukraine östlich des Dnjepr, 1667 von Polen abgetreten, dann Ingermanland, Estland und Livland, unter Peter dem Großen Schweden abgenommen."
+      },
+      "1796": {
+        "label": "1796",
+        "title": "Bis 1796",
+        "text": "Unter Katharina II. annektiert Russland die Krim (1783) und die Nordküste des Schwarzen Meeres. Durch die drei Teilungen Polens (1772–1795) nimmt es Land, das heute in Belarus, Litauen, Lettland und der Ukraine liegt."
+      },
+      "_note": "Der Umriss folgt einem amerikanischen Atlas von 1923 (Shepherd): Seine Grenzen sind ungefähr, und er zeigt nur das europäische Russland, nicht Sibirien. Diese Grenzen gehören der Vergangenheit an und sagen nichts über die heutigen."
+    },
+    "it": {
+      "1300": {
+        "label": "1300",
+        "title": "Verso il 1300",
+        "text": "Il principato di Mosca è allora un piccolo territorio che paga tributo all'Orda d'Oro."
+      },
+      "1462": {
+        "label": "1462",
+        "title": "Nel 1462",
+        "text": "Il granducato di Mosca, che la carta chiama «Grande Russia», è cresciuto intorno alla sua capitale."
+      },
+      "1584": {
+        "label": "1584",
+        "title": "Fino al 1584",
+        "text": "Con Ivan III, Basilio III e Ivan IV, Mosca annette Novgorod, Tver', Rjazan', poi i khanati di Kazan' e di Astrachan'. Questa crescita avvenne spesso con la guerra e a spese di altri popoli."
+      },
+      "1725": {
+        "label": "1725",
+        "title": "Fino al 1725",
+        "text": "La parte dell'Ucraina a est del Dnepr, ceduta dalla Polonia nel 1667, poi l'Ingria, l'Estonia e la Livonia, tolte alla Svezia con Pietro il Grande."
+      },
+      "1796": {
+        "label": "1796",
+        "title": "Fino al 1796",
+        "text": "Con Caterina II la Russia annette la Crimea (1783) e la costa settentrionale del mar Nero. Con le tre spartizioni della Polonia (1772-1795) prende terre oggi in Bielorussia, Lituania, Lettonia e Ucraina."
+      },
+      "_note": "Il tracciato segue un atlante americano del 1923 (Shepherd): i suoi limiti sono approssimativi e copre solo la Russia europea, non la Siberia. Questi confini appartengono al passato e non dicono nulla di quelli di oggi."
+    },
+    "uk": {
+      "1300": {
+        "label": "1300",
+        "title": "Близько 1300",
+        "text": "Московське князівство — тоді невелика територія, що платить данину Золотій Орді."
+      },
+      "1462": {
+        "label": "1462",
+        "title": "1462 рік",
+        "text": "Велике князівство Московське, яке карта називає «Великою Росією», розрослося навколо своєї столиці."
+      },
+      "1584": {
+        "label": "1584",
+        "title": "До 1584",
+        "text": "За Івана III, Василя III та Івана IV Москва приєднує Новгород, Твер, Рязань, а потім Казанське й Астраханське ханства. Це зростання часто відбувалося війною і коштом інших народів."
+      },
+      "1725": {
+        "label": "1725",
+        "title": "До 1725",
+        "text": "Лівобережна Україна, на схід від Дніпра, що відійшла від Польщі до Росії 1667 року, а потім Інгрія, Естляндія та Лівонія, відібрані у Швеції за Петра I."
+      },
+      "1796": {
+        "label": "1796",
+        "title": "До 1796",
+        "text": "За Катерини II Росія анексує Крим (1783) і північне узбережжя Чорного моря. Трьома поділами Польщі (1772–1795) вона бере землі, що нині лежать у Білорусі, Литві, Латвії та в Україні."
+      },
+      "_note": "Контур відтворює американський атлас 1923 року (Шепард): його межі наближені, і він охоплює лише європейську частину Росії, без Сибіру. Ці кордони належать минулому й нічого не кажуть про сучасні."
+    },
+    "nl": {
+      "1300": {
+        "label": "1300",
+        "title": "Rond 1300",
+        "text": "Het vorstendom Moskou is dan een klein gebied dat schatting betaalt aan de Gouden Horde."
+      },
+      "1462": {
+        "label": "1462",
+        "title": "In 1462",
+        "text": "Het groothertogdom Moskou, dat de kaart „Groot-Rusland” noemt, is gegroeid rond zijn hoofdstad."
+      },
+      "1584": {
+        "label": "1584",
+        "title": "Tot 1584",
+        "text": "Onder Ivan III, Vasili III en Ivan IV annexeert Moskou Novgorod, Tver, Rjazan en daarna de khanaten Kazan en Astrachan. Deze groei verliep vaak door oorlog en ten koste van andere volken."
+      },
+      "1725": {
+        "label": "1725",
+        "title": "Tot 1725",
+        "text": "Het deel van Oekraïne ten oosten van de Dnjepr, in 1667 door Polen afgestaan, en daarna Ingermanland, Estland en Lijfland, onder Peter de Grote op Zweden veroverd."
+      },
+      "1796": {
+        "label": "1796",
+        "title": "Tot 1796",
+        "text": "Onder Catharina II annexeert Rusland de Krim (1783) en de noordkust van de Zwarte Zee. Met de drie delingen van Polen (1772-1795) neemt het land dat nu in Wit-Rusland, Litouwen, Letland en Oekraïne ligt."
+      },
+      "_note": "De omtrek volgt een Amerikaanse atlas uit 1923 (Shepherd): de grenzen zijn bij benadering, en hij omvat alleen Europees Rusland, niet Siberië. Deze grenzen horen bij het verleden en zeggen niets over die van vandaag."
+    }
+  }
+}

@@ -7,6 +7,8 @@ import RouteMeta from "./components/RouteMeta";
 import XpToast from "./components/XpToast";
 import FragmentToast from "./components/collection/FragmentToast";
 import FlagUnlockOverlay from "./components/collection/FlagUnlockOverlay";
+import SealToast from "./components/collection/SealToast";
+import ScrollUnlockOverlay from "./components/collection/ScrollUnlockOverlay";
 import PresenceHeartbeat from "./components/PresenceHeartbeat";
 import InviteBanner from "./components/multiplayer/InviteBanner";
 import RouteErrorBoundary, { ErrorBoundary } from "./components/RouteErrorBoundary";
@@ -33,6 +35,7 @@ const AccountPage = lazy(() => import("./pages/AccountPage"));
 const PlayerPage = lazy(() => import("./pages/PlayerPage"));
 const AddFriendPage = lazy(() => import("./pages/AddFriendPage"));
 const LeaguePage = lazy(() => import("./pages/LeaguePage"));
+const ScrollsPage = lazy(() => import("./pages/ScrollsPage"));
 const ScoresPage = lazy(() => import("./pages/ScoresPage"));
 const LegalPage = lazy(() => import("./pages/legal/LegalPage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
@@ -48,7 +51,10 @@ export default function App() {
         <InviteBanner />
         <XpToast />
         <FragmentToast />
+        <SealToast />
+        {/* The flag overlay first: a claim that unlocks both plays the flags, then the scrolls */}
         <FlagUnlockOverlay />
+        <ScrollUnlockOverlay />
         <PresenceHeartbeat />
         <RouteErrorBoundary>
           <Suspense fallback={<RouteFallback />}>
@@ -72,6 +78,7 @@ export default function App() {
               <Route path="/player/:uid" element={<PlayerPage />} />
               <Route path="/add/:username" element={<AddFriendPage />} />
               <Route path="/league" element={<LeaguePage />} />
+              <Route path="/parchments" element={<ScrollsPage />} />
               <Route path="/community" element={<Navigate to="/league" replace />} />
               <Route path="/multiplayer" element={<MultiplayerHomePage />} />
               <Route path="/multiplayer/create" element={<MultiplayerCreatePage />} />

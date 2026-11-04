@@ -23,6 +23,7 @@
 .friends-add button:disabled { opacity: 0.45; cursor: not-allowed; }
 
 .friends-group { display: flex; flex-direction: column; gap: 0.4rem; }
+.friends-requests .profile-list { border-color: var(--accent); }
 .friends-row { display: flex; align-items: center; gap: 0.6rem; padding: 0.6rem 0.9rem; }
 .friends-row + .friends-row { border-top: 1px solid var(--border-subtle); }
 .friends-who { flex: 1; min-width: 0; display: flex; align-items: center; gap: 0.7rem; color: var(--text-primary); text-decoration: none; font-weight: 600; }

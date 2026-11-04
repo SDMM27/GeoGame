@@ -1,0 +1,107 @@
+{
+  "ottoman-empire": {
+    "1481": {
+      "label": "1481",
+      "title": "Em 1481",
+      "text": "À morte de Maomé II, conquistador de Constantinopla, o império domina os Balcãs e a Anatólia."
+    },
+    "1520": {
+      "label": "1520",
+      "title": "Até 1520",
+      "text": "Selim I toma a Síria, o Egito e o norte da Mesopotâmia."
+    },
+    "1566": {
+      "label": "1566",
+      "title": "Até 1566",
+      "text": "Sob Solimão, o Magnífico: a Hungria, o Iraque e o litoral norte-africano. Várias destas regiões são Estados tributários, como a Transilvânia ou Trípoli."
+    },
+    "1683": {
+      "label": "1683",
+      "title": "Até 1683",
+      "text": "Chipre, Creta, a Podólia e as costas da Arábia. Nesse ano, o fracasso diante de Viena marca o início do recuo na Europa."
+    },
+    "_note": "O traçado segue o atlas de Shepherd (1923): os seus limites são aproximados, e o mapa pára a sul do Egito e da Líbia."
+  },
+  "rome-395": {
+    "gaul": {
+      "label": "Gália",
+      "title": "Prefeitura das Gálias",
+      "text": "Após a morte de Teodósio I em 395, a metade ocidental do Império coube a Honório. Inclui a prefeitura das Gálias: Britânia, Gália, Hispânia e Mauritânia Tingitana."
+    },
+    "italy": {
+      "label": "Itália",
+      "title": "Prefeitura da Itália",
+      "text": "Abrange a Itália, o norte de África e parte das províncias do Danúbio. Com as Gálias, forma a metade ocidental, sob Honório."
+    },
+    "illyricum": {
+      "label": "Ilíria",
+      "title": "Prefeitura da Ilíria",
+      "text": "As dioceses da Macedónia e da Dácia formam no mapa uma prefeitura à parte, entre as duas metades do Império; a corte de que dependiam foi motivo de disputa."
+    },
+    "east": {
+      "label": "Oriente",
+      "title": "Prefeitura do Oriente",
+      "text": "Da Trácia ao Egito, com Constantinopla: é a metade oriental do Império, nas mãos de Arcádio."
+    },
+    "_note": "O traçado segue o atlas de Shepherd (The Roman Empire about 395, 1923) e é aproximado. O mapa termina nos limites do Império: o resto do mundo não aparece, e as zonas pálidas ou sombreadas (relevo) por vezes são mal reproduzidas."
+  },
+  "caliphate-750": {
+    "632": {
+      "label": "632",
+      "title": "Conquistas até a morte de Maomé",
+      "text": "Na morte de Maomé, em 632, a Arábia estava sob a autoridade da nova comunidade muçulmana, por persuasão e também pelas armas."
+    },
+    "656": {
+      "label": "632-656",
+      "title": "Sob os três primeiros califas",
+      "text": "Os exércitos árabes conquistaram pela força a Síria, o Egito, a Mesopotâmia e a Pérsia, e chegaram à Cirenaica, tomando terras dos impérios bizantino e persa."
+    },
+    "750": {
+      "label": "661-750",
+      "title": "Sob os califas omíadas",
+      "text": "Novas campanhas levaram o califado ao Magrebe, à Espanha, à Ásia Central e ao Sinde, formando um vasto império."
+    },
+    "_note": "O traçado segue o atlas de Shepherd (The Califate in 750) e é aproximado. O mapa cobre apenas o mundo mediterrâneo e a Ásia Ocidental: o resto do mundo não aparece."
+  },
+  "mongol-dominions": {
+    "1300": {
+      "label": "Mongóis, 1300",
+      "title": "Os domínios mongóis por volta de 1300",
+      "text": "Nascido das conquistas de Gengis Cã, o império mongol estende-se então da China à Rússia e à Pérsia, repartido em quatro canatos. Estas conquistas foram extremamente mortíferas."
+    },
+    "1405": {
+      "label": "Timur, 1405",
+      "title": "O império de Timur em 1405",
+      "text": "A partir de Samarcanda, Timur (Tamerlão) conquistou a Pérsia e a Ásia Central, e fez campanhas até à Índia. As suas guerras causaram muitas mortes, e o seu império não lhe sobreviveu."
+    },
+    "_note": "O traçado segue o atlas de Shepherd (Mongol dominions, 1300-1405); é aproximado."
+  },
+  "russia-growth": {
+    "1300": {
+      "label": "1300",
+      "title": "Por volta de 1300",
+      "text": "O principado de Moscou é então um pequeno território que paga tributo à Horda de Ouro."
+    },
+    "1462": {
+      "label": "1462",
+      "title": "Em 1462",
+      "text": "O grão-principado de Moscou, que o mapa chama de «Grande Rússia», cresceu em torno da sua capital."
+    },
+    "1584": {
+      "label": "1584",
+      "title": "Até 1584",
+      "text": "Com Ivan III, Basílio III e Ivan IV, Moscou anexa Novgorod, Tver, Riazan e depois os canatos de Cazã e de Astracã. Esse crescimento deu-se muitas vezes pela guerra e à custa de outros povos."
+    },
+    "1725": {
+      "label": "1725",
+      "title": "Até 1725",
+      "text": "A parte da Ucrânia a leste do Dnieper, cedida pela Polônia em 1667, e depois a Íngria, a Estônia e a Livônia, tomadas da Suécia com Pedro, o Grande."
+    },
+    "1796": {
+      "label": "1796",
+      "title": "Até 1796",
+      "text": "Com Catarina II, a Rússia anexa a Crimeia (1783) e a costa norte do mar Negro. Pelas três partilhas da Polônia (1772-1795), toma terras hoje na Bielorrússia, na Lituânia, na Letônia e na Ucrânia."
+    },
+    "_note": "O traçado segue um atlas americano de 1923 (Shepherd): seus limites são aproximados e cobre apenas a Rússia europeia, não a Sibéria. Essas fronteiras pertencem ao passado e não dizem nada sobre as de hoje."
+  }
+}

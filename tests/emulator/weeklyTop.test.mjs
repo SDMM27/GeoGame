@@ -206,6 +206,30 @@ describe('refreshWeeklyTop, the end of the week', () => {
     expect((await db.doc('users/p2').get()).data().league).toBeUndefined()
   })
 
+  it('pays a seal to the champion only, and the starter scroll with it', async () => {
+    await account('p1', { scrolls: { unlocked: ['continents-1858'], seals: 1 } })
+    await account('p2')
+    await playLastWeek('p1', 1)
+    await playLastWeek('p2', 2)
+    await refreshWeeklyTop({ db, now: NOW })
+    // One seal on top of the one they had: a second scroll
+    const won = (await db.doc('users/p1').get()).data().scrolls
+    expect(won.seals).toBe(0)
+    expect(won.unlocked).toHaveLength(2)
+    expect(won.unlocked[0]).toBe('continents-1858')
+    expect((await db.doc('users/p2').get()).data().scrolls).toBeUndefined()
+    // A second run pays nothing more
+    await refreshWeeklyTop({ db, now: NOW + 3600 * 1000 })
+    expect((await db.doc('users/p1').get()).data().scrolls).toEqual(won)
+  })
+
+  it('banks the seal of a champion without any scroll, after the starter', async () => {
+    await account('p1')
+    await playLastWeek('p1', 1)
+    await refreshWeeklyTop({ db, now: NOW })
+    expect((await db.doc('users/p1').get()).data().scrolls).toEqual({ unlocked: ['continents-1858'], seals: 1 })
+  })
+
   it('counts a first win from 1, and a second run does not count it twice', async () => {
     await account('p1')
     await playLastWeek('p1', 1)

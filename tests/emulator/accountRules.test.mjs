@@ -309,6 +309,14 @@ describe('flag collection and mastery', () => {
     await assertFails(claim(as('bob'), 'bob', 'Bob', { user: { flags } }))
   })
 
+  it('refuses the player writing their own scrolls, alone or along with something they may write', async () => {
+    const scrolls = { unlocked: ['continents-1858', 'turin-papyrus'], seals: 1 }
+    await assertFails(as('alice').doc('users/alice').update({ scrolls }))
+    await assertFails(as('alice').doc('users/alice').update({ scrolls, badges: { top: [], count: 0 } }))
+    await assertFails(as('alice').doc('users/alice').update({ 'scrolls.seals': 4 }))
+    await assertFails(claim(as('bob'), 'bob', 'Bob', { user: { scrolls } }))
+  })
+
   it('refuses any client writing the mastery, and lets anyone read it', async () => {
     const mastery = { placement: ['France'], flags: [], hardcore: [], updatedAt: 1 }
     await assertFails(as('alice').doc('mastery/alice').set(mastery))

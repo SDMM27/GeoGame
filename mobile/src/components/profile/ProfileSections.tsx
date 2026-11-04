@@ -226,6 +226,7 @@ export function AchievementsSection({ achievements, scope, uid }: { achievements
   const byUid: Record<string, { wins?: number } | undefined> = useBadges([uid])
   const wins = (uid ? byUid[uid]?.wins : 0) ?? 0
   const [expanded, setExpanded] = useState(false)
+  const [selected, setSelected] = useState<Achievement | null>(null)
   const unlocked = achievements.filter((item) => item.unlocked).length
   const visible = expanded ? achievements : achievements.slice(0, 6)
   return (
@@ -250,14 +251,17 @@ export function AchievementsSection({ achievements, scope, uid }: { achievements
       )}
       <View style={[styles.grid, { marginBottom: space.md }]}>
         {visible.map((achievement) => (
-          <View
+          <Touchable
             key={achievement.id}
+            accessibilityRole="button"
+            accessibilityLabel={t(`achievements.${achievement.id}.title`)}
+            onPress={() => setSelected(achievement)}
             style={[styles.achievement, achievement.unlocked ? { borderColor: `${TIER_COLORS[achievement.tier]}88` } : { opacity: 0.55 }]}
           >
             <View style={[styles.achievementIcon, { backgroundColor: achievement.unlocked ? `${TIER_COLORS[achievement.tier]}26` : colors.surfaceHigh }]}>
               <MaterialCommunityIcons name={achievement.icon} size={22} color={achievement.unlocked ? TIER_COLORS[achievement.tier] : colors.textFaint} />
             </View>
-            <Text variant="bodyStrong" numberOfLines={1} style={{ fontSize: 14 }}>
+            <Text variant="bodyStrong" numberOfLines={2} style={{ fontSize: 14 }}>
               {t(`achievements.${achievement.id}.title`)}
             </Text>
             <Text variant="caption" numberOfLines={2} style={{ fontSize: 12, lineHeight: 16 }}>
@@ -276,7 +280,7 @@ export function AchievementsSection({ achievements, scope, uid }: { achievements
                 </Text>
               </View>
             )}
-          </View>
+          </Touchable>
         ))}
       </View>
       {achievements.length > 6 && (
@@ -284,7 +288,52 @@ export function AchievementsSection({ achievements, scope, uid }: { achievements
           <LinkButton label={expanded ? t('profile.show_less') : t('profile.history_all')} onPress={() => setExpanded((value) => !value)} />
         </View>
       )}
+      {selected && <AchievementModal achievement={selected} onClose={() => setSelected(null)} />}
     </CollapsibleSection>
+  )
+}
+
+// One achievement in full: the cards of the grid cut long titles and descriptions short.
+function AchievementModal({ achievement, onClose }: { achievement: Achievement; onClose: () => void }) {
+  const { t } = useTranslation()
+  const color = TIER_COLORS[achievement.tier]
+  return (
+    <Modal transparent visible animationType="fade" onRequestClose={onClose}>
+      <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel={t('profile.details.close')}>
+        <Pressable style={[styles.sheet, { alignItems: 'center' }]} onPress={(event) => event.stopPropagation()}>
+          <View style={[styles.achievementBig, { backgroundColor: achievement.unlocked ? `${color}26` : colors.surfaceHigh, borderColor: achievement.unlocked ? color : colors.border }]}>
+            <MaterialCommunityIcons name={achievement.icon} size={40} color={achievement.unlocked ? color : colors.textFaint} />
+            {achievement.unlocked && (
+              <View style={[styles.chipBadge, { width: 22, height: 22, borderRadius: 11, backgroundColor: colors.accent }]}>
+                <MaterialCommunityIcons name="check" size={14} color={colors.bg} />
+              </View>
+            )}
+          </View>
+          <Text variant="caption" color={color} style={{ textTransform: 'uppercase', fontWeight: '700' }}>
+            {t(`achievements.tiers.${achievement.tier}`)}
+          </Text>
+          <Text variant="heading" style={{ textAlign: 'center' }}>
+            {t(`achievements.${achievement.id}.title`)}
+          </Text>
+          <Text variant="body" color={colors.textMuted} style={{ textAlign: 'center' }}>
+            {t(`achievements.${achievement.id}.desc`)}
+          </Text>
+          {!achievement.unlocked && achievement.target > 1 && (
+            <View style={{ alignSelf: 'stretch', gap: space.xs }}>
+              <View style={styles.track}>
+                <View style={[styles.bar, { width: `${(achievement.progress / achievement.target) * 100}%` }]} />
+              </View>
+              <Text variant="caption" style={{ textAlign: 'center' }}>
+                {achievement.progress}/{achievement.target}
+              </Text>
+            </View>
+          )}
+          <View style={{ alignSelf: 'stretch' }}>
+            <Button label={t('profile.details.close')} variant="secondary" onPress={onClose} />
+          </View>
+        </Pressable>
+      </Pressable>
+    </Modal>
   )
 }
 
@@ -684,6 +733,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   achievementIcon: { width: 40, height: 40, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center', marginBottom: space.xs },
+  achievementBig: { width: 72, height: 72, borderRadius: radius.lg, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
   track: { height: 4, borderRadius: 2, backgroundColor: colors.border, overflow: 'hidden' },
   bar: { height: 4, borderRadius: 2, backgroundColor: colors.warning },
   recordsRow: { flexDirection: 'row', gap: 4 },

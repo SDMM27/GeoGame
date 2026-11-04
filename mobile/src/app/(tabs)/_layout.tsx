@@ -1,10 +1,16 @@
 import { NativeTabs } from 'expo-router/unstable-native-tabs'
 import { useTranslation } from 'react-i18next'
 
+import { useFriendships } from '@shared/hooks/usePlayerProfile'
+
+import { useAccount } from '@/account/auth'
 import { colors } from '@/theme'
 
 export default function TabsLayout() {
   const { t } = useTranslation()
+  const { account } = useAccount()
+  // Friend requests waiting for an answer: a badge on the Profile tab, which leads to the friends screen.
+  const requests = useFriendships(account?.uid).incoming.length
   return (
     <NativeTabs
       backgroundColor={colors.bg}
@@ -26,6 +32,7 @@ export default function TabsLayout() {
       <NativeTabs.Trigger name="profile">
         <NativeTabs.Trigger.Icon sf={{ default: 'person.crop.circle', selected: 'person.crop.circle.fill' }} md="account_circle" />
         <NativeTabs.Trigger.Label>{t('mobile.tabs.profile')}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Badge hidden={requests === 0}>{String(requests)}</NativeTabs.Trigger.Badge>
       </NativeTabs.Trigger>
     </NativeTabs>
   )

@@ -1,0 +1,107 @@
+{
+  "ottoman-empire": {
+    "1481": {
+      "label": "1481",
+      "title": "En 1481",
+      "text": "À la mort de Mehmed II, conquérant de Constantinople, l'empire tient les Balkans et l'Anatolie."
+    },
+    "1520": {
+      "label": "1520",
+      "title": "Jusqu'en 1520",
+      "text": "Sélim Ier prend la Syrie, l'Égypte et le nord de la Mésopotamie."
+    },
+    "1566": {
+      "label": "1566",
+      "title": "Jusqu'en 1566",
+      "text": "Sous Soliman le Magnifique : la Hongrie, l'Irak et le littoral nord-africain. Plusieurs de ces régions sont des États tributaires, comme la Transylvanie ou Tripoli."
+    },
+    "1683": {
+      "label": "1683",
+      "title": "Jusqu'en 1683",
+      "text": "Chypre, la Crète, la Podolie et les côtes d'Arabie. Cette année-là, l'échec devant Vienne marque le début du recul en Europe."
+    },
+    "_note": "Le tracé suit l'atlas de Shepherd (1923) : ses limites sont approximatives, et la carte s'arrête au sud de l'Égypte et de la Libye."
+  },
+  "rome-395": {
+    "gaul": {
+      "label": "Gaules",
+      "title": "Préfecture des Gaules",
+      "text": "Après la mort de Théodose Ier en 395, la moitié occidentale de l'Empire revient à Honorius. Elle compte la préfecture des Gaules : Bretagne, Gaules, Espagne et Maurétanie Tingitane."
+    },
+    "italy": {
+      "label": "Italie",
+      "title": "Préfecture d'Italie",
+      "text": "Elle comprend l'Italie, l'Afrique du Nord et une partie des provinces du Danube. Avec les Gaules, elle forme la moitié occidentale, sous Honorius."
+    },
+    "illyricum": {
+      "label": "Illyrie",
+      "title": "Préfecture d'Illyrie",
+      "text": "Les diocèses de Macédoine et de Dacie forment, sur la carte, une préfecture à part, entre les deux moitiés de l'Empire ; leur rattachement fut disputé entre les deux cours."
+    },
+    "east": {
+      "label": "Orient",
+      "title": "Préfecture d'Orient",
+      "text": "De la Thrace à l'Égypte, avec Constantinople : c'est la moitié orientale de l'Empire, confiée à Arcadius."
+    },
+    "_note": "Le tracé suit l'atlas de Shepherd (The Roman Empire about 395, 1923) ; il est approximatif. La carte s'arrête aux limites de l'Empire : le reste du monde n'y figure pas, et les régions pâles ou ombrées (reliefs) sont parfois mal rendues."
+  },
+  "caliphate-750": {
+    "632": {
+      "label": "632",
+      "title": "Les conquêtes jusqu'à la mort de Mahomet",
+      "text": "À la mort de Mahomet en 632, l'Arabie est passée sous l'autorité de la nouvelle communauté musulmane, par la persuasion comme par les armes."
+    },
+    "656": {
+      "label": "632-656",
+      "title": "Sous les trois premiers califes",
+      "text": "Les armées arabes conquièrent par la force la Syrie, l'Égypte, la Mésopotamie et la Perse, et atteignent la Cyrénaïque, prises à l'Empire byzantin et à l'Empire perse."
+    },
+    "750": {
+      "label": "661-750",
+      "title": "Sous les califes omeyyades",
+      "text": "Par de nouvelles campagnes, le califat s'étend jusqu'au Maghreb, à l'Espagne, à l'Asie centrale et au Sind, et forme alors un vaste empire."
+    },
+    "_note": "Le tracé suit l'atlas de Shepherd (The Califate in 750) ; il est approximatif. La carte ne couvre que le monde méditerranéen et l'Asie occidentale : le reste du monde n'y figure pas."
+  },
+  "mongol-dominions": {
+    "1300": {
+      "label": "Mongols, 1300",
+      "title": "Les domaines mongols vers 1300",
+      "text": "Né des conquêtes de Gengis Khan, l'empire mongol s'étend alors de la Chine à la Russie et à la Perse, partagé entre quatre khanats. Ces conquêtes ont été extrêmement meurtrières."
+    },
+    "1405": {
+      "label": "Timur, 1405",
+      "title": "L'empire de Timur en 1405",
+      "text": "Depuis Samarcande, Timur (Tamerlan) a conquis la Perse et l'Asie centrale, et mené des campagnes jusqu'en Inde. Ses guerres ont fait de nombreux morts, et son empire ne lui a pas survécu."
+    },
+    "_note": "Le tracé suit l'atlas de Shepherd (Mongol dominions, 1300-1405) ; il est approximatif."
+  },
+  "russia-growth": {
+    "1300": {
+      "label": "1300",
+      "title": "Vers 1300",
+      "text": "La principauté de Moscou est alors un petit territoire qui verse tribut à la Horde d'Or."
+    },
+    "1462": {
+      "label": "1462",
+      "title": "En 1462",
+      "text": "Le grand-duché de Moscou, que la carte appelle « Grande Russie », s'est étendu autour de sa capitale."
+    },
+    "1584": {
+      "label": "1584",
+      "title": "Jusqu'en 1584",
+      "text": "Sous Ivan III, Vassili III et Ivan IV, Moscou annexe Novgorod, Tver, Riazan, puis les khanats de Kazan et d'Astrakhan. Cette croissance se fait souvent par la guerre et aux dépens d'autres peuples."
+    },
+    "1725": {
+      "label": "1725",
+      "title": "Jusqu'en 1725",
+      "text": "L'Ukraine à l'est du Dniepr, cédée par la Pologne en 1667, puis l'Ingrie, l'Estonie et la Livonie, prises à la Suède sous Pierre le Grand."
+    },
+    "1796": {
+      "label": "1796",
+      "title": "Jusqu'en 1796",
+      "text": "Sous Catherine II, la Russie annexe la Crimée (1783) et la côte nord de la mer Noire. Par les trois partages de la Pologne (1772-1795), elle prend des terres aujourd'hui en Biélorussie, en Lituanie, en Lettonie et en Ukraine."
+    },
+    "_note": "Le tracé suit un atlas américain de 1923 (Shepherd) : ses limites sont approximatives, et il ne couvre que la Russie d'Europe, pas la Sibérie. Ces frontières appartiennent au passé et ne disent rien de celles d'aujourd'hui."
+  }
+}

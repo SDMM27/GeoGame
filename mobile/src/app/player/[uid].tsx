@@ -14,6 +14,7 @@ import { fetchPlayer } from '@shared/utils/friends'
 import { useAccount } from '@/account/auth'
 import { FriendAction } from '@/components/profile/FriendAction'
 import { FlagCollection } from '@/components/profile/FlagCollection'
+import { ScrollCollection } from '@/components/profile/ScrollCollection'
 import { LevelBar } from '@/components/profile/LevelBar'
 import { Avatar, ProfileBody } from '@/components/profile/ProfileSections'
 import { ScreenHeader } from '@/components/ScreenHeader'
@@ -77,7 +78,12 @@ export default function PlayerScreen() {
           <FriendAction player={player} />
           <ProfileBody
             uid={player.uid}
-            collection={<FlagCollection uid={player.uid} />}
+            collection={
+              <>
+                <FlagCollection uid={player.uid} />
+                <ScrollCollection uid={player.uid} />
+              </>
+            }
             onSeeHistory={() => router.push({ pathname: '/history', params: { uid: player.uid, username: player.username } })}
           />
         </>

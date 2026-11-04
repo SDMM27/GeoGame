@@ -1,0 +1,68 @@
+{
+  "entry": {
+    "center": [30, 35],
+    "zoom": 3,
+    "stages": [
+      { "id": "632", "color": "#8E7CC3" },
+      { "id": "656", "color": "#7FB069" },
+      { "id": "750", "color": "#D9596B" }
+    ],
+    "cumulative": true
+  },
+  "texts": {
+    "fr": {
+      "632": { "label": "632", "title": "Les conquêtes jusqu'à la mort de Mahomet", "text": "À la mort de Mahomet en 632, l'Arabie est passée sous l'autorité de la nouvelle communauté musulmane, par la persuasion comme par les armes." },
+      "656": { "label": "632-656", "title": "Sous les trois premiers califes", "text": "Les armées arabes conquièrent par la force la Syrie, l'Égypte, la Mésopotamie et la Perse, et atteignent la Cyrénaïque, prises à l'Empire byzantin et à l'Empire perse." },
+      "750": { "label": "661-750", "title": "Sous les califes omeyyades", "text": "Par de nouvelles campagnes, le califat s'étend jusqu'au Maghreb, à l'Espagne, à l'Asie centrale et au Sind, et forme alors un vaste empire." },
+      "_note": "Le tracé suit l'atlas de Shepherd (The Califate in 750) ; il est approximatif. La carte ne couvre que le monde méditerranéen et l'Asie occidentale : le reste du monde n'y figure pas."
+    },
+    "en": {
+      "632": { "label": "632", "title": "Conquests up to the death of Muhammad", "text": "By the death of Muhammad in 632, Arabia had come under the authority of the new Muslim community, through persuasion as well as force of arms." },
+      "656": { "label": "632-656", "title": "Under the first three caliphs", "text": "Arab armies conquered Syria, Egypt, Mesopotamia and Persia by force, and reached Cyrenaica, taking land from the Byzantine and Persian empires." },
+      "750": { "label": "661-750", "title": "Under the Umayyad caliphs", "text": "Further campaigns carried the caliphate to the Maghreb, Spain, Central Asia and Sind, forming a vast empire." },
+      "_note": "The outline follows Shepherd's atlas (The Califate in 750) and is approximate. The map covers only the Mediterranean world and western Asia: the rest of the world is not shown."
+    },
+    "ru": {
+      "632": { "label": "632", "title": "Завоевания до смерти Мухаммеда", "text": "К моменту смерти Мухаммеда в 632 году Аравия оказалась под властью новой мусульманской общины, как путём убеждения, так и силой оружия." },
+      "656": { "label": "632-656", "title": "При первых трёх халифах", "text": "Арабские войска силой завоевали Сирию, Египет, Месопотамию и Персию и дошли до Киренаики, отняв земли у Византийской и Персидской империй." },
+      "750": { "label": "661-750", "title": "При халифах Омейядах", "text": "Новые походы довели границы халифата до Магриба, Испании, Средней Азии и Синда, и он стал огромной империей." },
+      "_note": "Контур следует атласу Шепарда (The Califate in 750) и приблизителен. Карта охватывает только Средиземноморье и Западную Азию: остальной мир на ней не показан."
+    },
+    "es": {
+      "632": { "label": "632", "title": "Conquistas hasta la muerte de Mahoma", "text": "A la muerte de Mahoma en 632, Arabia había quedado bajo la autoridad de la nueva comunidad musulmana, tanto por persuasión como por las armas." },
+      "656": { "label": "632-656", "title": "Con los tres primeros califas", "text": "Los ejércitos árabes conquistaron por la fuerza Siria, Egipto, Mesopotamia y Persia, y llegaron a la Cirenaica, tomando tierras a los imperios bizantino y persa." },
+      "750": { "label": "661-750", "title": "Con los califas omeyas", "text": "Nuevas campañas llevaron el califato hasta el Magreb, España, Asia central y el Sind, formando un vasto imperio." },
+      "_note": "El trazado sigue el atlas de Shepherd (The Califate in 750) y es aproximado. El mapa solo cubre el mundo mediterráneo y Asia occidental: el resto del mundo no aparece."
+    },
+    "pt": {
+      "632": { "label": "632", "title": "Conquistas até a morte de Maomé", "text": "Na morte de Maomé, em 632, a Arábia estava sob a autoridade da nova comunidade muçulmana, por persuasão e também pelas armas." },
+      "656": { "label": "632-656", "title": "Sob os três primeiros califas", "text": "Os exércitos árabes conquistaram pela força a Síria, o Egito, a Mesopotâmia e a Pérsia, e chegaram à Cirenaica, tomando terras dos impérios bizantino e persa." },
+      "750": { "label": "661-750", "title": "Sob os califas omíadas", "text": "Novas campanhas levaram o califado ao Magrebe, à Espanha, à Ásia Central e ao Sinde, formando um vasto império." },
+      "_note": "O traçado segue o atlas de Shepherd (The Califate in 750) e é aproximado. O mapa cobre apenas o mundo mediterrâneo e a Ásia Ocidental: o resto do mundo não aparece."
+    },
+    "de": {
+      "632": { "label": "632", "title": "Eroberungen bis zum Tod Mohammeds", "text": "Bis zum Tod Mohammeds im Jahr 632 war Arabien unter die Herrschaft der neuen muslimischen Gemeinschaft gekommen, durch Überzeugung wie durch Waffengewalt." },
+      "656": { "label": "632-656", "title": "Unter den ersten drei Kalifen", "text": "Arabische Heere eroberten mit Gewalt Syrien, Ägypten, Mesopotamien und Persien und erreichten die Kyrenaika, auf Kosten des Byzantinischen und des Persischen Reiches." },
+      "750": { "label": "661-750", "title": "Unter den Umayyaden-Kalifen", "text": "Weitere Feldzüge trugen das Kalifat bis in den Maghreb, nach Spanien, Zentralasien und Sindh und schufen ein riesiges Reich." },
+      "_note": "Die Umrisse folgen dem Atlas von Shepherd (The Califate in 750) und sind ungefähr. Die Karte zeigt nur die Mittelmeerwelt und Westasien: der Rest der Welt ist nicht dargestellt."
+    },
+    "it": {
+      "632": { "label": "632", "title": "Conquiste fino alla morte di Maometto", "text": "Alla morte di Maometto nel 632 l'Arabia era passata sotto l'autorità della nuova comunità musulmana, con la persuasione come con le armi." },
+      "656": { "label": "632-656", "title": "Sotto i primi tre califfi", "text": "Gli eserciti arabi conquistarono con la forza la Siria, l'Egitto, la Mesopotamia e la Persia e raggiunsero la Cirenaica, sottraendo terre agli imperi bizantino e persiano." },
+      "750": { "label": "661-750", "title": "Sotto i califfi omayyadi", "text": "Nuove campagne portarono il califfato fino al Maghreb, alla Spagna, all'Asia centrale e al Sind, formando un vasto impero." },
+      "_note": "Il tracciato segue l'atlante di Shepherd (The Califate in 750) ed è approssimativo. La carta copre solo il mondo mediterraneo e l'Asia occidentale: il resto del mondo non è rappresentato."
+    },
+    "uk": {
+      "632": { "label": "632", "title": "Завоювання до смерті Мухаммеда", "text": "До смерті Мухаммеда в 632 році Аравія опинилася під владою нової мусульманської громади, як шляхом переконання, так і силою зброї." },
+      "656": { "label": "632-656", "title": "За перших трьох халіфів", "text": "Арабські війська силою завоювали Сирію, Єгипет, Месопотамію та Персію й дійшли до Кіренаїки, відібравши землі в Візантійської та Перської імперій." },
+      "750": { "label": "661-750", "title": "За халіфів Омеядів", "text": "Нові походи довели межі халіфату до Магрибу, Іспанії, Середньої Азії та Сінду, і він став величезною імперією." },
+      "_note": "Контур наслідує атлас Шепгерда (The Califate in 750) і є наближеним. Карта охоплює лише Середземномор'я та Західну Азію: решта світу на ній не показана."
+    },
+    "nl": {
+      "632": { "label": "632", "title": "Veroveringen tot de dood van Mohammed", "text": "Bij de dood van Mohammed in 632 stond Arabië onder het gezag van de nieuwe moslimgemeenschap, zowel door overtuiging als met wapengeweld." },
+      "656": { "label": "632-656", "title": "Onder de eerste drie kaliefen", "text": "Arabische legers veroverden met geweld Syrië, Egypte, Mesopotamië en Perzië en bereikten Cyrenaica, ten koste van het Byzantijnse en het Perzische Rijk." },
+      "750": { "label": "661-750", "title": "Onder de Omajjaden-kaliefen", "text": "Nieuwe veldtochten brachten het kalifaat tot in de Maghreb, Spanje, Centraal-Azië en Sind en vormden een uitgestrekt rijk." },
+      "_note": "De omtrek volgt de atlas van Shepherd (The Califate in 750) en is bij benadering. De kaart toont alleen de Middellandse Zee-wereld en West-Azië: de rest van de wereld staat er niet op."
+    }
+  }
+}

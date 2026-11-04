@@ -1,0 +1,107 @@
+{
+  "ottoman-empire": {
+    "1481": {
+      "label": "1481",
+      "title": "Im Jahr 1481",
+      "text": "Beim Tod Mehmeds II., des Eroberers von Konstantinopel, beherrscht das Reich den Balkan und Anatolien."
+    },
+    "1520": {
+      "label": "1520",
+      "title": "Bis 1520",
+      "text": "Selim I. nimmt Syrien, Ägypten und das nördliche Mesopotamien ein."
+    },
+    "1566": {
+      "label": "1566",
+      "title": "Bis 1566",
+      "text": "Unter Süleyman dem Prächtigen: Ungarn, der Irak und die nordafrikanische Küste. Mehrere dieser Gebiete sind Tributstaaten, etwa Siebenbürgen oder Tripolis."
+    },
+    "1683": {
+      "label": "1683",
+      "title": "Bis 1683",
+      "text": "Zypern, Kreta, Podolien und die Küsten Arabiens. In diesem Jahr markiert das Scheitern vor Wien den Beginn des Rückzugs aus Europa."
+    },
+    "_note": "Die Grenzen folgen dem Atlas von Shepherd (1923): Sie sind ungefähr, und die Karte endet südlich von Ägypten und Libyen."
+  },
+  "rome-395": {
+    "gaul": {
+      "label": "Gallien",
+      "title": "Präfektur Gallien",
+      "text": "Nach dem Tod von Theodosius I. im Jahr 395 fiel die westliche Reichshälfte an Honorius. Zu ihr gehört die Präfektur Gallien: Britannien, Gallien, Spanien und Mauretania Tingitana."
+    },
+    "italy": {
+      "label": "Italien",
+      "title": "Präfektur Italien",
+      "text": "Sie umfasst Italien, Nordafrika und einen Teil der Donauprovinzen. Zusammen mit Gallien bildet sie die westliche Hälfte unter Honorius."
+    },
+    "illyricum": {
+      "label": "Illyricum",
+      "title": "Präfektur Illyricum",
+      "text": "Die Diözesen Makedonien und Dakien bilden auf der Karte eine eigene Präfektur zwischen den beiden Reichshälften; zu welchem Hof sie gehörten, war umstritten."
+    },
+    "east": {
+      "label": "Osten",
+      "title": "Präfektur Orient",
+      "text": "Von Thrakien bis Ägypten, mit Konstantinopel: Das ist die östliche Reichshälfte unter Arcadius."
+    },
+    "_note": "Der Umriss folgt dem Atlas von Shepherd (The Roman Empire about 395, 1923) und ist ungefähr. Die Karte endet an den Reichsgrenzen: Der Rest der Welt ist nicht abgebildet, und blasse oder schattierte (Relief) Bereiche sind manchmal schlecht wiedergegeben."
+  },
+  "caliphate-750": {
+    "632": {
+      "label": "632",
+      "title": "Eroberungen bis zum Tod Mohammeds",
+      "text": "Bis zum Tod Mohammeds im Jahr 632 war Arabien unter die Herrschaft der neuen muslimischen Gemeinschaft gekommen, durch Überzeugung wie durch Waffengewalt."
+    },
+    "656": {
+      "label": "632-656",
+      "title": "Unter den ersten drei Kalifen",
+      "text": "Arabische Heere eroberten mit Gewalt Syrien, Ägypten, Mesopotamien und Persien und erreichten die Kyrenaika, auf Kosten des Byzantinischen und des Persischen Reiches."
+    },
+    "750": {
+      "label": "661-750",
+      "title": "Unter den Umayyaden-Kalifen",
+      "text": "Weitere Feldzüge trugen das Kalifat bis in den Maghreb, nach Spanien, Zentralasien und Sindh und schufen ein riesiges Reich."
+    },
+    "_note": "Die Umrisse folgen dem Atlas von Shepherd (The Califate in 750) und sind ungefähr. Die Karte zeigt nur die Mittelmeerwelt und Westasien: der Rest der Welt ist nicht dargestellt."
+  },
+  "mongol-dominions": {
+    "1300": {
+      "label": "Mongolen, 1300",
+      "title": "Die mongolischen Herrschaftsgebiete um 1300",
+      "text": "Aus den Eroberungen Dschingis Khans entstanden, reicht das Mongolenreich nun von China bis nach Russland und Persien und ist auf vier Khanate aufgeteilt. Diese Eroberungen waren äußerst blutig."
+    },
+    "1405": {
+      "label": "Timur, 1405",
+      "title": "Timurs Reich im Jahr 1405",
+      "text": "Von Samarkand aus eroberte Timur (Tamerlan) Persien und Zentralasien und zog bis nach Indien. Seine Kriege forderten viele Todesopfer, und sein Reich überdauerte ihn nicht."
+    },
+    "_note": "Der Verlauf folgt dem Atlas von Shepherd (Mongol dominions, 1300-1405) und ist ungefähr."
+  },
+  "russia-growth": {
+    "1300": {
+      "label": "1300",
+      "title": "Um 1300",
+      "text": "Das Fürstentum Moskau ist damals ein kleines Gebiet, das der Goldenen Horde Tribut zahlt."
+    },
+    "1462": {
+      "label": "1462",
+      "title": "1462",
+      "text": "Das Großfürstentum Moskau, das die Karte „Great Russia“ nennt, ist rund um seine Hauptstadt gewachsen."
+    },
+    "1584": {
+      "label": "1584",
+      "title": "Bis 1584",
+      "text": "Unter Iwan III., Wassili III. und Iwan IV. annektiert Moskau Nowgorod, Twer, Rjasan, dann die Khanate Kasan und Astrachan. Dieses Wachstum geschah oft durch Krieg und auf Kosten anderer Völker."
+    },
+    "1725": {
+      "label": "1725",
+      "title": "Bis 1725",
+      "text": "Der Teil der Ukraine östlich des Dnjepr, 1667 von Polen abgetreten, dann Ingermanland, Estland und Livland, unter Peter dem Großen Schweden abgenommen."
+    },
+    "1796": {
+      "label": "1796",
+      "title": "Bis 1796",
+      "text": "Unter Katharina II. annektiert Russland die Krim (1783) und die Nordküste des Schwarzen Meeres. Durch die drei Teilungen Polens (1772–1795) nimmt es Land, das heute in Belarus, Litauen, Lettland und der Ukraine liegt."
+    },
+    "_note": "Der Umriss folgt einem amerikanischen Atlas von 1923 (Shepherd): Seine Grenzen sind ungefähr, und er zeigt nur das europäische Russland, nicht Sibirien. Diese Grenzen gehören der Vergangenheit an und sagen nichts über die heutigen."
+  }
+}

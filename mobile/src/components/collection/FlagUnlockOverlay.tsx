@@ -28,6 +28,7 @@ import { onXpClaimed } from '@shared/utils/xp'
 import { useAccount } from '@/account/auth'
 import { flagsAfter, haptic, rarityColor, rarityOf, type Claim, type Rarity } from '@/components/collection/claim'
 import { FlagPiece } from '@/components/collection/FlagPiece'
+import { setFlagOverlayOpen } from '@/components/collection/busy'
 import { onReplayFlag } from '@/components/collection/replay'
 import { Button, Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
@@ -65,6 +66,8 @@ export function FlagUnlockOverlay() {
       onXpClaimed((claim: Claim) => {
         const isos = claim.unlockedFlags ?? []
         if (isos.length === 0) return
+        // Right away, so that the scroll reveal of the same claim waits for this overlay (busy.ts)
+        setFlagOverlayOpen(true)
         const flags = flagsAfter(claim, uid)
         const first = nextId.current
         nextId.current += isos.length
@@ -87,6 +90,12 @@ export function FlagUnlockOverlay() {
       }),
     [],
   )
+
+  const open = queue.length > 0
+  useEffect(() => {
+    setFlagOverlayOpen(open)
+  }, [open])
+  useEffect(() => () => setFlagOverlayOpen(false), [])
 
   const item = queue[0]
   if (!item) return null

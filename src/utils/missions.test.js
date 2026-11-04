@@ -44,6 +44,7 @@ import {
   WEEKLY_BONUS_FRAGMENTS,
   streakFragments,
 } from './flagCollection'
+import { LEVEL_SEAL_EVERY, WEEKLY_BONUS_SEALS } from './scrollCollection'
 
 // Monday 2026-10-19, 12:00 in Paris (UTC+2).
 const NOW = Date.UTC(2026, 9, 19, 10)
@@ -327,6 +328,41 @@ describe('XP', () => {
 
   it('pays no fragment for games alone', () => {
     expect(grantXp(fresh(), [game(), game()], NOW)).toMatchObject({ fragments: 0 })
+  })
+
+  it('pays a seal for the weekly bonus once, and none for the daily bonus', () => {
+    const games = everything()
+    const progress = missionsAt(games, NOW)
+    const day = progress.daily.map((entry) => entry.mission.id)
+    const weekIds = progress.weekly.map((entry) => entry.mission.id)
+    // Only the daily bonus is left to pay (about 220 XP, which stays under level 5)
+    const daily = grantXp({ ...fresh(), weekMissions: [...weekIds, BONUS_ID], dayGames: GAMES_PER_DAY }, games, NOW)
+    expect(daily.state.dayMissions).toContain(BONUS_ID)
+    expect(daily.state.level).toBeLessThan(LEVEL_SEAL_EVERY)
+    expect(daily.seals).toBe(0)
+    // Only the week is left: the bonus pays one seal, plus one for each multiple of 5 levels crossed
+    const weekly = grantXp({ ...fresh(), dayMissions: [...day, BONUS_ID], dayGames: GAMES_PER_DAY }, games, NOW)
+    expect(weekly.state.weekMissions).toContain(BONUS_ID)
+    expect(weekly.state.level).toBeGreaterThanOrEqual(LEVEL_SEAL_EVERY)
+    expect(weekly.seals).toBe(WEEKLY_BONUS_SEALS + Math.floor(weekly.state.level / LEVEL_SEAL_EVERY))
+    // Asking again pays nothing
+    expect(grantXp(readXp({ xp: weekly.state }, '2026-10-19', '2026-W43'), games, NOW)).toMatchObject({ gained: 0, seals: 0 })
+    // Missions short of the bonus pay no seal
+    expect(grantXp(fresh(), [game(), game()], NOW).seals).toBe(0)
+  })
+
+  it('pays a seal for each multiple of 5 levels crossed, once', () => {
+    expect(LEVEL_SEAL_EVERY).toBe(5)
+    // Stored XP that is `short` XP away from the start of `level`: one game (GAME_XP) crosses it when short <= GAME_XP.
+    const justBelow = (level) => {
+      const start = Array.from({ length: level - 1 }, (_, index) => levelCost(index + 1)).reduce((sum, cost) => sum + cost, 0)
+      return readXp({ xp: { total: start - GAME_XP } }, '2026-10-19', '2026-W43')
+    }
+    const to5 = grantXp(justBelow(5), [game()], NOW)
+    expect([justBelow(5).level, to5.state.level, to5.seals]).toEqual([4, 5, 1])
+    const to6 = grantXp(justBelow(6), [game()], NOW)
+    expect([justBelow(6).level, to6.state.level, to6.seals]).toEqual([5, 6, 0])
+    expect(grantXp(readXp({ xp: to5.state }, '2026-10-19', '2026-W43'), [game()], NOW).seals).toBe(0)
   })
 })
 

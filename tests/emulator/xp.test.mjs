@@ -8,7 +8,9 @@ import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { handleXp } from '../../api/_lib/xp.mjs'
 import countriesMeta from '../../src/data/countries.meta.json' with { type: 'json' }
 import { flagPool, piecesOf } from '../../src/utils/flagCollection.js'
-import { GAMES_PER_DAY, GAME_XP, grantXp, levelOf, missionDayAt, readXp, weekKeyOf } from '../../src/utils/missions.js'
+import { SCROLLS } from '../../src/data/scrolls.js'
+import { GAMES_PER_DAY, GAME_XP, grantXp, levelCost, levelOf, missionDayAt, readXp, weekKeyOf } from '../../src/utils/missions.js'
+import { STARTER_SCROLL } from '../../src/utils/scrollCollection.js'
 
 const POOL = flagPool(countriesMeta.features)
 const PROJECT = 'geogame-sdmm'
@@ -66,6 +68,10 @@ describe('requests', () => {
     expect(await call('carol')).toEqual({ status: 403, body: { error: 'no_account' } })
   })
 })
+
+// Total XP that is one game (GAME_XP) short of reaching `level`.
+const justBelow = (level) => Array.from({ length: level - 1 }, (_, index) => levelCost(index + 1)).reduce((sum, cost) => sum + cost, 0) - GAME_XP
+const scrollsOf = async (uid) => (await db.doc(`users/${uid}`).get()).data().scrolls
 
 describe('paying XP', () => {
   it('starts at level 1 with nothing to pay', async () => {
@@ -179,6 +185,38 @@ describe('paying XP', () => {
     expect(body.rewards.map((reward) => reward.kind)).toEqual(['dailies_all', 'dailies_won_3', 'dailies_won_all'])
     expect(body.xp.dayRewards).toEqual(['dailies_all', 'dailies_won_3', 'dailies_won_all'])
     expect((await call('alice')).body.rewards).toEqual([])
+  })
+
+  it('grants the starter scroll on the first claim, even with nothing earned, and never again', async () => {
+    const first = await call('alice')
+    expect(first.body).toMatchObject({ seals: 0, scrolls: { unlocked: [STARTER_SCROLL], seals: 0 }, unlockedScrolls: [STARTER_SCROLL] })
+    expect(await scrollsOf('alice')).toEqual({ unlocked: [STARTER_SCROLL], seals: 0 })
+    const again = await call('alice')
+    expect(again.body).toMatchObject({ seals: 0, scrolls: { unlocked: [STARTER_SCROLL], seals: 0 }, unlockedScrolls: [] })
+    expect(await scrollsOf('alice')).toEqual({ unlocked: [STARTER_SCROLL], seals: 0 })
+  })
+
+  it('pays a seal for reaching level 5, then unlocks a scroll with the second, each paid once', async () => {
+    await db.doc('users/alice').update({ xp: { total: justBelow(5), level: 4 } })
+    await addGames('alice', [{}])
+    const first = await call('alice')
+    expect(first.body.xp.level).toBe(5)
+    expect(first.body).toMatchObject({ seals: 1, scrolls: { unlocked: [STARTER_SCROLL], seals: 1 }, unlockedScrolls: [STARTER_SCROLL] })
+    expect(await scrollsOf('alice')).toEqual({ unlocked: [STARTER_SCROLL], seals: 1 })
+    expect(await call('alice')).toMatchObject({ body: { seals: 0, unlockedScrolls: [], scrolls: { seals: 1 } } })
+
+    await db.doc('users/alice').update({ 'xp.total': justBelow(10), 'xp.level': 9 })
+    await addGames('alice', [{}])
+    const second = await call('alice')
+    expect(second.body.xp.level).toBe(10)
+    expect(second.body.seals).toBe(1)
+    expect(second.body.unlockedScrolls).toHaveLength(1)
+    expect(second.body.unlockedScrolls[0]).not.toBe(STARTER_SCROLL)
+    const stored = await scrollsOf('alice')
+    expect(stored).toEqual({ unlocked: [STARTER_SCROLL, ...second.body.unlockedScrolls], seals: 0 })
+    expect(SCROLLS.map((scroll) => scroll.id)).toEqual(expect.arrayContaining(stored.unlocked))
+    expect(await call('alice')).toMatchObject({ body: { seals: 0, unlockedScrolls: [] } })
+    expect(await scrollsOf('alice')).toEqual(stored)
   })
 
   it('keeps the rest of the users document', async () => {

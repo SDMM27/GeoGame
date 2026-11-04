@@ -21,8 +21,10 @@ export function cachedXp(uid) {
 
 const claimListeners = new Set()
 
-// Called with { gained, levelUp, level, fragments, rewards, unlockedFlags } each time the server answered a claim (gained may be 0);
-// `rewards`: the fragments of the dailies and the streak, [{ kind, fragments, streak? }] (grantXp in missions.js).
+// Called with { gained, levelUp, level, fragments, rewards, unlockedFlags, seals, scrolls, unlockedScrolls } each time the server answered a
+// claim (gained may be 0); `rewards`: the fragments of the dailies and the streak, [{ kind, fragments, streak? }] (grantXp in
+// missions.js); `seals`: the scroll seals paid, `scrolls`: the account's scrolls after it ({ unlocked, seals }),
+// `unlockedScrolls`: the scrolls the seals (or the starter gift) opened.
 export function onXpClaimed(listener) {
   claimListeners.add(listener)
   return () => claimListeners.delete(listener)
@@ -34,7 +36,8 @@ if (typeof __DEV__ !== 'undefined' && __DEV__) globalThis.__emitXpClaimed = (cla
 let pushApi = null
 let inFlight = null
 
-// Asks the server to pay the signed-in player `uid`. Resolves with { xp, gained, levelUp, flags, fragments, rewards, unlockedFlags }, or null (signed out,
+// Asks the server to pay the signed-in player `uid`. Resolves with { xp, gained, levelUp, flags, fragments, rewards, unlockedFlags, seals,
+// scrolls, unlockedScrolls }, or null (signed out,
 // offline, refused). Calls made while one runs share it.
 export function claimXp(uid) {
   if (!uid) return Promise.resolve(null)
@@ -43,10 +46,21 @@ export function claimXp(uid) {
       pushApi ??= import('./pushApi')
       const response = await (await pushApi).callPush('xp', {})
       if (response?.status !== 200 || !response.body?.xp) return null
-      const { xp, gained, levelUp, flags, fragments, rewards, unlockedFlags } = response.body
-      patchPublicData(uid, flags ? { xp, flags } : { xp })
+      const { xp, gained, levelUp, flags, fragments, rewards, unlockedFlags, seals, scrolls, unlockedScrolls } = response.body
+      // An older server answers without flags or scrolls: keep what the cache holds
+      patchPublicData(uid, { xp, ...(flags && { flags }), ...(scrolls && { scrolls }) })
       claimListeners.forEach((listener) =>
-        listener({ gained, levelUp: Boolean(levelUp), level: xp.level, fragments: fragments ?? 0, rewards: rewards ?? [], unlockedFlags: unlockedFlags ?? [] })
+        listener({
+          gained,
+          levelUp: Boolean(levelUp),
+          level: xp.level,
+          fragments: fragments ?? 0,
+          rewards: rewards ?? [],
+          unlockedFlags: unlockedFlags ?? [],
+          seals: seals ?? 0,
+          scrolls: scrolls ?? null,
+          unlockedScrolls: unlockedScrolls ?? [],
+        })
       )
       return response.body
     } catch (error) {

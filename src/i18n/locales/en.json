@@ -608,6 +608,7 @@
     "score_label": "Right answers",
     "time_label": "Total time",
     "rounds_title": "Your 12 questions",
+    "player_rounds_title": "Their 12 questions",
     "col_score": "Score",
     "share_label": "RIGHT ANSWERS",
     "share_time": "Time: {{time}}",

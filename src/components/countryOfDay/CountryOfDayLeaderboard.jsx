@@ -4,12 +4,12 @@ import { useTranslation } from 'react-i18next'
 import { fetchCountryOfDayScores } from '../../utils/saveScore'
 import { formatTime } from '../../utils/formatTime'
 import { getLast7Days } from '../../utils/dateUtils'
-import { COUNTRY_OF_DAY_STEPS, countryOfDayShareLine } from '../../utils/countryOfDay'
+import { COUNTRY_OF_DAY_STEPS, COUNTRY_OF_DAY_STEP_EMOJI, COUNTRY_OF_DAY_TRIES } from '../../utils/countryOfDay'
 import { useAccount } from '../../auth'
 import { useLeaderboardRefresh } from '../../hooks/useLeaderboardRefresh'
 import PlayerName, { mineClass } from '../PlayerName'
 import '../../pages/DailyLeaderboard.css'
-import '../../pages/ChallengeLeaderboard.css'
+import '../../pages/ChallengeRoundList.css'
 
 const MEDAL = ['🥇', '🥈', '🥉']
 
@@ -31,7 +31,17 @@ function Row({ score, index, account }) {
           <p className="daily-lb__accordion-title">
             {t('country_of_day.mode_played', { mode: t(`country_of_day.mode_${score.mode === 'free' ? 'free' : 'choice'}`) })}
           </p>
-          <p className="challenge-lb__grid">{countryOfDayShareLine(score.steps)}</p>
+          <ol className="challenge-rounds">
+            {COUNTRY_OF_DAY_STEPS.map((step, i) => (
+              <li key={step} className={`challenge-round challenge-round--${score.steps[i] ? 'correct' : 'failed'}`}>
+                <span className="challenge-round-icon" aria-hidden="true">{COUNTRY_OF_DAY_STEP_EMOJI[step]}</span>
+                <span className="challenge-round-answer">{t(`country_of_day.step_${step}`)}</span>
+                <span className="challenge-round-result">
+                  {score.steps[i] ? `${score.steps[i]}/${COUNTRY_OF_DAY_TRIES} ✅` : '❌'}
+                </span>
+              </li>
+            ))}
+          </ol>
         </div>
       )}
     </div>

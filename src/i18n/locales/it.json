@@ -608,6 +608,7 @@
     "score_label": "Risposte esatte",
     "time_label": "Tempo totale",
     "rounds_title": "Le tue 12 domande",
+    "player_rounds_title": "Le sue 12 domande",
     "col_score": "Punteggio",
     "share_label": "RISPOSTE ESATTE",
     "share_time": "Tempo: {{time}}",

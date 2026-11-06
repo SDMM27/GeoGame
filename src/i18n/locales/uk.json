@@ -622,6 +622,7 @@
     "score_label": "Правильні відповіді",
     "time_label": "Загальний час",
     "rounds_title": "Твої 12 питань",
+    "player_rounds_title": "12 питань гравця",
     "col_score": "Рахунок",
     "share_label": "ПРАВИЛЬНИХ ВІДПОВІДЕЙ",
     "share_time": "Час: {{time}}",

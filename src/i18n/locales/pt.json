@@ -608,6 +608,7 @@
     "score_label": "Acertos",
     "time_label": "Tempo total",
     "rounds_title": "Suas 12 perguntas",
+    "player_rounds_title": "As 12 perguntas do jogador",
     "col_score": "Pontos",
     "share_label": "ACERTOS",
     "share_time": "Tempo: {{time}}",

@@ -608,6 +608,7 @@
     "score_label": "Richtige Antworten",
     "time_label": "Gesamtzeit",
     "rounds_title": "Deine 12 Fragen",
+    "player_rounds_title": "Die 12 Fragen",
     "col_score": "Punkte",
     "share_label": "RICHTIGE ANTWORTEN",
     "share_time": "Zeit: {{time}}",

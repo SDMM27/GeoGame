@@ -608,6 +608,7 @@
     "score_label": "Juiste antwoorden",
     "time_label": "Totale tijd",
     "rounds_title": "Jouw 12 vragen",
+    "player_rounds_title": "Hun 12 vragen",
     "col_score": "Score",
     "share_label": "JUISTE ANTWOORDEN",
     "share_time": "Tijd: {{time}}",

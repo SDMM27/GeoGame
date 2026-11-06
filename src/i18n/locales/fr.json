@@ -608,6 +608,7 @@
     "score_label": "Bonnes réponses",
     "time_label": "Temps total",
     "rounds_title": "Tes 12 questions",
+    "player_rounds_title": "Ses 12 questions",
     "col_score": "Score",
     "share_label": "BONNES RÉPONSES",
     "share_time": "Temps : {{time}}",

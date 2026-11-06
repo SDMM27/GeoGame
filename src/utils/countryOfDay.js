@@ -144,9 +144,9 @@ export function countryOfDayScore(steps, mode) {
   return steps.reduce((total, tries) => total + stepPoints(tries, mode), 0)
 }
 
-const STEP_EMOJI = { borders: '🧭', flag: '🏳️', capital: '🏛️', placement: '📍' }
+export const COUNTRY_OF_DAY_STEP_EMOJI = { borders: '🧭', flag: '🏳️', capital: '🏛️', placement: '📍' }
 
 /** One line per game to share: "🧭 2/3 · 🏳️ 1/3 · 🏛️ 1/3 · 📍 ❌". */
 export function countryOfDayShareLine(steps) {
-  return COUNTRY_OF_DAY_STEPS.map((step, i) => `${STEP_EMOJI[step]} ${steps[i] ? `${steps[i]}/${COUNTRY_OF_DAY_TRIES}` : '❌'}`).join(' · ')
+  return COUNTRY_OF_DAY_STEPS.map((step, i) => `${COUNTRY_OF_DAY_STEP_EMOJI[step]} ${steps[i] ? `${steps[i]}/${COUNTRY_OF_DAY_TRIES}` : '❌'}`).join(' · ')
 }

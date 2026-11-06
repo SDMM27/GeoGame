@@ -13,13 +13,13 @@ import useDailyChallengeState from '../hooks/useDailyChallengeState'
 import { useDailyPlayedElsewhere } from '../hooks/useDailyPlayedElsewhere'
 import { useAccount, useRecordGame } from '../auth'
 import { GAME_TYPES } from '../utils/gameTypes'
-import { CHALLENGE_ROUND_EMOJI, CHALLENGE_TIMER, challengeShareGrid } from '../utils/dailyChallenge'
+import { CHALLENGE_TIMER, challengeShareGrid } from '../utils/dailyChallenge'
 import { formatTime } from '../utils/formatTime'
-import { getCapitalName, getCountryName } from '../utils/getCountryName'
 import { SURVIVAL_ROUND_ICONS } from '../components/SurvivalOptions'
 import { DIFFICULTY_COLORS } from './quiz/constants'
 import { PlacementRound, TypedRound, roundAnswer } from './survival/SurvivalRounds'
 import ChallengeForm from './ChallengeForm'
+import ChallengeRoundList from './ChallengeRoundList'
 import ChallengeLeaderboard from './ChallengeLeaderboard'
 import 'leaflet/dist/leaflet.css'
 import './GamePage.css'
@@ -39,14 +39,6 @@ function Progress({ results, current }) {
       ))}
     </span>
   )
-}
-
-// What a round asked and its answer, for the result: "🏛️ Paris (France)"
-function answerLabel(round, lang, t) {
-  const answer = roundAnswer(round, lang, t)
-  if (round.type !== GAME_TYPES.CAPITALS) return answer
-  const p = round.country.properties
-  return `${answer} (${getCountryName(p.ISO_A2, lang) || p.ADMIN})`
 }
 
 function Playing({ challenge }) {
@@ -201,15 +193,7 @@ export default function DailyChallengePage() {
               <p className="challenge-time">{t('daily_challenge.time_label')} : <strong>{formatTime(elapsedTime)}</strong></p>
 
               <h3 className="challenge-rounds-title">{t('daily_challenge.rounds_title')}</h3>
-              <ol className="challenge-rounds">
-                {rounds.map((round, index) => (
-                  <li key={index} className={`challenge-round challenge-round--${results[index] === 'correct' ? 'correct' : 'failed'}`}>
-                    <span className="challenge-round-icon" title={t(`survival.round_type.${round.type}`)}>{CHALLENGE_ROUND_EMOJI[round.type]}</span>
-                    <span className="challenge-round-answer">{answerLabel(round, i18n.language, t)}</span>
-                    <span className="challenge-round-result">{results[index] === 'correct' ? '✅' : '❌'}</span>
-                  </li>
-                ))}
-              </ol>
+              <ChallengeRoundList rounds={rounds} rights={results.map((result) => result === 'correct')} />
               <p className="quiz-muted challenge-come-back">{t('daily_challenge.come_back')}</p>
             </section>
 

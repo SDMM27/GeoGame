@@ -622,6 +622,7 @@
     "score_label": "Правильные ответы",
     "time_label": "Общее время",
     "rounds_title": "Твои 12 вопросов",
+    "player_rounds_title": "12 вопросов игрока",
     "col_score": "Счёт",
     "share_label": "ПРАВИЛЬНЫХ ОТВЕТОВ",
     "share_time": "Время: {{time}}",

@@ -5,25 +5,21 @@ import { useTranslation } from 'react-i18next'
 import { fetchChallengeScores } from '../utils/saveScore'
 import { formatTime } from '../utils/formatTime'
 import { getLast7Days } from '../utils/dateUtils'
-import { CHALLENGE_ROUNDS, challengeShareGrid } from '../utils/dailyChallenge'
+import { CHALLENGE_ROUNDS } from '../utils/dailyChallenge'
 import { challengeRounds } from '../utils/dailyChallengeRounds'
+import ChallengeRoundList from './ChallengeRoundList'
 import { useAccount } from '../auth'
 import { useLeaderboardRefresh } from '../hooks/useLeaderboardRefresh'
 import PlayerName, { mineClass } from '../components/PlayerName'
 import './DailyLeaderboard.css'
-import './ChallengeLeaderboard.css'
 
 const MEDAL = ['🥇', '🥈', '🥉']
 
 function ChallengeRow({ score, index, account, rounds }) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
-  const grid = useMemo(
-    () => (Array.isArray(score.results) && score.results.length === rounds.length
-      ? challengeShareGrid(rounds, score.results.map((right) => (right ? 'correct' : 'failed')))
-      : null),
-    [score.results, rounds]
-  )
+  const hasRounds = Array.isArray(score.results) && rounds.length > 0 && score.results.length === rounds.length
+  const mine = Boolean(mineClass(score, account))
 
   return (
     <div className={`daily-lb__row${index < 3 ? ' daily-lb__row--top' : ''}${mineClass(score, account)}`}>
@@ -33,10 +29,10 @@ function ChallengeRow({ score, index, account, rounds }) {
         <span className="daily-lb__attempts">{score.score}/{CHALLENGE_ROUNDS}</span>
         <span className="daily-lb__time">{score.elapsedTime != null ? formatTime(score.elapsedTime) : '—'}</span>
       </div>
-      {open && grid && (
+      {open && hasRounds && (
         <div className="daily-lb__accordion">
-          <p className="daily-lb__accordion-title">{t('daily_challenge.rounds_title')}</p>
-          <p className="challenge-lb__grid">{grid}</p>
+          <p className="daily-lb__accordion-title">{t(mine ? 'daily_challenge.rounds_title' : 'daily_challenge.player_rounds_title')}</p>
+          <ChallengeRoundList rounds={rounds} rights={score.results} />
         </div>
       )}
     </div>

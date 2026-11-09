@@ -1115529,7 +1115529,9 @@
                 "ISO_A2": "ID",
                 "aliases": [],
                 "capital": "Jakarta",
-                "capitalAliases": [],
+                "capitalAliases": [
+                    "Nusantara"
+                ],
                 "DifficultyFlag": "Moyen",
                 "DifficultyMissingFlag": "Moyen",
                 "DifficultyCapitals": "Moyen",

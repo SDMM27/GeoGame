@@ -10,14 +10,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import useDailyChallengeState from '@shared/hooks/useDailyChallengeState'
 import { useDailyPlayedElsewhere } from '@shared/hooks/useDailyPlayedElsewhere'
-import { CHALLENGE_ROUND_EMOJI, CHALLENGE_TIMER, challengeShareGrid } from '@shared/utils/dailyChallenge'
+import { CHALLENGE_TIMER, challengeShareGrid } from '@shared/utils/dailyChallenge'
 import { formatTime } from '@shared/utils/formatTime'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
-import { getCountryName } from '@shared/utils/getCountryName'
 
 import { announce } from '@/a11y'
 import { useAccount } from '@/account/auth'
 import { ChallengeLeaderboard } from '@/components/game/ChallengeLeaderboard'
+import { ChallengeRoundList } from '@/components/game/ChallengeRoundList'
 import { DailyPlayedElsewhere } from '@/components/game/DailyPlayedElsewhere'
 import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
@@ -31,14 +31,6 @@ const ACCENT = gameColors.daily_challenge
 
 type Challenge = ReturnType<typeof useDailyChallengeState>
 type Result = 'correct' | 'failed' | null
-
-// What a round asked and its answer, for the result: "Paris (France)" for a capital
-function answerLabel(round: SurvivalRound, lang: string, t: Parameters<typeof roundAnswer>[2]) {
-  const answer = roundAnswer(round, lang, t)
-  if (round.type !== GAME_TYPES.CAPITALS || !round.country) return answer
-  const p = round.country.properties
-  return `${answer} (${getCountryName(p.ISO_A2, lang) || p.ADMIN})`
-}
 
 function Playing({ challenge }: { challenge: Challenge }) {
   const { t, i18n } = useTranslation()
@@ -187,7 +179,7 @@ function Rules({ challenge }: { challenge: Challenge }) {
 }
 
 function Done({ challenge }: { challenge: Challenge }) {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const { dailyKey, rounds, results, score, elapsedTime, total } = challenge
   const grid = useMemo(() => challengeShareGrid(rounds, results), [rounds, results])
   const time = formatTime(elapsedTime)
@@ -229,15 +221,7 @@ function Done({ challenge }: { challenge: Challenge }) {
           <Text variant="bodyStrong" style={{ alignSelf: 'flex-start' }}>
             {t('daily_challenge.rounds_title')}
           </Text>
-          {(rounds as SurvivalRound[]).map((round, index) => (
-            <View key={index} style={styles.resultRow}>
-              <Text variant="body">{CHALLENGE_ROUND_EMOJI[round.type as keyof typeof CHALLENGE_ROUND_EMOJI]}</Text>
-              <Text variant="body" numberOfLines={1} style={{ flex: 1 }}>
-                {answerLabel(round, i18n.language, t)}
-              </Text>
-              <Text variant="body">{results[index] === 'correct' ? '✅' : '❌'}</Text>
-            </View>
-          ))}
+          <ChallengeRoundList rounds={rounds as SurvivalRound[]} rights={results.map((result: Result) => result === 'correct')} />
           <Text variant="caption" style={{ textAlign: 'center', marginTop: space.sm }}>
             {t('daily_challenge.come_back')}
           </Text>
@@ -291,5 +275,4 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  resultRow: { flexDirection: 'row', alignItems: 'center', gap: space.md, alignSelf: 'stretch', minHeight: 28 },
 })

@@ -3,7 +3,7 @@ import { router } from 'expo-router'
 import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
 
-import { COUNTRY_OF_DAY_STEPS, countryOfDayShareLine } from '@shared/utils/countryOfDay'
+import { COUNTRY_OF_DAY_STEPS, COUNTRY_OF_DAY_STEP_EMOJI, COUNTRY_OF_DAY_TRIES } from '@shared/utils/countryOfDay'
 import { formatTime } from '@shared/utils/formatTime'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
 import { fetchCountryOfDayScores } from '@shared/utils/saveScore'
@@ -15,6 +15,7 @@ import { colors, radius, space } from '@/theme'
 import { Text } from '../ui'
 import { DecoratedName } from '../leaderboards/DecoratedName'
 import { ReportFlag } from '../leaderboards/ReportFlag'
+import { RoundItem, RoundList } from '../game/ChallengeRoundList'
 import { ExpandableRow } from '../game/ExpandableRow'
 import { visibleRows } from '../game/leaderboardRows'
 
@@ -33,7 +34,17 @@ export function CountryOfDayLeaderboard({ dailyKey, refreshKey, maxRows = DEFAUL
     return (
       <>
         {score.mode && <Text variant="caption">{t(`country_of_day.mode_${score.mode}`, { defaultValue: '' })}</Text>}
-        <Text variant="body">{countryOfDayShareLine(score.steps)}</Text>
+        <RoundList>
+          {COUNTRY_OF_DAY_STEPS.map((step: string, i: number) => (
+            <RoundItem
+              key={step}
+              icon={COUNTRY_OF_DAY_STEP_EMOJI[step as keyof typeof COUNTRY_OF_DAY_STEP_EMOJI]}
+              label={t(`country_of_day.step_${step}`)}
+              right={Boolean(score.steps![i])}
+              result={score.steps![i] ? `${score.steps![i]}/${COUNTRY_OF_DAY_TRIES} ✅` : '❌'}
+            />
+          ))}
+        </RoundList>
       </>
     )
   }

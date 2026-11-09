@@ -4,7 +4,7 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
 
-import { CHALLENGE_ROUNDS, challengeShareGrid } from '@shared/utils/dailyChallenge'
+import { CHALLENGE_ROUNDS } from '@shared/utils/dailyChallenge'
 import { challengeRounds } from '@shared/utils/dailyChallengeRounds'
 import { formatTime } from '@shared/utils/formatTime'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
@@ -13,8 +13,10 @@ import { fetchChallengeScores } from '@shared/utils/saveScore'
 import { useAccount } from '@/account/auth'
 import { useLeaderboard } from '@/hooks/useLeaderboard'
 import { loadErrorKey } from '@/leaderboards'
+import { type SurvivalRound } from '@/components/survival/SurvivalRounds'
 import { colors, radius, space } from '@/theme'
 import { Text } from '../ui'
+import { ChallengeRoundList } from './ChallengeRoundList'
 import { DecoratedName } from '../leaderboards/DecoratedName'
 import { ReportFlag } from '../leaderboards/ReportFlag'
 import { ExpandableRow } from './ExpandableRow'
@@ -49,14 +51,11 @@ export function ChallengeLeaderboard({
 
   const details = (score: ChallengeScore) => {
     if (!Array.isArray(score.results) || score.results.length !== rounds.length) return undefined
-    const grid = challengeShareGrid(
-      rounds,
-      score.results.map((right) => (right ? 'correct' : 'failed'))
-    )
+    const mine = Boolean(score.uid) && score.uid === account?.uid
     return (
       <>
-        <Text variant="label">{t('daily_challenge.rounds_title')}</Text>
-        <Text variant="body">{grid}</Text>
+        <Text variant="label">{t(mine ? 'daily_challenge.rounds_title' : 'daily_challenge.player_rounds_title')}</Text>
+        <ChallengeRoundList rounds={rounds as SurvivalRound[]} rights={score.results} />
       </>
     )
   }

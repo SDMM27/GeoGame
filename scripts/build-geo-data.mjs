@@ -21,7 +21,7 @@
 // A uniform tolerance keeps small countries recognisable (a percentage-based method reduces them to
 // a handful of points) while the large ones lose the bulk of their vertices.
 //
-// Run it again whenever the source dataset changes (scripts/add-gdp-data.cjs, populate-capitals.js...).
+// Run it again whenever the source dataset changes (scripts/add-gdp-data.cjs...).
 //
 // Countries under 6 000 km2 use a finer tolerance (100 m by default).
 //

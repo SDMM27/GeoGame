@@ -87,8 +87,10 @@ export default function VoyageVoyagePage() {
     setActiveSuggestion(-1)
   }
 
+  // A picked suggestion is submitted right away, as the Validate button would.
   const selectSuggestion = (name) => {
-    setInput(name)
+    submitGuess(name)
+    setInput('')
     setSuggestions([])
     setActiveSuggestion(-1)
     inputRef.current?.focus()

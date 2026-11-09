@@ -172,7 +172,7 @@ function AnswerInput({ survival, placeholder, onSubmit, autoSubmit = null, sugge
         {isPlaying && shown.length > 0 && (
           <div className="survival-suggestions">
             {shown.map((name) => (
-              <button key={name} type="button" className="survival-suggestion" onClick={() => { setValue(name); inputRef.current?.focus() }}>
+              <button key={name} type="button" className="survival-suggestion" onClick={() => { setValue(name); submit(name); inputRef.current?.focus() }}>
                 {name}
               </button>
             ))}

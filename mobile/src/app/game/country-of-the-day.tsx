@@ -36,6 +36,8 @@ import { colors, gameColors, radius, space } from '@/theme'
 
 const ACCENT = gameColors.country_of_day ?? gameColors.border_guess
 const STEP_COUNT = COUNTRY_OF_DAY_STEPS.length
+// Stable, so the input bar skips the timer's re-renders
+const NO_SUGGESTIONS: string[] = []
 
 type Game = ReturnType<typeof useCountryOfDayState>
 type Note = { stepIndex: number; kind: 'wrong' | 'unknown' | 'ignored' }
@@ -182,7 +184,7 @@ function Playing({ game }: { game: Game }) {
             value={text}
             onChangeText={setText}
             onSubmit={() => text.trim() && submit(text)}
-            suggestions={[]}
+            suggestions={NO_SUGGESTIONS}
             locked={false}
             placeholder={t(step === 'capital' ? 'country_of_day.placeholder_capital' : 'country_of_day.placeholder_country')}
             accent={ACCENT}

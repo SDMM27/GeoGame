@@ -423,7 +423,11 @@
     "code_placeholder": "CODICE",
     "create_title": "Crea una partita",
     "create_subtitle": "Scegli un gioco e invita i tuoi amici con il codice",
-    "recent_title": "Partite recenti"
+    "recent_title": "Partite recenti",
+    "kicker": "Terminal · Multigiocatore",
+    "desk_join": "Banco A · Check-in",
+    "desk_create": "Banco B · Nuovo volo",
+    "desk_recent": "Voli recenti"
   },
   "lobby": {
     "connecting": "Connessione..."
@@ -431,7 +435,8 @@
   "config": {
     "title": "Imposta la partita",
     "creating": "Creazione...",
-    "typing_tolerance_note": "⚠️ Nei giochi in cui si scrive (bandiere, capitali), la prima esitazione per paese è tollerata e non influisce sul punteggio: gli errori di battitura capitano!"
+    "typing_tolerance_note": "⚠️ Nei giochi in cui si scrive (bandiere, capitali), la prima esitazione per paese è tollerata e non influisce sul punteggio: gli errori di battitura capitano!",
+    "kicker": "Carta d'imbarco"
   },
   "stats": {
     "first_try": "🎯 Al primo colpo",
@@ -761,7 +766,9 @@
       "room": "Stanza",
       "open_room": "Apri la stanza",
       "close": "Chiudi"
-    }
+    },
+    "passport": "Passaporto",
+    "field_since": "Dal"
   },
   "friends": {
     "online": "Online",
@@ -1149,7 +1156,11 @@
     "next_game": "Avvia il gioco {{n}}",
     "waiting_next": "In attesa del prossimo gioco…",
     "round_n": "Round {{n}} / {{total}}",
-    "next_round_soon": "Il prossimo round tra un attimo…"
+    "next_round_soon": "Il prossimo round tra un attimo…",
+    "manifest": "Elenco passeggeri",
+    "col_player": "Giocatore",
+    "col_result": "Risultato",
+    "standings_kicker": "Tabellone arrivi"
   },
   "survival": {
     "spectating": "Stai guardando i giocatori ancora in gara",
@@ -1370,7 +1381,9 @@
     "win_reward_other": "+{{count}} frammenti di bandiera",
     "win_champion": "Titolo vinto: Campione della settimana",
     "win_cta": "Vedi la lega",
-    "win_close": "Chiudi"
+    "win_close": "Chiudi",
+    "season": "Stagione in corso",
+    "stamp_label": "Premio"
   },
   "decorations": {
     "title": "Personalizza",
@@ -1686,5 +1699,8 @@
       "nairobi": "Nairobi",
       "paris": "Parigi"
     }
+  },
+  "scores": {
+    "kicker": "Tabellone partenze"
   }
 }

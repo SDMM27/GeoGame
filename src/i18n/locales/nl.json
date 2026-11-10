@@ -423,7 +423,11 @@
     "code_placeholder": "CODE",
     "create_title": "Maak een spel",
     "create_subtitle": "Kies een spel en nodig je vrienden uit met de code",
-    "recent_title": "Recente spellen"
+    "recent_title": "Recente spellen",
+    "kicker": "Terminal · Multiplayer",
+    "desk_join": "Balie A · Inchecken",
+    "desk_create": "Balie B · Nieuwe vlucht",
+    "desk_recent": "Recente vluchten"
   },
   "lobby": {
     "connecting": "Verbinden..."
@@ -431,7 +435,8 @@
   "config": {
     "title": "Het spel instellen",
     "creating": "Aanmaken...",
-    "typing_tolerance_note": "⚠️ Bij typespellen (vlaggen, hoofdsteden) wordt de eerste aarzeling per land getolereerd en heeft die geen invloed op de score — typfouten gebeuren!"
+    "typing_tolerance_note": "⚠️ Bij typespellen (vlaggen, hoofdsteden) wordt de eerste aarzeling per land getolereerd en heeft die geen invloed op de score — typfouten gebeuren!",
+    "kicker": "Instapkaart"
   },
   "stats": {
     "first_try": "🎯 Eén tik",
@@ -761,7 +766,9 @@
       "room": "Kamer",
       "open_room": "Open de kamer",
       "close": "Sluiten"
-    }
+    },
+    "passport": "Paspoort",
+    "field_since": "Sinds"
   },
   "friends": {
     "online": "Online",
@@ -1149,7 +1156,11 @@
     "next_game": "Spel {{n}} starten",
     "waiting_next": "Wachten op het volgende spel…",
     "round_n": "Ronde {{n}} / {{total}}",
-    "next_round_soon": "Volgende ronde over een moment…"
+    "next_round_soon": "Volgende ronde over een moment…",
+    "manifest": "Passagierslijst",
+    "col_player": "Speler",
+    "col_result": "Resultaat",
+    "standings_kicker": "Aankomstbord"
   },
   "survival": {
     "spectating": "Je kijkt naar de spelers die nog in het spel zitten",
@@ -1370,7 +1381,9 @@
     "win_reward_other": "+{{count}} vlagfragmenten",
     "win_champion": "Titel behaald: Kampioen van de week",
     "win_cta": "Bekijk de competitie",
-    "win_close": "Sluiten"
+    "win_close": "Sluiten",
+    "season": "Huidig seizoen",
+    "stamp_label": "Beloning"
   },
   "decorations": {
     "title": "Personaliseren",
@@ -1686,5 +1699,8 @@
       "nairobi": "Nairobi",
       "paris": "Parijs"
     }
+  },
+  "scores": {
+    "kicker": "Vertrekbord"
   }
 }

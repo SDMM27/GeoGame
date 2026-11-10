@@ -423,7 +423,11 @@
     "code_placeholder": "CODE",
     "create_title": "Create a game",
     "create_subtitle": "Pick a game, then invite your friends with the code",
-    "recent_title": "Recent games"
+    "recent_title": "Recent games",
+    "kicker": "Terminal · Multiplayer",
+    "desk_join": "Desk A · Check-in",
+    "desk_create": "Desk B · New flight",
+    "desk_recent": "Recent flights"
   },
   "lobby": {
     "connecting": "Connecting..."
@@ -431,7 +435,8 @@
   "config": {
     "title": "Configure the game",
     "creating": "Creating...",
-    "typing_tolerance_note": "⚠️ For typing games (flags, capitals), the first hesitation per country is tolerated and doesn't affect the score — typos happen!"
+    "typing_tolerance_note": "⚠️ For typing games (flags, capitals), the first hesitation per country is tolerated and doesn't affect the score — typos happen!",
+    "kicker": "Boarding pass"
   },
   "stats": {
     "first_try": "🎯 One tap",
@@ -761,7 +766,9 @@
       "room": "Room",
       "open_room": "Open the room",
       "close": "Close"
-    }
+    },
+    "passport": "Passport",
+    "field_since": "Since"
   },
   "friends": {
     "online": "Online",
@@ -1149,7 +1156,11 @@
     "next_game": "Launch game {{n}}",
     "waiting_next": "Waiting for the next game…",
     "round_n": "Round {{n}} / {{total}}",
-    "next_round_soon": "Next round in a moment…"
+    "next_round_soon": "Next round in a moment…",
+    "manifest": "Passenger manifest",
+    "col_player": "Player",
+    "col_result": "Result",
+    "standings_kicker": "Arrivals board"
   },
   "survival": {
     "spectating": "Watching the players still in",
@@ -1370,7 +1381,9 @@
     "win_reward_other": "+{{count}} flag fragments",
     "win_champion": "Title won: Champion of the week",
     "win_cta": "See the league",
-    "win_close": "Close"
+    "win_close": "Close",
+    "season": "Current season",
+    "stamp_label": "Reward"
   },
   "decorations": {
     "title": "Customize",
@@ -1686,5 +1699,8 @@
       "nairobi": "Nairobi",
       "paris": "Paris"
     }
+  },
+  "scores": {
+    "kicker": "Departures board"
   }
 }

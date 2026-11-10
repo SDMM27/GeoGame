@@ -423,7 +423,11 @@
     "code_placeholder": "CÓDIGO",
     "create_title": "Criar uma partida",
     "create_subtitle": "Escolha um jogo e convide seus amigos com o código",
-    "recent_title": "Partidas recentes"
+    "recent_title": "Partidas recentes",
+    "kicker": "Terminal · Multijogador",
+    "desk_join": "Balcão A · Check-in",
+    "desk_create": "Balcão B · Voo novo",
+    "desk_recent": "Voos recentes"
   },
   "lobby": {
     "connecting": "Conectando..."
@@ -431,7 +435,8 @@
   "config": {
     "title": "Configurar a partida",
     "creating": "Criando...",
-    "typing_tolerance_note": "⚠️ Nos jogos de digitação (bandeiras, capitais), a primeira hesitação por país é tolerada e não afeta a pontuação: erros de digitação acontecem!"
+    "typing_tolerance_note": "⚠️ Nos jogos de digitação (bandeiras, capitais), a primeira hesitação por país é tolerada e não afeta a pontuação: erros de digitação acontecem!",
+    "kicker": "Cartão de embarque"
   },
   "stats": {
     "first_try": "🎯 De primeira",
@@ -761,7 +766,9 @@
       "room": "Sala",
       "open_room": "Abrir a sala",
       "close": "Fechar"
-    }
+    },
+    "passport": "Passaporte",
+    "field_since": "Desde"
   },
   "friends": {
     "online": "Online",
@@ -1149,7 +1156,11 @@
     "next_game": "Iniciar o jogo {{n}}",
     "waiting_next": "Esperando o próximo jogo…",
     "round_n": "Rodada {{n}} / {{total}}",
-    "next_round_soon": "Próxima rodada em instantes…"
+    "next_round_soon": "Próxima rodada em instantes…",
+    "manifest": "Manifesto de passageiros",
+    "col_player": "Jogador",
+    "col_result": "Resultado",
+    "standings_kicker": "Painel de chegadas"
   },
   "survival": {
     "spectating": "Assistindo aos jogadores que ainda estão no jogo",
@@ -1370,7 +1381,9 @@
     "win_reward_other": "+{{count}} fragmentos de bandeira",
     "win_champion": "Título conquistado: Campeão da semana",
     "win_cta": "Ver a liga",
-    "win_close": "Fechar"
+    "win_close": "Fechar",
+    "season": "Temporada atual",
+    "stamp_label": "Recompensa"
   },
   "decorations": {
     "title": "Personalizar",
@@ -1686,5 +1699,8 @@
       "nairobi": "Nairóbi",
       "paris": "Paris"
     }
+  },
+  "scores": {
+    "kicker": "Painel de partidas"
   }
 }

@@ -423,7 +423,11 @@
     "code_placeholder": "CODE",
     "create_title": "Spiel erstellen",
     "create_subtitle": "Wähle ein Spiel und lade deine Freunde mit dem Code ein",
-    "recent_title": "Letzte Spiele"
+    "recent_title": "Letzte Spiele",
+    "kicker": "Terminal · Mehrspieler",
+    "desk_join": "Schalter A · Check-in",
+    "desk_create": "Schalter B · Neuer Flug",
+    "desk_recent": "Letzte Flüge"
   },
   "lobby": {
     "connecting": "Verbinde..."
@@ -431,7 +435,8 @@
   "config": {
     "title": "Spiel einstellen",
     "creating": "Wird erstellt...",
-    "typing_tolerance_note": "⚠️ Bei Tippspielen (Flaggen, Hauptstädte) wird das erste Zögern pro Land toleriert und zählt nicht zur Punktzahl – Tippfehler passieren!"
+    "typing_tolerance_note": "⚠️ Bei Tippspielen (Flaggen, Hauptstädte) wird das erste Zögern pro Land toleriert und zählt nicht zur Punktzahl – Tippfehler passieren!",
+    "kicker": "Bordkarte"
   },
   "stats": {
     "first_try": "🎯 Auf Anhieb",
@@ -761,7 +766,9 @@
       "room": "Raum",
       "open_room": "Raum öffnen",
       "close": "Schließen"
-    }
+    },
+    "passport": "Reisepass",
+    "field_since": "Seit"
   },
   "friends": {
     "online": "Online",
@@ -1149,7 +1156,11 @@
     "next_game": "Spiel {{n}} starten",
     "waiting_next": "Warten auf das nächste Spiel…",
     "round_n": "Runde {{n}} / {{total}}",
-    "next_round_soon": "Gleich geht es mit der nächsten Runde weiter…"
+    "next_round_soon": "Gleich geht es mit der nächsten Runde weiter…",
+    "manifest": "Passagierliste",
+    "col_player": "Spieler",
+    "col_result": "Ergebnis",
+    "standings_kicker": "Ankunftstafel"
   },
   "survival": {
     "spectating": "Du schaust den verbliebenen Spielern zu",
@@ -1370,7 +1381,9 @@
     "win_reward_other": "+{{count}} Flaggenfragmente",
     "win_champion": "Titel gewonnen: Champion der Woche",
     "win_cta": "Liga ansehen",
-    "win_close": "Schließen"
+    "win_close": "Schließen",
+    "season": "Aktuelle Saison",
+    "stamp_label": "Belohnung"
   },
   "decorations": {
     "title": "Anpassen",
@@ -1686,5 +1699,8 @@
       "nairobi": "Nairobi",
       "paris": "Paris"
     }
+  },
+  "scores": {
+    "kicker": "Abflugtafel"
   }
 }

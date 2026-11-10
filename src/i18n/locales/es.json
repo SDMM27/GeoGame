@@ -423,7 +423,11 @@
     "code_placeholder": "CÓDIGO",
     "create_title": "Crear una partida",
     "create_subtitle": "Elige un juego e invita a tus amigos con el código",
-    "recent_title": "Partidas recientes"
+    "recent_title": "Partidas recientes",
+    "kicker": "Terminal · Multijugador",
+    "desk_join": "Mostrador A · Facturación",
+    "desk_create": "Mostrador B · Vuelo nuevo",
+    "desk_recent": "Vuelos recientes"
   },
   "lobby": {
     "connecting": "Conectando..."
@@ -431,7 +435,8 @@
   "config": {
     "title": "Configurar la partida",
     "creating": "Creando...",
-    "typing_tolerance_note": "⚠️ En los juegos de escritura (banderas, capitales), la primera duda por país se tolera y no afecta a la puntuación: ¡los errores de tecleo pasan!"
+    "typing_tolerance_note": "⚠️ En los juegos de escritura (banderas, capitales), la primera duda por país se tolera y no afecta a la puntuación: ¡los errores de tecleo pasan!",
+    "kicker": "Tarjeta de embarque"
   },
   "stats": {
     "first_try": "🎯 A la primera",
@@ -761,7 +766,9 @@
       "room": "Sala",
       "open_room": "Abrir la sala",
       "close": "Cerrar"
-    }
+    },
+    "passport": "Pasaporte",
+    "field_since": "Desde"
   },
   "friends": {
     "online": "En línea",
@@ -1149,7 +1156,11 @@
     "next_game": "Lanzar el juego {{n}}",
     "waiting_next": "Esperando el siguiente juego…",
     "round_n": "Ronda {{n}} / {{total}}",
-    "next_round_soon": "Siguiente ronda en un momento…"
+    "next_round_soon": "Siguiente ronda en un momento…",
+    "manifest": "Manifiesto de pasajeros",
+    "col_player": "Jugador",
+    "col_result": "Resultado",
+    "standings_kicker": "Panel de llegadas"
   },
   "survival": {
     "spectating": "Mirando a los jugadores que siguen en juego",
@@ -1370,7 +1381,9 @@
     "win_reward_other": "+{{count}} fragmentos de bandera",
     "win_champion": "Título ganado: Campeón de la semana",
     "win_cta": "Ver la liga",
-    "win_close": "Cerrar"
+    "win_close": "Cerrar",
+    "season": "Temporada actual",
+    "stamp_label": "Premio"
   },
   "decorations": {
     "title": "Personalizar",
@@ -1686,5 +1699,8 @@
       "nairobi": "Nairobi",
       "paris": "París"
     }
+  },
+  "scores": {
+    "kicker": "Panel de salidas"
   }
 }

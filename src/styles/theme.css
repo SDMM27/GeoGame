@@ -251,6 +251,16 @@ select {
   display: none !important;
 }
 
+/* Read by screen readers, not shown */
+.gg-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* Small mono caps used across the « carnet de vol » (flight codes, gates, board headers). */
 .gg-mono {
   font-family: var(--sd-font-mono);

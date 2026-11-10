@@ -7,10 +7,10 @@
 }
 
 .share-pseudo-input {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--gg-tint-strong);
+  border: 1px solid var(--sd-line);
   border-radius: 8px;
-  color: #ffffff;
+  color: var(--sd-ink);
   font-size: 14px;
   padding: 8px 14px;
   width: 240px;
@@ -18,19 +18,19 @@
 }
 
 .share-pseudo-input::placeholder {
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--sd-muted);
 }
 
 .share-pseudo-input:focus {
   outline: none;
-  border-color: var(--accent);
+  border-color: var(--sd-accent);
 }
 
 .share-score-btn {
-  background: linear-gradient(135deg, #0f2027, #2c5364);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--sd-surface-2);
+  border: 1px solid var(--sd-line);
   border-radius: 8px;
-  color: #ffffff;
+  color: var(--sd-ink);
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
@@ -54,10 +54,10 @@
 }
 
 .share-copy-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--gg-tint-strong);
+  border: 1px solid var(--sd-line);
   border-radius: 8px;
-  color: #ffffff;
+  color: var(--sd-ink);
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
@@ -71,8 +71,8 @@
 }
 
 .share-challenge-btn {
-  background: rgba(34, 211, 238, 0.14);
-  border-color: rgba(34, 211, 238, 0.5);
+  background: var(--gg-accent-soft);
+  border-color: var(--gg-accent-line);
 }
 
 .share-image-btn:disabled {

@@ -3,20 +3,19 @@ import React, { useEffect, useState } from 'react'
 import { Navigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import NavBar from '../components/NavBar'
-import ProfileBody, { Avatar } from '../components/profile/ProfileBody'
+import ProfileBody from '../components/profile/ProfileBody'
+import ProfileHeader from '../components/profile/ProfileHeader'
 import FlagCollection from '../components/profile/FlagCollection'
 import ScrollCollection from '../components/profile/ScrollCollection'
-import LevelBadge from '../components/profile/LevelBadge'
 import { useAccount } from '../auth'
 import { useFriendships } from '../hooks/usePlayerProfile'
 import FriendAction from '../components/profile/FriendAction'
 import { fetchPlayer } from '../utils/friends'
-import { decorationStyle } from '../utils/decorations'
 import { useDecoration } from '../hooks/useDecoration'
 import './AccountPage.css'
 
 export default function PlayerPage() {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const { uid } = useParams()
   const { account } = useAccount()
   const friendships = useFriendships(account?.uid)
@@ -45,21 +44,9 @@ export default function PlayerPage() {
           <p className="profile-muted profile-center">{t('profile.not_found')}</p>
         ) : (
           <>
-            <header className="profile-header">
-              <Avatar username={player.username} size={72} decoration={decoration} />
-              <div className="profile-header-text">
-                <h1 style={{ color: decorationStyle(decoration).nameColor ?? undefined }}>{player.username}</h1>
-                {player.createdAt && (
-                  <small>
-                    {t('profile.member_since', {
-                      date: new Date(player.createdAt).toLocaleDateString(i18n.language, { month: 'long', year: 'numeric' }),
-                    })}
-                  </small>
-                )}
-                <LevelBadge uid={player.uid} />
-                {isFriend && <span className="profile-friend-pill">✓ {t('friends.is_friend')}</span>}
-              </div>
-            </header>
+            <ProfileHeader player={player} decoration={decoration}>
+              {isFriend && <span className="profile-friend-pill">✓ {t('friends.is_friend')}</span>}
+            </ProfileHeader>
             <FriendAction account={account} player={player} friendships={friendships} />
             <ProfileBody
               uid={player.uid}

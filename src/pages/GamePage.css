@@ -5,7 +5,7 @@
   min-height: 100vh;
   min-height: 100dvh;
   overflow: hidden;
-  background: var(--bg-primary);
+  background: var(--sd-bg);
 }
 
 /* ── HUD container (top-left, stacks main + stats) ── */
@@ -27,10 +27,10 @@
 
 /* ── HUD Main block ── */
 .hud-main {
-  background: var(--bg-glass);
+  background: var(--gg-glass);
   backdrop-filter: blur(10px);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--sd-line);
+  border-radius: var(--sd-radius-md);
   padding: 10px 16px 10px;
 }
 
@@ -57,9 +57,11 @@
 }
 
 .hud-target-label {
-  font-size: 0.65rem;
-  color: var(--text-muted);
-  letter-spacing: 1px;
+  font-family: var(--sd-font-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: var(--sd-muted);
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -69,7 +71,7 @@
   align-items: center;
   font-size: 1rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--sd-ink);
   white-space: nowrap;
 }
 
@@ -81,20 +83,24 @@
 
 .hud-target-capital {
   font-size: 0.75rem;
-  color: var(--text-secondary);
+  color: var(--sd-muted);
 }
 
 .hud-value {
+  font-family: var(--sd-font-mono);
   font-size: 1.4rem;
-  font-weight: 900;
+  font-weight: 800;
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
 
 .hud-label {
-  font-size: 0.65rem;
-  color: var(--text-muted);
-  letter-spacing: 2px;
+  font-family: var(--sd-font-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: var(--sd-muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   margin-top: 2px;
 }
 
@@ -107,7 +113,7 @@
 
 .hud-progress-track {
   flex: 1;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--gg-tint-strong);
   border-radius: 4px;
   height: 6px;
   overflow: hidden;
@@ -115,24 +121,26 @@
 
 .hud-progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, var(--success), var(--accent));
+  background: linear-gradient(90deg, var(--gg-success), var(--sd-accent));
   border-radius: 4px;
   transition: width 0.4s ease;
 }
 
 .hud-progress-text {
-  font-size: 0.6rem;
-  color: var(--text-muted);
+  font-family: var(--sd-font-mono);
+  font-size: 0.66rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--sd-muted);
   white-space: nowrap;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.06em;
 }
 
 /* ── HUD Stats block ── */
 .hud-stats {
-  background: var(--bg-glass);
+  background: var(--gg-glass);
   backdrop-filter: blur(10px);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--gg-tint-strong);
+  border-radius: var(--sd-radius-md);
   padding: 8px 16px;
   display: flex;
   justify-content: space-around;
@@ -145,27 +153,32 @@
 }
 
 .hud-stat-value {
+  font-family: var(--sd-font-mono);
   font-size: 1.2rem;
-  font-weight: 900;
+  font-weight: 800;
   line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 
 .hud-stat-value--found {
-  color: var(--success);
+  color: var(--gg-success-strong);
 }
 
 .hud-stat-value--skipped {
-  color: var(--danger);
+  color: var(--gg-danger-strong);
 }
 
 .hud-stat-value--remaining {
-  color: var(--warning);
+  color: var(--gg-warning-strong);
 }
 
 .hud-stat-label {
-  font-size: 0.6rem;
-  color: var(--text-muted);
-  letter-spacing: 1.5px;
+  font-family: var(--sd-font-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: var(--sd-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   margin-top: 2px;
 }
 
@@ -182,46 +195,46 @@
 
 .hud-btn {
   padding: 10px 18px;
-  border-radius: var(--radius-md);
-  font-family: var(--font-main);
+  border-radius: var(--sd-radius-md);
+  font-family: var(--sd-font-sans);
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  background: var(--bg-glass);
+  background: var(--gg-glass);
   backdrop-filter: blur(10px);
   transition: background 0.2s, transform 0.1s;
-  border: 1px solid var(--border-subtle);
-  color: var(--text-muted);
+  border: 1px solid var(--gg-tint-strong);
+  color: var(--sd-muted);
 }
 
 .hud-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--gg-tint-strong);
   transform: translateY(-1px);
 }
 
 .hud-btn--home {
-  color: var(--accent);
-  border-color: var(--accent-border);
+  color: var(--sd-accent-strong);
+  border-color: var(--gg-accent-line);
 }
 
 .hud-btn--reveal {
-  color: #fff;
-  background: rgba(245, 184, 61, 0.18);
-  border-color: rgba(245, 184, 61, 0.6);
+  color: var(--sd-ink);
+  background: color-mix(in srgb, var(--gg-warning) 18%, transparent);
+  border-color: color-mix(in srgb, var(--gg-warning) 60%, transparent);
   font-size: 0.95rem;
   padding: 12px 24px;
   letter-spacing: 0.03em;
 }
 
 .hud-btn--reveal:hover {
-  background: rgba(245, 184, 61, 0.32);
-  border-color: rgba(245, 184, 61, 0.9);
+  background: color-mix(in srgb, var(--gg-warning) 32%, transparent);
+  border-color: color-mix(in srgb, var(--gg-warning) 90%, transparent);
   transform: translateY(-2px);
 }
 
 .hud-btn--restart {
-  color: var(--danger);
-  border-color: rgba(255, 122, 107, 0.3);
+  color: var(--gg-danger-strong);
+  border-color: color-mix(in srgb, var(--gg-danger) 30%, transparent);
 }
 
 /* ── Controls hint (top-right) ── */
@@ -230,10 +243,10 @@
   top: 16px;
   right: 16px;
   z-index: 1000;
-  background: var(--bg-glass);
+  background: var(--gg-glass);
   backdrop-filter: blur(10px);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--gg-tint-strong);
+  border-radius: var(--sd-radius-md);
   padding: 8px 12px;
   display: flex;
   flex-direction: column;
@@ -247,12 +260,13 @@
 }
 
 .controls-key {
-  font-size: 0.6rem;
+  font-family: var(--sd-font-mono);
+  font-size: 0.62rem;
   font-weight: 700;
   letter-spacing: 0.5px;
-  color: var(--accent);
-  background: rgba(61, 220, 151, 0.08);
-  border: 1px solid var(--accent-border);
+  color: var(--sd-accent-strong);
+  background: color-mix(in srgb, var(--gg-success) 8%, transparent);
+  border: 1px solid var(--gg-accent-line);
   border-radius: 4px;
   padding: 1px 5px;
   white-space: nowrap;
@@ -260,7 +274,7 @@
 
 .controls-desc {
   font-size: 0.6rem;
-  color: var(--text-muted);
+  color: var(--sd-muted);
   letter-spacing: 0.5px;
 }
 
@@ -278,7 +292,7 @@
   width: 100%;
   height: 100%;
   z-index: 2000;
-  background: rgba(11, 16, 32, 0.85);
+  background: var(--gg-scrim);
   backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
@@ -358,9 +372,12 @@
   .hud-btn--reveal {
     flex: 1 1 0;
     min-width: 0;
+    min-height: 44px;
     padding: 10px 4px;
-    font-size: 0.8rem;
+    font-size: clamp(0.7rem, 3.3vw, 0.8rem);
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .game-over-overlay {

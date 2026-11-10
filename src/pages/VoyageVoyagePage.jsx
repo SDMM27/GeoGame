@@ -17,6 +17,7 @@ import DailyPlayedElsewhere from '../components/DailyPlayedElsewhere'
 import countries from '../data/countriesWithDifficulty_FR.json'
 import { normalize } from '../utils/normalizeAnswer'
 import { getCountryName } from '../utils/getCountryName'
+import EndStamp from '../components/EndStamp'
 import 'react-toastify/dist/ReactToastify.css'
 import './VoyageVoyagePage.css'
 
@@ -189,8 +190,8 @@ export default function VoyageVoyagePage() {
         </div>
 
         <div className="voyage-stats">
-          <span>{stepsUsed} {stepsUsed === 1 ? t('units.step_one') : t('units.step_other')} · {t('labels.optimal')} {optimalLength}</span>
-          <span>{wrongGuesses.length} {wrongGuesses.length === 1 ? t('units.error_one') : t('units.error_other')}</span>
+          <span className="gg-mono">{stepsUsed} {stepsUsed === 1 ? t('units.step_one') : t('units.step_other')} · {t('labels.optimal')} {optimalLength}</span>
+          <span className="gg-mono">{wrongGuesses.length} {wrongGuesses.length === 1 ? t('units.error_one') : t('units.error_other')}</span>
           {mode === 'infinite' && !isGameOver && (
             <button
               className="voyage-regen-btn"
@@ -340,6 +341,9 @@ export default function VoyageVoyagePage() {
         <div className="voyage-modal-overlay">
           <div className="voyage-modal">
             <button className="voyage-modal-close" onClick={() => setShowModal(false)}>✕</button>
+
+            <EndStamp />
+            <p className="gg-kicker">{t('carnet_games.kicker_end')}</p>
 
             {isPerfect
               ? <p className="voyage-result-perfect">{t('voyage_voyage.perfect_path')}</p>

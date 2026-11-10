@@ -86,6 +86,7 @@ function Victory({ result, onClose }) {
         </div>
 
         <div className="league-victory-texts">
+          <p className="gg-kicker league-victory-kicker">{t('league.season')}</p>
           <h2 id="league-victory-title" className="league-victory-title">{title}</h2>
           <span className="league-victory-reward">{t('league.win_reward', { count: result.reward })}</span>
           {champion && <span className="league-victory-champion">{t('league.win_champion')}</span>}

@@ -1,7 +1,7 @@
 .leaderboard-save {
   margin-top: 12px;
   font-size: 0.9rem;
-  color: var(--text-muted);
+  color: var(--sd-muted);
   text-align: center;
 }
 
@@ -10,23 +10,23 @@
 }
 
 .leaderboard-save__ok {
-  color: var(--success);
+  color: var(--gg-success-strong);
 }
 
 .leaderboard-save__error {
-  color: var(--danger);
+  color: var(--gg-danger-strong);
   margin: 0 0 8px;
 }
 
 .leaderboard-save__hint {
   margin: 10px 0 0;
   font-size: 0.8rem;
-  color: var(--text-muted);
+  color: var(--sd-muted);
 }
 
 .leaderboard-save__hint a,
 .leaderboard-save__link {
-  color: var(--accent);
+  color: var(--sd-accent-strong);
 }
 
 .leaderboard-save__link {

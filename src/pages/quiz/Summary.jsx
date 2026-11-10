@@ -2,6 +2,7 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import ShareScoreButton from '../../components/ShareScoreButton'
+import EndStamp from '../../components/EndStamp'
 import { GAME_TYPES } from '../../utils/gameTypes'
 import { useRecordGame } from '../../auth'
 
@@ -24,11 +25,13 @@ export default function Summary({ stats, maxDifficulty, onRestart, onChangeDiffi
   )
   return (
     <section className="quiz-card quiz-summary">
+      <EndStamp />
+      <p className="gg-kicker">{t('carnet_games.kicker_end')}</p>
       <h2 className="quiz-card-title">{t('quiz.summary_title')}</h2>
       <div className="quiz-summary-stats">
-        <div><strong>{stats.score}</strong><small>{t('quiz.score')}</small></div>
-        <div><strong>{stats.correct}/{stats.answered}</strong><small>{t('quiz.correct_answers')}</small></div>
-        <div><strong>{stats.bestStreak}</strong><small>{t('quiz.best_streak')}</small></div>
+        <div className="gg-field"><small>{t('quiz.score')}</small><strong>{stats.score}</strong></div>
+        <div className="gg-field"><small>{t('quiz.correct_answers')}</small><strong>{stats.correct}/{stats.answered}</strong></div>
+        <div className="gg-field"><small>{t('quiz.best_streak')}</small><strong>{stats.bestStreak}</strong></div>
       </div>
       {recordable && stats.answered > 0 && (
         <ShareScoreButton

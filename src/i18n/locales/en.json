@@ -49,7 +49,34 @@
     "games_subtitle": "Pick a difficulty or a continent",
     "daily": "Daily",
     "infinite": "Infinite",
-    "multi": "Play multiplayer"
+    "multi": "Play multiplayer",
+    "hero_lead": "{{count}} challenges a day, a passport to fill, multiplayer rooms. The same world for everyone, in 9 languages.",
+    "next_departure": "Next departure",
+    "globe_score": "Score",
+    "board_cta": "Board today’s challenge",
+    "passes_title": "Today’s boarding passes",
+    "passes_note": "{{count}} flights · same challenges for all",
+    "boarding_pass": "Boarding pass",
+    "gate": "Gate",
+    "departure": "Departs",
+    "board": "Board",
+    "passport_title": "Your passport",
+    "passport_intro": "Every mission you complete stamps your passport: XP, levels, frames and colors to unlock. The weekly league hands out flag fragments.",
+    "passport_example": "Sample passport page",
+    "stamp_level": "Level",
+    "stamp_xp": "{{count}} XP",
+    "stamp_streak": "Streak",
+    "stamp_today": "Today",
+    "stamp_dailies": "Daily challenges",
+    "stamp_won": "Won",
+    "special_flight": "Special flight",
+    "board_title": "Departures board",
+    "col_destination": "Destination",
+    "col_brief": "In short",
+    "col_status": "Status",
+    "status_boarding": "Boarding",
+    "status_on_time": "On time",
+    "status_open": "Open"
   },
   "games": {
     "daily_challenge": {
@@ -350,7 +377,12 @@
   "not_found": {
     "title": "Page not found",
     "message": "This page does not exist or has been moved.",
-    "home": "Back to home"
+    "home": "Back to home",
+    "cancelled": "Flight cancelled",
+    "flight": "Flight",
+    "gate": "Gate",
+    "status": "Status",
+    "status_cancelled": "Cancelled"
   },
   "units": {
     "pt": "pt",
@@ -396,7 +428,11 @@
     "code_placeholder": "CODE",
     "create_title": "Create a game",
     "create_subtitle": "Pick a game, then invite your friends with the code",
-    "recent_title": "Recent games"
+    "recent_title": "Recent games",
+    "kicker": "Terminal · Multiplayer",
+    "desk_join": "Desk A · Check-in",
+    "desk_create": "Desk B · New flight",
+    "desk_recent": "Recent flights"
   },
   "lobby": {
     "connecting": "Connecting..."
@@ -404,7 +440,8 @@
   "config": {
     "title": "Configure the game",
     "creating": "Creating...",
-    "typing_tolerance_note": "⚠️ For typing games (flags, capitals), the first hesitation per country is tolerated and doesn't affect the score — typos happen!"
+    "typing_tolerance_note": "⚠️ For typing games (flags, capitals), the first hesitation per country is tolerated and doesn't affect the score — typos happen!",
+    "kicker": "Boarding pass"
   },
   "stats": {
     "first_try": "🎯 One tap",
@@ -734,7 +771,9 @@
       "room": "Room",
       "open_room": "Open the room",
       "close": "Close"
-    }
+    },
+    "passport": "Passport",
+    "field_since": "Since"
   },
   "friends": {
     "online": "Online",
@@ -1122,7 +1161,11 @@
     "next_game": "Launch game {{n}}",
     "waiting_next": "Waiting for the next game…",
     "round_n": "Round {{n}} / {{total}}",
-    "next_round_soon": "Next round in a moment…"
+    "next_round_soon": "Next round in a moment…",
+    "manifest": "Passenger manifest",
+    "col_player": "Player",
+    "col_result": "Result",
+    "standings_kicker": "Arrivals board"
   },
   "survival": {
     "spectating": "Watching the players still in",
@@ -1301,7 +1344,9 @@
     "leaderboards": "Rankings",
     "profile": "Profile",
     "main": "Main navigation",
-    "language": "Language"
+    "language": "Language",
+    "theme_light": "Switch to light mode",
+    "theme_dark": "Switch to dark mode"
   },
   "league": {
     "title": "Weekly league",
@@ -1341,7 +1386,9 @@
     "win_reward_other": "+{{count}} flag fragments",
     "win_champion": "Title won: Champion of the week",
     "win_cta": "See the league",
-    "win_close": "Close"
+    "win_close": "Close",
+    "season": "Current season",
+    "stamp_label": "Reward"
   },
   "decorations": {
     "title": "Customize",
@@ -1641,5 +1688,38 @@
     "title_ottoman-empire": "Ottoman Empire, 1481-1683",
     "title_russia-growth": "Growth of Russia, 1300-1796",
     "title_british-empire-1886": "British Empire in 1886"
+  },
+  "globe": {
+    "find": "Find: {{city}}",
+    "found": "Found: {{city}}",
+    "hint_drag": "↔ Drag to spin the globe",
+    "hint_center": "Center the city in the crosshair",
+    "label": "Interactive globe: spin it (mouse, finger or arrow keys) to find {{city}}",
+    "city": {
+      "tokyo": "Tokyo",
+      "rio": "Rio de Janeiro",
+      "cairo": "Cairo",
+      "sydney": "Sydney",
+      "new_york": "New York",
+      "nairobi": "Nairobi",
+      "paris": "Paris"
+    }
+  },
+  "scores": {
+    "kicker": "Departures board"
+  },
+  "carnet_games": {
+    "kicker_end": "Landing",
+    "kicker_daily": "Daily flight",
+    "kicker_free": "Free flight",
+    "kicker_briefing": "Briefing",
+    "kicker_atlas": "Navigation charts",
+    "kicker_scrolls": "Flight archives",
+    "kicker_legal": "Onboard documents",
+    "stamp_landed": "Landed",
+    "stamp_diverted": "Diverted"
+  },
+  "route_fallback": {
+    "boarding": "Now boarding"
   }
 }

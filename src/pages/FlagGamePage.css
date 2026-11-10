@@ -4,7 +4,7 @@
   width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
-  background: var(--bg-primary);
+  background: var(--sd-bg);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -31,7 +31,7 @@
   height: auto;
   border-radius: 8px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--sd-line);
 }
 
 .flag-display-wrap {
@@ -46,7 +46,7 @@
 
 .missing-flag-band {
   position: absolute;
-  background: repeating-linear-gradient(135deg, #26304a, #26304a 12px, #1b2339 12px, #1b2339 24px);
+  background: repeating-linear-gradient(135deg, var(--sd-surface-2), var(--sd-surface-2) 12px, var(--sd-surface) 12px, var(--sd-surface) 24px);
 }
 
 .missing-flag-band--h {
@@ -54,7 +54,7 @@
   right: 0;
   top: calc(var(--missing-band) * 33.3333%);
   height: 33.3333%;
-  border-block: 1px dashed rgba(255, 255, 255, 0.35);
+  border-block: 1px dashed var(--sd-line);
 }
 
 .missing-flag-band--v {
@@ -62,20 +62,20 @@
   bottom: 0;
   left: calc(var(--missing-band) * 33.3333%);
   width: 33.3333%;
-  border-inline: 1px dashed rgba(255, 255, 255, 0.35);
+  border-inline: 1px dashed var(--sd-line);
 }
 
 .flag-placeholder {
   width: 320px;
   height: 213px;
-  background: var(--bg-secondary);
+  background: var(--sd-surface);
   border-radius: 8px;
-  border: 1px dashed var(--border-color);
+  border: 1px dashed var(--sd-line);
 }
 
 .flag-revealed-name {
   font-size: 1.4rem;
-  color: var(--danger);
+  color: var(--gg-danger-strong);
   font-weight: 700;
   letter-spacing: 0.05em;
   text-align: center;
@@ -95,18 +95,18 @@
 
 .flag-input {
   flex: 1;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
+  background: var(--sd-surface);
+  border: 1px solid var(--sd-line);
   border-radius: 6px;
   padding: 0.65rem 1rem;
-  color: var(--text-primary);
+  color: var(--sd-ink);
   font-size: 1rem;
   outline: none;
   transition: border-color 0.15s;
 }
 
 .flag-input:focus {
-  border-color: var(--accent-purple);
+  border-color: var(--sd-accent-2);
 }
 
 .flag-input:disabled {
@@ -115,18 +115,18 @@
 }
 
 .flag-submit-btn {
-  background: var(--accent-purple);
+  background: var(--sd-accent-2);
   border: none;
   border-radius: 6px;
   padding: 0.65rem 1.2rem;
-  color: #fff;
+  color: var(--sd-bg);
   font-size: 1rem;
   cursor: pointer;
   transition: background 0.15s;
 }
 
 .flag-submit-btn:hover {
-  background: #6d28d9;
+  background: color-mix(in srgb, var(--sd-accent-2) 85%, black);
 }
 
 .flag-submit-btn:disabled {
@@ -166,7 +166,7 @@
     bottom: max(8px, env(safe-area-inset-bottom));
     padding: 0.75rem;
     border-radius: 18px;
-    background: rgba(11, 16, 32, 0.94);
+    background: var(--gg-glass);
     backdrop-filter: blur(12px);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
   }

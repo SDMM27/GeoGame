@@ -1,4 +1,4 @@
 /* src/pages/multiplayer/MultiplayerRoomPage.css */
-.mp-room { min-height: 100vh; background: var(--bg-dark); color: var(--text-primary); }
-.mp-room-loading, .mp-room-error { display: flex; align-items: center; justify-content: center; height: 60vh; font-size: 1.1rem; color: var(--text-muted); }
-.mp-room-error { color: var(--danger); }
+.mp-room { min-height: 100vh; background: var(--sd-bg); color: var(--sd-ink); }
+.mp-room-loading, .mp-room-error { display: flex; align-items: center; justify-content: center; height: 60vh; font-size: 1.1rem; color: var(--sd-muted); }
+.mp-room-error { color: var(--gg-danger-strong); }

@@ -7,7 +7,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-primary);
+  color: var(--sd-ink);
 }
 
 .flag-reveal--leaving { animation: flag-reveal-out 0.22s ease-in forwards; }
@@ -15,7 +15,7 @@
 .flag-reveal-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(6, 10, 22, 0.94);
+  background: color-mix(in srgb, var(--sd-bg) 94%, transparent);
   animation: flag-reveal-fade 0.25s ease-out both;
 }
 
@@ -91,9 +91,9 @@
   position: absolute;
   inset: 0;
   border: 2px solid var(--rarity);
-  border-radius: var(--radius-sm);
+  border-radius: var(--sd-radius-sm);
   overflow: hidden;
-  background: var(--bg-card-hover);
+  background: var(--sd-surface-2);
   opacity: 0;
   animation: flag-reveal-show 0.06s var(--landed) forwards;
 }
@@ -171,7 +171,7 @@
   align-items: center;
   gap: 6px;
   padding: 5px 14px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--sd-radius-pill);
   border: 1px solid color-mix(in srgb, var(--rarity) 50%, transparent);
   background: color-mix(in srgb, var(--rarity) 15%, transparent);
   color: var(--rarity);
@@ -181,9 +181,9 @@
   text-transform: uppercase;
 }
 
-.flag-reveal-new { color: var(--text-muted); font-weight: 600; }
-.flag-reveal-name { margin: 0; font-family: var(--font-display); font-size: 2.1rem; line-height: 1.15; letter-spacing: -0.02em; font-weight: 700; }
-.flag-reveal-texts small { color: var(--text-muted); }
+.flag-reveal-new { color: var(--sd-muted); font-weight: 600; }
+.flag-reveal-name { margin: 0; font-family: var(--sd-font-display); font-size: 2.1rem; line-height: 1.15; letter-spacing: -0.02em; font-weight: 700; }
+.flag-reveal-texts small { color: var(--sd-muted); }
 
 .flag-reveal-buttons {
   display: flex;
@@ -198,9 +198,9 @@
 .flag-reveal-view {
   padding: 0.75rem 1.4rem;
   border: 0;
-  border-radius: var(--radius-pill);
+  border-radius: var(--sd-radius-pill);
   background: var(--rarity);
-  color: #0b1020;
+  color: var(--gg-on-game);
   font: inherit;
   font-weight: 700;
   cursor: pointer;
@@ -211,13 +211,13 @@
   padding: 0.5rem 1.2rem;
   border: 0;
   background: none;
-  color: var(--text-muted);
+  color: var(--sd-muted);
   font: inherit;
   font-size: 0.9rem;
   cursor: pointer;
 }
 
-.flag-reveal-continue:hover { color: var(--text-primary); }
+.flag-reveal-continue:hover { color: var(--sd-ink); }
 .flag-reveal-view:focus-visible, .flag-reveal-continue:focus-visible { outline: 2px solid var(--rarity); outline-offset: 3px; }
 
 .flag-reveal-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }

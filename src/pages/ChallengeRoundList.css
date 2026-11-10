@@ -8,6 +8,20 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 8px;
   text-align: left;
+  counter-reset: challenge-round;
+}
+
+/* Rank of the round, like a flight line on the board */
+.challenge-round::before {
+  counter-increment: challenge-round;
+  content: counter(challenge-round, decimal-leading-zero);
+  flex-shrink: 0;
+  font-family: var(--sd-font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+  color: var(--sd-muted);
 }
 
 .challenge-round {
@@ -16,19 +30,19 @@
   gap: 10px;
   min-width: 0;
   padding: 8px 12px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
-  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--sd-radius-md);
+  border: 1px solid var(--gg-tint-strong);
+  background: var(--gg-tint);
 }
 
 .challenge-round--correct {
-  border-color: var(--success);
-  background: var(--success-dim);
+  border-color: var(--gg-success);
+  background: var(--gg-success-soft);
 }
 
 .challenge-round--failed {
-  border-color: var(--danger);
-  background: var(--danger-dim);
+  border-color: var(--gg-danger);
+  background: var(--gg-danger-soft);
 }
 
 .challenge-round-answer {

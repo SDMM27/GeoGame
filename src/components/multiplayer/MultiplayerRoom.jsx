@@ -147,7 +147,7 @@ export default function MultiplayerRoom({ room, progress, gameResults, playerId,
     // The room takes the color of its current game, like in the app
     <div className="mpr" style={{ '--game': gameColor(games[current]?.id ?? 'placement') }}>
       <header className="mpr-header">
-        <span className="mpr-label">
+        <span className="mpr-label gg-kicker">
           {t('multiplayer.title')} · {t(room.mode === 'live' ? 'mp_room.live' : 'mp_room.challenge')}
         </span>
         <h2>{games.length === 1 ? gameLabel(games[0], t) : t('mp_room.n_games', { count: games.length })}</h2>
@@ -156,12 +156,16 @@ export default function MultiplayerRoom({ room, progress, gameResults, playerId,
 
       {games.length > 1 && <GameList room={room} results={known} playerId={playerId} />}
 
-      <div className="mpr-card mpr-code">
-        <span className="mpr-label">{t('mp_room.code')}</span>
-        <code>{room.id}</code>
-        <button type="button" className="mpr-link-btn" onClick={onCopyLink}>
-          {copied ? `✓ ${t('mp_room.link_copied')}` : `🔗 ${t('mp_room.copy_link')}`}
-        </button>
+      <div className="mpr-card mpr-code gg-ticket">
+        <div className="mpr-code-main gg-field">
+          <small>{t('mp_room.code')}</small>
+          <code>{room.id}</code>
+        </div>
+        <div className="mpr-code-stub gg-ticket-stub">
+          <button type="button" className="mpr-link-btn" onClick={onCopyLink}>
+            {copied ? `✓ ${t('mp_room.link_copied')}` : `🔗 ${t('mp_room.copy_link')}`}
+          </button>
+        </div>
       </div>
 
       {spectating ? (

@@ -5,11 +5,12 @@
 }
 
 .survival-options-label {
-  font-size: 0.75rem;
+  font-family: var(--sd-font-mono);
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 1px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--sd-muted);
 }
 
 .survival-options-games {
@@ -30,11 +31,11 @@
   justify-content: center;
   gap: 6px;
   padding: 9px 10px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  color: var(--text-muted);
-  font-family: var(--font-main);
+  background: var(--sd-surface);
+  border: 1px solid var(--gg-tint-strong);
+  border-radius: var(--sd-radius-md);
+  color: var(--sd-muted);
+  font-family: var(--sd-font-sans);
   font-size: 0.82rem;
   font-weight: 700;
   cursor: pointer;
@@ -42,13 +43,13 @@
 }
 
 .survival-option:hover {
-  background: var(--bg-card-hover);
+  background: var(--sd-surface-2);
 }
 
 .survival-option--active {
-  color: var(--text-primary);
-  border-color: var(--danger);
-  background: var(--danger-dim);
+  color: var(--sd-ink);
+  border-color: var(--gg-danger);
+  background: var(--gg-danger-soft);
 }
 
 .survival-option--lives {
@@ -57,12 +58,12 @@
 
 .survival-options-warning {
   font-size: 0.8rem;
-  color: var(--warning);
+  color: var(--gg-warning-strong);
 }
 
 .survival-options-hint {
   font-size: 0.78rem;
-  color: var(--text-muted);
+  color: var(--sd-muted);
   line-height: 1.4;
 }
 
@@ -77,9 +78,9 @@
   align-items: center;
   justify-content: space-between;
   padding: 6px 10px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  background: var(--sd-surface);
+  border: 1px solid var(--gg-tint-strong);
+  border-radius: var(--sd-radius-md);
   font-size: 0.85rem;
   font-weight: 700;
 }
@@ -93,17 +94,17 @@
 .survival-stepper strong {
   min-width: 24px;
   text-align: center;
-  color: var(--text-primary);
+  color: var(--sd-ink);
   font-variant-numeric: tabular-nums;
 }
 
 .survival-stepper button {
   width: 30px;
   height: 30px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  background: var(--bg-card);
-  color: var(--text-primary);
+  border: 1px solid var(--sd-line);
+  border-radius: var(--sd-radius-sm);
+  background: var(--sd-surface);
+  color: var(--sd-ink);
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;

@@ -1,57 +1,112 @@
 .not-found-page {
   min-height: 100vh;
   min-height: 100dvh;
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: var(--font-main);
+  background: var(--sd-bg);
+  color: var(--sd-ink);
+  font-family: var(--sd-font-sans);
 }
 
 .not-found {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  padding: 72px 24px;
-  text-align: center;
+  justify-content: center;
+  padding: 72px 16px;
 }
 
-.not-found__code {
-  margin: 0;
-  font-size: 5rem;
-  font-weight: 900;
-  line-height: 1;
-  color: var(--accent);
-  text-shadow: var(--shadow-glow);
+/* The page is a boarding pass for a cancelled flight */
+.not-found__ticket {
+  width: min(640px, 100%);
+  overflow: hidden;
+}
+
+.not-found__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 28px;
+}
+
+.not-found__kicker {
+  color: var(--gg-danger-strong);
 }
 
 .not-found__title {
-  margin: 0;
-  font-size: 1.8rem;
-  font-weight: 900;
+  font-size: clamp(2.2rem, 7vw, 3.4rem);
 }
 
 .not-found__message {
   max-width: 420px;
   margin: 0 0 12px;
-  color: var(--text-muted);
+  color: var(--sd-muted);
+}
+
+.not-found__stub {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  min-width: 150px;
+  padding: 24px 20px;
+  background: var(--sd-surface-2);
+}
+
+.not-found__status {
+  color: var(--gg-danger-strong) !important;
+}
+
+.not-found__stamp {
+  --gg-stamp-color: var(--gg-danger-strong);
+  --sd-stamp-rotate: -12deg;
+  align-self: center;
+  width: 84px;
+  height: 84px;
 }
 
 .not-found__home {
-  padding: 10px 24px;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--accent-border);
-  background: var(--accent-dim);
-  color: var(--text-primary);
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 24px;
+  border-radius: var(--sd-radius-pill);
+  border: 1px solid var(--gg-accent-line);
+  background: var(--gg-accent-soft);
+  color: var(--sd-ink);
   text-decoration: none;
   transition: background 0.15s;
 }
 
 .not-found__home:hover {
-  background: var(--bg-card-hover);
-  color: var(--text-primary);
+  background: var(--sd-surface-2);
+  color: var(--sd-ink);
 }
 
 .not-found__home:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--sd-accent);
   outline-offset: 2px;
+}
+
+@media (max-width: 560px) {
+  .not-found {
+    padding: 40px 16px;
+  }
+
+  .not-found__ticket {
+    flex-direction: column;
+  }
+
+  .not-found__main {
+    padding: 22px 20px;
+  }
+
+  .not-found__stub {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 16px 20px;
+    border-left: none;
+    border-top: 2px dashed var(--sd-line);
+  }
 }

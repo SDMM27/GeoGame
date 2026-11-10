@@ -76,7 +76,7 @@ export default function CountryOfDayLeaderboard({ dailyKey }) {
 
   return (
     <div className="daily-lb">
-      <h2 className="daily-lb__title">{t('country_of_day.leaderboard')}</h2>
+      <h2 className="daily-lb__title gg-kicker">{t('country_of_day.leaderboard')}</h2>
 
       <div className="daily-lb__date-nav">
         {days.map(({ key, label }) => (
@@ -111,7 +111,7 @@ export default function CountryOfDayLeaderboard({ dailyKey }) {
         <p className="daily-lb__empty">{t('leaderboard.no_scores_today')}</p>
       ) : (
         <>
-          <div className="daily-lb__header">
+          <div className="daily-lb__header gg-board-head">
             <span>#</span>
             <span>{t('labels.player')}</span>
             <span>{t('daily_challenge.col_score')}</span>

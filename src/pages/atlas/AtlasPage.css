@@ -1,4 +1,4 @@
-.atlas-page { display: flex; flex-direction: column; height: 100vh; height: 100dvh; background: var(--bg-primary); }
+.atlas-page { display: flex; flex-direction: column; height: 100vh; height: 100dvh; background: var(--sd-bg); }
 .atlas-body { position: relative; flex: 1; min-height: 0; display: flex; }
 .atlas-map { position: relative; flex: 1; min-width: 0; }
 
@@ -6,99 +6,100 @@
   position: absolute; top: 12px; left: 56px; z-index: 500;
   display: flex; flex-direction: column; gap: 8px; width: min(320px, calc(100% - 72px));
 }
-.atlas-title { margin: 0; font-size: 1.3rem; color: var(--text-primary); text-shadow: 0 2px 8px #000a; }
-.atlas-hint { margin: 0; font-size: 0.85rem; color: var(--text-secondary); text-shadow: 0 1px 4px #000a; }
+.atlas-kicker { text-shadow: 0 1px 4px var(--gg-glass); margin-bottom: -4px; }
+.atlas-title { margin: 0; font-family: var(--sd-font-display); font-weight: 800; letter-spacing: -0.02em; font-size: 1.3rem; color: var(--sd-ink); text-shadow: 0 2px 8px var(--gg-glass); }
+.atlas-hint { margin: 0; font-size: 0.85rem; color: var(--sd-muted); text-shadow: 0 1px 4px var(--gg-glass); }
 
 .atlas-search { position: relative; }
 .atlas-search input {
   width: 100%; box-sizing: border-box; padding: 0.6rem 0.85rem; border-radius: 10px;
-  border: 1px solid var(--border-color); background: #0f172aee; color: var(--text-primary); font-size: 0.95rem;
+  border: 1px solid var(--sd-line); background: var(--gg-glass); color: var(--sd-ink); font-size: 0.95rem;
 }
 .atlas-search-results {
   list-style: none; margin: 4px 0 0; padding: 4px; border-radius: 10px;
-  background: #0f172af5; border: 1px solid var(--border-color); max-height: 50vh; overflow-y: auto;
+  background: var(--sd-surface); border: 1px solid var(--sd-line); max-height: 50vh; overflow-y: auto;
 }
 .atlas-search-results li.atlas-muted { padding: 0.5rem; }
 .atlas-search-results button, .atlas-chip {
   display: flex; align-items: center; gap: 8px; width: 100%; padding: 0.45rem 0.55rem;
-  background: none; border: 0; border-radius: 8px; color: var(--text-primary); cursor: pointer; text-align: left; font-size: 0.9rem;
+  background: none; border: 0; border-radius: 8px; color: var(--sd-ink); cursor: pointer; text-align: left; font-size: 0.9rem;
 }
-.atlas-search-results button:hover { background: var(--bg-card); }
+.atlas-search-results button:hover { background: var(--sd-surface); }
 .atlas-search-results img, .atlas-chip img { width: 22px; height: 15px; object-fit: cover; border-radius: 2px; }
 
 .atlas-sheet {
   width: 360px; flex-shrink: 0; overflow-y: auto; box-sizing: border-box; padding: 16px;
-  background: var(--bg-primary); border-left: 1px solid var(--bg-card); display: flex; flex-direction: column; gap: 16px;
+  background: var(--sd-bg); border-left: 1px solid var(--sd-surface); display: flex; flex-direction: column; gap: 16px;
 }
 .atlas-sheet-header { display: flex; align-items: center; gap: 12px; }
-.atlas-sheet-flag { width: 64px; height: 43px; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 8px #0008; }
+.atlas-sheet-flag { width: 64px; height: 43px; object-fit: cover; border-radius: 4px; box-shadow: var(--gg-shadow); }
 .atlas-sheet-title { flex: 1; min-width: 0; }
-.atlas-sheet-title h2 { margin: 0; font-size: 1.35rem; color: var(--text-primary); }
-.atlas-sheet-title span { font-size: 0.85rem; color: var(--text-muted); }
-.atlas-sheet-close { background: none; border: 0; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; padding: 4px 8px; }
+.atlas-sheet-title h2 { margin: 0; font-size: 1.35rem; color: var(--sd-ink); }
+.atlas-sheet-title span { font-size: 0.85rem; color: var(--sd-muted); }
+.atlas-sheet-close { background: none; border: 0; color: var(--sd-muted); font-size: 1.2rem; cursor: pointer; padding: 4px 8px; }
 
 .atlas-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.atlas-fact { display: flex; flex-direction: column; gap: 2px; padding: 10px; border-radius: 10px; background: #1e293b80; border: 1px solid var(--bg-card); }
-.atlas-fact-label { font-size: 0.75rem; color: var(--text-muted); }
-.atlas-fact-value { font-size: 1rem; color: var(--text-primary); }
-.atlas-rank { align-self: flex-start; padding: 0; background: none; border: 0; font-size: 0.72rem; color: #a78bfa; cursor: pointer; font-family: inherit; }
+.atlas-fact { display: flex; flex-direction: column; gap: 2px; padding: 10px; border-radius: 10px; background: var(--gg-tint); border: 1px solid var(--sd-line); }
+.atlas-fact-label { font-family: var(--sd-font-mono); font-size: 0.66rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sd-muted); }
+.atlas-fact-value { font-family: var(--sd-font-mono); font-variant-numeric: tabular-nums; font-size: 0.95rem; color: var(--sd-ink); }
+.atlas-rank { align-self: flex-start; padding: 0; background: none; border: 0; font-size: 0.72rem; color: var(--sd-accent-2); cursor: pointer; font-family: inherit; }
 .atlas-rank:hover { text-decoration: underline; }
-.atlas-back { align-self: flex-start; padding: 0; background: none; border: 0; font-size: 0.85rem; color: #a78bfa; cursor: pointer; font-family: inherit; }
+.atlas-back { align-self: flex-start; padding: 0; background: none; border: 0; font-size: 0.85rem; color: var(--sd-accent-2); cursor: pointer; font-family: inherit; }
 .atlas-back:hover { text-decoration: underline; }
 
 .atlas-rankings-button {
-  align-self: flex-start; padding: 0.4rem 0.8rem; border-radius: 999px; border: 1px solid var(--border-color);
-  background: #0f172aee; color: var(--text-primary); font-size: 0.88rem; cursor: pointer;
+  align-self: flex-start; padding: 0.4rem 0.8rem; border-radius: 999px; border: 1px solid var(--sd-line);
+  background: var(--gg-glass); color: var(--sd-ink); font-size: 0.88rem; cursor: pointer;
 }
-.atlas-rankings-button:hover { border-color: var(--accent-purple); }
+.atlas-rankings-button:hover { border-color: var(--sd-accent-2); }
 
 .atlas-ranking { gap: 12px; overflow: hidden; }
 .atlas-ranking-header { display: flex; align-items: center; justify-content: space-between; }
-.atlas-ranking-header h2 { margin: 0; font-size: 1.25rem; color: var(--text-primary); }
+.atlas-ranking-header h2 { margin: 0; font-size: 1.25rem; color: var(--sd-ink); }
 .atlas-ranking-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
 .atlas-ranking-tab {
-  padding: 0.3rem 0.65rem; border-radius: 999px; border: 1px solid var(--border-color); background: var(--bg-card);
-  color: var(--text-secondary); font-size: 0.8rem; cursor: pointer;
+  padding: 0.3rem 0.65rem; border-radius: 999px; border: 1px solid var(--sd-line); background: var(--sd-surface);
+  color: var(--sd-muted); font-size: 0.8rem; cursor: pointer;
 }
-.atlas-ranking-tab:hover { border-color: var(--accent-purple); }
-.atlas-ranking-tab.active { background: var(--accent-purple); border-color: var(--accent-purple); color: #fff; }
+.atlas-ranking-tab:hover { border-color: var(--sd-accent-2); }
+.atlas-ranking-tab.active { background: var(--sd-accent-2); border-color: var(--sd-accent-2); color: var(--sd-accent-ink); }
 .atlas-ranking-list { list-style: none; margin: 0; padding: 0; flex: 1; min-height: 0; overflow-y: auto; }
 .atlas-ranking-row {
   display: flex; align-items: center; gap: 8px; width: 100%; padding: 0.4rem 0.45rem; background: none; border: 0;
-  border-radius: 8px; color: var(--text-primary); cursor: pointer; text-align: left; font-size: 0.88rem; font-family: inherit;
+  border-radius: 8px; color: var(--sd-ink); cursor: pointer; text-align: left; font-size: 0.88rem; font-family: inherit;
 }
-.atlas-ranking-row:hover { background: var(--bg-card); }
-.atlas-ranking-row.selected { background: var(--bg-card); box-shadow: inset 0 0 0 1px var(--accent-purple); }
+.atlas-ranking-row:hover { background: var(--sd-surface); }
+.atlas-ranking-row.selected { background: var(--sd-surface); box-shadow: inset 0 0 0 1px var(--sd-accent-2); }
 .atlas-ranking-row img { width: 22px; height: 15px; object-fit: cover; border-radius: 2px; flex-shrink: 0; }
-.atlas-ranking-rank { width: 2.2em; flex-shrink: 0; text-align: right; font-size: 0.78rem; color: #a78bfa; font-variant-numeric: tabular-nums; }
-.atlas-ranking-rank.top1 { color: #fbbf24; font-weight: 700; }
-.atlas-ranking-rank.top2 { color: #cbd5e1; font-weight: 700; }
-.atlas-ranking-rank.top3 { color: #d97706; font-weight: 700; }
+.atlas-ranking-rank { width: 2.2em; flex-shrink: 0; text-align: right; font-family: var(--sd-font-mono); font-size: 0.78rem; color: var(--sd-accent-2); font-variant-numeric: tabular-nums; }
+.atlas-ranking-rank.top1 { color: var(--gg-gold); font-weight: 700; }
+.atlas-ranking-rank.top2 { color: var(--sd-muted); font-weight: 700; }
+.atlas-ranking-rank.top3 { color: var(--game-daily-challenge-ink); font-weight: 700; }
 .atlas-ranking-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.atlas-ranking-value { flex-shrink: 0; font-size: 0.82rem; color: var(--text-secondary); text-align: right; }
+.atlas-ranking-value { flex-shrink: 0; font-family: var(--sd-font-mono); font-variant-numeric: tabular-nums; font-size: 0.8rem; color: var(--sd-muted); text-align: right; }
 
-.atlas-section h3 { margin: 0 0 8px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); }
+.atlas-section h3 { margin: 0 0 8px; font-family: var(--sd-font-mono); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--sd-muted); }
 .atlas-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.atlas-chip { width: auto; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 999px; padding: 0.3rem 0.65rem; font-size: 0.85rem; }
-.atlas-chip:hover { border-color: var(--accent-purple); }
-.atlas-muted { margin: 0; color: var(--text-muted); font-size: 0.85rem; }
-.atlas-timeline { list-style: none; margin: 0 0 10px; padding: 0 0 0 10px; border-left: 2px solid var(--border-color); display: flex; flex-direction: column; gap: 8px; }
-.atlas-timeline li { display: flex; flex-direction: column; font-size: 0.88rem; color: var(--text-primary); line-height: 1.35; }
-.atlas-timeline strong { color: var(--accent-purple); font-size: 0.8rem; }
-.atlas-quiz-link { display: inline-block; padding: 0.45rem 0.9rem; border-radius: 999px; background: var(--accent); color: var(--bg-primary); font-size: 0.88rem; font-weight: 600; text-decoration: none; }
+.atlas-chip { width: auto; background: var(--sd-surface); border: 1px solid var(--sd-line); border-radius: 999px; padding: 0.3rem 0.65rem; font-size: 0.85rem; }
+.atlas-chip:hover { border-color: var(--sd-accent-2); }
+.atlas-muted { margin: 0; color: var(--sd-muted); font-size: 0.85rem; }
+.atlas-timeline { list-style: none; margin: 0 0 10px; padding: 0 0 0 10px; border-left: 2px solid var(--sd-line); display: flex; flex-direction: column; gap: 8px; }
+.atlas-timeline li { display: flex; flex-direction: column; font-size: 0.88rem; color: var(--sd-ink); line-height: 1.35; }
+.atlas-timeline strong { color: var(--sd-accent-2); font-size: 0.8rem; }
+.atlas-quiz-link { display: inline-block; padding: 0.45rem 0.9rem; border-radius: 999px; background: var(--sd-accent); color: var(--sd-accent-ink); font-size: 0.88rem; font-weight: 600; text-decoration: none; }
 .atlas-quiz-link:hover { filter: brightness(1.1); }
 .atlas-difficulties { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-.atlas-difficulties li { display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--text-primary); }
+.atlas-difficulties li { display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--sd-ink); }
 
-.atlas-tooltip { background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color); }
+.atlas-tooltip { background: var(--sd-bg); color: var(--sd-ink); border: 1px solid var(--sd-line); }
 
 /* Phones: the sheet slides over the bottom of the map */
 @media (max-width: 760px) {
   .atlas-overlay { left: 52px; top: 10px; width: calc(100% - 64px); }
-  .atlas-title { display: none; }
+  .atlas-title, .atlas-kicker { display: none; }
   .atlas-sheet {
     position: absolute; left: 0; right: 0; bottom: 0; width: auto; max-height: 58%; z-index: 600;
-    border-left: 0; border-top: 1px solid var(--border-color); border-radius: 16px 16px 0 0; box-shadow: 0 -8px 24px #000a;
+    border-left: 0; border-top: 1px solid var(--sd-line); border-radius: 16px 16px 0 0; box-shadow: var(--gg-shadow);
   }
 }
 /* Phones: the ranking keeps the sheet's height so its list can scroll */

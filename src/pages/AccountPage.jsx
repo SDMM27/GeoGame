@@ -18,15 +18,14 @@ import {
 } from '../utils/account'
 import { reauthenticateWithGoogle, signInWithGoogle } from '../utils/accountGoogle'
 import FriendsPanel from '../components/profile/FriendsPanel'
-import ProfileBody, { Avatar } from '../components/profile/ProfileBody'
+import ProfileBody from '../components/profile/ProfileBody'
+import ProfileHeader from '../components/profile/ProfileHeader'
 import DecorationPicker from '../components/profile/DecorationPicker'
 import FlagCollection from '../components/profile/FlagCollection'
 import ScrollCollection from '../components/profile/ScrollCollection'
-import LevelBadge from '../components/profile/LevelBadge'
 import CollapsibleSection from '../components/CollapsibleSection'
 import { useFriendships } from '../hooks/usePlayerProfile'
 import { useDecoration } from '../hooks/useDecoration'
-import { decorationStyle } from '../utils/decorations'
 import './AccountPage.css'
 
 function GoogleButton({ onError }) {
@@ -306,26 +305,12 @@ function AccountSettings({ account }) {
 }
 
 function Profile({ account }) {
-  const { t, i18n } = useTranslation()
   const friendships = useFriendships(account.uid)
   const decoration = useDecoration(account.uid)
 
   return (
     <>
-      <header className="profile-header">
-        <Avatar username={account.username} size={72} decoration={decoration} />
-        <div className="profile-header-text">
-          <h1 style={{ color: decorationStyle(decoration).nameColor ?? undefined }}>{account.username}</h1>
-          {account.createdAt && (
-            <small>
-              {t('profile.member_since', {
-                date: new Date(account.createdAt).toLocaleDateString(i18n.language, { month: 'long', year: 'numeric' }),
-              })}
-            </small>
-          )}
-          <LevelBadge uid={account.uid} />
-        </div>
-      </header>
+      <ProfileHeader player={account} decoration={decoration} />
       <DecorationPicker account={account} />
       <ProfileBody
         uid={account.uid}
@@ -355,7 +340,8 @@ export default function AccountPage() {
       <main className={`account-main${signedIn ? ' account-main--wide' : ''}`}>
         {!signedIn && !loading && (
           <>
-            <h1 className="account-title">{t('profile.sign_in_title')}</h1>
+            <p className="gg-kicker account-kicker">{t('profile.passport')}</p>
+            <h1 className="account-title gg-title">{t('profile.sign_in_title')}</h1>
             <p className="account-pitch">{t('profile.sign_in_pitch')}</p>
           </>
         )}

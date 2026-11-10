@@ -3,33 +3,33 @@
   flex-direction: column;
   gap: 14px;
   padding: 18px;
-  border-radius: var(--radius-xl);
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
+  border-radius: var(--sd-radius-card);
+  background: var(--sd-surface);
+  border: 1px solid var(--sd-line);
 }
 
 .missions-head { display: flex; align-items: center; justify-content: space-between; gap: 12px 20px; flex-wrap: wrap; }
 .missions-head h3 { margin: 0; font-size: 1.2rem; }
 .missions-level { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 220px; max-width: 360px; }
 .missions-level .xp-bar { flex: 1; }
-.missions-level small { color: var(--text-muted); font-size: 0.75rem; white-space: nowrap; }
+.missions-level small { color: var(--sd-muted); font-size: 0.75rem; white-space: nowrap; }
 
 .missions-card .collapsible-head h2 { font-size: 1rem; }
 
-.missions-dailies { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border-color); }
+.missions-dailies { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border-radius: var(--sd-radius-md); background: var(--sd-bg); border: 1px solid var(--sd-line); }
 .missions-dailies-line { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; font-size: 0.85rem; }
 .missions-dailies-line strong { font-size: 0.85rem; }
-.missions-dailies-line small { color: var(--text-muted); font-size: 0.75rem; }
+.missions-dailies-line small { color: var(--sd-muted); font-size: 0.75rem; }
 .missions-dailies-tiers { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
-.missions-dailies-tier { display: flex; align-items: baseline; gap: 6px; padding: 3px 10px; border-radius: var(--radius-pill); border: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.75rem; }
+.missions-dailies-tier { display: flex; align-items: baseline; gap: 6px; padding: 3px 10px; border-radius: var(--sd-radius-pill); border: 1px solid var(--sd-line); color: var(--sd-muted); font-size: 0.75rem; }
 .missions-dailies-tier small { font-size: 0.7rem; }
-.missions-dailies-tier--done { border-color: var(--accent-border); color: var(--accent); }
+.missions-dailies-tier--done { border-color: var(--gg-accent-line); color: var(--sd-accent-strong); }
 
 .missions-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
 .missions-group { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .missions-group-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
 .missions-group-head h3 { margin: 0; font-size: 0.95rem; }
-.missions-group-head small, .missions-hint, .missions-loading { color: var(--text-muted); font-size: 0.75rem; }
+.missions-group-head small, .missions-hint, .missions-loading { color: var(--sd-muted); font-size: 0.75rem; }
 
 .missions-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 
@@ -38,14 +38,14 @@
   align-items: center;
   gap: 10px;
   padding: 8px 10px;
-  border-radius: var(--radius-md);
-  background: var(--bg-primary);
-  border: 1px solid var(--border-color);
+  border-radius: var(--sd-radius-md);
+  background: var(--sd-bg);
+  border: 1px solid var(--sd-line);
 }
 
-.mission-row--done { border-color: var(--accent-border); }
-.mission-row--done .mission-title { color: var(--text-muted); text-decoration: line-through; }
-.mission-row--done .mission-emoji { background: var(--accent-dim); color: var(--accent); font-weight: 800; }
+.mission-row--done { border-color: var(--gg-accent-line); }
+.mission-row--done .mission-title { color: var(--sd-muted); text-decoration: line-through; }
+.mission-row--done .mission-emoji { background: var(--gg-accent-soft); color: var(--sd-accent-strong); font-weight: 800; }
 
 .mission-emoji {
   flex-shrink: 0;
@@ -53,20 +53,20 @@
   place-items: center;
   width: 32px;
   height: 32px;
-  border-radius: var(--radius-sm);
-  background: var(--bg-card-hover);
+  border-radius: var(--sd-radius-sm);
+  background: var(--sd-surface-2);
   font-size: 1.1rem;
   line-height: 1;
 }
 
 .mission-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
 .mission-title { font-size: 0.85rem; line-height: 1.25; }
-.mission-tier { color: var(--text-muted); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+.mission-tier { color: var(--sd-muted); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
 .mission-progress { display: flex; align-items: center; gap: 8px; }
 .mission-progress .xp-bar { flex: 1; height: 6px; }
-.mission-progress small { color: var(--text-muted); font-size: 0.7rem; white-space: nowrap; }
-.mission-reward { flex-shrink: 0; color: var(--accent); font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
-.mission-fragments { display: block; color: var(--text-muted); font-size: 0.7rem; font-weight: 400; text-align: right; }
+.mission-progress small { color: var(--sd-muted); font-size: 0.7rem; white-space: nowrap; }
+.mission-reward { flex-shrink: 0; color: var(--sd-accent-strong); font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
+.mission-fragments { display: block; color: var(--sd-muted); font-size: 0.7rem; font-weight: 400; text-align: right; }
 
 .missions-bonus {
   display: flex;
@@ -74,11 +74,11 @@
   gap: 8px;
   margin: 0;
   padding: 0 10px;
-  color: var(--text-muted);
+  color: var(--sd-muted);
   font-size: 0.8rem;
 }
 
-.missions-bonus--done { color: var(--accent); }
+.missions-bonus--done { color: var(--sd-accent-strong); }
 .missions-hint, .missions-loading { margin: 0; }
 
 .missions-card--visitor {
@@ -90,9 +90,9 @@
   transition: border-color 0.2s;
 }
 
-.missions-card--visitor:hover { border-color: var(--accent-border); }
+.missions-card--visitor:hover { border-color: var(--gg-accent-line); }
 .missions-visitor-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.missions-visitor-text small { color: var(--text-muted); font-size: 0.8rem; line-height: 1.35; }
+.missions-visitor-text small { color: var(--sd-muted); font-size: 0.8rem; line-height: 1.35; }
 
 @media (max-width: 720px) {
   .missions-card { padding: 14px; }

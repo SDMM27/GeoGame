@@ -15,11 +15,11 @@
 }
 
 .nudge-search {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--gg-tint-strong);
+  border: 1px solid var(--sd-line);
   border-radius: 8px;
   box-sizing: border-box;
-  color: #ffffff;
+  color: var(--sd-ink);
   font-size: 14px;
   max-width: 240px;
   padding: 8px 14px;
@@ -28,11 +28,11 @@
 }
 
 .nudge-search::placeholder {
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--sd-muted);
 }
 
 .nudge-search:focus {
-  border-color: var(--accent);
+  border-color: var(--sd-accent);
   outline: none;
 }
 
@@ -59,10 +59,10 @@
 .nudge-chip {
   flex-shrink: 0;
   white-space: nowrap;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--gg-tint-strong);
+  border: 1px solid var(--sd-line);
   border-radius: 999px;
-  color: #ffffff;
+  color: var(--sd-ink);
   cursor: pointer;
   font-size: 13px;
   padding: 6px 14px;
@@ -74,15 +74,15 @@
 }
 
 .nudge-chip-done {
-  border-color: var(--accent);
+  border-color: var(--sd-accent);
 }
 
 .nudge-ok {
-  color: var(--accent);
+  color: var(--sd-accent-strong);
   font-size: 12px;
 }
 
 .nudge-warning {
-  color: #f5a524;
+  color: var(--gg-warning-strong);
   font-size: 12px;
 }

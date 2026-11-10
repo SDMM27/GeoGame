@@ -194,6 +194,7 @@ export default function AtlasPage() {
             <SmallCountryDots selected={selected} onSelect={select} />
           </MapContainer>
           <div className="atlas-overlay">
+            <p className="gg-kicker atlas-kicker">{t('carnet_games.kicker_atlas')}</p>
             <h1 className="atlas-title">🗺️ {t('atlas.title')}</h1>
             <Search onSelect={(admin) => { setRanking(null); setBackMetric(null); select(admin) }} />
             <button type="button" className="atlas-rankings-button" onClick={() => openRanking('population')}>

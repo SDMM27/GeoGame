@@ -24,6 +24,7 @@ import CountryClueMap from './CountryClueMap'
 import { readMapAssistPref, writeMapAssistPref } from '../utils/mapAssist'
 import { formatTime } from '../utils/formatTime'
 import 'leaflet/dist/leaflet.css'
+import '../components/map/mapTheme'
 import 'react-toastify/dist/ReactToastify.css'
 import './BorderGuessPage.css'
 
@@ -189,7 +190,7 @@ export default function BorderGuessPage() {
         )}
         <section className="border-guess-panel border-guess-panel--hero">
           <div>
-            <p className="border-guess-eyebrow">{t('labels.new_game')}</p>
+            <p className="border-guess-eyebrow gg-kicker">{t('labels.new_game')}</p>
             <h1>{title}</h1>
             <p className="border-guess-subtitle">{subtitle}</p>
           </div>

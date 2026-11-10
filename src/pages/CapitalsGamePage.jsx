@@ -88,7 +88,7 @@ function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, s
         <div className="hud-main">
           <div className="hud-row">
             <div className="hud-cell">
-              <span className="hud-value" style={{ color: 'var(--accent)' }}>{score}</span>
+              <span className="hud-value" style={{ color: 'var(--sd-accent-strong)' }}>{score}</span>
               <span className="hud-label">{t('game_hud.score')}</span>
             </div>
             <div className="hud-cell hud-cell--target">
@@ -96,7 +96,7 @@ function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, s
               <span className="hud-target-name">?</span>
             </div>
             <div className="hud-cell">
-              <span className="hud-value" style={{ color: 'var(--accent)' }}>{displayTimer}</span>
+              <span className="hud-value" style={{ color: 'var(--sd-accent-strong)' }}>{displayTimer}</span>
               <span className="hud-label">{t('game_hud.time')}</span>
             </div>
           </div>
@@ -188,8 +188,8 @@ function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, s
           <div className="game-over-content">
             {onGameFinished ? (
               <div className="mp-game-waiting">
-                <p style={{ color: '#4ade80', fontSize: '1.5rem' }}>{t('game_over.completed')}</p>
-                <p style={{ color: '#94a3b8' }}>{t('game_over.waiting_players')}</p>
+                <p style={{ color: 'var(--gg-success-strong)', fontSize: '1.5rem' }}>{t('game_over.completed')}</p>
+                <p style={{ color: 'var(--sd-muted)' }}>{t('game_over.waiting_players')}</p>
               </div>
             ) : isAscension ? (
               <AscensionForm

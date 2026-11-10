@@ -8,7 +8,7 @@ import { GAME_TYPES } from '../../utils/gameTypes'
 import { HISTORY_COUNTRIES } from '../../utils/quizQuestions'
 import { formatMetric } from './formatMetric'
 
-const DIFFICULTY_COLORS = { Facile: '#4ade80', Moyen: '#fbbf24', Difficile: '#f97316', Impossible: '#ef4444' }
+const DIFFICULTY_COLORS = { Facile: 'var(--gg-success-strong)', Moyen: 'var(--gg-warning-strong)', Difficile: 'var(--game-daily-challenge-ink)', Impossible: 'var(--gg-danger-strong)' }
 
 function Rank({ rank, onClick }) {
   const { t } = useTranslation()

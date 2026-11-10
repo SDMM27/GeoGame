@@ -1,12 +1,13 @@
-.account-page { min-height: 100vh; background: var(--bg-primary); color: var(--text-primary); }
+.account-page { min-height: 100vh; background: var(--sd-bg); color: var(--sd-ink); }
 .account-main { max-width: 440px; margin: 0 auto; padding: 3rem 1rem; }
-.account-title { font-size: 2rem; font-weight: 700; margin-bottom: 1.5rem; text-align: center; }
+.account-kicker { text-align: center; margin-bottom: 0.4rem; }
+.account-title { margin-bottom: 1.5rem; text-align: center; }
 
 .account-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
+  background: var(--sd-surface);
+  border: 1px solid var(--sd-line);
+  border-radius: var(--sd-radius-card);
+  box-shadow: var(--gg-shadow);
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -15,65 +16,65 @@
 
 .account-tabs {
   display: flex;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  background: var(--gg-tint);
+  border: 1px solid var(--gg-tint-strong);
+  border-radius: var(--sd-radius-md);
   padding: 3px;
 }
 .account-tab {
   flex: 1;
   background: none;
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: var(--sd-radius-sm);
   padding: 0.5rem;
-  color: var(--text-muted);
+  color: var(--sd-muted);
   font-weight: 600;
   cursor: pointer;
 }
-.account-tab.active { background: var(--accent); color: var(--bg-primary); }
+.account-tab.active { background: var(--sd-accent); color: var(--sd-accent-ink); }
 
-.account-intro { color: var(--text-muted); font-size: 0.9rem; margin: 0; }
-.account-legal { color: var(--text-muted); font-size: 0.8rem; margin: 0; }
-.account-legal a { color: var(--accent-cyan); }
+.account-intro { color: var(--sd-muted); font-size: 0.9rem; margin: 0; }
+.account-legal { color: var(--sd-muted); font-size: 0.8rem; margin: 0; }
+.account-legal a { color: var(--sd-accent-strong); }
 
 .account-form { display: flex; flex-direction: column; gap: 0.85rem; }
 .account-field { display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.85rem; font-weight: 600; }
-.account-field small { color: var(--text-muted); font-weight: 400; }
+.account-field small { color: var(--sd-muted); font-weight: 400; }
 .account-form input {
   padding: 0.65rem 0.8rem;
-  border-radius: var(--radius-sm);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: var(--bg-primary);
-  color: var(--text-primary);
+  border-radius: var(--sd-radius-sm);
+  border: 1px solid var(--sd-line);
+  background: var(--sd-bg);
+  color: var(--sd-ink);
   font-size: 1rem;
 }
-.account-form input:focus { outline: none; border-color: var(--accent); }
+.account-form input:focus { outline: none; border-color: var(--sd-accent); }
 
-.account-error { color: var(--danger); background: var(--danger-dim); border-radius: var(--radius-sm); padding: 0.5rem 0.75rem; margin: 0; font-size: 0.9rem; }
-.account-notice { color: var(--success); background: var(--success-dim); border-radius: var(--radius-sm); padding: 0.5rem 0.75rem; margin: 0; font-size: 0.9rem; }
+.account-error { color: var(--gg-danger-strong); background: var(--gg-danger-soft); border-radius: var(--sd-radius-sm); padding: 0.5rem 0.75rem; margin: 0; font-size: 0.9rem; }
+.account-notice { color: var(--gg-success-strong); background: var(--gg-success-soft); border-radius: var(--sd-radius-sm); padding: 0.5rem 0.75rem; margin: 0; font-size: 0.9rem; }
 
 .account-submit {
   padding: 0.7rem 1rem;
-  border-radius: var(--radius-md);
+  border-radius: var(--sd-radius-md);
   border: none;
-  background: var(--accent);
-  color: var(--bg-primary);
+  background: var(--sd-accent);
+  color: var(--sd-accent-ink);
   font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
 }
 .account-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-.account-submit--secondary { background: rgba(255, 255, 255, 0.08); color: var(--text-primary); border: 1px solid var(--border-subtle); }
-.account-submit--danger { background: var(--danger); color: #fff; }
+.account-submit--secondary { background: var(--gg-tint-strong); color: var(--sd-ink); border: 1px solid var(--sd-line); }
+.account-submit--danger { background: var(--gg-danger); color: var(--gg-on-danger); }
 
-.account-link { background: none; border: none; color: var(--accent); font-size: 0.9rem; cursor: pointer; padding: 0.25rem; align-self: center; }
+.account-link { background: none; border: none; color: var(--sd-accent-strong); font-size: 0.9rem; cursor: pointer; padding: 0.25rem; align-self: center; }
 .account-link:hover { text-decoration: underline; }
-.account-link--danger { color: var(--danger); margin-top: 0.5rem; }
+.account-link--danger { color: var(--gg-danger-strong); margin-top: 0.5rem; }
 
-.account-label { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; margin: 0; }
-.account-username { font-size: 1.6rem; font-weight: 800; margin: 0; }
-.account-email { color: var(--text-muted); margin: 0; }
-.account-delete { border-top: 1px solid var(--border-subtle); padding-top: 1rem; margin-top: 0.5rem; }
+.account-label { color: var(--sd-muted); font-family: var(--sd-font-mono); font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; margin: 0; }
+.account-username { font-family: var(--sd-font-display); font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; margin: 0; }
+.account-email { color: var(--sd-muted); margin: 0; }
+.account-delete { border-top: 1px solid var(--gg-tint-strong); padding-top: 1rem; margin-top: 0.5rem; }
 .account-row { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
 
 .account-google {
@@ -82,36 +83,45 @@
   justify-content: center;
   gap: 0.6rem;
   padding: 0.7rem 1rem;
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: #fff;
-  color: #1f1f1f;
+  border-radius: var(--sd-radius-md);
+  border: 1px solid var(--sd-line);
+  background: var(--sd-surface);
+  color: var(--sd-ink);
   font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
 }
 .account-google:disabled { opacity: 0.6; cursor: wait; }
 
-.account-divider { display: flex; align-items: center; gap: 0.75rem; color: var(--text-muted); font-size: 0.8rem; }
+.account-divider { display: flex; align-items: center; gap: 0.75rem; color: var(--sd-muted); font-size: 0.8rem; }
 .account-divider::before,
-.account-divider::after { content: ''; flex: 1; height: 1px; background: var(--border-subtle); }
+.account-divider::after { content: ''; flex: 1; height: 1px; background: var(--gg-tint-strong); }
 
 .account-main--wide { max-width: 760px; display: flex; flex-direction: column; gap: 1.75rem; }
-.account-pitch { color: var(--text-muted); text-align: center; margin: -0.75rem 0 1.5rem; }
+.account-pitch { color: var(--sd-muted); text-align: center; margin: -0.75rem 0 1.5rem; }
 .account-section-title { font-size: 1.2rem; font-weight: 700; margin: 0 0 0.25rem; }
 
-.profile-header { display: flex; align-items: center; gap: 1.1rem; }
+.profile-header { align-items: stretch; flex-wrap: wrap; }
+.profile-header-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 1.1rem; padding: 1.1rem 1.25rem; }
+.profile-header-stub { display: flex; align-items: center; }
+@media (max-width: 480px) {
+  .profile-header-stub { flex: 1 0 100%; border-left: 0; border-top: 2px dashed var(--sd-line); padding: 0.7rem 1.25rem; }
+}
 .profile-header-text { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
-.profile-header-text h1 { font-size: 2rem; font-weight: 800; margin: 0; overflow: hidden; text-overflow: ellipsis; }
-.profile-header-text small { color: var(--text-muted); }
+.profile-header-text h1 { font-family: var(--sd-font-display); font-size: clamp(1.7rem, 5vw, 2.4rem); font-weight: 800; line-height: 1.05; letter-spacing: -0.03em; margin: 0; overflow: hidden; text-overflow: ellipsis; }
+.profile-header-text small { color: var(--sd-muted); }
 .profile-friend-pill {
   align-self: flex-start;
   margin-top: 0.25rem;
   padding: 0.1rem 0.6rem;
-  border-radius: var(--radius-pill);
-  background: var(--success-dim);
-  color: var(--success);
+  border-radius: var(--sd-radius-pill);
+  background: var(--gg-success-soft);
+  color: var(--gg-success-strong);
   font-size: 0.8rem;
   font-weight: 600;
 }
 .player-action { display: flex; flex-direction: column; gap: 0.5rem; max-width: 360px; }
+
+/* 44px touch targets */
+.account-tab { min-height: 44px; }
+.account-link { min-height: 44px; }

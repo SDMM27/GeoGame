@@ -5,8 +5,8 @@
   align-items: center;
   gap: 1rem;
   padding: 0.6rem 2rem;
-  border-bottom: 1px solid var(--border-color);
-  background: var(--bg-primary);
+  border-bottom: 1px solid var(--sd-line);
+  background: var(--sd-bg);
 }
 
 .navbar-logo {
@@ -14,29 +14,19 @@
   align-items: center;
   gap: 0.6rem;
   text-decoration: none;
-  color: var(--text-primary);
+  color: var(--sd-ink);
   user-select: none;
 }
 
 .navbar-logo:hover {
-  color: var(--text-primary);
-}
-
-.navbar-logo-img {
-  height: 40px;
-  width: auto;
-  display: block;
-  transition: transform 0.2s;
-}
-
-.navbar-logo:hover .navbar-logo-img {
-  transform: scale(1.05);
+  color: var(--sd-ink);
 }
 
 .navbar-logo-name {
-  font-family: var(--font-display);
+  font-family: var(--sd-font-display);
   font-size: 1.35rem;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 .navbar-tabs {
@@ -45,14 +35,19 @@
   margin: 0 auto;
 }
 
+/* Language pill and theme switch, side by side at the end of the bar */
+.navbar .gg-theme-toggle {
+  margin-left: -0.5rem;
+}
+
 .navbar-tab {
   position: relative;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 0.9rem;
-  border-radius: var(--radius-md);
-  color: var(--text-muted);
+  border-radius: var(--sd-radius-md);
+  color: var(--sd-muted);
   font-weight: 600;
   font-size: 0.95rem;
   text-decoration: none;
@@ -60,13 +55,13 @@
 }
 
 .navbar-tab:hover {
-  color: var(--text-primary);
-  background: var(--bg-card);
+  color: var(--sd-ink);
+  background: var(--sd-surface);
 }
 
 .navbar-tab.active {
-  color: var(--accent);
-  background: var(--accent-dim);
+  color: var(--sd-accent-strong);
+  background: var(--gg-accent-soft);
 }
 
 .navbar-tab-label {
@@ -80,7 +75,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--success);
+  background: var(--gg-success);
 }
 
 /* Number of pending friend requests, on the Profile tab */
@@ -88,8 +83,8 @@
   min-width: 1.2rem;
   padding: 0 0.35rem;
   border-radius: 999px;
-  background: var(--accent);
-  color: var(--bg-primary, #fff);
+  background: var(--sd-accent);
+  color: var(--sd-accent-ink);
   font-size: 0.72rem;
   font-weight: 700;
   line-height: 1.2rem;
@@ -102,12 +97,12 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  height: 32px;
-  padding: 0 10px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-pill);
-  color: var(--text-primary);
+  height: 44px;
+  padding: 0 14px;
+  background: var(--sd-surface);
+  border: 1px solid var(--sd-line);
+  border-radius: var(--sd-radius-pill);
+  color: var(--sd-ink);
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.5px;
@@ -116,17 +111,17 @@
 
 .navbar-lang:hover,
 .navbar-lang:focus-within {
-  border-color: var(--accent);
+  border-color: var(--sd-accent);
 }
 
 .navbar-lang svg {
-  color: var(--text-muted);
+  color: var(--sd-muted);
 }
 
 /* The select covers the pill, invisible: the browser's own list opens on click or tap */
 .navbar-lang-select {
   position: absolute;
-  inset: 0;
+  inset: -1px; /* over the pill's border too: a 44px target */
   width: 100%;
   opacity: 0;
   cursor: pointer;
@@ -140,8 +135,8 @@
     padding: 0.5rem 1rem;
   }
 
-  .navbar-logo-img {
-    height: 34px;
+  .navbar-logo {
+    margin-right: auto;
   }
 
   .navbar-logo-name {
@@ -157,8 +152,8 @@
     margin: 0;
     gap: 0;
     padding: 0.3rem 0.25rem calc(0.3rem + env(safe-area-inset-bottom));
-    background: var(--bg-primary);
-    border-top: 1px solid var(--border-color);
+    background: var(--sd-bg);
+    border-top: 1px solid var(--sd-line);
   }
 
   /* A game page, or a room while its game is played */
@@ -173,7 +168,7 @@
     gap: 2px;
     padding: 0.35rem 0.25rem;
     font-size: 0.7rem;
-    border-radius: var(--radius-sm);
+    border-radius: var(--sd-radius-sm);
   }
 
   .navbar-tab:hover,

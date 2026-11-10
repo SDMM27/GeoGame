@@ -2,14 +2,14 @@
   padding: 40px 24px;
   max-width: 700px;
   margin: 0 auto;
-  color: var(--text-primary);
-  font-family: var(--font-main);
+  color: var(--sd-ink);
+  font-family: var(--sd-font-sans);
 }
 
 .scoreboard-title {
   font-size: 1.8rem;
   font-weight: 900;
-  color: var(--text-primary);
+  color: var(--sd-ink);
   border: none;
   padding: 0;
   margin-bottom: 24px;
@@ -22,8 +22,8 @@
   gap: 0;
   justify-content: center;
   margin-bottom: 24px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--sd-line);
+  border-radius: var(--sd-radius-md);
   overflow: hidden;
   width: fit-content;
   margin-left: auto;
@@ -40,41 +40,41 @@
 
 .scoreboard-mode-tab {
   padding: 10px 16px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-color);
-  background: var(--bg-secondary);
-  color: var(--text-muted);
-  font-family: var(--font-main);
+  border-radius: var(--sd-radius-md);
+  border: 1px solid var(--sd-line);
+  background: var(--sd-surface);
+  color: var(--sd-muted);
+  font-family: var(--sd-font-sans);
   font-size: 0.9rem;
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
 
 .scoreboard-mode-tab--active {
-  color: var(--text-primary);
-  border-color: var(--accent-border);
-  background: var(--accent-dim);
+  color: var(--sd-ink);
+  border-color: var(--gg-accent-line);
+  background: var(--gg-accent-soft);
 }
 
 .scoreboard-era-tab {
   padding: 8px 20px;
-  background: var(--bg-secondary);
+  background: var(--sd-surface);
   border: none;
-  color: var(--text-muted);
-  font-family: var(--font-main);
+  color: var(--sd-muted);
+  font-family: var(--sd-font-sans);
   font-size: 0.85rem;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
 }
 
 .scoreboard-era-tab:hover {
-  background: var(--bg-card-hover);
-  color: var(--text-primary);
+  background: var(--sd-surface-2);
+  color: var(--sd-ink);
 }
 
 .scoreboard-era-tab--active {
-  background: var(--accent);
-  color: #000;
+  background: var(--sd-accent);
+  color: var(--sd-accent-ink);
   font-weight: 700;
 }
 
@@ -96,11 +96,11 @@
   width: 100%;
   max-width: 320px;
   padding: 10px 16px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-family: var(--font-main);
+  background: var(--sd-surface);
+  border: 1px solid var(--sd-line);
+  border-radius: var(--sd-radius-md);
+  color: var(--sd-ink);
+  font-family: var(--sd-font-sans);
   font-size: 0.9rem;
   cursor: pointer;
 }
@@ -108,7 +108,7 @@
 .scoreboard-loading,
 .scoreboard-empty {
   text-align: center;
-  color: var(--text-muted);
+  color: var(--sd-muted);
   padding: 32px;
 }
 
@@ -125,8 +125,8 @@
   font-size: 0.7rem;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--text-muted);
-  border-bottom: 1px solid var(--border-subtle);
+  color: var(--sd-muted);
+  border-bottom: 1px solid var(--gg-tint-strong);
 }
 
 .scoreboard-row {
@@ -134,19 +134,19 @@
   grid-template-columns: 48px minmax(0, 1fr) 100px 80px 120px;
   align-items: center;
   padding: 12px 16px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  background: var(--sd-surface);
+  border: 1px solid var(--gg-tint-strong);
+  border-radius: var(--sd-radius-md);
   font-size: 0.9rem;
   transition: background 0.15s;
 }
 
 .scoreboard-row:hover {
-  background: var(--bg-card-hover);
+  background: var(--sd-surface-2);
 }
 
 .scoreboard-row--top {
-  border-color: var(--accent-border);
+  border-color: var(--gg-accent-line);
 }
 
 .scoreboard-rank {
@@ -157,38 +157,38 @@
   min-width: 0;
   overflow-wrap: anywhere;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--sd-ink);
 }
 
 .scoreboard-score {
-  color: var(--accent);
+  color: var(--sd-accent-strong);
   font-weight: 700;
 }
 
 .scoreboard-difficulty {
-  color: var(--text-muted);
+  color: var(--sd-muted);
   font-size: 0.8rem;
 }
 
 .scoreboard-time {
-  color: var(--text-muted);
+  color: var(--sd-muted);
   font-size: 0.85rem;
   font-variant-numeric: tabular-nums;
 }
 
 .scoreboard-time--strong {
-  color: var(--text-primary);
+  color: var(--sd-ink);
   font-weight: 700;
 }
 
 .scoreboard-preset {
-  color: var(--text-muted);
+  color: var(--sd-muted);
   font-size: 0.82rem;
 }
 
 .scoreboard-note {
   text-align: center;
-  color: var(--text-muted);
+  color: var(--sd-muted);
   font-size: 0.9rem;
   margin: -12px auto 16px;
   max-width: 560px;
@@ -230,3 +230,66 @@
   .scoreboard-difficulty,
   .scoreboard-preset { grid-area: extra; text-align: right; }
 }
+
+/* « Carnet de vol »: the leaderboards as a departures board */
+.scoreboard .gg-kicker { margin-bottom: 6px; }
+
+.scoreboard .scoreboard-title {
+  margin-bottom: 20px;
+  text-align: left;
+  font-size: clamp(1.9rem, 4.5vw, 3rem);
+  font-weight: 800;
+}
+
+.scoreboard-note { text-align: left; margin: -8px 0 16px; max-width: none; }
+.scoreboard-filters { justify-content: flex-start; margin-bottom: 24px; }
+
+.scoreboard-mode-tabs {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  max-width: 700px;
+}
+
+.scoreboard-mode-tab {
+  min-height: 44px;
+  padding: 8px 16px;
+  border-radius: var(--sd-radius-pill);
+  font-family: var(--sd-font-mono);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.scoreboard-mode-tab--active {
+  background: var(--sd-accent);
+  border-color: var(--sd-accent);
+  color: var(--sd-accent-ink);
+}
+
+.scoreboard-header { border-bottom: 2px solid var(--sd-line); font-size: 0.66rem; letter-spacing: 0.12em; }
+
+.scoreboard-row { border-radius: var(--sd-radius-sm); }
+.scoreboard-rank,
+.scoreboard-score,
+.scoreboard-time,
+.scoreboard-difficulty,
+.scoreboard-preset {
+  font-family: var(--sd-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+.scoreboard-rank { font-weight: 700; }
+.scoreboard-score { font-size: 0.85rem; }
+.scoreboard-time { font-size: 0.8rem; }
+.scoreboard-difficulty,
+.scoreboard-preset { font-size: 0.74rem; letter-spacing: 0.04em; }
+
+/* « Your flight »: the signed-in player's row gets a boarding-pass bar on its left edge */
+.scoreboard-row.leaderboard-row--mine { box-shadow: inset 4px 0 0 var(--sd-accent); }
+
+@media (max-width: 520px) {
+  .scoreboard-mode-tabs { padding: 0 12px; }
+}
+
+/* 44px touch targets */
+.scoreboard-select { min-height: 44px; }

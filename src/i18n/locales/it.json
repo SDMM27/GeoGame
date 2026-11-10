@@ -49,7 +49,34 @@
     "games_subtitle": "Scegli la difficoltà o il continente",
     "daily": "Sfida del giorno",
     "infinite": "Infinito",
-    "multi": "Gioca in multigiocatore"
+    "multi": "Gioca in multigiocatore",
+    "hero_lead": "{{count}} sfide al giorno, un passaporto da riempire, stanze multigiocatore. Lo stesso mondo per tutti, in 9 lingue.",
+    "next_departure": "Prossima partenza",
+    "globe_score": "Punti",
+    "board_cta": "Imbarcati per la sfida del giorno",
+    "passes_title": "Carte d’imbarco del giorno",
+    "passes_note": "{{count}} voli · stesse sfide per tutti",
+    "boarding_pass": "Carta d’imbarco",
+    "gate": "Gate",
+    "departure": "Partenza",
+    "board": "Imbarcati",
+    "passport_title": "Il tuo passaporto",
+    "passport_intro": "Ogni missione completata timbra il tuo passaporto: XP, livelli, cornici e colori da sbloccare. La lega settimanale distribuisce frammenti di bandiere.",
+    "passport_example": "Esempio di pagina del passaporto",
+    "stamp_level": "Livello",
+    "stamp_xp": "{{count}} XP",
+    "stamp_streak": "Serie",
+    "stamp_today": "Oggi",
+    "stamp_dailies": "Sfide del giorno",
+    "stamp_won": "Vinte",
+    "special_flight": "Volo speciale",
+    "board_title": "Tabellone delle partenze",
+    "col_destination": "Destinazione",
+    "col_brief": "In breve",
+    "col_status": "Stato",
+    "status_boarding": "Imbarco",
+    "status_on_time": "In orario",
+    "status_open": "Aperto"
   },
   "games": {
     "daily_challenge": {
@@ -350,7 +377,12 @@
   "not_found": {
     "title": "Pagina non trovata",
     "message": "Questa pagina non esiste o è stata spostata.",
-    "home": "Torna alla home"
+    "home": "Torna alla home",
+    "cancelled": "Volo cancellato",
+    "flight": "Volo",
+    "gate": "Gate",
+    "status": "Stato",
+    "status_cancelled": "Cancellato"
   },
   "units": {
     "pt": "pt",
@@ -396,7 +428,11 @@
     "code_placeholder": "CODICE",
     "create_title": "Crea una partita",
     "create_subtitle": "Scegli un gioco e invita i tuoi amici con il codice",
-    "recent_title": "Partite recenti"
+    "recent_title": "Partite recenti",
+    "kicker": "Terminal · Multigiocatore",
+    "desk_join": "Banco A · Check-in",
+    "desk_create": "Banco B · Nuovo volo",
+    "desk_recent": "Voli recenti"
   },
   "lobby": {
     "connecting": "Connessione..."
@@ -404,7 +440,8 @@
   "config": {
     "title": "Imposta la partita",
     "creating": "Creazione...",
-    "typing_tolerance_note": "⚠️ Nei giochi in cui si scrive (bandiere, capitali), la prima esitazione per paese è tollerata e non influisce sul punteggio: gli errori di battitura capitano!"
+    "typing_tolerance_note": "⚠️ Nei giochi in cui si scrive (bandiere, capitali), la prima esitazione per paese è tollerata e non influisce sul punteggio: gli errori di battitura capitano!",
+    "kicker": "Carta d'imbarco"
   },
   "stats": {
     "first_try": "🎯 Al primo colpo",
@@ -734,7 +771,9 @@
       "room": "Stanza",
       "open_room": "Apri la stanza",
       "close": "Chiudi"
-    }
+    },
+    "passport": "Passaporto",
+    "field_since": "Dal"
   },
   "friends": {
     "online": "Online",
@@ -1122,7 +1161,11 @@
     "next_game": "Avvia il gioco {{n}}",
     "waiting_next": "In attesa del prossimo gioco…",
     "round_n": "Round {{n}} / {{total}}",
-    "next_round_soon": "Il prossimo round tra un attimo…"
+    "next_round_soon": "Il prossimo round tra un attimo…",
+    "manifest": "Elenco passeggeri",
+    "col_player": "Giocatore",
+    "col_result": "Risultato",
+    "standings_kicker": "Tabellone arrivi"
   },
   "survival": {
     "spectating": "Stai guardando i giocatori ancora in gara",
@@ -1301,7 +1344,9 @@
     "leaderboards": "Classifiche",
     "profile": "Profilo",
     "main": "Navigazione principale",
-    "language": "Lingua"
+    "language": "Lingua",
+    "theme_light": "Passa alla modalità chiara",
+    "theme_dark": "Passa alla modalità scura"
   },
   "league": {
     "title": "Lega settimanale",
@@ -1341,7 +1386,9 @@
     "win_reward_other": "+{{count}} frammenti di bandiera",
     "win_champion": "Titolo vinto: Campione della settimana",
     "win_cta": "Vedi la lega",
-    "win_close": "Chiudi"
+    "win_close": "Chiudi",
+    "season": "Stagione in corso",
+    "stamp_label": "Premio"
   },
   "decorations": {
     "title": "Personalizza",
@@ -1641,5 +1688,38 @@
     "title_ottoman-empire": "Impero ottomano, 1481-1683",
     "title_russia-growth": "Crescita della Russia, 1300-1796",
     "title_british-empire-1886": "Impero britannico nel 1886"
+  },
+  "globe": {
+    "find": "Trova: {{city}}",
+    "found": "Trovata: {{city}}",
+    "hint_drag": "↔ Trascina per far girare il globo",
+    "hint_center": "Centra la città nel mirino",
+    "label": "Globo interattivo: fallo girare (mouse, dito o frecce) per trovare {{city}}",
+    "city": {
+      "tokyo": "Tokyo",
+      "rio": "Rio de Janeiro",
+      "cairo": "Il Cairo",
+      "sydney": "Sydney",
+      "new_york": "New York",
+      "nairobi": "Nairobi",
+      "paris": "Parigi"
+    }
+  },
+  "scores": {
+    "kicker": "Tabellone partenze"
+  },
+  "carnet_games": {
+    "kicker_end": "Atterraggio",
+    "kicker_daily": "Volo del giorno",
+    "kicker_free": "Volo libero",
+    "kicker_briefing": "Briefing",
+    "kicker_atlas": "Carte di navigazione",
+    "kicker_scrolls": "Archivi di bordo",
+    "kicker_legal": "Documenti di bordo",
+    "stamp_landed": "Atterrato",
+    "stamp_diverted": "Dirottato"
+  },
+  "route_fallback": {
+    "boarding": "Imbarco in corso"
   }
 }

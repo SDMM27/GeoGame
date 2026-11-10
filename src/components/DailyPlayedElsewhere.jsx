@@ -36,10 +36,12 @@ export function DailyPlayedElsewhereCard({ game, children }) {
 
 // The whole page, for the games whose page is the daily challenge.
 export default function DailyPlayedElsewhere({ title, game, children }) {
+  const { t } = useTranslation()
   return (
     <div className="daily-elsewhere-page">
       <NavBar />
       <main className="daily-elsewhere">
+        <p className="gg-kicker">{t('carnet_games.kicker_daily')}</p>
         <h1 className="daily-elsewhere__title">{title}</h1>
         <DailyPlayedElsewhereCard game={game}>{children}</DailyPlayedElsewhereCard>
       </main>

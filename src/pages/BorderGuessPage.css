@@ -1,9 +1,9 @@
 ﻿.border-guess-page {
   min-height: 100vh;
   background:
-    radial-gradient(circle at top left, rgba(61, 220, 151, 0.12), transparent 28%),
-    radial-gradient(circle at bottom right, rgba(199, 146, 255, 0.12), transparent 24%),
-    var(--bg-primary);
+    radial-gradient(circle at top left, color-mix(in srgb, var(--gg-success) 12%, transparent), transparent 28%),
+    radial-gradient(circle at bottom right, color-mix(in srgb, var(--sd-accent-2) 12%, transparent), transparent 24%),
+    var(--sd-bg);
 }
 
 .border-guess-main {
@@ -19,10 +19,10 @@
 }
 
 .border-guess-panel {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
+  background: var(--sd-surface);
+  border: 1px solid var(--sd-line);
+  border-radius: var(--sd-radius-card);
+  box-shadow: var(--gg-shadow);
 }
 
 .border-guess-panel--hero {
@@ -36,15 +36,19 @@
 
 .border-guess-panel--hero h1 {
   margin: 6px 0 10px;
-  color: var(--text-primary);
+  font-family: var(--sd-font-display);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--sd-ink);
   font-size: clamp(2rem, 4vw, 3.2rem);
 }
 
 .border-guess-eyebrow {
   margin: 0;
-  color: var(--accent);
+  color: var(--sd-accent-strong);
   text-transform: uppercase;
-  letter-spacing: 2px;
+  font-family: var(--sd-font-mono);
+  letter-spacing: 0.14em;
   font-size: 0.72rem;
   font-weight: 700;
 }
@@ -52,7 +56,7 @@
 .border-guess-subtitle {
   margin: 0;
   max-width: 620px;
-  color: var(--text-muted);
+  color: var(--sd-muted);
   line-height: 1.5;
 }
 
@@ -64,24 +68,28 @@
 .border-guess-stat {
   min-width: 92px;
   padding: 14px 16px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
-  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--sd-radius-md);
+  border: 1px solid var(--gg-tint-strong);
+  background: var(--gg-tint);
   text-align: center;
 }
 
 .border-guess-stat-value {
   display: block;
-  color: var(--text-primary);
+  color: var(--sd-ink);
+  font-family: var(--sd-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 1.5rem;
   font-weight: 800;
 }
 
 .border-guess-stat-label {
   display: block;
-  color: var(--text-muted);
-  font-size: 0.72rem;
-  letter-spacing: 1px;
+  color: var(--sd-muted);
+  font-family: var(--sd-font-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
@@ -95,15 +103,15 @@
   border-radius: 22px;
   overflow: hidden;
   background:
-    linear-gradient(180deg, rgba(125, 211, 252, 0.08), rgba(11, 16, 32, 0.75)),
+    linear-gradient(180deg, color-mix(in srgb, var(--gg-highlight) 8%, transparent), color-mix(in srgb, var(--sd-bg) 75%, transparent)),
     repeating-linear-gradient(
       45deg,
-      rgba(255, 255, 255, 0.025),
-      rgba(255, 255, 255, 0.025) 12px,
+      var(--gg-tint),
+      var(--gg-tint) 12px,
       transparent 12px,
       transparent 24px
     );
-  border: 1px solid rgba(125, 211, 252, 0.18);
+  border: 1px solid color-mix(in srgb, var(--gg-highlight) 18%, transparent);
 }
 
 .border-guess-map {
@@ -120,7 +128,7 @@
 
 .border-guess-map-caption {
   margin: 12px 0 0;
-  color: var(--text-muted);
+  color: var(--sd-muted);
   font-size: 0.88rem;
 }
 
@@ -133,7 +141,7 @@
 .border-guess-label {
   display: block;
   margin-bottom: 8px;
-  color: var(--text-primary);
+  color: var(--sd-ink);
   font-size: 0.88rem;
   font-weight: 700;
 }
@@ -145,10 +153,10 @@
 .border-guess-input {
   width: 100%;
   padding: 14px 16px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-color);
-  background: var(--bg-secondary);
-  color: var(--text-primary);
+  border-radius: var(--sd-radius-md);
+  border: 1px solid var(--sd-line);
+  background: var(--sd-surface);
+  color: var(--sd-ink);
   font-size: 1rem;
 }
 
@@ -163,9 +171,9 @@
   max-height: 240px;
   overflow-y: auto;
   padding: 8px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-color);
-  background: rgba(18, 22, 43, 0.96);
+  border-radius: var(--sd-radius-md);
+  border: 1px solid var(--sd-line);
+  background: var(--sd-surface);
   box-shadow: 0 18px 36px rgba(0, 0, 0, 0.38);
   backdrop-filter: blur(14px);
 }
@@ -173,18 +181,18 @@
 .border-guess-suggestion {
   width: 100%;
   padding: 10px 12px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
-  background: rgba(255, 255, 255, 0.03);
-  color: var(--text-primary);
+  border-radius: var(--sd-radius-md);
+  border: 1px solid var(--gg-tint-strong);
+  background: var(--gg-tint);
+  color: var(--sd-ink);
   text-align: left;
   cursor: pointer;
   transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
 }
 
 .border-guess-suggestion:hover {
-  background: rgba(61, 220, 151, 0.08);
-  border-color: rgba(61, 220, 151, 0.28);
+  background: color-mix(in srgb, var(--gg-success) 8%, transparent);
+  border-color: color-mix(in srgb, var(--gg-success) 28%, transparent);
   transform: translateY(-1px);
 }
 
@@ -193,9 +201,9 @@
 .border-guess-secondary {
   width: 100%;
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: var(--sd-radius-md);
   cursor: pointer;
-  font-family: var(--font-main);
+  font-family: var(--sd-font-sans);
   font-weight: 700;
   transition: transform 0.15s ease, opacity 0.15s ease;
 }
@@ -218,19 +226,19 @@
   margin-top: 10px;
   padding: 13px 16px;
   background: var(--game-border-guess);
-  color: var(--bg-primary);
+  color: var(--gg-on-game);
 }
 
 .border-guess-secondary {
   padding: 13px 16px;
   background: transparent;
-  border: 1px solid var(--border-color);
-  color: var(--text-muted);
+  border: 1px solid var(--sd-line);
+  color: var(--sd-muted);
 }
 
 .border-guess-secondary--warning {
-  border-color: rgba(245, 184, 61, 0.3);
-  color: var(--warning);
+  border-color: color-mix(in srgb, var(--gg-warning) 30%, transparent);
+  color: var(--gg-warning-strong);
 }
 
 .border-guess-action-button {
@@ -248,10 +256,10 @@
   align-items: center;
   gap: 10px;
   padding: 12px 14px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
-  background: rgba(255, 255, 255, 0.03);
-  color: var(--text-primary);
+  border-radius: var(--sd-radius-md);
+  border: 1px solid var(--gg-tint-strong);
+  background: var(--gg-tint);
+  color: var(--sd-ink);
 }
 
 .border-guess-chip-main {
@@ -273,9 +281,9 @@
   width: 28px;
   height: 28px;
   border-radius: 999px;
-  background: rgba(61, 220, 151, 0.16);
-  border: 1px solid rgba(61, 220, 151, 0.28);
-  color: var(--accent);
+  background: color-mix(in srgb, var(--gg-success) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gg-success) 28%, transparent);
+  color: var(--sd-accent-strong);
   font-size: 1.15rem;
   font-weight: 900;
   line-height: 1;
@@ -284,7 +292,7 @@
 }
 
 .border-guess-chip-main small {
-  color: var(--text-muted);
+  color: var(--sd-muted);
   font-size: 0.76rem;
 }
 
@@ -295,26 +303,26 @@
 }
 
 .border-guess-chip--correct {
-  border-color: rgba(61, 220, 151, 0.35);
-  background: rgba(61, 220, 151, 0.12);
+  border-color: color-mix(in srgb, var(--gg-success) 35%, transparent);
+  background: color-mix(in srgb, var(--gg-success) 12%, transparent);
 }
 
 .border-guess-chip--wrong {
-  border-color: rgba(255, 122, 107, 0.24);
+  border-color: color-mix(in srgb, var(--gg-danger) 24%, transparent);
 }
 
 .border-guess-empty,
 .border-guess-result {
   margin: 0;
-  color: var(--text-muted);
+  color: var(--sd-muted);
   line-height: 1.5;
 }
 
 .border-guess-result {
   padding: 14px 16px;
-  border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-subtle);
+  border-radius: var(--sd-radius-md);
+  background: var(--gg-tint);
+  border: 1px solid var(--gg-tint-strong);
 }
 
 /* Nothing to say until the round ends. */
@@ -323,13 +331,13 @@
 }
 
 .border-guess-result--win {
-  color: #bbf7d0;
-  border-color: rgba(61, 220, 151, 0.35);
+  color: var(--gg-success-strong);
+  border-color: color-mix(in srgb, var(--gg-success) 35%, transparent);
 }
 
 .border-guess-result--lose {
-  color: #fecaca;
-  border-color: rgba(255, 122, 107, 0.28);
+  color: var(--gg-danger-strong);
+  border-color: color-mix(in srgb, var(--gg-danger) 28%, transparent);
 }
 
 .border-guess-actions {
@@ -460,7 +468,7 @@
     border: 0;
     border-radius: 0;
     box-shadow: none;
-    background: var(--map-ocean);
+    background: var(--gg-ocean);
   }
 
   .border-guess-map-frame {
@@ -468,8 +476,8 @@
     border: 0;
     border-radius: 0;
     background:
-      radial-gradient(circle at center, rgba(122, 162, 255, 0.08), transparent 65%),
-      var(--map-ocean);
+      radial-gradient(circle at center, color-mix(in srgb, var(--gg-highlight) 8%, transparent), transparent 65%),
+      var(--gg-ocean);
   }
 
   .border-guess-map-frame .daily-map-placeholder {
@@ -486,7 +494,7 @@
     z-index: 2;
     margin: auto -20px -20px;
     padding: 12px 20px 20px;
-    background: var(--bg-card);
+    background: var(--sd-surface);
     box-shadow: 0 -10px 14px -8px rgba(0, 0, 0, 0.45);
   }
 
@@ -533,5 +541,5 @@
   border-radius: 16px;
   overflow: hidden;
   isolation: isolate;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--sd-line);
 }

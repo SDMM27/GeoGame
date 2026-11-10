@@ -92,7 +92,10 @@ export default function DailyQuiz() {
           result={isComplete ? { score: attempts + hintsUsed, solved: isSolved } : null}
         />
         <header className="quiz-header">
-          <h1>{t('quiz.daily_title')}</h1>
+          <div className="quiz-header__title">
+            <p className="gg-kicker">{t('carnet_games.kicker_daily')}</p>
+            <h1>{t('quiz.daily_title')}</h1>
+          </div>
           {hasStarted && (
             <div className="quiz-hud">
               <div>

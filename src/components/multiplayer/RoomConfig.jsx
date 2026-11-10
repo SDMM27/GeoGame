@@ -23,8 +23,8 @@ const SETUP_TYPES = [GAME_TYPES.PLACEMENT, GAME_TYPES.FLAGS, GAME_TYPES.CAPITALS
 const DIFFICULTIES = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
 const ASCENSION_DIFFS = ['Facile', 'Moyen', 'Difficile', 'Impossible']
 const DIFFICULTY_COLORS = {
-  Facile: '#4ade80', Moyen: '#00d4ff', Difficile: '#fbbf24',
-  Impossible: '#f97316', Hardcore: '#f87171',
+  Facile: 'var(--gg-success-strong)', Moyen: 'var(--game-voyage-voyage-ink)', Difficile: 'var(--gg-warning-strong)',
+  Impossible: 'var(--game-daily-challenge-ink)', Hardcore: 'var(--gg-danger-strong)',
 }
 const COUNTS = [5, 10, 15]
 const QUIZ_COUNTS = [5, 10, 20]
@@ -283,7 +283,8 @@ export default function RoomConfig({ onSubmit, submitting, initialGameId, initia
 
   return (
     <form className="room-config" onSubmit={handleSubmit}>
-      <h2 className="rc-title">{t('config.title')}</h2>
+      <p className="gg-kicker">{t('config.kicker')}</p>
+      <h2 className="rc-title gg-title">{t('config.title')}</h2>
 
       <div className="rc-pseudo">
         <label htmlFor="pseudo-input">{t('labels.your_username')}</label>

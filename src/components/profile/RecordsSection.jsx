@@ -35,7 +35,7 @@ export default function RecordsSection({ uid, scope }) {
       <div className="profile-card profile-records">
         <div className="profile-records-row">
           {grid.rows[0][by].map((cell) => (
-            <small key={cell.mode} className="profile-records-header" title={t(`${by}.${cell.mode}`)}>
+            <small key={cell.mode} className="profile-records-header gg-board-head" title={t(`${by}.${cell.mode}`)}>
               {t(`${by}.${cell.mode}`)}
             </small>
           ))}

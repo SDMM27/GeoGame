@@ -45,7 +45,7 @@
 
 .fragment-toast-text { display: flex; flex-direction: column; gap: 3px; min-width: 120px; }
 .fragment-toast-text strong { font-size: 0.9rem; }
-.fragment-toast-text small { color: var(--sd-muted); font-size: 0.75rem; }
+.fragment-toast-text small { color: var(--sd-muted); font-family: var(--sd-font-mono); font-size: 0.7rem; }
 
 .fragment-toast-text .fragment-toast-reason { color: var(--sd-accent-strong); }
 

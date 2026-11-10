@@ -155,16 +155,16 @@ function Achievements({ achievements, scope, uid }) {
     <CollapsibleSection id={`${scope}.achievements`} title={t('profile.achievements_title')} summary={summary} defaultOpen={scope === 'player'}>
       {wins > 0 && <p className="profile-muted">🏆 {t('league.champion_wins', { count: wins })}</p>}
       <div className="profile-achievements">
-        {visible.map((achievement) => (
+        {visible.map((achievement, index) => (
           <div
             key={achievement.id}
             className={`profile-achievement${achievement.unlocked ? ' unlocked' : ''}`}
-            style={{ '--tier': TIER_COLORS[achievement.tier] }}
+            style={{ '--tier': TIER_COLORS[achievement.tier], '--sd-stamp-rotate': `${[-7, 5, -3, 8][index % 4]}deg`, '--i': index % 8 }}
           >
-            <span className="profile-achievement-emoji">{achievement.emoji}</span>
+            <span className={`profile-achievement-emoji${achievement.unlocked ? ' sd-stamp' : ''}`}>{achievement.emoji}</span>
             <strong>{t(`achievements.${achievement.id}.title`)}</strong>
             <small>{t(`achievements.${achievement.id}.desc`)}</small>
-            <em className="profile-achievement-tier">{t(`achievements.tiers.${achievement.tier}`)}</em>
+            <em className="profile-achievement-tier gg-mono">{t(`achievements.tiers.${achievement.tier}`)}</em>
             {!achievement.unlocked && achievement.target > 1 && (
               <>
                 <div className="profile-progress" title={`${achievement.progress}/${achievement.target}`}>

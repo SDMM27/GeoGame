@@ -21,7 +21,7 @@
 
 .xp-toast { flex-wrap: wrap; justify-content: center; }
 
-.xp-toast strong { color: var(--sd-accent-strong); }
+.xp-toast strong { color: var(--sd-accent-strong); font-family: var(--sd-font-mono); letter-spacing: 0.04em; }
 
 @keyframes xp-toast-in {
   from { opacity: 0; transform: translate(-50%, 12px); }

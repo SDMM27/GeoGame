@@ -6,10 +6,10 @@
   padding: 1rem;
   border-radius: 12px;
   background: var(--sd-surface);
-  border: 1px solid var(--sd-line);
+  border: 2px dashed var(--sd-line);
 }
 
-.scroll-collection-progress { color: var(--sd-accent-strong); font-size: 0.9rem; }
+.scroll-collection-progress { color: var(--sd-accent-strong); font-family: var(--sd-font-mono); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
 .scroll-collection-note { margin: 0; color: var(--sd-muted); font-size: 0.9rem; }
 .scroll-collection-hint { color: var(--sd-muted); max-width: 420px; }
 

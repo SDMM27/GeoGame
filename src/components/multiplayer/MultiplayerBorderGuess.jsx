@@ -10,6 +10,7 @@ import { loadSnapshot, saveSnapshot } from '../../utils/multiplayerSnapshot'
 import { getCountryName } from '../../utils/getCountryName'
 import { localeOf } from '../../i18n/languages'
 import 'leaflet/dist/leaflet.css'
+import '../map/mapTheme'
 import 'react-toastify/dist/ReactToastify.css'
 import './MultiplayerBorderGuess.css'
 

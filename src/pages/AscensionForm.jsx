@@ -37,11 +37,11 @@ export default function AscensionForm({ score, timer, stats, phaseStats, gameTyp
           <div style={{ color: 'var(--sd-muted)', fontSize: '0.8em' }}>{t('labels.total_time')}</div>
         </div>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ color: '#fbbf24', fontSize: '1.4em', fontWeight: 'bold' }}>{score}</div>
+          <div style={{ color: 'var(--gg-warning-strong)', fontSize: '1.4em', fontWeight: 'bold' }}>{score}</div>
           <div style={{ color: 'var(--sd-muted)', fontSize: '0.8em' }}>{t('labels.score')}</div>
         </div>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ color: '#4ade80', fontSize: '1.4em', fontWeight: 'bold' }}>
+          <div style={{ color: 'var(--gg-success-strong)', fontSize: '1.4em', fontWeight: 'bold' }}>
             {stats.found}/{stats.total}
           </div>
           <div style={{ color: 'var(--sd-muted)', fontSize: '0.8em' }}>{t('labels.found')}</div>
@@ -61,10 +61,10 @@ export default function AscensionForm({ score, timer, stats, phaseStats, gameTyp
           <tbody>
             {phaseStats.map((ps, i) => (
               <tr key={i} style={{ borderBottom: '1px solid var(--gg-tint-strong)' }}>
-                <td style={{ color: DIFFICULTY_COLORS[ps.difficulty] ?? '#e2e8f0', padding: '4px 0' }}>
+                <td style={{ color: DIFFICULTY_COLORS[ps.difficulty] ?? 'var(--sd-ink)', padding: '4px 0' }}>
                   {t(`difficulties.${ps.difficulty}`, ps.difficulty)}
                 </td>
-                <td style={{ textAlign: 'center', color: '#e2e8f0' }}>{ps.found}/{ps.count}</td>
+                <td style={{ textAlign: 'center', color: 'var(--sd-ink)' }}>{ps.found}/{ps.count}</td>
                 <td style={{ textAlign: 'center', color: 'var(--sd-muted)' }}>{ps.skipped}</td>
                 <td style={{ textAlign: 'right', color: 'var(--sd-muted)' }}>{formatTime(ps.timeMs)}</td>
               </tr>

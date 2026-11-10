@@ -24,6 +24,7 @@ import CountryClueMap from './CountryClueMap'
 import { readMapAssistPref, writeMapAssistPref } from '../utils/mapAssist'
 import { formatTime } from '../utils/formatTime'
 import 'leaflet/dist/leaflet.css'
+import '../components/map/mapTheme'
 import 'react-toastify/dist/ReactToastify.css'
 import './BorderGuessPage.css'
 

@@ -100,48 +100,6 @@
   --game-survival-ink: #ff5c7a;
 }
 
-/* Legacy names (« Atlas de nuit »), kept only while the stylesheets move to --sd-* / --gg-*: to be removed. */
-:root {
-  --bg-primary: var(--sd-bg);
-  --bg-dark: var(--sd-bg);
-  --bg-secondary: var(--sd-surface);
-  --bg-card: var(--sd-surface);
-  --bg-card-hover: var(--sd-surface-2);
-  --bg-glass: var(--gg-glass);
-  --map-ocean: var(--gg-ocean);
-  --accent: var(--sd-accent);
-  --accent-dim: var(--gg-accent-soft);
-  --accent-border: var(--gg-accent-line);
-  --on-accent: var(--sd-accent-ink);
-  --highlight: var(--gg-highlight);
-  --accent-purple: var(--sd-accent-2);
-  --success: var(--gg-success);
-  --success-dim: var(--gg-success-soft);
-  --warning: var(--gg-warning);
-  --warning-dim: var(--gg-warning-soft);
-  --on-warning: var(--gg-on-warning);
-  --danger: var(--gg-danger);
-  --danger-dim: var(--gg-danger-soft);
-  --on-danger: var(--gg-on-danger);
-  --text-primary: var(--sd-ink);
-  --text-secondary: var(--sd-muted);
-  --text-muted: var(--sd-muted);
-  --text-dim: var(--sd-muted);
-  --border: var(--sd-line);
-  --border-color: var(--sd-line);
-  --border-strong: var(--gg-line-strong);
-  --border-subtle: var(--gg-tint-strong);
-  --radius-sm: 10px;
-  --radius-md: var(--sd-radius-md);
-  --radius-lg: var(--sd-radius-card);
-  --radius-xl: 28px;
-  --radius-pill: var(--sd-radius-pill);
-  --shadow-card: var(--gg-shadow);
-  --shadow-glow: 0 0 20px var(--gg-accent-soft);
-  --font-main: var(--sd-font-sans);
-  --font-display: var(--sd-font-display);
-}
-
 * {
   box-sizing: border-box;
   margin: 0;

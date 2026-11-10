@@ -1301,7 +1301,9 @@
     "leaderboards": "Ranglisten",
     "profile": "Profil",
     "main": "Hauptnavigation",
-    "language": "Sprache"
+    "language": "Sprache",
+    "theme_light": "Zum hellen Modus wechseln",
+    "theme_dark": "Zum dunklen Modus wechseln"
   },
   "league": {
     "title": "Wochenliga",

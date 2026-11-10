@@ -1301,7 +1301,9 @@
     "leaderboards": "Classements",
     "profile": "Profil",
     "main": "Navigation principale",
-    "language": "Langue"
+    "language": "Langue",
+    "theme_light": "Passer en mode clair",
+    "theme_dark": "Passer en mode sombre"
   },
   "league": {
     "title": "Ligue de la semaine",

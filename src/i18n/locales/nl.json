@@ -1301,7 +1301,9 @@
     "leaderboards": "Ranglijsten",
     "profile": "Profiel",
     "main": "Hoofdnavigatie",
-    "language": "Taal"
+    "language": "Taal",
+    "theme_light": "Overschakelen naar lichte modus",
+    "theme_dark": "Overschakelen naar donkere modus"
   },
   "league": {
     "title": "Weekcompetitie",

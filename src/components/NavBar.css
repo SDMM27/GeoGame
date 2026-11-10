@@ -22,27 +22,22 @@
   color: var(--text-primary);
 }
 
-.navbar-logo-img {
-  height: 40px;
-  width: auto;
-  display: block;
-  transition: transform 0.2s;
-}
-
-.navbar-logo:hover .navbar-logo-img {
-  transform: scale(1.05);
-}
-
 .navbar-logo-name {
-  font-family: var(--font-display);
+  font-family: var(--sd-font-display);
   font-size: 1.35rem;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 .navbar-tabs {
   display: flex;
   gap: 0.25rem;
   margin: 0 auto;
+}
+
+/* Language pill and theme switch, side by side at the end of the bar */
+.navbar .gg-theme-toggle {
+  margin-left: -0.5rem;
 }
 
 .navbar-tab {
@@ -102,8 +97,8 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  height: 32px;
-  padding: 0 10px;
+  height: 44px;
+  padding: 0 14px;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-pill);
@@ -140,8 +135,8 @@
     padding: 0.5rem 1rem;
   }
 
-  .navbar-logo-img {
-    height: 34px;
+  .navbar-logo {
+    margin-right: auto;
   }
 
   .navbar-logo-name {

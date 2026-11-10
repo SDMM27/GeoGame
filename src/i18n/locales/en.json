@@ -1301,7 +1301,9 @@
     "leaderboards": "Rankings",
     "profile": "Profile",
     "main": "Main navigation",
-    "language": "Language"
+    "language": "Language",
+    "theme_light": "Switch to light mode",
+    "theme_dark": "Switch to dark mode"
   },
   "league": {
     "title": "Weekly league",

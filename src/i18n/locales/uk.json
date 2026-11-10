@@ -1333,7 +1333,9 @@
     "leaderboards": "Рейтинги",
     "profile": "Профіль",
     "main": "Головне меню",
-    "language": "Мова"
+    "language": "Мова",
+    "theme_light": "Увімкнути світлу тему",
+    "theme_dark": "Увімкнути темну тему"
   },
   "league": {
     "title": "Тижнева ліга",

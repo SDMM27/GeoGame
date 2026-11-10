@@ -55,10 +55,10 @@ export function createGlobeScene(land, events) {
   const readColors = (s) => {
     colors = {
       ...s.colors,
-      ocean: readVar('--gg-ocean', '#060e1f'),
-      oceanDeep: readVar('--gg-ocean-deep', '#0e1630'),
-      land: readVar('--gg-land', '#2a3e66'),
-      landEdge: readVar('--gg-land-edge', '#6f88bd'),
+      ocean: readVar('--gg-globe-ocean', '#1b2a4d'),
+      oceanDeep: readVar('--gg-globe-ocean-deep', '#0e1630'),
+      land: readVar('--gg-globe-land', '#eef1f8'),
+      landEdge: readVar('--gg-globe-land-edge', 'rgba(11,16,32,.4)'),
       graticule: readVar('--gg-graticule', 'rgba(138,147,176,.25)'),
       plane: readVar('--gg-board-accent', '#f5c84b'),
       dark: document.documentElement.dataset.theme !== 'light',
@@ -169,6 +169,11 @@ export function createGlobeScene(land, events) {
       ctx.beginPath(); ctx.arc(x, y, isTarget ? 6 : 3.5, 0, Math.PI * 2)
       ctx.fillStyle = isTarget ? colors.accent : colors.muted; ctx.fill()
       ctx.lineWidth = 1.5; ctx.strokeStyle = colors.oceanDeep; ctx.stroke()
+      // A halo in the ocean's color keeps the code readable over the land as over the sea
+      ctx.lineWidth = 3
+      ctx.lineJoin = 'round'
+      ctx.strokeStyle = colors.oceanDeep
+      ctx.strokeText(c.code, x + 8, y - 8)
       ctx.fillStyle = colors.ink
       ctx.fillText(c.code, x + 8, y - 8)
     })

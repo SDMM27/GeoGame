@@ -25,9 +25,9 @@
   --gg-danger-strong: #c62828;
   --gg-danger-soft: rgba(229, 72, 77, 0.12);
   --gg-on-danger: #ffffff;
-  --gg-gold: #b07d00;
+  --gg-gold: #b07d00;                          /* departures board, medals (text-safe) */
   --gg-stamp-green: #08663f;                   /* passport stamps: small text on --sd-surface-2 */
-  --gg-stamp-violet: #5b2fd6;                          /* departures board, medals (text-safe) */
+  --gg-stamp-violet: #5b2fd6;
 
   /* Departures board: dark in both themes, like the real thing */
   --gg-board: #0b1020;
@@ -42,6 +42,12 @@
   --gg-land: #ffffff;
   --gg-land-edge: #94a3c4;   /* same as the light map stroke (src/components/map/mapTheme.js) */
   --gg-graticule: rgba(90, 99, 128, 0.22);
+
+  /* The hero globe, as in the validated mockup: dark land on a pale ocean (light), light land on navy (dark) */
+  --gg-globe-ocean: #dfe7f5;
+  --gg-globe-ocean-deep: #c4d1ea;
+  --gg-globe-land: #0b1020;
+  --gg-globe-land-edge: rgba(255, 255, 255, 0.4);
 
   /* One color per game, as in the app (src/utils/roomGames.js builds these names). --game-* fills icons, chips and
      bars; --game-*-ink is the text-safe shade. */
@@ -90,6 +96,11 @@
   --gg-land: #2a3e66;
   --gg-land-edge: #6f88bd;
   --gg-graticule: rgba(138, 147, 176, 0.25);
+
+  --gg-globe-ocean: #1b2a4d;
+  --gg-globe-ocean-deep: #0e1630;
+  --gg-globe-land: #eef1f8;
+  --gg-globe-land-edge: rgba(11, 16, 32, 0.4);
 
   --game-placement-ink: #7aa2ff;
   --game-flags-ink: #ff7a6b;

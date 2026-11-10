@@ -377,7 +377,12 @@
   "not_found": {
     "title": "Страница не найдена",
     "message": "Такой страницы нет или она была перемещена.",
-    "home": "На главную"
+    "home": "На главную",
+    "cancelled": "Рейс отменён",
+    "flight": "Рейс",
+    "gate": "Выход",
+    "status": "Статус",
+    "status_cancelled": "Отменён"
   },
   "units": {
     "pt": "очко",
@@ -1758,5 +1763,19 @@
   },
   "scores": {
     "kicker": "Табло вылетов"
+  },
+  "carnet_games": {
+    "kicker_end": "Посадка",
+    "kicker_daily": "Рейс дня",
+    "kicker_free": "Свободный рейс",
+    "kicker_briefing": "Брифинг",
+    "kicker_atlas": "Навигационные карты",
+    "kicker_scrolls": "Бортовой архив",
+    "kicker_legal": "Бортовые документы",
+    "stamp_landed": "Приземлился",
+    "stamp_diverted": "Перенаправлен"
+  },
+  "route_fallback": {
+    "boarding": "Идёт посадка"
   }
 }

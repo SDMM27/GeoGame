@@ -19,8 +19,16 @@
   margin-bottom: 20px;
 }
 
+.quiz-header__title {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .quiz-header h1 {
   margin: 0;
+  font-family: var(--sd-font-display);
+  letter-spacing: -0.02em;
   font-size: clamp(1.8rem, 4vw, 2.6rem);
   font-weight: 800;
 }
@@ -41,19 +49,21 @@
   text-align: center;
 }
 
-.quiz-hud strong,
-.quiz-summary-stats strong {
+.quiz-hud strong {
   display: block;
+  font-family: var(--sd-font-mono);
   font-size: 1.35rem;
-  font-weight: 900;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
 }
 
-.quiz-hud small,
-.quiz-summary-stats small {
+.quiz-hud small {
   color: var(--sd-muted);
-  font-size: 0.72rem;
+  font-family: var(--sd-font-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.12em;
 }
 
 .quiz-card {
@@ -160,10 +170,11 @@
 }
 
 .quiz-badge {
-  font-size: 0.78rem;
-  font-weight: 800;
+  font-family: var(--sd-font-mono);
+  font-size: 0.74rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
+  letter-spacing: 0.12em;
 }
 
 .quiz-question {
@@ -245,6 +256,8 @@
 }
 
 .quiz-points {
+  font-family: var(--sd-font-mono);
+  font-variant-numeric: tabular-nums;
   color: var(--sd-muted);
   font-size: 0.85rem;
   font-weight: 700;
@@ -410,8 +423,44 @@
   font-size: 0.9rem;
 }
 
+/* End of a practice run: a ticket with a stamp, the figures on the stub below the tear line */
+.quiz-summary {
+  position: relative;
+}
+
+.quiz-summary > .end-stamp {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+
+.quiz-summary > .gg-kicker,
+.quiz-summary > .quiz-card-title {
+  padding-right: 96px;
+}
+
 .quiz-summary .quiz-summary-stats {
   margin: 16px 0 20px;
+  padding-top: 14px;
+  border-top: 2px dashed var(--sd-line);
+  justify-content: space-between;
+}
+
+.quiz-summary .quiz-summary-stats > div {
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: left;
+}
+
+.quiz-summary .quiz-summary-stats > div:last-child {
+  text-align: right;
+}
+
+.quiz-summary .quiz-summary-stats .gg-field > strong {
+  font-size: 1.35rem;
+  color: var(--sd-accent-strong);
 }
 
 @media (max-width: 560px) {

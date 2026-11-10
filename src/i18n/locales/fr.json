@@ -377,7 +377,12 @@
   "not_found": {
     "title": "Page introuvable",
     "message": "Cette page n'existe pas ou a été déplacée.",
-    "home": "Retour à l'accueil"
+    "home": "Retour à l'accueil",
+    "cancelled": "Vol annulé",
+    "flight": "Vol",
+    "gate": "Porte",
+    "status": "Statut",
+    "status_cancelled": "Annulé"
   },
   "units": {
     "pt": "pt",
@@ -1702,5 +1707,19 @@
   },
   "scores": {
     "kicker": "Tableau des départs"
+  },
+  "carnet_games": {
+    "kicker_end": "Atterrissage",
+    "kicker_daily": "Vol du jour",
+    "kicker_free": "Vol libre",
+    "kicker_briefing": "Briefing",
+    "kicker_atlas": "Cartes de navigation",
+    "kicker_scrolls": "Archives de bord",
+    "kicker_legal": "Documents de bord",
+    "stamp_landed": "Atterri",
+    "stamp_diverted": "Dérouté"
+  },
+  "route_fallback": {
+    "boarding": "Embarquement en cours"
   }
 }

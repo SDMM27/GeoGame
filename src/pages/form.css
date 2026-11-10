@@ -107,3 +107,84 @@
   color: var(--sd-muted);
   font-size: 0.8rem;
 }
+
+/* ── « Carnet de vol »: the end-of-game form is a ticket, the score and time sit on its stub ── */
+.form-container.form-ticket {
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+
+.form-ticket__main {
+  position: relative;
+  padding: 28px 32px 24px;
+}
+
+.form-ticket__main .end-stamp {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+
+.form-ticket__main .gg-kicker,
+.form-ticket__main .form-title {
+  text-align: left;
+  padding-right: 88px;
+}
+
+.form-ticket__main .form-title {
+  font-family: var(--sd-font-display);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.form-ticket__main .form-score-display {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.form-ticket__stub {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 32px;
+  border-left: none;
+  border-top: 2px dashed var(--sd-line);
+  background: var(--sd-surface-2);
+}
+
+.form-ticket__stub .gg-field > strong {
+  color: var(--sd-accent-strong);
+  font-size: 1.25rem;
+}
+
+.form-ticket__stub .gg-field:last-child {
+  text-align: right;
+}
+
+.form-label {
+  font-family: var(--sd-font-mono);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+@media (max-width: 420px) {
+  .form-ticket__main { padding: 24px 20px 20px; }
+  .form-ticket__stub { padding: 12px 20px; }
+}
+
+/* The daily forms keep their own sizing (daily-form) but borrow the ticket skin */
+.daily-form.form-ticket {
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+
+.daily-form--ticket .daily-form__title {
+  font-family: var(--sd-font-display);
+  font-weight: 800;
+}
+
+.daily-form--ticket .form-ticket__main > .end-stamp ~ .daily-form__title {
+  padding-right: 88px;
+}

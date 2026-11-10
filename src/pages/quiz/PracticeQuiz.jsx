@@ -106,6 +106,8 @@ export default function PracticeQuiz({ room = null }) {
       {!room && <NavBar />}
       <main className="quiz-main">
         <header className="quiz-header">
+          <div className="quiz-header__title">
+          <p className="gg-kicker">{t(maxDifficulty ? 'carnet_games.kicker_free' : 'carnet_games.kicker_briefing')}</p>
           <h1>
             {(maxDifficulty ? theme : presetTheme) === QUIZ_THEMES.HISTORY ? t('quiz.history.title') : t('games.quiz.title')}
             {room && (
@@ -114,6 +116,7 @@ export default function PracticeQuiz({ room = null }) {
               </small>
             )}
           </h1>
+          </div>
           {maxDifficulty && !isFinished && (
             <div className="quiz-hud">
               <div><strong>{stats.score}</strong><small>{t('quiz.score')}</small></div>

@@ -31,13 +31,17 @@
   margin: 0 0 8px;
   color: var(--gg-warning-strong);
   text-transform: uppercase;
-  letter-spacing: 2px;
-  font-size: 0.76rem;
-  font-weight: 800;
+  font-family: var(--sd-font-mono);
+  letter-spacing: 0.14em;
+  font-size: 0.74rem;
+  font-weight: 700;
 }
 
 .country-clue-hero h1 {
   margin: 0 0 10px;
+  font-family: var(--sd-font-display);
+  font-weight: 800;
+  letter-spacing: -0.03em;
   font-size: clamp(2.1rem, 4vw, 3.4rem);
   color: var(--sd-ink);
 }
@@ -65,15 +69,20 @@
 
 .country-clue-stat span {
   display: block;
+  font-family: var(--sd-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 1.55rem;
-  font-weight: 900;
+  font-weight: 800;
   color: var(--gg-warning-strong);
 }
 
 .country-clue-stat small {
   color: var(--sd-muted);
+  font-family: var(--sd-font-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.12em;
 }
 
 .country-clue-layout {

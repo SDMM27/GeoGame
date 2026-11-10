@@ -377,7 +377,12 @@
   "not_found": {
     "title": "Seite nicht gefunden",
     "message": "Diese Seite gibt es nicht oder sie wurde verschoben.",
-    "home": "Zurück zur Startseite"
+    "home": "Zurück zur Startseite",
+    "cancelled": "Flug annulliert",
+    "flight": "Flug",
+    "gate": "Gate",
+    "status": "Status",
+    "status_cancelled": "Annulliert"
   },
   "units": {
     "pt": "Pkt.",
@@ -1702,5 +1707,19 @@
   },
   "scores": {
     "kicker": "Abflugtafel"
+  },
+  "carnet_games": {
+    "kicker_end": "Landung",
+    "kicker_daily": "Flug des Tages",
+    "kicker_free": "Freier Flug",
+    "kicker_briefing": "Briefing",
+    "kicker_atlas": "Navigationskarten",
+    "kicker_scrolls": "Bordarchiv",
+    "kicker_legal": "Bordunterlagen",
+    "stamp_landed": "Gelandet",
+    "stamp_diverted": "Umgeleitet"
+  },
+  "route_fallback": {
+    "boarding": "Boarding läuft"
   }
 }

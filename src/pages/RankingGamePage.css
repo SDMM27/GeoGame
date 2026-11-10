@@ -16,11 +16,16 @@
 
 /* ── Title ── */
 .ranking-game-title {
+  font-family: var(--sd-font-display);
   font-size: clamp(1.6rem, 4vw, 2.4rem);
-  font-weight: 900;
+  font-weight: 800;
   color: var(--sd-ink);
-  letter-spacing: 1px;
+  letter-spacing: -0.02em;
   margin-bottom: 20px;
+}
+
+.ranking-game-main > .gg-kicker {
+  margin-bottom: 6px;
 }
 
 /* ── Mode tabs ── */
@@ -60,6 +65,7 @@
 }
 
 .ranking-slider-value {
+  font-family: var(--sd-font-mono);
   font-size: 1.1rem;
   font-weight: 800;
   color: var(--sd-ink);
@@ -139,9 +145,11 @@
 
 .ranking-criterion-label {
   color: var(--sd-muted);
-  font-size: 0.65rem;
+  font-family: var(--sd-font-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
+  letter-spacing: 0.12em;
   margin-bottom: 4px;
 }
 
@@ -200,6 +208,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: var(--sd-font-mono);
   font-size: 0.72rem;
   font-weight: 700;
   flex-shrink: 0;
@@ -249,10 +258,33 @@
 }
 
 .ranking-score-value {
+  font-family: var(--sd-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 3.2rem;
-  font-weight: 900;
+  font-weight: 800;
   color: var(--gg-warning-strong);
   line-height: 1;
+}
+
+/* End of a round: the score is a ticket with a stamp, the error count on its stub */
+.ranking-score--final {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 20px 16px 0;
+  border: 1px solid var(--sd-line);
+  border-radius: 18px;
+  background: var(--sd-surface);
+}
+
+.ranking-score--final .ranking-score-sub {
+  align-self: stretch;
+  margin: 0;
+  padding: 12px 0 14px;
+  border-top: 2px dashed var(--sd-line);
+  font-family: var(--sd-font-mono);
 }
 
 .ranking-score-sub {
@@ -505,8 +537,10 @@
 
 /* ── Attempt counter ── */
 .ranking-attempt-counter {
+  font-family: var(--sd-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--sd-muted);
   text-align: center;
   margin-bottom: 8px;

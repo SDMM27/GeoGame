@@ -40,10 +40,12 @@
 }
 
 .voyage-country small {
+  font-family: var(--sd-font-mono);
   font-size: 0.68em;
+  font-weight: 700;
   color: var(--sd-muted);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.12em;
 }
 
 .voyage-start span { color: var(--gg-success-strong); }
@@ -55,6 +57,7 @@
   align-items: center;
   gap: 4px;
   font-size: 0.8em;
+  font-variant-numeric: tabular-nums;
   color: var(--sd-muted);
 }
 

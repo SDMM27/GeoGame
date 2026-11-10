@@ -14,15 +14,19 @@
 }
 
 .legal-title {
-  margin: 0;
+  margin: 0.4rem 0 0;
+  font-family: var(--sd-font-display);
   font-size: 2rem;
-  font-weight: 900;
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 .legal-updated {
   margin: 0.25rem 0 1.5rem;
   color: var(--sd-muted);
-  font-size: 0.9rem;
+  font-family: var(--sd-font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
 }
 
 .legal-section h2 {

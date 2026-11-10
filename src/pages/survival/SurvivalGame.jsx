@@ -18,6 +18,7 @@ import { DIFFICULTY_COLORS } from '../quiz/constants'
 import SurvivalForm from './SurvivalForm'
 import { BorderRound, PlacementRound, QuizRound, TypedRound, roundAnswer } from './SurvivalRounds'
 import Spectator from './Spectator'
+import EndStamp from '../../components/EndStamp'
 import { othersStillIn, spectatorRows } from '../../utils/survivalSync'
 import 'react-toastify/dist/ReactToastify.css'
 import './Survival.css'
@@ -194,6 +195,8 @@ export default function SurvivalGame({
       {spectating && (
         <div className="game-over-overlay">
           <div className="game-over-content survival-over">
+            <EndStamp tone={isWon ? 'success' : 'danger'} label={t(isWon ? 'carnet_games.stamp_landed' : 'carnet_games.stamp_diverted')} />
+            <p className="gg-kicker">{t('carnet_games.kicker_end')}</p>
             <h2>{t('survival.game_over')}</h2>
             <Spectator
               round={survival.rounds[shared.round] ?? null}
@@ -210,12 +213,14 @@ export default function SurvivalGame({
       {isOver && !spectating && (
         <div className="game-over-overlay">
           <div className="game-over-content survival-over">
+            <EndStamp tone={isWon ? 'success' : 'danger'} label={t(isWon ? 'carnet_games.stamp_landed' : 'carnet_games.stamp_diverted')} />
+            <p className="gg-kicker">{t('carnet_games.kicker_end')}</p>
             <h2>{isWon ? t(lastStanding ? 'survival.last_standing' : 'survival.victory') : t('survival.game_over')}</h2>
             {!isWon && round && <p className="survival-muted">{t('survival.answer_was', { answer: roundAnswer(round, i18n.language, t) })}</p>}
             <div className="survival-over-stats">
-              <div><strong>{score}</strong><small>{t('survival.rounds_survived')}</small></div>
-              <div><strong>{formatTime(elapsedMs)}</strong><small>{t('survival.time')}</small></div>
-              <div><strong>{lives} ❤️</strong><small>{t('survival.lives_at_start')}</small></div>
+              <div className="gg-field"><small>{t('survival.rounds_survived')}</small><strong>{score}</strong></div>
+              <div className="gg-field"><small>{t('survival.time')}</small><strong>{formatTime(elapsedMs)}</strong></div>
+              <div className="gg-field"><small>{t('survival.lives_at_start')}</small><strong>{lives} ❤️</strong></div>
             </div>
             {room ? (
               synced && room.onExit ? (

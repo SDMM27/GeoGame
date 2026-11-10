@@ -9,8 +9,11 @@
 }
 
 .daily-elsewhere__title {
-  margin: 0;
+  margin: 4px 0 0;
   color: var(--sd-ink);
+  font-family: var(--sd-font-display);
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 .daily-elsewhere__checking {
@@ -34,5 +37,6 @@
   background: transparent;
   color: var(--sd-ink);
   font-weight: 700;
+  min-height: 44px;
   cursor: pointer;
 }

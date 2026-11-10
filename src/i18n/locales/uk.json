@@ -377,7 +377,12 @@
   "not_found": {
     "title": "Сторінку не знайдено",
     "message": "Такої сторінки немає, або її було переміщено.",
-    "home": "На головну"
+    "home": "На головну",
+    "cancelled": "Рейс скасовано",
+    "flight": "Рейс",
+    "gate": "Вихід",
+    "status": "Статус",
+    "status_cancelled": "Скасовано"
   },
   "units": {
     "pt": "бал",
@@ -1758,5 +1763,19 @@
   },
   "scores": {
     "kicker": "Табло вильотів"
+  },
+  "carnet_games": {
+    "kicker_end": "Посадка",
+    "kicker_daily": "Рейс дня",
+    "kicker_free": "Вільний рейс",
+    "kicker_briefing": "Брифінг",
+    "kicker_atlas": "Навігаційні карти",
+    "kicker_scrolls": "Бортовий архів",
+    "kicker_legal": "Бортові документи",
+    "stamp_landed": "Приземлився",
+    "stamp_diverted": "Перенаправлено"
+  },
+  "route_fallback": {
+    "boarding": "Триває посадка"
   }
 }

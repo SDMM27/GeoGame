@@ -24,6 +24,7 @@ import ChallengeLeaderboard from './ChallengeLeaderboard'
 import 'leaflet/dist/leaflet.css'
 import './GamePage.css'
 import './QuizPage.css'
+import EndStamp from '../components/EndStamp'
 import './survival/Survival.css'
 import './DailyChallengePage.css'
 
@@ -165,7 +166,10 @@ export default function DailyChallengePage() {
           result={done ? { score, solved: true } : null}
         />
         <header className="quiz-header">
-          <h1>{t('games.daily_challenge.title')}</h1>
+          <div className="quiz-header__title">
+            <p className="gg-kicker">{t(done ? 'carnet_games.kicker_end' : 'carnet_games.kicker_daily')}</p>
+            <h1>{t('games.daily_challenge.title')}</h1>
+          </div>
         </header>
 
         {phase === 'loading' && <p className="quiz-muted">{t('messages.loading')}</p>}
@@ -184,6 +188,7 @@ export default function DailyChallengePage() {
         {done && (
           <>
             <section className="quiz-card challenge-result">
+              <EndStamp />
               <h2 className="quiz-card-title">{t('daily_challenge.result_title')}</h2>
               <div className="challenge-score">
                 <strong>{score}</strong>

@@ -6,6 +6,7 @@ import { formatTime } from "../utils/formatTime";
 import { useAccount } from "../auth";
 import { useScoreSave } from "../hooks/useScoreSave";
 import LeaderboardSave from "../components/LeaderboardSave";
+import EndStamp from "../components/EndStamp";
 
 export default function Form({ finalScore, difficulty, elapsedTime, gameType, continent }) {
   const { t } = useTranslation();
@@ -14,21 +15,24 @@ export default function Form({ finalScore, difficulty, elapsedTime, gameType, co
   );
 
   return (
-    <div className="form-container">
-      <h2 className="form-title">{t('form.title')}</h2>
-      <p className="form-score-display">
-        {t('labels.score')} <strong>{finalScore} {t('units.pts')}</strong> — {difficulty}
-      </p>
-      <p className="form-score-display">
-        {t('labels.time')} <strong>{formatTime(elapsedTime)}</strong>
-      </p>
+    <div className="form-container gg-ticket form-ticket">
+      <div className="form-ticket__main">
+        <EndStamp />
+        <p className="gg-kicker">{t('carnet_games.kicker_end')}</p>
+        <h2 className="form-title">{t('form.title')}</h2>
+        {difficulty && <p className="form-score-display">{difficulty}</p>}
 
-      <LeaderboardSave
-        saver={saver}
-        existingText={(existing) => `${existing.score} ${t('units.pts')} — ${formatTime(existing.elapsedTime)}`}
-        blockedLabel={t('form.better_score_exists')}
-        blockedHint={t('form.use_different_name')}
-      />
+        <LeaderboardSave
+          saver={saver}
+          existingText={(existing) => `${existing.score} ${t('units.pts')} — ${formatTime(existing.elapsedTime)}`}
+          blockedLabel={t('form.better_score_exists')}
+          blockedHint={t('form.use_different_name')}
+        />
+      </div>
+      <div className="gg-ticket-stub form-ticket__stub">
+        <span className="gg-field"><small>{t('game_hud.score')}</small><strong>{finalScore} {t('units.pts')}</strong></span>
+        <span className="gg-field"><small>{t('game_hud.time')}</small><strong>{formatTime(elapsedTime)}</strong></span>
+      </div>
     </div>
   );
 }

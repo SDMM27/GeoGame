@@ -9,7 +9,7 @@
 
 .scroll-grid-groups { display: flex; flex-direction: column; gap: 1.5rem; }
 .scroll-era { display: flex; flex-direction: column; gap: 0.6rem; }
-.scroll-era h3 { margin: 0; font-size: 1rem; color: var(--sd-muted); font-weight: 700; }
+.scroll-era h3 { margin: 0; font-family: var(--sd-font-mono); font-size: 0.72rem; color: var(--sd-muted); font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
 
 .scroll-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.75rem; margin: 0; padding: 0; list-style: none; }
 
@@ -72,7 +72,7 @@
 .scroll-sheet-close { position: absolute; top: 0.5rem; right: 0.5rem; z-index: 2; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--gg-line-strong); background: var(--gg-glass); color: var(--sd-ink); font-size: 1.3rem; line-height: 1; cursor: pointer; }
 .scroll-sheet-head h2 { margin: 0; font-size: 1.4rem; }
 .scroll-sheet-head p { margin: 0.15rem 0 0; }
-.scroll-sheet-date { color: var(--sd-accent-strong); font-weight: 700; }
+.scroll-sheet-date { color: var(--sd-accent-strong); font-family: var(--sd-font-mono); font-variant-numeric: tabular-nums; font-weight: 700; }
 .scroll-sheet-family { color: var(--sd-muted); font-size: 0.9rem; }
 .scroll-sheet-body { margin: 0; line-height: 1.55; }
 .scroll-sheet-detail { padding: 0.7rem 0.9rem; border-radius: 10px; background: var(--sd-surface-2); border-left: 3px solid var(--gg-warning); }

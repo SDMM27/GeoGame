@@ -25,6 +25,7 @@ import { getCountryStyle, getFocusCountry } from '../utils/borderGuessMap'
 import { formatTime } from '../utils/formatTime'
 import { FitCountryBounds, GuessHistory } from './BorderGuessPage'
 import 'leaflet/dist/leaflet.css'
+import EndStamp from '../components/EndStamp'
 import './QuizPage.css'
 import './CountryOfDayPage.css'
 
@@ -302,7 +303,10 @@ export default function CountryOfDayPage() {
       <NavBar />
       <main className="quiz-main">
         <header className="quiz-header">
-          <h1>{t('games.country_of_day.title')}</h1>
+          <div className="quiz-header__title">
+            <p className="gg-kicker">{t(done ? 'carnet_games.kicker_end' : 'carnet_games.kicker_daily')}</p>
+            <h1>{t('games.country_of_day.title')}</h1>
+          </div>
         </header>
 
         {phase === 'loading' && <p className="quiz-muted">{t('messages.loading')}</p>}
@@ -311,6 +315,7 @@ export default function CountryOfDayPage() {
         {done && (
           <>
             <section className="quiz-card cod-result">
+              <EndStamp />
               <div className="cod-score">
                 <strong>{score}</strong>
                 <span>/{COUNTRY_OF_DAY_MAX_SCORE[mode]}</span>

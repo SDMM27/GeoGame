@@ -36,6 +36,9 @@
 
 .border-guess-panel--hero h1 {
   margin: 6px 0 10px;
+  font-family: var(--sd-font-display);
+  font-weight: 800;
+  letter-spacing: -0.03em;
   color: var(--sd-ink);
   font-size: clamp(2rem, 4vw, 3.2rem);
 }
@@ -44,7 +47,8 @@
   margin: 0;
   color: var(--sd-accent-strong);
   text-transform: uppercase;
-  letter-spacing: 2px;
+  font-family: var(--sd-font-mono);
+  letter-spacing: 0.14em;
   font-size: 0.72rem;
   font-weight: 700;
 }
@@ -73,6 +77,8 @@
 .border-guess-stat-value {
   display: block;
   color: var(--sd-ink);
+  font-family: var(--sd-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 1.5rem;
   font-weight: 800;
 }
@@ -80,8 +86,10 @@
 .border-guess-stat-label {
   display: block;
   color: var(--sd-muted);
-  font-size: 0.72rem;
-  letter-spacing: 1px;
+  font-family: var(--sd-font-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 

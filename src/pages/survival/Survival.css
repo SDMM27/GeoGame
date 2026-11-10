@@ -109,9 +109,10 @@
 }
 
 .survival-hud-label {
+  font-family: var(--sd-font-mono);
   font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 2px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--sd-muted);
 }
@@ -126,6 +127,7 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 2px;
+  font-family: var(--sd-font-mono);
   font-size: 0.85rem;
   color: var(--sd-muted);
   font-variant-numeric: tabular-nums;
@@ -401,6 +403,7 @@
 
 /* End */
 .survival-over {
+  position: relative;
   max-width: 440px;
   width: 100%;
   padding: 24px;
@@ -413,34 +416,44 @@
 }
 
 .survival-over h2 {
+  font-family: var(--sd-font-display);
+  font-weight: 800;
   font-size: 1.6rem;
   color: var(--sd-ink);
 }
 
+/* Stamp and kicker sit like on the end-of-game ticket */
+.survival-over > .end-stamp {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+}
+
+.survival-over > .gg-kicker,
+.survival-over > h2 {
+  align-self: stretch;
+  padding-right: 88px;
+  text-align: left;
+}
+
+/* The tear line, then the figures of the run */
 .survival-over-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
   width: 100%;
+  padding-top: 14px;
+  border-top: 2px dashed var(--sd-line);
 }
 
-.survival-over-stats div {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 10px 6px;
-  background: var(--sd-surface);
-  border-radius: var(--sd-radius-md);
+.survival-over-stats .gg-field {
+  align-items: center;
+  padding: 4px 2px;
 }
 
-.survival-over-stats strong {
+.survival-over-stats .gg-field > strong {
   font-size: 1.25rem;
   color: var(--sd-accent-strong);
-}
-
-.survival-over-stats small {
-  font-size: 0.72rem;
-  color: var(--sd-muted);
 }
 
 .survival-muted {

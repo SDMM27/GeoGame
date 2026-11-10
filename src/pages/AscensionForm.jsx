@@ -6,6 +6,7 @@ import { presetLabel } from '../utils/ascensionPresets'
 import { useAccount } from '../auth'
 import { useScoreSave } from '../hooks/useScoreSave'
 import LeaderboardSave from '../components/LeaderboardSave'
+import EndStamp from '../components/EndStamp'
 
 /**
  * End-of-game summary and score save for Ascension mode.
@@ -25,33 +26,17 @@ export default function AscensionForm({ score, timer, stats, phaseStats, gameTyp
   }
 
   return (
-    <div className="form-container">
+    <div className="form-container gg-ticket form-ticket">
+      <div className="form-ticket__main">
+      <EndStamp />
+      <p className="gg-kicker">{t('carnet_games.kicker_end')}</p>
       <h2 className="form-title">{t('form.ascension_title')}</h2>
       {presetName && <p className="form-score-display">{t('labels.preset')} <strong>{presetLabel(presetName, t)}</strong></p>}
 
-      <div style={{ display: 'flex', justifyContent: 'space-around', margin: '12px 0' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ color: 'var(--sd-accent-2)', fontSize: '1.4em', fontWeight: 'bold' }}>
-            {formatTime(timer)}
-          </div>
-          <div style={{ color: 'var(--sd-muted)', fontSize: '0.8em' }}>{t('labels.total_time')}</div>
-        </div>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ color: 'var(--gg-warning-strong)', fontSize: '1.4em', fontWeight: 'bold' }}>{score}</div>
-          <div style={{ color: 'var(--sd-muted)', fontSize: '0.8em' }}>{t('labels.score')}</div>
-        </div>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ color: 'var(--gg-success-strong)', fontSize: '1.4em', fontWeight: 'bold' }}>
-            {stats.found}/{stats.total}
-          </div>
-          <div style={{ color: 'var(--sd-muted)', fontSize: '0.8em' }}>{t('labels.found')}</div>
-        </div>
-      </div>
-
       {phaseStats?.length > 0 && (
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82em', marginBottom: '12px' }}>
+        <table className="form-ticket__phases" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82em', marginBottom: '12px' }}>
           <thead>
-            <tr style={{ color: 'var(--sd-muted)', borderBottom: '1px solid var(--sd-line)' }}>
+            <tr className="gg-board-head" style={{ borderBottom: '1px solid var(--sd-line)' }}>
               <th style={{ textAlign: 'left', padding: '3px 0' }}>{t('labels.phase')}</th>
               <th style={{ textAlign: 'center' }}>{t('labels.found')}</th>
               <th style={{ textAlign: 'center' }}>{t('game_hud.skipped')}</th>
@@ -86,6 +71,12 @@ export default function AscensionForm({ score, timer, stats, phaseStats, gameTyp
           {isTraining ? t('form.training_mode_not_saved') : t('form.custom_config_not_saved')}
         </p>
       )}
+      </div>
+      <div className="gg-ticket-stub form-ticket__stub">
+        <span className="gg-field"><small>{t('labels.total_time')}</small><strong>{formatTime(timer)}</strong></span>
+        <span className="gg-field"><small>{t('game_hud.score')}</small><strong>{score}</strong></span>
+        <span className="gg-field"><small>{t('labels.found')}</small><strong>{stats.found}/{stats.total}</strong></span>
+      </div>
     </div>
   )
 }

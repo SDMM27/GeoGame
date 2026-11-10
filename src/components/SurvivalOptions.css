@@ -5,9 +5,10 @@
 }
 
 .survival-options-label {
-  font-size: 0.75rem;
+  font-family: var(--sd-font-mono);
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 1px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--sd-muted);
 }

@@ -377,7 +377,12 @@
   "not_found": {
     "title": "Pagina non trovata",
     "message": "Questa pagina non esiste o è stata spostata.",
-    "home": "Torna alla home"
+    "home": "Torna alla home",
+    "cancelled": "Volo cancellato",
+    "flight": "Volo",
+    "gate": "Gate",
+    "status": "Stato",
+    "status_cancelled": "Cancellato"
   },
   "units": {
     "pt": "pt",
@@ -1702,5 +1707,19 @@
   },
   "scores": {
     "kicker": "Tabellone partenze"
+  },
+  "carnet_games": {
+    "kicker_end": "Atterraggio",
+    "kicker_daily": "Volo del giorno",
+    "kicker_free": "Volo libero",
+    "kicker_briefing": "Briefing",
+    "kicker_atlas": "Carte di navigazione",
+    "kicker_scrolls": "Archivi di bordo",
+    "kicker_legal": "Documenti di bordo",
+    "stamp_landed": "Atterrato",
+    "stamp_diverted": "Dirottato"
+  },
+  "route_fallback": {
+    "boarding": "Imbarco in corso"
   }
 }

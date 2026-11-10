@@ -61,6 +61,7 @@ export default function LegalPage({ doc }) {
     <div className="legal-page">
       <NavBar />
       <main className="legal-main">
+        <p className="gg-kicker">{t('carnet_games.kicker_legal')}</p>
         <h1 className="legal-title">{content.title}</h1>
         <p className="legal-updated">{t('legal.updated', { date: updated })}</p>
         {content.intro.map((block, index) => <Block key={index} block={block} />)}

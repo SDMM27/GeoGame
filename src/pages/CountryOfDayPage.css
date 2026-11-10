@@ -163,7 +163,12 @@
 
 /* Result */
 .cod-result {
+  position: relative;
   text-align: center;
+}
+
+.cod-result > .end-stamp {
+  margin-bottom: 10px;
 }
 
 .cod-score {
@@ -174,13 +179,16 @@
 }
 
 .cod-score strong {
+  font-family: var(--sd-font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: clamp(3.2rem, 14vw, 5rem);
-  font-weight: 900;
+  font-weight: 800;
   line-height: 1;
   color: var(--sd-accent-strong);
 }
 
 .cod-score span {
+  font-family: var(--sd-font-mono);
   font-size: 1.6rem;
   font-weight: 800;
   color: var(--sd-muted);

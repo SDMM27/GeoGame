@@ -184,7 +184,7 @@ export default function CountryCluePage() {
         )}
         <section className="country-clue-hero">
           <div>
-            <p className="country-clue-eyebrow">{t('labels.new_game')}</p>
+            <p className="country-clue-eyebrow gg-kicker">{t('labels.new_game')}</p>
             <h1>{title}</h1>
             <p className="country-clue-subtitle">{subtitle}</p>
           </div>

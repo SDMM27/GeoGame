@@ -17,16 +17,20 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.82em;
+  font-family: var(--sd-font-mono);
+  font-size: 0.74em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   margin-bottom: 4px;
 }
 
 .phase-indicator-label {
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .phase-indicator-count {
   color: var(--sd-muted);
+  font-variant-numeric: tabular-nums;
 }
 
 .phase-indicator-track {

@@ -377,7 +377,12 @@
   "not_found": {
     "title": "Pagina niet gevonden",
     "message": "Deze pagina bestaat niet of is verplaatst.",
-    "home": "Terug naar start"
+    "home": "Terug naar start",
+    "cancelled": "Vlucht geannuleerd",
+    "flight": "Vlucht",
+    "gate": "Gate",
+    "status": "Status",
+    "status_cancelled": "Geannuleerd"
   },
   "units": {
     "pt": "pt",
@@ -1702,5 +1707,19 @@
   },
   "scores": {
     "kicker": "Vertrekbord"
+  },
+  "carnet_games": {
+    "kicker_end": "Landing",
+    "kicker_daily": "Vlucht van de dag",
+    "kicker_free": "Vrije vlucht",
+    "kicker_briefing": "Briefing",
+    "kicker_atlas": "Navigatiekaarten",
+    "kicker_scrolls": "Boordarchief",
+    "kicker_legal": "Boorddocumenten",
+    "stamp_landed": "Geland",
+    "stamp_diverted": "Omgeleid"
+  },
+  "route_fallback": {
+    "boarding": "Instappen bezig"
   }
 }

@@ -57,9 +57,11 @@
 }
 
 .hud-target-label {
-  font-size: 0.65rem;
+  font-family: var(--sd-font-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
   color: var(--sd-muted);
-  letter-spacing: 1px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -85,16 +87,20 @@
 }
 
 .hud-value {
+  font-family: var(--sd-font-mono);
   font-size: 1.4rem;
-  font-weight: 900;
+  font-weight: 800;
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
 
 .hud-label {
-  font-size: 0.65rem;
+  font-family: var(--sd-font-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
   color: var(--sd-muted);
-  letter-spacing: 2px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   margin-top: 2px;
 }
 
@@ -121,10 +127,12 @@
 }
 
 .hud-progress-text {
-  font-size: 0.6rem;
+  font-family: var(--sd-font-mono);
+  font-size: 0.66rem;
+  font-variant-numeric: tabular-nums;
   color: var(--sd-muted);
   white-space: nowrap;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.06em;
 }
 
 /* ── HUD Stats block ── */
@@ -145,9 +153,11 @@
 }
 
 .hud-stat-value {
+  font-family: var(--sd-font-mono);
   font-size: 1.2rem;
-  font-weight: 900;
+  font-weight: 800;
   line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 
 .hud-stat-value--found {
@@ -163,9 +173,12 @@
 }
 
 .hud-stat-label {
-  font-size: 0.6rem;
+  font-family: var(--sd-font-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
   color: var(--sd-muted);
-  letter-spacing: 1.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   margin-top: 2px;
 }
 
@@ -247,7 +260,8 @@
 }
 
 .controls-key {
-  font-size: 0.6rem;
+  font-family: var(--sd-font-mono);
+  font-size: 0.62rem;
   font-weight: 700;
   letter-spacing: 0.5px;
   color: var(--sd-accent-strong);

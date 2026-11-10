@@ -269,6 +269,106 @@ select {
   text-transform: uppercase;
 }
 
+/* « Carnet de vol » building blocks shared by the pages (the home page has its own, in pages/home/flight) */
+
+/* Mono kicker above a title: « SALON · 4F2K », « CLASSEMENT · SEMAINE 46 » */
+.gg-kicker {
+  margin: 0;
+  font-family: var(--sd-font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sd-accent-strong);
+}
+
+/* Big display title of a page */
+.gg-title {
+  margin: 0;
+  font-family: var(--sd-font-display);
+  font-weight: 800;
+  font-size: clamp(1.9rem, 4.5vw, 3rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--sd-ink);
+}
+
+/* A ticket: a surface with a dashed tear line before its last child (.gg-ticket-stub) */
+.gg-ticket {
+  display: flex;
+  border-radius: 18px;
+  border: 1px solid var(--sd-line);
+  background: var(--sd-surface);
+}
+
+.gg-ticket-stub {
+  flex-shrink: 0;
+  padding: 16px;
+  border-left: 2px dashed var(--sd-line);
+  font-family: var(--sd-font-mono);
+}
+
+/* A label / value pair in mono, like the fields of a boarding pass */
+.gg-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: var(--sd-font-mono);
+}
+
+.gg-field > small {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sd-muted);
+}
+
+.gg-field > strong {
+  font-size: 1.1rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--sd-ink);
+}
+
+/* A round passport stamp (add .sd-stamp to slam it down; tilt with --sd-stamp-rotate) */
+.gg-stamp {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 96px;
+  padding: 6px;
+  border-radius: 50%;
+  border: 3px double var(--gg-stamp-color, var(--sd-accent-strong));
+  color: var(--gg-stamp-color, var(--sd-accent-strong));
+  font-family: var(--sd-font-mono);
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+  transform: rotate(var(--sd-stamp-rotate, -6deg));
+}
+
+.gg-stamp > strong {
+  font-family: var(--sd-font-display);
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* Header row of a board-like table (leaderboards, manifests) */
+.gg-board-head {
+  font-family: var(--sd-font-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sd-muted);
+}
+
 /* Game maps: the ocean under the filled land (src/components/map/LandLayer.jsx). */
 .leaflet-container.map-night {
   background: var(--gg-ocean);

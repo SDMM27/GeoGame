@@ -35,3 +35,5 @@
 .rc-add-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .rc-submit { min-height: 48px; width: 100%; padding: 0.85rem; border-radius: 10px; border: none; background: var(--sd-accent); color: var(--sd-bg); font-size: 1rem; font-weight: 700; cursor: pointer; }
 .rc-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.rc-add-btn { min-height: 44px; }

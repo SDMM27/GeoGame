@@ -290,3 +290,6 @@
 @media (max-width: 520px) {
   .scoreboard-mode-tabs { padding: 0 12px; }
 }
+
+/* 44px touch targets */
+.scoreboard-select { min-height: 44px; }

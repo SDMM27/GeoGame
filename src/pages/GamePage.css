@@ -372,9 +372,12 @@
   .hud-btn--reveal {
     flex: 1 1 0;
     min-width: 0;
+    min-height: 44px;
     padding: 10px 4px;
-    font-size: 0.8rem;
+    font-size: clamp(0.7rem, 3.3vw, 0.8rem);
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .game-over-overlay {

@@ -123,3 +123,7 @@
   opacity: 0.6;
   cursor: default;
 }
+
+/* The flag stays small in the row; its hit area is 44px tall */
+.report__flag { position: relative; }
+.report__flag::after { content: ''; position: absolute; inset: -16px -6px; } /* not wider: the name link sits just left */

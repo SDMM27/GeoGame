@@ -11,7 +11,7 @@
   --gg-glass: rgba(243, 245, 250, 0.88);       /* bars and overlays over a map */
   --gg-scrim: rgba(11, 16, 32, 0.45);          /* behind a modal */
   --gg-shadow: 0 8px 24px -8px rgba(11, 16, 32, 0.18), 0 2px 6px rgba(11, 16, 32, 0.06);
-  --gg-accent-soft: rgba(20, 168, 107, 0.12);
+  --gg-accent-soft: rgba(20, 168, 107, 0.08); /* light enough for --sd-accent-strong text on it (AA) */
   --gg-accent-line: rgba(20, 168, 107, 0.4);
   --gg-highlight: #3557c9;
   --gg-success: #14a86b;
@@ -25,7 +25,9 @@
   --gg-danger-strong: #c62828;
   --gg-danger-soft: rgba(229, 72, 77, 0.12);
   --gg-on-danger: #ffffff;
-  --gg-gold: #b07d00;                          /* departures board, medals (text-safe) */
+  --gg-gold: #b07d00;
+  --gg-stamp-green: #08663f;                   /* passport stamps: small text on --sd-surface-2 */
+  --gg-stamp-violet: #5b2fd6;                          /* departures board, medals (text-safe) */
 
   /* Departures board: dark in both themes, like the real thing */
   --gg-board: #0b1020;
@@ -48,7 +50,7 @@
   --game-capitals: #f5b83d;      --game-capitals-ink: #8a5a00;
   --game-border-guess: #c792ff;  --game-border-guess-ink: #7c4dff;
   --game-country-clue: #3ddc97;  --game-country-clue-ink: #0b7a4c;
-  --game-voyage-voyage: #5fd4f4; --game-voyage-voyage-ink: #0a6f8c;
+  --game-voyage-voyage: #5fd4f4; --game-voyage-voyage-ink: #08617a;
   --game-ranking: #ff9ec7;       --game-ranking-ink: #b8306f;
   --game-quiz: #b4e05a;          --game-quiz-ink: #4d6b0e;
   --game-daily-challenge: #ff9f45; --game-daily-challenge-ink: #a8520a;
@@ -78,6 +80,8 @@
   --gg-danger-soft: rgba(255, 122, 107, 0.15);
   --gg-on-danger: #3a0d07;
   --gg-gold: #f5c84b;
+  --gg-stamp-green: var(--sd-accent-strong);
+  --gg-stamp-violet: var(--sd-accent-2);
 
   --gg-board: #070b16;
 

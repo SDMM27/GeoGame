@@ -266,6 +266,7 @@
 .boarding-pass-more {
   display: grid;
   place-items: center;
+  flex-shrink: 0;
   width: 46px;
   min-height: 44px;
   border-radius: 12px;
@@ -392,7 +393,7 @@
 }
 
 .passport-stamp {
-  --tone: var(--sd-accent-strong);
+  --tone: var(--gg-stamp-green);
   width: 116px;
   height: 116px;
   border-radius: 50%;
@@ -410,7 +411,7 @@
 }
 
 .passport-stamp--accent2 {
-  --tone: var(--sd-accent-2);
+  --tone: var(--gg-stamp-violet);
 }
 
 .passport-stamp--waiting {

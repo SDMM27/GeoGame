@@ -5,6 +5,9 @@
 
 .player-name__link--colored { color: var(--name-color); }
 
+/* The name colors are bright, made for the dark theme: darkened in the light one to stay readable (AA) */
+:root[data-theme="light"] .player-name__link--colored { color: color-mix(in srgb, var(--name-color) 55%, #000); }
+
 .player-name__ring {
   display: inline-block;
   box-sizing: border-box;

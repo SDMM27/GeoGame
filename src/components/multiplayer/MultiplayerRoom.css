@@ -14,7 +14,7 @@
 .mpr-link-btn { padding: 0.5rem 1rem; border-radius: var(--sd-radius-md); border: 1px solid var(--sd-line); background: transparent; color: var(--sd-muted); font-size: 0.9rem; cursor: pointer; }
 .mpr-link-btn:hover { border-color: var(--sd-accent); color: var(--sd-accent-strong); }
 .mpr-input { padding: 0.65rem 0.9rem; border-radius: var(--sd-radius-md); border: 1px solid var(--sd-line); background: var(--sd-bg); color: var(--sd-ink); font-size: 1rem; }
-.mpr-btn { padding: 0.75rem 1rem; border-radius: var(--sd-radius-md); border: none; background: var(--game, var(--sd-accent)); color: var(--sd-bg); font-size: 1rem; font-weight: 700; cursor: pointer; }
+.mpr-btn { min-height: 48px; padding: 0.75rem 1rem; border-radius: var(--sd-radius-md); border: none; background: var(--game, var(--sd-accent)); color: var(--gg-on-game); font-size: 1rem; font-weight: 700; cursor: pointer; }
 .mpr-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .mpr-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.35rem; }
 .mpr-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.2rem 0.6rem; padding: 0.45rem 0.6rem; border-radius: 8px; border: 1px solid transparent; }
@@ -85,4 +85,12 @@
   .mpr-strip__name { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
   .mpr-strip__rounds { color: var(--sd-muted); font-variant-numeric: tabular-nums; }
   .mpr-strip__rounds::after { content: ' ✓'; }
+}
+
+/* Phones: the stub goes under the code, which keeps the whole width */
+@media (max-width: 520px) {
+  .mpr-code { flex-direction: column; }
+  .mpr-code-stub { border-left: 0; border-top: 2px dashed var(--sd-line); }
+  .mpr-code-stub .mpr-link-btn { width: 100%; }
+  .mpr-code code { letter-spacing: 0.14em; }
 }

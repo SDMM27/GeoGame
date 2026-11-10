@@ -42,7 +42,7 @@
   white-space: nowrap;
 }
 .friends-btn:hover { border-color: var(--gg-line-strong); }
-.friends-btn--primary { background: var(--sd-accent); border-color: var(--sd-accent); color: var(--sd-bg); }
+.friends-btn--primary { background: var(--sd-accent); border-color: var(--sd-accent); color: var(--sd-accent-ink); }
 .friends-btn--icon { width: 30px; height: 30px; padding: 0; color: var(--sd-muted); }
 .friends-btn--danger { color: var(--gg-danger-strong); }
 
@@ -76,3 +76,8 @@
   .friends-row { flex-wrap: wrap; }
   .friends-row .profile-daily-chips--small { order: 3; width: 100%; padding-left: 46px; }
 }
+
+/* 44px touch targets (the icon buttons keep their size and get a larger hit area) */
+.friends-btn { min-height: 44px; }
+.friends-btn--icon { position: relative; min-height: 30px; }
+.friends-btn--icon::after { content: ''; position: absolute; inset: -7px; }

@@ -121,7 +121,7 @@
 /* The select covers the pill, invisible: the browser's own list opens on click or tap */
 .navbar-lang-select {
   position: absolute;
-  inset: 0;
+  inset: -1px; /* over the pill's border too: a 44px target */
   width: 100%;
   opacity: 0;
   cursor: pointer;

@@ -121,3 +121,7 @@
   font-weight: 600;
 }
 .player-action { display: flex; flex-direction: column; gap: 0.5rem; max-width: 360px; }
+
+/* 44px touch targets */
+.account-tab { min-height: 44px; }
+.account-link { min-height: 44px; }

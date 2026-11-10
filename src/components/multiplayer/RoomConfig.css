@@ -1,18 +1,18 @@
 /* src/components/multiplayer/RoomConfig.css */
 .room-config { max-width: 640px; margin: 0 auto; padding: 2rem 16px; color: var(--sd-ink); }
-.rc-title { font-size: 1.75rem; font-weight: 700; margin-bottom: 1.5rem; }
+.rc-title { margin: 0.25rem 0 1.5rem; }
 .rc-pseudo { margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.4rem; }
 .rc-pseudo label { font-weight: 600; color: var(--sd-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
 .rc-pseudo input { padding: 0.6rem 0.9rem; border-radius: 8px; border: 1px solid var(--sd-line); background: var(--sd-surface); color: var(--sd-ink); font-size: 1rem; }
 .rc-section { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem; }
-.rc-games-title { font-size: 0.85rem; font-weight: 600; color: var(--sd-muted); text-transform: uppercase; letter-spacing: 0.05em; margin: 0; }
+.rc-games-title { font-family: var(--sd-font-mono); font-size: 0.72rem; font-weight: 700; color: var(--sd-muted); text-transform: uppercase; letter-spacing: 0.12em; margin: 0; }
 .rc-hint { margin: 0; font-size: 0.9rem; color: var(--sd-muted); }
 .rc-game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.5rem; }
 .rc-game-pick { display: flex; align-items: center; gap: 0.5rem; padding: 0.7rem 0.8rem; border-radius: 10px; border: 1px solid var(--sd-line); background: var(--sd-surface); color: var(--sd-ink); font-size: 0.95rem; font-weight: 600; text-align: left; cursor: pointer; }
 .rc-game-pick.active { border-color: var(--sd-accent); background: var(--gg-accent-soft); }
 .rc-game-icon { font-size: 1.3rem; }
 .rc-mode-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-.rc-mode-tab { padding: 0.35rem 0.75rem; border-radius: 20px; border: 1px solid var(--gg-line-strong); background: transparent; color: var(--sd-muted); cursor: pointer; font-size: 0.85rem; }
+.rc-mode-tab { min-height: 44px; padding: 0.35rem 0.9rem; font-family: var(--sd-font-mono); border-radius: 20px; border: 1px solid var(--gg-line-strong); background: transparent; color: var(--sd-muted); cursor: pointer; font-size: 0.85rem; }
 .rc-mode-tab.active { background: var(--gg-accent-soft); border-color: var(--sd-accent); color: var(--sd-accent-strong); }
 .rc-difficulties { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .rc-diff-btn { padding: 0.4rem 0.75rem; border-radius: 8px; border: 1px solid var(--sd-line); background: var(--sd-bg); cursor: pointer; display: flex; flex-direction: column; align-items: center; min-width: 80px; }
@@ -23,13 +23,15 @@
 .rc-preset { padding: 0.3rem 0.6rem; border-radius: 6px; border: 1px solid var(--sd-line); background: transparent; color: var(--sd-muted); cursor: pointer; font-size: 0.8rem; }
 .rc-preset.active { border-color: var(--sd-accent); color: var(--sd-accent-strong); background: var(--gg-accent-soft); }
 .rc-asc-row { display: grid; grid-template-columns: 100px 60px 1fr; align-items: center; gap: 0.5rem; font-size: 0.9rem; }
-.rc-asc-val { text-align: right; color: var(--sd-muted); font-size: 0.8rem; }
+.rc-asc-val { font-family: var(--sd-font-mono); text-align: right; color: var(--sd-muted); font-size: 0.8rem; }
 .rc-game-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+.rc-game-list { counter-reset: rcgame; }
+.rc-game-list li::before { counter-increment: rcgame; content: counter(rcgame, decimal-leading-zero); font-family: var(--sd-font-mono); font-weight: 700; color: var(--sd-muted); }
 .rc-game-list li { display: flex; align-items: center; gap: 0.5rem; padding: 0.55rem 0.8rem; border-radius: 10px; border: 1px solid var(--sd-line); background: var(--sd-surface); font-weight: 600; }
 .rc-game-list li span { flex: 1; min-width: 0; }
 .rc-game-list button { padding: 0.2rem 0.5rem; border-radius: 6px; border: 1px solid var(--gg-line-strong); background: transparent; color: var(--sd-muted); cursor: pointer; }
 .rc-add-btn { align-self: flex-start; padding: 0.5rem 0.85rem; border-radius: 10px; border: 1px dashed var(--gg-line-strong); background: transparent; color: var(--sd-muted); font-size: 0.9rem; cursor: pointer; }
 .rc-add-btn:hover:not(:disabled) { border-color: var(--sd-accent); color: var(--sd-accent-strong); }
 .rc-add-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-.rc-submit { width: 100%; padding: 0.85rem; border-radius: 10px; border: none; background: var(--sd-accent); color: var(--sd-bg); font-size: 1rem; font-weight: 700; cursor: pointer; }
+.rc-submit { min-height: 48px; width: 100%; padding: 0.85rem; border-radius: 10px; border: none; background: var(--sd-accent); color: var(--sd-bg); font-size: 1rem; font-weight: 700; cursor: pointer; }
 .rc-submit:disabled { opacity: 0.5; cursor: not-allowed; }

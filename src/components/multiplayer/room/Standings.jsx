@@ -31,6 +31,17 @@ function resultLine(game, result, t) {
   return `${Math.round(result.weightedScore)} ${t('units.pts')} · ${time}`
 }
 
+// Departures-board header over a list of results
+function BoardHead({ t }) {
+  return (
+    <div className="mpr-board-head gg-board-head" aria-hidden="true">
+      <span>#</span>
+      <span>{t('mp_room.col_player')}</span>
+      <span className="mpr-board-head-end">{t('mp_room.col_result')}</span>
+    </div>
+  )
+}
+
 // Lives left as hearts (a lost one is a black heart), capped at the lives the game started with.
 export function Hearts({ left, max }) {
   const total = Math.max(max, left)
@@ -70,6 +81,8 @@ export function Standings({ room, progress, results, playerId, index }) {
   if (game.type === GAME_TYPES.SURVIVAL) others.sort(bySurvivalProgress(live))
 
   return (
+    <>
+    <BoardHead t={t} />
     <ul className="mpr-list">
       {ranked.map((result, i) => (
         <li
@@ -99,6 +112,7 @@ export function Standings({ room, progress, results, playerId, index }) {
         </li>
       ))}
     </ul>
+    </>
   )
 }
 
@@ -108,6 +122,8 @@ function OverallStandings({ room, results, playerId }) {
   const total = roomGames(room).length
   const badges = useRoomBadges(room)
   return (
+    <>
+    <BoardHead t={t} />
     <ul className="mpr-list">
       {overallStandings(room, results).map((entry, i) => (
         <li
@@ -126,6 +142,7 @@ function OverallStandings({ room, results, playerId }) {
         </li>
       ))}
     </ul>
+    </>
   )
 }
 
@@ -138,6 +155,7 @@ export function StandingsCard({ room, progress, results, playerId, defaultTab })
 
   return (
     <div className="mpr-card">
+      <p className="gg-kicker">{t('mp_room.standings_kicker')}</p>
       <h3>{t('mp_room.standings')}</h3>
       {games.length > 1 && (
         <div className="mpr-tabs">

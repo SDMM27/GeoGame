@@ -50,10 +50,18 @@ export default function Players({ room, playerId, strangersOnly = false, readOnl
 
   return (
     <div className="mpr-card">
+      {!(strangersOnly && !readOnly) && <p className="gg-kicker">{t('mp_room.manifest')}</p>}
       <h3>{strangersOnly && !readOnly ? t('mp_room.add_players') : t('mp_room.players', { count: players.length })}</h3>
+      {!(strangersOnly && !readOnly) && (
+        <div className="mpr-board-head gg-board-head" aria-hidden="true">
+          <span>N°</span>
+          <span>{t('mp_room.col_player')}</span>
+        </div>
+      )}
       <ul className="mpr-list">
-        {players.map(([id, player]) => (
+        {players.map(([id, player], index) => (
           <li key={id} className={`mpr-row${id === playerId ? ' mpr-row--me' : ''}`}>
+            {!(strangersOnly && !readOnly) && <span className="mpr-rank" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>}
             <span className="mpr-name">
               {player.pseudo}
               {id === playerId && ` (${t('mp_room.you')})`}

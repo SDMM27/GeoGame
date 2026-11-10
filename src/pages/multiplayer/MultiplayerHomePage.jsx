@@ -40,7 +40,8 @@ export default function MultiplayerHomePage() {
       <NavBar />
       <main className="mp-home-main">
         <header className="mp-home-header">
-          <h1 className="mp-home-title">{t('multiplayer.title')}</h1>
+          <p className="gg-kicker">{t('multiplayer.kicker')}</p>
+          <h1 className="mp-home-title gg-title">{t('multiplayer.title')}</h1>
           <p>{t('multiplayer.subtitle')}</p>
         </header>
 
@@ -59,7 +60,9 @@ export default function MultiplayerHomePage() {
           </section>
         )}
 
-        <form className="mp-join-card" onSubmit={handleJoin}>
+        <form className="mp-join-card gg-ticket" onSubmit={handleJoin}>
+          <div className="mp-join-body">
+          <p className="gg-kicker">{t('multiplayer.desk_join')}</p>
           <h2>{t('multiplayer.join_title')}</h2>
           <div className="mp-join-form">
             <input
@@ -77,10 +80,15 @@ export default function MultiplayerHomePage() {
               {t('buttons.join')}
             </button>
           </div>
+          </div>
+          <div className="mp-join-stub gg-ticket-stub" aria-hidden="true">
+            <span className="gg-field"><small>{t('mp_room.code')}</small><strong>{(joinCode + '------').slice(0, 6)}</strong></span>
+          </div>
         </form>
 
         <section className="mp-section">
           <div className="mp-section-head">
+            <p className="gg-kicker">{t('multiplayer.desk_create')}</p>
             <h2>{t('multiplayer.create_title')}</h2>
             <p>{t('multiplayer.create_subtitle')}</p>
           </div>
@@ -104,6 +112,7 @@ export default function MultiplayerHomePage() {
         {recent.length > 0 && (
           <section className="mp-section">
             <div className="mp-section-head">
+              <p className="gg-kicker">{t('multiplayer.desk_recent')}</p>
               <h2>{t('multiplayer.recent_title')}</h2>
             </div>
             <div className="mp-rows">
@@ -123,7 +132,7 @@ export default function MultiplayerHomePage() {
                       {new Date(room.at).toLocaleDateString(i18n.language)}
                     </span>
                   </span>
-                  <span className="mp-row-code">{room.code}</span>
+                  <span className="mp-row-code gg-mono">{room.code}</span>
                 </button>
               ))}
             </div>

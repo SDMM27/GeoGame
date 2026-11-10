@@ -283,7 +283,8 @@ export default function RoomConfig({ onSubmit, submitting, initialGameId, initia
 
   return (
     <form className="room-config" onSubmit={handleSubmit}>
-      <h2 className="rc-title">{t('config.title')}</h2>
+      <p className="gg-kicker">{t('config.kicker')}</p>
+      <h2 className="rc-title gg-title">{t('config.title')}</h2>
 
       <div className="rc-pseudo">
         <label htmlFor="pseudo-input">{t('labels.your_username')}</label>

@@ -2,14 +2,18 @@
 .mp-home { min-height: 100vh; background: var(--sd-bg); color: var(--sd-ink); }
 .mp-home-main { max-width: 720px; margin: 0 auto; padding: 28px 24px 48px; display: flex; flex-direction: column; gap: 28px; }
 .mp-home-header p { margin: 2px 0 0; color: var(--sd-muted); font-size: 0.9rem; }
-.mp-home-title { margin: 0; font-size: 2rem; }
+.mp-home-title { margin: 4px 0 0; }
 .mp-home h2 { margin: 0; font-size: 1.3rem; }
 
 .mp-section { display: flex; flex-direction: column; gap: 12px; }
 .mp-section-head p { margin: 2px 0 0; color: var(--sd-muted); font-size: 0.85rem; }
 
 /* Join with a code */
-.mp-join-card { display: flex; flex-direction: column; gap: 12px; padding: 18px; border-radius: var(--sd-radius-card); background: var(--sd-surface); border: 1px solid var(--sd-line); }
+.mp-join-card { align-items: stretch; }
+.mp-join-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px; padding: 18px; }
+.mp-join-stub { display: flex; align-items: center; }
+.mp-join-stub .gg-field > strong { letter-spacing: 0.2em; color: var(--sd-muted); }
+.mp-section-head .gg-kicker { margin-bottom: 2px; }
 .mp-join-form { display: flex; gap: 8px; }
 .mp-join-input {
   flex: 1;
@@ -20,7 +24,8 @@
   border: 1px solid var(--sd-line);
   background: var(--sd-bg);
   color: var(--sd-ink);
-  font-family: var(--sd-font-display);
+  font-family: var(--sd-font-mono);
+  font-weight: 700;
   font-size: 1.4rem;
   letter-spacing: 0.25em;
   text-transform: uppercase;
@@ -64,5 +69,5 @@
 
 @media (max-width: 720px) {
   .mp-home-main { padding: 20px 16px 32px; gap: 24px; }
-  .mp-home-title { font-size: 1.6rem; }
+  .mp-join-stub { display: none; }
 }

@@ -54,7 +54,7 @@
 }
 
 /* Saisie */
-.mp-cc-label { font-size: 0.8rem; color: var(--sd-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.mp-cc-label { font-family: var(--sd-font-mono); font-weight: 700; font-size: 0.75rem; color: var(--sd-muted); text-transform: uppercase; letter-spacing: 0.05em; }
 .mp-cc-input-block { display: flex; flex-direction: column; gap: 0.5rem; }
 .mp-cc-input-overlay { position: relative; }
 .mp-cc-input { width: 100%; padding: 0.6rem 0.9rem; border-radius: 8px; border: 1px solid var(--sd-line); background: var(--sd-bg); color: var(--sd-ink); font-size: 1rem; box-sizing: border-box; }

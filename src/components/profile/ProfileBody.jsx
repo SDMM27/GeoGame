@@ -18,21 +18,21 @@ import RecordsSection from './RecordsSection'
 import './ProfileBody.css'
 
 export const GAME_META = {
-  [GAME_TYPES.DAILY_CHALLENGE]: { emoji: '🎯', titleKey: 'games.daily_challenge.title', color: '#FF9F45' },
-  [GAME_TYPES.COUNTRY_OF_DAY]: { emoji: '🌐', titleKey: 'games.country_of_day.title', color: '#2EC4B6' },
-  [GAME_TYPES.PLACEMENT]: { emoji: '🌍', titleKey: 'games.placement.title', color: '#7AA2FF' },
-  [GAME_TYPES.FLAGS]: { emoji: '🚩', titleKey: 'games.flags.title', color: '#FF7A6B' },
-  [GAME_TYPES.MISSING_FLAG]: { emoji: '🧩', titleKey: 'games.missing_flag.title', color: '#C792FF' },
-  [GAME_TYPES.CAPITALS]: { emoji: '🏛️', titleKey: 'games.capitals.title', color: '#F5B83D' },
-  [GAME_TYPES.BORDER_GUESS]: { emoji: '🧭', titleKey: 'games.border_guess.title', color: '#C792FF' },
-  [GAME_TYPES.COUNTRY_CLUE]: { emoji: '🔎', titleKey: 'games.country_clue.title', color: '#3DDC97' },
-  [GAME_TYPES.VOYAGE_VOYAGE]: { emoji: '✈️', titleKey: 'games.voyage_voyage.title', color: '#5FD4F4' },
-  [GAME_TYPES.RANKING]: { emoji: '🏆', titleKey: 'games.ranking.title', color: '#FF9EC7' },
-  [GAME_TYPES.QUIZ]: { emoji: '🧠', titleKey: 'games.quiz.title', color: '#B4E05A' },
-  [GAME_TYPES.SURVIVAL]: { emoji: '❤️', titleKey: 'games.survival.title', color: '#FF5C7A' },
+  [GAME_TYPES.DAILY_CHALLENGE]: { emoji: '🎯', titleKey: 'games.daily_challenge.title', color: 'var(--game-daily-challenge)', ink: 'var(--game-daily-challenge-ink)' },
+  [GAME_TYPES.COUNTRY_OF_DAY]: { emoji: '🌐', titleKey: 'games.country_of_day.title', color: 'var(--game-country-of-day)', ink: 'var(--game-country-of-day-ink)' },
+  [GAME_TYPES.PLACEMENT]: { emoji: '🌍', titleKey: 'games.placement.title', color: 'var(--game-placement)', ink: 'var(--game-placement-ink)' },
+  [GAME_TYPES.FLAGS]: { emoji: '🚩', titleKey: 'games.flags.title', color: 'var(--game-flags)', ink: 'var(--game-flags-ink)' },
+  [GAME_TYPES.MISSING_FLAG]: { emoji: '🧩', titleKey: 'games.missing_flag.title', color: 'var(--game-border-guess)', ink: 'var(--game-border-guess-ink)' },
+  [GAME_TYPES.CAPITALS]: { emoji: '🏛️', titleKey: 'games.capitals.title', color: 'var(--game-capitals)', ink: 'var(--game-capitals-ink)' },
+  [GAME_TYPES.BORDER_GUESS]: { emoji: '🧭', titleKey: 'games.border_guess.title', color: 'var(--game-border-guess)', ink: 'var(--game-border-guess-ink)' },
+  [GAME_TYPES.COUNTRY_CLUE]: { emoji: '🔎', titleKey: 'games.country_clue.title', color: 'var(--game-country-clue)', ink: 'var(--game-country-clue-ink)' },
+  [GAME_TYPES.VOYAGE_VOYAGE]: { emoji: '✈️', titleKey: 'games.voyage_voyage.title', color: 'var(--game-voyage-voyage)', ink: 'var(--game-voyage-voyage-ink)' },
+  [GAME_TYPES.RANKING]: { emoji: '🏆', titleKey: 'games.ranking.title', color: 'var(--game-ranking)', ink: 'var(--game-ranking-ink)' },
+  [GAME_TYPES.QUIZ]: { emoji: '🧠', titleKey: 'games.quiz.title', color: 'var(--game-quiz)', ink: 'var(--game-quiz-ink)' },
+  [GAME_TYPES.SURVIVAL]: { emoji: '❤️', titleKey: 'games.survival.title', color: 'var(--game-survival)', ink: 'var(--game-survival-ink)' },
 }
 
-const AVATAR_COLORS = ['#3DDC97', '#7AA2FF', '#FF7A6B', '#F5B83D', '#C792FF', '#5FD4F4', '#FF9EC7', '#B4E05A']
+const AVATAR_COLORS = ['country-clue', 'placement', 'flags', 'capitals', 'border-guess', 'voyage-voyage', 'ranking', 'quiz'].map((id) => `var(--game-${id})`)
 
 // `decoration` ({ frame, color } ids): draws the frame as a ring inside the avatar's box, so the size never changes.
 export function Avatar({ username, size = 44, decoration }) {
@@ -67,7 +67,7 @@ export function DailyChips({ today, small = false, onSelect }) {
         const props = {
           title: t(meta.titleKey),
           className: `profile-daily-chip${result ? ' done' : ''}${result && onSelect ? ' clickable' : ''}`,
-          style: result ? { borderColor: meta.color, background: `${meta.color}26` } : undefined,
+          style: result ? { borderColor: meta.color, background: `color-mix(in srgb, ${meta.color} 15%, transparent)` } : undefined,
         }
         const content = (
           <>
@@ -193,7 +193,7 @@ function GameRow({ game }) {
   return (
     <li>
       <button type="button" className="profile-game-row profile-game-row--button" onClick={() => setOpen(true)}>
-        <span className="profile-game-icon" style={{ background: `${meta.color}1F` }}>{meta.emoji}</span>
+        <span className="profile-game-icon" style={{ background: `color-mix(in srgb, ${meta.color} 12%, transparent)` }}>{meta.emoji}</span>
         <div className="profile-game-main">
           <strong>{t(meta.titleKey)}</strong>
           <small>{describeMode(game, t)}</small>
@@ -224,7 +224,7 @@ function GameDetail({ game, meta, onClose }) {
     <div className="profile-detail-backdrop" onClick={onClose}>
       <div className="profile-detail" role="dialog" aria-modal="true" aria-labelledby={titleId} onClick={(event) => event.stopPropagation()}>
         <div className="profile-detail-header">
-          <span className="profile-game-icon" style={{ background: `${meta.color}1F` }}>{meta.emoji}</span>
+          <span className="profile-game-icon" style={{ background: `color-mix(in srgb, ${meta.color} 12%, transparent)` }}>{meta.emoji}</span>
           <div className="profile-game-main">
             <strong id={titleId}>{t(meta.titleKey)}</strong>
             <small>{describeMode(game, t)}</small>
@@ -242,7 +242,7 @@ function GameDetail({ game, meta, onClose }) {
           ))}
         </dl>
         {game.mode === 'multi' && game.roomCode && (
-          <Link to={`/multiplayer/room/${game.roomCode}`} className="profile-detail-action" style={{ borderColor: meta.color, color: meta.color }}>
+          <Link to={`/multiplayer/room/${game.roomCode}`} className="profile-detail-action" style={{ borderColor: meta.color, color: meta.ink }}>
             {t('profile.details.open_room')}
           </Link>
         )}
@@ -311,7 +311,7 @@ function ByGame({ stats, scope }) {
           const best = describeBest(gameStats, t, type)
           return (
             <li key={type} className="profile-game-row">
-              <span className="profile-game-icon" style={{ background: `${meta.color}1F` }}>{meta.emoji}</span>
+              <span className="profile-game-icon" style={{ background: `color-mix(in srgb, ${meta.color} 12%, transparent)` }}>{meta.emoji}</span>
               <div className="profile-game-main">
                 <strong>{t(meta.titleKey)}</strong>
                 <small>
@@ -323,7 +323,7 @@ function ByGame({ stats, scope }) {
                     .join(' · ')}
                 </small>
               </div>
-              {best && <strong className="profile-game-best" style={{ color: meta.color }}>{best}</strong>}
+              {best && <strong className="profile-game-best" style={{ color: meta.ink }}>{best}</strong>}
             </li>
           )
         })}

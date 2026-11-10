@@ -5,27 +5,27 @@
   gap: 0.8rem;
   padding: 1rem;
   border-radius: 12px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
+  background: var(--sd-surface);
+  border: 1px solid var(--sd-line);
 }
 
-.scroll-collection-progress { color: var(--accent); font-size: 0.9rem; }
-.scroll-collection-note { margin: 0; color: var(--text-muted); font-size: 0.9rem; }
-.scroll-collection-hint { color: var(--text-muted); max-width: 420px; }
+.scroll-collection-progress { color: var(--sd-accent-strong); font-size: 0.9rem; }
+.scroll-collection-note { margin: 0; color: var(--sd-muted); font-size: 0.9rem; }
+.scroll-collection-hint { color: var(--sd-muted); max-width: 420px; }
 
 .scroll-collection-seals { display: flex; align-items: center; gap: 0.6rem; }
 .scroll-collection-pips { display: inline-flex; gap: 0.3rem; }
-.scroll-collection-pip { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border-strong); background: transparent; }
+.scroll-collection-pip { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--gg-line-strong); background: transparent; }
 .scroll-collection-pip--full { background: #b3402e; border-color: #d8664f; box-shadow: 0 0 8px rgba(179, 64, 46, 0.55); }
 
 .scroll-collection-link {
   padding: 0.4rem 0.9rem;
-  border-radius: var(--radius-sm);
-  background: var(--accent);
-  color: var(--on-accent);
+  border-radius: var(--sd-radius-sm);
+  background: var(--sd-accent);
+  color: var(--sd-accent-ink);
   font-size: 0.85rem;
   font-weight: 600;
   text-decoration: none;
 }
 
-.scroll-public-count { margin: 0; color: var(--text-muted); font-size: 0.9rem; font-weight: 600; }
+.scroll-public-count { margin: 0; color: var(--sd-muted); font-size: 0.9rem; font-weight: 600; }

@@ -9,11 +9,11 @@
   gap: 0.6rem;
   max-width: calc(100vw - 32px);
   padding: 0.6rem 1rem;
-  border-radius: var(--radius-pill);
-  background: var(--bg-card-hover);
-  border: 1px solid var(--accent-border);
-  box-shadow: var(--shadow-card);
-  color: var(--text-primary);
+  border-radius: var(--sd-radius-pill);
+  background: var(--sd-surface-2);
+  border: 1px solid var(--gg-accent-line);
+  box-shadow: var(--gg-shadow);
+  color: var(--sd-ink);
   font-size: 0.9rem;
   animation: xp-toast-in 0.25s ease-out;
   pointer-events: none;
@@ -21,7 +21,7 @@
 
 .xp-toast { flex-wrap: wrap; justify-content: center; }
 
-.xp-toast strong { color: var(--accent); }
+.xp-toast strong { color: var(--sd-accent-strong); }
 
 @keyframes xp-toast-in {
   from { opacity: 0; transform: translate(-50%, 12px); }

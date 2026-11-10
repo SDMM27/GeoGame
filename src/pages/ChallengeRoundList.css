@@ -16,19 +16,19 @@
   gap: 10px;
   min-width: 0;
   padding: 8px 12px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
-  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--sd-radius-md);
+  border: 1px solid var(--gg-tint-strong);
+  background: var(--gg-tint);
 }
 
 .challenge-round--correct {
-  border-color: var(--success);
-  background: var(--success-dim);
+  border-color: var(--gg-success);
+  background: var(--gg-success-soft);
 }
 
 .challenge-round--failed {
-  border-color: var(--danger);
-  background: var(--danger-dim);
+  border-color: var(--gg-danger);
+  background: var(--gg-danger-soft);
 }
 
 .challenge-round-answer {

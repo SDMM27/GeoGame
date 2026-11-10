@@ -12,24 +12,24 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--border-color);
+  background: var(--sd-line);
 }
 
 .challenge-dot--correct {
-  background: var(--success);
+  background: var(--gg-success);
 }
 
 .challenge-dot--failed {
-  background: var(--danger);
+  background: var(--gg-danger);
 }
 
 .challenge-dot--current {
-  box-shadow: 0 0 0 2px var(--accent);
+  box-shadow: 0 0 0 2px var(--sd-accent);
 }
 
 .challenge-resumed {
   margin: 0 0 12px;
-  color: var(--warning);
+  color: var(--gg-warning-strong);
   font-weight: 600;
 }
 
@@ -53,11 +53,11 @@
   width: 8px;
   height: 14px;
   border-radius: 2px;
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--gg-tint-strong);
 }
 
 .challenge-level__bars span.is-on {
-  background: var(--warning);
+  background: var(--gg-warning);
 }
 
 .challenge-level p {
@@ -82,23 +82,23 @@
   font-size: clamp(3.2rem, 14vw, 5rem);
   font-weight: 900;
   line-height: 1;
-  color: var(--accent);
+  color: var(--sd-accent-strong);
 }
 
 .challenge-score span {
   font-size: 1.6rem;
   font-weight: 800;
-  color: var(--text-muted);
+  color: var(--sd-muted);
 }
 
 .challenge-score-label,
 .challenge-time {
   margin: 4px 0 0;
-  color: var(--text-muted);
+  color: var(--sd-muted);
 }
 
 .challenge-time strong {
-  color: var(--text-primary);
+  color: var(--sd-ink);
   font-variant-numeric: tabular-nums;
 }
 

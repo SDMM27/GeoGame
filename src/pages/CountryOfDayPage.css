@@ -17,28 +17,28 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--border-color);
+  background: var(--sd-line);
 }
 
 .cod-dot--found {
-  background: var(--success);
+  background: var(--gg-success);
 }
 
 .cod-dot--missed {
-  background: var(--danger);
+  background: var(--gg-danger);
 }
 
 .cod-dot--current {
-  box-shadow: 0 0 0 2px var(--accent);
+  box-shadow: 0 0 0 2px var(--sd-accent);
 }
 
 .cod-silhouette {
   height: 280px;
   margin-bottom: 16px;
-  border-radius: var(--radius-md);
+  border-radius: var(--sd-radius-md);
   overflow: hidden;
-  border: 1px solid var(--border-subtle);
-  background: var(--map-ocean, #060e1f);
+  border: 1px solid var(--gg-tint-strong);
+  background: var(--gg-ocean);
 }
 
 .cod-silhouette__map {
@@ -53,7 +53,7 @@
 
 .cod-notice {
   margin: 0;
-  color: var(--warning);
+  color: var(--gg-warning-strong);
   font-weight: 600;
   font-size: 0.9rem;
 }
@@ -68,8 +68,8 @@
 .cod-wrong-chip {
   padding: 6px 12px;
   border-radius: 999px;
-  border: 1px solid var(--danger);
-  background: var(--danger-dim);
+  border: 1px solid var(--gg-danger);
+  background: var(--gg-danger-soft);
   text-decoration: line-through;
   font-size: 0.9rem;
 }
@@ -94,16 +94,16 @@
   place-items: center;
   padding: 10px;
   min-height: 84px;
-  border-radius: var(--radius-md);
-  border: 2px solid var(--border-subtle);
-  background: rgba(255, 255, 255, 0.04);
+  border-radius: var(--sd-radius-md);
+  border: 2px solid var(--gg-tint-strong);
+  background: var(--gg-tint);
   cursor: pointer;
   transition: border-color 0.2s, background 0.2s, opacity 0.2s;
 }
 
 .cod-flag:not(:disabled):hover {
-  border-color: var(--accent-border);
-  background: var(--accent-dim);
+  border-color: var(--gg-accent-line);
+  background: var(--gg-accent-soft);
 }
 
 .cod-flag:disabled {
@@ -114,17 +114,17 @@
   max-width: 100%;
   max-height: 64px;
   border-radius: 3px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--gg-shadow);
 }
 
 .cod-flag--correct {
-  border-color: var(--success);
-  background: var(--success-dim);
+  border-color: var(--gg-success);
+  background: var(--gg-success-soft);
 }
 
 .cod-flag--wrong {
-  border-color: var(--danger);
-  background: var(--danger-dim);
+  border-color: var(--gg-danger);
+  background: var(--gg-danger-soft);
 }
 
 .cod-flag--wrong img {
@@ -143,9 +143,9 @@
 
 .cod-map {
   height: 420px;
-  border-radius: var(--radius-md);
+  border-radius: var(--sd-radius-md);
   overflow: hidden;
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--gg-tint-strong);
 }
 
 .cod-modes {
@@ -177,22 +177,22 @@
   font-size: clamp(3.2rem, 14vw, 5rem);
   font-weight: 900;
   line-height: 1;
-  color: var(--accent);
+  color: var(--sd-accent-strong);
 }
 
 .cod-score span {
   font-size: 1.6rem;
   font-weight: 800;
-  color: var(--text-muted);
+  color: var(--sd-muted);
 }
 
 .cod-result__label {
   margin: 6px 0 0;
-  color: var(--text-muted);
+  color: var(--sd-muted);
 }
 
 .cod-result__label strong {
-  color: var(--text-primary);
+  color: var(--sd-ink);
   font-variant-numeric: tabular-nums;
 }
 
@@ -209,10 +209,10 @@
 .cod-sheet {
   margin-top: 16px;
   padding: 24px;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-color);
-  background: var(--bg-card);
-  box-shadow: var(--shadow-card);
+  border-radius: var(--sd-radius-card);
+  border: 1px solid var(--sd-line);
+  background: var(--sd-surface);
+  box-shadow: var(--gg-shadow);
 }
 
 .cod-sheet__title {
@@ -232,7 +232,7 @@
   height: 40px;
   width: auto;
   border-radius: 4px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--gg-shadow);
 }
 
 .cod-sheet__name {
@@ -241,7 +241,7 @@
 }
 
 .cod-sheet__continent {
-  color: var(--text-muted);
+  color: var(--sd-muted);
   font-size: 0.9rem;
 }
 
@@ -256,14 +256,14 @@
   flex-direction: column;
   gap: 2px;
   padding: 10px 12px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
-  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--sd-radius-md);
+  border: 1px solid var(--gg-tint-strong);
+  background: var(--gg-tint);
 }
 
 .cod-sheet__fact span,
 .cod-sheet__fact small {
-  color: var(--text-muted);
+  color: var(--sd-muted);
   font-size: 0.8rem;
 }
 
@@ -284,7 +284,7 @@
   gap: 6px;
   padding: 5px 10px;
   border-radius: 999px;
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--gg-tint-strong);
   font-size: 0.9rem;
 }
 
@@ -297,7 +297,7 @@
 .cod-sheet__atlas {
   display: inline-block;
   margin-top: 18px;
-  color: var(--accent);
+  color: var(--sd-accent-strong);
   font-weight: 700;
   text-decoration: none;
 }

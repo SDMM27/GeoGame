@@ -1,17 +1,19 @@
 import L from 'leaflet'
 import { MAP_COLORS } from '../../utils/mapColors'
+import { themedMapColor } from './mapTheme'
 
 const hexToRgb = (hex) => {
   const value = parseInt(hex.slice(1), 16)
   return [(value >> 16) & 255, (value >> 8) & 255, value & 255]
 }
-const LAND_RGB = hexToRgb(MAP_COLORS.land)
 
-// The color of `fillColor` drawn with `opacity` over the land
+// The color of `fillColor` drawn with `opacity` over the land, both in the current theme's colors (mapTheme.js)
 const overLand = (fillColor, opacity) => {
-  if (!opacity || typeof fillColor !== 'string' || !/^#[0-9a-f]{6}$/i.test(fillColor)) return MAP_COLORS.land
-  const rgb = hexToRgb(fillColor)
-  return `rgb(${LAND_RGB.map((land, i) => Math.round(land + (rgb[i] - land) * opacity)).join(',')})`
+  // rgb(), never a hex: the canvas would otherwise swap the already themed color a second time
+  const land = hexToRgb(themedMapColor(MAP_COLORS.land))
+  const valid = opacity && typeof fillColor === 'string' && /^#[0-9a-f]{6}$/i.test(fillColor)
+  const rgb = valid ? hexToRgb(themedMapColor(fillColor)) : land
+  return `rgb(${land.map((base, i) => Math.round(base + (rgb[i] - base) * (valid ? opacity : 0))).join(',')})`
 }
 
 // Web Mercator of a LatLng, kept on it: a zoom then only scales and shifts it instead of redoing the

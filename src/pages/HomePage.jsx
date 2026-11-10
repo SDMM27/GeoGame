@@ -98,7 +98,7 @@ export default function HomePage() {
         <section className="home-section home-rows">
           <HomeRow
             icon="🗺️"
-            color="var(--highlight)"
+            color="var(--gg-highlight)"
             title={t("atlas.title")}
             description={t("atlas.subtitle")}
             onClick={() => navigate("/atlas")}

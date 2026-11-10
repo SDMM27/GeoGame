@@ -23,8 +23,8 @@ const SETUP_TYPES = [GAME_TYPES.PLACEMENT, GAME_TYPES.FLAGS, GAME_TYPES.CAPITALS
 const DIFFICULTIES = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
 const ASCENSION_DIFFS = ['Facile', 'Moyen', 'Difficile', 'Impossible']
 const DIFFICULTY_COLORS = {
-  Facile: '#4ade80', Moyen: '#00d4ff', Difficile: '#fbbf24',
-  Impossible: '#f97316', Hardcore: '#f87171',
+  Facile: 'var(--gg-success-strong)', Moyen: 'var(--game-voyage-voyage-ink)', Difficile: 'var(--gg-warning-strong)',
+  Impossible: 'var(--game-daily-challenge-ink)', Hardcore: 'var(--gg-danger-strong)',
 }
 const COUNTS = [5, 10, 15]
 const QUIZ_COUNTS = [5, 10, 20]

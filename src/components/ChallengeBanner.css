@@ -1,8 +1,8 @@
 .challenge-banner {
-  background: rgba(34, 211, 238, 0.1);
-  border: 1px solid rgba(34, 211, 238, 0.45);
+  background: var(--gg-accent-soft);
+  border: 1px solid var(--gg-accent-line);
   border-radius: 12px;
-  color: #ffffff;
+  color: var(--sd-ink);
   margin: 12px auto;
   max-width: 720px;
   padding: 12px 18px;
@@ -10,18 +10,18 @@
 }
 
 .challenge-banner--win {
-  background: rgba(34, 197, 94, 0.14);
-  border-color: rgba(34, 197, 94, 0.55);
+  background: var(--gg-success-soft);
+  border-color: var(--gg-success);
 }
 
 .challenge-banner--lose {
-  background: rgba(239, 68, 68, 0.12);
-  border-color: rgba(239, 68, 68, 0.5);
+  background: var(--gg-danger-soft);
+  border-color: var(--gg-danger);
 }
 
 .challenge-banner--tie {
-  background: rgba(250, 204, 21, 0.12);
-  border-color: rgba(250, 204, 21, 0.5);
+  background: var(--gg-warning-soft);
+  border-color: var(--gg-warning);
 }
 
 .challenge-banner p {

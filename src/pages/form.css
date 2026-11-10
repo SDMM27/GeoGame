@@ -1,18 +1,18 @@
 .form-container {
-  background: var(--bg-secondary);
-  border: 1px solid var(--accent-border);
-  border-radius: var(--radius-lg);
+  background: var(--sd-surface);
+  border: 1px solid var(--gg-accent-line);
+  border-radius: var(--sd-radius-card);
   padding: 36px 32px;
   width: 360px;
   max-width: 90vw;
-  box-shadow: var(--shadow-card), var(--shadow-glow);
-  font-family: var(--font-main);
+  box-shadow: var(--gg-shadow), 0 0 20px var(--gg-accent-soft);
+  font-family: var(--sd-font-sans);
 }
 
 .form-title {
   font-size: 1.4rem;
   font-weight: 900;
-  color: var(--text-primary);
+  color: var(--sd-ink);
   text-align: center;
   border: none;
   padding: 0;
@@ -22,19 +22,19 @@
 
 .form-score-display {
   text-align: center;
-  color: var(--text-muted);
+  color: var(--sd-muted);
   font-size: 0.9rem;
   margin-bottom: 24px;
 }
 
 .form-score-display strong {
-  color: var(--accent);
+  color: var(--sd-accent-strong);
 }
 
 .form-label {
   display: block;
   font-size: 0.8rem;
-  color: var(--text-muted);
+  color: var(--sd-muted);
   letter-spacing: 1px;
   text-transform: uppercase;
   margin-bottom: 8px;
@@ -44,11 +44,11 @@
   display: block;
   width: 100%;
   padding: 12px 14px;
-  background: var(--bg-primary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-family: var(--font-main);
+  background: var(--sd-bg);
+  border: 1px solid var(--sd-line);
+  border-radius: var(--sd-radius-md);
+  color: var(--sd-ink);
+  font-family: var(--sd-font-sans);
   font-size: 1rem;
   margin-bottom: 20px;
   transition: border-color 0.2s;
@@ -56,21 +56,21 @@
 
 .form-input:focus {
   outline: none;
-  border-color: var(--accent);
+  border-color: var(--sd-accent);
 }
 
 .form-input::placeholder {
-  color: var(--text-dim);
+  color: var(--sd-muted);
 }
 
 .form-submit {
   width: 100%;
   padding: 14px;
-  background: var(--accent);
-  color: var(--bg-primary);
+  background: var(--sd-accent);
+  color: var(--sd-accent-ink);
   border: none;
-  border-radius: var(--radius-md);
-  font-family: var(--font-main);
+  border-radius: var(--sd-radius-md);
+  font-family: var(--sd-font-sans);
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
@@ -82,7 +82,7 @@
 }
 
 .form-submit:disabled {
-  background: var(--success);
+  background: var(--gg-success);
   cursor: default;
 }
 
@@ -92,18 +92,18 @@
 }
 
 .form-blocked-message {
-  color: var(--text-muted);
+  color: var(--sd-muted);
   font-size: 0.9rem;
   margin-bottom: 8px;
 }
 
 .form-blocked-score {
-  color: var(--accent);
+  color: var(--sd-accent-strong);
   font-size: 1.1rem;
   margin-bottom: 8px;
 }
 
 .form-blocked-hint {
-  color: var(--text-muted);
+  color: var(--sd-muted);
   font-size: 0.8rem;
 }

@@ -10,7 +10,7 @@
 .ranking-lb__error,
 .ranking-lb__attempts {
   font-size: 0.9rem;
-  color: var(--text-primary);
+  color: var(--sd-ink);
   text-align: right;
 }
 

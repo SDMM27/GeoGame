@@ -35,10 +35,10 @@
   --gg-board-accent: #f5c84b;
 
   /* Game maps (Leaflet) and the hero globe */
-  --gg-ocean: #dfe7f5;
-  --gg-ocean-deep: #c4d1ea;
-  --gg-land: #f9fbff;
-  --gg-land-edge: #8e9cbc;
+  --gg-ocean: #d3def1;
+  --gg-ocean-deep: #b9c8e4;
+  --gg-land: #ffffff;
+  --gg-land-edge: #94a3c4;   /* same as the light map stroke (src/components/map/mapTheme.js) */
   --gg-graticule: rgba(90, 99, 128, 0.22);
 
   /* One color per game, as in the app (src/utils/roomGames.js builds these names). --game-* fills icons, chips and

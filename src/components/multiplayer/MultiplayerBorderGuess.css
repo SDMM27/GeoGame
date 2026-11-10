@@ -2,25 +2,25 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    background: var(--bg-dark);
-    color: var(--text-primary);
+    background: var(--sd-bg);
+    color: var(--sd-ink);
 }
 
 .mp-border-guess-header {
     display: flex;
     justify-content: space-between;
     padding: 0.75rem 1.5rem;
-    background: var(--bg-card);
-    border-bottom: 1px solid var(--border-color);
+    background: var(--sd-surface);
+    border-bottom: 1px solid var(--sd-line);
 }
 
 .mp-border-guess-round {
     font-weight: 700;
-    color: var(--accent);
+    color: var(--sd-accent-strong);
 }
 
 .mp-border-guess-attempts {
-    color: var(--text-muted);
+    color: var(--sd-muted);
 }
 
 .mp-border-guess-layout {
@@ -31,7 +31,7 @@
 
 .mp-border-guess-map-frame {
     flex: 1;
-    background: var(--bg-primary);
+    background: var(--sd-bg);
 }
 
 .mp-border-guess-map {
@@ -47,8 +47,8 @@
     gap: 1rem;
     padding: 1rem;
     overflow-y: auto;
-    background: var(--bg-card);
-    border-left: 1px solid var(--border-color);
+    background: var(--sd-surface);
+    border-left: 1px solid var(--sd-line);
 }
 
 .mp-border-guess-input-wrap {
@@ -65,9 +65,9 @@
     width: 100%;
     padding: 0.6rem 0.9rem;
     border-radius: 8px;
-    border: 1px solid var(--border-color);
-    background: var(--bg-primary);
-    color: var(--text-primary);
+    border: 1px solid var(--sd-line);
+    background: var(--sd-bg);
+    color: var(--sd-ink);
     font-size: 1rem;
     box-sizing: border-box;
 }
@@ -77,8 +77,8 @@
     top: 100%;
     left: 0;
     right: 0;
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
+    background: var(--sd-surface);
+    border: 1px solid var(--sd-line);
     border-radius: 0 0 8px 8px;
     z-index: 10;
 }
@@ -89,21 +89,21 @@
     padding: 0.5rem 0.9rem;
     background: none;
     border: none;
-    color: var(--text-primary);
+    color: var(--sd-ink);
     text-align: left;
     cursor: pointer;
     font-size: 0.9rem;
 }
 
 .mp-border-guess-suggestions button:hover {
-    background: var(--border-color);
+    background: var(--sd-line);
 }
 
 .mp-border-guess-submit {
     padding: 0.6rem;
     border-radius: 8px;
-    background: var(--accent);
-    color: var(--bg-primary);
+    background: var(--sd-accent);
+    color: var(--sd-bg);
     font-weight: 700;
     border: none;
     cursor: pointer;
@@ -125,38 +125,38 @@
 }
 
 .mp-bg-chip--correct {
-    background: var(--on-accent);
-    border: 1px solid var(--success);
-    color: var(--success);
+    background: var(--sd-accent-ink);
+    border: 1px solid var(--gg-success);
+    color: var(--gg-success-strong);
 }
 
 .mp-bg-chip--wrong {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    color: var(--text-muted);
+    background: var(--sd-surface);
+    border: 1px solid var(--sd-line);
+    color: var(--sd-muted);
 }
 
 .mp-border-guess-result {
     padding: 1rem;
     border-radius: 8px;
-    background: var(--bg-card);
+    background: var(--sd-surface);
     text-align: center;
 }
 
 .mp-bg-solved {
-    color: var(--success);
+    color: var(--gg-success-strong);
     font-weight: 700;
     font-size: 1.1rem;
 }
 
 .mp-bg-lost {
-    color: var(--danger);
+    color: var(--gg-danger-strong);
     font-weight: 700;
     font-size: 1.1rem;
 }
 
 .mp-bg-next {
-    color: var(--text-muted);
+    color: var(--sd-muted);
     font-size: 0.85rem;
     margin-top: 0.5rem;
 }
@@ -169,8 +169,8 @@
 
 .mp-border-guess-reveal {
   background: transparent;
-  border: 1px solid #6b7280;
-  color: #9ca3af;
+  border: 1px solid var(--gg-line-strong);
+  color: var(--sd-muted);
   padding: 0.4rem 0.8rem;
   border-radius: 6px;
   cursor: pointer;
@@ -179,6 +179,6 @@
 }
 
 .mp-border-guess-reveal:hover {
-  border-color: var(--warning);
-  color: var(--warning);
+  border-color: var(--gg-warning);
+  color: var(--gg-warning-strong);
 }

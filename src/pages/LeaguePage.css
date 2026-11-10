@@ -25,3 +25,38 @@
 @media (max-width: 600px) {
   .league-me-gap { margin-left: 0; flex-basis: 100%; }
 }
+
+/* « Carnet de vol »: the week as a season, my place as a ticket, the reward as a stamp */
+.league-header .gg-kicker { margin-bottom: 0.4rem; }
+.league-header .account-title.gg-title { font-size: clamp(1.9rem, 4.5vw, 3rem); font-weight: 800; }
+.league-days { font-variant-numeric: tabular-nums; }
+
+.account-tabs { gap: 3px; }
+.account-tab.gg-mono { min-height: 44px; font-size: 0.78rem; }
+
+.league-me.gg-ticket { padding: 0; align-items: stretch; background: var(--sd-surface); }
+.league-me.gg-ticket > .league-me-rank,
+.league-me.gg-ticket > .league-me-text { padding-block: 1rem; }
+.league-me.gg-ticket > .league-me-rank { padding-left: 1.1rem; font-family: var(--sd-font-mono); font-variant-numeric: tabular-nums; align-self: center; }
+.league-me.gg-ticket > .league-me-text { padding-left: 1rem; justify-content: center; }
+.league-me-text strong { font-family: var(--sd-font-mono); font-variant-numeric: tabular-nums; }
+.league-me-gap.gg-ticket-stub {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  font-size: 0.78rem;
+  max-width: 14rem;
+}
+
+.league-last { --gg-stamp-color: var(--sd-accent-strong); }
+.league-stamp { width: 84px; height: 84px; margin-left: auto; }
+
+@media (max-width: 600px) {
+  .league-me-gap.gg-ticket-stub {
+    flex-basis: 100%;
+    max-width: none;
+    border-left: 0;
+    border-top: 2px dashed var(--sd-line);
+    padding: 0.7rem 1.1rem;
+  }
+}

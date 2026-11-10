@@ -59,7 +59,8 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT, contine
 
   return (
     <div className="scoreboard">
-      <h1 className="scoreboard-title">{t('scoreboard.title')}</h1>
+      <p className="gg-kicker">{t('scores.kicker')}</p>
+      <h1 className="scoreboard-title gg-title">{t('scoreboard.title')}</h1>
 
       <div className="scoreboard-filters">
         <select
@@ -106,7 +107,7 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT, contine
         <p className="scoreboard-empty">{t('scoreboard.no_ascension_scores')}</p>
       ) : (
         <div className="scoreboard-table">
-          <div className="scoreboard-header">
+          <div className="scoreboard-header gg-board-head">
             <span>#</span>
             <span>{t('labels.player')}</span>
             <span>{t('profile.details.score')}</span>

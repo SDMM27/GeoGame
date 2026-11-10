@@ -230,3 +230,63 @@
   .scoreboard-difficulty,
   .scoreboard-preset { grid-area: extra; text-align: right; }
 }
+
+/* « Carnet de vol »: the leaderboards as a departures board */
+.scoreboard .gg-kicker { margin-bottom: 6px; }
+
+.scoreboard .scoreboard-title {
+  margin-bottom: 20px;
+  text-align: left;
+  font-size: clamp(1.9rem, 4.5vw, 3rem);
+  font-weight: 800;
+}
+
+.scoreboard-note { text-align: left; margin: -8px 0 16px; max-width: none; }
+.scoreboard-filters { justify-content: flex-start; margin-bottom: 24px; }
+
+.scoreboard-mode-tabs {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  max-width: 700px;
+}
+
+.scoreboard-mode-tab {
+  min-height: 44px;
+  padding: 8px 16px;
+  border-radius: var(--sd-radius-pill);
+  font-family: var(--sd-font-mono);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.scoreboard-mode-tab--active {
+  background: var(--sd-accent);
+  border-color: var(--sd-accent);
+  color: var(--sd-accent-ink);
+}
+
+.scoreboard-header { border-bottom: 2px solid var(--sd-line); font-size: 0.66rem; letter-spacing: 0.12em; }
+
+.scoreboard-row { border-radius: var(--sd-radius-sm); }
+.scoreboard-rank,
+.scoreboard-score,
+.scoreboard-time,
+.scoreboard-difficulty,
+.scoreboard-preset {
+  font-family: var(--sd-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+.scoreboard-rank { font-weight: 700; }
+.scoreboard-score { font-size: 0.85rem; }
+.scoreboard-time { font-size: 0.8rem; }
+.scoreboard-difficulty,
+.scoreboard-preset { font-size: 0.74rem; letter-spacing: 0.04em; }
+
+/* « Your flight »: the signed-in player's row gets a boarding-pass bar on its left edge */
+.scoreboard-row.leaderboard-row--mine { box-shadow: inset 4px 0 0 var(--sd-accent); }
+
+@media (max-width: 520px) {
+  .scoreboard-mode-tabs { padding: 0 12px; }
+}

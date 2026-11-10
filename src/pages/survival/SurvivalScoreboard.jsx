@@ -68,7 +68,8 @@ export default function SurvivalScoreboard({ initialLives = null, initialTimer =
 
   return (
     <div className="scoreboard">
-      <h1 className="scoreboard-title">{t('survival.leaderboard_title')}</h1>
+      <p className="gg-kicker">{t('scores.kicker')}</p>
+      <h1 className="scoreboard-title gg-title">{t('survival.leaderboard_title')}</h1>
 
       <div className="scoreboard-filters">
         <select className="scoreboard-select" value={lives} onChange={(event) => setLives(Number(event.target.value))}>
@@ -101,7 +102,7 @@ export default function SurvivalScoreboard({ initialLives = null, initialTimer =
         <p className="scoreboard-empty">{t('survival.no_scores')}</p>
       ) : (
         <div className="scoreboard-table">
-          <div className="scoreboard-header">
+          <div className="scoreboard-header gg-board-head">
             <span>#</span>
             <span>{t('survival.col_player')}</span>
             <span>{t('survival.col_rounds')}</span>

@@ -53,7 +53,8 @@ export default function EloScoreboard() {
 
   return (
     <div className="scoreboard">
-      <h1 className="scoreboard-title">{t('elo.title')}</h1>
+      <p className="gg-kicker">{t('scores.kicker')}</p>
+      <h1 className="scoreboard-title gg-title">{t('elo.title')}</h1>
       <p className="scoreboard-note">{formatSeason(currentSeason(), t)}</p>
       <p className="scoreboard-note">{t('elo.explain')}</p>
 
@@ -74,7 +75,7 @@ export default function EloScoreboard() {
         <p className="scoreboard-empty">{t('elo.empty')}</p>
       ) : (
         <div className="scoreboard-table">
-          <div className="scoreboard-header scoreboard-header--elo">
+          <div className="scoreboard-header gg-board-head scoreboard-header--elo">
             <span>#</span>
             <span>{t('labels.player')}</span>
             <span>{t('elo.rating')}</span>

@@ -303,3 +303,52 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
+
+/* ── « Carnet de vol »: the day's leaderboard as a departures board ── */
+.daily-lb .daily-lb__title {
+  margin: 0 0 14px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--sd-accent-strong);
+}
+
+.daily-lb__header {
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  padding-bottom: 8px;
+  margin-bottom: 6px;
+  border-bottom: 2px solid var(--sd-line);
+}
+
+.daily-lb__header > :nth-child(n + 3) { text-align: right; }
+
+.daily-lb__rank,
+.daily-lb__attempts,
+.daily-lb__time {
+  font-family: var(--sd-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.daily-lb__day-btn {
+  min-height: 44px;
+  padding: 5px 14px;
+  border-radius: var(--sd-radius-pill);
+  font-family: var(--sd-font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.daily-lb__day-btn--active {
+  background: var(--sd-accent);
+  border-color: var(--sd-accent);
+  color: var(--sd-accent-ink);
+}
+
+.daily-lb__history-link { min-height: 44px; }
+
+.daily-lb__tier { font-family: var(--sd-font-mono); letter-spacing: 0.1em; }
+
+/* « Your flight »: a boarding-pass bar on the left edge of the player's own row */
+.daily-lb__row.leaderboard-row--mine .daily-lb__row-main { box-shadow: inset 4px 0 0 var(--sd-accent); }

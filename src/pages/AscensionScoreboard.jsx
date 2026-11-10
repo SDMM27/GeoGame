@@ -55,7 +55,8 @@ export default function AscensionScoreboard({ defaultGame = GAME_TYPES.PLACEMENT
 
   return (
     <div className="scoreboard">
-      <h1 className="scoreboard-title">{t('scoreboard.ascension_title')}</h1>
+      <p className="gg-kicker">{t('scores.kicker')}</p>
+      <h1 className="scoreboard-title gg-title">{t('scoreboard.ascension_title')}</h1>
 
       <div className="scoreboard-filters">
         <select
@@ -89,7 +90,7 @@ export default function AscensionScoreboard({ defaultGame = GAME_TYPES.PLACEMENT
         <p className="scoreboard-empty">{t('scoreboard.no_ascension_scores')}</p>
       ) : (
         <div className="scoreboard-table">
-          <div className="scoreboard-header scoreboard-header--ascension">
+          <div className="scoreboard-header gg-board-head scoreboard-header--ascension">
             <span>#</span>
             <span>{t('labels.player')}</span>
             <span>{t('leaderboard.time')}</span>

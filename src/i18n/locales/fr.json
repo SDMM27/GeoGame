@@ -49,7 +49,34 @@
     "games_subtitle": "Choisis ta difficulté ou ton continent",
     "daily": "Défi du jour",
     "infinite": "Infini",
-    "multi": "Jouer en multijoueur"
+    "multi": "Jouer en multijoueur",
+    "hero_lead": "{{count}} défis par jour, un passeport à remplir, des salons multijoueurs. Le même monde pour tout le monde, en 9 langues.",
+    "next_departure": "Prochain départ",
+    "globe_score": "Score",
+    "board_cta": "Embarquer pour le défi du jour",
+    "passes_title": "Cartes d’embarquement du jour",
+    "passes_note": "{{count}} vols · mêmes défis pour tous",
+    "boarding_pass": "Carte d’embarquement",
+    "gate": "Porte",
+    "departure": "Départ",
+    "board": "Embarquer",
+    "passport_title": "Ton passeport",
+    "passport_intro": "Chaque mission réussie tamponne ton passeport : XP, niveaux, cadres et couleurs à débloquer. La ligue de la semaine distribue des fragments de drapeaux.",
+    "passport_example": "Exemple de page de passeport",
+    "stamp_level": "Niveau",
+    "stamp_xp": "{{count}} XP",
+    "stamp_streak": "Série",
+    "stamp_today": "Aujourd’hui",
+    "stamp_dailies": "Défis du jour",
+    "stamp_won": "Réussis",
+    "special_flight": "Vol spécial",
+    "board_title": "Tableau des départs",
+    "col_destination": "Destination",
+    "col_brief": "En bref",
+    "col_status": "Statut",
+    "status_boarding": "Embarquement",
+    "status_on_time": "À l’heure",
+    "status_open": "Ouvert"
   },
   "games": {
     "daily_challenge": {
@@ -1643,5 +1670,21 @@
     "title_ottoman-empire": "Empire ottoman, 1481-1683",
     "title_russia-growth": "Croissance de la Russie, 1300-1796",
     "title_british-empire-1886": "Empire britannique en 1886"
+  },
+  "globe": {
+    "find": "Trouve : {{city}}",
+    "found": "Trouvé : {{city}}",
+    "hint_drag": "↔ Glisse pour faire tourner le globe",
+    "hint_center": "Centre la ville dans le viseur",
+    "label": "Globe interactif : fais-le tourner (souris, doigt ou flèches) pour trouver {{city}}",
+    "city": {
+      "tokyo": "Tokyo",
+      "rio": "Rio de Janeiro",
+      "cairo": "Le Caire",
+      "sydney": "Sydney",
+      "new_york": "New York",
+      "nairobi": "Nairobi",
+      "paris": "Paris"
+    }
   }
 }

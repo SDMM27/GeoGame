@@ -49,7 +49,34 @@
     "games_subtitle": "Pick a difficulty or a continent",
     "daily": "Daily",
     "infinite": "Infinite",
-    "multi": "Play multiplayer"
+    "multi": "Play multiplayer",
+    "hero_lead": "{{count}} challenges a day, a passport to fill, multiplayer rooms. The same world for everyone, in 9 languages.",
+    "next_departure": "Next departure",
+    "globe_score": "Score",
+    "board_cta": "Board today’s challenge",
+    "passes_title": "Today’s boarding passes",
+    "passes_note": "{{count}} flights · same challenges for all",
+    "boarding_pass": "Boarding pass",
+    "gate": "Gate",
+    "departure": "Departs",
+    "board": "Board",
+    "passport_title": "Your passport",
+    "passport_intro": "Every mission you complete stamps your passport: XP, levels, frames and colors to unlock. The weekly league hands out flag fragments.",
+    "passport_example": "Sample passport page",
+    "stamp_level": "Level",
+    "stamp_xp": "{{count}} XP",
+    "stamp_streak": "Streak",
+    "stamp_today": "Today",
+    "stamp_dailies": "Daily challenges",
+    "stamp_won": "Won",
+    "special_flight": "Special flight",
+    "board_title": "Departures board",
+    "col_destination": "Destination",
+    "col_brief": "In short",
+    "col_status": "Status",
+    "status_boarding": "Boarding",
+    "status_on_time": "On time",
+    "status_open": "Open"
   },
   "games": {
     "daily_challenge": {
@@ -1643,5 +1670,21 @@
     "title_ottoman-empire": "Ottoman Empire, 1481-1683",
     "title_russia-growth": "Growth of Russia, 1300-1796",
     "title_british-empire-1886": "British Empire in 1886"
+  },
+  "globe": {
+    "find": "Find: {{city}}",
+    "found": "Found: {{city}}",
+    "hint_drag": "↔ Drag to spin the globe",
+    "hint_center": "Center the city in the crosshair",
+    "label": "Interactive globe: spin it (mouse, finger or arrow keys) to find {{city}}",
+    "city": {
+      "tokyo": "Tokyo",
+      "rio": "Rio de Janeiro",
+      "cairo": "Cairo",
+      "sydney": "Sydney",
+      "new_york": "New York",
+      "nairobi": "Nairobi",
+      "paris": "Paris"
+    }
   }
 }

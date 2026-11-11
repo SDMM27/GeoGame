@@ -3,11 +3,11 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Pressable, StyleSheet, View } from 'react-native'
+import { Pressable, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { SITE_ORIGIN } from '@/links'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 import { Text } from './ui'
 
 const DISMISSED_KEY = 'install_hint_dismissed'
@@ -38,6 +38,8 @@ const STEPS = [
 ] as const
 
 export function InstallHint() {
+  const colors = useColors()
+  const styles = useStyles()
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   const [visible, setVisible] = useState(shouldShow)
@@ -89,7 +91,7 @@ export function InstallHint() {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   card: {
     position: 'absolute',
     left: space.md,
@@ -114,4 +116,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: colors.accent,
   },
-})
+}))

@@ -20,6 +20,12 @@ module.exports = {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@shared/(.*)$': `${sharedRoot}/$1`,
   },
+  // d3-geo and d3-array ship ES modules only: let babel transform them (the preset skips node_modules)
+  transformIgnorePatterns: [
+    '/node_modules/(?!(.pnpm|d3-geo|d3-array|internmap|react-native|@react-native|@react-native-community|expo|@expo|@expo-google-fonts|react-navigation|@react-navigation|@sentry/react-native|native-base|standard-navigation))',
+    '/node_modules/react-native-reanimated/plugin/',
+    '/node_modules/@react-native/babel-preset/',
+  ],
   // Bare imports from ../src resolve from the app's node_modules (React 19), like metro.config.js does
   resolver: path.resolve(__dirname, 'jest.resolver.js'),
   // ../src is outside rootDir: let jest transform it (the preset only skips node_modules)

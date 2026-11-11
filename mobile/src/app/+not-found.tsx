@@ -1,16 +1,18 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { useRouter } from 'expo-router'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, Text as RNText, View } from 'react-native'
+import { Text as RNText, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { DepartureRow, DeparturesBoard, Kicker, ScreenTitle, Stamp } from '@/components/flight'
 import { Button, Text } from '@/components/ui'
 import { getGame } from '@/games'
-import { colors, fonts, space } from '@/theme'
+import { fonts, makeStyles, space, useColors } from '@/theme'
 
 // Any route that matches no screen (a stale link, a mistyped URL on the web): a departures board where the flight is cancelled.
 export default function NotFound() {
+  const styles = useStyles()
+  const colors = useColors()
   const { t } = useTranslation()
   const router = useRouter()
   const insets = useSafeAreaInsets()
@@ -55,7 +57,7 @@ export default function NotFound() {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   screen: { flex: 1, backgroundColor: colors.bg, paddingHorizontal: space.lg, gap: space.xxl, justifyContent: 'center' },
   hero: { alignItems: 'center', gap: space.md },
   stamp: { position: 'absolute', right: -64, bottom: -4 },
@@ -65,4 +67,4 @@ const styles = StyleSheet.create({
   name: { flex: 1, minWidth: 0, fontFamily: fonts.monoBold, fontSize: 12, color: colors.textMuted },
   struck: { textDecorationLine: 'line-through' },
   status: { fontFamily: fonts.monoBold, fontSize: 10, letterSpacing: 0.8, color: colors.danger },
-})
+}))

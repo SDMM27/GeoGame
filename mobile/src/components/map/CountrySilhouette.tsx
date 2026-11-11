@@ -9,7 +9,7 @@ import { View, type LayoutChangeEvent, type StyleProp, type ViewStyle } from 're
 import { getFocusCountry } from '@shared/utils/borderGuessMap'
 
 import silhouettes from '@/assets/data/silhouettes.json'
-import { colors } from '@/theme'
+import { useColors } from '@/theme'
 import type { CountryFeature } from './geometry'
 
 const PADDING = 20
@@ -19,7 +19,7 @@ const OUTLINES = silhouettes as unknown as Record<string, Geometry>
 
 export function CountrySilhouette({
   country,
-  color = colors.highlight,
+  color,
   style,
   label,
 }: {
@@ -30,6 +30,8 @@ export function CountrySilhouette({
   label?: string
 }) {
   const { t } = useTranslation()
+  const colors = useColors()
+  const ink = color ?? colors.highlight
   const [size, setSize] = useState({ width: 0, height: 0 })
 
   const path = useMemo(() => {
@@ -66,8 +68,8 @@ export function CountrySilhouette({
       onLayout={onLayout}>
       {path && (
         <Canvas style={{ flex: 1 }}>
-          <Path path={path} color={`${color}33`} />
-          <Path path={path} color={color} style="stroke" strokeWidth={2} strokeJoin="round" />
+          <Path path={path} color={`${ink}33`} />
+          <Path path={path} color={ink} style="stroke" strokeWidth={2} strokeJoin="round" />
         </Canvas>
       )}
     </View>

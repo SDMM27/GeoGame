@@ -13,7 +13,7 @@ import { Kicker } from '@/components/flight'
 import { BadgeStrip, type PlayerBadges } from '@/components/profile/BadgeStrip'
 import { Avatar } from '@/components/profile/ProfileSections'
 import { Button, Text, Touchable } from '@/components/ui'
-import { colors, fonts, radius, space } from '@/theme'
+import { fonts, makeStyles, radius, space, useColors } from '@/theme'
 
 // `rank` and `detail` (e.g. "12 pts") are for leaderboards; `reward` is the flag fragments the rank pays (league).
 export type Candidate = { uid: string; name: string; badges?: PlayerBadges; rank?: number; detail?: string; reward?: number }
@@ -35,6 +35,8 @@ function CandidateButton({
   onMessage?: (message: CandidateMessage) => void
 }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const [busy, setBusy] = useState(false)
   const status = friendships.all.find((item) => item.uid === uid)?.status
   if (uid === account.uid || !account.username) return null
@@ -76,6 +78,8 @@ export function FriendCandidates({
   zones?: Zone[]
 }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   if (players.length === 0) return null
   // The zone each player opens: the last one whose first rank is reached, shown once
   const zoneOf = (player: Candidate) => (player.rank == null ? undefined : [...(zones ?? [])].reverse().find((zone) => player.rank! >= zone.fromRank && player.rank! <= (zone.toRank ?? Infinity)))
@@ -130,7 +134,7 @@ export function FriendCandidates({
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   list: { borderRadius: radius.lg, backgroundColor: colors.board, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.sm, paddingHorizontal: space.md, paddingVertical: space.md },
   divider: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },
@@ -141,4 +145,4 @@ const styles = StyleSheet.create({
   detail: { fontFamily: fonts.monoBold, fontSize: 12, fontVariant: ['tabular-nums'] },
   smallButton: { minHeight: 38, paddingHorizontal: space.md },
   state: { flexDirection: 'row', alignItems: 'center', gap: space.xs },
-})
+}))

@@ -15,10 +15,12 @@ import BoardingPass from "./home/flight/BoardingPass";
 import Countdown from "./home/flight/Countdown";
 import DeparturesBoard from "./home/flight/DeparturesBoard";
 import FlapText from "./home/flight/FlapText";
+import NextFlightBoard from "./home/flight/NextFlightBoard";
 import PassportStamps from "./home/flight/PassportStamps";
 import { useAccount } from "../auth";
 import { useMissions } from "../hooks/useMissions";
 import { GAMES } from "./home/gameData";
+import { nextFlight } from "../utils/nextFlight";
 import "./HomePage.css";
 import "./home/flight/flight.css";
 
@@ -27,6 +29,11 @@ const FlightGlobe = lazy(() => import("../components/globe/FlightGlobe"));
 
 const DAILY_GAMES = GAMES.filter((game) => game.active && game.kind === "daily");
 const SETUP_GAMES = GAMES.filter((game) => game.active && (game.kind === "setup" || game.kind === "survival"));
+// What the globe can offer once the city is found (utils/nextFlight.js): the dailies first, then the other games
+const GLOBE_FLIGHTS = [
+  ...DAILY_GAMES.map((game) => ({ type: game.id.toUpperCase(), daily: true, game })),
+  ...SETUP_GAMES.map((game) => ({ type: game.id.toUpperCase(), daily: false, game })),
+];
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -38,11 +45,22 @@ export default function HomePage() {
   // Loaded once for the missions card and the dailies played today (one history read)
   const missions = useMissions(account?.uid ?? null);
   const dailyStatus = missions.dailies?.status ?? null;
+  // The player's finds on the globe: each one swings down the board with the next flight to take
+  const [globeFinds, setGlobeFinds] = useState(0);
+  const [offerOpen, setOfferOpen] = useState(false);
+  const onGlobeFind = useCallback(() => { setGlobeFinds((n) => n + 1); setOfferOpen(true); }, []);
+  const closeOffer = useCallback(() => setOfferOpen(false), []);
   const configGame = GAMES.find((game) => game.id === configGameId) ?? null;
   const closeConfig = useCallback(() => { setConfigGameId(null); setConfigInitialMode("standard"); }, []);
   // « Explore - Découvre - Voyage » → « EXPLORE · DÉCOUVRE · VOYAGE »
   const motto = t("home.subtitle").split(/\s+-\s+/).join(" · ").toLocaleUpperCase(i18n.resolvedLanguage);
   const firstDaily = DAILY_GAMES[0];
+  const offer = offerOpen ? nextFlight(GLOBE_FLIGHTS, { dailyStatus, playedToday: missions.playedToday, turn: globeFinds - 1 }) : null;
+  const boardFlight = (flight) => {
+    setOfferOpen(false);
+    if (flight.daily) navigate(flight.game.route, { state: { mode: "daily" } });
+    else setConfigGameId(flight.game.id);
+  };
 
   const boardRows = [
     ...SETUP_GAMES.map((game, i) => ({
@@ -92,7 +110,18 @@ export default function HomePage() {
           </div>
           <div className="flight-hero-globe">
             <Suspense fallback={<div className="flight-globe-placeholder" aria-hidden="true" />}>
-              <FlightGlobe onScore={setGlobeScore} />
+              <FlightGlobe
+                onScore={setGlobeScore}
+                onFind={onGlobeFind}
+                overlay={offerOpen && (
+                  <NextFlightBoard
+                    key={globeFinds}
+                    flight={offer && { game: offer.game.id, title: t(offer.game.titleKey), daily: offer.daily }}
+                    onBoard={() => boardFlight(offer)}
+                    onClose={closeOffer}
+                  />
+                )}
+              />
             </Suspense>
           </div>
         </section>

@@ -1,57 +1,22 @@
-// "Atlas de nuit" design tokens.
-export const colors = {
-  bg: '#0B1020',
-  surface: '#141B30',
-  surfaceHigh: '#1B2440',
-  border: '#232C48',
-  borderStrong: '#34406A',
-  text: '#EEF1F8',
-  textMuted: '#A3ACC6',
-  textFaint: '#6B7596',
+// « Carnet de vol » design tokens, in a dark and a light theme (the light one follows the website's light tokens:
+// @sdmm/design themes/geogame.css and src/styles/theme.css). Colors come from the theme in use: useTheme(),
+// useColors() or makeStyles() (./theme.ts); fonts, radii and spacing don't change with it.
+import { Platform } from 'react-native'
 
-  accent: '#3DDC97',
-  onAccent: '#06281A',
-  danger: '#FF7A6B',
-  onDanger: '#3A0D07',
-  warning: '#F5B83D',
-  // « Warmer / colder » hints that point the other way than the accent (Border Guess, Country Clue)
-  info: '#60A5FA',
-  onWarning: '#2A1C02',
+export { makeStyles, setThemePreference, useColors, useTheme, useThemePreference } from './theme'
+export type { Theme, ThemePreference } from './theme'
+export { darkColors, gameFills, lightColors, darkGameColors, lightGameColors } from './palettes'
+export type { GameColors, Palette } from './palettes'
 
-  ocean: '#060E1F',
-  land: '#2A3E66',
-  landStroke: '#6F88BD',
-  highlight: '#7AA2FF',
-
-  // « Carnet de vol »: departures board, ticket stub, gold flight codes
-  board: '#060A16',
-  boardLine: '#141C33',
-  gold: '#F5C84B',
-  stub: '#26324F',
-  accent2: '#C792FF',
-} as const
-
-// One color per game, used for icons and accents.
-export const gameColors = {
-  daily_challenge: '#FF9F45',
-  country_of_day: '#2EC4B6',
-  placement: '#7AA2FF',
-  hardcore: '#FF7A6B',
-  flags: '#FF7A6B',
-  missing_flag: '#C792FF',
-  capitals: '#F5B83D',
-  border_guess: '#C792FF',
-  country_clue: '#3DDC97',
-  voyage_voyage: '#5FD4F4',
-  ranking: '#FF9EC7',
-  quiz: '#B4E05A',
-  survival: '#FF5C7A',
-} as const
+// Bricolage Grotesque has no Cyrillic, Greek, Arabic or CJK letters. iOS and Android fall back to their system font for
+// those; a browser falls back to its default serif one, so on the web the display fonts list Inter (Cyrillic, Greek) and
+// the system font after it, for names such as « Распути ».
+const displayFallback = Platform.OS === 'web' ? ', Inter_600SemiBold, system-ui, sans-serif' : ''
 
 export const fonts = {
-  display: 'BricolageGrotesque_700Bold',
-  displayHeavy: 'BricolageGrotesque_800ExtraBold',
-  displayMedium: 'BricolageGrotesque_600SemiBold',
+  display: `BricolageGrotesque_700Bold${displayFallback}`,
+  displayHeavy: `BricolageGrotesque_800ExtraBold${displayFallback}`,
+  displayMedium: `BricolageGrotesque_600SemiBold${displayFallback}`,
   body: 'Inter_400Regular',
   bodyMedium: 'Inter_500Medium',
   bodyBold: 'Inter_600SemiBold',

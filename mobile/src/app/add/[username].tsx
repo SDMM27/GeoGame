@@ -3,7 +3,7 @@
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native'
+import { ActivityIndicator, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { findPlayer } from '@shared/utils/friends'
@@ -15,11 +15,13 @@ import { Avatar } from '@/components/profile/ProfileSections'
 import { ScreenHeader } from '@/components/ScreenHeader'
 import { Kicker, ScreenTitle } from '@/components/flight'
 import { Button, Text } from '@/components/ui'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 
 type Player = { uid: string; username: string }
 
 export default function AddFriendScreen() {
+  const styles = useStyles()
+  const colors = useColors()
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   const { username } = useLocalSearchParams<{ username: string }>()
@@ -87,7 +89,7 @@ export default function AddFriendScreen() {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   card: {
     alignItems: 'center',
     gap: space.md,
@@ -97,4 +99,4 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-})
+}))

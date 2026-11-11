@@ -1,16 +1,12 @@
 // Last step: tap the country on the world map. Wrong taps are painted, and the right country once the step is over.
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { View } from 'react-native'
 
 import { mainPartBounds } from '@shared/utils/countryInfo'
 
 import { WorldMap, type MapLayer, type WorldMapHandle } from '@/components/map/WorldMap'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 import type { Feature } from './labels'
-
-const WRONG = { fillColor: colors.danger, fillOpacity: 0.5, color: colors.danger, weight: 1.5 }
-const FOUND = { fillColor: colors.accent, fillOpacity: 0.6, color: colors.accent, weight: 2 }
-const MISSED = { fillColor: colors.warning, fillOpacity: 0.6, color: colors.warning, weight: 2 }
 
 export function PlacementStep({
   country,
@@ -30,6 +26,8 @@ export function PlacementStep({
   bottomInset: number
   children: ReactNode
 }) {
+  const styles = useStyles()
+  const colors = useColors()
   const mapRef = useRef<WorldMapHandle>(null)
   const [ready, setReady] = useState(false)
   const admin = country.properties.ADMIN
@@ -45,10 +43,14 @@ export function PlacementStep({
     map.geoJson.resetStyle()
     for (const layer of map.geoJson.getLayers()) {
       const name = layer.feature.properties.ADMIN
-      if (resolved && name === admin) layer.setStyle(found ? FOUND : MISSED)
-      else if (wrong.includes(name)) layer.setStyle(WRONG)
+      if (resolved && name === admin) {
+        const color = found ? colors.accent : colors.warning
+        layer.setStyle({ fillColor: color, fillOpacity: 0.6, color, weight: 2 })
+      } else if (wrong.includes(name)) {
+        layer.setStyle({ fillColor: colors.danger, fillOpacity: 0.5, color: colors.danger, weight: 1.5 })
+      }
     }
-  }, [ready, wrong, resolved, found, admin])
+  }, [ready, wrong, resolved, found, admin, colors])
 
   // A step lost zooms on the country, as the classic game's reveal does
   useEffect(() => {
@@ -66,7 +68,7 @@ export function PlacementStep({
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   root: { flex: 1, backgroundColor: colors.ocean },
   panel: {
     position: 'absolute',
@@ -78,6 +80,6 @@ const styles = StyleSheet.create({
     borderRadius: radius.xl,
     borderWidth: 1,
     borderColor: colors.border,
-    backgroundColor: 'rgba(11,16,32,0.96)',
+    backgroundColor: colors.surface,
   },
-})
+}))

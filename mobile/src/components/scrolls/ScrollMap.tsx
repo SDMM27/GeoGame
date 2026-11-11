@@ -10,7 +10,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-na
 
 import { Text, Touchable } from '@/components/ui'
 import { ScrollImage, type ImageSize } from '@/components/scrolls/ScrollImage'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 
 export const MIN_SCALE = 1
 export const MAX_SCALE = 8
@@ -32,6 +32,8 @@ export const clampScale = (scale: number) => {
 
 export function ScrollMap({ id, label, maxHeight }: { id: string; label: string; maxHeight?: number }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const [ratio, setRatio] = useState(1.5)
   const scale = useSharedValue(1)
   const tx = useSharedValue(0)
@@ -150,11 +152,12 @@ export function ScrollMap({ id, label, maxHeight }: { id: string; label: string;
   )
 }
 
-const styles = StyleSheet.create({
+// The parchment image sits on a dark backdrop in both themes: the paper is fixed
+const useStyles = makeStyles((colors) => ({
   frame: { width: '100%', borderRadius: radius.md, overflow: 'hidden', backgroundColor: '#1A1610' },
   viewport: { flex: 1, overflow: 'hidden' },
   // Explicit size: react-native-web draws an absolute-fill Image at its natural size
   image: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
   controls: { position: 'absolute', right: space.sm, bottom: space.sm, flexDirection: 'row', gap: 6 },
-  control: { width: 38, height: 38, borderRadius: radius.pill, backgroundColor: 'rgba(11,16,32,0.85)', borderWidth: 1, borderColor: colors.borderStrong, alignItems: 'center', justifyContent: 'center' },
-})
+  control: { width: 38, height: 38, borderRadius: radius.pill, backgroundColor: `${colors.surface}D9`, borderWidth: 1, borderColor: colors.borderStrong, alignItems: 'center', justifyContent: 'center' },
+}))

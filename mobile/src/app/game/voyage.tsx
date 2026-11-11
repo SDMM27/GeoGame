@@ -5,7 +5,7 @@ import { Image } from 'expo-image'
 import { useLocalSearchParams } from 'expo-router'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native'
+import { KeyboardAvoidingView, Platform, ScrollView, View, useWindowDimensions } from 'react-native'
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated'
 
 import countries from '@shared/data/countriesWithDifficulty_FR.json'
@@ -23,7 +23,7 @@ import { GameHud } from '@/components/game/GameHud'
 import { GuessInputBar } from '@/components/game/GuessInputBar'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
 import { type CountryFeature } from '@/components/map/geometry'
-import { ExpandableVoyageMap, VOYAGE_COLORS, type VoyageColor } from '@/components/map/VoyageMap'
+import { ExpandableVoyageMap, type VoyageColor, useVoyageColors } from '@/components/map/VoyageMap'
 import { Stamp, type EscaleState } from '@/components/flight'
 import { Button, Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
@@ -31,9 +31,7 @@ import { useKeyboardVisible } from '@/hooks/useKeyboardVisible'
 import { clean } from '@/i18n'
 import { navigate } from '@/shims/react-router-dom'
 import { toast } from '@/shims/react-toastify'
-import { colors, gameColors, radius, space } from '@/theme'
-
-const ACCENT = gameColors.voyage_voyage
+import { makeStyles, radius, space, useColors, useTheme } from '@/theme'
 
 type Guess = { feature: CountryFeature; color: VoyageColor }
 
@@ -58,7 +56,10 @@ function nameOf(feature: CountryFeature, lang: string) {
 }
 
 function CountryChip({ feature, color, lang }: { feature: CountryFeature; color: VoyageColor | 'missed'; lang: string }) {
-  const tint = color === 'missed' ? colors.textMuted : VOYAGE_COLORS[color]
+  const styles = useStyles()
+  const colors = useColors()
+  const voyageColors = useVoyageColors()
+  const tint = color === 'missed' ? colors.textMuted : voyageColors[color]
   const flag = getFlag(feature.properties.ISO_A2)
   return (
     <View style={[styles.chip, { borderColor: `${tint}88`, backgroundColor: `${tint}1A` }, color === 'missed' && styles.chipMissed]}>
@@ -71,6 +72,8 @@ function CountryChip({ feature, color, lang }: { feature: CountryFeature; color:
 }
 
 function OptimalPath({ path, chain }: { path: CountryFeature[]; chain: CountryFeature[] }) {
+  const styles = useStyles()
+  const colors = useColors()
   const { t, i18n } = useTranslation()
   const guessed = new Set(chain.map((feature) => feature.properties.ISO_A2))
   return (
@@ -89,6 +92,9 @@ function OptimalPath({ path, chain }: { path: CountryFeature[]; chain: CountryFe
 }
 
 export default function VoyageScreen() {
+  const styles = useStyles()
+  const colors = useColors()
+  const ACCENT = useTheme().gameColors.voyage_voyage
   const { t, i18n } = useTranslation()
   const { mode = 'daily' } = useLocalSearchParams<{ mode?: string }>()
   const isDaily = mode === 'daily'
@@ -413,7 +419,7 @@ export default function VoyageScreen() {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   content: { paddingHorizontal: space.xl, paddingTop: space.sm, paddingBottom: space.xl, gap: space.lg },
   chain: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6 },
   chainItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
@@ -449,4 +455,4 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-})
+}))

@@ -235,7 +235,7 @@ export function createGlobeScene(land, events) {
       },
       theme: readColors,
       pointerdown(state, e) {
-        drag = { x: e.clientX, y: e.clientY, lon: view.lon, lat: view.lat, t: performance.now(), lastX: e.clientX, mouse: e.pointerType === 'mouse' }
+        drag = { x: e.clientX, y: e.clientY, lon: view.lon, lat: view.lat, t: performance.now(), lastX: e.clientX }
         velocity = 0
         idle = 0
         state.canvas.setPointerCapture?.(e.pointerId)
@@ -249,8 +249,9 @@ export function createGlobeScene(land, events) {
         drag.t = now
         drag.lastX = e.clientX
         view.lon = wrap(drag.lon - (e.clientX - drag.x) * k)
-        // Vertical drags scroll the page on touch screens (touch-action: pan-y): only the mouse tilts the globe
-        if (drag.mouse) view.lat = Math.max(-70, Math.min(70, drag.lat + (e.clientY - drag.y) * k))
+        // Mouse and finger tilt alike (same feel as the app). On touch screens a drag that starts vertically scrolls the
+        // page instead (touch-action: pan-y, the browser cancels the pointer); one that starts sideways keeps the globe.
+        view.lat = Math.max(-70, Math.min(70, drag.lat + (e.clientY - drag.y) * k))
         idle = 0
         if (phase !== 'found') {
           phase = 'manual'

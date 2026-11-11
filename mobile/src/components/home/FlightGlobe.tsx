@@ -1,0 +1,373 @@
+// The home screen's interactive globe (port of the website's FlightGlobe): turn it with a drag, tilt it up and down, to
+// put the city in the reticle. It runs entirely on the UI thread: the scene state lives in one shared value, a frame
+// callback steps it, and each Skia path / position is a derived value that rotates and projects the precomputed unit
+// vectors (globeGeometry.ts, globeMath.ts). The JS thread only hears about discrete events: a new target, a find.
+import {
+  Canvas,
+  Circle,
+  DashPathEffect,
+  Group,
+  Path,
+  RadialGradient,
+  Rect,
+  Skia,
+  Text as SkiaText,
+  TwoPointConicalGradient,
+  useFont,
+  vec,
+  type SkFont,
+  type SkPath,
+} from '@shopify/react-native-skia'
+import { useFocusEffect } from 'expo-router'
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
+import { Text, View, useWindowDimensions } from 'react-native'
+import { Gesture, GestureDetector } from 'react-native-gesture-handler'
+import { useDerivedValue, useFrameCallback, useReducedMotion, useSharedValue, type SharedValue } from 'react-native-reanimated'
+import { scheduleOnRN } from 'react-native-worklets'
+
+import { fonts, makeStyles, radius, space, useTheme } from '@/theme'
+
+import { CITY_VECTORS, FLIGHT_PATH, GRATICULE, LAND, ROUTES_ACCENT, ROUTES_ACCENT2 } from './globeGeometry'
+import { createPathRing, framePath } from './framePaths'
+import { appendLines, appendRings, rotate, sampleAt, toScreen, viewBasis } from './globeMath'
+import {
+  CITIES,
+  EVENT_FOUND,
+  EVENT_TARGET,
+  FLIGHT_SECONDS,
+  createGlobeState,
+  dragEnd,
+  dragMove,
+  dragStart,
+  stepGlobe,
+  type GlobeState,
+} from './globeModel'
+
+const MAX_SIZE = 340
+
+// The globe's colors come from the theme, like the web's --gg-globe-* tokens: light land on navy in the dark theme,
+// dark land on a pale ocean in the light one. The glow around it is the accent, fainter on the light background.
+const GLOW = { dark: 'rgba(61,220,151,', light: 'rgba(20,168,107,' } as const
+const GLOW_ALPHA = { dark: 0.22, light: 0.16 } as const
+const PLANE = Skia.Path.MakeFromSVGString('M-8 -2L7 0L-8 2L-5 0ZM-2 -7L2 0L-2 7Z')!
+
+// Module-level names for what the worklets capture (each is copied to the UI thread once)
+const land = LAND
+const graticule = GRATICULE
+const routesAccent = ROUTES_ACCENT
+const routesAccent2 = ROUTES_ACCENT2
+const flight = FLIGHT_PATH
+const cityVectors = CITY_VECTORS
+
+const monoBold = require('@expo-google-fonts/jetbrains-mono/700Bold/JetBrainsMono_700Bold.ttf')
+
+type Scene = { state: SharedValue<GlobeState>; basis: SharedValue<number[]>; c: number; r: number }
+type Ink = { accent: string; muted: string; text: string; halo: string }
+
+function CityMark({ index, scene, font, reduced, ink }: { index: number; scene: Scene; font: SkFont | null; reduced: boolean; ink: Ink }) {
+  const { state, basis, c, r } = scene
+  const { accent, muted, text, halo } = ink
+  const view = useDerivedValue(() => rotate(basis.value, cityVectors[3 * index], cityVectors[3 * index + 1], cityVectors[3 * index + 2]))
+  const transform = useDerivedValue(() => {
+    const v = view.value
+    const [x, y] = toScreen(v[0], v[1], v[2], c, c, r)
+    return [{ translateX: x }, { translateY: y }]
+  })
+  const visible = useDerivedValue(() => (view.value[2] > 0.02 ? 1 : 0))
+  const isTarget = useDerivedValue(() => state.value.target === index)
+  const dotRadius = useDerivedValue(() => (isTarget.value ? 6 : 3.5))
+  const dotColor = useDerivedValue(() => (isTarget.value ? accent : muted))
+  const pingProgress = useDerivedValue(() => (state.value.clock % 1.6) / 1.6)
+  const pingRadius = useDerivedValue(() => 5 + pingProgress.value * 15)
+  const pingOpacity = useDerivedValue(() => (isTarget.value ? 0.9 * (1 - pingProgress.value) : 0))
+  const code = CITIES[index].code
+  return (
+    <Group transform={transform} opacity={visible}>
+      {!reduced && <Circle cx={0} cy={0} r={pingRadius} style="stroke" strokeWidth={2} color={accent} opacity={pingOpacity} />}
+      <Circle cx={0} cy={0} r={dotRadius} color={dotColor} />
+      <Circle cx={0} cy={0} r={dotRadius} style="stroke" strokeWidth={1.5} color={halo} />
+      {font && (
+        // A halo in the ocean's color keeps the code readable over the land as over the sea
+        <>
+          <SkiaText x={8} y={-8} text={code} font={font} style="stroke" strokeWidth={3} strokeJoin="round" color={halo} />
+          <SkiaText x={8} y={-8} text={code} font={font} color={text} />
+        </>
+      )}
+    </Group>
+  )
+}
+
+// `onFind` runs when the player (not the globe on its own) finds the city; `overlay` is drawn over the bottom of the globe.
+export function FlightGlobe({ onFind, overlay = null }: { onFind?: () => void; overlay?: ReactNode } = {}) {
+  const { t } = useTranslation()
+  const { colors, scheme } = useTheme()
+  const styles = useStyles()
+  const ink: Ink = useMemo(
+    () => ({ accent: colors.accent, muted: colors.textMuted, text: colors.text, halo: scheme === 'light' ? colors.surface : colors.globeOceanDeep }),
+    [colors, scheme]
+  )
+  const accentColor = colors.accent
+  const textColor = colors.text
+  const reduced = useReducedMotion()
+  const { width } = useWindowDimensions()
+  const size = Math.round(Math.min(width - space.lg * 2, MAX_SIZE))
+  const c = size / 2
+  const r = size * 0.4
+  const [target, setTarget] = useState(0)
+  const [found, setFound] = useState(false)
+  const [score, setScore] = useState(0)
+  const [touched, setTouched] = useState(false)
+
+  const codeFont = useFont(monoBold, Math.max(9, size * 0.026))
+  const burstFont = useFont(monoBold, Math.max(13, size * 0.042))
+
+  const state = useSharedValue<GlobeState>(createGlobeState())
+  const basis = useDerivedValue(() => viewBasis(state.value.lon, state.value.lat))
+  const scene: Scene = { state, basis, c, r }
+
+  // The only things that cross threads: a new target, a find (only the player's own finds change the score)
+  const onTarget = useCallback((index: number) => {
+    setTarget(index)
+    setFound(false)
+  }, [])
+  const onFound = useCallback(
+    (total: number, byPlayer: boolean) => {
+      setFound(true)
+      if (byPlayer) {
+        setScore(total)
+        onFind?.()
+      }
+    },
+    [onFind],
+  )
+  const emit = useCallback(
+    (events: number, s: GlobeState) => {
+      'worklet'
+      if (events & EVENT_TARGET) scheduleOnRN(onTarget, s.target)
+      if (events & EVENT_FOUND) scheduleOnRN(onFound, s.score, s.scored)
+    },
+    [onTarget, onFound],
+  )
+
+  useEffect(() => {
+    state.modify((s) => {
+      'worklet'
+      s.reduced = reduced
+      return s
+    })
+  }, [state, reduced])
+
+  // Under reduced motion nothing moves; the frame callback only lets the pause after a find run out (cheap early return)
+  const frameCallback = useFrameCallback((info) => {
+    'worklet'
+    const current = state.value
+    if (current.reduced && current.phase !== 'found') return
+    const dt = Math.min((info.timeSincePreviousFrame ?? 16) / 1000, 0.1)
+    state.modify((s) => {
+      'worklet'
+      emit(stepGlobe(s, dt, s.reduced), s)
+      return s
+    })
+  }, false)
+
+  // The Home tab stays mounted under the other tabs: stop stepping while it is not the one in front
+  useFocusEffect(
+    useCallback(() => {
+      frameCallback.setActive(true)
+      return () => frameCallback.setActive(false)
+    }, [frameCallback]),
+  )
+
+  const pan = useMemo(
+    () =>
+      Gesture.Pan()
+        // A gesture that starts vertically still scrolls the home page; once active, a drag turns (horizontal) and tilts (vertical)
+        .activeOffsetX([-10, 10])
+        .failOffsetY([-10, 10])
+        .onStart(() => {
+          'worklet'
+          state.modify((s) => {
+            'worklet'
+            dragStart(s, performance.now())
+            return s
+          })
+          scheduleOnRN(setTouched, true)
+        })
+        .onUpdate((event) => {
+          'worklet'
+          state.modify((s) => {
+            'worklet'
+            emit(dragMove(s, event.translationX, event.translationY, size, performance.now()), s)
+            return s
+          })
+        })
+        .onFinalize(() => {
+          'worklet'
+          state.modify((s) => {
+            'worklet'
+            dragEnd(s, performance.now()) // a no-op when the pan never started (a vertical swipe)
+            return s
+          })
+        }),
+    [state, size, emit],
+  )
+
+  // On the web each of these paths frees the ones it made a few frames ago (framePaths.ts)
+  const rings = useMemo(
+    () => ({ land: createPathRing(), graticule: createPathRing(), routesAccent: createPathRing(), routesAccent2: createPathRing() }),
+    [],
+  )
+  const landPath = useDerivedValue<SkPath>(() => {
+    const path = framePath(rings.land)
+    appendRings(path, land, basis.value, c, c, r)
+    return path
+  })
+  const graticulePath = useDerivedValue<SkPath>(() => {
+    const path = framePath(rings.graticule)
+    appendLines(path, graticule, basis.value, c, c, r)
+    return path
+  })
+  const accentPath = useDerivedValue<SkPath>(() => {
+    const path = framePath(rings.routesAccent)
+    appendLines(path, routesAccent, basis.value, c, c, r)
+    return path
+  })
+  const accent2Path = useDerivedValue<SkPath>(() => {
+    const path = framePath(rings.routesAccent2)
+    appendLines(path, routesAccent2, basis.value, c, c, r)
+    return path
+  })
+  // Routes: dashes that run along the arcs
+  const dashPhase = useDerivedValue(() => (((-state.value.clock * 20) % 10) + 10) % 10)
+
+  // The plane, nose along its route: position, heading and whether it is on the near side
+  const plane = useDerivedValue(() => {
+    const u = (state.value.clock / FLIGHT_SECONDS) % 1
+    const a = sampleAt(flight, u)
+    const b = sampleAt(flight, Math.min(1, u + 0.01))
+    const va = rotate(basis.value, a[0], a[1], a[2])
+    const vb = rotate(basis.value, b[0], b[1], b[2])
+    const [x1, y1] = toScreen(va[0], va[1], va[2], c, c, r)
+    const [x2, y2] = toScreen(vb[0], vb[1], vb[2], c, c, r)
+    return { x: x1, y: y1, angle: Math.atan2(y2 - y1, x2 - x1), visible: va[2] > 0.05 }
+  })
+  const planeTransform = useDerivedValue(() => [
+    { translateX: plane.value.x },
+    { translateY: plane.value.y },
+    { rotate: plane.value.angle },
+    { scale: size / 400 },
+  ])
+  const planeOpacity = useDerivedValue(() => (plane.value.visible ? 1 : 0))
+
+  const ret = r * 0.09
+  const reticlePath = useMemo(() => {
+    const path = Skia.Path.Make()
+    path.addCircle(c, c, ret)
+    for (const [dx, dy] of [[0, -1], [0, 1], [-1, 0], [1, 0]]) {
+      path.moveTo(c + dx * (ret + 6), c + dy * (ret + 6))
+      path.lineTo(c + dx * (ret + 14), c + dy * (ret + 14))
+    }
+    return path
+  }, [c, ret])
+  const reticleColor = useDerivedValue(() => (state.value.phase === 'found' ? accentColor : textColor))
+  const reticleOpacity = useDerivedValue(() => (state.value.phase === 'found' ? 1 : 0.7))
+
+  // The +100 burst
+  const burstRadius = useDerivedValue(() => ret + (1 - state.value.burst) * r * 0.55)
+  const burstOpacity = useDerivedValue(() => state.value.burst)
+  const burstTextOpacity = useDerivedValue(() => (state.value.scored ? state.value.burst : 0))
+  const burstTextY = useDerivedValue(() => c - ret - 12 - (1 - state.value.burst) * 20)
+  const burstTextX = burstFont ? c - burstFont.getTextWidth('+100') / 2 : c
+
+  const cityName = t(`globe.city.${CITIES[target].key}`)
+
+  return (
+    <View style={styles.wrap}>
+      <View style={{ width: size, height: size }}>
+        <GestureDetector gesture={pan}>
+          <View accessible accessibilityRole="image" accessibilityLabel={t('globe.label', { city: cityName })} style={{ width: size, height: size }}>
+            <Canvas style={{ width: size, height: size }}>
+              <Rect x={0} y={0} width={size} height={size}>
+                <RadialGradient
+                  c={vec(c, c)}
+                  r={r * 1.22}
+                  colors={[`${GLOW[scheme]}${GLOW_ALPHA[scheme]})`, `${GLOW[scheme]}${GLOW_ALPHA[scheme]})`, `${GLOW[scheme]}0)`]}
+                  positions={[0, 0.95 / 1.22, 1]}
+                />
+              </Rect>
+              <Circle cx={c} cy={c} r={r}>
+                <TwoPointConicalGradient start={vec(c - r * 0.35, c - r * 0.4)} startR={r * 0.1} end={vec(c, c)} endR={r * 1.05} colors={[colors.globeOcean, colors.globeOceanDeep]} />
+              </Circle>
+              <Path path={graticulePath} style="stroke" strokeWidth={0.6} color={colors.globeGraticule} />
+              <Path path={landPath} fillType="evenOdd" color={colors.globeLand} />
+              <Path path={landPath} style="stroke" strokeWidth={0.7} color={colors.globeLandEdge} />
+              <Circle cx={c} cy={c} r={r} style="stroke" strokeWidth={1.2} color={colors.borderStrong} />
+              <Path path={accentPath} style="stroke" strokeWidth={1.8} strokeCap="round" color={colors.accent}>
+                {!reduced && <DashPathEffect intervals={[5, 5]} phase={dashPhase} />}
+              </Path>
+              <Path path={accent2Path} style="stroke" strokeWidth={1.8} strokeCap="round" color={colors.accent2}>
+                {!reduced && <DashPathEffect intervals={[5, 5]} phase={dashPhase} />}
+              </Path>
+              {CITIES.map((city, index) => (
+                <CityMark key={city.code} index={index} scene={scene} font={codeFont} reduced={reduced} ink={ink} />
+              ))}
+              {!reduced && (
+                <Group transform={planeTransform} opacity={planeOpacity}>
+                  <Path path={PLANE} color={colors.gold} />
+                </Group>
+              )}
+              <Path path={reticlePath} style="stroke" strokeWidth={1.6} color={reticleColor} opacity={reticleOpacity} />
+              {!reduced && (
+                <>
+                  <Circle cx={c} cy={c} r={burstRadius} style="stroke" strokeWidth={3} color={colors.accent} opacity={burstOpacity} />
+                  {burstFont && <SkiaText x={burstTextX} y={burstTextY} text="+100" font={burstFont} color={colors.accent} opacity={burstTextOpacity} />}
+                </>
+              )}
+            </Canvas>
+          </View>
+        </GestureDetector>
+        {overlay && (
+          <View style={[styles.overlay, { bottom: size * 0.06 }]}>
+            {overlay}
+          </View>
+        )}
+      </View>
+      <View accessibilityLiveRegion="polite" style={[styles.chip, found && styles.chipFound]}>
+        <Text style={[styles.chipText, found && styles.chipTextFound, styles.chipCity]} numberOfLines={1}>
+          {found ? `✓ ${t('globe.found', { city: cityName })}` : t('globe.find', { city: cityName })}
+        </Text>
+        {score > 0 && (
+          // The player's globe score lives in the chip: three cells in the board strip do not fit a 360 px phone
+          <Text style={[styles.chipScore, found && styles.chipTextFound]} numberOfLines={1}>
+            {`${t('home.globe_score')} ${score}`}
+          </Text>
+        )}
+      </View>
+      <Text style={styles.hint}>{touched ? t('globe.hint_center') : t('globe.hint_drag')}</Text>
+    </View>
+  )
+}
+
+const useStyles = makeStyles((colors) => ({
+  wrap: { alignItems: 'center', gap: space.sm },
+  overlay: { position: 'absolute', left: 0, right: 0, alignItems: 'center', pointerEvents: 'box-none' },
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    maxWidth: '100%',
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+  },
+  chipFound: { backgroundColor: colors.accent, borderColor: colors.accent },
+  chipText: { fontFamily: fonts.monoBold, fontSize: 13, color: colors.text },
+  chipCity: { flexShrink: 1 },
+  chipScore: { fontFamily: fonts.monoBold, fontSize: 13, color: colors.gold },
+  chipTextFound: { color: colors.onAccent },
+  hint: { fontFamily: fonts.mono, fontSize: 11, color: colors.textMuted, textAlign: 'center' },
+}))

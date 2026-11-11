@@ -2,6 +2,7 @@
 export { BoardStrip, type BoardCell } from './BoardStrip'
 export { BoardingPass, Barcode } from './BoardingPass'
 export { DepartureRow, DeparturesBoard, type DepartureTone } from './DeparturesBoard'
+export { ExpandableDeparture, useAccordion } from './ExpandableDeparture'
 export { EscaleProgress, type EscaleState } from './EscaleProgress'
 export { GameHeader } from './GameHeader'
 export { Kicker } from './Kicker'

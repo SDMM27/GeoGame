@@ -4,7 +4,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { router } from 'expo-router'
 import type { TFunction } from 'i18next'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, View } from 'react-native'
+import { View } from 'react-native'
 
 import type { useMissions } from '@shared/hooks/useMissions'
 import {
@@ -24,7 +24,7 @@ import { Kicker, ScreenTitle, Stamp } from '@/components/flight'
 import { CollapsibleSection } from '@/components/CollapsibleSection'
 import { XpBar, type Xp } from '@/components/profile/XpBar'
 import { Text, Touchable } from '@/components/ui'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 
 type Entry = {
   mission: { id: string; icon: string; target: number; tier?: 'easy' | 'medium' | 'hard' }
@@ -45,6 +45,8 @@ const rewardText = (t: TFunction, { xp, fragments }: Reward) =>
 
 function MissionRow({ entry, reward }: { entry: Entry; reward: Reward }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const { mission, progress, done, paid } = entry
   const shown = Math.min(progress, mission.target)
   const color = done ? colors.accent : colors.highlight
@@ -87,6 +89,8 @@ function MissionRow({ entry, reward }: { entry: Entry; reward: Reward }) {
 // Today's dailies (played, won, the 3 tiers of fragments) and the streak with its next milestone.
 function DailiesRow({ dailies, streak }: { dailies: Dailies; streak: Streak | null }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   return (
     <View style={styles.dailies}>
       <View style={styles.dailiesLine}>
@@ -130,6 +134,8 @@ function DailiesRow({ dailies, streak }: { dailies: Dailies; streak: Streak | nu
 
 function Bonus({ count, reward, paid }: { count: number; reward: Reward; paid: boolean }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   return (
     <View style={[styles.bonus, paid && { borderColor: colors.accent }]}>
       <MaterialCommunityIcons name={paid ? 'check-circle' : 'gift-outline'} size={18} color={paid ? colors.accent : colors.warning} />
@@ -148,6 +154,8 @@ const doneCount = (entries: Entry[]) => entries.filter((entry) => entry.done).le
 // `missions`: useMissions(uid), loaded by the home screen (it also marks the dailies played).
 export function MissionsCard({ uid, missions }: { uid: string | null | undefined; missions: ReturnType<typeof useMissions> }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
 
   if (!uid) {
     return (
@@ -208,7 +216,7 @@ export function MissionsCard({ uid, missions }: { uid: string | null | undefined
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   card: {
     gap: space.lg,
     backgroundColor: colors.board,
@@ -261,4 +269,4 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     backgroundColor: colors.bg,
   },
-})
+}))

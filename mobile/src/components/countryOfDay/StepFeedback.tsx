@@ -1,10 +1,9 @@
 // Result of the step on screen: the points when found, the answer when missed, and the way on to the next step.
 import { useTranslation } from 'react-i18next'
-import { StyleSheet } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 
 import { Button, Text } from '@/components/ui'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 
 export function StepFeedback({
   found,
@@ -20,6 +19,8 @@ export function StepFeedback({
   onNext: () => void
 }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const color = found ? colors.accent : colors.warning
   return (
     <Animated.View entering={FadeInDown.springify().damping(18)} style={[styles.box, { borderColor: color }]}>
@@ -31,7 +32,7 @@ export function StepFeedback({
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   box: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -42,4 +43,4 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     backgroundColor: colors.surface,
   },
-})
+}))

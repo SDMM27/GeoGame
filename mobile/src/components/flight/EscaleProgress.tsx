@@ -7,11 +7,9 @@
 //   style   container style
 import { Text, View, type StyleProp, type ViewStyle } from 'react-native'
 
-import { colors, fonts } from '@/theme'
+import { fonts, useColors } from '@/theme'
 
 export type EscaleState = 'good' | 'bad' | 'current' | 'todo' | (string & {})
-
-const STATE_COLORS: Record<string, string> = { good: colors.accent, bad: colors.danger, current: colors.gold, todo: colors.stub }
 
 export function EscaleProgress({
   states,
@@ -24,6 +22,8 @@ export function EscaleProgress({
   style?: StyleProp<ViewStyle>
   accessibilityLabel?: string
 }) {
+  const colors = useColors()
+  const stateColors: Record<string, string> = { good: colors.accent, bad: colors.danger, current: colors.gold, todo: colors.stub }
   const a11y = accessibilityLabel
     ? ({ accessible: true, accessibilityRole: 'progressbar', accessibilityLabel } as const)
     : ({ accessible: false, importantForAccessibility: 'no-hide-descendants' } as const)
@@ -32,7 +32,7 @@ export function EscaleProgress({
     <View {...a11y} style={[{ flexDirection: 'row', gap: 4 }, style]}>
       {states.map((state, index) => (
         <View key={index} style={{ flex: 1, gap: 6 }}>
-          <View style={{ height: 4, borderRadius: 4, backgroundColor: STATE_COLORS[state] ?? (state.startsWith('#') ? state : colors.stub) }} />
+          <View style={{ height: 4, borderRadius: 4, backgroundColor: stateColors[state] ?? (state.startsWith('#') ? state : colors.stub) }} />
           {captions && (
             <Text numberOfLines={1} style={{ fontFamily: fonts.monoBold, fontSize: 9, letterSpacing: 0.9, color: colors.textMuted, textAlign: index === 0 ? 'left' : index === states.length - 1 ? 'right' : 'center' }}>
               {captions[index]}

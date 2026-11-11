@@ -1,22 +1,25 @@
 // Renders toasts raised by the shared hooks through the react-toastify shim.
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { useEffect, useState } from 'react'
-import { Image, StyleSheet, View } from 'react-native'
+import { Image, View } from 'react-native'
 import Animated, { FadeInUp, FadeOutUp, LinearTransition } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { subscribeToasts, type ToastKind, type ToastMessage } from '@/shims/react-toastify'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 import { Text } from './ui'
 
-const KIND_STYLE: Record<ToastKind, { color: string; icon: 'check-circle' | 'close-circle' | 'information' | 'alert' }> = {
-  success: { color: colors.accent, icon: 'check-circle' },
-  error: { color: colors.danger, icon: 'close-circle' },
-  info: { color: colors.highlight, icon: 'information' },
-  warning: { color: colors.warning, icon: 'alert' },
-}
+type ToastKindStyle = { color: string; icon: 'check-circle' | 'close-circle' | 'information' | 'alert' }
 
 export function ToastHost() {
+  const colors = useColors()
+  const styles = useStyles()
+  const kindStyles: Record<ToastKind, ToastKindStyle> = {
+    success: { color: colors.accent, icon: 'check-circle' },
+    error: { color: colors.danger, icon: 'close-circle' },
+    info: { color: colors.highlight, icon: 'information' },
+    warning: { color: colors.warning, icon: 'alert' },
+  }
   const [toasts, setToasts] = useState<ToastMessage[]>([])
   const insets = useSafeAreaInsets()
   useEffect(() => subscribeToasts(setToasts), [])
@@ -24,7 +27,7 @@ export function ToastHost() {
   return (
     <View pointerEvents="none" style={[styles.host, { top: insets.top + space.sm }]}>
       {toasts.map((toast) => {
-        const kind = KIND_STYLE[toast.kind]
+        const kind = kindStyles[toast.kind]
         return (
           <Animated.View
             key={toast.id}
@@ -48,7 +51,7 @@ export function ToastHost() {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   host: { position: 'absolute', left: space.lg, right: space.lg, alignItems: 'center', gap: space.sm, zIndex: 100 },
   flag: { width: 24, height: 16, borderRadius: 3 },
   toast: {
@@ -63,4 +66,4 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     maxWidth: '100%',
   },
-})
+}))

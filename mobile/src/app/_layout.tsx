@@ -10,11 +10,12 @@ import {
 import { JetBrainsMono_500Medium, JetBrainsMono_700Bold } from '@expo-google-fonts/jetbrains-mono'
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold } from '@expo-google-fonts/inter'
 import { useFonts } from 'expo-font'
-import { DarkTheme, router, Stack, ThemeProvider, type ErrorBoundaryProps } from 'expo-router'
+import { DarkTheme, DefaultTheme, router, Stack, ThemeProvider, type ErrorBoundaryProps } from 'expo-router'
 import * as ScreenOrientation from 'expo-screen-orientation'
 import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
-import { useEffect } from 'react'
+import * as SystemUI from 'expo-system-ui'
+import { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Dimensions, Platform } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
@@ -34,7 +35,7 @@ import { ToastHost } from '@/components/ToastHost'
 import { UpdateBanner } from '@/components/UpdateBanner'
 import { WhatsNew } from '@/components/WhatsNew'
 import { XpToasts } from '@/components/XpToasts'
-import { colors } from '@/theme'
+import { useTheme, type Theme } from '@/theme'
 import { useLaunchUpdate } from '@/updates'
 
 SplashScreen.preventAutoHideAsync()
@@ -48,17 +49,21 @@ if (Platform.OS !== 'web' && Math.min(screen.width, screen.height) < 600) {
 
 // Game setup sheets. On Android a sheet lays its content out at its full height, so at 75% the footer with the
 // create button sat below the visible part (empty space above it, and a drag needed to reach it): open them full there.
-const sheetOptions = {
-  presentation: 'formSheet',
-  sheetAllowedDetents: Platform.OS === 'android' ? [1] : [0.75, 1],
-  sheetGrabberVisible: true,
-  sheetCornerRadius: 28,
-  contentStyle: { backgroundColor: colors.surface },
-} as const
+const sheetOptions = (theme: Theme) =>
+  ({
+    presentation: 'formSheet',
+    sheetAllowedDetents: Platform.OS === 'android' ? [1] : [0.75, 1],
+    sheetGrabberVisible: true,
+    sheetCornerRadius: 28,
+    contentStyle: { backgroundColor: theme.colors.surface },
+  }) as const
 
-const navigationTheme = {
-  ...DarkTheme,
-  colors: { ...DarkTheme.colors, background: colors.bg, card: colors.bg, primary: colors.accent, text: colors.text, border: colors.border },
+const navigationTheme = ({ scheme, colors }: Theme) => {
+  const base = scheme === 'light' ? DefaultTheme : DarkTheme
+  return {
+    ...base,
+    colors: { ...base.colors, background: colors.bg, card: colors.bg, primary: colors.accent, text: colors.text, border: colors.border },
+  }
 }
 
 // Replaces the whole app when a screen throws (Expo Router error boundary): retry re-renders it, home goes back to the start.
@@ -100,6 +105,15 @@ export default function RootLayout() {
   })
 
   const updateChecked = useLaunchUpdate()
+  const theme = useTheme()
+  const { colors } = theme
+  const navigation = useMemo(() => navigationTheme(theme), [theme])
+  const sheet = useMemo(() => sheetOptions(theme), [theme])
+
+  // The window behind the screens (seen during transitions and the keyboard on Android) follows the theme
+  useEffect(() => {
+    SystemUI.setBackgroundColorAsync(colors.bg).catch(() => {})
+  }, [colors.bg])
 
   useEffect(() => {
     if (fontsLoaded && updateChecked) SplashScreen.hideAsync()
@@ -109,21 +123,21 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.bg }}>
-      <ThemeProvider value={navigationTheme}>
-        <StatusBar style="light" />
+      <ThemeProvider value={navigation}>
+        <StatusBar style={theme.scheme === 'light' ? 'dark' : 'light'} />
         <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
           <Stack.Screen name="(tabs)" />
           <Stack.Screen
             name="play/[game]"
-            options={sheetOptions}
+            options={sheet}
           />
           <Stack.Screen
             name="multi/create"
-            options={sheetOptions}
+            options={sheet}
           />
           <Stack.Screen
             name="multi/add"
-            options={sheetOptions}
+            options={sheet}
           />
           <Stack.Screen name="multi/[code]" options={{ animation: 'fade_from_bottom' }} />
           <Stack.Screen name="game" options={{ gestureEnabled: false, animation: 'fade_from_bottom' }} />

@@ -1,13 +1,13 @@
 // Leaderboard of one Country Ranking daily challenge (best score, then smallest total error).
 import { router } from 'expo-router'
 import { useTranslation } from 'react-i18next'
-import { ActivityIndicator, StyleSheet, View } from 'react-native'
+import { ActivityIndicator, View } from 'react-native'
 
 import { fetchRankingScores, type RankingScore } from '@/rankingScores'
 import { useAccount } from '@/account/auth'
 import { useLeaderboard } from '@/hooks/useLeaderboard'
 import { loadErrorKey } from '@/leaderboards'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 import { Text } from '../ui'
 import { DecoratedName } from '../leaderboards/DecoratedName'
 import { AnswerList, ExpandableRow } from './ExpandableRow'
@@ -18,6 +18,8 @@ const DEFAULT_MAX_ROWS = 20
 
 export function RankingLeaderboard({ dailyKey, refreshKey, maxRows = DEFAULT_MAX_ROWS, onSettled }: { dailyKey: string; refreshKey?: unknown; maxRows?: number; onSettled?: () => void }) {
   const { t } = useTranslation()
+  const colors = useColors()
+  const styles = useStyles()
   const { account } = useAccount()
   const { scores, error } = useLeaderboard<RankingScore>(dailyKey, () => fetchRankingScores(dailyKey), refreshKey, onSettled)
 
@@ -67,7 +69,7 @@ export function RankingLeaderboard({ dailyKey, refreshKey, maxRows = DEFAULT_MAX
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   card: { gap: space.sm, padding: space.lg, borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   row: { paddingVertical: 6, paddingHorizontal: space.sm, borderRadius: radius.sm },
   rowTop: { backgroundColor: colors.surfaceHigh },
@@ -75,4 +77,4 @@ const styles = StyleSheet.create({
   rank: { width: 28, textAlign: 'center' },
   value: { minWidth: 52, textAlign: 'right', fontVariant: ['tabular-nums'] },
   error: { minWidth: 52, textAlign: 'right', fontVariant: ['tabular-nums'] },
-})
+}))

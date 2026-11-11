@@ -1,10 +1,11 @@
 // The home page's interactive globe: turn it with the mouse, a finger or the arrow keys to put the city in the
 // reticle. The land (world-atlas, ~55 kB) and the drawing code load after the page, in their own chunk.
+// `onFind` runs when the player (not the globe on its own) finds the city; `overlay` is drawn over the globe.
 import React, { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import './FlightGlobe.css'
 
-export default function FlightGlobe({ onScore }) {
+export default function FlightGlobe({ onScore, onFind, overlay = null }) {
   const { t } = useTranslation()
   const box = useRef(null)
   const hooks = useRef(null)
@@ -14,6 +15,8 @@ export default function FlightGlobe({ onScore }) {
   const [cities, setCities] = useState(null)
   const onScoreRef = useRef(onScore)
   onScoreRef.current = onScore
+  const onFindRef = useRef(onFind)
+  onFindRef.current = onFind
 
   useEffect(() => {
     let cleanup = () => {}
@@ -28,7 +31,11 @@ export default function FlightGlobe({ onScore }) {
       const land = feature(atlas.default ?? atlas, (atlas.default ?? atlas).objects.land)
       const setup = createGlobeScene(land, {
         onTarget: (index) => { setTarget(index); setFound(false) },
-        onFound: (_index, score) => { setFound(true); onScoreRef.current?.(score) },
+        onFound: (_index, score, manual) => {
+          setFound(true)
+          onScoreRef.current?.(score)
+          if (manual) onFindRef.current?.()
+        },
       })
       setCities(CITIES)
       cleanup = mountCanvas(box.current, (s) => {
@@ -70,6 +77,7 @@ export default function FlightGlobe({ onScore }) {
           {found ? `✓ ${t('globe.found', { city: cityName })}` : t('globe.find', { city: cityName })}
         </p>
       )}
+      {overlay}
       <figcaption className="flight-globe-hint">{touched ? t('globe.hint_center') : t('globe.hint_drag')}</figcaption>
     </figure>
   )

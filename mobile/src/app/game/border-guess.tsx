@@ -4,7 +4,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native'
+import { KeyboardAvoidingView, Platform, ScrollView, View, useWindowDimensions } from 'react-native'
 import Animated, { FadeIn, LinearTransition, ZoomIn } from 'react-native-reanimated'
 
 import useBorderGuessState, { ROOM_MAX_ATTEMPTS, roomRoundErrors } from '@shared/hooks/useBorderGuessState'
@@ -31,9 +31,7 @@ import { clean } from '@/i18n'
 import { RoomGate, RoomHudPill, Standings, type RoomPlay } from '@/multiplayer/RoomPlay'
 import { useRoomRounds, useRoundResult } from '@/multiplayer/useRoomRounds'
 import { navigate } from '@/shims/react-router-dom'
-import { colors, gameColors, radius, space } from '@/theme'
-
-const ACCENT = gameColors.border_guess
+import { makeStyles, radius, space, useColors, useTheme } from '@/theme'
 
 export default function BorderGuessScreen() {
   const { mode = 'daily', room } = useLocalSearchParams<{ mode?: string; room?: string }>()
@@ -42,6 +40,9 @@ export default function BorderGuessScreen() {
 }
 
 function BorderGuessGame({ mode, play }: { mode: string; play?: RoomPlay }) {
+  const styles = useStyles()
+  const colors = useColors()
+  const ACCENT = useTheme().gameColors.border_guess
   const { t, i18n } = useTranslation()
   const isDaily = mode === 'daily' && !play
   const rounds = useRoomRounds(play)
@@ -274,7 +275,7 @@ function BorderGuessGame({ mode, play }: { mode: string; play?: RoomPlay }) {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   content: { paddingHorizontal: space.xl, paddingBottom: space.xl, gap: space.lg },
   mapCard: {
     borderRadius: radius.xl,
@@ -303,4 +304,4 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-})
+}))

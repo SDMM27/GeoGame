@@ -10,13 +10,14 @@
 import { StyleSheet, type StyleProp, type ViewStyle } from 'react-native'
 import Animated, { useReducedMotion, ZoomIn } from 'react-native-reanimated'
 
-import { colors, fonts } from '@/theme'
+import { fonts, useColors } from '@/theme'
 
 export type StampTone = 'ok' | 'bad'
 
 type Props = { label: string; tone?: StampTone; color?: string; rotate?: number; animate?: boolean; size?: number; style?: StyleProp<ViewStyle> }
 
 export function Stamp({ label, tone = 'ok', color, rotate = -6, animate = true, size = 12, style }: Props) {
+  const colors = useColors()
   const reduceMotion = useReducedMotion()
   const ink = color ?? (tone === 'bad' ? colors.danger : colors.accent)
   return (

@@ -358,3 +358,22 @@
   }
   .scoreboard-game { grid-area: game; }
 }
+
+/* « Journalier » tab: one daily game at a time, under its own row of game tabs */
+.scores-daily {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 0 24px 48px;
+}
+
+.scores-daily__games {
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding: 0;
+}
+
+@media (max-width: 640px) {
+  .scores-daily {
+    padding: 0 12px 32px;
+  }
+}

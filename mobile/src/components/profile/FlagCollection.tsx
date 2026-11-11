@@ -15,7 +15,7 @@ import { replayFlag } from '@/components/collection/replay'
 import { Kicker } from '@/components/flight'
 import { Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 
 type Rarity = 'common' | 'uncommon' | 'rare' | 'legendary'
 type Progress = { found: number; total: number }
@@ -38,6 +38,7 @@ export function sortFlags(unlocked: string[], lang: string): string[] {
 
 // The pieces of a flag (cost pieces, cut by pieceGrid), left to right then top to bottom; the pieces not won yet are covered.
 function PieceFlag({ iso, pieces, cost }: { iso: string; pieces: number; cost: number }) {
+  const styles = useStyles()
   const { cols, rows } = pieceGrid(cost)
   const quarters = Array.from({ length: cost }, (_, index) => index)
   return (
@@ -67,6 +68,7 @@ function PieceFlag({ iso, pieces, cost }: { iso: string; pieces: number; cost: n
 // A rarity spelled out with its colour (the border of its flags below) and how many of its flags are unlocked.
 function RarityCount({ rarity, count }: { rarity: Rarity; count: number }) {
   const { t } = useTranslation()
+  const styles = useStyles()
   return (
     <View style={styles.rarityItem}>
       <View style={[styles.dot, { backgroundColor: COLORS[rarity] }]} />
@@ -79,6 +81,8 @@ function RarityCount({ rarity, count }: { rarity: Rarity; count: number }) {
 
 export function FlagCollectionView({ collection, sectionId = 'collection' }: { collection: Collection; sectionId?: string }) {
   const { t, i18n } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const [showAll, setShowAll] = useState(false)
   const { flags, mastery } = collection
   const total = FLAG_POOL.length
@@ -204,7 +208,7 @@ export function FlagCollection({ uid, own = false }: { uid: string; own?: boolea
 }
 
 const CELL = 44
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   card: {
     gap: space.md,
     backgroundColor: colors.board,
@@ -225,4 +229,4 @@ const styles = StyleSheet.create({
   cellImage: { width: CELL - 4, height: CELL * 0.7 - 4 },
   legend: { gap: 6, paddingTop: space.sm, borderTopWidth: 1, borderTopColor: colors.border },
   modeRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
-})
+}))

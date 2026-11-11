@@ -4,19 +4,21 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { router } from 'expo-router'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, View } from 'react-native'
+import { View } from 'react-native'
 
 import { useLeague } from '@shared/hooks/useLeague'
 
 import { Kicker } from '@/components/flight'
 import { Text, Touchable } from '@/components/ui'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 
 type Me = { rank: number; points: number; ahead: { name: string; gap: number } | null }
 type League = { me: Me | null; lastResult: { reward: number } | null }
 
 function Row({ children }: { children: ReactNode }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   return (
     <Touchable accessibilityRole="button" onPress={() => router.push('/league')} style={styles.row}>
       <View style={styles.icon}>
@@ -65,7 +67,7 @@ export function LeagueCard({ uid }: { uid?: string }) {
   return <PlayerLeagueCard uid={uid} />
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -77,4 +79,4 @@ const styles = StyleSheet.create({
     padding: space.lg,
   },
   icon: { width: 56, height: 56, borderRadius: radius.lg, alignItems: 'center', justifyContent: 'center', backgroundColor: `${colors.highlight}22` },
-})
+}))

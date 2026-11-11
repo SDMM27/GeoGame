@@ -233,6 +233,7 @@ export const de: MobileStrings = {
     challenge_body: "12 Fragen, für alle gleich: Länder auf der Karte finden, Flaggen erkennen, Hauptstädte nennen. Ein Versuch pro Tag, vergleiche dein Ergebnis mit deinen Freunden.",
     ok: "Los geht's!",
   },
+  theme: { title: 'Design', light: 'Hell', dark: 'Dunkel', system: 'System' },
   common: {
     coming_soon: 'Demnächst',
     back: 'Zurück',

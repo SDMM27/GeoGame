@@ -12,7 +12,7 @@ import Animated, { ZoomIn } from 'react-native-reanimated'
 
 import { useAccount } from '@/account/auth'
 import { usePushPermission } from '@/notifications/push'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 import { Button, Text } from './ui'
 import { whatsNewAtLaunch } from './WhatsNew'
 
@@ -29,6 +29,8 @@ function deniedSeen() {
 }
 
 export function NotificationPrompt() {
+  const colors = useColors()
+  const styles = useStyles()
   const { t } = useTranslation()
   const pathname = usePathname()
   const { account } = useAccount()
@@ -109,8 +111,8 @@ export function NotificationPrompt() {
   )
 }
 
-const styles = StyleSheet.create({
-  backdrop: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, backgroundColor: 'rgba(3, 6, 14, 0.72)' },
+const useStyles = makeStyles((colors) => ({
+  backdrop: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, backgroundColor: colors.scrim },
   card: {
     zIndex: 1,
     width: '100%',
@@ -139,4 +141,4 @@ const styles = StyleSheet.create({
   },
   center: { textAlign: 'center' },
   button: { alignSelf: 'stretch', marginTop: space.md },
-})
+}))

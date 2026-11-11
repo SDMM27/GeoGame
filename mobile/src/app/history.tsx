@@ -2,7 +2,7 @@
 import { useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native'
+import { ActivityIndicator, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { usePlayerProfile } from '@shared/hooks/usePlayerProfile'
@@ -13,9 +13,12 @@ import { ScreenHeader } from '@/components/ScreenHeader'
 import { Text, Touchable } from '@/components/ui'
 import { getGameByType } from '@/games'
 import GameEmblem from '@/components/GameEmblem'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors, useTheme } from '@/theme'
 
 export default function HistoryScreen() {
+  const styles = useStyles()
+  const colors = useColors()
+  const { gameColors } = useTheme()
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   const { uid, username } = useLocalSearchParams<{ uid: string; username?: string }>()
@@ -49,6 +52,7 @@ export default function HistoryScreen() {
             const game = getGameByType(type)
             if (!game) return null
             const active = filter === type
+            const gameColor = gameColors[game.id]
             return (
               <Touchable
                 key={type}
@@ -56,8 +60,8 @@ export default function HistoryScreen() {
                 accessibilityLabel={t(game.titleKey)}
                 accessibilityState={{ selected: active }}
                 onPress={() => setFilter(active ? null : type)}
-                style={[styles.filter, active && { borderColor: game.color, backgroundColor: `${game.color}1F` }]}>
-                <GameEmblem game={game.id} variant="glyph" size={16} color={active ? game.color : colors.textMuted} />
+                style={[styles.filter, active && { borderColor: gameColor, backgroundColor: `${gameColor}1F` }]}>
+                <GameEmblem game={game.id} variant="glyph" size={16} color={active ? gameColor : colors.textMuted} />
                 <Text variant="bodyStrong" style={{ fontSize: 13 }} color={active ? colors.text : colors.textMuted}>
                   {t(game.titleKey)}
                 </Text>
@@ -80,7 +84,7 @@ export default function HistoryScreen() {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   filter: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -93,4 +97,4 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
   },
   filterActive: { backgroundColor: `${colors.accent}1F`, borderColor: colors.accent },
-})
+}))

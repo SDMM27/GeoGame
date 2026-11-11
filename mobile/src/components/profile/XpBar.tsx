@@ -1,14 +1,16 @@
 // Level chip and XP bar (rules in @shared/utils/missions).
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, View } from 'react-native'
+import { View } from 'react-native'
 
 import { Pill, Text } from '@/components/ui'
-import { colors, fonts, radius, space } from '@/theme'
+import { fonts, makeStyles, radius, space, useColors } from '@/theme'
 
 export type Xp = { total: number; level: number; into: number; needed: number }
 
 export function XpBar({ xp }: { xp: Xp }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const ratio = xp.needed > 0 ? Math.min(1, xp.into / xp.needed) : 0
   return (
     <View style={styles.wrap}>
@@ -23,10 +25,10 @@ export function XpBar({ xp }: { xp: Xp }) {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   wrap: { gap: space.sm },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.sm },
   progress: { fontFamily: fonts.monoBold, fontSize: 12, color: colors.textMuted, fontVariant: ['tabular-nums'] },
   track: { height: 8, borderRadius: radius.pill, backgroundColor: colors.surfaceHigh, overflow: 'hidden' },
   fill: { height: '100%', borderRadius: radius.pill, backgroundColor: colors.accent },
-})
+}))

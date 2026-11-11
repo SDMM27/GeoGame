@@ -248,6 +248,7 @@ const fr = {
     challenge_body: "12 questions identiques pour tout le monde : place des pays, reconnais des drapeaux, nomme des capitales. Une seule tentative par jour, compare ton score à celui de tes amis.",
     ok: "C'est parti !",
   },
+  theme: { title: 'Thème', light: 'Clair', dark: 'Sombre', system: 'Système' },
   common: {
     coming_soon: 'Bientôt disponible',
     back: 'Retour',
@@ -541,6 +542,7 @@ const en: MobileStrings = {
     challenge_body: "12 questions, the same for everyone: place countries, recognise flags, name capitals. One try a day, then compare your score with your friends.",
     ok: "Let's go!",
   },
+  theme: { title: 'Theme', light: 'Light', dark: 'Dark', system: 'System' },
   common: {
     coming_soon: 'Coming soon',
     back: 'Back',
@@ -832,6 +834,7 @@ const ru: MobileStrings = {
     challenge_body: "12 одинаковых для всех вопросов: найди страны на карте, узнай флаги, назови столицы. Одна попытка в день, сравни свой результат с друзьями.",
     ok: "Поехали!",
   },
+  theme: { title: 'Тема', light: 'Светлая', dark: 'Тёмная', system: 'Системная' },
   common: {
     coming_soon: 'Скоро',
     back: 'Назад',

@@ -23,7 +23,7 @@ import { TIER_COLORS } from '@shared/utils/achievements'
 
 import { haptic } from '@/components/collection/claim'
 import { Button, Text, Touchable } from '@/components/ui'
-import { colors, fonts, space } from '@/theme'
+import { fonts, makeStyles, space, useColors } from '@/theme'
 
 type Result = { week: string; rank: number; points: number; reward: number }
 
@@ -39,6 +39,8 @@ export function LeagueVictoryOverlay({ uid }: { uid?: string }) {
 
 function Victory({ result, onClose }: { result: Result; onClose: () => void }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const reduced = useReducedMotion()
   const champion = result.rank === 1
   const color = champion ? TIER_COLORS.gold : result.rank === 2 ? TIER_COLORS.silver : TIER_COLORS.bronze
@@ -83,7 +85,7 @@ function Victory({ result, onClose }: { result: Result; onClose: () => void }) {
               <>
                 <Animated.View style={[styles.ring, { borderColor: color }, ringStyle]} />
                 {Array.from({ length: BURST_COUNT }, (_, index) => (
-                  <Particle key={index} burst={burst} index={index} color={index % 3 === 0 ? '#FFFFFF' : color} />
+                  <Particle key={index} burst={burst} index={index} color={index % 3 === 0 ? colors.text : color} />
                 ))}
               </>
             )}
@@ -157,9 +159,9 @@ function Particle({ burst, index, color }: { burst: SharedValue<number>; index: 
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   root: { flex: 1 },
-  backdrop: { backgroundColor: 'rgba(6,10,22,0.94)' },
+  backdrop: { backgroundColor: `${colors.bg}F0` },
   content: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: space.xl, paddingBottom: space.xxl },
   stage: { width: STAGE, height: STAGE, marginBottom: space.xxl, alignItems: 'center', justifyContent: 'center' },
   glow: { position: 'absolute', width: 300, height: 300, borderRadius: 150, opacity: 0.18 },
@@ -169,4 +171,4 @@ const styles = StyleSheet.create({
   chip: { paddingHorizontal: space.md, paddingVertical: 5, borderRadius: 999, borderWidth: 1 },
   buttons: { alignItems: 'stretch', gap: space.sm, marginTop: space.xl, alignSelf: 'stretch' },
   secondary: { alignSelf: 'center', paddingVertical: space.sm, paddingHorizontal: space.lg },
-})
+}))

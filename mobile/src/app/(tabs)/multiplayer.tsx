@@ -3,7 +3,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { router, useFocusEffect } from 'expo-router'
 import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, TextInput, View } from 'react-native'
+import { ScrollView, TextInput, View } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -17,12 +17,14 @@ import { acceptInvite, useInvites, type Invite } from '@/multiplayer/invites'
 import { startMultiGame } from '@/multiplayer/navigation'
 import { getRecentRooms, normalizeCode, type RecentRoom } from '@/multiplayer/room'
 import GameEmblem from '@/components/GameEmblem'
-import { colors, fonts, radius, space } from '@/theme'
+import { fonts, makeStyles, radius, space, useColors, useTheme } from '@/theme'
 
 const openRoom = (code: string) => router.push({ pathname: '/multi/[code]', params: { code } })
 
 // A game of the « create » board: emblem, flight code, name, plus
 function GameRow({ game, index, last }: { game: GameDefinition; index: number; last: boolean }) {
+  const styles = useStyles()
+  const colors = useColors()
   const { t } = useTranslation()
   return (
     <Animated.View entering={FadeInDown.delay(60 + index * 50).springify().damping(18)}>
@@ -43,13 +45,16 @@ function GameRow({ game, index, last }: { game: GameDefinition; index: number; l
 }
 
 function RecentRow({ recent }: { recent: RecentRoom }) {
+  const styles = useStyles()
+  const { gameColors } = useTheme()
+  const colors = useColors()
   const { t } = useTranslation()
   const game = getGame(recent.gameId)
   if (!game) return null
   return (
     <Touchable accessibilityRole="button" onPress={() => openRoom(recent.code)} style={styles.row}>
-      <View style={[styles.icon, { backgroundColor: `${game.color}1F` }]}>
-        <GameEmblem game={game.id} variant="glyph" size={24} color={game.color} />
+      <View style={[styles.icon, { backgroundColor: `${gameColors[game.id]}1F` }]}>
+        <GameEmblem game={game.id} variant="glyph" size={24} color={gameColors[game.id]} />
       </View>
       <View style={{ flex: 1 }}>
         <Text variant="bodyStrong">{t(game.titleKey)}</Text>
@@ -66,13 +71,16 @@ function RecentRow({ recent }: { recent: RecentRoom }) {
 }
 
 function InviteRow({ invite }: { invite: Invite }) {
+  const styles = useStyles()
+  const { gameColors } = useTheme()
+  const colors = useColors()
   const { t } = useTranslation()
   const game = getGame(invite.gameId)
   if (!game) return null
   return (
-    <Animated.View entering={FadeInDown.springify().damping(18)} style={[styles.row, { borderColor: `${game.color}66` }]}>
-      <View style={[styles.icon, { backgroundColor: `${game.color}1F` }]}>
-        <GameEmblem game={game.id} variant="glyph" size={24} color={game.color} />
+    <Animated.View entering={FadeInDown.springify().damping(18)} style={[styles.row, { borderColor: `${gameColors[game.id]}66` }]}>
+      <View style={[styles.icon, { backgroundColor: `${gameColors[game.id]}1F` }]}>
+        <GameEmblem game={game.id} variant="glyph" size={24} color={gameColors[game.id]} />
       </View>
       <View style={{ flex: 1 }}>
         <Text variant="bodyStrong" numberOfLines={1}>
@@ -82,7 +90,7 @@ function InviteRow({ invite }: { invite: Invite }) {
           {t(game.titleKey)} · {t(invite.mode === 'live' ? 'mobile.multi.live' : 'mobile.multi.challenge')}
         </Text>
       </View>
-      <Button label={t('mobile.multi.join')} color={game.color} onPress={() => acceptInvite(invite)} style={styles.smallButton} />
+      <Button label={t('mobile.multi.join')} color={gameColors[game.id]} onPress={() => acceptInvite(invite)} style={styles.smallButton} />
       <Touchable accessibilityRole="button" accessibilityLabel={t('mobile.invites.decline')} onPress={() => dismissInvite(invite.id)} style={styles.iconButton}>
         <MaterialCommunityIcons name="close" size={18} color={colors.textMuted} />
       </Touchable>
@@ -91,6 +99,8 @@ function InviteRow({ invite }: { invite: Invite }) {
 }
 
 export default function MultiplayerScreen() {
+  const styles = useStyles()
+  const colors = useColors()
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   const [code, setCode] = useState('')
@@ -174,7 +184,7 @@ export default function MultiplayerScreen() {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   joinCard: { gap: space.md, padding: space.lg, borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   codeInput: {
     flex: 1,
@@ -208,4 +218,4 @@ const styles = StyleSheet.create({
   smallButton: { minHeight: 38, paddingHorizontal: space.md },
   iconButton: { width: 34, height: 34, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surfaceHigh },
   icon: { width: 44, height: 44, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },
-})
+}))

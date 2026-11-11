@@ -1,13 +1,10 @@
 // Static world map highlighting the countries guessed in a round (wrong in red, answer in green).
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native'
+import { View, type StyleProp, type ViewStyle } from 'react-native'
 
-import { colors, radius } from '@/theme'
+import { makeStyles, radius, useColors } from '@/theme'
 import { allCountries } from './geometry'
 import { WorldMap, type Overlay, type WorldMapHandle } from './WorldMap'
-
-const WRONG = { fillColor: colors.danger, fillOpacity: 0.55, color: colors.danger, weight: 2 }
-const CORRECT = { fillColor: colors.accent, fillOpacity: 0.6, color: colors.accent, weight: 2 }
 
 const CENTERS = new Map(
   allCountries.map((feature) => [feature.properties.ADMIN, feature.properties.center as [number, number] | undefined])
@@ -20,6 +17,8 @@ export function GuessesMap({
   guesses: { name: string; correct: boolean }[]
   style?: StyleProp<ViewStyle>
 }) {
+  const styles = useStyles()
+  const colors = useColors()
   const mapRef = useRef<WorldMapHandle>(null)
   const [ready, setReady] = useState(false)
   const signature = guesses.map((guess) => `${guess.name}:${guess.correct}`).join('|')
@@ -32,21 +31,23 @@ export function GuessesMap({
         return center ? [{ type: 'circle' as const, center: [center[1], center[0]] as [number, number], radius: 4, color: guess.correct ? colors.accent : colors.danger }] : []
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [signature]
+    [signature, colors]
   )
 
   useEffect(() => {
     const map = mapRef.current
     if (!ready || !map) return
+    const wrong = { fillColor: colors.danger, fillOpacity: 0.55, color: colors.danger, weight: 2 }
+    const right = { fillColor: colors.accent, fillOpacity: 0.6, color: colors.accent, weight: 2 }
     const byName = new Map(guesses.map((guess) => [guess.name, guess.correct]))
     map.geoJson.resetStyle()
     for (const layer of map.geoJson.getLayers()) {
       const correct = byName.get(layer.feature.properties.ADMIN)
-      if (correct !== undefined) layer.setStyle(correct ? CORRECT : WRONG)
+      if (correct !== undefined) layer.setStyle(correct ? right : wrong)
     }
     map.fitCountries([...byName.keys()], { animate: false, maxZoom: 5 })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ready, signature])
+  }, [ready, signature, colors])
 
   return (
     <View style={[styles.frame, style]}>
@@ -55,7 +56,7 @@ export function GuessesMap({
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   frame: {
     height: 220,
     borderRadius: radius.lg,
@@ -64,4 +65,4 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     backgroundColor: colors.ocean,
   },
-})
+}))

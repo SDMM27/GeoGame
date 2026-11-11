@@ -5,7 +5,7 @@ import { Image } from 'expo-image'
 import { useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native'
+import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native'
 import Animated, { FadeIn } from 'react-native-reanimated'
 
 import useCountryClueState from '@shared/hooks/useCountryClueState'
@@ -32,11 +32,11 @@ import { clean } from '@/i18n'
 import { RoomGate, RoomHudPill, Standings, type RoomPlay } from '@/multiplayer/RoomPlay'
 import { useRoomRounds, useRoundResult } from '@/multiplayer/useRoomRounds'
 import { navigate } from '@/shims/react-router-dom'
-import { colors, gameColors, radius, space } from '@/theme'
-
-const ACCENT = gameColors.country_clue
+import { makeStyles, radius, space, useColors, useTheme } from '@/theme'
 
 function AnswerCard({ iso, name, capital, solved }: { iso: string | null; name: string; capital: string; solved: boolean }) {
+  const styles = useStyles()
+  const colors = useColors()
   const { t } = useTranslation()
   const flag = getFlag(iso)
   return (
@@ -61,6 +61,9 @@ export default function CountryClueScreen() {
 }
 
 function CountryClueGame({ mode, play }: { mode: string; play?: RoomPlay }) {
+  const styles = useStyles()
+  const colors = useColors()
+  const ACCENT = useTheme().gameColors.country_clue
   const { t, i18n } = useTranslation()
   const isDaily = mode === 'daily' && !play
   const rounds = useRoomRounds(play)
@@ -292,7 +295,7 @@ function CountryClueGame({ mode, play }: { mode: string; play?: RoomPlay }) {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   content: { paddingHorizontal: space.xl, paddingBottom: space.xl, gap: space.lg },
   start: {
     alignItems: 'center',
@@ -314,4 +317,4 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   answerFlag: { width: 72, height: 48, borderRadius: 6 },
-})
+}))

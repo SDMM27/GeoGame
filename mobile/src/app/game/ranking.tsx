@@ -6,7 +6,7 @@ import { Image } from 'expo-image'
 import { useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -25,13 +25,12 @@ import { SortableList } from '@/components/game/SortableList'
 import { type CountryFeature } from '@/components/map/geometry'
 import { type EscaleState } from '@/components/flight'
 import { Button, Text, Touchable } from '@/components/ui'
-import { DIFFICULTY_COLORS } from '@/games'
 import { getFlag } from '@/flags'
+import { useDifficultyColors } from '@/games'
 import { clean } from '@/i18n'
 import { navigate } from '@/shims/react-router-dom'
-import { colors, gameColors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors, useTheme } from '@/theme'
 
-const ACCENT = gameColors.ranking
 const ROW_HEIGHT = 54
 const ROW_GAP = space.sm
 const MIN_COUNT = 3
@@ -57,7 +56,7 @@ const CATEGORIES: { key: Criterion['key'] | null; icon: IconName }[] = [
 ]
 
 // Same ranges as the website slider.
-const COUNT_PRESETS = [
+const countPresets = (DIFFICULTY_COLORS: Record<string, string>) => [
   { labelKey: 'difficulties.easy_range', value: 5, color: DIFFICULTY_COLORS.Facile, active: (n: number) => n <= 5 },
   { labelKey: 'difficulties.medium_range', value: 9, color: DIFFICULTY_COLORS.Moyen, active: (n: number) => n >= 6 && n <= 12 },
   { labelKey: 'difficulties.hard_range', value: 15, color: DIFFICULTY_COLORS.Difficile, active: (n: number) => n >= 13 },
@@ -78,6 +77,9 @@ function CountryRow({
   state?: 'correct' | 'wrong'
   draggable?: boolean
 }) {
+  const ACCENT = useTheme().gameColors.ranking
+  const styles = useStyles()
+  const colors = useColors()
   const flag = getFlag(country.properties.ISO_A2)
   const tint = state === 'correct' ? colors.accent : state === 'wrong' ? colors.danger : null
   const { t } = useTranslation()
@@ -111,6 +113,8 @@ function CorrectRanking({
   values: Map<string, string>
   title?: string
 }) {
+  const styles = useStyles()
+  const colors = useColors()
   const { t, i18n } = useTranslation()
   return (
     <View style={styles.card}>
@@ -147,6 +151,9 @@ function CorrectRanking({
 
 // Daily: the points of each criterion.
 function StageSummary({ stages }: { stages: StageResult[] }) {
+  const ACCENT = useTheme().gameColors.ranking
+  const styles = useStyles()
+  const colors = useColors()
   const { t } = useTranslation()
   return (
     <View style={styles.card}>
@@ -170,6 +177,10 @@ function StageSummary({ stages }: { stages: StageResult[] }) {
 }
 
 function InfiniteSetup({ count, onCount, onPick }: { count: number; onCount: (n: number) => void; onPick: (key: Criterion['key'] | null) => void }) {
+  const ACCENT = useTheme().gameColors.ranking
+  const COUNT_PRESETS = countPresets(useDifficultyColors())
+  const styles = useStyles()
+  const colors = useColors()
   const { t } = useTranslation()
   return (
     <View style={{ gap: space.lg }}>
@@ -219,6 +230,9 @@ function InfiniteSetup({ count, onCount, onPick }: { count: number; onCount: (n:
 }
 
 export default function RankingScreen() {
+  const ACCENT = useTheme().gameColors.ranking
+  const styles = useStyles()
+  const colors = useColors()
   const { t, i18n } = useTranslation()
   const insets = useSafeAreaInsets()
   const { mode = 'daily' } = useLocalSearchParams<{ mode?: string }>()
@@ -461,7 +475,7 @@ export default function RankingScreen() {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   content: { paddingHorizontal: space.xl, gap: space.lg },
   criterion: {
     alignItems: 'center',
@@ -525,4 +539,4 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-})
+}))

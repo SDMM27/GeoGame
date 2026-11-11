@@ -233,6 +233,7 @@ export const nl: MobileStrings = {
     challenge_body: "12 vragen, voor iedereen hetzelfde: vind landen op de kaart, herken vlaggen, noem hoofdsteden. Eén poging per dag, vergelijk je resultaat met je vrienden.",
     ok: "Aan de slag!",
   },
+  theme: { title: 'Thema', light: 'Licht', dark: 'Donker', system: 'Systeem' },
   common: {
     coming_soon: 'Binnenkort',
     back: 'Terug',

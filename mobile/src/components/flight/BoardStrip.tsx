@@ -6,13 +6,14 @@
 //          left-aligned, the last right-aligned, the ones in between centered. Without accessibilityLabel a cell is
 //          read as « label, value ».
 //   style  container style
-import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native'
+import { Text, View, type StyleProp, type ViewStyle } from 'react-native'
 
-import { colors, fonts } from '@/theme'
+import { fonts, makeStyles } from '@/theme'
 
 export type BoardCell = { label: string; value: string; color?: string; suffix?: string; accessibilityLabel?: string }
 
 export function BoardStrip({ cells, style }: { cells: BoardCell[]; style?: StyleProp<ViewStyle> }) {
+  const styles = useStyles()
   return (
     <View style={[styles.strip, style]}>
       {cells.map((cell, index) => {
@@ -35,7 +36,7 @@ export function BoardStrip({ cells, style }: { cells: BoardCell[]; style?: Style
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   strip: {
     flexDirection: 'row',
     paddingVertical: 10,
@@ -48,4 +49,4 @@ const styles = StyleSheet.create({
   label: { fontFamily: fonts.monoBold, fontSize: 9, lineHeight: 12, letterSpacing: 1.08, color: colors.textMuted },
   suffix: { fontFamily: fonts.mono, fontSize: 10, color: colors.textMuted },
   value: { fontFamily: fonts.monoBold, fontSize: 18, lineHeight: 24, color: colors.text, fontVariant: ['tabular-nums'] },
-})
+}))

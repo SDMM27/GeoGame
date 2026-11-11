@@ -5,7 +5,7 @@ import { Image } from 'expo-image'
 import { useLocalSearchParams } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, View } from 'react-native'
+import { View } from 'react-native'
 import Animated, { FadeIn, FadeInDown, LinearTransition } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -23,12 +23,12 @@ import { allCountries } from '@/components/map/geometry'
 import { Kicker } from '@/components/flight'
 import { Button, Text } from '@/components/ui'
 import { getFlag } from '@/flags'
-import { DIFFICULTY_COLORS, getGame } from '@/games'
+import { useDifficultyColors, getGame } from '@/games'
 import { usePlacementClues } from '@/hooks/usePlacementClues'
 import { clean } from '@/i18n'
 import { RoomGate, RoomHudPill, Standings, useReportFound, type RoomPlay } from '@/multiplayer/RoomPlay'
 import { navigate } from '@/shims/react-router-dom'
-import { colors, gameColors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors, useTheme } from '@/theme'
 
 const CONTINENT_VIEW: Record<string, { center: [number, number]; zoom: number }> = {
   Amériques: { center: [10, -80], zoom: 3 },
@@ -70,6 +70,10 @@ function PlacementGame({
   play?: RoomPlay
   gameType?: string
 }) {
+  const { gameColors } = useTheme()
+  const styles = useStyles()
+  const colors = useColors()
+  const DIFFICULTY_COLORS = useDifficultyColors()
   const { t, i18n } = useTranslation()
   const insets = useSafeAreaInsets()
   const mapRef = useRef<WorldMapHandle>(null)
@@ -144,7 +148,7 @@ function PlacementGame({
       setFeedback(next)
       announce(next.text)
     }
-  }, [stats.found, stats.skipped, stats.totalErrors, targetName, t])
+  }, [stats.found, stats.skipped, stats.totalErrors, targetName, t, colors])
 
   const gameId = gameType === GAME_TYPES.HARDCORE ? 'hardcore' : 'placement'
 
@@ -328,7 +332,7 @@ export default function PlacementScreen() {
   return <StandardGame difficulty={params.difficulty ?? null} continent={params.continent ?? null} isTraining={isTraining} gameType={params.gameType ?? GAME_TYPES.PLACEMENT} />
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   mapCard: {
     flex: 1,
     marginHorizontal: space.lg,
@@ -362,4 +366,4 @@ const styles = StyleSheet.create({
   findRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.xs },
   targetRow: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   flag: { width: 48, height: 32, borderRadius: 4 },
-})
+}))

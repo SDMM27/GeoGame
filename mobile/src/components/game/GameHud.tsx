@@ -15,13 +15,13 @@
 import { useFocusEffect } from 'expo-router'
 import { useCallback, useEffect, useRef, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { BackHandler, StyleSheet, View } from 'react-native'
+import { BackHandler, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { BoardStrip, EscaleProgress, GameHeader, type BoardCell, type EscaleState } from '@/components/flight'
 import { GAMES } from '@/games'
 import { navigate } from '@/shims/react-router-dom'
-import { colors, space } from '@/theme'
+import { makeStyles, space, useColors } from '@/theme'
 import { confirmAction } from '../confirm'
 import { Text } from '../ui'
 
@@ -84,7 +84,9 @@ type Props = {
   children?: ReactNode
 }
 
-export function GameHud({ game, title, cells, progress, states, progressColor = colors.gold, progressLabel, stepLabels, gate, tag, confirmQuit, onQuit, right, children }: Props) {
+export function GameHud({ game, title, cells, progress, states, progressColor, progressLabel, stepLabels, gate, tag, confirmQuit, onQuit, right, children }: Props) {
+  const colors = useColors()
+  const styles = useStyles()
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   const onClose = useQuitGuard({ confirmQuit, onQuit })
@@ -111,7 +113,7 @@ export function GameHud({ game, title, cells, progress, states, progressColor = 
           accessibilityLabel={progressLabel}
           accessibilityValue={{ min: 0, max: 100, now: Math.round(progress * 100) }}
           style={[styles.track, styles.progress]}>
-          <View style={{ height: 4, borderRadius: 4, width: `${Math.min(1, Math.max(0, progress)) * 100}%`, backgroundColor: progressColor }} />
+          <View style={{ height: 4, borderRadius: 4, width: `${Math.min(1, Math.max(0, progress)) * 100}%`, backgroundColor: progressColor ?? colors.gold }} />
         </View>
       ) : null}
       {progressLabel && states == null && progress != null && (
@@ -124,9 +126,9 @@ export function GameHud({ game, title, cells, progress, states, progressColor = 
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   strip: { marginHorizontal: space.lg },
   progress: { marginHorizontal: space.lg, marginTop: space.md },
   track: { height: 4, borderRadius: 4, backgroundColor: colors.stub, overflow: 'hidden' },
   label: { marginHorizontal: space.lg, marginTop: 6 },
-})
+}))

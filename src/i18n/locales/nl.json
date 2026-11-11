@@ -1697,6 +1697,11 @@
     "hint_drag": "↔ Sleep om de wereldbol te draaien",
     "hint_center": "Zet de stad in het vizier",
     "label": "Interactieve wereldbol: draai hem (muis, vinger of pijltjes) om {{city}} te vinden",
+    "offer_daily": "Dagelijkse uitdaging nog niet gedaan",
+    "offer_game": "Vandaag nog niet gespeeld",
+    "all_done": "Alle vluchten van vandaag zijn vertrokken",
+    "all_done_hint": "Kom morgen terug voor nieuwe uitdagingen",
+    "close": "Sluiten",
     "city": {
       "tokyo": "Tokio",
       "rio": "Rio de Janeiro",

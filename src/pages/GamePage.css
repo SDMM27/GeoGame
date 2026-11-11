@@ -401,3 +401,41 @@
     backdrop-filter: none;
   }
 }
+
+/* « VOL DRP » flight tag at the top of the HUD */
+.hud-flight {
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--sd-line);
+}
+
+/* Capitals / Flags: the HUD is a board bar in the flow above the question (it used to float over the flag on short screens) */
+@media (min-width: 761px) {
+  .capitals-game-page .hud-container,
+  .flag-game-page .hud-container {
+    position: static;
+    transform: none;
+    flex-direction: row;
+    align-items: stretch;
+    width: min(1320px, calc(100% - 48px));
+    min-width: 0;
+    margin: 16px auto 0;
+  }
+  .capitals-game-page .hud-container--with-phase,
+  .flag-game-page .hud-container--with-phase { margin-top: 64px; }
+  .capitals-game-page .hud-main,
+  .flag-game-page .hud-main {
+    flex: 1;
+    min-width: 0;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 28px;
+    align-items: center;
+  }
+  .capitals-game-page .hud-flight,
+  .flag-game-page .hud-flight { grid-row: 1 / span 2; margin: 0; padding: 0 28px 0 0; border-bottom: 0; border-right: 1px dashed var(--sd-line); }
+  .capitals-game-page .hud-row,
+  .flag-game-page .hud-row { margin-bottom: 6px; }
+  .capitals-game-page .hud-stats,
+  .flag-game-page .hud-stats { flex: 0 0 320px; align-items: center; }
+}

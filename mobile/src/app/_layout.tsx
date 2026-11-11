@@ -5,7 +5,9 @@ import '@/i18n'
 import {
   BricolageGrotesque_600SemiBold,
   BricolageGrotesque_700Bold,
+  BricolageGrotesque_800ExtraBold,
 } from '@expo-google-fonts/bricolage-grotesque'
+import { JetBrainsMono_500Medium, JetBrainsMono_700Bold } from '@expo-google-fonts/jetbrains-mono'
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold } from '@expo-google-fonts/inter'
 import { useFonts } from 'expo-font'
 import { DarkTheme, router, Stack, ThemeProvider, type ErrorBoundaryProps } from 'expo-router'
@@ -89,6 +91,9 @@ export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     BricolageGrotesque_600SemiBold,
     BricolageGrotesque_700Bold,
+    BricolageGrotesque_800ExtraBold,
+    JetBrainsMono_500Medium,
+    JetBrainsMono_700Bold,
     Inter_400Regular,
     Inter_500Medium,
     Inter_600SemiBold,

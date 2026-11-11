@@ -20,6 +20,7 @@ import {
 
 import { DAILY_BONUS_FRAGMENTS, DAILY_MISSION_FRAGMENTS, WEEKLY_BONUS_FRAGMENTS } from '@shared/utils/flagCollection'
 
+import { Kicker, ScreenTitle, Stamp } from '@/components/flight'
 import { CollapsibleSection } from '@/components/CollapsibleSection'
 import { XpBar, type Xp } from '@/components/profile/XpBar'
 import { Text, Touchable } from '@/components/ui'
@@ -64,6 +65,7 @@ function MissionRow({ entry, reward }: { entry: Entry; reward: Reward }) {
                 {t(`missions.tier_${mission.tier}`)}
               </Text>
             ) : null}
+            {done ? <Stamp label={t('mobile.flight.visa_ok').toLocaleUpperCase()} rotate={-4} animate={false} size={8} style={styles.visa} /> : null}
             <Text variant="caption" color={done ? colors.accent : colors.textMuted} style={styles.missionReward}>
               {rewardText(t, reward)}
             </Text>
@@ -165,7 +167,7 @@ export function MissionsCard({ uid, missions }: { uid: string | null | undefined
 
   return (
     <View style={styles.card}>
-      <Text variant="heading">{t('missions.title')}</Text>
+      <ScreenTitle size={20}>{t('missions.title')}</ScreenTitle>
       {missions.xp && <XpBar xp={missions.xp as Xp} />}
       {missions.dailies ? <DailiesRow dailies={missions.dailies as Dailies} streak={missions.streak as Streak | null} /> : null}
       {daily.length > 0 && (
@@ -177,7 +179,7 @@ export function MissionsCard({ uid, missions }: { uid: string | null | undefined
           defaultOpen={daily.some((entry) => !entry.done)}>
           <View style={{ gap: space.lg }}>
             <View style={styles.group}>
-              <Text variant="label">{t('missions.daily')}</Text>
+              <Kicker>{t('missions.daily')}</Kicker>
               {daily.map((entry) => (
                 <MissionRow key={entry.mission.id} entry={entry} reward={DAILY_REWARD} />
               ))}
@@ -190,7 +192,7 @@ export function MissionsCard({ uid, missions }: { uid: string | null | undefined
               </Text>
             </View>
             <View style={styles.group}>
-              <Text variant="label">{t('missions.weekly')}</Text>
+              <Kicker>{t('missions.weekly')}</Kicker>
               {weekly.map((entry) => (
                 <MissionRow key={entry.mission.id} entry={entry} reward={WEEKLY_TIERS[entry.mission.tier ?? 'easy']} />
               ))}
@@ -209,7 +211,7 @@ export function MissionsCard({ uid, missions }: { uid: string | null | undefined
 const styles = StyleSheet.create({
   card: {
     gap: space.lg,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.board,
     borderRadius: radius.xl,
     borderWidth: 1,
     borderColor: colors.border,
@@ -246,7 +248,8 @@ const styles = StyleSheet.create({
   missionReward: { fontSize: 12, marginLeft: 'auto' },
   progress: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   count: { fontSize: 12, fontVariant: ['tabular-nums'] },
-  track: { flex: 1, height: 6, borderRadius: radius.pill, backgroundColor: colors.surfaceHigh, overflow: 'hidden' },
+  visa: { paddingVertical: 1, paddingHorizontal: 5, borderWidth: 1.5, borderRadius: 5 },
+  track: { flex: 1, height: 6, borderRadius: radius.pill, backgroundColor: colors.stub, overflow: 'hidden' },
   fill: { height: '100%', borderRadius: radius.pill },
   bonus: {
     flexDirection: 'row',

@@ -23,10 +23,9 @@ import { formatTime } from '@shared/utils/formatTime'
 import { clearPresenceRoom, setPresenceRoom } from '@shared/utils/presence'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
 
-import { HudPill } from '@/components/game/GameTopBar'
 import { BadgeStrip, useRoomBadges } from '@/components/profile/BadgeStrip'
 import { Button, Text } from '@/components/ui'
-import { colors, radius, space } from '@/theme'
+import { colors, fonts, radius, space } from '@/theme'
 import { getRoomContent, rankRoomResults, scoringMode, type RoomContent } from './content'
 import {
   getPlayerId,
@@ -311,10 +310,28 @@ export function RoomHudPill({ code, gameIndex }: { code: string; gameIndex: numb
   const progress: Progress = progressForGame(all, gameIndex)
   const mine = progress[playerId]?.found ?? 0
   const ahead = ids.filter((id) => id !== playerId && (progress[id]?.found ?? 0) > mine).length
-  return <HudPill icon="account-group" label={`${ahead + 1}/${ids.length}`} color={colors.highlight} />
+  const label = `${ahead + 1}/${ids.length}`
+  return (
+    <View accessible accessibilityLabel={label} style={styles.pill}>
+      <MaterialCommunityIcons name="account-group" size={15} color={colors.textMuted} />
+      <Text style={styles.pillText}>{label}</Text>
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
+  pill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    height: 44,
+    paddingHorizontal: 12,
+    borderRadius: radius.pill,
+    backgroundColor: colors.board,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  pillText: { fontFamily: fonts.monoBold, fontSize: 14, color: colors.highlight, fontVariant: ['tabular-nums'] },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: space.lg, padding: space.xl, backgroundColor: colors.bg },
   card: { gap: space.sm, padding: space.lg, borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.md, paddingVertical: 6, paddingHorizontal: space.sm, borderRadius: radius.sm },

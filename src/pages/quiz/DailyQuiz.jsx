@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import NavBar from '../../components/NavBar'
 import ChallengeBanner from '../../components/ChallengeBanner'
+import { GameFlightTag } from '../../components/GameEmblem'
 import ShareScoreButton from '../../components/ShareScoreButton'
 import useDailyQuizState from '../../hooks/useDailyQuizState'
 import DailyForm from '../DailyForm'
@@ -91,6 +92,7 @@ export default function DailyQuiz() {
           dailyKey={dailyKey}
           result={isComplete ? { score: attempts + hintsUsed, solved: isSolved } : null}
         />
+        <GameFlightTag game={GAME_TYPES.QUIZ} className="game-flight-tag--board" />
         <header className="quiz-header">
           <div className="quiz-header__title">
             <p className="gg-kicker">{t('carnet_games.kicker_daily')}</p>

@@ -51,23 +51,32 @@
   transition: border-color 0.2s, transform 0.1s;
 }
 .mp-row:hover { border-color: color-mix(in srgb, var(--game) 45%, transparent); transform: translateY(-1px); }
-.mp-row-icon {
-  flex-shrink: 0;
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  border-radius: var(--sd-radius-md);
-  background: color-mix(in srgb, var(--game) 14%, transparent);
-  font-size: 1.3rem;
-}
 .mp-row-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
 .mp-row-title { flex: 1; font-weight: 600; }
 .mp-row-desc { font-size: 0.8rem; color: var(--sd-muted); }
+.mp-row-flight { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; color: var(--sd-muted); }
 .mp-row-end { color: var(--sd-muted); display: grid; }
 .mp-row-code { font-weight: 700; letter-spacing: 2px; color: var(--sd-muted); font-variant-numeric: tabular-nums; }
 
 @media (max-width: 720px) {
   .mp-home-main { padding: 20px 16px 32px; gap: 24px; }
   .mp-join-stub { display: none; }
+}
+
+/* Wide screens (validated mockup): on the 1320px column, joining and recent flights on the left, the game list on the right */
+@media (min-width: 1000px) {
+  .mp-home-main {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    grid-template-rows: auto auto auto 1fr;
+    align-items: start;
+    column-gap: 40px;
+    row-gap: 28px;
+    max-width: 1320px;
+  }
+  .mp-home-header,
+  .mp-home-main > .invite-list { grid-column: 1 / -1; }
+  .mp-home-main > .mp-join-card { grid-column: 1; grid-row: 3; }
+  .mp-home-main > .mp-section--create { grid-column: 2; grid-row: 3 / span 2; }
+  .mp-home-main > .mp-section--recent { grid-column: 1; grid-row: 4; }
 }

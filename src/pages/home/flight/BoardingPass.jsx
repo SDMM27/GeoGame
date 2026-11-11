@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { MultiIcon } from '../../../components/NavIcons'
 import { gameColor } from '../../../utils/roomGames'
+import GameEmblem, { flightCode } from '../../../components/GameEmblem'
 
 const GATES = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'D1', 'D2']
 
@@ -18,7 +19,7 @@ export default function BoardingPass({ game, index, status = null }) {
   return (
     <article
       className={`boarding-pass sd-punch${done ? ' boarding-pass--done' : ''}`}
-      style={{ '--game': gameColor(game.id), '--i': index }}
+      style={{ '--game': gameColor(game.id), '--game-ink': gameColor(`${game.id}-ink`), '--i': index }}
     >
       <div className="boarding-pass-main">
         <div className="boarding-pass-top">
@@ -33,7 +34,7 @@ export default function BoardingPass({ game, index, status = null }) {
           )}
         </div>
         <h3 className="boarding-pass-title">
-          <span className="boarding-pass-icon" aria-hidden="true">{game.icon}</span>
+          <GameEmblem game={game.id} size={36} />
           {t(game.titleKey)}
         </h3>
         <p className="boarding-pass-desc">{t(game.descKey)}</p>
@@ -66,6 +67,7 @@ export default function BoardingPass({ game, index, status = null }) {
         </div>
       </div>
       <div className="boarding-pass-stub" aria-hidden="true">
+        <span className="boarding-pass-flight">{flightCode(game.id)}</span>
         <span className="boarding-pass-field">
           <small>{t('home.gate')}</small>
           <strong className="boarding-pass-gate">{gate}</strong>

@@ -44,11 +44,12 @@ export function AscensionLeaderboard({
 
   return (
     <LeaderboardCard scores={scores} error={error} emptyText={t('mobile.leaderboards.empty_ascension')}>
-      {visibleRows(scores ?? [], account?.uid, MAX_ROWS).map(({ score, index }) => {
+      {visibleRows(scores ?? [], account?.uid, MAX_ROWS).map(({ score, index }, position, rows) => {
         const game = score.gameType ? getGameByType(score.gameType) : undefined
         const detail = [filters.game === allGames && game ? t(game.titleKey) : null, score.presetName ? presetLabel(score.presetName, t) : null].filter(Boolean).join(' · ')
         return (
           <LeaderboardRow
+            last={position === rows.length - 1}
             key={`${score.uid ?? score.name}-${score.gameType}-${score.presetName}-${index}`}
             index={index}
             name={score.name}

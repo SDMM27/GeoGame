@@ -57,7 +57,7 @@ export function createGlobeScene(land, events) {
       ...s.colors,
       ocean: readVar('--gg-globe-ocean', '#1b2a4d'),
       oceanDeep: readVar('--gg-globe-ocean-deep', '#0e1630'),
-      land: readVar('--gg-globe-land', '#eef1f8'),
+      land: readVar('--gg-globe-land', '#9aa9cc'),
       landEdge: readVar('--gg-globe-land-edge', 'rgba(11,16,32,.4)'),
       graticule: readVar('--gg-graticule', 'rgba(138,147,176,.25)'),
       plane: readVar('--gg-board-accent', '#f5c84b'),

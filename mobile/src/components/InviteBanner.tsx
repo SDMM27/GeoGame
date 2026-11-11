@@ -9,6 +9,7 @@ import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useAccount } from '@/account/auth'
+import GameEmblem from '@/components/GameEmblem'
 import { getGame } from '@/games'
 import { acceptInvite, useInvites } from '@/multiplayer/invites'
 import { colors, radius, space } from '@/theme'
@@ -49,7 +50,7 @@ export function InviteBanner() {
       style={[styles.banner, { top: insets.top + space.sm, borderColor: `${game.color}88` }]}
       accessibilityLiveRegion="polite">
       <View style={[styles.icon, { backgroundColor: `${game.color}22` }]}>
-        <MaterialCommunityIcons name={game.icon} size={22} color={game.color} />
+        <GameEmblem game={game.id} variant="glyph" size={22} color={game.color} />
       </View>
       <View style={{ flex: 1 }}>
         <Text variant="bodyStrong" numberOfLines={2}>

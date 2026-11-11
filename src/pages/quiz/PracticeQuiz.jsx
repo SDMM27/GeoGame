@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import NavBar from '../../components/NavBar'
+import { GameFlightTag } from '../../components/GameEmblem'
 import useQuizState from '../../hooks/useQuizState'
 import { ANSWER_MODES, HISTORY_COUNTRIES, QUIZ_THEMES, getQuestionHints, localizeQuestion } from '../../utils/quizQuestions'
 import DifficultyPicker from './DifficultyPicker'
@@ -105,6 +106,7 @@ export default function PracticeQuiz({ room = null }) {
     <div className={room ? 'quiz-page quiz-page--room' : 'quiz-page'}>
       {!room && <NavBar />}
       <main className="quiz-main">
+        {!room && <GameFlightTag game="QUIZ" className="game-flight-tag--board" />}
         <header className="quiz-header">
           <div className="quiz-header__title">
           <p className="gg-kicker">{t(maxDifficulty ? 'carnet_games.kicker_free' : 'carnet_games.kicker_briefing')}</p>

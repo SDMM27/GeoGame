@@ -16,13 +16,14 @@ import { useDailyPlayedElsewhere } from '@shared/hooks/useDailyPlayedElsewhere'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
 
 import { announce } from '@/a11y'
-import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
 import { useAccount } from '@/account/auth'
 import { RankingLeaderboard } from '@/components/game/RankingLeaderboard'
 import { DailyPlayedElsewhere } from '@/components/game/DailyPlayedElsewhere'
+import { GameHud } from '@/components/game/GameHud'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
 import { SortableList } from '@/components/game/SortableList'
 import { type CountryFeature } from '@/components/map/geometry'
+import { type EscaleState } from '@/components/flight'
 import { Button, Text, Touchable } from '@/components/ui'
 import { DIFFICULTY_COLORS } from '@/games'
 import { getFlag } from '@/flags'
@@ -260,6 +261,11 @@ export default function RankingScreen() {
   const crit = criterion as Criterion | null
   const isSubmitted = status === 'submitted'
   const stages = stageResults as StageResult[]
+  const modeLabel = (isDaily ? t('mobile.home.daily') : t('mobile.home.infinite')).toUpperCase()
+  // One segment per criterion: done, the current one in gold.
+  const stageStates: EscaleState[] = Array.from({ length: Math.max(stageCount, 1) }, (_, index) =>
+    index < stages.length ? 'good' : index === stageIndex ? 'current' : 'todo',
+  )
   const positionsLabel = (count: number) => t('units.position', { count })
 
   // Spoken: the outcome of a validated order (the rows only show it with colours and icons)
@@ -270,7 +276,7 @@ export default function RankingScreen() {
 
   if (elsewhere.checking || elsewhere.game) {
     return (
-      <DailyPlayedElsewhere title={t('ranking.title')} game={elsewhere.game} accent={ACCENT}>
+      <DailyPlayedElsewhere gameId="ranking" title={t('ranking.title')} game={elsewhere.game} accent={ACCENT}>
         {dailyKey && <RankingLeaderboard dailyKey={dailyKey} />}
       </DailyPlayedElsewhere>
     )
@@ -278,10 +284,26 @@ export default function RankingScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
-      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + 42 + space.md, paddingBottom: insets.bottom + space.xl }]}>
-        <Text variant="label" color={ACCENT}>
-          {isDaily ? t('mobile.home.daily') : t('mobile.home.infinite')} · {t('ranking.title')}
-        </Text>
+      {!(isSubmitted && isDaily) && (
+        <GameHud
+          game="ranking"
+          title={t('ranking.title')}
+          tag={modeLabel}
+          confirmQuit={false}
+          cells={
+            crit
+              ? [
+                  { label: clean(t('labels.criterion')).toUpperCase(), value: `${stageIndex + 1}/${stageCount}`, color: colors.gold },
+                  { label: t('units.attempt_one').toLocaleUpperCase(), value: `${attemptNumber}/${maxAttempts}` },
+                  { label: t('mobile.flight.mode').toLocaleUpperCase(), value: modeLabel.slice(0, 5), color: ACCENT },
+                ]
+              : []
+          }
+          states={crit ? stageStates : undefined}
+          progressLabel={`${stageIndex + 1} / ${stageCount}`}
+        />
+      )}
+      <ScrollView contentContainerStyle={[styles.content, { paddingTop: space.sm, paddingBottom: insets.bottom + space.xl }]}>
 
         {status === 'choosing-category' && (
           <InfiniteSetup count={countryCount} onCount={setCountryCount} onPick={(key) => startInfiniteRound(key)} />
@@ -384,14 +406,12 @@ export default function RankingScreen() {
         )}
       </ScrollView>
 
-      {!(isSubmitted && isDaily) && (
-        <GameTopBar confirmQuit={false}>
-          {status === 'playing' && <HudPill icon="target" label={`${attemptNumber} / ${maxAttempts}`} color={ACCENT} />}
-        </GameTopBar>
-      )}
-
       {isSubmitted && isDaily && dailyKey && score != null && (
         <ResultsSheet
+          game="ranking"
+          ticketNote={`${t('mobile.home.daily')} · ${stageCount} ${stageCount === 1 ? t('mobile.flight.stop') : t('mobile.flight.stops')}`.toLocaleUpperCase()}
+          states={stageStates}
+          tone={score > 0 ? 'ok' : 'bad'}
           title={score > 0 ? t('mobile.ranking.solved') : t('mobile.ranking.failed')}
           score={score}
           scoreLabel={t('units.pts')}

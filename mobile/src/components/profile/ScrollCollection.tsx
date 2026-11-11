@@ -75,7 +75,7 @@ export function ScrollCollection({ uid, own = false }: { uid: string; own?: bool
 }
 
 const styles = StyleSheet.create({
-  card: { gap: space.md, backgroundColor: colors.surface, borderRadius: radius.xl, borderWidth: 1, borderColor: colors.border, padding: space.lg },
+  card: { gap: space.md, backgroundColor: colors.board, borderRadius: radius.xl, borderWidth: 1, borderColor: colors.border, padding: space.lg },
   seals: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   pips: { flexDirection: 'row', gap: 6 },
   pip: { width: 18, height: 18, borderRadius: radius.pill, borderWidth: 2, borderColor: colors.borderStrong },

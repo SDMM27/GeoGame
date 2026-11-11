@@ -7,6 +7,7 @@ import { friendErrorKey, sendFriendRequestTo } from '../../utils/friends'
 import BadgeStrip from './BadgeStrip'
 import { Avatar } from './ProfileBody'
 import './FriendsPanel.css'
+import RankBadge from '../RankBadge'
 
 function CandidateButton({ account, friendships, uid, onMessage }) {
   const { t } = useTranslation()
@@ -42,7 +43,7 @@ export default function FriendCandidates({ players, account, friendships, onMess
     <ul className="profile-list">
       {players.map((player) => (
         <li key={player.uid} className="friends-row">
-          {player.rank != null && <span className="friends-rank">{player.rank}</span>}
+          {player.rank != null && <span className="friends-rank"><RankBadge rank={player.rank} plain /></span>}
           <Link to={`/player/${player.uid}`} className="friends-who">
             <Avatar username={player.name} size={36} />
             <span>{player.name}</span>

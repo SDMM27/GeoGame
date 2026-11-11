@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import SurvivalOptions, { defaultSurvivalOptions } from "../../components/SurvivalOptions";
 import { GAME_TYPES } from "../../utils/gameTypes";
 import MultiButton from "./MultiButton";
+import GameEmblem from "../../components/GameEmblem";
 
 // Survival setup: the games of the rounds, the lives, the time per round and the difficulty ramp.
 export default function SurvivalCard({ game }) {
@@ -13,7 +14,7 @@ export default function SurvivalCard({ game }) {
 
   return (
     <div className="game-card game-card--active">
-      <div className="game-card-icon">{game.icon}</div>
+      <div className="game-card-icon"><GameEmblem game={game.id} size={44} /></div>
       <h2 className="game-card-title">{t(game.titleKey)}</h2>
       <p className="game-card-desc">{t(game.descKey)}</p>
       <div className="game-card-controls">

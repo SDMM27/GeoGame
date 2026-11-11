@@ -11,8 +11,8 @@ import { useLeaderboardRefresh } from '../hooks/useLeaderboardRefresh'
 import PlayerName, { mineClass } from '../components/PlayerName'
 import './DailyLeaderboard.css'
 import './RankingLeaderboard.css'
+import RankBadge from '../components/RankBadge'
 
-const MEDAL = ['🥇', '🥈', '🥉']
 
 function AccordionRow({ score, index, account }) {
   const { t } = useTranslation()
@@ -22,7 +22,7 @@ function AccordionRow({ score, index, account }) {
     <div className={`daily-lb__row${index < 3 ? ' daily-lb__row--top' : ''}${mineClass(score, account)}`}>
       <div className="daily-lb__row-main" onClick={() => setOpen((prev) => !prev)}>
         <span className="daily-lb__rank">
-          {index < 3 ? MEDAL[index] : `#${index + 1}`}
+          <RankBadge rank={index + 1} />
         </span>
         <span className="daily-lb__name">
           <PlayerName entry={score} account={account} reportIn="daily_scores" />

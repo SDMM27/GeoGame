@@ -1,0 +1,38 @@
+.game-picker {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.game-picker-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 6px 14px 6px 8px;
+  border: 1px solid var(--sd-line);
+  border-radius: var(--sd-radius-pill);
+  background: var(--sd-surface);
+  color: var(--sd-ink);
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.game-picker-option:hover {
+  border-color: var(--sd-muted);
+}
+
+.game-picker-option--active {
+  border-color: var(--sd-accent);
+  background: var(--gg-accent-soft);
+}
+
+.game-picker-all {
+  flex-shrink: 0;
+  color: var(--sd-muted);
+}

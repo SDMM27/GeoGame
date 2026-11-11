@@ -78,7 +78,7 @@ export default function LeaguePage() {
   return (
     <div className="account-page">
       <NavBar />
-      <main className="account-main account-main--wide">
+      <main className="account-main account-main--wide league-main">
         <header className="league-header">
           <p className="gg-kicker">{t('league.season')}</p>
           <h1 className="account-title gg-title">{t('league.title')}</h1>

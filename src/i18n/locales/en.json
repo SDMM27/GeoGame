@@ -233,6 +233,7 @@
     "unknown": "Unknown"
   },
   "game_hud": {
+    "flight": "FLIGHT {{code}}",
     "target_country": "COUNTRY TO FIND",
     "score": "SCORE",
     "time": "TIME",
@@ -1323,7 +1324,8 @@
     "legal": "Legal notice",
     "delete_account": "Delete my account",
     "updated": "Last updated: {{date}}",
-    "signup_notice": "By creating an account, you accept the <terms>terms of use</terms> and the <privacy>privacy policy</privacy>. You must be at least 13 (and have a parent’s agreement under 15)."
+    "signup_notice": "By creating an account, you accept the <terms>terms of use</terms> and the <privacy>privacy policy</privacy>. You must be at least 13 (and have a parent’s agreement under 15).",
+    "toc": "Contents"
   },
   "invites": {
     "title": "Invite friends",

@@ -58,9 +58,9 @@ export default function ScrollsPage() {
   return (
     <div className="account-page">
       <NavBar />
-      <main className="account-main account-main--wide">
+      <main className="account-main account-main--wide scrolls-main">
         <p className="gg-kicker">{t('carnet_games.kicker_scrolls')}</p>
-        <h1 className="account-title">{t('scrolls.title')}</h1>
+        <h1 className="account-title gg-title">{t('scrolls.title')}</h1>
         {loading ? null : !uid ? (
           <div className="league-card">
             <p className="profile-muted">{t('scrolls.need_account')}</p>

@@ -9,7 +9,7 @@
 .home-main {
   flex: 1;
   width: 100%;
-  max-width: 1180px;
+  max-width: 1320px;
   margin: 0 auto;
   padding: 8px 24px 64px;
   display: flex;
@@ -158,11 +158,8 @@
 }
 
 .game-card-icon {
+  display: flex;
   font-size: 2.2rem;
-}
-
-.game-card-icon--dim {
-  opacity: 0.25;
 }
 
 .game-card-title {

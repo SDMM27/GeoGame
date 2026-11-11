@@ -31,8 +31,9 @@ import { useAccount } from '@/account/auth'
 import { announce } from '@/a11y'
 import { DailyLeaderboard } from '@/components/game/DailyLeaderboard'
 import { DailyPlayedElsewhere } from '@/components/game/DailyPlayedElsewhere'
-import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
+import { GameHud } from '@/components/game/GameHud'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
+import { type EscaleState } from '@/components/flight'
 import { Button, Segmented, Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
 import { DIFFICULTY_COLORS } from '@/games'
@@ -209,7 +210,7 @@ function DailyQuiz() {
 
   if (elsewhere.checking || elsewhere.game) {
     return (
-      <DailyPlayedElsewhere title={t('quiz.daily_title')} game={elsewhere.game} accent={ACCENT}>
+      <DailyPlayedElsewhere gameId="quiz" title={t('quiz.daily_title')} game={elsewhere.game} accent={ACCENT}>
         {dailyKey && <DailyLeaderboard gameType={GAME_TYPES.QUIZ} dailyKey={dailyKey} />}
       </DailyPlayedElsewhere>
     )
@@ -217,12 +218,29 @@ function DailyQuiz() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
+      {!isComplete && (
+        <GameHud
+          game="quiz"
+          title={t('games.quiz.title')}
+          tag={t('mobile.home.daily').toLocaleUpperCase()}
+          confirmQuit={false}
+          cells={
+            hasStarted
+              ? [
+                  { label: clean(t('labels.time')).replace(/\s*:$/, '').toUpperCase(), value: formatTime(elapsed).slice(0, 5), color: colors.accent },
+                  { label: clean(t('labels.attempts')).toUpperCase(), value: `${attemptsLeft}`, color: colors.gold },
+                  { label: clean(t('labels.hints')).replace(/\s*:$/, '').toUpperCase(), value: `${hintsUsed}/${MAX_HINTS}` },
+                ]
+              : []
+          }
+        />
+      )}
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <ScrollView
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={[styles.content, { paddingTop: insets.top + 42 + space.md, paddingBottom: insets.bottom + space.xl }]}>
+          contentContainerStyle={[styles.content, { paddingTop: space.sm, paddingBottom: insets.bottom + space.xl }]}>
           <Text variant="label" color={ACCENT}>
-            {t('mobile.home.daily')} · {t('games.quiz.title')}
+            {t('mobile.home.daily')}
           </Text>
 
           {localized && (
@@ -317,16 +335,10 @@ function DailyQuiz() {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {!isComplete && (
-        <GameTopBar confirmQuit={false}>
-          {hasStarted && <HudPill icon="timer-outline" label={formatTime(elapsed).slice(0, 5)} />}
-          {hasStarted && <HudPill icon="target" label={`${attemptsLeft}`} color={ACCENT} />}
-          {hasStarted && <HudPill icon="lightbulb-on-outline" label={`${hintsUsed}/${MAX_HINTS}`} />}
-        </GameTopBar>
-      )}
-
       {isComplete && (
         <ResultsSheet
+          game="quiz"
+          ticketNote={t('mobile.home.daily')}
           title={isSolved ? t('mobile.quiz.found') : t('mobile.quiz.not_found')}
           score={attempts + hintsUsed}
           scoreLabel={t('share.score_attempts')}
@@ -538,6 +550,12 @@ function PracticeQuiz({
     if (isFree) inputRef.current?.focus()
   }, [question, isFree])
 
+  // Room: one segment per question (answered right/wrong are not kept per question, so the answered ones are « done »).
+  const escales: EscaleState[] =
+    play && maxDifficulty && questionCount > 0 && questionCount <= 24
+      ? Array.from({ length: questionCount }, (_, index) => (index < stats.answered ? 'good' : index === stats.answered ? 'current' : 'todo'))
+      : []
+
   const choiceStyle = (id: string) => {
     if (hidden.includes(id)) return { opacity: 0.2 }
     if (!isAnswered || !current) return null
@@ -548,16 +566,40 @@ function PracticeQuiz({
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
+      {!isFinished && (
+        <GameHud
+          game="quiz"
+          title={isHistory ? t('quiz.history.title') : t('games.quiz.title')}
+          tag={(play ? t('mobile.tabs.multiplayer') : t('mobile.home.infinite')).toLocaleUpperCase()}
+          confirmQuit={stats.answered > 0}
+          onQuit={play?.exit}
+          right={play && maxDifficulty ? <RoomHudPill code={play.room.id} gameIndex={play.room.gameIndex} /> : undefined}
+          cells={
+            maxDifficulty
+              ? [
+                  {
+                    label: t('mobile.flight.stop').toLocaleUpperCase(),
+                    value: play ? `${String(Math.min(stats.answered + (isAnswered ? 0 : 1), questionCount)).padStart(2, '0')}/${questionCount}` : String(stats.answered + (isAnswered ? 0 : 1)),
+                    color: colors.gold,
+                  },
+                  { label: t('mobile.flight.streak').toLocaleUpperCase(), value: `${stats.streak}`, color: stats.streak >= 3 ? colors.accent : colors.text },
+                  { label: clean(t('labels.score')).replace(/\s*:$/, '').toUpperCase(), value: `${stats.score}` },
+                ]
+              : []
+          }
+          states={escales.length > 0 ? escales : undefined}
+          progressLabel={play ? t('mobile.multi.question', { n: Math.min(stats.answered + (isAnswered ? 0 : 1), questionCount), total: questionCount }) : undefined}
+        />
+      )}
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <ScrollView
           ref={scrollRef}
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={[styles.content, { paddingTop: insets.top + 42 + space.md, paddingBottom: insets.bottom + space.xl }]}>
+          contentContainerStyle={[styles.content, { paddingTop: space.sm, paddingBottom: insets.bottom + space.xl }]}>
           <Text variant="label" color={ACCENT}>
             {play
               ? t('mobile.multi.question', { n: Math.min(stats.answered + (isAnswered ? 0 : 1), questionCount), total: questionCount })
-              : t('mobile.home.infinite')}{' '}
-            · {isHistory ? t('quiz.history.title') : t('games.quiz.title')}
+              : t('mobile.home.infinite')}
           </Text>
 
           {!maxDifficulty && !play && (
@@ -704,21 +746,11 @@ function PracticeQuiz({
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {!isFinished && (
-        <GameTopBar confirmQuit={stats.answered > 0} onQuit={play?.exit ?? (() => navigate('/'))}>
-          {maxDifficulty && (
-            <>
-              {play && <RoomHudPill code={play.room.id} gameIndex={play.room.gameIndex} />}
-              <HudPill icon="star-outline" label={`${stats.score}`} color={ACCENT} />
-              <HudPill icon="check" label={`${stats.correct}/${stats.answered}`} />
-              <HudPill icon="fire" label={`${stats.streak}`} color={stats.streak >= 3 ? colors.warning : colors.text} />
-            </>
-          )}
-        </GameTopBar>
-      )}
-
       {isFinished && maxDifficulty && (
         <ResultsSheet
+          game="quiz"
+          ticketNote={play ? t('mobile.tabs.multiplayer') : t('mobile.home.infinite')}
+          states={escales}
           title={t('quiz.summary_title')}
           score={stats.score}
           scoreLabel={t('units.pts')}

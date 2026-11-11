@@ -6,19 +6,111 @@
   font-family: var(--sd-font-sans);
 }
 
-.legal-main {
-  max-width: 720px;
+/* The 1320px column: contents and documents on the left, the text on the right */
+.legal-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 280px) minmax(0, 760px);
+  justify-content: space-between;
+  gap: 48px;
+  max-width: 1320px;
   margin: 0 auto;
-  padding: 2.5rem 1rem 3rem;
+  padding: 0 24px;
+}
+
+.legal-aside {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  padding: 2.5rem 0 3rem;
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
+.legal-aside-label {
+  margin-bottom: 12px;
+  color: var(--sd-accent-strong);
+  font-size: 0.66rem;
+}
+
+.legal-toc {
+  margin: 0 0 24px;
+  padding: 0;
+  list-style: none;
+}
+
+.legal-toc a,
+.legal-docs a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: var(--sd-radius-sm);
+  color: var(--sd-muted);
+  font-size: 0.88rem;
+  text-decoration: none;
+}
+
+.legal-toc a:hover,
+.legal-docs a:hover {
+  color: var(--sd-ink);
+}
+
+.legal-toc-num {
+  color: var(--sd-accent-strong);
+  font-size: 0.66rem;
+  font-weight: 700;
+}
+
+.legal-docs {
+  padding-top: 20px;
+  border-top: 1px dashed var(--sd-line);
+}
+
+.legal-docs a[aria-current='page'] {
+  background: var(--gg-accent-soft);
+  color: var(--sd-accent-strong);
+  font-weight: 600;
+}
+
+.legal-main {
+  min-width: 0;
+  padding: 2.5rem 0 3rem;
   line-height: 1.6;
+}
+
+.legal-intro {
+  padding-bottom: 8px;
+}
+
+@media (max-width: 900px) {
+  .legal-shell {
+    display: block;
+    padding: 0 16px;
+  }
+
+  .legal-aside {
+    position: static;
+    max-height: none;
+    padding: 1.5rem 0 0;
+  }
+
+  .legal-docs {
+    display: none;
+  }
+
+  .legal-main {
+    padding-top: 1.5rem;
+  }
 }
 
 .legal-title {
   margin: 0.4rem 0 0;
   font-family: var(--sd-font-display);
-  font-size: 2rem;
+  font-size: clamp(2rem, 5vw, 3.2rem);
   font-weight: 800;
-  letter-spacing: -0.02em;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
 }
 
 .legal-updated {
@@ -29,10 +121,22 @@
   letter-spacing: 0.04em;
 }
 
+.legal-section {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--sd-line);
+}
+
 .legal-section h2 {
-  margin: 2rem 0 0.5rem;
-  font-size: 1.2rem;
-  font-weight: 700;
+  margin: 0 0 0.75rem;
+  font-family: var(--sd-font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.legal-section {
+  scroll-margin-top: 16px;
 }
 
 .legal-main p {

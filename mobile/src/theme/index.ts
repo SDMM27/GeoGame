@@ -6,7 +6,7 @@ export const colors = {
   border: '#232C48',
   borderStrong: '#34406A',
   text: '#EEF1F8',
-  textMuted: '#8892B0',
+  textMuted: '#A3ACC6',
   textFaint: '#6B7596',
 
   accent: '#3DDC97',
@@ -14,12 +14,21 @@ export const colors = {
   danger: '#FF7A6B',
   onDanger: '#3A0D07',
   warning: '#F5B83D',
+  // « Warmer / colder » hints that point the other way than the accent (Border Guess, Country Clue)
+  info: '#60A5FA',
   onWarning: '#2A1C02',
 
   ocean: '#060E1F',
   land: '#2A3E66',
   landStroke: '#6F88BD',
   highlight: '#7AA2FF',
+
+  // « Carnet de vol »: departures board, ticket stub, gold flight codes
+  board: '#060A16',
+  boardLine: '#141C33',
+  gold: '#F5C84B',
+  stub: '#26324F',
+  accent2: '#C792FF',
 } as const
 
 // One color per game, used for icons and accents.
@@ -41,10 +50,13 @@ export const gameColors = {
 
 export const fonts = {
   display: 'BricolageGrotesque_700Bold',
+  displayHeavy: 'BricolageGrotesque_800ExtraBold',
   displayMedium: 'BricolageGrotesque_600SemiBold',
   body: 'Inter_400Regular',
   bodyMedium: 'Inter_500Medium',
   bodyBold: 'Inter_600SemiBold',
+  mono: 'JetBrainsMono_500Medium',
+  monoBold: 'JetBrainsMono_700Bold',
 } as const
 
 export const radius = { sm: 10, md: 14, lg: 20, xl: 28, pill: 999 } as const

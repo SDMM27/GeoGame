@@ -38,8 +38,9 @@ import { EloLeaderboard } from '@/components/leaderboards/EloLeaderboard'
 import { FilterChips, type Chip } from '@/components/leaderboards/LeaderboardParts'
 import { SoloLeaderboard } from '@/components/leaderboards/SoloLeaderboard'
 import { SurvivalLeaderboard } from '@/components/leaderboards/SurvivalLeaderboard'
+import { Kicker, ScreenTitle } from '@/components/flight'
 import { LanguageButton } from '@/components/LanguageButton'
-import { Segmented, Text } from '@/components/ui'
+import { Segmented } from '@/components/ui'
 import { LISTED_GAMES, DIFFICULTY_COLORS, getGameByType } from '@/games'
 import { colors, space } from '@/theme'
 
@@ -92,7 +93,7 @@ export default function LeaderboardsScreen() {
 
   const gameChips = (games: typeof LISTED_GAMES, withAll: boolean): Chip[] => [
     ...(withAll ? [{ value: ALL_GAMES, label: t('options.all_games'), icon: 'view-grid-outline' as const }] : []),
-    ...games.map((game) => ({ value: game.type, label: t(game.titleKey), color: game.color, icon: game.icon })),
+    ...games.map((game) => ({ value: game.type, label: t(game.titleKey), color: game.color, game: game.id })),
   ]
 
   const days = useMemo(() => getLast7Days(todayKey, i18n.language), [todayKey, i18n.language])
@@ -105,7 +106,10 @@ export default function LeaderboardsScreen() {
       contentContainerStyle={{ paddingTop: insets.top + space.lg, paddingHorizontal: space.lg, paddingBottom: space.xxl * 2, gap: space.lg }}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} colors={[colors.accent]} />}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Text variant="title">{t('mobile.tabs.leaderboards')}</Text>
+        <View style={{ flex: 1, gap: 4 }}>
+          <Kicker>{t('home.board_title')}</Kicker>
+          <ScreenTitle size={32}>{t('mobile.tabs.leaderboards')}</ScreenTitle>
+        </View>
         <LanguageButton />
       </View>
 
@@ -183,7 +187,7 @@ export default function LeaderboardsScreen() {
               { value: 'duel', label: t('elo.duel'), icon: 'sword-cross' },
               ...ELO_MODES.map((mode: string) => {
                 const game = getGameByType(mode)!
-                return { value: mode, label: t(game.titleKey), color: game.color, icon: game.icon }
+                return { value: mode, label: t(game.titleKey), color: game.color, game: game.id }
               }),
             ]}
             value={eloKey}
@@ -223,7 +227,7 @@ export default function LeaderboardsScreen() {
               { value: ALL_SIX, label: t('survival.all_six'), icon: 'shuffle-variant' },
               ...SURVIVAL_ROUND_TYPES.map((type: string) => {
                 const game = getGameByType(type)
-                return { value: type, label: t(`survival.round_type.${type}`), color: game?.color, icon: game?.icon }
+                return { value: type, label: t(`survival.round_type.${type}`), color: game?.color, game: game?.id }
               }),
             ]}
             value={survivalModes}

@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ToastContainer } from 'react-toastify'
 import NavBar from '../components/NavBar'
+import { GameFlightTag } from '../components/GameEmblem'
 import VoyageVoyageMap from '../components/VoyageVoyageMap'
 import ShareScoreButton from '../components/ShareScoreButton'
 import ChallengeBanner from '../components/ChallengeBanner'
@@ -178,6 +179,7 @@ export default function VoyageVoyagePage() {
         />
       )}
 
+      <GameFlightTag game={GAME_TYPES.VOYAGE_VOYAGE} className="game-flight-tag--board" />
       <div className="voyage-header">
         <div className="voyage-country voyage-start">
           {startCountry && (

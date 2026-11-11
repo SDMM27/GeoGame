@@ -90,7 +90,7 @@ export function PlacementRound({ survival, footer }: { survival: Survival; foote
   }, [outcome, target])
 
   return (
-    <View style={StyleSheet.absoluteFill}>
+    <View style={{ flex: 1 }}>
       <WorldMap ref={mapRef} onCountryPress={(layer) => clickCountry(layer.feature.properties.ADMIN)} />
       <View style={styles.mapPanel}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>

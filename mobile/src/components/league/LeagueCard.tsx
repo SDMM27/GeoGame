@@ -8,6 +8,7 @@ import { StyleSheet, View } from 'react-native'
 
 import { useLeague } from '@shared/hooks/useLeague'
 
+import { Kicker } from '@/components/flight'
 import { Text, Touchable } from '@/components/ui'
 import { colors, radius, space } from '@/theme'
 
@@ -22,7 +23,7 @@ function Row({ children }: { children: ReactNode }) {
         <MaterialCommunityIcons name="trophy-outline" size={28} color={colors.highlight} />
       </View>
       <View style={{ flex: 1, gap: 2 }}>
-        <Text variant="bodyStrong">{t('league.card_title')}</Text>
+        <Kicker color={colors.gold}>{t('league.card_title')}</Kicker>
         {children}
       </View>
       <MaterialCommunityIcons name="chevron-right" size={22} color={colors.textFaint} />
@@ -69,7 +70,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: space.lg,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.board,
     borderRadius: radius.xl,
     borderWidth: 1,
     borderColor: colors.border,

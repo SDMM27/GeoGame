@@ -80,7 +80,8 @@ describe('ProfileView', () => {
 
   it('puts the friends then the collection right after the streak, and remembers what was opened', () => {
     const view = renderView(games, { own: true, friends: <p>mes-amis</p>, collection: <p>ma-collection</p> })
-    const children = [...view.container.querySelector('.profile-body').children]
+    // Zones in reading order (the CSS lays them out in two columns when wide)
+    const children = [...view.container.querySelectorAll('.profile-body > .profile-zone')].flatMap((zone) => [...zone.children])
     const at = (match) => children.findIndex((node) => match(node))
     const streak = at((node) => node.classList.contains('profile-streak'))
     expect(streak).toBeGreaterThan(-1)

@@ -26,6 +26,7 @@ import {
 import { SheetCloseButton } from '@/components/SheetCloseButton'
 import { Button, Segmented, Text, Touchable } from '@/components/ui'
 import { DIFFICULTY_COLORS, getGame, getGameByType } from '@/games'
+import GameEmblem from '@/components/GameEmblem'
 import { colors, radius, space } from '@/theme'
 
 type Ramp = Record<string, number>
@@ -86,7 +87,7 @@ export function SurvivalSetupSheet() {
       <ScrollView contentContainerStyle={{ padding: space.xl, gap: space.lg }}>
         <View style={styles.titleRow}>
           <View style={[styles.icon, { backgroundColor: `${game.color}22` }]}>
-            <MaterialCommunityIcons name={game.icon} size={28} color={game.color} />
+            <GameEmblem game={game.id} variant="glyph" size={28} color={game.color} />
           </View>
           <View style={{ flex: 1 }}>
             <Text variant="title" style={{ fontSize: 26 }}>
@@ -110,7 +111,7 @@ export function SurvivalSetupSheet() {
                 accessibilityState={{ checked: active }}
                 onPress={() => toggle(type)}
                 style={[styles.option, active && { borderColor: round.color, backgroundColor: `${round.color}14` }]}>
-                <MaterialCommunityIcons name={round.icon} size={20} color={active ? round.color : colors.textFaint} />
+                <GameEmblem game={round.id} variant="glyph" size={20} color={active ? round.color : colors.textFaint} />
                 <Text variant="bodyStrong" color={active ? colors.text : colors.textMuted} numberOfLines={2} style={{ flex: 1, fontSize: 15 }}>
                   {t(`survival.round_type.${type}`)}
                 </Text>

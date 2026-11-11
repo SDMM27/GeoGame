@@ -18,6 +18,7 @@ import { shareInvite } from '@/account/shareInvite'
 import { confirmAction } from '@/components/confirm'
 import { FriendCandidates } from '@/components/profile/FriendCandidates'
 import { Avatar, DailyChips, SectionTitle } from '@/components/profile/ProfileSections'
+import { Kicker } from '@/components/flight'
 import { ScreenHeader } from '@/components/ScreenHeader'
 import { Button, Text, Touchable } from '@/components/ui'
 import { getGameByType } from '@/games'
@@ -151,6 +152,7 @@ export default function FriendsScreen() {
           <Text variant="heading">{t('friends.add_title')}</Text>
           <View style={{ flexDirection: 'row', gap: space.sm }}>
             <TextInput
+              accessibilityLabel={t('friends.add_placeholder')}
               value={username}
               onChangeText={(value) => {
                 setUsername(value)
@@ -226,7 +228,7 @@ export default function FriendsScreen() {
             <View style={{ gap: space.md }}>
               <SectionTitle
                 title={t('friends.title')}
-                right={<Text variant="bodyStrong" color={colors.textMuted}>{friendships.friends.length}</Text>}
+                right={<Kicker color={colors.accent} size={12}>{friendships.friends.length}</Kicker>}
               />
               {friendships.friends.length === 0 ? (
                 <Text variant="caption">{t('friends.empty')}</Text>
@@ -295,9 +297,9 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     minWidth: 0,
-    height: 52,
+    height: 56,
     borderRadius: radius.md,
-    backgroundColor: colors.bg,
+    backgroundColor: colors.board,
     borderWidth: 1,
     borderColor: colors.border,
     paddingHorizontal: space.lg,
@@ -306,12 +308,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   leagueLink: { flexDirection: 'row', alignItems: 'center', gap: space.md, padding: space.lg, borderRadius: radius.xl, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
-  list: { borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
+  list: { borderRadius: radius.lg, backgroundColor: colors.board, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.sm, paddingHorizontal: space.md, paddingVertical: space.md },
-  divider: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },
+  divider: { borderTopWidth: 1, borderTopColor: colors.boardLine },
   who: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: space.md },
   presence: { flexDirection: 'row', alignItems: 'center', gap: space.xs },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.accent },
-  smallButton: { minHeight: 38, paddingHorizontal: space.md },
-  iconButton: { width: 38, height: 38, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surfaceHigh },
+  smallButton: { minHeight: 44, paddingHorizontal: space.md },
+  iconButton: { width: 44, height: 44, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surfaceHigh },
 })

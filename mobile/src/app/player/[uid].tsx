@@ -17,6 +17,7 @@ import { FlagCollection } from '@/components/profile/FlagCollection'
 import { ScrollCollection } from '@/components/profile/ScrollCollection'
 import { LevelBar } from '@/components/profile/LevelBar'
 import { Avatar, ProfileBody } from '@/components/profile/ProfileSections'
+import { Kicker, ScreenTitle } from '@/components/flight'
 import { ScreenHeader } from '@/components/ScreenHeader'
 import { Text } from '@/components/ui'
 import { colors, radius, space } from '@/theme'
@@ -53,12 +54,17 @@ export default function PlayerScreen() {
         <Text variant="caption">{t('profile.not_found')}</Text>
       ) : (
         <>
+          <View style={styles.passport}>
+          <View style={styles.passportHead}>
+            <Kicker>{t('profile.passport')}</Kicker>
+            <Kicker>{t('mp_room.col_player')}</Kicker>
+          </View>
           <View style={styles.header}>
-            <Avatar username={player.username} size={64} decoration={decoration} />
+            <Avatar username={player.username} size={72} decoration={decoration} />
             <View style={{ flex: 1, gap: 2 }}>
-              <Text variant="heading" numberOfLines={1} color={nameColor ?? undefined}>
+              <ScreenTitle size={26} numberOfLines={1} color={nameColor ?? undefined}>
                 {player.username}
-              </Text>
+              </ScreenTitle>
               {player.createdAt && (
                 <Text variant="caption">
                   {t('profile.member_since', { date: new Date(player.createdAt).toLocaleDateString(i18n.language, { month: 'long', year: 'numeric' }) })}
@@ -75,6 +81,7 @@ export default function PlayerScreen() {
             </View>
           </View>
           <LevelBar uid={player.uid} />
+          </View>
           <FriendAction player={player} />
           <ProfileBody
             uid={player.uid}
@@ -93,7 +100,9 @@ export default function PlayerScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: { flexDirection: 'row', alignItems: 'center', gap: space.lg },
+  passport: { gap: space.lg, paddingBottom: space.lg, borderRadius: radius.xl, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
+  passportHead: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: space.lg, paddingVertical: space.sm, backgroundColor: colors.board, borderBottomWidth: 1, borderBottomColor: colors.boardLine },
+  header: { flexDirection: 'row', alignItems: 'center', gap: space.lg, paddingHorizontal: space.lg },
   friendPill: {
     flexDirection: 'row',
     alignItems: 'center',

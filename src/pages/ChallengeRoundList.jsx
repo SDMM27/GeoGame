@@ -4,12 +4,12 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { GAME_TYPES } from '../utils/gameTypes'
-import { CHALLENGE_ROUND_EMOJI } from '../utils/dailyChallenge'
 import { getCountryName } from '../utils/getCountryName'
 import { roundAnswer } from './survival/SurvivalRounds'
+import GameEmblem from '../components/GameEmblem'
 import './ChallengeRoundList.css'
 
-// What a round asked and its answer: "🏛️ Paris (France)"
+// What a round asked and its answer: "Paris (France)"
 function answerLabel(round, lang, t) {
   const answer = roundAnswer(round, lang, t)
   if (round.type !== GAME_TYPES.CAPITALS) return answer
@@ -24,7 +24,7 @@ export default function ChallengeRoundList({ rounds, rights }) {
     <ol className="challenge-rounds">
       {rounds.map((round, index) => (
         <li key={index} className={`challenge-round challenge-round--${rights[index] ? 'correct' : 'failed'}`}>
-          <span className="challenge-round-icon" title={t(`survival.round_type.${round.type}`)}>{CHALLENGE_ROUND_EMOJI[round.type]}</span>
+          <span className="challenge-round-icon" title={t(`survival.round_type.${round.type}`)}><GameEmblem game={round.type} variant="glyph" size={18} /></span>
           <span className="challenge-round-answer" title={answerLabel(round, i18n.language, t)}>{answerLabel(round, i18n.language, t)}</span>
           <span className="challenge-round-result">{rights[index] ? '✅' : '❌'}</span>
         </li>

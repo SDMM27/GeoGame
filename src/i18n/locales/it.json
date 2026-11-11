@@ -233,6 +233,7 @@
     "unknown": "Sconosciuto"
   },
   "game_hud": {
+    "flight": "VOLO {{code}}",
     "target_country": "PAESE DA TROVARE",
     "score": "PUNTI",
     "time": "TEMPO",
@@ -1323,7 +1324,8 @@
     "legal": "Note legali",
     "delete_account": "Elimina il mio account",
     "updated": "Ultimo aggiornamento: {{date}}",
-    "signup_notice": "Creando un account accetti le <terms>condizioni d'uso</terms> e l'<privacy>informativa sulla privacy</privacy>. Devi avere almeno 13 anni (e il consenso di un genitore se hai meno di 15 anni)."
+    "signup_notice": "Creando un account accetti le <terms>condizioni d'uso</terms> e l'<privacy>informativa sulla privacy</privacy>. Devi avere almeno 13 anni (e il consenso di un genitore se hai meno di 15 anni).",
+    "toc": "Indice"
   },
   "invites": {
     "title": "Invita amici",

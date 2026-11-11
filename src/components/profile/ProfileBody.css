@@ -1,4 +1,21 @@
 .profile-body { display: flex; flex-direction: column; gap: 1.75rem; }
+.profile-zone { display: flex; flex-direction: column; gap: 1.75rem; min-width: 0; }
+.profile-zone:empty { display: none; }
+/* Wide: the passport on the left, what is kept in it (collection, friends, account) on the right. One column below, in reading order. */
+@media (min-width: 960px) {
+  .profile-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1.97fr) minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas: 'head side' 'rest side';
+    column-gap: 24px;
+    row-gap: 1.75rem;
+    align-items: start;
+  }
+  .profile-zone--head { grid-area: head; }
+  .profile-zone--side { grid-area: side; }
+  .profile-zone--rest { grid-area: rest; }
+}
 .profile-muted { color: var(--sd-muted); font-size: 0.9rem; margin: 0; }
 .profile-center { text-align: center; padding: 2rem 0; }
 .profile-label { color: var(--sd-muted); font-family: var(--sd-font-mono); font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; }

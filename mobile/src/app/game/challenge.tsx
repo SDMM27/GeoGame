@@ -19,12 +19,15 @@ import { useAccount } from '@/account/auth'
 import { ChallengeLeaderboard } from '@/components/game/ChallengeLeaderboard'
 import { ChallengeRoundList } from '@/components/game/ChallengeRoundList'
 import { DailyPlayedElsewhere } from '@/components/game/DailyPlayedElsewhere'
-import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
+import { GameHud } from '@/components/game/GameHud'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
 import { PlacementRound, TypedRound, roundAnswer, type Survival, type SurvivalRound } from '@/components/survival/SurvivalRounds'
+import { clean } from '@/i18n'
 import { Button, Text } from '@/components/ui'
 import { DIFFICULTY_COLORS, getGameByType } from '@/games'
 import { navigate } from '@/shims/react-router-dom'
+import GameEmblem from '@/components/GameEmblem'
+import { type EscaleState } from '@/components/flight'
 import { colors, gameColors, radius, space } from '@/theme'
 
 const ACCENT = gameColors.daily_challenge
@@ -34,8 +37,7 @@ type Result = 'correct' | 'failed' | null
 
 function Playing({ challenge }: { challenge: Challenge }) {
   const { t, i18n } = useTranslation()
-  const insets = useSafeAreaInsets()
-  const { round, roundIndex, total, score, timeLeftMs, outcome, timedOut, next, giveUp, submitText } = challenge
+  const { round, roundIndex, total, score, results, timeLeftMs, outcome, timedOut, next, giveUp, submitText } = challenge
 
   // Spoken: each round's result, then the timer turning red
   const fiveLeft = timeLeftMs != null && Math.ceil(timeLeftMs / 1000) === 5 && !outcome
@@ -57,6 +59,12 @@ function Playing({ challenge }: { challenge: Challenge }) {
   const isPlacement = round.type === GAME_TYPES.PLACEMENT
   const roundGame = getGameByType(round.type)
   const answer = roundAnswer(round, i18n.language, t)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  const states: EscaleState[] = Array.from({ length: total }, (_, index) => {
+    const result = (results as Result[])[index]
+    if (result) return result === 'correct' ? 'good' : 'bad'
+    return index === roundIndex ? 'current' : 'todo'
+  })
 
   const outcomeBanner = outcome && (
     <Animated.View
@@ -86,6 +94,26 @@ function Playing({ challenge }: { challenge: Challenge }) {
 
   return (
     <View style={{ flex: 1, backgroundColor: isPlacement ? colors.ocean : colors.bg }}>
+      <View style={{ backgroundColor: colors.bg }}>
+        <GameHud
+          game="daily_challenge"
+          title={t('games.daily_challenge.title')}
+          tag={`${total} ${t('mobile.flight.stops')}`.toLocaleUpperCase()}
+          gate=""
+          confirmQuit
+          cells={[
+            { label: t('mobile.flight.stop').toLocaleUpperCase(), value: `${pad(roundIndex + 1)}/${total}`, color: colors.gold },
+            { label: clean(t('labels.score')).replace(/\s*:$/, '').toUpperCase(), value: String(score) },
+            {
+              label: clean(t('labels.time')).replace(/\s*:$/, '').toUpperCase(),
+              value: `00:${pad(secondsLeft != null && !outcome ? secondsLeft : CHALLENGE_TIMER)}`,
+              color: secondsLeft != null && !outcome && secondsLeft <= 5 ? colors.danger : colors.accent,
+            },
+          ]}
+          states={states}
+          progressLabel={t('daily_challenge.round', { n: roundIndex + 1, total })}
+        />
+      </View>
       {isPlacement ? (
         <PlacementRound
           survival={survival}
@@ -100,9 +128,9 @@ function Playing({ challenge }: { challenge: Challenge }) {
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
           <ScrollView
             keyboardShouldPersistTaps="handled"
-            contentContainerStyle={[styles.content, { paddingTop: insets.top + 42 + space.md }]}>
+            contentContainerStyle={styles.content}>
             <View style={styles.roundHeader}>
-              {roundGame && <MaterialCommunityIcons name={roundGame.icon} size={18} color={roundGame.color} />}
+              {roundGame && <GameEmblem game={roundGame.id} variant="glyph" size={18} color={roundGame.color} />}
               <Text variant="label" color={roundGame?.color} style={{ flex: 1 }}>
                 {t('daily_challenge.round', { n: roundIndex + 1, total })} · {t(`survival.round_type.${round.type}`)}
               </Text>
@@ -116,15 +144,6 @@ function Playing({ challenge }: { challenge: Challenge }) {
         </KeyboardAvoidingView>
       )}
 
-      <GameTopBar>
-        <HudPill icon="target" label={`${roundIndex + 1}/${total}`} color={ACCENT} />
-        {secondsLeft != null && !outcome ? (
-          <HudPill icon="timer-sand" label={`${secondsLeft} s`} color={secondsLeft <= 5 ? colors.danger : colors.text} />
-        ) : (
-          <HudPill icon="timer-outline" label={`${CHALLENGE_TIMER} s`} />
-        )}
-        <HudPill icon="star-four-points-outline" label={String(score)} color={colors.accent} />
-      </GameTopBar>
     </View>
   )
 }
@@ -135,9 +154,10 @@ function Rules({ challenge }: { challenge: Challenge }) {
   const { phase, resumed, start, level } = challenge
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
-      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + 42 + space.md, paddingBottom: insets.bottom + space.xl }]}>
+      <GameHud game="daily_challenge" title={t('games.daily_challenge.title')} tag={`${challenge.total ?? 12} ${t('mobile.flight.stops')}`.toLocaleUpperCase()} gate="" confirmQuit={false} />
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + space.xl }]}>
         <Text variant="label" color={ACCENT}>
-          {t('mobile.home.daily')} · {t('games.daily_challenge.title')}
+          {t('mobile.home.daily')}
         </Text>
         {phase === 'loading' ? (
           <Text variant="caption">{t('messages.loading')}</Text>
@@ -173,7 +193,6 @@ function Rules({ challenge }: { challenge: Challenge }) {
           </View>
         )}
       </ScrollView>
-      <GameTopBar confirmQuit={false} />
     </View>
   )
 }
@@ -188,6 +207,9 @@ function Done({ challenge }: { challenge: Challenge }) {
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
       <ResultsSheet
+        game="daily_challenge"
+        ticketNote={`${t('mobile.home.daily')} · ${total} ${t('mobile.flight.stops')}`}
+        states={(results as Result[]).map((result) => (result === 'correct' ? 'good' : 'bad'))}
         title={t('daily_challenge.result_title')}
         score={score}
         scoreText={scoreText}
@@ -244,7 +266,7 @@ export default function ChallengeScreen() {
 
   if (elsewhere.checking || elsewhere.game) {
     return (
-      <DailyPlayedElsewhere title={t('games.daily_challenge.title')} game={elsewhere.game} accent={ACCENT}>
+      <DailyPlayedElsewhere gameId="daily_challenge" title={t('games.daily_challenge.title')} game={elsewhere.game} accent={ACCENT}>
         {dailyKey && <ChallengeLeaderboard dailyKey={dailyKey} />}
       </DailyPlayedElsewhere>
     )
@@ -255,7 +277,7 @@ export default function ChallengeScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { paddingHorizontal: space.xl, paddingBottom: space.xl, gap: space.lg },
+  content: { paddingHorizontal: space.xl, paddingTop: space.sm, paddingBottom: space.xl, gap: space.lg },
   roundHeader: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   outcome: {
     flexDirection: 'row',

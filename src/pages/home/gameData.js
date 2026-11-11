@@ -60,7 +60,7 @@ export function buildPresetPhases(name) {
   return { ...preset.phases };
 }
 
-// Like the app (mobile/src/games.ts): `kind` 'daily' games have a daily challenge and an infinite mode, 'setup' and
+// Like the app (mobile/src/games.ts); a game's emblem comes from its id (utils/gameEmblems.js): `kind` 'daily' games have a daily challenge and an infinite mode, 'setup' and
 // 'survival' games open their settings first (`dailyOnly`: no infinite mode). `multiId`: the game's id in multiplayer rooms (null: not playable there).
 export const GAMES = [
   {
@@ -69,7 +69,6 @@ export const GAMES = [
     // Only a daily challenge: no infinite mode
     dailyOnly: true,
     multiId: null,
-    icon: "🎯",
     titleKey: "games.daily_challenge.title",
     descKey: "games.daily_challenge.description",
     route: "/challenge",
@@ -81,7 +80,6 @@ export const GAMES = [
     // Only a daily game: no infinite mode
     dailyOnly: true,
     multiId: null,
-    icon: "🌍",
     titleKey: "games.country_of_day.title",
     descKey: "games.country_of_day.description",
     route: "/country-of-the-day",
@@ -91,7 +89,6 @@ export const GAMES = [
     id: GAME_TYPES.PLACEMENT,
     kind: "setup",
     multiId: "placement",
-    icon: "\u{1F30D}",
     titleKey: "games.placement.title",
     descKey: "games.placement.description",
     route: "/game",
@@ -101,7 +98,6 @@ export const GAMES = [
     id: GAME_TYPES.FLAGS,
     kind: "setup",
     multiId: "flags",
-    icon: "\u{1F6A9}",
     titleKey: "games.flags.title",
     descKey: "games.flags.description",
     route: "/flag-game",
@@ -111,7 +107,6 @@ export const GAMES = [
     id: GAME_TYPES.CAPITALS,
     kind: "setup",
     multiId: "capitals",
-    icon: "\u{1F3DB}\uFE0F",
     titleKey: "games.capitals.title",
     descKey: "games.capitals.description",
     route: "/capitals-game",
@@ -121,7 +116,6 @@ export const GAMES = [
     id: GAME_TYPES.BORDER_GUESS,
     kind: "daily",
     multiId: "border_guess",
-    icon: "\u{1F9ED}",
     titleKey: "games.border_guess.title",
     descKey: "games.border_guess.description",
     route: "/border-guess",
@@ -131,7 +125,6 @@ export const GAMES = [
     id: GAME_TYPES.COUNTRY_CLUE,
     kind: "daily",
     multiId: "country_clue",
-    icon: "\u{1F50E}",
     titleKey: "games.country_clue.title",
     descKey: "games.country_clue.description",
     route: "/country-clue",
@@ -141,7 +134,6 @@ export const GAMES = [
     id: GAME_TYPES.VOYAGE_VOYAGE,
     kind: "daily",
     multiId: null,
-    icon: "✈️",
     titleKey: "games.voyage_voyage.title",
     descKey: "games.voyage_voyage.description",
     route: "/voyage-voyage",
@@ -152,7 +144,6 @@ export const GAMES = [
     id: "ranking",
     kind: "daily",
     multiId: null,
-    icon: "🏆",
     titleKey: "games.ranking.title",
     descKey: "games.ranking.description",
     route: "/ranking",
@@ -163,7 +154,6 @@ export const GAMES = [
     id: GAME_TYPES.QUIZ,
     kind: "daily",
     multiId: "quiz",
-    icon: "🧠",
     titleKey: "games.quiz.title",
     descKey: "games.quiz.description",
     route: "/quiz",
@@ -172,7 +162,6 @@ export const GAMES = [
   },
   {
     id: "placement",
-    icon: "\u{1F4CD}",
     titleKey: "games.placement_map.title",
     descKey: "games.placement_map.description",
     route: null,
@@ -182,7 +171,6 @@ export const GAMES = [
     id: GAME_TYPES.SURVIVAL,
     kind: "survival",
     multiId: "survival",
-    icon: "\u2764\uFE0F",
     titleKey: "games.survival.title",
     descKey: "games.survival.description",
     route: "/survival",
@@ -192,7 +180,6 @@ export const GAMES = [
     id: GAME_TYPES.HARDCORE,
     kind: "setup",
     multiId: null,
-    icon: "💀",
     titleKey: "games.hardcore.title",
     descKey: "games.hardcore.description",
     route: "/game",
@@ -202,7 +189,6 @@ export const GAMES = [
     id: GAME_TYPES.MISSING_FLAG,
     kind: "setup",
     multiId: null,
-    icon: "🧩",
     titleKey: "games.missing_flag.title",
     descKey: "games.missing_flag.description",
     route: "/missing-flag",

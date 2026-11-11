@@ -17,6 +17,9 @@ import { SurvivalSetupSheet } from '@/components/survival/SurvivalSetupSheet'
 import { Button, Segmented, Text, Touchable } from '@/components/ui'
 import { DIFFICULTIES, DIFFICULTY_COLORS, getGame } from '@/games'
 import { usePlacementClues } from '@/hooks/usePlacementClues'
+import GameEmblem, { flightCode } from '@/components/GameEmblem'
+import { Kicker, ScreenTitle } from '@/components/flight'
+import { gameGate } from '@/components/game/GameHud'
 import { colors, radius, space } from '@/theme'
 
 type Phases = Record<string, number>
@@ -155,12 +158,11 @@ function GameSetupSheet() {
       <ScrollView contentContainerStyle={{ padding: space.xl, paddingBottom: space.xl, gap: space.lg }}>
         <View style={styles.titleRow}>
           <View style={[styles.icon, { backgroundColor: `${game.color}22` }]}>
-            <MaterialCommunityIcons name={game.icon} size={28} color={game.color} />
+            <GameEmblem game={game.id} variant="glyph" size={28} color={game.color} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text variant="title" style={{ fontSize: 26 }}>
-              {t(game.titleKey)}
-            </Text>
+            <Kicker color={game.color} numberOfLines={1}>{`${t('game_hud.flight', { code: flightCode(game.id) })} · ${t('home.gate')} ${gameGate(game.id)}`}</Kicker>
+            <ScreenTitle size={26}>{t(game.titleKey)}</ScreenTitle>
             <Text variant="caption">{t(game.descKey)}</Text>
           </View>
           <SheetCloseButton />
@@ -345,7 +347,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     borderWidth: 1.5,
     borderColor: colors.border,
-    backgroundColor: colors.bg,
+    backgroundColor: colors.board,
     gap: 2,
   },
   optionWide: { flexBasis: '100%' },
@@ -381,8 +383,8 @@ const styles = StyleSheet.create({
   },
   stepper: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   stepperButton: {
-    width: 36,
-    height: 36,
+    width: 44,
+    height: 44,
     borderRadius: radius.sm,
     backgroundColor: colors.surfaceHigh,
     alignItems: 'center',

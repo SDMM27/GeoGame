@@ -50,7 +50,7 @@
 .friends-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gg-success); box-shadow: 0 0 6px var(--gg-success); }
 .friends-presence--playing { color: var(--sd-ink); }
 
-.friends-rank { width: 1.6rem; text-align: center; color: var(--sd-muted); font-weight: 800; }
+.friends-rank { width: 1.75rem; text-align: center; flex-shrink: 0; }
 .friends-detail { color: var(--sd-muted); font-size: 0.85rem; font-weight: 600; white-space: nowrap; }
 .friends-state { color: var(--sd-muted); font-size: 0.85rem; font-weight: 600; white-space: nowrap; }
 .friends-invite,

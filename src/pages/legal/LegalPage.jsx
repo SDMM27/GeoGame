@@ -5,7 +5,7 @@ import NavBar from '../../components/NavBar'
 import LegalLinks from '../../components/LegalLinks'
 import { LEGAL_DOCUMENTS } from '../../legal/documents'
 import { DEFAULT_LANGUAGE } from '../../i18n/languages'
-import { LEGAL_INFO } from '../../legal/legalInfo'
+import { LEGAL_INFO, LEGAL_PATHS } from '../../legal/legalInfo'
 import { SITE_NAME, SITE_URL } from '../../seo/seoPages'
 import './LegalPage.css'
 
@@ -60,19 +60,48 @@ export default function LegalPage({ doc }) {
   return (
     <div className="legal-page">
       <NavBar />
-      <main className="legal-main">
-        <p className="gg-kicker">{t('carnet_games.kicker_legal')}</p>
-        <h1 className="legal-title">{content.title}</h1>
-        <p className="legal-updated">{t('legal.updated', { date: updated })}</p>
-        {content.intro.map((block, index) => <Block key={index} block={block} />)}
-        {content.sections.map((section) => (
-          <section key={section.id} id={section.id} className="legal-section">
-            <h2>{section.title}</h2>
-            {section.blocks.map((block, index) => <Block key={index} block={block} />)}
-          </section>
-        ))}
-        <LegalLinks />
-      </main>
+      <div className="legal-shell">
+        <aside className="legal-aside">
+          {content.sections.length > 1 && (
+            <nav aria-labelledby="legal-toc">
+              <p id="legal-toc" className="gg-kicker legal-aside-label">{t('legal.toc')}</p>
+              <ol className="legal-toc">
+                {content.sections.map((section, index) => (
+                  <li key={section.id}>
+                    <a href={`#${section.id}`}>
+                      <span className="gg-mono legal-toc-num">{String(index + 1).padStart(2, '0')}</span>
+                      {section.title}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          )}
+          <nav aria-labelledby="legal-docs" className="legal-docs">
+            <p id="legal-docs" className="gg-kicker legal-aside-label">{t('carnet_games.kicker_legal')}</p>
+            {Object.keys(LEGAL_PATHS).map((key) => (
+              <Link key={key} to={LEGAL_PATHS[key]} aria-current={key === doc ? 'page' : undefined}>
+                {t(`legal.${key === 'deleteAccount' ? 'delete_account' : key}`)}
+              </Link>
+            ))}
+          </nav>
+        </aside>
+        <main className="legal-main">
+          <p className="gg-kicker">{t('carnet_games.kicker_legal')}</p>
+          <h1 className="legal-title">{content.title}</h1>
+          <p className="legal-updated">{t('legal.updated', { date: updated })}</p>
+          <div className="legal-intro">
+            {content.intro.map((block, index) => <Block key={index} block={block} />)}
+          </div>
+          {content.sections.map((section) => (
+            <section key={section.id} id={section.id} className="legal-section">
+              <h2>{section.title}</h2>
+              {section.blocks.map((block, index) => <Block key={index} block={block} />)}
+            </section>
+          ))}
+          <LegalLinks />
+        </main>
+      </div>
     </div>
   )
 }

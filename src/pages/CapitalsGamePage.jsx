@@ -13,6 +13,7 @@ import { useRecordGame } from '../auth'
 import { matchKnownAnswer } from '../utils/answerLexicon'
 import { restartTyping } from '../utils/restartTyping'
 import { getCountryName, getCapitalName, getAllCapitalNames } from '../utils/getCountryName'
+import { GameFlightTag } from '../components/GameEmblem'
 import PhaseIndicator from '../components/PhaseIndicator'
 import Form from './form'
 import AscensionForm from './AscensionForm'
@@ -86,6 +87,7 @@ function CapitalsGameLayout({ difficulty, isTraining, isAscension, presetName, s
       {/* HUD — structure identique à FlagGamePage */}
       <div className={`hud-container${isAscension ? ' hud-container--with-phase' : ''}`}>
         <div className="hud-main">
+          <GameFlightTag game={GAME_TYPES.CAPITALS} className="hud-flight" />
           <div className="hud-row">
             <div className="hud-cell">
               <span className="hud-value" style={{ color: 'var(--sd-accent-strong)' }}>{score}</span>

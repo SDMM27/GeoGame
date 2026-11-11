@@ -3,12 +3,12 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, TextInput, View } from 'react-native'
+import { KeyboardAvoidingView, Modal, Platform, Pressable, TextInput, View } from 'react-native'
 
 import { REPORT_NOTE_MAX, REPORT_REASONS, reportEntry } from '@shared/utils/reports'
 
 import { useAccount } from '@/account/auth'
-import { colors, fonts, radius, space } from '@/theme'
+import { fonts, makeStyles, radius, space, useColors } from '@/theme'
 import { Button, Text, Touchable } from '../ui'
 
 export type ReportTarget = { collection: string; id: string; name: string }
@@ -17,6 +17,8 @@ type Status = 'idle' | 'sending' | 'sent' | 'already' | 'error'
 
 export function ReportFlag({ target }: { target: ReportTarget }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const { account } = useAccount()
   const [open, setOpen] = useState(false)
   const [reason, setReason] = useState<string>(REPORT_REASONS[0])
@@ -109,9 +111,9 @@ export function ReportFlag({ target }: { target: ReportTarget }) {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   flag: { padding: 2 },
-  backdrop: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, backgroundColor: 'rgba(0, 0, 0, 0.6)' },
+  backdrop: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, backgroundColor: colors.scrim },
   sheet: {
     width: '100%',
     maxWidth: 420,
@@ -146,4 +148,4 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   actions: { flexDirection: 'row', gap: space.sm, marginTop: space.sm },
-})
+}))

@@ -1,0 +1,15 @@
+.end-stamp {
+  --gg-stamp-color: var(--gg-success-strong);
+  width: 84px;
+  height: 84px;
+  flex-shrink: 0;
+}
+
+.end-stamp--warning { --gg-stamp-color: var(--gg-warning-strong); }
+.end-stamp--danger { --gg-stamp-color: var(--gg-danger-strong); }
+
+.end-stamp > strong {
+  font-family: var(--sd-font-mono);
+  font-size: 1.05rem;
+  font-variant-numeric: tabular-nums;
+}

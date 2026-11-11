@@ -2,7 +2,7 @@
 import React, { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { GAME_TYPES } from '../../utils/gameTypes'
-import { SURVIVAL_ROUND_ICONS } from '../../components/SurvivalOptions'
+import GameEmblem from '../../components/GameEmblem'
 import { localizeQuestion } from '../../utils/quizQuestions'
 import { DIFFICULTY_COLORS } from '../quiz/constants'
 import { BorderSilhouette, countryLabel, roundAnswer } from './SurvivalRounds'
@@ -63,7 +63,7 @@ export default function Spectator({ round, roundIndex, rows, waiting, maxLives, 
       {round && (
         <div className="survival-spectator-round">
           <span className="survival-hud-label">
-            {t('survival.round', { n: roundIndex + 1 })} · {SURVIVAL_ROUND_ICONS[round.type]} {t(`survival.prompt.${round.type}`)}
+            {t('survival.round', { n: roundIndex + 1 })} · <GameEmblem game={round.type} variant="glyph" size={14} /> {t(`survival.prompt.${round.type}`)}
             {round.difficulty && (
               <span className="survival-hud-difficulty" style={{ color: DIFFICULTY_COLORS[round.difficulty] }}>
                 {' · '}{t(`difficulties.${round.difficulty}`)}

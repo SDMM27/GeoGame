@@ -49,7 +49,34 @@
     "games_subtitle": "Kies een moeilijkheidsgraad of een continent",
     "daily": "Dagelijks",
     "infinite": "Eindeloos",
-    "multi": "Speel multiplayer"
+    "multi": "Speel multiplayer",
+    "hero_lead": "{{count}} uitdagingen per dag, een paspoort om te vullen, multiplayerkamers. Dezelfde wereld voor iedereen, in 9 talen.",
+    "next_departure": "Volgend vertrek",
+    "globe_score": "Score",
+    "board_cta": "Instappen voor de uitdaging van vandaag",
+    "passes_title": "Instapkaarten van vandaag",
+    "passes_note": "{{count}} vluchten · dezelfde uitdagingen voor iedereen",
+    "boarding_pass": "Instapkaart",
+    "gate": "Gate",
+    "departure": "Vertrek",
+    "board": "Instappen",
+    "passport_title": "Jouw paspoort",
+    "passport_intro": "Elke voltooide missie stempelt je paspoort: XP, levels, kaders en kleuren om vrij te spelen. De weekcompetitie deelt vlagfragmenten uit.",
+    "passport_example": "Voorbeeldpagina van een paspoort",
+    "stamp_level": "Level",
+    "stamp_xp": "{{count}} XP",
+    "stamp_streak": "Reeks",
+    "stamp_today": "Vandaag",
+    "stamp_dailies": "Dagelijkse uitdagingen",
+    "stamp_won": "Gewonnen",
+    "special_flight": "Speciale vlucht",
+    "board_title": "Vertrekbord",
+    "col_destination": "Bestemming",
+    "col_brief": "In het kort",
+    "col_status": "Status",
+    "status_boarding": "Instappen",
+    "status_on_time": "Op tijd",
+    "status_open": "Open"
   },
   "games": {
     "daily_challenge": {
@@ -206,6 +233,7 @@
     "unknown": "Onbekend"
   },
   "game_hud": {
+    "flight": "VLUCHT {{code}}",
     "target_country": "TE VINDEN LAND",
     "score": "SCORE",
     "time": "TIJD",
@@ -350,7 +378,12 @@
   "not_found": {
     "title": "Pagina niet gevonden",
     "message": "Deze pagina bestaat niet of is verplaatst.",
-    "home": "Terug naar start"
+    "home": "Terug naar start",
+    "cancelled": "Vlucht geannuleerd",
+    "flight": "Vlucht",
+    "gate": "Gate",
+    "status": "Status",
+    "status_cancelled": "Geannuleerd"
   },
   "units": {
     "pt": "pt",
@@ -396,7 +429,11 @@
     "code_placeholder": "CODE",
     "create_title": "Maak een spel",
     "create_subtitle": "Kies een spel en nodig je vrienden uit met de code",
-    "recent_title": "Recente spellen"
+    "recent_title": "Recente spellen",
+    "kicker": "Terminal · Multiplayer",
+    "desk_join": "Balie A · Inchecken",
+    "desk_create": "Balie B · Nieuwe vlucht",
+    "desk_recent": "Recente vluchten"
   },
   "lobby": {
     "connecting": "Verbinden..."
@@ -404,7 +441,8 @@
   "config": {
     "title": "Het spel instellen",
     "creating": "Aanmaken...",
-    "typing_tolerance_note": "⚠️ Bij typespellen (vlaggen, hoofdsteden) wordt de eerste aarzeling per land getolereerd en heeft die geen invloed op de score — typfouten gebeuren!"
+    "typing_tolerance_note": "⚠️ Bij typespellen (vlaggen, hoofdsteden) wordt de eerste aarzeling per land getolereerd en heeft die geen invloed op de score — typfouten gebeuren!",
+    "kicker": "Instapkaart"
   },
   "stats": {
     "first_try": "🎯 Eén tik",
@@ -734,7 +772,9 @@
       "room": "Kamer",
       "open_room": "Open de kamer",
       "close": "Sluiten"
-    }
+    },
+    "passport": "Paspoort",
+    "field_since": "Sinds"
   },
   "friends": {
     "online": "Online",
@@ -1122,7 +1162,11 @@
     "next_game": "Spel {{n}} starten",
     "waiting_next": "Wachten op het volgende spel…",
     "round_n": "Ronde {{n}} / {{total}}",
-    "next_round_soon": "Volgende ronde over een moment…"
+    "next_round_soon": "Volgende ronde over een moment…",
+    "manifest": "Passagierslijst",
+    "col_player": "Speler",
+    "col_result": "Resultaat",
+    "standings_kicker": "Aankomstbord"
   },
   "survival": {
     "spectating": "Je kijkt naar de spelers die nog in het spel zitten",
@@ -1280,7 +1324,8 @@
     "legal": "Juridische vermeldingen",
     "delete_account": "Mijn account verwijderen",
     "updated": "Laatst bijgewerkt: {{date}}",
-    "signup_notice": "Door een account aan te maken ga je akkoord met de <terms>gebruiksvoorwaarden</terms> en het <privacy>privacybeleid</privacy>. Je moet minstens 13 zijn (en toestemming van een ouder hebben onder de 15)."
+    "signup_notice": "Door een account aan te maken ga je akkoord met de <terms>gebruiksvoorwaarden</terms> en het <privacy>privacybeleid</privacy>. Je moet minstens 13 zijn (en toestemming van een ouder hebben onder de 15).",
+    "toc": "Inhoud"
   },
   "invites": {
     "title": "Vrienden uitnodigen",
@@ -1301,7 +1346,9 @@
     "leaderboards": "Ranglijsten",
     "profile": "Profiel",
     "main": "Hoofdnavigatie",
-    "language": "Taal"
+    "language": "Taal",
+    "theme_light": "Overschakelen naar lichte modus",
+    "theme_dark": "Overschakelen naar donkere modus"
   },
   "league": {
     "title": "Weekcompetitie",
@@ -1341,7 +1388,9 @@
     "win_reward_other": "+{{count}} vlagfragmenten",
     "win_champion": "Titel behaald: Kampioen van de week",
     "win_cta": "Bekijk de competitie",
-    "win_close": "Sluiten"
+    "win_close": "Sluiten",
+    "season": "Huidig seizoen",
+    "stamp_label": "Beloning"
   },
   "decorations": {
     "title": "Personaliseren",
@@ -1641,5 +1690,43 @@
     "title_ottoman-empire": "Ottomaanse Rijk, 1481-1683",
     "title_russia-growth": "Groei van Rusland, 1300-1796",
     "title_british-empire-1886": "Brits Rijk in 1886"
+  },
+  "globe": {
+    "find": "Vind: {{city}}",
+    "found": "Gevonden: {{city}}",
+    "hint_drag": "↔ Sleep om de wereldbol te draaien",
+    "hint_center": "Zet de stad in het vizier",
+    "label": "Interactieve wereldbol: draai hem (muis, vinger of pijltjes) om {{city}} te vinden",
+    "offer_daily": "Dagelijkse uitdaging nog niet gedaan",
+    "offer_game": "Vandaag nog niet gespeeld",
+    "all_done": "Alle vluchten van vandaag zijn vertrokken",
+    "all_done_hint": "Kom morgen terug voor nieuwe uitdagingen",
+    "close": "Sluiten",
+    "city": {
+      "tokyo": "Tokio",
+      "rio": "Rio de Janeiro",
+      "cairo": "Caïro",
+      "sydney": "Sydney",
+      "new_york": "New York",
+      "nairobi": "Nairobi",
+      "paris": "Parijs"
+    }
+  },
+  "scores": {
+    "kicker": "Vertrekbord"
+  },
+  "carnet_games": {
+    "kicker_end": "Landing",
+    "kicker_daily": "Vlucht van de dag",
+    "kicker_free": "Vrije vlucht",
+    "kicker_briefing": "Briefing",
+    "kicker_atlas": "Navigatiekaarten",
+    "kicker_scrolls": "Boordarchief",
+    "kicker_legal": "Boorddocumenten",
+    "stamp_landed": "Geland",
+    "stamp_diverted": "Omgeleid"
+  },
+  "route_fallback": {
+    "boarding": "Instappen bezig"
   }
 }

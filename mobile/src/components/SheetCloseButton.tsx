@@ -3,12 +3,14 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { router } from 'expo-router'
 import { useTranslation } from 'react-i18next'
-import { Platform, StyleSheet } from 'react-native'
+import { Platform } from 'react-native'
 
-import { colors, radius } from '@/theme'
+import { makeStyles, radius, useColors } from '@/theme'
 import { Touchable } from './ui'
 
 export function SheetCloseButton() {
+  const colors = useColors()
+  const styles = useStyles()
   const { t } = useTranslation()
   if (Platform.OS !== 'web') return null
   const close = () => (router.canGoBack() ? router.back() : router.replace('/'))
@@ -19,10 +21,10 @@ export function SheetCloseButton() {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   button: {
-    width: 42,
-    height: 42,
+    width: 44,
+    height: 44,
     borderRadius: radius.pill,
     backgroundColor: colors.surfaceHigh,
     borderWidth: 1,
@@ -31,4 +33,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignSelf: 'flex-start',
   },
-})
+}))

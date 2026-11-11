@@ -4,6 +4,7 @@ import { useBadges } from '../../../hooks/useBadges'
 import BadgeStrip from '../../profile/BadgeStrip'
 import { formatTime } from '../../../utils/formatTime'
 import { GAME_TYPES } from '../../../utils/gameTypes'
+import RankBadge from '../../RankBadge'
 import {
   overallStandings,
   progressForGame,
@@ -13,7 +14,6 @@ import {
   roomScoringMode,
 } from '../../../utils/multiplayerRoom'
 
-const MEDALS = ['🥇', '🥈', '🥉']
 
 // The badges of the room's players, by player id.
 function useRoomBadges(room) {
@@ -29,6 +29,17 @@ function resultLine(game, result, t) {
     return `${result.countriesSolved}/${result.total} · ${t('mp_room.errors', { count: result.attempts })} · ${time}`
   }
   return `${Math.round(result.weightedScore)} ${t('units.pts')} · ${time}`
+}
+
+// Departures-board header over a list of results
+function BoardHead({ t }) {
+  return (
+    <div className="mpr-board-head gg-board-head" aria-hidden="true">
+      <span>#</span>
+      <span>{t('mp_room.col_player')}</span>
+      <span className="mpr-board-head-end">{t('mp_room.col_result')}</span>
+    </div>
+  )
 }
 
 // Lives left as hearts (a lost one is a black heart), capped at the lives the game started with.
@@ -70,13 +81,15 @@ export function Standings({ room, progress, results, playerId, index }) {
   if (game.type === GAME_TYPES.SURVIVAL) others.sort(bySurvivalProgress(live))
 
   return (
+    <>
+    <BoardHead t={t} />
     <ul className="mpr-list">
       {ranked.map((result, i) => (
         <li
           key={result.playerId}
           className={`mpr-row${i < 3 ? ' mpr-row--top' : ''}${result.playerId === playerId ? ' mpr-row--me' : ''}`}
         >
-          <span className="mpr-rank">{MEDALS[result.rank - 1] ?? result.rank}</span>
+          <span className="mpr-rank"><RankBadge rank={result.rank} plain /></span>
           <span className="mpr-name">
             {result.pseudo}
             {result.playerId === playerId && ` (${t('mp_room.you')})`}
@@ -99,6 +112,7 @@ export function Standings({ room, progress, results, playerId, index }) {
         </li>
       ))}
     </ul>
+    </>
   )
 }
 
@@ -108,13 +122,15 @@ function OverallStandings({ room, results, playerId }) {
   const total = roomGames(room).length
   const badges = useRoomBadges(room)
   return (
+    <>
+    <BoardHead t={t} />
     <ul className="mpr-list">
       {overallStandings(room, results).map((entry, i) => (
         <li
           key={entry.playerId}
           className={`mpr-row${i < 3 ? ' mpr-row--top' : ''}${entry.playerId === playerId ? ' mpr-row--me' : ''}`}
         >
-          <span className="mpr-rank">{MEDALS[entry.rank - 1] ?? entry.rank}</span>
+          <span className="mpr-rank"><RankBadge rank={entry.rank} plain /></span>
           <span className="mpr-name">
             {entry.pseudo}
             {entry.playerId === playerId && ` (${t('mp_room.you')})`}
@@ -126,6 +142,7 @@ function OverallStandings({ room, results, playerId }) {
         </li>
       ))}
     </ul>
+    </>
   )
 }
 
@@ -138,6 +155,7 @@ export function StandingsCard({ room, progress, results, playerId, defaultTab })
 
   return (
     <div className="mpr-card">
+      <p className="gg-kicker">{t('mp_room.standings_kicker')}</p>
       <h3>{t('mp_room.standings')}</h3>
       {games.length > 1 && (
         <div className="mpr-tabs">

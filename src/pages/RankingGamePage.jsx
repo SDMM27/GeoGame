@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import NavBar from '../components/NavBar'
+import { GameFlightTag } from '../components/GameEmblem'
 import RankingLeaderboard from './RankingLeaderboard'
 import ShareScoreButton from '../components/ShareScoreButton'
 import ChallengeBanner from '../components/ChallengeBanner'
@@ -16,6 +17,7 @@ import { useScoreSave } from '../hooks/useScoreSave'
 import { saveRankingScore } from '../utils/saveScore'
 import LeaderboardSave from '../components/LeaderboardSave'
 import { getCountryName } from '../utils/getCountryName'
+import EndStamp from '../components/EndStamp'
 import './RankingGamePage.css'
 
 const FLAG_URL = (iso2) =>
@@ -166,6 +168,8 @@ export default function RankingGamePage() {
     <div className="ranking-game-page">
       <NavBar />
       <div className="ranking-game-main">
+        <GameFlightTag game={GAME_TYPES.RANKING} className="game-flight-tag--board" />
+        <p className="gg-kicker">{t(isSubmitted ? 'carnet_games.kicker_end' : mode === 'daily' ? 'carnet_games.kicker_daily' : 'carnet_games.kicker_free')}</p>
         <h1 className="ranking-game-title">{t('ranking.title')}</h1>
 
         {/* Mode tabs */}
@@ -353,7 +357,8 @@ export default function RankingGamePage() {
         {isSubmitted && (
           <>
             {/* Score */}
-            <div className="ranking-score">
+            <div className="ranking-score ranking-score--final">
+              <EndStamp />
               <div className="ranking-score-value">
                 {score} / {maxScore} pts
               </div>

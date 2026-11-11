@@ -16,6 +16,7 @@ import { restartTyping } from '../../utils/restartTyping'
 import { FitCountryBounds, GuessHistory } from '../BorderGuessPage'
 import SmallCountryCircles from '../game/SmallCountryCircles'
 import { HOVER_STYLE, MAP_COLORS } from '../../utils/mapColors'
+import GameEmblem from '../../components/GameEmblem'
 import '../BorderGuessPage.css'
 import '../QuizPage.css'
 
@@ -196,7 +197,7 @@ export function TypedRound({ survival, onSubmit }) {
     <div className="survival-typed">
       {/* Both rounds show a flag: say plainly which answer is expected */}
       <p className={`survival-ask survival-ask--${isCapital ? 'capital' : 'flag'}`}>
-        {isCapital ? '🏛️' : '🚩'} {t(isCapital ? 'survival.ask_capital' : 'survival.ask_flag')}
+        <GameEmblem game={isCapital ? GAME_TYPES.CAPITALS : GAME_TYPES.FLAGS} variant="glyph" size={16} /> {t(isCapital ? 'survival.ask_capital' : 'survival.ask_flag')}
       </p>
       {isCapital ? (
         <div className="survival-capital-country">

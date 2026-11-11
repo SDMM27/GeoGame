@@ -25,7 +25,7 @@ import { haptic, type Claim } from '@/components/collection/claim'
 import { ScrollImage, parchment } from '@/components/scrolls/ScrollImage'
 import { ScrollSeal } from '@/components/scrolls/ScrollSeal'
 import { Button, Text, Touchable } from '@/components/ui'
-import { colors, fonts, radius, space } from '@/theme'
+import { fonts, makeStyles, radius, space, useColors } from '@/theme'
 
 type Item = { id: number; scrollId: string; count: number | null }
 
@@ -74,6 +74,8 @@ export function ScrollUnlockOverlay() {
 }
 
 function ScrollReveal({ item, onNext, onView }: { item: Item; onNext: () => void; onView: () => void }) {
+  const colors = useColors()
+  const styles = useStyles()
   const { t } = useTranslation()
   const reduced = useReducedMotion()
   const [opened, setOpened] = useState(false)
@@ -162,9 +164,10 @@ function ScrollReveal({ item, onNext, onView }: { item: Item; onNext: () => void
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   root: { ...StyleSheet.absoluteFill, zIndex: 1000, elevation: 1000 },
-  backdrop: { backgroundColor: 'rgba(6,10,22,0.94)' },
+  // Near-opaque, in the theme's background: the texts over it use the theme's text colors
+  backdrop: { backgroundColor: `${colors.bg}F0` },
   content: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: space.lg, paddingHorizontal: space.xl },
   stage: { width: W, height: H },
   map: { width: W, height: H, borderRadius: radius.md },
@@ -174,4 +177,4 @@ const styles = StyleSheet.create({
   name: { fontFamily: fonts.display, fontSize: 28, lineHeight: 34, letterSpacing: -0.5, color: colors.text, textAlign: 'center' },
   buttons: { alignItems: 'stretch', gap: space.sm, alignSelf: 'stretch' },
   secondary: { alignSelf: 'center', paddingVertical: space.sm, paddingHorizontal: space.lg },
-})
+}))

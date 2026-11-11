@@ -4,8 +4,8 @@
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
-  background: var(--bg-primary);
-  color: var(--text-primary);
+  background: var(--sd-bg);
+  color: var(--sd-ink);
   font-family: inherit;
 }
 
@@ -15,8 +15,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 14px 20px;
-  background: var(--bg-card);
-  border-bottom: 1px solid var(--border-color);
+  background: var(--sd-surface);
+  border-bottom: 1px solid var(--sd-line);
   gap: 12px;
 }
 
@@ -40,14 +40,16 @@
 }
 
 .voyage-country small {
+  font-family: var(--sd-font-mono);
   font-size: 0.68em;
-  color: var(--text-muted);
+  font-weight: 700;
+  color: var(--sd-muted);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.12em;
 }
 
-.voyage-start span { color: var(--success); }
-.voyage-target span { color: var(--warning); }
+.voyage-start span { color: var(--gg-success-strong); }
+.voyage-target span { color: var(--gg-warning-strong); }
 
 .voyage-stats {
   display: flex;
@@ -55,13 +57,14 @@
   align-items: center;
   gap: 4px;
   font-size: 0.8em;
-  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  color: var(--sd-muted);
 }
 
 .voyage-regen-btn {
   margin-top: 6px;
   background: color-mix(in srgb, var(--game-voyage-voyage) 14%, transparent);
-  color: var(--game-voyage-voyage);
+  color: var(--game-voyage-voyage-ink);
   border: 1px solid color-mix(in srgb, var(--game-voyage-voyage) 45%, transparent);
   padding: 5px 14px;
   border-radius: 20px;
@@ -73,7 +76,7 @@
 
 .voyage-regen-btn:hover {
   background: var(--game-voyage-voyage);
-  color: var(--bg-primary);
+  color: var(--gg-on-game);
   border-color: var(--game-voyage-voyage);
 }
 
@@ -82,7 +85,7 @@
   position: fixed;
   inset: 0;
   z-index: 2000;
-  background: rgba(10, 15, 30, 0.75);
+  background: var(--gg-glass);
   backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
@@ -92,8 +95,8 @@
 
 .voyage-modal {
   position: relative;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
+  background: var(--sd-surface);
+  border: 1px solid var(--sd-line);
   border-radius: 12px;
   padding: 28px 24px 24px;
   width: min(640px, 100%);
@@ -112,37 +115,37 @@
   right: 14px;
   background: none;
   border: none;
-  color: var(--text-muted);
+  color: var(--sd-muted);
   font-size: 1.1em;
   cursor: pointer;
   line-height: 1;
   padding: 4px;
 }
 
-.voyage-modal-close:hover { color: var(--text-primary); }
+.voyage-modal-close:hover { color: var(--sd-ink); }
 
 .voyage-modal-title {
   margin: 0;
   font-size: 0.95em;
-  color: var(--text-primary);
+  color: var(--sd-ink);
 }
 
 .voyage-modal-sub {
   margin: 0;
   font-size: 0.88em;
-  color: var(--text-muted);
+  color: var(--sd-muted);
 }
 
-.voyage-modal-sub strong { color: var(--warning); }
+.voyage-modal-sub strong { color: var(--gg-warning-strong); }
 
 .voyage-modal-new-game {
   margin-top: 8px;
   background: var(--game-voyage-voyage);
-  color: var(--bg-primary);
+  color: var(--gg-on-game);
   font-weight: 700;
   border: none;
   padding: 9px 24px;
-  border-radius: var(--radius-md);
+  border-radius: var(--sd-radius-md);
   font-size: 0.9em;
   cursor: pointer;
 }
@@ -151,7 +154,7 @@
 
 .voyage-regen-btn--results {
   background: color-mix(in srgb, var(--game-voyage-voyage) 14%, transparent);
-  color: var(--game-voyage-voyage);
+  color: var(--game-voyage-voyage-ink);
   border-color: var(--game-voyage-voyage);
 }
 
@@ -163,9 +166,9 @@
 
 /* Labels sur la carte */
 .voyage-map-label {
-  background: rgba(11, 16, 32, 0.85) !important;
-  border: 1px solid var(--border-strong) !important;
-  color: var(--text-primary) !important;
+  background: var(--gg-glass) !important;
+  border: 1px solid var(--gg-line-strong) !important;
+  color: var(--sd-ink) !important;
   font-size: 0.72em !important;
   padding: 2px 6px !important;
   border-radius: 4px !important;
@@ -180,13 +183,13 @@
   flex-wrap: wrap;
   gap: 4px;
   padding: 10px 16px;
-  background: var(--bg-primary);
-  border-top: 1px solid var(--bg-card);
+  background: var(--sd-bg);
+  border-top: 1px solid var(--sd-surface);
   min-height: 44px;
 }
 
 .voyage-chain-sep {
-  color: var(--border-color);
+  color: var(--sd-line);
   font-size: 1em;
 }
 
@@ -206,12 +209,12 @@
 }
 
 /* Couleurs Travle */
-.voyage-chain-badge--start  { background: color-mix(in srgb, var(--game-voyage-voyage) 18%, transparent); color: var(--game-voyage-voyage); }
-.voyage-chain-badge--green  { background: #166534; color: var(--success); }
-.voyage-chain-badge--yellow { background: #78350f; color: var(--warning); }
-.voyage-chain-badge--red          { background: #450a0a; color: var(--danger); text-decoration: line-through; opacity: 0.75; }
-.voyage-chain-badge--missed       { background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border-color); }
-.voyage-chain-badge--hint-initial { background: var(--bg-card); color: var(--text-muted); border: 1px dashed var(--border-strong); font-weight: 700; min-width: 24px; justify-content: center; }
+.voyage-chain-badge--start  { background: color-mix(in srgb, var(--game-voyage-voyage-ink) 18%, transparent); color: var(--game-voyage-voyage-ink); }
+.voyage-chain-badge--green  { background: var(--gg-success-soft); color: var(--gg-success-strong); }
+.voyage-chain-badge--yellow { background: var(--gg-warning-soft); color: var(--gg-warning-strong); }
+.voyage-chain-badge--red          { background: var(--gg-danger-soft); color: var(--gg-danger-strong); text-decoration: line-through; opacity: 0.75; }
+.voyage-chain-badge--missed       { background: var(--sd-surface); color: var(--sd-muted); border: 1px solid var(--sd-line); }
+.voyage-chain-badge--hint-initial { background: var(--sd-surface); color: var(--sd-muted); border: 1px dashed var(--gg-line-strong); font-weight: 700; min-width: 24px; justify-content: center; }
 
 /* Bloc des erreurs séparé visuellement */
 .voyage-chain-wrongs {
@@ -220,13 +223,13 @@
   gap: 4px;
   margin-left: 12px;
   padding-left: 12px;
-  border-left: 1px solid var(--border-color);
+  border-left: 1px solid var(--sd-line);
 }
 
 .voyage-chain-empty {
-  background: var(--bg-card);
-  border: 1px dashed var(--border-strong);
-  color: var(--text-muted);
+  background: var(--sd-surface);
+  border: 1px dashed var(--gg-line-strong);
+  color: var(--sd-muted);
   padding: 3px 10px;
   border-radius: 12px;
   font-size: 0.8em;
@@ -237,15 +240,15 @@
   display: flex;
   gap: 8px;
   padding: 12px 16px;
-  background: var(--bg-card);
-  border-top: 1px solid var(--border-color);
+  background: var(--sd-surface);
+  border-top: 1px solid var(--sd-line);
 }
 
 .voyage-input-row input {
   flex: 1;
-  background: var(--bg-primary);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
+  background: var(--sd-bg);
+  border: 1px solid var(--sd-line);
+  color: var(--sd-ink);
   padding: 9px 12px;
   border-radius: 6px;
   font-size: 0.9em;
@@ -258,16 +261,16 @@
 }
 
 .voyage-input-row input::placeholder {
-  color: var(--border-strong);
+  color: var(--gg-line-strong);
 }
 
 .voyage-input-row button {
   background: var(--game-voyage-voyage);
-  color: var(--bg-primary);
+  color: var(--gg-on-game);
   font-weight: 700;
   border: none;
   padding: 9px 18px;
-  border-radius: var(--radius-md);
+  border-radius: var(--sd-radius-md);
   font-size: 0.9em;
   cursor: pointer;
   transition: background 0.15s;
@@ -283,14 +286,14 @@
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background: var(--bg-primary);
-  border-top: 1px solid var(--bg-card);
+  background: var(--sd-bg);
+  border-top: 1px solid var(--sd-surface);
   flex-wrap: wrap;
 }
 
 .voyage-hints-label {
   font-size: 0.75em;
-  color: var(--border-strong);
+  color: var(--gg-line-strong);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   flex-shrink: 0;
@@ -300,9 +303,9 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: var(--bg-card);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
+  background: var(--sd-surface);
+  color: var(--sd-ink);
+  border: 1px solid var(--sd-line);
   padding: 5px 12px;
   border-radius: 20px;
   font-size: 0.8em;
@@ -311,9 +314,9 @@
 }
 
 .voyage-hint-btn:hover:not(:disabled) {
-  background: var(--border-color);
-  border-color: var(--text-muted);
-  color: var(--text-primary);
+  background: var(--sd-line);
+  border-color: var(--sd-muted);
+  color: var(--sd-ink);
 }
 
 .voyage-hint-btn:disabled,
@@ -330,8 +333,8 @@
 /* ───── Wrapper input + suggestions ───── */
 .voyage-input-wrapper {
   position: relative;
-  background: var(--bg-card);
-  border-top: 1px solid var(--border-color);
+  background: var(--sd-surface);
+  border-top: 1px solid var(--sd-line);
 }
 
 /* ───── Liste d'autocomplétion ───── */
@@ -343,8 +346,8 @@
   margin: 0;
   padding: 4px 0;
   list-style: none;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
+  background: var(--sd-surface);
+  border: 1px solid var(--sd-line);
   border-bottom: none;
   border-radius: 8px 8px 0 0;
   max-height: 280px;
@@ -359,14 +362,14 @@
   padding: 9px 14px;
   cursor: pointer;
   font-size: 0.88em;
-  color: var(--text-primary);
+  color: var(--sd-ink);
   transition: background 0.1s;
 }
 
 .voyage-suggestions li:hover,
 .voyage-suggestions li.active {
-  background: var(--border-color);
-  color: var(--text-primary);
+  background: var(--sd-line);
+  color: var(--sd-ink);
 }
 
 .voyage-suggestions li img {
@@ -377,7 +380,7 @@
 
 /* ───── Résultat (dans la modal) ───── */
 .voyage-result-perfect {
-  color: var(--success);
+  color: var(--gg-success-strong);
   font-weight: 700;
   font-size: 1.05em;
   margin: 0;
@@ -386,12 +389,12 @@
 .voyage-optimal {
   width: 100%;
   padding-top: 10px;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid var(--sd-line);
 }
 
 .voyage-optimal-label {
   font-size: 0.78em;
-  color: var(--text-muted);
+  color: var(--sd-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   display: block;

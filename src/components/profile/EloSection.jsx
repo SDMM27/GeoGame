@@ -4,17 +4,18 @@ import { useTranslation } from 'react-i18next'
 import { usePlayerElo } from '../../hooks/usePlayerElo'
 import { formatSeason } from '../../utils/elo'
 import { GAME_TYPES } from '../../utils/gameTypes'
+import GameEmblem from '../GameEmblem'
 import CollapsibleSection from '../CollapsibleSection'
 
 const ELO_META = {
-  duel: { emoji: '⚔️', titleKey: 'elo.duel', color: '#7AA2FF' },
-  [GAME_TYPES.PLACEMENT]: { emoji: '🌍', titleKey: 'games.placement.title', color: '#7AA2FF' },
-  [GAME_TYPES.HARDCORE]: { emoji: '🌍', titleKey: 'games.hardcore.title', color: '#FF9F45' },
-  [GAME_TYPES.FLAGS]: { emoji: '🚩', titleKey: 'games.flags.title', color: '#FF7A6B' },
-  [GAME_TYPES.MISSING_FLAG]: { emoji: '🧩', titleKey: 'games.missing_flag.title', color: '#C792FF' },
-  [GAME_TYPES.CAPITALS]: { emoji: '🏛️', titleKey: 'games.capitals.title', color: '#F5B83D' },
-  [GAME_TYPES.BORDER_GUESS]: { emoji: '🧭', titleKey: 'games.border_guess.title', color: '#C792FF' },
-  [GAME_TYPES.SURVIVAL]: { emoji: '❤️', titleKey: 'games.survival.title', color: '#FF5C7A' },
+  duel: { emoji: '⚔️', titleKey: 'elo.duel', color: 'var(--game-placement)', ink: 'var(--game-placement-ink)' },
+  [GAME_TYPES.PLACEMENT]: { titleKey: 'games.placement.title', color: 'var(--game-placement)', ink: 'var(--game-placement-ink)' },
+  [GAME_TYPES.HARDCORE]: { titleKey: 'games.hardcore.title', color: 'var(--game-daily-challenge)', ink: 'var(--game-daily-challenge-ink)' },
+  [GAME_TYPES.FLAGS]: { titleKey: 'games.flags.title', color: 'var(--game-flags)', ink: 'var(--game-flags-ink)' },
+  [GAME_TYPES.MISSING_FLAG]: { titleKey: 'games.missing_flag.title', color: 'var(--game-border-guess)', ink: 'var(--game-border-guess-ink)' },
+  [GAME_TYPES.CAPITALS]: { titleKey: 'games.capitals.title', color: 'var(--game-capitals)', ink: 'var(--game-capitals-ink)' },
+  [GAME_TYPES.BORDER_GUESS]: { titleKey: 'games.border_guess.title', color: 'var(--game-border-guess)', ink: 'var(--game-border-guess-ink)' },
+  [GAME_TYPES.SURVIVAL]: { titleKey: 'games.survival.title', color: 'var(--game-survival)', ink: 'var(--game-survival-ink)' },
 }
 
 export default function EloSection({ uid, scope }) {
@@ -40,12 +41,14 @@ export default function EloSection({ uid, scope }) {
           }
           return (
             <li key={entry.key} className="profile-game-row">
-              <span className="profile-game-icon" style={{ background: `${meta.color}1F` }}>{meta.emoji}</span>
+              {meta.emoji
+                ? <span className="profile-game-icon" style={{ background: `color-mix(in srgb, ${meta.color} 12%, transparent)` }}>{meta.emoji}</span>
+                : <GameEmblem game={entry.key} size={38} />}
               <div className="profile-game-main">
                 <strong>{t(meta.titleKey)}</strong>
                 <small>{detail}</small>
               </div>
-              <strong className="profile-game-best" style={{ color: meta.color }}>{entry.rating}</strong>
+              <strong className="profile-game-best" style={{ color: meta.ink }}>{entry.rating}</strong>
             </li>
           )
         })}

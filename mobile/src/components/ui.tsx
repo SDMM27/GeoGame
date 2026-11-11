@@ -5,7 +5,6 @@ import {
   ActivityIndicator,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text as RNText,
   View,
   type PressableProps,
@@ -16,7 +15,7 @@ import {
 } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
 
-import { colors, fonts, radius, space } from '@/theme'
+import { fonts, makeStyles, radius, space, useColors } from '@/theme'
 
 type TextVariant = 'hero' | 'title' | 'heading' | 'body' | 'bodyStrong' | 'caption' | 'label' | 'number'
 
@@ -26,8 +25,8 @@ const textStyles: Record<TextVariant, TextStyle> = {
   heading: { fontFamily: fonts.displayMedium, fontSize: 20, lineHeight: 26, letterSpacing: -0.2 },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 21 },
   bodyStrong: { fontFamily: fonts.bodyBold, fontSize: 15, lineHeight: 21 },
-  caption: { fontFamily: fonts.body, fontSize: 13, lineHeight: 18, color: colors.textMuted },
-  label: { fontFamily: fonts.bodyBold, fontSize: 12, lineHeight: 16, letterSpacing: 0.6, textTransform: 'uppercase', color: colors.textMuted },
+  caption: { fontFamily: fonts.body, fontSize: 13, lineHeight: 18 },
+  label: { fontFamily: fonts.bodyBold, fontSize: 12, lineHeight: 16, letterSpacing: 0.6, textTransform: 'uppercase' },
   number: { fontFamily: fonts.display, fontSize: 22, lineHeight: 26, fontVariant: ['tabular-nums'] },
 }
 
@@ -37,7 +36,9 @@ export function Text({
   style,
   ...props
 }: TextProps & { variant?: TextVariant; color?: string }) {
-  return <RNText {...props} style={[{ color: colors.text }, textStyles[variant], color ? { color } : null, style]} />
+  const colors = useColors()
+  const ink = variant === 'caption' || variant === 'label' ? colors.textMuted : colors.text
+  return <RNText {...props} style={[{ color: ink }, textStyles[variant], color ? { color } : null, style]} />
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
@@ -96,6 +97,8 @@ export function Button({
   style?: StyleProp<ViewStyle>
   color?: string
 }) {
+  const colors = useColors()
+  const buttonStyles = useButtonStyles()
   const background =
     variant === 'primary' ? (color ?? colors.accent) : variant === 'danger' ? colors.danger : variant === 'secondary' ? colors.surfaceHigh : 'transparent'
   const foreground =
@@ -126,7 +129,7 @@ export function Button({
   )
 }
 
-const buttonStyles = StyleSheet.create({
+const useButtonStyles = makeStyles((colors) => ({
   base: {
     minHeight: 52,
     paddingHorizontal: space.xl,
@@ -137,13 +140,14 @@ const buttonStyles = StyleSheet.create({
     gap: space.sm,
   },
   secondary: { borderWidth: 1, borderColor: colors.border },
-})
+}))
 
 export function Card({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
+  const cardStyles = useCardStyles()
   return <View style={[cardStyles.card, style]}>{children}</View>
 }
 
-const cardStyles = StyleSheet.create({
+const useCardStyles = makeStyles((colors) => ({
   card: {
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
@@ -151,7 +155,7 @@ const cardStyles = StyleSheet.create({
     borderColor: colors.border,
     padding: space.lg,
   },
-})
+}))
 
 // Segmented control (e.g. Standard / Ascension)
 export function Segmented<T extends string>({
@@ -163,6 +167,8 @@ export function Segmented<T extends string>({
   value: T
   onChange: (value: T) => void
 }) {
+  const colors = useColors()
+  const segmentStyles = useSegmentStyles()
   // Segments share the width; when their labels don't fit (narrow phone, long translation, large font) the row scrolls.
   return (
     <View style={segmentStyles.track}>
@@ -187,7 +193,7 @@ export function Segmented<T extends string>({
   )
 }
 
-const segmentStyles = StyleSheet.create({
+const useSegmentStyles = makeStyles((colors) => ({
   track: {
     backgroundColor: colors.bg,
     borderRadius: radius.md,
@@ -198,13 +204,14 @@ const segmentStyles = StyleSheet.create({
   row: { flexGrow: 1 },
   item: { flexGrow: 1, paddingVertical: 9, paddingHorizontal: 10, alignItems: 'center', borderRadius: radius.sm },
   itemActive: { backgroundColor: colors.surfaceHigh },
-})
+}))
 
-export function Pill({ label, color = colors.textMuted, background = colors.surfaceHigh, icon }: { label: string; color?: string; background?: string; icon?: ReactNode }) {
+export function Pill({ label, color, background, icon }: { label: string; color?: string; background?: string; icon?: ReactNode }) {
+  const colors = useColors()
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: background, borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 5 }}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: background ?? colors.surfaceHigh, borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 5 }}>
       {icon}
-      <Text variant="caption" color={color} style={{ fontFamily: fonts.bodyBold, fontSize: 12 }}>
+      <Text variant="caption" color={color ?? colors.textMuted} style={{ fontFamily: fonts.bodyBold, fontSize: 12 }}>
         {label}
       </Text>
     </View>

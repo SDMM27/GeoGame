@@ -6,7 +6,7 @@ import { Image } from 'expo-image'
 import { Redirect, router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, View } from 'react-native'
+import { KeyboardAvoidingView, Platform, ScrollView, TextInput, View } from 'react-native'
 import Animated, { FadeIn, FadeInDown, ZoomIn } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -31,18 +31,18 @@ import { useAccount } from '@/account/auth'
 import { announce } from '@/a11y'
 import { DailyLeaderboard } from '@/components/game/DailyLeaderboard'
 import { DailyPlayedElsewhere } from '@/components/game/DailyPlayedElsewhere'
-import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
+import { GameHud } from '@/components/game/GameHud'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
+import { type EscaleState } from '@/components/flight'
 import { Button, Segmented, Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
-import { DIFFICULTY_COLORS } from '@/games'
+import { useDifficultyColors } from '@/games'
 import { useElapsed } from '@/hooks/useElapsed'
 import { clean } from '@/i18n'
 import { RoomGate, RoomHudPill, Standings, useReportFound, type RoomPlay } from '@/multiplayer/RoomPlay'
 import { navigate } from '@/shims/react-router-dom'
-import { colors, fonts, gameColors, radius, space } from '@/theme'
+import { fonts, makeStyles, radius, space, useColors, useTheme } from '@/theme'
 
-const ACCENT = gameColors.quiz
 const MODE_STORAGE_KEY = 'geogame_quiz_mode'
 
 type AnswerMode = 'choices' | 'free'
@@ -58,6 +58,9 @@ function loadMode(): AnswerMode {
 }
 
 function DifficultyBadge({ difficulty }: { difficulty: string }) {
+  const styles = useStyles()
+  const colors = useColors()
+  const DIFFICULTY_COLORS = useDifficultyColors()
   const { t } = useTranslation()
   const color = DIFFICULTY_COLORS[difficulty] ?? colors.textMuted
   return (
@@ -84,6 +87,8 @@ function AnswerInput({
   state?: 'correct' | 'wrong'
   inputRef?: React.RefObject<TextInput | null>
 }) {
+  const styles = useStyles()
+  const colors = useColors()
   const { t } = useTranslation()
   const tint = state === 'correct' ? colors.accent : state === 'wrong' ? colors.danger : null
   return (
@@ -117,6 +122,8 @@ function Feedback({
   lines: (string | null | false | undefined)[]
   spoken: string
 }) {
+  const styles = useStyles()
+  const colors = useColors()
   const tint = correct ? colors.accent : colors.danger
   // Mounted when the answer is revealed.
   useEffect(() => announce(spoken), []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -137,6 +144,9 @@ function Feedback({
 // ─── Daily question ────────────────────────────────────────────────────────
 
 function DailyQuiz() {
+  const styles = useStyles()
+  const colors = useColors()
+  const ACCENT = useTheme().gameColors.quiz
   const { t, i18n } = useTranslation()
   const insets = useSafeAreaInsets()
   const {
@@ -209,7 +219,7 @@ function DailyQuiz() {
 
   if (elsewhere.checking || elsewhere.game) {
     return (
-      <DailyPlayedElsewhere title={t('quiz.daily_title')} game={elsewhere.game} accent={ACCENT}>
+      <DailyPlayedElsewhere gameId="quiz" title={t('quiz.daily_title')} game={elsewhere.game} accent={ACCENT}>
         {dailyKey && <DailyLeaderboard gameType={GAME_TYPES.QUIZ} dailyKey={dailyKey} />}
       </DailyPlayedElsewhere>
     )
@@ -217,12 +227,29 @@ function DailyQuiz() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
+      {!isComplete && (
+        <GameHud
+          game="quiz"
+          title={t('games.quiz.title')}
+          tag={t('mobile.home.daily').toLocaleUpperCase()}
+          confirmQuit={false}
+          cells={
+            hasStarted
+              ? [
+                  { label: clean(t('labels.time')).replace(/\s*:$/, '').toUpperCase(), value: formatTime(elapsed).slice(0, 5), color: colors.accent },
+                  { label: clean(t('labels.attempts')).toUpperCase(), value: `${attemptsLeft}`, color: colors.gold },
+                  { label: clean(t('labels.hints')).replace(/\s*:$/, '').toUpperCase(), value: `${hintsUsed}/${MAX_HINTS}` },
+                ]
+              : []
+          }
+        />
+      )}
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <ScrollView
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={[styles.content, { paddingTop: insets.top + 42 + space.md, paddingBottom: insets.bottom + space.xl }]}>
+          contentContainerStyle={[styles.content, { paddingTop: space.sm, paddingBottom: insets.bottom + space.xl }]}>
           <Text variant="label" color={ACCENT}>
-            {t('mobile.home.daily')} · {t('games.quiz.title')}
+            {t('mobile.home.daily')}
           </Text>
 
           {localized && (
@@ -317,16 +344,10 @@ function DailyQuiz() {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {!isComplete && (
-        <GameTopBar confirmQuit={false}>
-          {hasStarted && <HudPill icon="timer-outline" label={formatTime(elapsed).slice(0, 5)} />}
-          {hasStarted && <HudPill icon="target" label={`${attemptsLeft}`} color={ACCENT} />}
-          {hasStarted && <HudPill icon="lightbulb-on-outline" label={`${hintsUsed}/${MAX_HINTS}`} />}
-        </GameTopBar>
-      )}
-
       {isComplete && (
         <ResultsSheet
+          game="quiz"
+          ticketNote={t('mobile.home.daily')}
           title={isSolved ? t('mobile.quiz.found') : t('mobile.quiz.not_found')}
           score={attempts + hintsUsed}
           scoreLabel={t('share.score_attempts')}
@@ -385,6 +406,9 @@ function DifficultyPicker({
   initialTheme: Theme
   country: string | null
 }) {
+  const styles = useStyles()
+  const ACCENT = useTheme().gameColors.quiz
+  const DIFFICULTY_COLORS = useDifficultyColors()
   const { t, i18n } = useTranslation()
   const [mode, setMode] = useState<AnswerMode>(loadMode)
   const [theme, setTheme] = useState<Theme>(initialTheme)
@@ -464,6 +488,9 @@ function PracticeQuiz({
   presetTheme?: Theme
   presetCountry?: string | null
 }) {
+  const styles = useStyles()
+  const colors = useColors()
+  const ACCENT = useTheme().gameColors.quiz
   const { t, i18n } = useTranslation()
   const insets = useSafeAreaInsets()
   const {
@@ -538,6 +565,12 @@ function PracticeQuiz({
     if (isFree) inputRef.current?.focus()
   }, [question, isFree])
 
+  // Room: one segment per question (answered right/wrong are not kept per question, so the answered ones are « done »).
+  const escales: EscaleState[] =
+    play && maxDifficulty && questionCount > 0 && questionCount <= 24
+      ? Array.from({ length: questionCount }, (_, index) => (index < stats.answered ? 'good' : index === stats.answered ? 'current' : 'todo'))
+      : []
+
   const choiceStyle = (id: string) => {
     if (hidden.includes(id)) return { opacity: 0.2 }
     if (!isAnswered || !current) return null
@@ -548,16 +581,40 @@ function PracticeQuiz({
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
+      {!isFinished && (
+        <GameHud
+          game="quiz"
+          title={isHistory ? t('quiz.history.title') : t('games.quiz.title')}
+          tag={(play ? t('mobile.tabs.multiplayer') : t('mobile.home.infinite')).toLocaleUpperCase()}
+          confirmQuit={stats.answered > 0}
+          onQuit={play?.exit}
+          right={play && maxDifficulty ? <RoomHudPill code={play.room.id} gameIndex={play.room.gameIndex} /> : undefined}
+          cells={
+            maxDifficulty
+              ? [
+                  {
+                    label: t('mobile.flight.stop').toLocaleUpperCase(),
+                    value: play ? `${String(Math.min(stats.answered + (isAnswered ? 0 : 1), questionCount)).padStart(2, '0')}/${questionCount}` : String(stats.answered + (isAnswered ? 0 : 1)),
+                    color: colors.gold,
+                  },
+                  { label: t('mobile.flight.streak').toLocaleUpperCase(), value: `${stats.streak}`, color: stats.streak >= 3 ? colors.accent : colors.text },
+                  { label: clean(t('labels.score')).replace(/\s*:$/, '').toUpperCase(), value: `${stats.score}` },
+                ]
+              : []
+          }
+          states={escales.length > 0 ? escales : undefined}
+          progressLabel={play ? t('mobile.multi.question', { n: Math.min(stats.answered + (isAnswered ? 0 : 1), questionCount), total: questionCount }) : undefined}
+        />
+      )}
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <ScrollView
           ref={scrollRef}
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={[styles.content, { paddingTop: insets.top + 42 + space.md, paddingBottom: insets.bottom + space.xl }]}>
+          contentContainerStyle={[styles.content, { paddingTop: space.sm, paddingBottom: insets.bottom + space.xl }]}>
           <Text variant="label" color={ACCENT}>
             {play
               ? t('mobile.multi.question', { n: Math.min(stats.answered + (isAnswered ? 0 : 1), questionCount), total: questionCount })
-              : t('mobile.home.infinite')}{' '}
-            · {isHistory ? t('quiz.history.title') : t('games.quiz.title')}
+              : t('mobile.home.infinite')}
           </Text>
 
           {!maxDifficulty && !play && (
@@ -704,21 +761,11 @@ function PracticeQuiz({
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {!isFinished && (
-        <GameTopBar confirmQuit={stats.answered > 0} onQuit={play?.exit ?? (() => navigate('/'))}>
-          {maxDifficulty && (
-            <>
-              {play && <RoomHudPill code={play.room.id} gameIndex={play.room.gameIndex} />}
-              <HudPill icon="star-outline" label={`${stats.score}`} color={ACCENT} />
-              <HudPill icon="check" label={`${stats.correct}/${stats.answered}`} />
-              <HudPill icon="fire" label={`${stats.streak}`} color={stats.streak >= 3 ? colors.warning : colors.text} />
-            </>
-          )}
-        </GameTopBar>
-      )}
-
       {isFinished && maxDifficulty && (
         <ResultsSheet
+          game="quiz"
+          ticketNote={play ? t('mobile.tabs.multiplayer') : t('mobile.home.infinite')}
+          states={escales}
           title={t('quiz.summary_title')}
           score={stats.score}
           scoreLabel={t('units.pts')}
@@ -776,7 +823,7 @@ export default function QuizScreen() {
   return mode === 'infinite' ? <PracticeQuiz presetTheme={presetTheme} presetCountry={presetCountry} /> : <DailyQuiz />
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   content: { paddingHorizontal: space.xl, gap: space.lg },
   card: {
     gap: space.lg,
@@ -845,4 +892,4 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: colors.border,
   },
-})
+}))

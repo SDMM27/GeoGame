@@ -6,7 +6,7 @@ import { Image } from 'expo-image'
 import { useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -16,21 +16,21 @@ import { useDailyPlayedElsewhere } from '@shared/hooks/useDailyPlayedElsewhere'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
 
 import { announce } from '@/a11y'
-import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
 import { useAccount } from '@/account/auth'
 import { RankingLeaderboard } from '@/components/game/RankingLeaderboard'
 import { DailyPlayedElsewhere } from '@/components/game/DailyPlayedElsewhere'
+import { GameHud } from '@/components/game/GameHud'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
 import { SortableList } from '@/components/game/SortableList'
 import { type CountryFeature } from '@/components/map/geometry'
+import { type EscaleState } from '@/components/flight'
 import { Button, Text, Touchable } from '@/components/ui'
-import { DIFFICULTY_COLORS } from '@/games'
 import { getFlag } from '@/flags'
+import { useDifficultyColors } from '@/games'
 import { clean } from '@/i18n'
 import { navigate } from '@/shims/react-router-dom'
-import { colors, gameColors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors, useTheme } from '@/theme'
 
-const ACCENT = gameColors.ranking
 const ROW_HEIGHT = 54
 const ROW_GAP = space.sm
 const MIN_COUNT = 3
@@ -56,7 +56,7 @@ const CATEGORIES: { key: Criterion['key'] | null; icon: IconName }[] = [
 ]
 
 // Same ranges as the website slider.
-const COUNT_PRESETS = [
+const countPresets = (DIFFICULTY_COLORS: Record<string, string>) => [
   { labelKey: 'difficulties.easy_range', value: 5, color: DIFFICULTY_COLORS.Facile, active: (n: number) => n <= 5 },
   { labelKey: 'difficulties.medium_range', value: 9, color: DIFFICULTY_COLORS.Moyen, active: (n: number) => n >= 6 && n <= 12 },
   { labelKey: 'difficulties.hard_range', value: 15, color: DIFFICULTY_COLORS.Difficile, active: (n: number) => n >= 13 },
@@ -77,6 +77,9 @@ function CountryRow({
   state?: 'correct' | 'wrong'
   draggable?: boolean
 }) {
+  const ACCENT = useTheme().gameColors.ranking
+  const styles = useStyles()
+  const colors = useColors()
   const flag = getFlag(country.properties.ISO_A2)
   const tint = state === 'correct' ? colors.accent : state === 'wrong' ? colors.danger : null
   const { t } = useTranslation()
@@ -110,6 +113,8 @@ function CorrectRanking({
   values: Map<string, string>
   title?: string
 }) {
+  const styles = useStyles()
+  const colors = useColors()
   const { t, i18n } = useTranslation()
   return (
     <View style={styles.card}>
@@ -146,6 +151,9 @@ function CorrectRanking({
 
 // Daily: the points of each criterion.
 function StageSummary({ stages }: { stages: StageResult[] }) {
+  const ACCENT = useTheme().gameColors.ranking
+  const styles = useStyles()
+  const colors = useColors()
   const { t } = useTranslation()
   return (
     <View style={styles.card}>
@@ -169,6 +177,10 @@ function StageSummary({ stages }: { stages: StageResult[] }) {
 }
 
 function InfiniteSetup({ count, onCount, onPick }: { count: number; onCount: (n: number) => void; onPick: (key: Criterion['key'] | null) => void }) {
+  const ACCENT = useTheme().gameColors.ranking
+  const COUNT_PRESETS = countPresets(useDifficultyColors())
+  const styles = useStyles()
+  const colors = useColors()
   const { t } = useTranslation()
   return (
     <View style={{ gap: space.lg }}>
@@ -218,6 +230,9 @@ function InfiniteSetup({ count, onCount, onPick }: { count: number; onCount: (n:
 }
 
 export default function RankingScreen() {
+  const ACCENT = useTheme().gameColors.ranking
+  const styles = useStyles()
+  const colors = useColors()
   const { t, i18n } = useTranslation()
   const insets = useSafeAreaInsets()
   const { mode = 'daily' } = useLocalSearchParams<{ mode?: string }>()
@@ -260,6 +275,11 @@ export default function RankingScreen() {
   const crit = criterion as Criterion | null
   const isSubmitted = status === 'submitted'
   const stages = stageResults as StageResult[]
+  const modeLabel = (isDaily ? t('mobile.home.daily') : t('mobile.home.infinite')).toUpperCase()
+  // One segment per criterion: done, the current one in gold.
+  const stageStates: EscaleState[] = Array.from({ length: Math.max(stageCount, 1) }, (_, index) =>
+    index < stages.length ? 'good' : index === stageIndex ? 'current' : 'todo',
+  )
   const positionsLabel = (count: number) => t('units.position', { count })
 
   // Spoken: the outcome of a validated order (the rows only show it with colours and icons)
@@ -270,7 +290,7 @@ export default function RankingScreen() {
 
   if (elsewhere.checking || elsewhere.game) {
     return (
-      <DailyPlayedElsewhere title={t('ranking.title')} game={elsewhere.game} accent={ACCENT}>
+      <DailyPlayedElsewhere gameId="ranking" title={t('ranking.title')} game={elsewhere.game} accent={ACCENT}>
         {dailyKey && <RankingLeaderboard dailyKey={dailyKey} />}
       </DailyPlayedElsewhere>
     )
@@ -278,10 +298,26 @@ export default function RankingScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
-      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + 42 + space.md, paddingBottom: insets.bottom + space.xl }]}>
-        <Text variant="label" color={ACCENT}>
-          {isDaily ? t('mobile.home.daily') : t('mobile.home.infinite')} · {t('ranking.title')}
-        </Text>
+      {!(isSubmitted && isDaily) && (
+        <GameHud
+          game="ranking"
+          title={t('ranking.title')}
+          tag={modeLabel}
+          confirmQuit={false}
+          cells={
+            crit
+              ? [
+                  { label: clean(t('labels.criterion')).toUpperCase(), value: `${stageIndex + 1}/${stageCount}`, color: colors.gold },
+                  { label: t('units.attempt_one').toLocaleUpperCase(), value: `${attemptNumber}/${maxAttempts}` },
+                  { label: t('mobile.flight.mode').toLocaleUpperCase(), value: modeLabel.slice(0, 5), color: ACCENT },
+                ]
+              : []
+          }
+          states={crit ? stageStates : undefined}
+          progressLabel={`${stageIndex + 1} / ${stageCount}`}
+        />
+      )}
+      <ScrollView contentContainerStyle={[styles.content, { paddingTop: space.sm, paddingBottom: insets.bottom + space.xl }]}>
 
         {status === 'choosing-category' && (
           <InfiniteSetup count={countryCount} onCount={setCountryCount} onPick={(key) => startInfiniteRound(key)} />
@@ -384,14 +420,12 @@ export default function RankingScreen() {
         )}
       </ScrollView>
 
-      {!(isSubmitted && isDaily) && (
-        <GameTopBar confirmQuit={false}>
-          {status === 'playing' && <HudPill icon="target" label={`${attemptNumber} / ${maxAttempts}`} color={ACCENT} />}
-        </GameTopBar>
-      )}
-
       {isSubmitted && isDaily && dailyKey && score != null && (
         <ResultsSheet
+          game="ranking"
+          ticketNote={`${t('mobile.home.daily')} · ${stageCount} ${stageCount === 1 ? t('mobile.flight.stop') : t('mobile.flight.stops')}`.toLocaleUpperCase()}
+          states={stageStates}
+          tone={score > 0 ? 'ok' : 'bad'}
           title={score > 0 ? t('mobile.ranking.solved') : t('mobile.ranking.failed')}
           score={score}
           scoreLabel={t('units.pts')}
@@ -441,7 +475,7 @@ export default function RankingScreen() {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   content: { paddingHorizontal: space.xl, gap: space.lg },
   criterion: {
     alignItems: 'center',
@@ -505,4 +539,4 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-})
+}))

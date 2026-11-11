@@ -49,7 +49,34 @@
     "games_subtitle": "Elige tu dificultad o tu continente",
     "daily": "Reto del día",
     "infinite": "Infinito",
-    "multi": "Jugar en multijugador"
+    "multi": "Jugar en multijugador",
+    "hero_lead": "{{count}} retos al día, un pasaporte que llenar, salas multijugador. El mismo mundo para todos, en 9 idiomas.",
+    "next_departure": "Próxima salida",
+    "globe_score": "Puntos",
+    "board_cta": "Embarcar en el reto del día",
+    "passes_title": "Tarjetas de embarque del día",
+    "passes_note": "{{count}} vuelos · mismos retos para todos",
+    "boarding_pass": "Tarjeta de embarque",
+    "gate": "Puerta",
+    "departure": "Salida",
+    "board": "Embarcar",
+    "passport_title": "Tu pasaporte",
+    "passport_intro": "Cada misión cumplida sella tu pasaporte: XP, niveles, marcos y colores por desbloquear. La liga semanal reparte fragmentos de banderas.",
+    "passport_example": "Ejemplo de página de pasaporte",
+    "stamp_level": "Nivel",
+    "stamp_xp": "{{count}} XP",
+    "stamp_streak": "Racha",
+    "stamp_today": "Hoy",
+    "stamp_dailies": "Retos del día",
+    "stamp_won": "Ganados",
+    "special_flight": "Vuelo especial",
+    "board_title": "Panel de salidas",
+    "col_destination": "Destino",
+    "col_brief": "En breve",
+    "col_status": "Estado",
+    "status_boarding": "Embarcando",
+    "status_on_time": "A tiempo",
+    "status_open": "Abierto"
   },
   "games": {
     "daily_challenge": {
@@ -206,6 +233,7 @@
     "unknown": "Desconocido"
   },
   "game_hud": {
+    "flight": "VUELO {{code}}",
     "target_country": "PAÍS A ENCONTRAR",
     "score": "PUNTOS",
     "time": "TIEMPO",
@@ -350,7 +378,12 @@
   "not_found": {
     "title": "Página no encontrada",
     "message": "Esta página no existe o se ha movido.",
-    "home": "Volver al inicio"
+    "home": "Volver al inicio",
+    "cancelled": "Vuelo cancelado",
+    "flight": "Vuelo",
+    "gate": "Puerta",
+    "status": "Estado",
+    "status_cancelled": "Cancelado"
   },
   "units": {
     "pt": "pt",
@@ -396,7 +429,11 @@
     "code_placeholder": "CÓDIGO",
     "create_title": "Crear una partida",
     "create_subtitle": "Elige un juego e invita a tus amigos con el código",
-    "recent_title": "Partidas recientes"
+    "recent_title": "Partidas recientes",
+    "kicker": "Terminal · Multijugador",
+    "desk_join": "Mostrador A · Facturación",
+    "desk_create": "Mostrador B · Vuelo nuevo",
+    "desk_recent": "Vuelos recientes"
   },
   "lobby": {
     "connecting": "Conectando..."
@@ -404,7 +441,8 @@
   "config": {
     "title": "Configurar la partida",
     "creating": "Creando...",
-    "typing_tolerance_note": "⚠️ En los juegos de escritura (banderas, capitales), la primera duda por país se tolera y no afecta a la puntuación: ¡los errores de tecleo pasan!"
+    "typing_tolerance_note": "⚠️ En los juegos de escritura (banderas, capitales), la primera duda por país se tolera y no afecta a la puntuación: ¡los errores de tecleo pasan!",
+    "kicker": "Tarjeta de embarque"
   },
   "stats": {
     "first_try": "🎯 A la primera",
@@ -734,7 +772,9 @@
       "room": "Sala",
       "open_room": "Abrir la sala",
       "close": "Cerrar"
-    }
+    },
+    "passport": "Pasaporte",
+    "field_since": "Desde"
   },
   "friends": {
     "online": "En línea",
@@ -1122,7 +1162,11 @@
     "next_game": "Lanzar el juego {{n}}",
     "waiting_next": "Esperando el siguiente juego…",
     "round_n": "Ronda {{n}} / {{total}}",
-    "next_round_soon": "Siguiente ronda en un momento…"
+    "next_round_soon": "Siguiente ronda en un momento…",
+    "manifest": "Manifiesto de pasajeros",
+    "col_player": "Jugador",
+    "col_result": "Resultado",
+    "standings_kicker": "Panel de llegadas"
   },
   "survival": {
     "spectating": "Mirando a los jugadores que siguen en juego",
@@ -1280,7 +1324,8 @@
     "legal": "Aviso legal",
     "delete_account": "Eliminar mi cuenta",
     "updated": "Última actualización: {{date}}",
-    "signup_notice": "Al crear una cuenta, aceptas las <terms>condiciones de uso</terms> y la <privacy>política de privacidad</privacy>. Debes tener al menos 13 años (y el permiso de uno de tus padres si tienes menos de 15)."
+    "signup_notice": "Al crear una cuenta, aceptas las <terms>condiciones de uso</terms> y la <privacy>política de privacidad</privacy>. Debes tener al menos 13 años (y el permiso de uno de tus padres si tienes menos de 15).",
+    "toc": "Índice"
   },
   "invites": {
     "title": "Invitar a amigos",
@@ -1301,7 +1346,9 @@
     "leaderboards": "Clasificaciones",
     "profile": "Perfil",
     "main": "Navegación principal",
-    "language": "Idioma"
+    "language": "Idioma",
+    "theme_light": "Cambiar al modo claro",
+    "theme_dark": "Cambiar al modo oscuro"
   },
   "league": {
     "title": "Liga semanal",
@@ -1341,7 +1388,9 @@
     "win_reward_other": "+{{count}} fragmentos de bandera",
     "win_champion": "Título ganado: Campeón de la semana",
     "win_cta": "Ver la liga",
-    "win_close": "Cerrar"
+    "win_close": "Cerrar",
+    "season": "Temporada actual",
+    "stamp_label": "Premio"
   },
   "decorations": {
     "title": "Personalizar",
@@ -1641,5 +1690,43 @@
     "title_ottoman-empire": "Imperio otomano, 1481-1683",
     "title_russia-growth": "Crecimiento de Rusia, 1300-1796",
     "title_british-empire-1886": "Imperio británico en 1886"
+  },
+  "globe": {
+    "find": "Encuentra: {{city}}",
+    "found": "Encontrada: {{city}}",
+    "hint_drag": "↔ Arrastra para girar el globo",
+    "hint_center": "Centra la ciudad en el visor",
+    "label": "Globo interactivo: gíralo (ratón, dedo o flechas) para encontrar {{city}}",
+    "offer_daily": "Reto del día aún sin hacer",
+    "offer_game": "Aún no jugado hoy",
+    "all_done": "Todos los vuelos de hoy han despegado",
+    "all_done_hint": "Vuelve mañana para nuevos retos",
+    "close": "Cerrar",
+    "city": {
+      "tokyo": "Tokio",
+      "rio": "Río de Janeiro",
+      "cairo": "El Cairo",
+      "sydney": "Sídney",
+      "new_york": "Nueva York",
+      "nairobi": "Nairobi",
+      "paris": "París"
+    }
+  },
+  "scores": {
+    "kicker": "Panel de salidas"
+  },
+  "carnet_games": {
+    "kicker_end": "Aterrizaje",
+    "kicker_daily": "Vuelo del día",
+    "kicker_free": "Vuelo libre",
+    "kicker_briefing": "Briefing",
+    "kicker_atlas": "Cartas de navegación",
+    "kicker_scrolls": "Archivos de a bordo",
+    "kicker_legal": "Documentos de a bordo",
+    "stamp_landed": "Aterrizado",
+    "stamp_diverted": "Desviado"
+  },
+  "route_fallback": {
+    "boarding": "Embarque en curso"
   }
 }

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import NavBar from '../components/NavBar'
+import { GameFlightTag } from '../components/GameEmblem'
 import ShareScoreButton from '../components/ShareScoreButton'
 import ChallengeBanner from '../components/ChallengeBanner'
 import { resolveMode } from '../utils/challenge'
@@ -185,9 +186,10 @@ export default function CountryCluePage() {
             result={isComplete ? { score, solved: isSolved, mapAssist: mapAssistUsed } : null}
           />
         )}
+        <GameFlightTag game={GAME_TYPES.COUNTRY_CLUE} className="game-flight-tag--board" />
         <section className="country-clue-hero">
           <div>
-            <p className="country-clue-eyebrow">{t('labels.new_game')}</p>
+            <p className="country-clue-eyebrow gg-kicker">{t('labels.new_game')}</p>
             <h1>{title}</h1>
             <p className="country-clue-subtitle">{subtitle}</p>
           </div>

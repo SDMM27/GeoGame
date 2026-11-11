@@ -7,8 +7,9 @@ import PlayerName, { mineClass } from '../components/PlayerName'
 import { GAME_TYPES } from '../utils/gameTypes'
 import { ASCENSION_PRESETS, presetLabel } from '../utils/ascensionPresets'
 import { ALL_PRESETS } from '../utils/leaderboards'
+import GamePicker from '../components/GamePicker'
+import RankBadge from '../components/RankBadge'
 
-const MEDAL = ['\uD83E\uDD47', '\uD83E\uDD48', '\uD83E\uDD49']
 const ACTIVE_GAMES = [
   { id: GAME_TYPES.PLACEMENT, labelKey: 'games.placement.title' },
   { id: GAME_TYPES.FLAGS, labelKey: 'games.flags.title' },
@@ -55,19 +56,11 @@ export default function AscensionScoreboard({ defaultGame = GAME_TYPES.PLACEMENT
 
   return (
     <div className="scoreboard">
-      <h1 className="scoreboard-title">{t('scoreboard.ascension_title')}</h1>
+      <p className="gg-kicker">{t('scores.kicker')}</p>
+      <h1 className="scoreboard-title gg-title">{t('scoreboard.ascension_title')}</h1>
 
       <div className="scoreboard-filters">
-        <select
-          className="scoreboard-select"
-          value={selectedGame}
-          onChange={(event) => setSelectedGame(event.target.value)}
-        >
-          {ACTIVE_GAMES.map((game) => (
-            <option key={game.id} value={game.id}>{t(game.labelKey)}</option>
-          ))}
-          <option value="AllGames">{t('options.all_games')}</option>
-        </select>
+        <GamePicker games={ACTIVE_GAMES} value={selectedGame} onChange={setSelectedGame} allValue="AllGames" />
 
         <select
           className="scoreboard-select"
@@ -89,7 +82,7 @@ export default function AscensionScoreboard({ defaultGame = GAME_TYPES.PLACEMENT
         <p className="scoreboard-empty">{t('scoreboard.no_ascension_scores')}</p>
       ) : (
         <div className="scoreboard-table">
-          <div className="scoreboard-header scoreboard-header--ascension">
+          <div className="scoreboard-header gg-board-head scoreboard-header--ascension">
             <span>#</span>
             <span>{t('labels.player')}</span>
             <span>{t('leaderboard.time')}</span>
@@ -102,7 +95,7 @@ export default function AscensionScoreboard({ defaultGame = GAME_TYPES.PLACEMENT
               className={`scoreboard-row scoreboard-row--ascension ${index < 3 ? 'scoreboard-row--top' : ''}${mineClass(score, account)}`}
             >
               <span className="scoreboard-rank">
-                {index < 3 ? MEDAL[index] : `#${index + 1}`}
+                <RankBadge rank={index + 1} />
               </span>
               <span className="scoreboard-name"><PlayerName entry={score} account={account} reportIn="ascension_scores" /></span>
               <span className="scoreboard-time scoreboard-time--strong">

@@ -9,11 +9,11 @@
   gap: 0.8rem;
   max-width: calc(100vw - 32px);
   padding: 0.6rem 0.9rem;
-  border-radius: var(--radius-lg);
-  background: var(--bg-card-hover);
-  border: 1px solid var(--border-strong);
-  box-shadow: var(--shadow-card);
-  color: var(--text-primary);
+  border-radius: var(--sd-radius-card);
+  background: var(--sd-surface-2);
+  border: 1px solid var(--gg-line-strong);
+  box-shadow: var(--gg-shadow);
+  color: var(--sd-ink);
   animation: fragment-toast-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   pointer-events: none;
 }
@@ -25,11 +25,11 @@
   height: 40px;
   border-radius: 6px;
   overflow: hidden;
-  background: var(--bg-card);
+  background: var(--sd-surface);
 }
 
 .fragment-toast-piece { position: absolute; }
-.fragment-toast-piece--covered { background: var(--border-strong); }
+.fragment-toast-piece--covered { background: var(--gg-line-strong); }
 
 .fragment-toast-piece--new {
   animation: fragment-toast-pop 0.66s var(--delay, 0.25s) both;
@@ -45,11 +45,11 @@
 
 .fragment-toast-text { display: flex; flex-direction: column; gap: 3px; min-width: 120px; }
 .fragment-toast-text strong { font-size: 0.9rem; }
-.fragment-toast-text small { color: var(--text-muted); font-size: 0.75rem; }
+.fragment-toast-text small { color: var(--sd-muted); font-family: var(--sd-font-mono); font-size: 0.7rem; }
 
-.fragment-toast-text .fragment-toast-reason { color: var(--accent); }
+.fragment-toast-text .fragment-toast-reason { color: var(--sd-accent-strong); }
 
-.fragment-toast-track { height: 4px; border-radius: 2px; background: var(--border-color); overflow: hidden; margin-top: 2px; }
+.fragment-toast-track { height: 4px; border-radius: 2px; background: var(--sd-line); overflow: hidden; margin-top: 2px; }
 .fragment-toast-fill {
   height: 100%;
   border-radius: 2px;

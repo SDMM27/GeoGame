@@ -3,12 +3,14 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { router } from 'expo-router'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, View } from 'react-native'
+import { View } from 'react-native'
 
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 import { Text, Touchable } from './ui'
 
 export function ScreenHeader({ title, right }: { title: string; right?: ReactNode }) {
+  const colors = useColors()
+  const styles = useStyles()
   const { t } = useTranslation()
   const goBack = () => (router.canGoBack() ? router.back() : router.replace('/profile'))
   return (
@@ -24,11 +26,11 @@ export function ScreenHeader({ title, right }: { title: string; right?: ReactNod
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   row: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   back: {
-    width: 42,
-    height: 42,
+    width: 44,
+    height: 44,
     borderRadius: radius.pill,
     backgroundColor: colors.surface,
     borderWidth: 1,
@@ -36,4 +38,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-})
+}))

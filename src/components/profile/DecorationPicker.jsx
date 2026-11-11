@@ -82,7 +82,7 @@ function PickerDialog({ account, onClose }) {
         <div className="decoration-options">
           {NAME_COLORS.map((color) => (
             <Option key={color.id} item={color} level={level} selected={current.color === color.id} onPick={() => pick({ color: color.id })} label={t(`decorations.color.${color.id}`)}>
-              <span className="decoration-swatch" style={{ background: color.value ?? 'var(--text-muted)' }} />
+              <span className="decoration-swatch" style={{ background: color.value ?? 'var(--sd-muted)' }} />
             </Option>
           ))}
         </div>

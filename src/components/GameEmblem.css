@@ -1,0 +1,84 @@
+/* Game emblems: the color comes from --emblem (the game's --game-* token), the tint is mixed from it. */
+.game-emblem {
+  display: block;
+  flex-shrink: 0;
+  stroke: var(--emblem);
+}
+
+.game-emblem-fill {
+  fill: color-mix(in srgb, var(--emblem) 16%, transparent);
+}
+
+.game-emblem--stamp .game-emblem-fill {
+  fill: color-mix(in srgb, var(--emblem) 10%, transparent);
+}
+
+.game-emblem-code {
+  fill: var(--emblem);
+  stroke: none;
+  font-family: var(--sd-font-mono);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+/* The light theme draws strokes and codes in the game's text-safe shade (--game-*-ink) */
+:root[data-theme='light'] .game-emblem {
+  stroke: var(--emblem-ink, var(--emblem));
+}
+
+/* Emblem tile + « VOL DRP » + game name */
+.game-flight-tag {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.game-flight-tag-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.game-flight-tag-code {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--sd-muted);
+  white-space: nowrap;
+}
+
+.game-flight-tag-title {
+  font-family: var(--sd-font-display);
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+  color: var(--sd-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The glyph sits in the line of text it comes with */
+.game-emblem--glyph {
+  display: inline-block;
+  vertical-align: -0.2em;
+}
+
+/* Board strip: the flight tag as the first line of a game screen (quiz, daily games, ranking, voyage) */
+.game-flight-tag--board {
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  border: 1px solid var(--sd-line);
+  border-radius: var(--sd-radius-md);
+  background: var(--sd-surface);
+}
+
+.voyage-page > .game-flight-tag--board {
+  flex-shrink: 0;
+  margin-bottom: 0;
+  border-width: 0 0 1px;
+  border-radius: 0;
+  padding: 8px 20px;
+}

@@ -2,7 +2,7 @@
 import { router } from 'expo-router'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ActivityIndicator, StyleSheet, View } from 'react-native'
+import { ActivityIndicator, View } from 'react-native'
 
 import { CHALLENGE_ROUNDS } from '@shared/utils/dailyChallenge'
 import { challengeRounds } from '@shared/utils/dailyChallengeRounds'
@@ -14,7 +14,7 @@ import { useAccount } from '@/account/auth'
 import { useLeaderboard } from '@/hooks/useLeaderboard'
 import { loadErrorKey } from '@/leaderboards'
 import { type SurvivalRound } from '@/components/survival/SurvivalRounds'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 import { Text } from '../ui'
 import { ChallengeRoundList } from './ChallengeRoundList'
 import { DecoratedName } from '../leaderboards/DecoratedName'
@@ -39,6 +39,8 @@ export function ChallengeLeaderboard({
   onSettled?: () => void
 }) {
   const { t } = useTranslation()
+  const colors = useColors()
+  const styles = useStyles()
   const { account } = useAccount()
   const { scores, error } = useLeaderboard<ChallengeScore>(
     `${GAME_TYPES.DAILY_CHALLENGE}|${dailyKey}`,
@@ -105,7 +107,7 @@ export function ChallengeLeaderboard({
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   card: { gap: space.sm, padding: space.lg, borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   row: { paddingVertical: 6, paddingHorizontal: space.sm, borderRadius: radius.sm },
   rowTop: { backgroundColor: colors.surfaceHigh },
@@ -113,4 +115,4 @@ const styles = StyleSheet.create({
   rank: { width: 28, textAlign: 'center' },
   value: { minWidth: 44, textAlign: 'right', fontVariant: ['tabular-nums'] },
   time: { minWidth: 64, textAlign: 'right', fontVariant: ['tabular-nums'] },
-})
+}))

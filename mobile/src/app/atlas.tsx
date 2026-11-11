@@ -5,7 +5,7 @@ import { Image } from 'expo-image'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Keyboard, Platform, ScrollView, StyleSheet, TextInput, View, useWindowDimensions } from 'react-native'
+import { Keyboard, Platform, ScrollView, TextInput, View, useWindowDimensions } from 'react-native'
 import Animated, { FadeIn, FadeInDown, SlideInDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -22,14 +22,15 @@ import { isGameHidden } from '@shared/utils/gameAvailability'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
 import { HISTORY_COUNTRIES } from '@shared/utils/quizQuestions'
 
+import { Kicker, ScreenTitle } from '@/components/flight'
 import { RankingSheet } from '@/components/atlas/RankingSheet'
 import { formatMetric, type Metric } from '@/components/atlas/format'
 import { WorldMap, type MapLayer, type WorldMapHandle } from '@/components/map/WorldMap'
 import { Button, Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
-import { DIFFICULTY_COLORS } from '@/games'
+import { useDifficultyColors } from '@/games'
 import { clean } from '@/i18n'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 
 const SELECTED = { fillColor: '#7B2FF7', fillOpacity: 0.65, color: '#C4B5FD', weight: 2 }
 // Closest zoom a selected country is framed at (Malta is then about 50px wide)
@@ -62,18 +63,20 @@ type TimelineEvent = { year: string; text: Record<string, string> }
 
 function Fact({ label, value, rank, onRank }: { label: string; value: string; rank?: Rank; onRank?: () => void }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   return (
     <View style={styles.fact}>
-      <Text variant="caption">{label}</Text>
-      <Text variant="bodyStrong" numberOfLines={1} adjustsFontSizeToFit>
+      <Kicker size={9}>{label}</Kicker>
+      <Text variant="bodyStrong" numberOfLines={1} adjustsFontSizeToFit style={{ fontSize: 17 }}>
         {value}
       </Text>
       {rank && (
         <Touchable accessibilityRole="button" accessibilityLabel={t('atlas.see_ranking')} onPress={onRank} style={styles.rankLink}>
-          <Text variant="caption" color={colors.highlight}>
+          <Text variant="caption" color={colors.accent2}>
             {t(rank.rank === 1 ? 'atlas.rank_first' : 'atlas.rank', rank)}
           </Text>
-          <MaterialCommunityIcons name="chevron-right" size={14} color={colors.highlight} />
+          <MaterialCommunityIcons name="chevron-right" size={14} color={colors.accent2} />
         </Touchable>
       )}
     </View>
@@ -96,6 +99,9 @@ function CountrySheet({
   maxHeight: number
 }) {
   const { t, i18n } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
+  const difficultyColors = useDifficultyColors()
   const insets = useSafeAreaInsets()
   const lang = i18n.language
   const unknown = t('atlas.unknown')
@@ -115,6 +121,7 @@ function CountrySheet({
     <Animated.View
       entering={Platform.OS === 'android' ? FadeInDown.duration(220) : SlideInDown.springify().damping(20)}
       style={[styles.sheet, { maxHeight }]}>
+      <View style={styles.handle} />
       <ScrollView contentContainerStyle={{ padding: space.lg, gap: space.lg, paddingBottom: insets.bottom + space.lg }}>
         {onBack && (
           <Touchable accessibilityRole="button" onPress={onBack} style={styles.back}>
@@ -126,10 +133,10 @@ function CountrySheet({
         <View style={styles.sheetHeader}>
           {flag && <Image source={flag} contentFit="cover" style={styles.flag} accessible={false} alt="" />}
           <View style={{ flex: 1 }}>
-            <Text variant="title" numberOfLines={2} adjustsFontSizeToFit>
+            <ScreenTitle size={30} numberOfLines={2} adjustsFontSizeToFit>
               {info.name}
-            </Text>
-            {info.continent && <Text variant="caption">{t(`continents.${info.continent}`, { defaultValue: info.continent })}</Text>}
+            </ScreenTitle>
+            {info.continent && <Kicker>{t(`continents.${info.continent}`, { defaultValue: info.continent })}</Kicker>}
           </View>
           <Touchable accessibilityRole="button" accessibilityLabel={t('atlas.close')} onPress={onClose} style={styles.iconButton}>
             <MaterialCommunityIcons name="close" size={20} color={colors.text} />
@@ -171,7 +178,7 @@ function CountrySheet({
         </View>
 
         <View style={{ gap: space.sm }}>
-          <Text variant="label">{t('atlas.neighbors')}</Text>
+          <Kicker>{t('atlas.neighbors')}</Kicker>
           {info.neighbors.length === 0 ? (
             <Text variant="caption">{t('atlas.no_neighbors')}</Text>
           ) : (
@@ -193,14 +200,12 @@ function CountrySheet({
 
         {(timeline.length > 0 || hasHistoryQuiz) && (
           <View style={{ gap: space.sm }}>
-            <Text variant="label">{t('atlas.history')}</Text>
+            <Kicker>{t('atlas.history')}</Kicker>
             {timeline.length > 0 && (
               <View style={styles.timeline}>
                 {timeline.map((event) => (
                   <View key={event.year} style={{ gap: 1 }}>
-                    <Text variant="label" color={colors.accent}>
-                      {event.year}
-                    </Text>
+                    <Kicker color={colors.gold}>{event.year}</Kicker>
                     <Text variant="body">{event.text[lang] ?? event.text.en}</Text>
                   </View>
                 ))}
@@ -218,13 +223,13 @@ function CountrySheet({
 
         {games.length > 0 && (
           <View style={{ gap: space.sm }}>
-            <Text variant="label">{t('atlas.difficulty')}</Text>
+            <Kicker>{t('atlas.difficulty')}</Kicker>
             {games.map(([id, label, level]) => (
               <View key={id} style={styles.difficultyRow}>
                 <Text variant="body" style={{ flex: 1 }}>
                   {label}
                 </Text>
-                <Text variant="bodyStrong" color={DIFFICULTY_COLORS[level as string]}>
+                <Text variant="bodyStrong" color={difficultyColors[level as string]}>
                   {t(`difficulties.${level}`)}
                 </Text>
               </View>
@@ -238,6 +243,8 @@ function CountrySheet({
 
 export default function AtlasScreen() {
   const { t, i18n } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const insets = useSafeAreaInsets()
   const { height } = useWindowDimensions()
   const mapRef = useRef<WorldMapHandle>(null)
@@ -358,6 +365,7 @@ export default function AtlasScreen() {
           <View style={styles.search}>
             <MaterialCommunityIcons name="magnify" size={18} color={colors.textMuted} />
             <TextInput
+              accessibilityLabel={t('atlas.search_placeholder')}
               value={query}
               onChangeText={setQuery}
               placeholder={t('atlas.search_placeholder')}
@@ -427,12 +435,12 @@ export default function AtlasScreen() {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   top: { position: 'absolute', left: space.lg, right: space.lg, gap: space.sm },
   searchRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   iconButton: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     borderRadius: radius.pill,
     alignItems: 'center',
     justifyContent: 'center',
@@ -445,7 +453,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: space.sm,
-    height: 44,
+    height: 48,
     paddingHorizontal: space.md,
     borderRadius: radius.md,
     backgroundColor: colors.surface,
@@ -455,7 +463,7 @@ const styles = StyleSheet.create({
   searchInput: { flex: 1, color: colors.text, fontSize: 16 },
   results: { marginLeft: 48, borderRadius: radius.md, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
   result: { flexDirection: 'row', alignItems: 'center', gap: space.sm, paddingVertical: space.md, paddingHorizontal: space.md },
-  hint: { marginLeft: 48, textShadowColor: '#000A', textShadowRadius: 4 },
+  hint: { marginLeft: 48, textShadowColor: colors.ocean, textShadowRadius: 4 },
   sheet: {
     position: 'absolute',
     left: 0,
@@ -476,25 +484,26 @@ const styles = StyleSheet.create({
     gap: 2,
     padding: space.md,
     borderRadius: radius.md,
-    backgroundColor: colors.bg,
+    backgroundColor: colors.board,
     borderWidth: 1,
     borderColor: colors.border,
   },
-  rankLink: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start' },
-  back: { alignSelf: 'flex-start' },
+  handle: { alignSelf: 'center', width: 36, height: 4, borderRadius: 2, marginTop: space.sm, backgroundColor: colors.borderStrong },
+  rankLink: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', minHeight: 28 },
+  back: { alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center' },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    paddingVertical: 6,
+    minHeight: 44,
     paddingHorizontal: space.md,
     borderRadius: radius.pill,
-    backgroundColor: colors.bg,
+    backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
   },
   chipFlag: { width: 22, height: 15, borderRadius: 2 },
   difficultyRow: { flexDirection: 'row', alignItems: 'center' },
   timeline: { gap: space.sm, paddingLeft: space.md, borderLeftWidth: 2, borderLeftColor: colors.border },
-})
+}))

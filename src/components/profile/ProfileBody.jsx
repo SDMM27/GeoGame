@@ -9,6 +9,7 @@ import { TIER_COLORS } from '../../utils/achievements'
 import { badgeSummary, readBadges } from '../../utils/badges'
 import { decorationStyle } from '../../utils/decorations'
 import { GAME_TYPES } from '../../utils/gameTypes'
+import GameEmblem from '../GameEmblem'
 import { describeBest, describeDetails, describeMode, describeResult, formatPlayedAt } from '../../utils/profileFormat'
 import { dailyTypesOn, dayKey, formatPlayTime } from '../../utils/profileStats'
 import CollapsibleSection from '../CollapsibleSection'
@@ -18,21 +19,21 @@ import RecordsSection from './RecordsSection'
 import './ProfileBody.css'
 
 export const GAME_META = {
-  [GAME_TYPES.DAILY_CHALLENGE]: { emoji: '🎯', titleKey: 'games.daily_challenge.title', color: '#FF9F45' },
-  [GAME_TYPES.COUNTRY_OF_DAY]: { emoji: '🌐', titleKey: 'games.country_of_day.title', color: '#2EC4B6' },
-  [GAME_TYPES.PLACEMENT]: { emoji: '🌍', titleKey: 'games.placement.title', color: '#7AA2FF' },
-  [GAME_TYPES.FLAGS]: { emoji: '🚩', titleKey: 'games.flags.title', color: '#FF7A6B' },
-  [GAME_TYPES.MISSING_FLAG]: { emoji: '🧩', titleKey: 'games.missing_flag.title', color: '#C792FF' },
-  [GAME_TYPES.CAPITALS]: { emoji: '🏛️', titleKey: 'games.capitals.title', color: '#F5B83D' },
-  [GAME_TYPES.BORDER_GUESS]: { emoji: '🧭', titleKey: 'games.border_guess.title', color: '#C792FF' },
-  [GAME_TYPES.COUNTRY_CLUE]: { emoji: '🔎', titleKey: 'games.country_clue.title', color: '#3DDC97' },
-  [GAME_TYPES.VOYAGE_VOYAGE]: { emoji: '✈️', titleKey: 'games.voyage_voyage.title', color: '#5FD4F4' },
-  [GAME_TYPES.RANKING]: { emoji: '🏆', titleKey: 'games.ranking.title', color: '#FF9EC7' },
-  [GAME_TYPES.QUIZ]: { emoji: '🧠', titleKey: 'games.quiz.title', color: '#B4E05A' },
-  [GAME_TYPES.SURVIVAL]: { emoji: '❤️', titleKey: 'games.survival.title', color: '#FF5C7A' },
+  [GAME_TYPES.DAILY_CHALLENGE]: { titleKey: 'games.daily_challenge.title', color: 'var(--game-daily-challenge)', ink: 'var(--game-daily-challenge-ink)' },
+  [GAME_TYPES.COUNTRY_OF_DAY]: { titleKey: 'games.country_of_day.title', color: 'var(--game-country-of-day)', ink: 'var(--game-country-of-day-ink)' },
+  [GAME_TYPES.PLACEMENT]: { titleKey: 'games.placement.title', color: 'var(--game-placement)', ink: 'var(--game-placement-ink)' },
+  [GAME_TYPES.FLAGS]: { titleKey: 'games.flags.title', color: 'var(--game-flags)', ink: 'var(--game-flags-ink)' },
+  [GAME_TYPES.MISSING_FLAG]: { titleKey: 'games.missing_flag.title', color: 'var(--game-border-guess)', ink: 'var(--game-border-guess-ink)' },
+  [GAME_TYPES.CAPITALS]: { titleKey: 'games.capitals.title', color: 'var(--game-capitals)', ink: 'var(--game-capitals-ink)' },
+  [GAME_TYPES.BORDER_GUESS]: { titleKey: 'games.border_guess.title', color: 'var(--game-border-guess)', ink: 'var(--game-border-guess-ink)' },
+  [GAME_TYPES.COUNTRY_CLUE]: { titleKey: 'games.country_clue.title', color: 'var(--game-country-clue)', ink: 'var(--game-country-clue-ink)' },
+  [GAME_TYPES.VOYAGE_VOYAGE]: { titleKey: 'games.voyage_voyage.title', color: 'var(--game-voyage-voyage)', ink: 'var(--game-voyage-voyage-ink)' },
+  [GAME_TYPES.RANKING]: { titleKey: 'games.ranking.title', color: 'var(--game-ranking)', ink: 'var(--game-ranking-ink)' },
+  [GAME_TYPES.QUIZ]: { titleKey: 'games.quiz.title', color: 'var(--game-quiz)', ink: 'var(--game-quiz-ink)' },
+  [GAME_TYPES.SURVIVAL]: { titleKey: 'games.survival.title', color: 'var(--game-survival)', ink: 'var(--game-survival-ink)' },
 }
 
-const AVATAR_COLORS = ['#3DDC97', '#7AA2FF', '#FF7A6B', '#F5B83D', '#C792FF', '#5FD4F4', '#FF9EC7', '#B4E05A']
+const AVATAR_COLORS = ['country-clue', 'placement', 'flags', 'capitals', 'border-guess', 'voyage-voyage', 'ranking', 'quiz'].map((id) => `var(--game-${id})`)
 
 // `decoration` ({ frame, color } ids): draws the frame as a ring inside the avatar's box, so the size never changes.
 export function Avatar({ username, size = 44, decoration }) {
@@ -67,11 +68,11 @@ export function DailyChips({ today, small = false, onSelect }) {
         const props = {
           title: t(meta.titleKey),
           className: `profile-daily-chip${result ? ' done' : ''}${result && onSelect ? ' clickable' : ''}`,
-          style: result ? { borderColor: meta.color, background: `${meta.color}26` } : undefined,
+          style: result ? { borderColor: meta.color, background: `color-mix(in srgb, ${meta.color} 15%, transparent)` } : undefined,
         }
         const content = (
           <>
-            {meta.emoji}
+            <GameEmblem game={type} variant="glyph" size={20} />
             {result && <i className={result.solved === false ? 'failed' : ''}>{result.solved === false ? '✗' : '✓'}</i>}
           </>
         )
@@ -155,16 +156,16 @@ function Achievements({ achievements, scope, uid }) {
     <CollapsibleSection id={`${scope}.achievements`} title={t('profile.achievements_title')} summary={summary} defaultOpen={scope === 'player'}>
       {wins > 0 && <p className="profile-muted">🏆 {t('league.champion_wins', { count: wins })}</p>}
       <div className="profile-achievements">
-        {visible.map((achievement) => (
+        {visible.map((achievement, index) => (
           <div
             key={achievement.id}
             className={`profile-achievement${achievement.unlocked ? ' unlocked' : ''}`}
-            style={{ '--tier': TIER_COLORS[achievement.tier] }}
+            style={{ '--tier': TIER_COLORS[achievement.tier], '--sd-stamp-rotate': `${[-7, 5, -3, 8][index % 4]}deg`, '--i': index % 8 }}
           >
-            <span className="profile-achievement-emoji">{achievement.emoji}</span>
+            <span className={`profile-achievement-emoji${achievement.unlocked ? ' sd-stamp' : ''}`}>{achievement.emoji}</span>
             <strong>{t(`achievements.${achievement.id}.title`)}</strong>
             <small>{t(`achievements.${achievement.id}.desc`)}</small>
-            <em className="profile-achievement-tier">{t(`achievements.tiers.${achievement.tier}`)}</em>
+            <em className="profile-achievement-tier gg-mono">{t(`achievements.tiers.${achievement.tier}`)}</em>
             {!achievement.unlocked && achievement.target > 1 && (
               <>
                 <div className="profile-progress" title={`${achievement.progress}/${achievement.target}`}>
@@ -193,7 +194,7 @@ function GameRow({ game }) {
   return (
     <li>
       <button type="button" className="profile-game-row profile-game-row--button" onClick={() => setOpen(true)}>
-        <span className="profile-game-icon" style={{ background: `${meta.color}1F` }}>{meta.emoji}</span>
+        <GameEmblem game={game.gameType} size={38} />
         <div className="profile-game-main">
           <strong>{t(meta.titleKey)}</strong>
           <small>{describeMode(game, t)}</small>
@@ -224,7 +225,7 @@ function GameDetail({ game, meta, onClose }) {
     <div className="profile-detail-backdrop" onClick={onClose}>
       <div className="profile-detail" role="dialog" aria-modal="true" aria-labelledby={titleId} onClick={(event) => event.stopPropagation()}>
         <div className="profile-detail-header">
-          <span className="profile-game-icon" style={{ background: `${meta.color}1F` }}>{meta.emoji}</span>
+          <GameEmblem game={game.gameType} size={38} />
           <div className="profile-game-main">
             <strong id={titleId}>{t(meta.titleKey)}</strong>
             <small>{describeMode(game, t)}</small>
@@ -242,7 +243,7 @@ function GameDetail({ game, meta, onClose }) {
           ))}
         </dl>
         {game.mode === 'multi' && game.roomCode && (
-          <Link to={`/multiplayer/room/${game.roomCode}`} className="profile-detail-action" style={{ borderColor: meta.color, color: meta.color }}>
+          <Link to={`/multiplayer/room/${game.roomCode}`} className="profile-detail-action" style={{ borderColor: meta.color, color: meta.ink }}>
             {t('profile.details.open_room')}
           </Link>
         )}
@@ -278,7 +279,7 @@ function History({ games, scope }) {
           </button>
           {types.map((type) => (
             <button key={type} type="button" className={filter === type ? 'active' : ''} onClick={() => setFilter(filter === type ? null : type)}>
-              {GAME_META[type]?.emoji} {t(GAME_META[type]?.titleKey ?? type)}
+              <GameEmblem game={type} variant="glyph" size={16} /> {t(GAME_META[type]?.titleKey ?? type)}
             </button>
           ))}
         </div>
@@ -301,7 +302,7 @@ function ByGame({ stats, scope }) {
   const entries = Object.entries(stats.byGame).sort((a, b) => b[1].played - a[1].played)
   if (entries.length === 0) return null
   const top = GAME_META[entries[0][0]]
-  const summary = top && `${top.emoji} ${t(top.titleKey)} · ${t('profile.games_count', { count: entries[0][1].played })}`
+  const summary = top && `${t(top.titleKey)} · ${t('profile.games_count', { count: entries[0][1].played })}`
   return (
     <CollapsibleSection id={`${scope}.by_game`} title={t('profile.by_game_title')} summary={summary}>
       <ul className="profile-list">
@@ -311,7 +312,7 @@ function ByGame({ stats, scope }) {
           const best = describeBest(gameStats, t, type)
           return (
             <li key={type} className="profile-game-row">
-              <span className="profile-game-icon" style={{ background: `${meta.color}1F` }}>{meta.emoji}</span>
+              <GameEmblem game={type} size={38} />
               <div className="profile-game-main">
                 <strong>{t(meta.titleKey)}</strong>
                 <small>
@@ -323,7 +324,7 @@ function ByGame({ stats, scope }) {
                     .join(' · ')}
                 </small>
               </div>
-              {best && <strong className="profile-game-best" style={{ color: meta.color }}>{best}</strong>}
+              {best && <strong className="profile-game-best" style={{ color: meta.ink }}>{best}</strong>}
             </li>
           )
         })}
@@ -332,38 +333,55 @@ function ByGame({ stats, scope }) {
   )
 }
 
-export default function ProfileBody({ uid, friendsCount, own = false, friends, collection }) {
+// `header` (identity page and what goes with it) and `aside` (e.g. the account settings) are placed by the layout:
+// wide screens put `header`, stats, streak, achievements and history on the left, `friends`, `collection` and `aside` on the right.
+export default function ProfileBody({ uid, friendsCount, own = false, friends, collection, header, aside }) {
   const { t } = useTranslation()
   const { loading, error, games, stats, achievements } = usePlayerProfile(uid, { friendsCount, own })
 
-  if (loading) return <p className="profile-muted profile-center">…</p>
-  if (error) {
+  if (loading || error) {
     return (
       <div className="profile-body">
-        <p className="profile-muted">{t('profile.load_error')}</p>
-        {friends}
-        {collection}
+        <div className="profile-zone profile-zone--head">
+          {header}
+          {loading ? <p className="profile-muted profile-center">…</p> : <p className="profile-muted">{t('profile.load_error')}</p>}
+        </div>
+        {!loading && (
+          <div className="profile-zone profile-zone--side">
+            {friends}
+            {collection}
+            {aside}
+          </div>
+        )}
       </div>
     )
   }
-  return <ProfileView games={games} stats={stats} achievements={achievements} uid={uid} own={own} friends={friends} collection={collection} />
+  return <ProfileView games={games} stats={stats} achievements={achievements} uid={uid} own={own} friends={friends} collection={collection} header={header} aside={aside} />
 }
 
 // The sections themselves, from already loaded data (the Elo ratings load on their own, for `uid`).
 // `friends` and `collection` (nodes) are shown, in that order, right after the streak. `own` picks which sections start folded.
-export function ProfileView({ games, stats, achievements, uid, own = false, friends, collection }) {
+export function ProfileView({ games, stats, achievements, uid, own = false, friends, collection, header, aside }) {
   const scope = own ? 'own' : 'player'
   return (
     <div className="profile-body">
-      <StatTiles stats={stats} />
-      <StreakCard stats={stats} />
-      {friends}
-      {collection}
-      {uid && <RecordsSection uid={uid} scope={scope} />}
-      <Achievements achievements={achievements} scope={scope} uid={uid} />
-      {uid && <EloSection uid={uid} scope={scope} />}
-      <History games={games} scope={scope} />
-      <ByGame stats={stats} scope={scope} />
+      <div className="profile-zone profile-zone--head">
+        {header}
+        <StatTiles stats={stats} />
+        <StreakCard stats={stats} />
+      </div>
+      <div className="profile-zone profile-zone--side">
+        {friends}
+        {collection}
+        {aside}
+      </div>
+      <div className="profile-zone profile-zone--rest">
+        {uid && <RecordsSection uid={uid} scope={scope} />}
+        <Achievements achievements={achievements} scope={scope} uid={uid} />
+        {uid && <EloSection uid={uid} scope={scope} />}
+        <History games={games} scope={scope} />
+        <ByGame stats={stats} scope={scope} />
+      </div>
     </div>
   )
 }

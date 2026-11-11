@@ -3,15 +3,17 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Modal, Pressable, ScrollView, StyleSheet } from 'react-native'
+import { Modal, Pressable, ScrollView } from 'react-native'
 
 import { LANGUAGES as SHARED_LANGUAGES, toLanguage } from '@shared/i18n/languages'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 import { Text, Touchable } from './ui'
 
 const LANGUAGES: { code: string; label: string }[] = SHARED_LANGUAGES
 
 export function LanguageButton() {
+  const colors = useColors()
+  const styles = useStyles()
   const { t, i18n } = useTranslation()
   const current = toLanguage(i18n.resolvedLanguage ?? i18n.language)
   const [pickerOpen, setPickerOpen] = useState(false)
@@ -65,7 +67,7 @@ export function LanguageButton() {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   button: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -77,7 +79,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  backdrop: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, backgroundColor: 'rgba(0, 0, 0, 0.6)' },
+  backdrop: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, backgroundColor: colors.scrim },
   sheet: {
     width: '100%',
     maxWidth: 320,
@@ -98,4 +100,4 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
   },
   optionSelected: { backgroundColor: colors.surface },
-})
+}))

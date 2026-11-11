@@ -2,14 +2,14 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { COUNTRY_OF_DAY_MAX_SCORE } from '@shared/utils/countryOfDay'
 
-import { GameTopBar } from '@/components/game/GameTopBar'
+import { GameHud } from '@/components/game/GameHud'
 import { Button, Text, Touchable } from '@/components/ui'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 
 const MODES = [
   { id: 'choice', icon: 'format-list-bulleted' },
@@ -18,14 +18,17 @@ const MODES = [
 
 export function ModePicker({ accent, loading, onChoose }: { accent: string; loading: boolean; onChoose: (mode: string) => void }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const insets = useSafeAreaInsets()
   const [selected, setSelected] = useState<string | null>(null)
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
-      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + 42 + space.md, paddingBottom: insets.bottom + space.xl }]}>
+      <GameHud game="country_of_day" title={t('games.country_of_day.title')} tag={t('mobile.home.daily').toLocaleUpperCase()} gate="" confirmQuit={false} />
+      <ScrollView contentContainerStyle={[styles.content, { paddingTop: space.sm, paddingBottom: insets.bottom + space.xl }]}>
         <Text variant="label" color={accent}>
-          {t('mobile.home.daily')} · {t('games.country_of_day.title')}
+          {t('mobile.home.daily')}
         </Text>
         {loading ? (
           <Text variant="caption">{t('messages.loading')}</Text>
@@ -66,12 +69,11 @@ export function ModePicker({ accent, loading, onChoose }: { accent: string; load
           </>
         )}
       </ScrollView>
-      <GameTopBar confirmQuit={false} />
     </View>
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   content: { paddingHorizontal: space.xl, gap: space.lg },
   card: {
     flexDirection: 'row',
@@ -83,4 +85,4 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-})
+}))

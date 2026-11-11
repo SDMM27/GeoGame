@@ -1,9 +1,9 @@
 import i18n from '@shared/i18n'
 import { LANGUAGE_CODES } from '@shared/i18n/languages'
 
-import { DIFFICULTIES, DIFFICULTY_COLORS, GAMES, LISTED_GAMES, MULTI_GAMES, getGame, getGameByType } from './games'
+import { DIFFICULTIES, DIFFICULTY_COLORS, DIFFICULTY_COLORS_LIGHT, GAMES, LISTED_GAMES, MULTI_GAMES, getGame, getGameByType } from './games'
 import './i18n'
-import { gameColors } from './theme'
+import { darkGameColors, gameFills, lightGameColors } from './theme/palettes'
 
 describe('GAMES', () => {
   it('has unique ids and shared game types', () => {
@@ -16,8 +16,11 @@ describe('GAMES', () => {
   })
 
   it('covers every game colour of the theme, with that colour', () => {
-    expect(GAMES.map((game) => game.id).sort()).toEqual(Object.keys(gameColors).sort())
-    for (const game of GAMES) expect(game.color).toBe(gameColors[game.id])
+    expect(GAMES.map((game) => game.id).sort()).toEqual(Object.keys(gameFills).sort())
+    for (const game of GAMES) {
+      expect(darkGameColors[game.id]).toBeDefined()
+      expect(lightGameColors[game.id]).toBeDefined()
+    }
   })
 
   it('has an absolute route for each game', () => {
@@ -97,5 +100,7 @@ describe('difficulties', () => {
   it('has a colour per difficulty', () => {
     expect(Object.keys(DIFFICULTY_COLORS).sort()).toEqual([...DIFFICULTIES].sort())
     for (const color of Object.values(DIFFICULTY_COLORS)) expect(color).toMatch(/^#[0-9A-F]{6}$/)
+    expect(Object.keys(DIFFICULTY_COLORS_LIGHT).sort()).toEqual([...DIFFICULTIES].sort())
+    for (const color of Object.values(DIFFICULTY_COLORS_LIGHT)) expect(color).toMatch(/^#[0-9A-F]{6}$/)
   })
 })

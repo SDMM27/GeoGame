@@ -4,8 +4,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { Image } from 'expo-image'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { KeyboardAvoidingView, Platform, ScrollView, View, useWindowDimensions } from 'react-native'
 
 import useCountryOfDayState from '@shared/hooks/useCountryOfDayState'
 import { useDailyPlayedElsewhere } from '@shared/hooks/useDailyPlayedElsewhere'
@@ -24,18 +23,26 @@ import { ScoreSaveCard } from '@/components/countryOfDay/ScoreSaveCard'
 import { StepFeedback } from '@/components/countryOfDay/StepFeedback'
 import { answerLabel, capitalLabel, countryLabel } from '@/components/countryOfDay/labels'
 import { DailyPlayedElsewhere } from '@/components/game/DailyPlayedElsewhere'
-import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
 import { BorderGuessRow, type BorderGuess } from '@/components/game/GuessCards'
 import { GuessInputBar } from '@/components/game/GuessInputBar'
+import { GameHud } from '@/components/game/GameHud'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
 import { CountrySilhouette } from '@/components/map/CountrySilhouette'
+import { type EscaleState } from '@/components/flight'
 import { Button, Text } from '@/components/ui'
 import { getFlag } from '@/flags'
+import { clean } from '@/i18n'
 import { navigate } from '@/shims/react-router-dom'
-import { colors, gameColors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors, useTheme } from '@/theme'
 
-const ACCENT = gameColors.country_of_day ?? gameColors.border_guess
+function useAccent() {
+  const { gameColors } = useTheme()
+  return gameColors.country_of_day ?? gameColors.border_guess
+}
 const STEP_COUNT = COUNTRY_OF_DAY_STEPS.length
+// Caption under each segment of the progress bar (the step's subject, not its question)
+const STEP_CAPTION: Record<string, string> = { borders: 'step_country', flag: 'step_flag', capital: 'step_capital', placement: 'step_map' }
+const STEP_CAPTIONS = (COUNTRY_OF_DAY_STEPS as string[]).map((id) => STEP_CAPTION[id])
 // Stable, so the input bar skips the timer's re-renders
 const NO_SUGGESTIONS: string[] = []
 
@@ -47,8 +54,10 @@ const asGuess = (entry: BorderGuess | string): BorderGuess =>
   typeof entry === 'string' ? { value: entry, iso: null, isCorrect: false, distanceKm: null, direction: null, directionArrow: null } : { ...entry, isCorrect: false }
 
 function Playing({ game }: { game: Game }) {
+  const ACCENT = useAccent()
+  const styles = useStyles()
+  const colors = useColors()
   const { t, i18n } = useTranslation()
-  const insets = useSafeAreaInsets()
   const { height: windowHeight } = useWindowDimensions()
   const { country, mode, step, stepIndex, choices, wrong, triesLeft, resolved, found, steps, score, answer, giveUp, next } = game
   const [text, setText] = useState('')
@@ -86,21 +95,7 @@ function Playing({ game }: { game: Game }) {
     />
   )
   const giveUpButton = !resolved && <Button label={t('country_of_day.give_up')} variant="secondary" onPress={giveUp} />
-  const header = (
-    <View style={{ gap: 2 }}>
-      <View style={styles.headerRow}>
-        <Text variant="label" color={ACCENT}>
-          {t('country_of_day.step', { n: stepIndex + 1, total: STEP_COUNT })}
-        </Text>
-        {!resolved && (
-          <Text variant="caption" color={triesLeft === 1 ? colors.warning : undefined}>
-            {t('country_of_day.tries_left', { count: triesLeft })}
-          </Text>
-        )}
-      </View>
-      <Text variant="heading">{t(`country_of_day.step_${step}`)}</Text>
-    </View>
-  )
+  const header = <Text variant="heading">{t(`country_of_day.step_${step}`)}</Text>
   // From the second step on the country is known: name it (the flag step keeps the flag secret)
   const identity = stepIndex > 0 && (
     <View style={styles.identity}>
@@ -113,16 +108,32 @@ function Playing({ game }: { game: Game }) {
     </View>
   )
 
+  // One segment per step: found (menthe), missed (rouge), the current one in gold.
+  const states: EscaleState[] = (COUNTRY_OF_DAY_STEPS as string[]).map((_, index) =>
+    index < stepIndex || (index === stepIndex && resolved) ? (steps[index] > 0 ? 'good' : 'bad') : index === stepIndex ? 'current' : 'todo',
+  )
   const hud = (
-    <GameTopBar>
-      <HudPill icon="target" label={`${stepIndex + 1}/${STEP_COUNT}`} color={ACCENT} />
-      <HudPill icon="star-four-points-outline" label={String(score)} color={colors.accent} />
-    </GameTopBar>
+    <GameHud
+      game="country_of_day"
+      title={t('games.country_of_day.title')}
+      tag={t('mobile.home.daily').toLocaleUpperCase()}
+      gate=""
+      confirmQuit
+      cells={[
+        { label: t('units.step_one').toLocaleUpperCase(), value: `${stepIndex + 1}/${STEP_COUNT}`, color: colors.gold },
+        { label: t('units.attempt_other').toLocaleUpperCase(), value: `${Math.max(triesLeft, 0)}`, color: triesLeft === 1 && !resolved ? colors.warning : colors.text },
+        { label: clean(t('labels.score')).replace(/\s*:$/, '').toUpperCase(), value: String(score), suffix: `/${COUNTRY_OF_DAY_MAX_SCORE[mode as 'choice' | 'free']}` },
+      ]}
+      states={states}
+      stepLabels={STEP_CAPTIONS.map((key) => t(`mobile.flight.${key}`).toLocaleUpperCase())}
+      progressLabel={t('country_of_day.step', { n: stepIndex + 1, total: STEP_COUNT })}
+    />
   )
 
   if (step === 'placement') {
     return (
       <View style={{ flex: 1, backgroundColor: colors.ocean }}>
+        <View style={{ backgroundColor: colors.bg }}>{hud}</View>
         <PlacementStep
           country={country}
           wrong={wrong as string[]}
@@ -137,15 +148,15 @@ function Playing({ game }: { game: Game }) {
           {giveUpButton}
           {feedback}
         </PlacementStep>
-        {hud}
       </View>
     )
   }
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
+      {hud}
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={[styles.content, { paddingTop: insets.top + 42 + space.md }]}>
+        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.content}>
           {header}
           {identity}
           {step === 'borders' && (
@@ -191,12 +202,14 @@ function Playing({ game }: { game: Game }) {
           />
         )}
       </KeyboardAvoidingView>
-      {hud}
     </View>
   )
 }
 
 function Done({ game }: { game: Game }) {
+  const ACCENT = useAccent()
+  const styles = useStyles()
+  const colors = useColors()
   const { t, i18n } = useTranslation()
   const [leaderboardVersion, setLeaderboardVersion] = useState(0)
   const { dailyKey, country, mode, steps, score, attempts, errors, solved } = game
@@ -208,6 +221,9 @@ function Done({ game }: { game: Game }) {
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
       <ResultsSheet
+        game="country_of_day"
+        ticketNote={`${t('mobile.home.daily')} · ${modeLabel}`}
+        states={(steps as number[]).map((points) => (points > 0 ? 'good' : 'bad'))}
         title={countryLabel(country, i18n.language)}
         score={score}
         scoreText={`${score}/${max}`}
@@ -240,6 +256,7 @@ function Done({ game }: { game: Game }) {
 }
 
 export default function CountryOfTheDayScreen() {
+  const ACCENT = useAccent()
   const { t } = useTranslation()
   const game = useCountryOfDayState()
   const { dailyKey, phase } = game
@@ -251,7 +268,7 @@ export default function CountryOfTheDayScreen() {
 
   if (elsewhere.checking || elsewhere.game) {
     return (
-      <DailyPlayedElsewhere title={t('games.country_of_day.title')} game={elsewhere.game} accent={ACCENT}>
+      <DailyPlayedElsewhere gameId="country_of_day" title={t('games.country_of_day.title')} game={elsewhere.game} accent={ACCENT}>
         {dailyKey && <CountryOfDayLeaderboard dailyKey={dailyKey} />}
       </DailyPlayedElsewhere>
     )
@@ -261,12 +278,11 @@ export default function CountryOfTheDayScreen() {
   return <ModePicker accent={ACCENT} loading={phase === 'loading'} onChoose={game.chooseMode} />
 }
 
-const styles = StyleSheet.create({
-  content: { paddingHorizontal: space.xl, paddingBottom: space.xl, gap: space.lg },
-  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+const useStyles = makeStyles((colors) => ({
+  content: { paddingHorizontal: space.xl, paddingTop: space.sm, paddingBottom: space.xl, gap: space.lg },
   identity: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   identityFlag: { width: 32, height: 21, borderRadius: 3 },
   silhouette: { borderRadius: radius.xl, backgroundColor: colors.ocean, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
   summary: { alignItems: 'center', gap: 2, padding: space.lg, borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   wrongRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
-})
+}))

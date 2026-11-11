@@ -19,8 +19,10 @@ import { generateShareText } from '@shared/utils/shareScore'
 import { announce } from '@/a11y'
 import { useAccount } from '@/account/auth'
 import { useRecordGame, type GameRecord } from '@/account/history'
+import GameEmblem, { flightCode } from '@/components/GameEmblem'
+import { BoardStrip, EscaleProgress, Kicker, ScreenTitle, Stamp, type EscaleState } from '@/components/flight'
 import { SITE_ORIGIN } from '@/links'
-import { colors, fonts, radius, space } from '@/theme'
+import { fonts, makeStyles, radius, space, useColors } from '@/theme'
 import { Button, Text } from '../ui'
 import { NudgeFriends } from './NudgeFriends'
 
@@ -75,6 +77,12 @@ type Props = {
   homeLabel?: string
   onSaved?: () => void
   children?: React.ReactNode
+  // Optional, for the ticket: game id (emblem and flight code), right-hand ticket line (« MOYEN · EUROPE »),
+  // one segment per round (found / missed), stamp tone (default: ok, bad when the accent is a warning)
+  game?: string
+  ticketNote?: string
+  states?: EscaleState[]
+  tone?: 'ok' | 'bad'
 }
 
 // Same key as the website's DailyForm: one save per daily challenge.
@@ -88,7 +96,10 @@ const dailySavedKey = (save: SaveConfig | null | undefined) =>
         ? `ranking-saved:${save.dailyKey}`
         : null
 
-export function ResultsSheet({ title, score, scoreText, scoreLabel, accent = colors.accent, stats, save, share, record, onReplay, onHome, homeLabel, onSaved, children }: Props) {
+export function ResultsSheet({ title, score, scoreText, scoreLabel, accent: accentProp, stats, save, share, record, onReplay, onHome, homeLabel, onSaved, children, game, ticketNote, states, tone }: Props) {
+  const colors = useColors()
+  const styles = useStyles()
+  const accent = accentProp ?? colors.accent
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   const [typedPseudo, setTypedPseudo] = useState(() => globalThis.localStorage?.getItem(PSEUDO_KEY) ?? '')
@@ -172,30 +183,46 @@ export function ResultsSheet({ title, score, scoreText, scoreLabel, accent = col
 
   return (
     <Animated.View entering={FadeIn.duration(250)} style={StyleSheet.absoluteFill}>
-      <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(5,8,18,0.92)' }]} />
+      <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.bg }]} />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={[styles.content, { paddingTop: insets.top + space.xxl, paddingBottom: insets.bottom + space.xl }]}>
-          <Animated.View entering={ZoomIn.springify().damping(14)} style={{ alignItems: 'center' }}>
-            <Text variant="label">{title ?? t('mobile.game.finished')}</Text>
-            <Text variant="hero" color={accent} style={{ fontSize: 64, lineHeight: 72, marginTop: space.sm }}>
-              {scoreText ?? Math.round(score).toLocaleString()}
-            </Text>
-            <Text variant="caption">{scoreLabel ?? t('units.pts')}</Text>
-          </Animated.View>
+          contentContainerStyle={[styles.content, { paddingTop: insets.top + space.lg, paddingBottom: insets.bottom + space.xl }]}>
+          <View style={styles.head}>
+            {game && <GameEmblem game={game} size={36} />}
+            <View style={{ flex: 1, minWidth: 0 }}>
+              <Kicker numberOfLines={1}>{game ? `${t('game_hud.flight', { code: flightCode(game) })} · ${t('carnet_games.kicker_end')}` : t('carnet_games.kicker_end')}</Kicker>
+              <ScreenTitle size={20} numberOfLines={2} accessibilityRole="header">
+                {title ?? t('mobile.game.finished')}
+              </ScreenTitle>
+            </View>
+          </View>
 
-          <Animated.View entering={FadeInDown.delay(150).springify()} style={styles.stats}>
-            {stats.map((stat) => (
-              <View key={stat.label} style={styles.stat}>
-                <Text variant="number" color={stat.color}>
-                  {stat.value}
+          <Animated.View entering={ZoomIn.springify().damping(14)} style={styles.ticket}>
+            <View style={styles.ticketTop}>
+              {game ? <Text style={styles.mono}>{t('game_hud.flight', { code: flightCode(game) })}</Text> : <View />}
+              {ticketNote ? <Text style={styles.mono}>{ticketNote.toLocaleUpperCase()}</Text> : null}
+            </View>
+            <Text style={[styles.mono, { marginTop: space.md }]}>{t('game_hud.score')}</Text>
+            <View style={styles.scoreRow}>
+              <View style={{ flexShrink: 1 }}>
+                <Text variant="hero" color={accent} style={{ fontSize: 56, lineHeight: 64 }} numberOfLines={1} adjustsFontSizeToFit>
+                  {scoreText ?? Math.round(score).toLocaleString()}
                 </Text>
-                <Text variant="caption" style={{ textAlign: 'center' }}>
-                  {stat.label}
-                </Text>
+                <Text variant="caption">{scoreLabel ?? t('units.pts')}</Text>
               </View>
-            ))}
+              <Stamp
+                label={(tone ?? (accent === colors.warning || accent === colors.danger ? 'bad' : 'ok')) === 'bad' ? t('carnet_games.stamp_diverted').toLocaleUpperCase() : t('carnet_games.stamp_landed').toLocaleUpperCase()}
+                tone={tone ?? (accent === colors.warning || accent === colors.danger ? 'bad' : 'ok')}
+                size={14}
+              />
+            </View>
+            <Animated.View entering={FadeInDown.delay(150).springify()}>
+              <BoardStrip
+                cells={stats.map((stat) => ({ label: stat.label.toLocaleUpperCase(), value: stat.value, color: stat.color }))}
+              />
+            </Animated.View>
+            {states && states.length > 0 && <EscaleProgress states={states} style={{ marginTop: space.md }} />}
           </Animated.View>
 
           {save && !saver.loading && (
@@ -331,19 +358,13 @@ export function ResultsSheet({ title, score, scoreText, scoreLabel, accent = col
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   content: { paddingHorizontal: space.xl, gap: space.xl },
-  stats: { flexDirection: 'row', gap: space.sm },
-  stat: {
-    flex: 1,
-    alignItems: 'center',
-    gap: 2,
-    paddingVertical: space.md,
-    borderRadius: radius.md,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
+  head: { flexDirection: 'row', alignItems: 'center', gap: space.md },
+  ticket: { gap: space.md, padding: space.lg, borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
+  ticketTop: { flexDirection: 'row', justifyContent: 'space-between' },
+  scoreRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.md },
+  mono: { fontFamily: fonts.monoBold, fontSize: 10, letterSpacing: 1.2, color: colors.textMuted },
   saveCard: { gap: space.sm, padding: space.lg, borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   saveRow: { flexDirection: 'row', gap: space.sm },
   input: {
@@ -359,4 +380,4 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bodyMedium,
     fontSize: 16,
   },
-})
+}))

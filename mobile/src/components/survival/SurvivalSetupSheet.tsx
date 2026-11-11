@@ -4,7 +4,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import {
@@ -25,8 +25,9 @@ import {
 
 import { SheetCloseButton } from '@/components/SheetCloseButton'
 import { Button, Segmented, Text, Touchable } from '@/components/ui'
-import { DIFFICULTY_COLORS, getGame, getGameByType } from '@/games'
-import { colors, radius, space } from '@/theme'
+import { useDifficultyColors, getGame, getGameByType } from '@/games'
+import GameEmblem from '@/components/GameEmblem'
+import { makeStyles, radius, space, useColors, useTheme } from '@/theme'
 
 type Ramp = Record<string, number>
 
@@ -40,6 +41,8 @@ const RAMP_ICONS: Record<string, keyof typeof MaterialCommunityIcons.glyphMap> =
 }
 
 function Stepper({ value, onChange }: { value: number; onChange: (value: number) => void }) {
+  const styles = useStyles()
+  const colors = useColors()
   return (
     <View style={styles.stepper}>
       <Touchable accessibilityLabel="-" onPress={() => onChange(Math.max(0, value - 1))} style={styles.stepperButton}>
@@ -56,6 +59,10 @@ function Stepper({ value, onChange }: { value: number; onChange: (value: number)
 }
 
 export function SurvivalSetupSheet() {
+  const { gameColors } = useTheme()
+  const styles = useStyles()
+  const colors = useColors()
+  const DIFFICULTY_COLORS = useDifficultyColors()
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   // `add`: the room the host adds this game to (see multi/add)
@@ -85,8 +92,8 @@ export function SurvivalSetupSheet() {
     <View style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={{ padding: space.xl, gap: space.lg }}>
         <View style={styles.titleRow}>
-          <View style={[styles.icon, { backgroundColor: `${game.color}22` }]}>
-            <MaterialCommunityIcons name={game.icon} size={28} color={game.color} />
+          <View style={[styles.icon, { backgroundColor: `${gameColors[game.id]}22` }]}>
+            <GameEmblem game={game.id} variant="glyph" size={28} color={gameColors[game.id]} />
           </View>
           <View style={{ flex: 1 }}>
             <Text variant="title" style={{ fontSize: 26 }}>
@@ -109,8 +116,8 @@ export function SurvivalSetupSheet() {
                 accessibilityRole="checkbox"
                 accessibilityState={{ checked: active }}
                 onPress={() => toggle(type)}
-                style={[styles.option, active && { borderColor: round.color, backgroundColor: `${round.color}14` }]}>
-                <MaterialCommunityIcons name={round.icon} size={20} color={active ? round.color : colors.textFaint} />
+                style={[styles.option, active && { borderColor: gameColors[round.id], backgroundColor: `${gameColors[round.id]}14` }]}>
+                <GameEmblem game={round.id} variant="glyph" size={20} color={active ? gameColors[round.id] : colors.textFaint} />
                 <Text variant="bodyStrong" color={active ? colors.text : colors.textMuted} numberOfLines={2} style={{ flex: 1, fontSize: 15 }}>
                   {t(`survival.round_type.${type}`)}
                 </Text>
@@ -155,8 +162,8 @@ export function SurvivalSetupSheet() {
                   setRamp({ ...SURVIVAL_RAMPS[name] })
                   setCustomRamp(false)
                 }}
-                style={[styles.option, active && { borderColor: game.color, backgroundColor: `${game.color}14` }]}>
-                <MaterialCommunityIcons name={RAMP_ICONS[name]} size={20} color={active ? game.color : colors.textFaint} />
+                style={[styles.option, active && { borderColor: gameColors[game.id], backgroundColor: `${gameColors[game.id]}14` }]}>
+                <MaterialCommunityIcons name={RAMP_ICONS[name]} size={20} color={active ? gameColors[game.id] : colors.textFaint} />
                 <Text variant="bodyStrong" color={active ? colors.text : colors.textMuted} numberOfLines={2} style={{ flex: 1, fontSize: 15 }}>
                   {t(`survival.ramp.${name}`)}
                 </Text>
@@ -187,7 +194,7 @@ export function SurvivalSetupSheet() {
             label={t('mobile.multi.continue')}
             onPress={startMulti}
             disabled={!canPlay}
-            color={game.color}
+            color={gameColors[game.id]}
             style={{ flex: 1 }}
             icon={<MaterialCommunityIcons name="account-group" size={20} color={colors.onAccent} />}
           />
@@ -205,7 +212,7 @@ export function SurvivalSetupSheet() {
               label={t('mobile.setup.play')}
               onPress={start}
               disabled={!canPlay}
-              color={game.color}
+              color={gameColors[game.id]}
               style={{ flex: 1 }}
               icon={<MaterialCommunityIcons name="play" size={20} color={colors.onAccent} />}
             />
@@ -216,7 +223,7 @@ export function SurvivalSetupSheet() {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: space.lg },
   icon: { width: 56, height: 56, borderRadius: radius.lg, alignItems: 'center', justifyContent: 'center' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
@@ -271,4 +278,4 @@ const styles = StyleSheet.create({
     borderTopColor: colors.border,
     backgroundColor: colors.surface,
   },
-})
+}))

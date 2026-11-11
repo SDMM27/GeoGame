@@ -17,7 +17,7 @@ import { EMPIRES, shownStages } from '@shared/data/empires'
 import { BASE_ZOOM, WORLD_SIZE, featurePath, getBaseTiles, getCountryShapes, lodLevel, project } from '@/components/map/geometry'
 import { BaseTile } from '@/components/map/WorldMap'
 import { Text, Touchable } from '@/components/ui'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useTheme } from '@/theme'
 
 type Stage = { id: string; color: string }
 type Empire = { center: [number, number]; zoom: number; cumulative?: boolean; stages: Stage[]; load: () => Promise<unknown> }
@@ -60,6 +60,10 @@ export function stageAt(paths: Map<string, Pick<SkPath, 'contains'>>, shown: str
 
 export function EmpireMap({ id, maxHeight }: { id: string; maxHeight?: number }) {
   const { t, i18n } = useTranslation()
+  const styles = useStyles()
+  const { colors, scheme } = useTheme()
+  // Hairline between territories: the night navy on the dark theme, the land's edge on the light one
+  const edge = scheme === 'dark' ? '#141a2e' : colors.landStroke
   const empire = (EMPIRES as Record<string, Empire>)[id]
   const [step, setStep] = useState(empire.stages.length - 1)
   const [picked, setPicked] = useState<string | null>(null)
@@ -228,7 +232,7 @@ export function EmpireMap({ id, maxHeight }: { id: string; maxHeight?: number })
                   <BaseTile key={`border-${index}`} levels={levels} level={level} border />
                 ))}
                 {shown.map((item) => (
-                  <Path key={`edge-${item.id}`} path={paths.get(item.id)!} color="#141a2e" style="stroke" strokeWidth={hairline} />
+                  <Path key={`edge-${item.id}`} path={paths.get(item.id)!} color={edge} style="stroke" strokeWidth={hairline} />
                 ))}
               </Group>
             </Canvas>
@@ -280,13 +284,13 @@ export function EmpireMap({ id, maxHeight }: { id: string; maxHeight?: number })
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   frame: { width: '100%', aspectRatio: 4 / 3, borderRadius: radius.md, overflow: 'hidden', backgroundColor: colors.ocean },
   viewport: { flex: 1, overflow: 'hidden' },
   controls: { position: 'absolute', right: space.sm, bottom: space.sm, flexDirection: 'row', gap: 6 },
-  control: { width: 38, height: 38, borderRadius: radius.pill, backgroundColor: 'rgba(11,16,32,0.85)', borderWidth: 1, borderColor: colors.borderStrong, alignItems: 'center', justifyContent: 'center' },
+  control: { width: 38, height: 38, borderRadius: radius.pill, backgroundColor: `${colors.surface}D9`, borderWidth: 1, borderColor: colors.borderStrong, alignItems: 'center', justifyContent: 'center' },
   steps: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: space.xs },
   stepButton: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 8, paddingHorizontal: 6, minHeight: 40 },
   dot: { width: 10, height: 10, borderRadius: 5 },
   info: { gap: 2, padding: space.md, borderRadius: radius.md, backgroundColor: colors.surfaceHigh, borderLeftWidth: 3 },
-})
+}))

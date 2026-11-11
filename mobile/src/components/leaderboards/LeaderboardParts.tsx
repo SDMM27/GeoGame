@@ -4,20 +4,22 @@ import { router } from 'expo-router'
 import type { ComponentProps, ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
-import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native'
+import { ActivityIndicator, ScrollView, View } from 'react-native'
 
 import { useFriendships } from '@shared/hooks/usePlayerProfile'
 import { sendFriendRequestTo } from '@shared/utils/friends'
 
-import { loadErrorKey, rankLabel } from '@/leaderboards'
-import { colors, radius, space } from '@/theme'
+import GameEmblem from '@/components/GameEmblem'
+import { Kicker } from '@/components/flight'
+import { loadErrorKey } from '@/leaderboards'
+import { fonts, makeStyles, radius, space, useColors } from '@/theme'
 import { Text, Touchable } from '../ui'
 import { DecoratedName } from './DecoratedName'
 import { ReportFlag, type ReportTarget } from './ReportFlag'
 
 type IconName = ComponentProps<typeof MaterialCommunityIcons>['name']
 
-export type Chip = { value: string; label: string; color?: string; icon?: IconName }
+export type Chip = { value: string; label: string; color?: string; icon?: IconName; game?: string }
 
 // One horizontally scrolling row of exclusive choices.
 export function FilterChips({
@@ -31,9 +33,11 @@ export function FilterChips({
   onChange: (value: string) => void
   label?: string
 }) {
+  const styles = useStyles()
+  const colors = useColors()
   return (
     <View style={{ gap: 6 }}>
-      {label ? <Text variant="label">{label}</Text> : null}
+      {label ? <Kicker>{label}</Kicker> : null}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.sm }}>
         {options.map((option) => {
           const active = option.value === value
@@ -46,7 +50,11 @@ export function FilterChips({
               accessibilityLabel={option.label}
               onPress={() => onChange(option.value)}
               style={[styles.chip, active && { borderColor: color, backgroundColor: `${color}1F` }]}>
-              {option.icon ? <MaterialCommunityIcons name={option.icon} size={16} color={active ? color : colors.textMuted} /> : null}
+              {option.game ? (
+                <GameEmblem game={option.game} variant="glyph" size={16} color={active ? color : colors.textMuted} />
+              ) : option.icon ? (
+                <MaterialCommunityIcons name={option.icon} size={16} color={active ? color : colors.textMuted} />
+              ) : null}
               <Text variant="bodyStrong" style={{ fontSize: 13 }} color={active ? colors.text : colors.textMuted}>
                 {option.label}
               </Text>
@@ -64,6 +72,8 @@ type Me = { uid: string; username: string | null } | null
 // One shared Firestore listener serves every row (see watchSharedFriendships).
 function QuickAdd({ me, uid, name }: { me: { uid: string; username: string }; uid: string; name: string }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const friendships = useFriendships(me.uid)
   const [failed, setFailed] = useState(false)
   if (friendships.loading) return null
@@ -98,6 +108,7 @@ export function LeaderboardRow({
   value,
   secondary,
   report,
+  last,
 }: {
   index: number
   name: string
@@ -110,13 +121,15 @@ export function LeaderboardRow({
   secondary?: string
   // The entry's collection and id, to offer a report (not for the player's own entry)
   report?: Omit<ReportTarget, 'name'>
+  // Last row of the board: no divider under it
+  last?: boolean
 }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const content = (
     <>
-      <Text variant="bodyStrong" style={styles.rank}>
-        {rankLabel(index)}
-      </Text>
+      <Text style={[styles.rank, index === 0 && { color: colors.gold }, index === 2 && { color: '#E0905A' }]}>{index + 1}</Text>
       <View style={{ flex: 1 }}>
         <DecoratedName uid={uid} color={mine ? colors.accent : undefined}>
           {name}
@@ -128,7 +141,7 @@ export function LeaderboardRow({
           ) : null}
         </DecoratedName>
         {detail ? (
-          <Text variant="caption" numberOfLines={1}>
+          <Text style={styles.detail} numberOfLines={1}>
             {detail}
           </Text>
         ) : null}
@@ -136,18 +149,16 @@ export function LeaderboardRow({
       {uid && me?.username && !mine ? <QuickAdd me={{ uid: me.uid, username: me.username }} uid={uid} name={name} /> : null}
       {report && !mine ? <ReportFlag target={{ ...report, name }} /> : null}
       <View style={styles.values}>
-        <Text variant="bodyStrong" style={styles.value}>
-          {value}
-        </Text>
+        <Text style={[styles.value, styles.valueMain]}>{value}</Text>
         {secondary !== undefined ? (
-          <Text variant="caption" style={styles.value}>
+          <Text style={[styles.value, styles.valueSecondary]}>
             {secondary}
           </Text>
         ) : null}
       </View>
     </>
   )
-  const style = [styles.row, index < 3 && styles.rowTop, mine && styles.rowMine]
+  const style = [styles.row, !last && styles.rowDivider, mine && styles.rowMine]
   return uid ? (
     <Touchable
       accessibilityRole="button"
@@ -174,6 +185,8 @@ export function LeaderboardCard({
   children: ReactNode
 }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   return (
     <View style={styles.card}>
       {error ? (
@@ -199,25 +212,29 @@ export function LeaderboardCard({
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   quickAdd: { width: 30, height: 30, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.border },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
     paddingHorizontal: space.md,
-    paddingVertical: space.sm,
+    minHeight: 44,
     borderRadius: radius.pill,
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.surface,
   },
-  card: { gap: 4, padding: space.md, borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
+  // The board: dark, rows separated by hairlines
+  card: { borderRadius: radius.lg, backgroundColor: colors.board, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
   message: { alignItems: 'center', gap: space.sm, paddingVertical: space.xl, paddingHorizontal: space.md },
-  row: { flexDirection: 'row', alignItems: 'center', gap: space.md, paddingVertical: 8, paddingHorizontal: space.sm, borderRadius: radius.sm },
-  rowTop: { backgroundColor: colors.surfaceHigh },
-  rowMine: { borderWidth: 1, borderColor: colors.accent },
-  rank: { width: 28, textAlign: 'center' },
+  row: { flexDirection: 'row', alignItems: 'center', gap: space.md, minHeight: 52, paddingVertical: 8, paddingHorizontal: space.md },
+  rowDivider: { borderBottomWidth: 1, borderBottomColor: colors.boardLine },
+  rowMine: { backgroundColor: `${colors.accent}14`, borderLeftWidth: 3, borderLeftColor: colors.accent },
+  rank: { width: 28, textAlign: 'center', fontFamily: fonts.monoBold, fontSize: 15, color: colors.text },
+  detail: { fontFamily: fonts.monoBold, fontSize: 9, letterSpacing: 1, textTransform: 'uppercase', color: colors.textMuted },
   values: { alignItems: 'flex-end' },
   value: { textAlign: 'right', fontVariant: ['tabular-nums'] },
-})
+  valueMain: { fontFamily: fonts.monoBold, fontSize: 14, color: colors.gold },
+  valueSecondary: { fontFamily: fonts.mono, fontSize: 11, color: colors.textMuted },
+}))

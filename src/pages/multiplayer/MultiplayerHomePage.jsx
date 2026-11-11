@@ -9,7 +9,8 @@ import { useAccount } from '../../auth'
 import useInvites, { acceptInvite } from '../../hooks/useInvites'
 import { dismissInvite } from '../../utils/invites'
 import { getRecentRooms } from '../../utils/recentRooms'
-import { LISTED_ROOM_GAMES, gameColor, roomGameIcon } from '../../utils/roomGames'
+import { LISTED_ROOM_GAMES, gameColor } from '../../utils/roomGames'
+import GameEmblem, { flightCode } from '../../components/GameEmblem'
 import '../../components/multiplayer/Invites.css'
 import './MultiplayerHomePage.css'
 
@@ -40,7 +41,8 @@ export default function MultiplayerHomePage() {
       <NavBar />
       <main className="mp-home-main">
         <header className="mp-home-header">
-          <h1 className="mp-home-title">{t('multiplayer.title')}</h1>
+          <p className="gg-kicker">{t('multiplayer.kicker')}</p>
+          <h1 className="mp-home-title gg-title">{t('multiplayer.title')}</h1>
           <p>{t('multiplayer.subtitle')}</p>
         </header>
 
@@ -59,7 +61,9 @@ export default function MultiplayerHomePage() {
           </section>
         )}
 
-        <form className="mp-join-card" onSubmit={handleJoin}>
+        <form className="mp-join-card gg-ticket" onSubmit={handleJoin}>
+          <div className="mp-join-body">
+          <p className="gg-kicker">{t('multiplayer.desk_join')}</p>
           <h2>{t('multiplayer.join_title')}</h2>
           <div className="mp-join-form">
             <input
@@ -77,10 +81,15 @@ export default function MultiplayerHomePage() {
               {t('buttons.join')}
             </button>
           </div>
+          </div>
+          <div className="mp-join-stub gg-ticket-stub" aria-hidden="true">
+            <span className="gg-field"><small>{t('mp_room.code')}</small><strong>{(joinCode + '------').slice(0, 6)}</strong></span>
+          </div>
         </form>
 
-        <section className="mp-section">
+        <section className="mp-section mp-section--create">
           <div className="mp-section-head">
+            <p className="gg-kicker">{t('multiplayer.desk_create')}</p>
             <h2>{t('multiplayer.create_title')}</h2>
             <p>{t('multiplayer.create_subtitle')}</p>
           </div>
@@ -93,8 +102,9 @@ export default function MultiplayerHomePage() {
                 style={{ '--game': gameColor(game.id) }}
                 onClick={() => navigate('/multiplayer/create', { state: { gameId: game.id } })}
               >
-                <span className="mp-row-icon" aria-hidden="true">{game.icon}</span>
+                <GameEmblem game={game.id} size={44} />
                 <span className="mp-row-title">{t(`games.${game.id}.title`)}</span>
+                <span className="mp-row-flight gg-mono">{flightCode(game.id)}</span>
                 <span className="mp-row-end"><PlusIcon /></span>
               </button>
             ))}
@@ -102,8 +112,9 @@ export default function MultiplayerHomePage() {
         </section>
 
         {recent.length > 0 && (
-          <section className="mp-section">
+          <section className="mp-section mp-section--recent">
             <div className="mp-section-head">
+              <p className="gg-kicker">{t('multiplayer.desk_recent')}</p>
               <h2>{t('multiplayer.recent_title')}</h2>
             </div>
             <div className="mp-rows">
@@ -115,7 +126,7 @@ export default function MultiplayerHomePage() {
                   style={{ '--game': gameColor(room.gameId) }}
                   onClick={() => navigate(`/multiplayer/room/${room.code}`)}
                 >
-                  <span className="mp-row-icon" aria-hidden="true">{roomGameIcon(room.gameId)}</span>
+                  <GameEmblem game={room.gameId} size={44} />
                   <span className="mp-row-text">
                     <span className="mp-row-title">{t(`games.${room.gameId}.title`)}</span>
                     <span className="mp-row-desc">
@@ -123,7 +134,7 @@ export default function MultiplayerHomePage() {
                       {new Date(room.at).toLocaleDateString(i18n.language)}
                     </span>
                   </span>
-                  <span className="mp-row-code">{room.code}</span>
+                  <span className="mp-row-code gg-mono">{room.code}</span>
                 </button>
               ))}
             </div>

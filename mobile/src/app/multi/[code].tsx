@@ -3,7 +3,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ActivityIndicator, ScrollView, Share, StyleSheet, TextInput, View } from 'react-native'
+import { ActivityIndicator, ScrollView, Share, TextInput, View } from 'react-native'
 import Animated, { FadeIn, ZoomIn } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -22,6 +22,7 @@ import { serverNow } from '@shared/utils/serverTime'
 import { announce } from '@/a11y'
 import { useAccount, type Account } from '@/account/auth'
 import { SITE_ORIGIN } from '@/links'
+import { BoardingPass, Kicker, ScreenTitle, Stamp } from '@/components/flight'
 import { BadgeStrip, useRoomBadges } from '@/components/profile/BadgeStrip'
 import { Avatar } from '@/components/profile/ProfileSections'
 import { Button, Pill, Text, Touchable } from '@/components/ui'
@@ -40,7 +41,8 @@ import {
   type RoomGame,
 } from '@/multiplayer/room'
 import { navigate } from '@/shims/react-router-dom'
-import { colors, fonts, radius, space } from '@/theme'
+import GameEmblem from '@/components/GameEmblem'
+import { fonts, makeStyles, radius, space, useColors, useTheme } from '@/theme'
 
 // Time left before a live start, on the server's clock.
 function useCountdown(startAt: number | null) {
@@ -57,6 +59,8 @@ function useCountdown(startAt: number | null) {
 
 // `autoJoin`: opened from a friend's invite with an account, so the player joins under their username right away.
 function JoinCard({ room, account, autoJoin }: { room: Room; account: Account | null; autoJoin: boolean }) {
+  const styles = useStyles()
+  const colors = useColors()
   const { t } = useTranslation()
   // Signed in: the account's username until the player types another one
   const [typed, setPseudo] = useState<string | null>(null)
@@ -86,6 +90,7 @@ function JoinCard({ room, account, autoJoin }: { room: Room; account: Account | 
         {t('mobile.multi.join_hint')}
       </Text>
       <TextInput
+        accessibilityLabel={t('mobile.multi.pseudo')}
         value={pseudo}
         onChangeText={setPseudo}
         placeholder={t('labels.your_username')}
@@ -108,24 +113,36 @@ function JoinCard({ room, account, autoJoin }: { room: Room; account: Account | 
 }
 
 function Players({ room }: { room: Room }) {
+  const styles = useStyles()
+  const colors = useColors()
   const { t } = useTranslation()
   const playerId = getPlayerId()
   const players = Object.entries(room.players)
   const badges = useRoomBadges(room.players)
   return (
-    <View style={styles.card}>
-      <Text variant="bodyStrong">{t('mobile.multi.players', { count: players.length })}</Text>
-      {players.map(([id, player]) => (
-        <Animated.View key={id} entering={FadeIn.duration(250)} style={styles.playerRow}>
-          <MaterialCommunityIcons name="account-circle" size={22} color={id === playerId ? colors.accent : colors.textMuted} />
-          <Text variant="body" numberOfLines={1} style={{ flex: 1 }}>
-            {player.pseudo}
-            {id === playerId ? ` (${t('mobile.multi.you')})` : ''}
-          </Text>
-          <BadgeStrip badges={badges[id]} />
-          {id === room.hostId && <Pill label={t('mobile.multi.host')} color={colors.warning} />}
-        </Animated.View>
-      ))}
+    <View style={{ gap: space.sm }}>
+      <View style={styles.manifestHead}>
+        <ScreenTitle size={20} style={{ flex: 1 }}>
+          {t('mp_room.manifest')}
+        </ScreenTitle>
+        <Kicker color={colors.accent}>{t('mobile.multi.players', { count: players.length })}</Kicker>
+      </View>
+      <View style={styles.manifest}>
+        {players.map(([id, player], index) => {
+          const me = id === playerId
+          return (
+            <Animated.View key={id} entering={FadeIn.duration(250)} style={[styles.manifestRow, index > 0 && styles.manifestDivider]}>
+              <Avatar username={player.pseudo} size={32} />
+              <Text variant="bodyStrong" numberOfLines={1} color={me ? colors.accent : colors.text} style={{ flex: 1 }}>
+                {player.pseudo}
+                {me ? ` (${t('mobile.multi.you')})` : ''}
+              </Text>
+              <BadgeStrip badges={badges[id]} />
+              {id === room.hostId && <Stamp label={t('mobile.multi.host').toUpperCase()} color={colors.gold} rotate={0} animate={false} size={10} />}
+            </Animated.View>
+          )
+        })}
+      </View>
     </View>
   )
 }
@@ -136,6 +153,8 @@ type Friendship = Friend & { status: 'friend' | 'incoming' | 'outgoing' }
 // Signed-in players invite their friends straight into the room; they get a banner in the app.
 // The room's other players with an account, not friends yet, can be added from here too.
 function InviteFriends({ room, account, color }: { room: Room; account: Account; color: string }) {
+  const styles = useStyles()
+  const colors = useColors()
   const { t } = useTranslation()
   const friendships = useFriendships(account.uid)
   const [invited, setInvited] = useState<Record<string, 'sending' | 'sent' | 'failed'>>({})
@@ -213,9 +232,7 @@ function InviteFriends({ room, account, color }: { room: Room; account: Account;
       )}
       {strangers.length > 0 && (
         <>
-          <Text variant="label" style={{ marginTop: space.sm }}>
-            {t('mobile.invites.room_players')}
-          </Text>
+          <Kicker style={{ marginTop: space.sm }}>{t('mobile.invites.room_players')}</Kicker>
           {strangers.map(([uid, pseudo]) => {
             const status = known.get(uid)?.status
             return (
@@ -245,6 +262,9 @@ function InviteFriends({ room, account, color }: { room: Room; account: Account;
 }
 
 export default function RoomScreen() {
+  const styles = useStyles()
+  const colors = useColors()
+  const { gameColors } = useTheme()
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   const { code, invited, watch } = useLocalSearchParams<{ code: string; invited?: string; watch?: string }>()
@@ -366,12 +386,12 @@ export default function RoomScreen() {
         </Touchable>
         {game && (
           <View style={{ flex: 1 }}>
-            <Text variant="label" color={game.color}>
+            <Kicker color={gameColors[game.id]}>
               {t('mobile.multi.title')} · {t(room!.mode === 'live' ? 'mobile.multi.live' : 'mobile.multi.challenge')}
-            </Text>
-            <Text variant="heading" numberOfLines={1}>
+            </Kicker>
+            <ScreenTitle size={22} numberOfLines={1}>
               {games.length > 1 ? t('mp_room.n_games', { count: games.length }) : t(game.titleKey)}
-            </Text>
+            </ScreenTitle>
           </View>
         )}
       </View>
@@ -390,9 +410,16 @@ export default function RoomScreen() {
         <ScrollView
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ padding: space.xl, paddingBottom: insets.bottom + space.xl, gap: space.lg }}>
-          <View style={[styles.codeCard, { borderColor: `${game!.color}55` }]}>
-            <Text variant="label">{t('mobile.multi.code_label')}</Text>
-            <Text selectable variant="hero" color={game!.color} style={styles.code}>
+          <BoardingPass
+            code={game!.code}
+            gate={String(Object.keys(room!.players).length)}
+            codeColor={gameColors[game!.id]}
+            codeLabel={t('mobile.flight.flight').toLocaleUpperCase()}
+            gateLabel={t('mobile.flight.pax').toLocaleUpperCase()}
+            accessibilityLabel={`${t('mobile.multi.code_label')} ${code}`}
+            style={{ borderColor: `${gameColors[game!.id]}55` }}>
+            <Kicker>{t('mobile.multi.code_label')}</Kicker>
+            <Text selectable variant="hero" color={gameColors[game!.id]} style={styles.code}>
               {code}
             </Text>
             <Button
@@ -400,8 +427,9 @@ export default function RoomScreen() {
               variant="secondary"
               onPress={onShare}
               icon={<MaterialCommunityIcons name="export-variant" size={18} color={colors.text} />}
+              style={{ minHeight: 44 }}
             />
-          </View>
+          </BoardingPass>
 
           {games.length > 1 && <GameList room={room!} results={results} playerId={playerId} />}
 
@@ -431,13 +459,13 @@ export default function RoomScreen() {
           ) : inLobby ? (
             <>
               <Players room={room!} />
-              {account?.username && <InviteFriends room={room!} account={account} color={game!.color} />}
+              {account?.username && <InviteFriends room={room!} account={account} color={gameColors[game!.id]} />}
               {isHost ? (
                 <>
                   {addGameButton}
                   <Button
                     label={t('mobile.multi.launch')}
-                    color={game!.color}
+                    color={gameColors[game!.id]}
                     onPress={() => onLaunch(() => launchRoom(code))}
                     loading={launching}
                     icon={<MaterialCommunityIcons name="play" size={20} color={colors.onAccent} />}
@@ -454,12 +482,12 @@ export default function RoomScreen() {
             </>
           ) : counting ? (
             <View style={styles.countdown}>
-              <Text variant="label">
+              <Kicker>
                 {games.length > 1 ? `${t('mp_room.game_n', { n: current + 1 })} · ` : ''}
                 {t('mobile.multi.starting_in')}
-              </Text>
+              </Kicker>
               <Animated.View key={Math.ceil(remaining! / 1000)} entering={ZoomIn.springify().damping(12)}>
-                <Text variant="hero" color={game!.color} style={{ fontSize: 96, lineHeight: 104 }}>
+                <Text variant="hero" color={gameColors[game!.id]} style={{ fontSize: 96, lineHeight: 104 }}>
                   {Math.ceil(remaining! / 1000)}
                 </Text>
               </Animated.View>
@@ -478,7 +506,7 @@ export default function RoomScreen() {
                   </Text>
                   <Button
                     label={t('mobile.multi.play')}
-                    color={game!.color}
+                    color={gameColors[game!.id]}
                     onPress={play}
                     icon={<MaterialCommunityIcons name="play" size={20} color={colors.onAccent} />}
                   />
@@ -505,14 +533,14 @@ export default function RoomScreen() {
               {isHost && hasNextLive && (
                 <Button
                   label={`${t('mp_room.next_game', { n: current + 2 })} · ${t(getGame(games[current + 1].id)?.titleKey ?? '')}`}
-                  color={game!.color}
+                  color={gameColors[game!.id]}
                   onPress={() => onLaunch(() => launchNextGame(room!))}
                   loading={launching}
                   icon={<MaterialCommunityIcons name="skip-next" size={20} color={colors.onAccent} />}
                 />
               )}
               {addGameButton}
-              {account?.username && <InviteFriends room={room!} account={account} color={game!.color} />}
+              {account?.username && <InviteFriends room={room!} account={account} color={gameColors[game!.id]} />}
               <Standings code={code} />
             </>
           )}
@@ -524,26 +552,29 @@ export default function RoomScreen() {
 
 // The room's games, with the player's progress through them
 function GameList({ room, results, playerId }: { room: Room; results: PlayerResult[]; playerId: string }) {
+  const styles = useStyles()
+  const colors = useColors()
+  const { gameColors } = useTheme()
   const { t } = useTranslation()
   const games: RoomGame[] = roomGames(room)
   const current: number = currentGameIndex(room)
   const played = new Set(results.filter((result) => result.playerId === playerId).map((result) => result.gameIndex ?? 0))
   return (
-    <View style={styles.card}>
+    <View style={styles.manifest}>
       {games.map((roomGame, i) => {
         const definition = getGame(roomGame.id)
         const isCurrent = room.mode === 'live' && room.status === 'playing' && i === current
         const done = played.has(i)
         return (
-          <View key={i} style={styles.playerRow}>
-            <View style={[styles.gameNumber, done && { backgroundColor: `${colors.accent}33` }, isCurrent && { borderColor: definition?.color ?? colors.accent }]}>
+          <View key={i} style={[styles.manifestRow, i > 0 && styles.manifestDivider]}>
+            <View style={[styles.gameNumber, done && { backgroundColor: `${colors.accent}33` }, isCurrent && { borderColor: (definition && gameColors[definition.id]) || colors.accent }]}>
               {done ? (
                 <MaterialCommunityIcons name="check" size={14} color={colors.accent} />
               ) : (
                 <Text variant="caption">{i + 1}</Text>
               )}
             </View>
-            {definition && <MaterialCommunityIcons name={definition.icon} size={20} color={definition.color} />}
+            {definition && <GameEmblem game={definition.id} variant="glyph" size={20} color={gameColors[definition.id]} />}
             <Text variant="body" numberOfLines={1} style={{ flex: 1 }}>
               {definition ? t(definition.titleKey) : roomGame.id}
               {roomGameSettings(roomGame, t)}
@@ -566,7 +597,7 @@ function roomGameSettings(roomGame: RoomGame, t: (key: string, options?: Record<
   return `${settings ? ` · ${settings}` : ''}${roomGame.count ? ` · ${roomGame.count}` : ''}`
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   header: { flexDirection: 'row', alignItems: 'center', gap: space.md, paddingHorizontal: space.lg },
   close: {
     width: 42,
@@ -579,15 +610,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: space.lg, padding: space.xl },
-  codeCard: {
-    alignItems: 'center',
-    gap: space.sm,
-    padding: space.lg,
-    borderRadius: radius.xl,
-    backgroundColor: colors.surface,
-    borderWidth: 1.5,
-  },
-  code: { letterSpacing: 6, fontVariant: ['tabular-nums'] },
+  code: { fontFamily: fonts.monoBold, fontSize: 34, lineHeight: 42, letterSpacing: 6 },
+  manifestHead: { flexDirection: 'row', alignItems: 'center', gap: space.md },
+  manifest: { borderRadius: radius.lg, backgroundColor: colors.board, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
+  manifestRow: { flexDirection: 'row', alignItems: 'center', gap: space.md, minHeight: 56, paddingHorizontal: space.md },
+  manifestDivider: { borderTopWidth: 1, borderTopColor: colors.boardLine },
   card: { gap: space.md, padding: space.lg, borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   playerRow: { flexDirection: 'row', alignItems: 'center', gap: space.md, paddingVertical: 4 },
   inviteButton: { minHeight: 36, paddingHorizontal: space.md },
@@ -606,7 +633,7 @@ const styles = StyleSheet.create({
   input: {
     height: 52,
     borderRadius: radius.md,
-    backgroundColor: colors.bg,
+    backgroundColor: colors.board,
     borderWidth: 1,
     borderColor: colors.border,
     paddingHorizontal: space.lg,
@@ -614,4 +641,4 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bodyMedium,
     fontSize: 16,
   },
-})
+}))

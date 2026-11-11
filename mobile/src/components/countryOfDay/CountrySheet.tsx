@@ -3,14 +3,14 @@ import { Image } from 'expo-image'
 import { router } from 'expo-router'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, View } from 'react-native'
+import { View } from 'react-native'
 
 import { getCountryInfo } from '@shared/utils/countryInfo'
 
 import { formatMetric, type Metric } from '@/components/atlas/format'
 import { Button, Text } from '@/components/ui'
 import { getFlag } from '@/flags'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 import type { Feature } from './labels'
 
 type Rank = { rank: number; total: number } | null
@@ -35,6 +35,8 @@ type Info = {
 
 function Fact({ label, value, rank }: { label: string; value: string; rank?: Rank }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   return (
     <View style={styles.fact}>
       <Text variant="caption">{label}</Text>
@@ -48,6 +50,8 @@ function Fact({ label, value, rank }: { label: string; value: string; rank?: Ran
 
 export function CountrySheet({ country }: { country: Feature }) {
   const { t, i18n } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const lang = i18n.language
   const info = useMemo(() => getCountryInfo(country, lang) as Info | null, [country, lang])
   if (!info) return null
@@ -101,7 +105,7 @@ export function CountrySheet({ country }: { country: Feature }) {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   card: { gap: space.md, padding: space.lg, borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   header: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   flag: { width: 64, height: 43, borderRadius: 6 },
@@ -129,4 +133,4 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   chipFlag: { width: 22, height: 15, borderRadius: 2 },
-})
+}))

@@ -5,7 +5,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, TextInput, View } from 'react-native'
+import { ScrollView, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { presetLabel } from '@shared/utils/ascensionPresets'
@@ -14,11 +14,13 @@ import { matchSurvivalRamp, parseSurvivalModes } from '@shared/utils/survivalCon
 import { QUIZ_DIFFICULTIES } from '@shared/utils/quizQuestions'
 
 import { useAccount } from '@/account/auth'
+import { BoardStrip, type BoardCell, Kicker, ScreenTitle, Stamp } from '@/components/flight'
 import { SheetCloseButton } from '@/components/SheetCloseButton'
 import { Button, Segmented, Text } from '@/components/ui'
-import { DIFFICULTY_COLORS, getGame } from '@/games'
+import { getGame, useDifficultyColors } from '@/games'
 import { addGameToRoom, createRoom, getSavedPseudo, type RoomGame, type RoomMode } from '@/multiplayer/room'
-import { colors, fonts, radius, space } from '@/theme'
+import GameEmblem from '@/components/GameEmblem'
+import { fonts, makeStyles, radius, space, useColors, useTheme } from '@/theme'
 
 // From the setup sheet: Placement / Flags / Capitals (difficulty, continent or Ascension), Survival (modes and lives)
 type SetupConfig = {
@@ -36,6 +38,10 @@ const COUNTS = ['5', '10', '15'] as const
 const QUIZ_COUNTS = ['5', '10', '20'] as const
 
 export default function CreateRoomSheet() {
+  const styles = useStyles()
+  const colors = useColors()
+  const { gameColors } = useTheme()
+  const difficultyColors = useDifficultyColors()
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   const params = useLocalSearchParams<{ game: string; config?: string; add?: string }>()
@@ -74,6 +80,12 @@ export default function CreateRoomSheet() {
         ? t(`difficulties.${setup.difficulty}`)
         : null
 
+  const boardCells: BoardCell[] = [
+    { label: t('mobile.flight.flight').toLocaleUpperCase(), value: game.code, color: colors.gold },
+    ...(addTo ? [] : [{ label: t('mobile.flight.mode').toLocaleUpperCase(), value: t(mode === 'live' ? 'mobile.multi.live' : 'mobile.multi.challenge').toUpperCase(), color: mode === 'live' ? colors.warning : colors.text }]),
+    ...(isRounds || isQuiz ? [{ label: t('mobile.flight.stops').toLocaleUpperCase(), value: count, color: colors.accent }] : []),
+  ]
+
   const onCreate = async () => {
     const name = pseudo.trim()
     if ((!name || forbidden) && !addTo) return
@@ -109,20 +121,20 @@ export default function CreateRoomSheet() {
     <View style={{ flex: 1 }}>
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: space.xl, gap: space.lg }}>
         <View style={styles.titleRow}>
-          <View style={[styles.icon, { backgroundColor: `${game.color}22` }]}>
-            <MaterialCommunityIcons name={game.icon} size={28} color={game.color} />
+          <View style={[styles.icon, { backgroundColor: `${gameColors[game.id]}22` }]}>
+            <GameEmblem game={game.id} variant="glyph" size={28} color={gameColors[game.id]} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text variant="label" color={game.color}>
-              {t('mobile.multi.title')}
-            </Text>
-            <Text variant="title" style={{ fontSize: 26 }}>
+            <Kicker color={gameColors[game.id]}>{t('mobile.multi.title')}</Kicker>
+            <ScreenTitle size={28} numberOfLines={2}>
               {t(game.titleKey)}
-            </Text>
+            </ScreenTitle>
             {setupLabel && <Text variant="caption">{setupLabel}</Text>}
           </View>
           <SheetCloseButton />
         </View>
+
+        <BoardStrip cells={boardCells} />
 
         {!addTo && (
           <View style={{ gap: space.sm }}>
@@ -141,11 +153,11 @@ export default function CreateRoomSheet() {
         {isQuiz && (
           <>
             <View style={{ gap: space.sm }}>
-              <Text variant="label">{t('mobile.multi.difficulty')}</Text>
+              <Kicker>{t('mobile.multi.difficulty')}</Kicker>
               <View style={styles.grid}>
                 {(QUIZ_DIFFICULTIES as string[]).map((difficulty) => {
                   const active = quizDifficulty === difficulty
-                  const color = DIFFICULTY_COLORS[difficulty]
+                  const color = difficultyColors[difficulty]
                   return (
                     <Button
                       key={difficulty}
@@ -159,7 +171,7 @@ export default function CreateRoomSheet() {
               </View>
             </View>
             <View style={{ gap: space.sm }}>
-              <Text variant="label">{t('mobile.multi.answer_mode')}</Text>
+              <Kicker>{t('mobile.multi.answer_mode')}</Kicker>
               <Segmented<'choices' | 'free'>
                 value={answerMode}
                 onChange={setAnswerMode}
@@ -174,7 +186,7 @@ export default function CreateRoomSheet() {
 
         {(isRounds || isQuiz) && (
           <View style={{ gap: space.sm }}>
-            <Text variant="label">{t(isQuiz ? 'mobile.multi.questions_count' : 'mobile.multi.countries_count')}</Text>
+            <Kicker>{t(isQuiz ? 'mobile.multi.questions_count' : 'mobile.multi.countries_count')}</Kicker>
             <Segmented<string>
               value={count}
               onChange={setCount}
@@ -186,8 +198,11 @@ export default function CreateRoomSheet() {
         <View style={{ gap: space.sm }}>
           {!addTo && (
             <>
-              <Text variant="label">{t('mobile.multi.pseudo')}</Text>
+              <Kicker>{t('mobile.multi.pseudo')}</Kicker>
+              <View style={styles.inputBox}>
+              <MaterialCommunityIcons name="account-outline" size={22} color={colors.textMuted} />
               <TextInput
+                accessibilityLabel={t('mobile.multi.pseudo')}
                 value={pseudo}
                 onChangeText={setPseudo}
                 placeholder={t('labels.your_username')}
@@ -199,6 +214,8 @@ export default function CreateRoomSheet() {
                 onSubmitEditing={onCreate}
                 style={styles.input}
               />
+              <Text style={styles.counter}>{pseudo.length}/20</Text>
+              </View>
             </>
           )}
           {!addTo && forbidden && (
@@ -212,6 +229,15 @@ export default function CreateRoomSheet() {
             </Text>
           )}
         </View>
+
+        {!addTo && (
+          <View style={styles.hostNote}>
+            <Stamp label={t('mobile.multi.host').toLocaleUpperCase()} rotate={-6} animate={false} size={11} />
+            <Text variant="caption" style={{ flex: 1 }}>
+              {t('mobile.flight.host_note')}
+            </Text>
+          </View>
+        )}
       </ScrollView>
 
       <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, space.lg) }]}>
@@ -220,7 +246,7 @@ export default function CreateRoomSheet() {
           onPress={onCreate}
           loading={creating}
           disabled={!addTo && (!pseudo.trim() || forbidden)}
-          color={game.color}
+          color={gameColors[game.id]}
           icon={<MaterialCommunityIcons name="account-group" size={20} color={colors.onAccent} />}
           style={{ flex: 1 }}
         />
@@ -229,22 +255,35 @@ export default function CreateRoomSheet() {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
+  hostNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.md,
+    padding: space.md,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+  },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: space.lg },
   icon: { width: 56, height: 56, borderRadius: radius.lg, alignItems: 'center', justifyContent: 'center' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
   option: { flexBasis: '48%', flexGrow: 1, borderWidth: 1.5, borderColor: colors.border },
-  input: {
-    height: 52,
+  inputBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.md,
+    height: 56,
     borderRadius: radius.md,
-    backgroundColor: colors.bg,
+    backgroundColor: colors.board,
     borderWidth: 1,
     borderColor: colors.border,
     paddingHorizontal: space.lg,
-    color: colors.text,
-    fontFamily: fonts.bodyMedium,
-    fontSize: 16,
   },
+  input: { flex: 1, height: '100%', color: colors.text, fontFamily: fonts.bodyBold, fontSize: 17 },
+  counter: { fontFamily: fonts.monoBold, fontSize: 11, color: colors.textMuted },
   footer: {
     flexDirection: 'row',
     paddingHorizontal: space.xl,
@@ -253,4 +292,4 @@ const styles = StyleSheet.create({
     borderTopColor: colors.border,
     backgroundColor: colors.surface,
   },
-})
+}))

@@ -4,10 +4,11 @@ import { useTranslation } from 'react-i18next'
 import { useFriendships } from '@shared/hooks/usePlayerProfile'
 
 import { useAccount } from '@/account/auth'
-import { colors } from '@/theme'
+import { fonts, useColors } from '@/theme'
 
 export default function TabsLayout() {
   const { t } = useTranslation()
+  const colors = useColors()
   const { account } = useAccount()
   // Friend requests waiting for an answer: a badge on the Profile tab, which leads to the friends screen.
   const requests = useFriendships(account?.uid).incoming.length
@@ -16,7 +17,10 @@ export default function TabsLayout() {
       backgroundColor={colors.bg}
       tintColor={colors.accent}
       iconColor={{ default: colors.textMuted, selected: colors.accent }}
-      labelStyle={{ default: { color: colors.textMuted }, selected: { color: colors.text } }}>
+      labelStyle={{
+        default: { color: colors.textMuted, fontSize: 11, fontFamily: fonts.bodyBold },
+        selected: { color: colors.accent, fontSize: 11, fontFamily: fonts.bodyBold },
+      }}>
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Icon sf={{ default: 'globe.europe.africa', selected: 'globe.europe.africa.fill' }} md="public" />
         <NativeTabs.Trigger.Label>{t('mobile.tabs.play')}</NativeTabs.Trigger.Label>
@@ -31,7 +35,7 @@ export default function TabsLayout() {
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="profile">
         <NativeTabs.Trigger.Icon sf={{ default: 'person.crop.circle', selected: 'person.crop.circle.fill' }} md="account_circle" />
-        <NativeTabs.Trigger.Label>{t('mobile.tabs.profile')}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>{t('profile.passport')}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Badge hidden={requests === 0}>{String(requests)}</NativeTabs.Trigger.Badge>
       </NativeTabs.Trigger>
     </NativeTabs>

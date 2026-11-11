@@ -1,0 +1,796 @@
+/* Home page « carnet de vol »: hero, boarding passes, passport, departures board */
+
+/* ---------- Hero ---------- */
+.flight-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 32px;
+  padding-top: 24px;
+}
+
+.flight-hero-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+  min-width: 0;
+}
+
+.flight-hero-motto {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--sd-accent-strong);
+  letter-spacing: 0.14em;
+}
+
+.flight-hero-title {
+  margin: 0;
+  font-family: var(--sd-font-display);
+  font-weight: 800;
+  font-size: clamp(2.6rem, 6.5vw, 5.4rem);
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  color: var(--sd-ink);
+}
+
+.flight-hero-lead {
+  margin: 0;
+  max-width: 46ch;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--sd-muted);
+}
+
+.flight-hero-panels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.flight-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 140px;
+  padding: 14px 18px;
+  border-radius: var(--sd-radius-md);
+  border: 1px solid var(--sd-line);
+  background: var(--sd-surface);
+  font-family: var(--sd-font-mono);
+}
+
+.flight-panel-label {
+  font-size: 0.65rem;
+  color: var(--sd-muted);
+}
+
+.flight-panel-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--sd-ink);
+}
+
+.flight-panel-value--accent {
+  color: var(--sd-accent-strong);
+}
+
+.flight-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 12px 22px;
+  border: 0;
+  border-radius: var(--sd-radius-pill);
+  background: var(--sd-accent);
+  color: var(--sd-accent-ink);
+  font-weight: 700;
+  font-size: 1rem;
+  box-shadow: 0 8px 24px -10px var(--sd-accent);
+}
+
+.flight-cta:hover {
+  filter: brightness(1.06);
+}
+
+.flight-hero-globe {
+  min-width: 0;
+}
+
+.flight-globe-placeholder {
+  width: 100%;
+  max-width: 560px;
+  aspect-ratio: 1;
+  margin-inline: auto;
+}
+
+/* ---------- Section heads ---------- */
+.flight-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 6px 16px;
+}
+
+.flight-section-head h2 {
+  margin: 0;
+  font-family: var(--sd-font-display);
+  font-weight: 800;
+  font-size: clamp(1.7rem, 3.4vw, 2.5rem);
+  letter-spacing: -0.02em;
+}
+
+.flight-section-head p {
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--sd-muted);
+}
+
+/* ---------- Boarding passes ---------- */
+.boarding-passes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 16px;
+}
+
+.boarding-pass {
+  --notch: 18px;
+  --stub: 104px;
+  position: relative;
+  display: flex;
+  border-radius: 18px;
+  border: 1px solid var(--sd-line);
+  background: var(--sd-surface);
+  transition: transform var(--sd-dur-base) var(--sd-ease-spring), box-shadow var(--sd-dur-base), border-color var(--sd-dur-base);
+}
+
+/* The two notches where the stub tears off */
+.boarding-pass::before,
+.boarding-pass::after {
+  content: '';
+  position: absolute;
+  right: calc(var(--stub) - var(--notch) / 2);
+  width: var(--notch);
+  height: var(--notch);
+  border-radius: 50%;
+  background: var(--sd-bg);
+  border: 1px solid var(--sd-line);
+}
+
+.boarding-pass::before { top: calc(var(--notch) / -2); clip-path: inset(50% 0 0 0); }
+.boarding-pass::after { bottom: calc(var(--notch) / -2); clip-path: inset(0 0 50% 0); }
+
+.boarding-pass:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--gg-shadow);
+  border-color: color-mix(in srgb, var(--game) 50%, var(--sd-line));
+}
+
+.boarding-pass--done {
+  border-color: var(--gg-accent-line);
+}
+
+.boarding-pass-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+}
+
+.boarding-pass-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.boarding-pass-code {
+  font-size: 0.62rem;
+  color: var(--sd-muted);
+}
+
+.boarding-pass-status {
+  flex-shrink: 0;
+  padding: 3px 9px;
+  border-radius: var(--sd-radius-pill);
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: var(--gg-tint-strong);
+  color: var(--sd-muted);
+}
+
+.boarding-pass-status--won,
+.boarding-pass-status--played {
+  background: var(--gg-success-soft);
+  color: var(--gg-success-strong);
+}
+
+.boarding-pass-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-family: var(--sd-font-display);
+  font-weight: 800;
+  font-size: 1.4rem;
+  letter-spacing: -0.01em;
+  color: var(--sd-ink);
+}
+
+
+.boarding-pass-desc {
+  flex-grow: 1;
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--sd-muted);
+}
+
+.boarding-pass-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.boarding-pass-board {
+  flex-grow: 1;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--sd-accent);
+  color: var(--sd-accent-ink);
+  font-weight: 700;
+  font-size: 0.92rem;
+  transition: filter var(--sd-dur-fast);
+}
+
+.boarding-pass-board:hover {
+  filter: brightness(1.06);
+}
+
+.boarding-pass-more {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 46px;
+  min-height: 44px;
+  border-radius: 12px;
+  border: 1px solid var(--sd-line);
+  background: transparent;
+  color: var(--sd-ink);
+  font-size: 1.15rem;
+  transition: border-color var(--sd-dur-fast), background var(--sd-dur-fast);
+}
+
+.boarding-pass-more:hover {
+  border-color: var(--sd-accent);
+  background: var(--gg-accent-soft);
+}
+
+.boarding-pass-stub {
+  flex: 0 0 var(--stub);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 20px 14px;
+  border-left: 2px dashed var(--sd-line);
+  font-family: var(--sd-font-mono);
+  transform-origin: 0 50%;
+  transition: transform var(--sd-dur-slow) var(--sd-ease-spring);
+}
+
+.boarding-pass:hover .boarding-pass-stub {
+  transform: rotate(3deg) translateX(4px);
+}
+
+.boarding-pass-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.boarding-pass-field small {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sd-muted);
+}
+
+.boarding-pass-field strong {
+  font-size: 0.9rem;
+  color: var(--sd-ink);
+}
+
+.boarding-pass-field .boarding-pass-gate {
+  font-size: 1.4rem;
+  color: var(--sd-accent-strong);
+}
+
+.boarding-pass-flight {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  color: var(--game-ink);
+}
+
+.boarding-pass-barcode {
+  height: 34px;
+  opacity: 0.8;
+  background: repeating-linear-gradient(90deg, var(--sd-ink) 0 2px, transparent 2px 4px, var(--sd-ink) 4px 5px, transparent 5px 8px);
+}
+
+/* ---------- Passport ---------- */
+.passport {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 32px;
+  border-radius: 24px;
+  background: var(--sd-surface-2);
+  border: 1px solid var(--sd-line);
+}
+
+.passport-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 24px 32px;
+}
+
+.passport-intro {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+
+.passport-intro h2 {
+  margin: 0 0 8px;
+  font-family: var(--sd-font-display);
+  font-weight: 800;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  letter-spacing: -0.02em;
+}
+
+.passport-intro p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--sd-muted);
+}
+
+.passport-stamps-wrap {
+  flex: 2 1 420px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.passport-example {
+  margin: 0;
+  font-size: 0.65rem;
+  color: var(--sd-muted);
+}
+
+.passport-stamps {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.passport-stamp {
+  --tone: var(--gg-stamp-green);
+  width: 116px;
+  height: 116px;
+  border-radius: 50%;
+  border: 3px double var(--tone);
+  color: var(--tone);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 8px;
+  text-align: center;
+  font-family: var(--sd-font-mono);
+  transform: rotate(var(--sd-stamp-rotate));
+}
+
+.passport-stamp--accent2 {
+  --tone: var(--gg-stamp-violet);
+}
+
+.passport-stamp--waiting {
+  opacity: 0;
+}
+
+.passport-stamp-top,
+.passport-stamp-bottom {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.passport-stamp-label {
+  font-family: var(--sd-font-display);
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.passport-cards {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+
+/* ---------- Ascension: a special flight ---------- */
+.ascension-featured-kicker {
+  font-size: 0.62rem;
+  color: var(--sd-accent-2);
+}
+
+/* ---------- Departures board: white in light, night blue in dark (tokens in src/styles/theme.css) ---------- */
+.departures {
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--sd-line);
+  background: var(--gg-board);
+  color: var(--gg-board-ink);
+  font-family: var(--sd-font-mono);
+}
+
+.departures-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.departures-table thead tr {
+  font-size: 0.68rem;
+  text-align: left;
+  color: var(--gg-board-muted);
+}
+
+.departures-table th {
+  padding: 14px 20px;
+  font-weight: 700;
+}
+
+.departures-row {
+  position: relative;
+  border-top: 1px solid var(--gg-board-line);
+  transition: background var(--sd-dur-fast);
+}
+
+.departures-row:hover,
+.departures-row:focus-within {
+  background: var(--gg-board-hover);
+}
+
+.departures-table td {
+  padding: 0 20px;
+}
+
+.departures-name {
+  width: 1%;
+  white-space: nowrap;
+}
+
+/* The button covers the whole row: one target per game */
+.departures-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 14px 0;
+  border: 0;
+  background: none;
+  color: var(--gg-board-accent);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-align: left;
+}
+
+.departures-emblem {
+  display: block;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+}
+
+/* The flight code, in gold like the rest of the board's accents */
+.departures-code {
+  flex-shrink: 0;
+  min-width: 3ch;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  color: var(--gg-board-accent);
+}
+
+.departures-button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.departures-button:focus-visible {
+  outline: none;
+}
+
+.departures-row:has(.departures-button:focus-visible) {
+  outline: 2px solid var(--sd-accent);
+  outline-offset: -2px;
+}
+
+.departures-brief {
+  font-size: 0.8rem;
+  color: var(--gg-board-muted);
+}
+
+.departures-status-col {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.departures-status {
+  font-size: 0.72rem;
+  color: var(--gg-board-muted);
+}
+
+.departures-status--boarding {
+  color: var(--gg-board-boarding);
+  animation: departures-blink 1.2s steps(2) infinite;
+}
+
+.departures-status--open {
+  color: var(--gg-board-ink);
+}
+
+@keyframes departures-blink {
+  50% { opacity: 0.35; }
+}
+
+.flap-text-visual {
+  white-space: pre;
+}
+
+/* ---------- Phones ---------- */
+@media (max-width: 860px) {
+  .flight-hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .flight-hero-globe {
+    order: -1;
+  }
+
+  .flight-hero .flight-globe {
+    max-width: 360px;
+  }
+}
+
+@media (max-width: 600px) {
+  .departures-brief {
+    display: none;
+  }
+
+  .departures-table th,
+  .departures-table td {
+    padding-inline: 14px;
+  }
+
+  .departures-name {
+    width: auto;
+    white-space: normal;
+  }
+
+  .passport {
+    padding: 22px 16px;
+  }
+
+  .passport-stamp {
+    width: 96px;
+    height: 96px;
+  }
+
+  .boarding-pass {
+    --stub: 84px;
+  }
+
+  .boarding-pass-stub {
+    padding: 16px 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boarding-pass,
+  .boarding-pass:hover,
+  .boarding-pass:hover .boarding-pass-stub {
+    transform: none;
+  }
+
+  .departures-status--boarding {
+    animation: none;
+  }
+
+  .passport-stamp--waiting {
+    opacity: 1;
+  }
+}
+
+/* ---------- Next flight, over the globe once the city is found ---------- */
+.next-flight {
+  position: absolute;
+  left: 50%;
+  bottom: 9%;
+  z-index: 2;
+  width: min(92%, 360px);
+  translate: -50% 0;
+  border-radius: var(--sd-radius-md, 14px);
+  border: 1px solid var(--gg-board-line);
+  background: var(--gg-board);
+  color: var(--gg-board-ink);
+  box-shadow: var(--gg-shadow);
+  overflow: hidden;
+  transform-origin: 50% 0;
+  animation: next-flight-flap 620ms cubic-bezier(0.2, 0.9, 0.3, 1.25) both;
+}
+
+/* The flap's hinge, across the middle like a split-flap card */
+.next-flight::after {
+  content: '';
+  position: absolute;
+  inset: 50% 0 auto;
+  height: 1px;
+  background: var(--gg-board-line);
+  opacity: 0;
+  animation: next-flight-hinge 620ms ease-out both;
+  pointer-events: none;
+}
+
+@keyframes next-flight-flap {
+  0% { transform: perspective(700px) rotateX(-100deg); opacity: 0; }
+  35% { opacity: 1; }
+  70% { transform: perspective(700px) rotateX(14deg); }
+  100% { transform: perspective(700px) rotateX(0); }
+}
+
+@keyframes next-flight-hinge {
+  0%, 60% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.next-flight-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.5rem 0.45rem 0.9rem;
+  border-bottom: 1px solid var(--gg-board-line);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--gg-board-muted);
+}
+
+.next-flight-code {
+  color: var(--gg-board-accent);
+  font-weight: 700;
+}
+
+.next-flight-close {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-left: auto;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--gg-board-muted);
+  cursor: pointer;
+}
+
+.next-flight-close:hover {
+  background: var(--gg-board-hover);
+  color: var(--gg-board-ink);
+}
+
+.next-flight-body {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.9rem 0.35rem;
+  min-height: 3.4rem;
+}
+
+.next-flight-emblem {
+  display: flex;
+  flex-shrink: 0;
+  animation: next-flight-pop 420ms 380ms cubic-bezier(0.2, 0.9, 0.3, 1.4) both;
+}
+
+@keyframes next-flight-pop {
+  from { transform: scale(0.4); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.next-flight-title {
+  font-family: var(--sd-font-mono);
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: 0.06em;
+  color: var(--gg-board-accent);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.next-flight-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.35rem 0.5rem 0.6rem 0.9rem;
+}
+
+.next-flight-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.72rem;
+  color: var(--gg-board-boarding);
+}
+
+.next-flight-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: next-flight-blink 1.1s steps(2, jump-none) infinite;
+}
+
+@keyframes next-flight-blink {
+  50% { opacity: 0.2; }
+}
+
+.next-flight-board {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  padding: 0 1rem;
+  border: 0;
+  border-radius: var(--sd-radius-pill);
+  background: var(--sd-accent);
+  color: var(--sd-accent-ink);
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .next-flight,
+  .next-flight::after,
+  .next-flight-emblem,
+  .next-flight-dot {
+    animation: none;
+  }
+}

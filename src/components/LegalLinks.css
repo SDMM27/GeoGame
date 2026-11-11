@@ -8,11 +8,13 @@
 }
 
 .legal-links a {
-  color: var(--text-muted);
+  display: inline-block;
+  padding: 0.7rem 0;
+  color: var(--sd-muted);
   text-decoration: none;
 }
 
 .legal-links a:hover {
-  color: var(--text-primary);
+  color: var(--sd-ink);
   text-decoration: underline;
 }

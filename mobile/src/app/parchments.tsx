@@ -3,7 +3,7 @@
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native'
+import { ActivityIndicator, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { onPublicDataPatched } from '@shared/utils/publicProfile'
@@ -14,9 +14,11 @@ import { useAccount } from '@/account/auth'
 import { ScrollsView, type Scrolls } from '@/components/scrolls/ScrollsView'
 import { ScreenHeader } from '@/components/ScreenHeader'
 import { Button, Text } from '@/components/ui'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 
 export default function ParchmentsScreen() {
+  const styles = useStyles()
+  const colors = useColors()
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   const { open } = useLocalSearchParams<{ open?: string }>()
@@ -60,6 +62,6 @@ export default function ParchmentsScreen() {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   card: { gap: space.lg, padding: space.lg, borderRadius: radius.xl, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
-})
+}))

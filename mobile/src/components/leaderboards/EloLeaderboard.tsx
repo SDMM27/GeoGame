@@ -36,8 +36,9 @@ export function EloLeaderboard({
         <Text variant="caption">{t('elo.explain')}</Text>
       </View>
       <LeaderboardCard scores={scores} error={error} emptyText={t('elo.empty')}>
-        {visibleRows(scores ?? [], account?.uid, MAX_ROWS).map(({ score, index }) => (
+        {visibleRows(scores ?? [], account?.uid, MAX_ROWS).map(({ score, index }, position, rows) => (
           <LeaderboardRow
+            last={position === rows.length - 1}
             key={score.id}
             index={index}
             name={score.name}

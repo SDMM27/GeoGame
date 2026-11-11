@@ -4,17 +4,21 @@ import * as Haptics from 'expo-haptics'
 import { usePathname } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, View } from 'react-native'
+import { View } from 'react-native'
 import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useAccount } from '@/account/auth'
+import GameEmblem from '@/components/GameEmblem'
 import { getGame } from '@/games'
 import { acceptInvite, useInvites } from '@/multiplayer/invites'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors, useTheme } from '@/theme'
 import { Button, Text, Touchable } from './ui'
 
 export function InviteBanner() {
+  const colors = useColors()
+  const styles = useStyles()
+  const theme = useTheme()
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   const pathname = usePathname()
@@ -39,6 +43,7 @@ export function InviteBanner() {
 
   if (!visible) return null
 
+  const gameColor = theme.gameColors[game.id]
   const hide = () => setSeen((previous) => new Set(previous).add(`${invite.id}:${invite.at}`))
 
   return (
@@ -46,10 +51,10 @@ export function InviteBanner() {
       key={invite.id}
       entering={FadeInUp.springify().damping(18)}
       exiting={FadeOutUp.duration(180)}
-      style={[styles.banner, { top: insets.top + space.sm, borderColor: `${game.color}88` }]}
+      style={[styles.banner, { top: insets.top + space.sm, borderColor: `${gameColor}88` }]}
       accessibilityLiveRegion="polite">
-      <View style={[styles.icon, { backgroundColor: `${game.color}22` }]}>
-        <MaterialCommunityIcons name={game.icon} size={22} color={game.color} />
+      <View style={[styles.icon, { backgroundColor: `${gameColor}22` }]}>
+        <GameEmblem game={game.id} variant="glyph" size={22} color={gameColor} />
       </View>
       <View style={{ flex: 1 }}>
         <Text variant="bodyStrong" numberOfLines={2}>
@@ -59,7 +64,7 @@ export function InviteBanner() {
       </View>
       <Button
         label={t('mobile.multi.join')}
-        color={game.color}
+        color={gameColor}
         onPress={() => {
           hide()
           acceptInvite(invite)
@@ -73,7 +78,7 @@ export function InviteBanner() {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   banner: {
     position: 'absolute',
     left: space.md,
@@ -95,4 +100,4 @@ const styles = StyleSheet.create({
   icon: { width: 40, height: 40, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },
   join: { minHeight: 38, paddingHorizontal: space.md },
   close: { width: 32, height: 32, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
-})
+}))

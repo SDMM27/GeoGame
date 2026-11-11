@@ -3,46 +3,55 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Modal, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native'
+import { Modal, View, type StyleProp, type ViewStyle } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { Touchable } from '@/components/ui'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors, useTheme, type Palette } from '@/theme'
 import { allCountries, type CountryFeature } from './geometry'
 import { WorldMap, type LeafletStyle, type Overlay, type WorldMapHandle } from './WorldMap'
 
 export type VoyageColor = 'start' | 'green' | 'yellow' | 'red' | 'target' | 'hint'
 
-export const VOYAGE_COLORS: Record<VoyageColor, string> = {
-  start: '#5FD4F4',
-  green: colors.accent,
-  yellow: colors.warning,
-  red: colors.danger,
-  target: '#FF9EC7',
-  hint: colors.textMuted,
+export function voyageColors(colors: Palette, gameColors: ReturnType<typeof useTheme>['gameColors']): Record<VoyageColor, string> {
+  return {
+    start: gameColors.voyage_voyage,
+    green: colors.accent,
+    yellow: colors.warning,
+    red: colors.danger,
+    target: gameColors.ranking,
+    hint: colors.textMuted,
+  }
 }
 
-function styleFor(color: VoyageColor): LeafletStyle {
-  if (color === 'hint') return { fillColor: VOYAGE_COLORS.hint, fillOpacity: 0.08, color: '#EEF1F8', weight: 2 }
-  return { fillColor: VOYAGE_COLORS[color], fillOpacity: color === 'red' ? 0.4 : 0.55, color: VOYAGE_COLORS[color], weight: 2 }
+/** The colors of the Voyage Voyage guesses in the theme in use. */
+export function useVoyageColors(): Record<VoyageColor, string> {
+  const { colors, gameColors } = useTheme()
+  return useMemo(() => voyageColors(colors, gameColors), [colors, gameColors])
 }
 
-const GRATICULE_COLOR = '#1E3A5F'
-const GRATICULE: Overlay[] = [
-  ...[-60, -30, 0, 30, 60].map((lat) => ({
-    type: 'line' as const,
-    points: [-180, -90, 0, 90, 180].map((lng) => [lat, lng] as [number, number]),
-    color: GRATICULE_COLOR,
-    width: 1,
-  })),
-  ...[-150, -120, -90, -60, -30, 0, 30, 60, 90, 120, 150].map((lng) => ({
-    type: 'line' as const,
-    points: [[-85, lng], [85, lng]] as [number, number][],
-    color: GRATICULE_COLOR,
-    width: 1,
-  })),
-]
+function styleFor(color: VoyageColor, voyage: Record<VoyageColor, string>, colors: Palette): LeafletStyle {
+  if (color === 'hint') return { fillColor: voyage.hint, fillOpacity: 0.08, color: colors.text, weight: 2 }
+  return { fillColor: voyage[color], fillOpacity: color === 'red' ? 0.4 : 0.55, color: voyage[color], weight: 2 }
+}
+
+function graticule(color: string): Overlay[] {
+  return [
+    ...[-60, -30, 0, 30, 60].map((lat) => ({
+      type: 'line' as const,
+      points: [-180, -90, 0, 90, 180].map((lng) => [lat, lng] as [number, number]),
+      color,
+      width: 1,
+    })),
+    ...[-150, -120, -90, -60, -30, 0, 30, 60, 90, 120, 150].map((lng) => ({
+      type: 'line' as const,
+      points: [[-85, lng], [85, lng]] as [number, number][],
+      color,
+      width: 1,
+    })),
+  ]
+}
 
 const CENTERS = new Map(
   allCountries.map((feature) => [feature.properties.ADMIN, feature.properties.center as [number, number] | undefined])
@@ -63,6 +72,8 @@ type VoyageMapProps = {
 // Pinching a map a third of the screen tall inside a scrolling page was cramped and fought the scroll.
 export function ExpandableVoyageMap(props: Omit<VoyageMapProps, 'interactive' | 'onExpand'>) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const insets = useSafeAreaInsets()
   const [open, setOpen] = useState(false)
   return (
@@ -87,6 +98,9 @@ export function ExpandableVoyageMap(props: Omit<VoyageMapProps, 'interactive' | 
 
 export function VoyageMap({ start, target, guesses, hints, interactive, style, onExpand }: VoyageMapProps) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
+  const voyage = useVoyageColors()
   const mapRef = useRef<WorldMapHandle>(null)
   const [ready, setReady] = useState(false)
   const framed = useRef(false)
@@ -107,15 +121,15 @@ export function VoyageMap({ start, target, guesses, hints, interactive, style, o
   // A dot on each country keeps tiny ones visible.
   const overlays = useMemo<Overlay[]>(
     () =>
-      GRATICULE.concat(
+      graticule(colors.stub).concat(
         [...colored].flatMap(([name, color]) => {
           const center = CENTERS.get(name)
           if (!center || color === 'hint') return []
-          return [{ type: 'circle' as const, center: [center[1], center[0]] as [number, number], radius: 4, color: VOYAGE_COLORS[color] }]
+          return [{ type: 'circle' as const, center: [center[1], center[0]] as [number, number], radius: 4, color: voyage[color] }]
         })
       ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [signature]
+    [signature, colors, voyage]
   )
 
   // Hints are not framed: a huge country (Russia, Canada) would take over the view.
@@ -130,12 +144,12 @@ export function VoyageMap({ start, target, guesses, hints, interactive, style, o
     map.geoJson.resetStyle()
     for (const layer of map.geoJson.getLayers()) {
       const color = colored.get(layer.feature.properties.ADMIN)
-      if (color) layer.setStyle(styleFor(color))
+      if (color) layer.setStyle(styleFor(color, voyage, colors))
     }
     frame(framed.current)
     framed.current = true
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ready, signature])
+  }, [ready, signature, colors, voyage])
 
   return (
     <View
@@ -163,7 +177,7 @@ export function VoyageMap({ start, target, guesses, hints, interactive, style, o
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   frame: {
     height: 240,
     borderRadius: radius.lg,
@@ -198,4 +212,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-})
+}))

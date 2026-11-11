@@ -76,8 +76,8 @@ describe('soloDetailParts', () => {
 })
 
 describe('rankLabel', () => {
-  it('uses medals for the podium and 1-based numbers after it', () => {
-    expect([0, 1, 2].map(rankLabel)).toEqual(['🥇', '🥈', '🥉'])
+  it('is the 1-based rank, without medals', () => {
+    expect([0, 1, 2].map(rankLabel)).toEqual(['1', '2', '3'])
     expect(rankLabel(3)).toBe('4')
     expect(rankLabel(49)).toBe('50')
   })

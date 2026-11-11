@@ -15,7 +15,7 @@ import { useAccount, useRecordGame } from '../auth'
 import { GAME_TYPES } from '../utils/gameTypes'
 import { CHALLENGE_TIMER, challengeShareGrid } from '../utils/dailyChallenge'
 import { formatTime } from '../utils/formatTime'
-import { SURVIVAL_ROUND_ICONS } from '../components/SurvivalOptions'
+import GameEmblem, { GameFlightTag } from '../components/GameEmblem'
 import { DIFFICULTY_COLORS } from './quiz/constants'
 import { PlacementRound, TypedRound, roundAnswer } from './survival/SurvivalRounds'
 import ChallengeForm from './ChallengeForm'
@@ -24,6 +24,7 @@ import ChallengeLeaderboard from './ChallengeLeaderboard'
 import 'leaflet/dist/leaflet.css'
 import './GamePage.css'
 import './QuizPage.css'
+import EndStamp from '../components/EndStamp'
 import './survival/Survival.css'
 import './DailyChallengePage.css'
 
@@ -53,6 +54,7 @@ function Playing({ challenge }) {
       <NavBar />
       <div className={`survival-game${round.type === GAME_TYPES.PLACEMENT ? ' survival-game--map' : ''}`}>
         <header className="survival-hud">
+          <GameFlightTag game={GAME_TYPES.DAILY_CHALLENGE} className="survival-hud-flight" />
           <Progress results={results} current={roundIndex} />
           <div className="survival-hud-round">
             <span className="survival-hud-label">
@@ -61,7 +63,7 @@ function Playing({ challenge }) {
                 {' · '}{t(`difficulties.${round.difficulty}`)}
               </span>
             </span>
-            <strong>{SURVIVAL_ROUND_ICONS[round.type]} {t(`survival.prompt.${round.type}`)}</strong>
+            <strong><GameEmblem game={round.type} variant="glyph" size={16} /> {t(`survival.prompt.${round.type}`)}</strong>
           </div>
           <div className="survival-hud-stats">
             <span><strong>{score}</strong> {t('daily_challenge.correct_short')}</span>
@@ -165,7 +167,10 @@ export default function DailyChallengePage() {
           result={done ? { score, solved: true } : null}
         />
         <header className="quiz-header">
-          <h1>{t('games.daily_challenge.title')}</h1>
+          <div className="quiz-header__title">
+            <p className="gg-kicker">{t(done ? 'carnet_games.kicker_end' : 'carnet_games.kicker_daily')}</p>
+            <h1>{t('games.daily_challenge.title')}</h1>
+          </div>
         </header>
 
         {phase === 'loading' && <p className="quiz-muted">{t('messages.loading')}</p>}
@@ -184,6 +189,7 @@ export default function DailyChallengePage() {
         {done && (
           <>
             <section className="quiz-card challenge-result">
+              <EndStamp />
               <h2 className="quiz-card-title">{t('daily_challenge.result_title')}</h2>
               <div className="challenge-score">
                 <strong>{score}</strong>

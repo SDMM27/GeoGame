@@ -7,6 +7,7 @@ import { useAccount } from '../../auth'
 import { useScoreSave } from '../../hooks/useScoreSave'
 import LeaderboardSave from '../LeaderboardSave'
 import '../../pages/DailyLeaderboard.css'
+import '../../pages/form.css'
 
 // End of the Country of the Day: the score (even 0) goes to the day's leaderboard, once.
 export default function CountryOfDayForm({ mode, steps, score, elapsedTime, dailyKey }) {
@@ -24,17 +25,23 @@ export default function CountryOfDayForm({ mode, steps, score, elapsedTime, dail
   const text = (entry) => `${t('country_of_day.points', { count: entry.score })} — ${entry.elapsedTime != null ? formatTime(entry.elapsedTime) : '—'}`
 
   return (
-    <div className="daily-form">
-      <h2 className="daily-form__title">{t('form.title')}</h2>
-      <p className="daily-form__stat">{text({ score, elapsedTime })}</p>
+    <div className="daily-form gg-ticket form-ticket daily-form--ticket">
+      <div className="form-ticket__main">
+        <p className="gg-kicker">{t('carnet_games.kicker_end')}</p>
+        <h2 className="daily-form__title">{t('form.title')}</h2>
 
-      <LeaderboardSave
-        saver={saver}
-        variant="daily"
-        existingText={text}
-        blockedLabel={t('form.better_daily_score')}
-        blockedHint={t('form.use_different_name_daily')}
-      />
+        <LeaderboardSave
+          saver={saver}
+          variant="daily"
+          existingText={text}
+          blockedLabel={t('form.better_daily_score')}
+          blockedHint={t('form.use_different_name_daily')}
+        />
+      </div>
+      <div className="gg-ticket-stub form-ticket__stub">
+        <span className="gg-field"><small>{t('game_hud.score')}</small><strong>{t('country_of_day.points', { count: score })}</strong></span>
+        <span className="gg-field"><small>{t('game_hud.time')}</small><strong>{elapsedTime != null ? formatTime(elapsedTime) : '—'}</strong></span>
+      </div>
     </div>
   )
 }

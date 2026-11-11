@@ -12,14 +12,16 @@ import { usePlayerProfile } from '@shared/hooks/usePlayerProfile'
 import { TIER_COLORS } from '@shared/utils/achievements'
 import { decorationStyle } from '@shared/utils/decorations'
 import { formatSeason } from '@shared/utils/elo'
-import { describeBest, describeDetails, describeMode, describeResult, formatPlayedAt } from '@shared/utils/profileFormat'
+import { describeBest, describeDetails, describeMode, describeResult } from '@shared/utils/profileFormat'
 import { dailyTypesOn, dayKey, formatPlayTime } from '@shared/utils/profileStats'
 
 import { CollapsibleSection } from '@/components/CollapsibleSection'
 import { BadgeStrip } from '@/components/profile/BadgeStrip'
+import { Stamp } from '@/components/flight'
 import { Button, Segmented, Text, Touchable } from '@/components/ui'
 import { getGameByType } from '@/games'
-import { colors, fonts, radius, space } from '@/theme'
+import GameEmblem from '@/components/GameEmblem'
+import { darkColors, fonts, makeStyles, radius, space, useColors, useTheme } from '@/theme'
 import { RING_WIDTH_DOUBLE, ringBorder } from './decorationStyle'
 
 export type Decoration = { frame: string; color: string }
@@ -75,7 +77,7 @@ const RING_ROOM = RING_GAP + RING_WIDTH_DOUBLE
 export function Avatar({ username, size = 44, decoration }: { username: string; size?: number; decoration?: Decoration | null }) {
   const disc = (
     <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: avatarColor(username), alignItems: 'center', justifyContent: 'center' }}>
-      <Text style={{ fontFamily: fonts.display, fontSize: size * 0.45, lineHeight: size * 0.55 }} color={colors.onAccent}>
+      <Text style={{ fontFamily: fonts.display, fontSize: size * 0.45, lineHeight: size * 0.55 }} color={darkColors.onAccent}>
         {username.charAt(0).toUpperCase()}
       </Text>
     </View>
@@ -94,6 +96,7 @@ export function Avatar({ username, size = 44, decoration }: { username: string; 
 }
 
 export function SectionTitle({ title, right }: { title: string; right?: ReactNode }) {
+  const styles = useStyles()
   return (
     <View style={styles.sectionTitle}>
       <Text variant="heading">{title}</Text>
@@ -102,24 +105,26 @@ export function SectionTitle({ title, right }: { title: string; right?: ReactNod
   )
 }
 
-export function LinkButton({ label, onPress, color = colors.accent }: { label: string; onPress: () => void; color?: string }) {
+export function LinkButton({ label, onPress, color }: { label: string; onPress: () => void; color?: string }) {
+  const colors = useColors()
   return (
     <Touchable accessibilityRole="button" onPress={onPress} style={{ paddingVertical: space.xs, paddingHorizontal: space.sm }}>
-      <Text variant="bodyStrong" color={color} style={{ fontSize: 14 }}>
+      <Text variant="bodyStrong" color={color ?? colors.accent} style={{ fontSize: 14 }}>
         {label}
       </Text>
     </Touchable>
   )
 }
 
-function Tile({ icon, value, label, color }: { icon: IconName; value: string; label: string; color: string }) {
+// A passport figure: mono value over its label
+function Tile({ value, label }: { value: string; label: string }) {
+  const styles = useStyles()
   return (
-    <View style={styles.tile}>
-      <MaterialCommunityIcons name={icon} size={20} color={color} />
-      <Text variant="number" numberOfLines={1} adjustsFontSizeToFit>
+    <View accessible accessibilityLabel={`${label}, ${value}`} style={styles.tile}>
+      <Text style={styles.tileValue} numberOfLines={1} adjustsFontSizeToFit>
         {value}
       </Text>
-      <Text variant="caption" numberOfLines={1}>
+      <Text variant="caption" numberOfLines={2} style={{ fontSize: 11, lineHeight: 14 }}>
         {label}
       </Text>
     </View>
@@ -128,18 +133,21 @@ function Tile({ icon, value, label, color }: { icon: IconName; value: string; la
 
 export function StatTiles({ stats }: { stats: ProfileStats }) {
   const { t } = useTranslation()
+  const styles = useStyles()
   return (
     <View style={styles.tiles}>
-      <Tile icon="gamepad-variant-outline" value={String(stats.total)} label={t('profile.games')} color={colors.highlight} />
-      <Tile icon="timer-outline" value={formatPlayTime(stats.totalTime)} label={t('profile.play_time')} color={colors.warning} />
-      <Tile icon="earth" value={String(stats.countriesFound)} label={t('profile.countries')} color={colors.accent} />
-      <Tile icon="calendar-month-outline" value={String(stats.daysPlayed)} label={t('profile.days')} color="#C792FF" />
+      <Tile value={String(stats.total)} label={t('profile.games')} />
+      <Tile value={formatPlayTime(stats.totalTime)} label={t('profile.play_time')} />
+      <Tile value={String(stats.countriesFound)} label={t('profile.countries')} />
+      <Tile value={String(stats.daysPlayed)} label={t('profile.days')} />
     </View>
   )
 }
 
 export function StreakCard({ stats }: { stats: ProfileStats }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   // Dailies of today that the app knows
   const todayTypes = dailyTypesOn(dayKey()).filter((type: string) => getGameByType(type))
   const doneToday = todayTypes.filter((type: string) => stats.todayDaily[type]).length
@@ -188,20 +196,24 @@ export function DailyChips({
   onSelect?: (type: string) => void
 }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
+  const { gameColors } = useTheme()
   return (
     <View style={{ flexDirection: 'row', gap: space.sm }}>
       {dailyTypesOn(dayKey()).map((type: string) => {
         const game = getGameByType(type)
         const result = today[type]
         if (!game) return null
+        const gameColor = gameColors[game.id]
         const chip = (
           <View
             style={[
               styles.chip,
               { width: size, height: size, borderRadius: size / 3 },
-              result ? { backgroundColor: `${game.color}26`, borderColor: game.color } : { opacity: 0.35 },
+              result ? { backgroundColor: `${gameColor}26`, borderColor: gameColor } : { opacity: 0.35 },
             ]}>
-            <MaterialCommunityIcons name={game.icon} size={size * 0.5} color={result ? game.color : colors.textMuted} />
+            <GameEmblem game={game.id} variant="glyph" size={size * 0.5} color={result ? gameColor : colors.textMuted} />
             {result && (
               <View style={[styles.chipBadge, { backgroundColor: result.solved === false ? colors.danger : colors.accent }]}>
                 <MaterialCommunityIcons name={result.solved === false ? 'close' : 'check'} size={9} color={colors.bg} />
@@ -223,6 +235,8 @@ export function DailyChips({
 
 export function AchievementsSection({ achievements, scope, uid }: { achievements: Achievement[]; scope: Scope; uid?: string }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const byUid: Record<string, { wins?: number } | undefined> = useBadges([uid])
   const wins = (uid ? byUid[uid]?.wins : 0) ?? 0
   const [expanded, setExpanded] = useState(false)
@@ -250,38 +264,35 @@ export function AchievementsSection({ achievements, scope, uid }: { achievements
         </Text>
       )}
       <View style={[styles.grid, { marginBottom: space.md }]}>
-        {visible.map((achievement) => (
-          <Touchable
-            key={achievement.id}
-            accessibilityRole="button"
-            accessibilityLabel={t(`achievements.${achievement.id}.title`)}
-            onPress={() => setSelected(achievement)}
-            style={[styles.achievement, achievement.unlocked ? { borderColor: `${TIER_COLORS[achievement.tier]}88` } : { opacity: 0.55 }]}
-          >
-            <View style={[styles.achievementIcon, { backgroundColor: achievement.unlocked ? `${TIER_COLORS[achievement.tier]}26` : colors.surfaceHigh }]}>
-              <MaterialCommunityIcons name={achievement.icon} size={22} color={achievement.unlocked ? TIER_COLORS[achievement.tier] : colors.textFaint} />
-            </View>
-            <Text variant="bodyStrong" numberOfLines={2} style={{ fontSize: 14 }}>
-              {t(`achievements.${achievement.id}.title`)}
-            </Text>
-            <Text variant="caption" numberOfLines={2} style={{ fontSize: 12, lineHeight: 16 }}>
-              {t(`achievements.${achievement.id}.desc`)}
-            </Text>
-            <Text variant="caption" color={TIER_COLORS[achievement.tier]} style={{ fontSize: 10, textTransform: 'uppercase', fontWeight: '700' }}>
-              {t(`achievements.tiers.${achievement.tier}`)}
-            </Text>
-            {!achievement.unlocked && achievement.target > 1 && (
-              <View style={{ gap: 3 }}>
-                <View style={styles.track}>
-                  <View style={[styles.bar, { width: `${(achievement.progress / achievement.target) * 100}%` }]} />
-                </View>
-                <Text variant="caption" style={{ fontSize: 11 }}>
-                  {achievement.progress}/{achievement.target}
-                </Text>
+        {visible.map((achievement) => {
+          const tint = achievement.unlocked ? TIER_COLORS[achievement.tier] : colors.textFaint
+          const partial = !achievement.unlocked && achievement.target > 1
+          return (
+            <Touchable
+              key={achievement.id}
+              accessibilityRole="button"
+              accessibilityLabel={`${t(`achievements.${achievement.id}.title`)}, ${t(`achievements.${achievement.id}.desc`)}`}
+              onPress={() => setSelected(achievement)}
+              style={styles.achievement}>
+              {/* Unlocked: a solid stamp in the tier's ink; locked: a dashed outline */}
+              <View
+                style={[
+                  styles.stampTile,
+                  achievement.unlocked
+                    ? { borderColor: tint, backgroundColor: `${tint}1F`, transform: [{ rotate: '-3deg' }] }
+                    : { borderColor: colors.borderStrong, borderStyle: 'dashed' },
+                ]}>
+                <MaterialCommunityIcons name={achievement.icon} size={26} color={tint} />
               </View>
-            )}
-          </Touchable>
-        ))}
+              <Text variant="bodyStrong" numberOfLines={2} style={{ fontSize: 13, lineHeight: 17, textAlign: 'center' }}>
+                {t(`achievements.${achievement.id}.title`)}
+              </Text>
+              <Text style={[styles.stampTier, { color: partial ? colors.textMuted : tint }]}>
+                {partial ? `${achievement.progress}/${achievement.target}` : t(`achievements.tiers.${achievement.tier}`)}
+              </Text>
+            </Touchable>
+          )
+        })}
       </View>
       {achievements.length > 6 && (
         <View style={{ alignItems: 'center' }}>
@@ -296,6 +307,8 @@ export function AchievementsSection({ achievements, scope, uid }: { achievements
 // One achievement in full: the cards of the grid cut long titles and descriptions short.
 function AchievementModal({ achievement, onClose }: { achievement: Achievement; onClose: () => void }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const color = TIER_COLORS[achievement.tier]
   return (
     <Modal transparent visible animationType="fade" onRequestClose={onClose}>
@@ -339,6 +352,8 @@ function AchievementModal({ achievement, onClose }: { achievement: Achievement; 
 
 export function ByGameSection({ stats, scope }: { stats: ProfileStats; scope: Scope }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const { gameColors } = useTheme()
   const entries = Object.entries(stats.byGame).sort((a, b) => b[1].played - a[1].played)
   if (entries.length === 0) return null
   const top = getGameByType(entries[0][0])
@@ -349,11 +364,12 @@ export function ByGameSection({ stats, scope }: { stats: ProfileStats; scope: Sc
         {entries.map(([type, gameStats], index) => {
           const game = getGameByType(type)
           if (!game) return null
+          const gameColor = gameColors[game.id]
           const best = describeBest(gameStats, t, type)
           return (
             <View key={type} style={[styles.listRow, index > 0 && styles.listDivider]}>
-              <View style={[styles.gameIcon, { backgroundColor: `${game.color}1F` }]}>
-                <MaterialCommunityIcons name={game.icon} size={20} color={game.color} />
+              <View style={[styles.gameIcon, { backgroundColor: `${gameColor}1F` }]}>
+                <GameEmblem game={game.id} variant="glyph" size={20} color={gameColor} />
               </View>
               <View style={{ flex: 1 }}>
                 <Text variant="bodyStrong" numberOfLines={1}>
@@ -369,7 +385,7 @@ export function ByGameSection({ stats, scope }: { stats: ProfileStats; scope: Sc
                 </Text>
               </View>
               {best && (
-                <Text variant="bodyStrong" color={game.color} style={{ fontSize: 13 }}>
+                <Text variant="bodyStrong" color={gameColor} style={{ fontSize: 13 }}>
                   {best}
                 </Text>
               )}
@@ -387,6 +403,9 @@ type RecordsGrid = { rows: { game: string; difficulties: RecordCell[]; continent
 // Best solo score of each game by difficulty or continent: perfect ones in gold, the others with how close they are.
 export function RecordsSection({ uid, scope }: { uid: string; scope: Scope }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
+  const { gameColors } = useTheme()
   const { loading, error, grid, reload } = usePlayerRecords(uid) as { loading: boolean; error: boolean; grid: RecordsGrid | null; reload: () => void }
   const [by, setBy] = useState<'difficulties' | 'continents'>('difficulties')
   // The first load is the hook's own: only the next focuses reload
@@ -425,10 +444,11 @@ export function RecordsSection({ uid, scope }: { uid: string; scope: Scope }) {
         {grid.rows.map((row) => {
           const game = getGameByType(row.game)
           if (!game) return null
+          const gameColor = gameColors[game.id]
           return (
             <View key={row.game} style={{ gap: 4 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.xs }}>
-                <MaterialCommunityIcons name={game.icon} size={14} color={game.color} />
+                <GameEmblem game={game.id} variant="glyph" size={14} color={gameColor} />
                 <Text variant="caption" numberOfLines={1} style={{ fontSize: 12 }}>
                   {t(game.titleKey)}
                 </Text>
@@ -457,7 +477,7 @@ export function RecordsSection({ uid, scope }: { uid: string; scope: Scope }) {
                         </View>
                         {!cell.isPerfect && (
                           <View style={[styles.track, { alignSelf: 'stretch' }]}>
-                            <View style={[styles.bar, { width: `${cell.ratio * 100}%`, backgroundColor: game.color }]} />
+                            <View style={[styles.bar, { width: `${cell.ratio * 100}%`, backgroundColor: gameColor }]} />
                           </View>
                         )}
                       </>
@@ -478,6 +498,9 @@ type EloEntry = { key: string; rating: number; played: boolean; games?: number; 
 // Elo ratings of the current season: duels, then each solo mode.
 export function EloSection({ uid, scope }: { uid: string; scope: Scope }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
+  const { gameColors } = useTheme()
   const { loading, error, season, entries } = usePlayerElo(uid) as { loading: boolean; error: boolean; season: string; entries: EloEntry[] }
   if (loading || error) return null
   const played = entries.filter((entry) => entry.played)
@@ -487,7 +510,7 @@ export function EloSection({ uid, scope }: { uid: string; scope: Scope }) {
       <View style={styles.list}>
         {entries.map((entry, index) => {
           const game = entry.key === 'duel' ? undefined : getGameByType(entry.key)
-          const color = game?.color ?? colors.highlight
+          const color = game ? gameColors[game.id] : colors.highlight
           let detail = t('elo.unplayed')
           if (entry.played) {
             detail = entry.key === 'duel' ? t('elo.duel_detail', { games: entry.games, wins: entry.wins }) : t('elo.found_count', { count: entry.found })
@@ -495,7 +518,11 @@ export function EloSection({ uid, scope }: { uid: string; scope: Scope }) {
           return (
             <View key={entry.key} style={[styles.listRow, index > 0 && styles.listDivider]}>
               <View style={[styles.gameIcon, { backgroundColor: `${color}1F` }]}>
-                <MaterialCommunityIcons name={game?.icon ?? 'sword-cross'} size={20} color={color} />
+                {game ? (
+                  <GameEmblem game={game.id} variant="glyph" size={20} color={color} />
+                ) : (
+                  <MaterialCommunityIcons name="sword-cross" size={20} color={color} />
+                )}
               </View>
               <View style={{ flex: 1 }}>
                 <Text variant="bodyStrong" numberOfLines={1}>
@@ -516,11 +543,22 @@ export function EloSection({ uid, scope }: { uid: string; scope: Scope }) {
   )
 }
 
+// « 10 NOV. · 18:42 »: the board's date of a game (not the relative « today » of formatPlayedAt)
+function boardDate(playedAt: number, language: string) {
+  const date = new Date(playedAt)
+  const day = date.toLocaleDateString(language, { day: 'numeric', month: 'short' })
+  const time = date.toLocaleTimeString(language, { hour: '2-digit', minute: '2-digit' })
+  return `${day} · ${time}`.toLocaleUpperCase(language)
+}
+
 export function GameHistoryRow({ game, divider }: { game: HistoryGame; divider?: boolean }) {
   const { t, i18n } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const [open, setOpen] = useState(false)
   const meta = getGameByType(game.gameType)
   if (!meta) return null
+  const failed = game.solved === false
   return (
     <>
       <Touchable
@@ -528,9 +566,7 @@ export function GameHistoryRow({ game, divider }: { game: HistoryGame; divider?:
         accessibilityLabel={t('profile.details.title')}
         onPress={() => setOpen(true)}
         style={[styles.listRow, divider && styles.listDivider]}>
-        <View style={[styles.gameIcon, { backgroundColor: `${meta.color}1F` }]}>
-          <MaterialCommunityIcons name={meta.icon} size={20} color={meta.color} />
-        </View>
+        <GameEmblem game={game.gameType} size={38} />
         <View style={{ flex: 1 }}>
           <Text variant="bodyStrong" numberOfLines={1}>
             {t(meta.titleKey)}
@@ -538,16 +574,23 @@ export function GameHistoryRow({ game, divider }: { game: HistoryGame; divider?:
           <Text variant="caption" numberOfLines={1}>
             {describeMode(game, t)}
           </Text>
+          <Text style={styles.rowDate} numberOfLines={1}>
+            {boardDate(game.playedAt, i18n.language)}
+          </Text>
         </View>
-        <View style={{ alignItems: 'flex-end', maxWidth: '45%' }}>
-          <Text variant="bodyStrong" numberOfLines={1} style={{ fontSize: 13 }} color={game.solved === false ? colors.danger : colors.text}>
+        <View style={styles.rowResult}>
+          <Text variant="bodyStrong" numberOfLines={2} style={styles.rowScore} color={failed ? colors.danger : colors.text}>
             {describeResult(game, t)}
           </Text>
-          <Text variant="caption" style={{ fontSize: 12 }}>
-            {formatPlayedAt(game.playedAt, i18n.language)}
-          </Text>
+          <Stamp
+            label={t(failed ? 'carnet_games.stamp_diverted' : 'carnet_games.stamp_landed').toLocaleUpperCase()}
+            tone={failed ? 'bad' : 'ok'}
+            rotate={-3}
+            animate={false}
+            size={9}
+            style={styles.rowStamp}
+          />
         </View>
-        <MaterialCommunityIcons name="chevron-right" size={20} color={colors.textFaint} />
       </Touchable>
       <GameDetailModal game={game} visible={open} onClose={() => setOpen(false)} />
     </>
@@ -557,6 +600,9 @@ export function GameHistoryRow({ game, divider }: { game: HistoryGame; divider?:
 // Everything recorded for one game of the history. A multiplayer game can reopen its room, with every player's results.
 function GameDetailModal({ game, visible, onClose }: { game: HistoryGame; visible: boolean; onClose: () => void }) {
   const { t, i18n } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
+  const { gameColors } = useTheme()
   const meta = getGameByType(game.gameType)
   if (!meta) return null
   const roomCode = game.mode === 'multi' && typeof game.roomCode === 'string' ? game.roomCode : null
@@ -566,8 +612,8 @@ function GameDetailModal({ game, visible, onClose }: { game: HistoryGame; visibl
       <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel={t('profile.details.close')}>
         <Pressable style={styles.sheet} onPress={(event) => event.stopPropagation()}>
           <View style={styles.sheetHeader}>
-            <View style={[styles.gameIcon, { backgroundColor: `${meta.color}1F` }]}>
-              <MaterialCommunityIcons name={meta.icon} size={20} color={meta.color} />
+            <View style={[styles.gameIcon, { backgroundColor: `${gameColors[meta.id]}1F` }]}>
+              <MaterialCommunityIcons name={meta.icon} size={20} color={gameColors[meta.id]} />
             </View>
             <View style={{ flex: 1 }}>
               <Text variant="heading" numberOfLines={1}>
@@ -605,8 +651,9 @@ function GameDetailModal({ game, visible, onClose }: { game: HistoryGame; visibl
 }
 
 export function HistoryList({ games }: { games: HistoryGame[] }) {
+  const styles = useStyles()
   return (
-    <View style={styles.list}>
+    <View style={styles.table}>
       {games.map((game, index) => (
         <GameHistoryRow key={game.id} game={game} divider={index > 0} />
       ))}
@@ -631,6 +678,7 @@ export function ProfileBody({
   onSeeHistory: () => void
 }) {
   const { t } = useTranslation()
+  const colors = useColors()
   const profile = usePlayerProfile(uid, { friendsCount, own })
   const { reload } = profile
   useFocusEffect(useCallback(() => reload(), [reload]))
@@ -704,16 +752,18 @@ export function ProfileView({
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   sectionTitle: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   card: { gap: space.lg, padding: space.lg, borderRadius: radius.xl, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   tiles: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
+  tileValue: { fontFamily: fonts.monoBold, fontSize: 18, lineHeight: 24, color: colors.text, fontVariant: ['tabular-nums'] },
   tile: {
-    flexBasis: '47%',
+    flexBasis: '22%',
     flexGrow: 1,
+    minWidth: 72,
     gap: 2,
     padding: space.md,
-    borderRadius: radius.lg,
+    borderRadius: radius.md,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
@@ -722,16 +772,9 @@ const styles = StyleSheet.create({
   chip: { borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surfaceHigh, alignItems: 'center', justifyContent: 'center' },
   chipBadge: { position: 'absolute', right: -4, top: -4, width: 15, height: 15, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
-  achievement: {
-    flexBasis: '47%',
-    flexGrow: 1,
-    gap: space.xs,
-    padding: space.md,
-    borderRadius: radius.lg,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
+  achievement: { flexBasis: '30%', flexGrow: 1, alignItems: 'center', gap: space.xs, paddingVertical: space.sm, minHeight: 44 },
+  stampTile: { width: 64, height: 64, borderRadius: radius.lg, borderWidth: 2, alignItems: 'center', justifyContent: 'center', marginBottom: space.xs },
+  stampTier: { fontFamily: fonts.monoBold, fontSize: 9, letterSpacing: 1, textTransform: 'uppercase' },
   achievementIcon: { width: 40, height: 40, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center', marginBottom: space.xs },
   achievementBig: { width: 72, height: 72, borderRadius: radius.lg, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
   track: { height: 4, borderRadius: 2, backgroundColor: colors.border, overflow: 'hidden' },
@@ -751,9 +794,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceHigh,
   },
   list: { borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
+  table: { borderRadius: radius.lg, backgroundColor: colors.board, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
   listRow: { flexDirection: 'row', alignItems: 'center', gap: space.md, paddingHorizontal: space.md, paddingVertical: space.md },
+  rowDate: { fontFamily: fonts.mono, fontSize: 10, letterSpacing: 0.5, color: colors.textMuted, marginTop: 2 },
+  rowResult: { alignItems: 'flex-end', gap: 6, maxWidth: '45%' },
+  rowScore: { fontFamily: fonts.monoBold, fontSize: 12, textAlign: 'right' },
+  rowStamp: { alignSelf: 'flex-end', paddingVertical: 2, paddingHorizontal: 6, borderWidth: 1.5, borderRadius: 6 },
   listDivider: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },
-  backdrop: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, backgroundColor: 'rgba(0, 0, 0, 0.6)' },
+  backdrop: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, backgroundColor: colors.scrim },
   sheet: {
     width: '100%',
     maxWidth: 420,
@@ -777,4 +825,4 @@ const styles = StyleSheet.create({
   },
   detailValue: { flexShrink: 1, textAlign: 'right', fontSize: 14 },
   gameIcon: { width: 38, height: 38, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },
-})
+}))

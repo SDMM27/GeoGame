@@ -29,22 +29,28 @@ import { API_ORIGIN, legalUrl } from '@/links'
 import { DecorationPicker } from '@/components/profile/DecorationPicker'
 import { FlagCollection } from '@/components/profile/FlagCollection'
 import { ScrollCollection } from '@/components/profile/ScrollCollection'
+import { Kicker, ScreenTitle } from '@/components/flight'
 import { LevelBar } from '@/components/profile/LevelBar'
 import { Avatar, ProfileBody } from '@/components/profile/ProfileSections'
 import { CollapsibleSection } from '@/components/CollapsibleSection'
 import { Button, Pill, Segmented, Text, Touchable } from '@/components/ui'
 import { forgetDevice, useDailyReminder, useWebPushPermission } from '@/notifications/push'
-import { colors, fonts, radius, space } from '@/theme'
+import { fonts, makeStyles, radius, space, useColors, useThemePreference, type ThemePreference } from '@/theme'
 
 // This device stops receiving the account's invite notifications.
 const signOutDevice = () => forgetDevice().then(() => signOut(auth))
 
 type Mode = 'signin' | 'signup'
 
+// Machine-readable zone of the passport page: capitals and digits only, padded with « < » (purely decorative)
+const mrzLine = (text: string) =>
+  text.normalize('NFD').toUpperCase().replace(/[^A-Z0-9<]+/g, '<').padEnd(30, '<').slice(0, 30)
+
 const openLegal = (path: string) => openBrowserAsync(legalUrl(path)).catch(() => {})
 
 // Shown wherever an account gets created (email form, or username choice after a first Google sign-in).
 function SignupNotice() {
+  const colors = useColors()
   const link = (path: string) => <Text variant="caption" color={colors.accent} onPress={() => openLegal(path)} />
   return (
     <Text variant="caption">
@@ -55,6 +61,7 @@ function SignupNotice() {
 
 // Privacy policy, terms, legal notice and account deletion, on the website.
 function LegalLinks() {
+  const styles = useStyles()
   const { t } = useTranslation()
   const pages = [
     [LEGAL_PATHS.privacy, 'legal.privacy'],
@@ -73,6 +80,8 @@ function LegalLinks() {
 }
 
 function Field({ label, hint, ...props }: TextInputProps & { label: string; hint?: string }) {
+  const styles = useStyles()
+  const colors = useColors()
   return (
     <View style={{ gap: space.sm }}>
       <Text variant="label">{label}</Text>
@@ -83,6 +92,8 @@ function Field({ label, hint, ...props }: TextInputProps & { label: string; hint
 }
 
 function Message({ text, kind }: { text: string; kind: 'error' | 'notice' }) {
+  const styles = useStyles()
+  const colors = useColors()
   const color = kind === 'error' ? colors.danger : colors.accent
   return (
     <View style={[styles.message, { backgroundColor: `${color}1F` }]}>
@@ -95,6 +106,8 @@ function Message({ text, kind }: { text: string; kind: 'error' | 'notice' }) {
 
 // Only where Google sign-in is available (web and Android builds, see account/google.ts).
 function GoogleButton({ onError }: { onError: (key: string | null) => void }) {
+  const styles = useStyles()
+  const colors = useColors()
   const { t } = useTranslation()
   const [pending, setPending] = useState(false)
   if (!signInWithGoogle) return null
@@ -131,6 +144,8 @@ function GoogleButton({ onError }: { onError: (key: string | null) => void }) {
 }
 
 function AuthForm() {
+  const styles = useStyles()
+  const colors = useColors()
   const { t } = useTranslation()
   const [mode, setMode] = useState<Mode>('signin')
   const [username, setUsername] = useState('')
@@ -248,6 +263,8 @@ const suggestUsername = () =>
   (auth.currentUser?.displayName ?? '').replace(/[^\p{L}\p{N} _.-]/gu, '').trim().slice(0, USERNAME_MAX)
 
 function ChooseUsername() {
+  const styles = useStyles()
+  const colors = useColors()
   const { t } = useTranslation()
   const [username, setUsername] = useState(suggestUsername)
   const [error, setError] = useState<string | null>(null)
@@ -292,6 +309,8 @@ function ChooseUsername() {
 }
 
 function AccountSettings({ account }: { account: Account }) {
+  const styles = useStyles()
+  const colors = useColors()
   const { t } = useTranslation()
   const [deleting, setDeleting] = useState(false)
   const [password, setPassword] = useState('')
@@ -373,6 +392,8 @@ function AccountSettings({ account }: { account: Account }) {
 // Notifications of this device. The web app turns them on here, since Safari asks for the permission only from a tap;
 // the daily challenge reminder can be turned off once they're on (the app asks for the permission by itself).
 function NotificationsCard({ uid }: { uid: string }) {
+  const styles = useStyles()
+  const colors = useColors()
   const { t } = useTranslation()
   const { state, enable } = useWebPushPermission(uid)
   const daily = useDailyReminder()
@@ -414,6 +435,8 @@ function NotificationsCard({ uid }: { uid: string }) {
 }
 
 function FriendsCard({ count, pending }: { count: number; pending: number }) {
+  const styles = useStyles()
+  const colors = useColors()
   const { t } = useTranslation()
   return (
     <Touchable accessibilityRole="button" onPress={() => router.push('/friends')} style={[styles.card, styles.friendsCard]}>
@@ -431,6 +454,7 @@ function FriendsCard({ count, pending }: { count: number; pending: number }) {
 }
 
 function Profile({ account }: { account: Account }) {
+  const styles = useStyles()
   const { t, i18n } = useTranslation()
   const friendships = useFriendships(account.uid)
   const username = account.username ?? '?'
@@ -439,20 +463,37 @@ function Profile({ account }: { account: Account }) {
 
   return (
     <View style={{ gap: space.xl }}>
-      <View style={styles.header}>
-        <Avatar username={username} size={72} decoration={decoration} />
-        <View style={{ flex: 1, gap: 2 }}>
-          <Text variant="title" numberOfLines={1} adjustsFontSizeToFit color={nameColor ?? undefined}>
-            {username}
+      {/* Identity page of the passport: name, member since, level, and the machine-readable lines */}
+      <View style={styles.passport}>
+        <View style={styles.passportBar}>
+          <Kicker size={9}>{t('mobile.tabs.profile')}</Kicker>
+          <Kicker size={9}>GeoGame</Kicker>
+        </View>
+        <View style={styles.passportBody}>
+          <View style={styles.header}>
+            <Avatar username={username} size={72} decoration={decoration} />
+            <View style={{ flex: 1, gap: 2 }}>
+              <ScreenTitle size={30} numberOfLines={1} adjustsFontSizeToFit color={nameColor ?? undefined}>
+                {username}
+              </ScreenTitle>
+              {account.createdAt && (
+                <Text variant="caption">
+                  {t('profile.member_since', { date: new Date(account.createdAt).toLocaleDateString(i18n.language, { month: 'long', year: 'numeric' }) })}
+                </Text>
+              )}
+            </View>
+          </View>
+          <LevelBar uid={account.uid} />
+        </View>
+        <View style={styles.mrz} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+          <Text style={styles.mrzLine} numberOfLines={1}>
+            {mrzLine(`P<GGM<${username}`)}
           </Text>
-          {account.createdAt && (
-            <Text variant="caption">
-              {t('profile.member_since', { date: new Date(account.createdAt).toLocaleDateString(i18n.language, { month: 'long', year: 'numeric' }) })}
-            </Text>
-          )}
+          <Text style={styles.mrzLine} numberOfLines={1}>
+            {mrzLine(account.uid)}
+          </Text>
         </View>
       </View>
-      <LevelBar uid={account.uid} />
       <DecorationPicker uid={account.uid} username={username} />
       <FriendsCard count={friendships.friends.length} pending={friendships.incoming.length} />
       <ProfileBody
@@ -472,7 +513,29 @@ function Profile({ account }: { account: Account }) {
   )
 }
 
+// Light, dark, or as the phone: applied at once, everywhere, and remembered on this device
+function ThemeCard() {
+  const styles = useStyles()
+  const { t } = useTranslation()
+  const [preference, setPreference] = useThemePreference()
+  return (
+    <View style={[styles.card, { gap: space.md }]}>
+      <Text variant="label">{t('mobile.theme.title')}</Text>
+      <Segmented<ThemePreference>
+        options={[
+          { value: 'light', label: t('mobile.theme.light') },
+          { value: 'dark', label: t('mobile.theme.dark') },
+          { value: 'system', label: t('mobile.theme.system') },
+        ]}
+        value={preference}
+        onChange={setPreference}
+      />
+    </View>
+  )
+}
+
 export default function ProfileScreen() {
+  const colors = useColors()
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   const { loading, account } = useAccount()
@@ -496,13 +559,14 @@ export default function ProfileScreen() {
             {!account ? <AuthForm /> : account.needsUsername ? <ChooseUsername /> : <Profile account={account} />}
           </Animated.View>
         )}
+        {!loading && <ThemeCard />}
         {!loading && <LegalLinks />}
       </ScrollView>
     </KeyboardAvoidingView>
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   switchRow: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   card: { gap: space.lg, padding: space.lg, borderRadius: radius.xl, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   input: {
@@ -521,7 +585,20 @@ const styles = StyleSheet.create({
   divider: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   dividerLine: { flex: 1, height: StyleSheet.hairlineWidth, backgroundColor: colors.border },
   header: { flexDirection: 'row', alignItems: 'center', gap: space.lg },
+  passport: { borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
+  passportBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: space.lg,
+    paddingVertical: 8,
+    backgroundColor: colors.board,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  passportBody: { gap: space.lg, padding: space.lg },
+  mrz: { gap: 2, paddingHorizontal: space.lg, paddingVertical: space.md, backgroundColor: colors.board, borderTopWidth: 2, borderTopColor: colors.stub },
+  mrzLine: { fontFamily: fonts.mono, fontSize: 11, letterSpacing: 1.5, color: colors.textFaint },
   friendsCard: { flexDirection: 'row', alignItems: 'center', gap: space.md, paddingVertical: space.md },
   legalLinks: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: space.md },
   friendsIcon: { width: 44, height: 44, borderRadius: radius.md, backgroundColor: `${colors.highlight}1F`, alignItems: 'center', justifyContent: 'center' },
-})
+}))

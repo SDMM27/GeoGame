@@ -2,13 +2,13 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ActivityIndicator, ScrollView, StyleSheet, TextInput, View } from 'react-native'
+import { ActivityIndicator, ScrollView, TextInput, View } from 'react-native'
 
 import { useFriendships } from '@shared/hooks/usePlayerProfile'
 import { NUDGE_SEARCH_MIN_FRIENDS, filterNudgeFriends, nudgeFriend } from '@shared/utils/dailyNudge'
 
 import { useAccount } from '@/account/auth'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 import { Avatar } from '../profile/ProfileSections'
 import { Text, Touchable } from '../ui'
 
@@ -19,6 +19,8 @@ type State = 'sending' | Result
 // `recent`: a regular game (any game of that type played in the last hours) rather than the daily challenge.
 export function NudgeFriends({ gameType, recent = false }: { gameType: string; recent?: boolean }) {
   const { t } = useTranslation()
+  const colors = useColors()
+  const styles = useStyles()
   const { account } = useAccount()
   const { friends } = useFriendships(account?.uid) as { friends: Friend[] }
   const [states, setStates] = useState<Record<string, State>>({})
@@ -106,7 +108,7 @@ export function NudgeFriends({ gameType, recent = false }: { gameType: string; r
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   card: { gap: space.sm, padding: space.lg, borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   search: {
     flexDirection: 'row',
@@ -132,4 +134,4 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-})
+}))

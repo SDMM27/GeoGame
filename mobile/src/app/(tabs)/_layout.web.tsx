@@ -9,7 +9,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useFriendships } from '@shared/hooks/usePlayerProfile'
 
 import { useAccount } from '@/account/auth'
-import { colors, fonts } from '@/theme'
+import { fonts, useColors } from '@/theme'
 
 type IconName = ComponentProps<typeof MaterialCommunityIcons>['name']
 
@@ -17,12 +17,13 @@ const TABS: { name: string; labelKey: string; icon: IconName; iconSelected: Icon
   { name: 'index', labelKey: 'mobile.tabs.play', icon: 'earth', iconSelected: 'earth' },
   { name: 'multiplayer', labelKey: 'mobile.tabs.multiplayer', icon: 'account-group-outline', iconSelected: 'account-group' },
   { name: 'leaderboards', labelKey: 'mobile.tabs.leaderboards', icon: 'trophy-outline', iconSelected: 'trophy' },
-  { name: 'profile', labelKey: 'mobile.tabs.profile', icon: 'account-circle-outline', iconSelected: 'account-circle' },
+  { name: 'profile', labelKey: 'profile.passport', icon: 'account-circle-outline', iconSelected: 'account-circle' },
 ]
 
 export default function TabsLayout() {
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
+  const colors = useColors()
   const { account } = useAccount()
   // Friend requests waiting for an answer: a badge on the Profile tab, which leads to the friends screen.
   const requests = useFriendships(account?.uid).incoming.length

@@ -6,16 +6,18 @@ import * as Updates from 'expo-updates'
 import { usePathname } from 'expo-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Linking, StyleSheet, View } from 'react-native'
+import { Linking, View } from 'react-native'
 import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 import { APK_URL } from '@/links'
 import { updatesEnabled, useNewerApk } from '@/updates'
 import { Button, Text, Touchable } from './ui'
 
 export function UpdateBanner() {
+  const colors = useColors()
+  const styles = useStyles()
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   const pathname = usePathname()
@@ -58,7 +60,7 @@ export function UpdateBanner() {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   banner: {
     position: 'absolute',
     left: space.md,
@@ -81,4 +83,4 @@ const styles = StyleSheet.create({
   icon: { width: 40, height: 40, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center', backgroundColor: `${colors.accent}22` },
   restart: { minHeight: 38, paddingHorizontal: space.md },
   close: { width: 32, height: 32, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
-})
+}))

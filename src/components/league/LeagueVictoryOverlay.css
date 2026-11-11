@@ -5,13 +5,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-primary);
+  color: var(--sd-ink);
 }
 
 .league-victory-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(6, 10, 22, 0.94);
+  background: color-mix(in srgb, var(--sd-bg) 94%, transparent);
   animation: league-victory-fade 0.25s ease-out both;
 }
 
@@ -91,12 +91,12 @@
   animation: league-victory-rise 0.4s 0.5s cubic-bezier(0.215, 0.61, 0.355, 1) both;
 }
 
-.league-victory-title { margin: 0; font-family: var(--font-display); font-size: 2rem; line-height: 1.15; letter-spacing: -0.02em; font-weight: 700; }
+.league-victory-title { margin: 0; font-family: var(--sd-font-display); font-size: 2rem; line-height: 1.15; letter-spacing: -0.02em; font-weight: 700; }
 
 .league-victory-reward,
 .league-victory-champion {
   padding: 5px 14px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--sd-radius-pill);
   border: 1px solid color-mix(in srgb, var(--tone) 50%, transparent);
   background: color-mix(in srgb, var(--tone) 15%, transparent);
   color: var(--tone);
@@ -104,7 +104,7 @@
   font-weight: 700;
 }
 
-.league-victory-texts small { color: var(--text-muted); }
+.league-victory-texts small { color: var(--sd-muted); }
 
 .league-victory-buttons {
   display: flex;
@@ -119,9 +119,9 @@
 .league-victory-cta {
   padding: 0.75rem 1.4rem;
   border: 0;
-  border-radius: var(--radius-pill);
+  border-radius: var(--sd-radius-pill);
   background: var(--tone);
-  color: #0b1020;
+  color: var(--gg-on-game);
   font: inherit;
   font-weight: 700;
   cursor: pointer;
@@ -132,13 +132,13 @@
   padding: 0.5rem 1.2rem;
   border: 0;
   background: none;
-  color: var(--text-muted);
+  color: var(--sd-muted);
   font: inherit;
   font-size: 0.9rem;
   cursor: pointer;
 }
 
-.league-victory-close:hover { color: var(--text-primary); }
+.league-victory-close:hover { color: var(--sd-ink); }
 .league-victory-cta:focus-visible, .league-victory-close:focus-visible { outline: 2px solid var(--tone); outline-offset: 3px; }
 
 @keyframes league-victory-fade { from { opacity: 0; } }
@@ -170,4 +170,14 @@
   .league-victory-icon { animation: league-victory-fade 0.3s both; }
   .league-victory-texts { animation: league-victory-fade 0.4s both; }
   .league-victory-buttons { animation: league-victory-fade 0.35s both; }
+}
+
+/* « Carnet de vol »: mono kicker and badges; the tier colour (--tone) stays on the reward */
+.league-victory-kicker { color: var(--sd-muted); }
+.league-victory-reward,
+.league-victory-champion {
+  font-family: var(--sd-font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
 }

@@ -5,7 +5,7 @@ import { Image } from 'expo-image'
 import { useLocalSearchParams } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, View } from 'react-native'
+import { View } from 'react-native'
 import Animated, { FadeIn, FadeInDown, LinearTransition } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -16,18 +16,19 @@ import { getCapitalName, getCountryName } from '@shared/utils/getCountryName'
 
 import { announce } from '@/a11y'
 import { setupGameRecord } from '@/account/history'
-import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
+import { GameHud } from '@/components/game/GameHud'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
 import { WorldMap, type WorldMapHandle } from '@/components/map/WorldMap'
 import { allCountries } from '@/components/map/geometry'
+import { Kicker } from '@/components/flight'
 import { Button, Text } from '@/components/ui'
 import { getFlag } from '@/flags'
-import { DIFFICULTY_COLORS } from '@/games'
+import { useDifficultyColors, getGame } from '@/games'
 import { usePlacementClues } from '@/hooks/usePlacementClues'
 import { clean } from '@/i18n'
 import { RoomGate, RoomHudPill, Standings, useReportFound, type RoomPlay } from '@/multiplayer/RoomPlay'
 import { navigate } from '@/shims/react-router-dom'
-import { colors, gameColors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors, useTheme } from '@/theme'
 
 const CONTINENT_VIEW: Record<string, { center: [number, number]; zoom: number }> = {
   Amériques: { center: [10, -80], zoom: 3 },
@@ -69,6 +70,10 @@ function PlacementGame({
   play?: RoomPlay
   gameType?: string
 }) {
+  const { gameColors } = useTheme()
+  const styles = useStyles()
+  const colors = useColors()
+  const DIFFICULTY_COLORS = useDifficultyColors()
   const { t, i18n } = useTranslation()
   const insets = useSafeAreaInsets()
   const mapRef = useRef<WorldMapHandle>(null)
@@ -143,34 +148,53 @@ function PlacementGame({
       setFeedback(next)
       announce(next.text)
     }
-  }, [stats.found, stats.skipped, stats.totalErrors, targetName, t])
+  }, [stats.found, stats.skipped, stats.totalErrors, targetName, t, colors])
+
+  const gameId = gameType === GAME_TYPES.HARDCORE ? 'hardcore' : 'placement'
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.ocean }}>
-      <WorldMap
-        ref={mapRef}
-        showBorders={gameType !== GAME_TYPES.HARDCORE}
-        showSmallCountryMarkers={gameType !== GAME_TYPES.HARDCORE}
-        onCountryPress={(layer, latlng) =>
-          gameType === GAME_TYPES.HARDCORE ? onMapClick({ latlng }) : onCountryClick({ target: layer })
-        }
-        // Only Hardcore reads a tap on the sea: the sea is only tapped in Hardcore
-        onMapPress={gameType === GAME_TYPES.HARDCORE ? (latlng) => onMapClick({ latlng }) : undefined}
-      />
-
+    <View style={{ flex: 1, backgroundColor: colors.bg }}>
       {!isGameOver && (
-        <GameTopBar onQuit={play?.exit}>
-          {play && <RoomHudPill code={play.room.id} gameIndex={play.room.gameIndex} />}
-          <HudPill icon="timer-outline" label={displayTimer} />
-          {!isTraining && <HudPill icon="star-four-points-outline" label={String(score)} color={colors.accent} />}
-        </GameTopBar>
+        <GameHud
+          game={gameId}
+          title={t(getGame(gameId)?.titleKey ?? '')}
+          onQuit={play?.exit}
+          right={play ? <RoomHudPill code={play.room.id} gameIndex={play.room.gameIndex} /> : undefined}
+          cells={[
+            { label: t('mobile.game.found').toLocaleUpperCase(), value: `${stats.found}/${stats.total}`, color: colors.gold },
+            ...(isTraining ? [] : [{ label: t('mobile.game.score').toLocaleUpperCase(), value: String(score) }]),
+            { label: t('mobile.game.time').toLocaleUpperCase(), value: displayTimer, color: colors.accent },
+          ]}
+          progress={progress}
+          progressColor={gameColors.placement}
+          progressLabel={`${stats.found}/${stats.total} ${t('mobile.game.found')} · ${remaining} ${t('mobile.game.remaining')}`}
+        />
       )}
+
+      {/* The map stays mounted (the game hook holds its handle), the panel sits under it */}
+      <View style={[styles.mapCard, isGameOver && { opacity: 0 }]}>
+        <WorldMap
+          ref={mapRef}
+          showBorders={gameType !== GAME_TYPES.HARDCORE}
+          showSmallCountryMarkers={gameType !== GAME_TYPES.HARDCORE}
+          onCountryPress={(layer, latlng) =>
+            gameType === GAME_TYPES.HARDCORE ? onMapClick({ latlng }) : onCountryClick({ target: layer })
+          }
+          // Only Hardcore reads a tap on the sea: the sea is only tapped in Hardcore
+          onMapPress={gameType === GAME_TYPES.HARDCORE ? (latlng) => onMapClick({ latlng }) : undefined}
+        />
+        {continent && (
+          <View pointerEvents="none" style={styles.mapTag}>
+            <Kicker color={gameColors.placement}>{t(`continents.${continent}`)}</Kicker>
+          </View>
+        )}
+      </View>
 
       {!isGameOver && targetCountry && (
         <Animated.View
           entering={FadeInDown.springify().damping(18)}
           layout={LinearTransition.springify()}
-          style={[styles.panel, { bottom: insets.bottom + space.md }]}>
+          style={[styles.panel, { marginBottom: insets.bottom + space.md }]}>
           {currentPhase && (
             <View style={styles.phaseRow}>
               <Text variant="label" color={phaseColor ?? colors.textMuted}>
@@ -182,44 +206,36 @@ function PlacementGame({
             </View>
           )}
           <View style={styles.findRow}>
-            <Text variant="label">
-              {t('mobile.game.find')}
-            </Text>
+            <Kicker>{t('mobile.game.find')}</Kicker>
             {feedback && (
               <Text variant="caption" color={feedback.color} numberOfLines={1} style={{ flexShrink: 1 }}>
                 {feedback.text}
               </Text>
             )}
           </View>
-          <Animated.View key={targetCountry} entering={FadeIn.duration(220)} style={styles.targetRow}>
-            {flag && <Image source={flag} contentFit="cover" style={styles.flag} accessible={false} alt="" />}
-            <View style={{ flex: 1 }}>
-              <Text variant="title" numberOfLines={2} adjustsFontSizeToFit style={{ marginTop: 2 }}>
-                {targetName}
-              </Text>
-              {capital && (
-                <Text variant="caption" numberOfLines={1}>
-                  {t('mobile.game.capital', { name: capital })}
+          <View style={styles.targetRow}>
+            <Animated.View key={targetCountry} entering={FadeIn.duration(220)} style={[styles.targetRow, { flex: 1 }]}>
+              {flag && <Image source={flag} contentFit="cover" style={styles.flag} accessible={false} alt="" />}
+              <View style={{ flex: 1 }}>
+                <Text variant="title" numberOfLines={2} adjustsFontSizeToFit style={{ fontSize: 26, lineHeight: 30 }}>
+                  {targetName}
                 </Text>
-              )}
-            </View>
-          </Animated.View>
-          <View style={styles.footer}>
-            <View style={{ flex: 1, gap: 6 }}>
-              <View style={styles.track}>
-                <View style={[styles.bar, { width: `${progress * 100}%`, backgroundColor: gameColors.placement }]} />
+                {capital && (
+                  <Text variant="caption" numberOfLines={1}>
+                    {t('mobile.game.capital', { name: capital })}
+                  </Text>
+                )}
               </View>
-              <Text variant="caption">
-                {stats.found}/{stats.total} {t('mobile.game.found')} · {remaining} {t('mobile.game.remaining')}
-              </Text>
-            </View>
-            {gameType !== GAME_TYPES.HARDCORE && <Button
-              label={t('mobile.game.reveal')}
-              variant="secondary"
-              onPress={seeCountry}
-              icon={<MaterialCommunityIcons name="eye-outline" size={18} color={colors.text} />}
-              style={{ minHeight: 44, paddingHorizontal: space.lg }}
-            />}
+            </Animated.View>
+            {gameType !== GAME_TYPES.HARDCORE && (
+              <Button
+                label={t('mobile.game.reveal')}
+                variant="secondary"
+                onPress={seeCountry}
+                icon={<MaterialCommunityIcons name="eye-outline" size={18} color={colors.text} />}
+                style={{ minHeight: 44, paddingHorizontal: space.lg }}
+              />
+            )}
           </View>
         </Animated.View>
       )}
@@ -227,6 +243,8 @@ function PlacementGame({
       {isGameOver && (
         <ResultsSheet
           score={score}
+          game={gameId}
+          ticketNote={[difficulty ? t(`difficulties.${difficulty}`) : null, continent ? t(`continents.${continent}`) : null].filter(Boolean).join(' · ') || undefined}
           accent={gameType === GAME_TYPES.HARDCORE ? gameColors.hardcore : gameColors.placement}
           stats={[
             { label: t('labels.countries_found'), value: `${stats.found}/${stats.total}`, color: colors.accent },
@@ -314,22 +332,38 @@ export default function PlacementScreen() {
   return <StandardGame difficulty={params.difficulty ?? null} continent={params.continent ?? null} isTraining={isTraining} gameType={params.gameType ?? GAME_TYPES.PLACEMENT} />
 }
 
-const styles = StyleSheet.create({
-  panel: {
+const useStyles = makeStyles((colors) => ({
+  mapCard: {
+    flex: 1,
+    marginHorizontal: space.lg,
+    marginTop: space.md,
+    borderRadius: radius.xl,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.ocean,
+    overflow: 'hidden',
+  },
+  mapTag: {
     position: 'absolute',
-    left: space.md,
-    right: space.md,
-    backgroundColor: 'rgba(11,16,32,0.96)',
+    top: space.sm,
+    left: space.sm,
+    paddingHorizontal: space.sm,
+    paddingVertical: 3,
+    borderRadius: radius.pill,
+    backgroundColor: colors.board,
+  },
+  panel: {
+    marginHorizontal: space.lg,
+    marginTop: space.md,
+    backgroundColor: colors.surface,
     borderRadius: radius.xl,
     borderWidth: 1,
     borderColor: colors.border,
     padding: space.lg,
+    gap: space.sm,
   },
-  phaseRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: space.sm },
+  phaseRow: { flexDirection: 'row', justifyContent: 'space-between' },
   findRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.xs },
   targetRow: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   flag: { width: 48, height: 32, borderRadius: 4 },
-  footer: { flexDirection: 'row', alignItems: 'center', gap: space.md, marginTop: space.md },
-  track: { height: 6, borderRadius: 3, backgroundColor: colors.border, overflow: 'hidden' },
-  bar: { height: 6, borderRadius: 3 },
-})
+}))

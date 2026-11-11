@@ -49,4 +49,4 @@ export function soloDetailParts(
   return parts
 }
 
-export const rankLabel = (index: number) => ['🥇', '🥈', '🥉'][index] ?? `${index + 1}`
+export const rankLabel = (index: number) => `${index + 1}`

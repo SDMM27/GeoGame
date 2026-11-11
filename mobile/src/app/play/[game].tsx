@@ -3,7 +3,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, Switch, View } from 'react-native'
+import { ScrollView, Switch, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { getTotalCapitalCountries, getTotalCapitalCountriesByContinent } from '@shared/hooks/useCapitalsGameState'
@@ -15,9 +15,12 @@ import { CONTINENTS } from '@shared/utils/continents'
 import { SheetCloseButton } from '@/components/SheetCloseButton'
 import { SurvivalSetupSheet } from '@/components/survival/SurvivalSetupSheet'
 import { Button, Segmented, Text, Touchable } from '@/components/ui'
-import { DIFFICULTIES, DIFFICULTY_COLORS, getGame } from '@/games'
+import { DIFFICULTIES, getGame, useDifficultyColors } from '@/games'
 import { usePlacementClues } from '@/hooks/usePlacementClues'
-import { colors, radius, space } from '@/theme'
+import GameEmblem, { flightCode } from '@/components/GameEmblem'
+import { Kicker, ScreenTitle } from '@/components/flight'
+import { gameGate } from '@/components/game/GameHud'
+import { makeStyles, radius, space, useColors, useTheme } from '@/theme'
 
 type Phases = Record<string, number>
 type Mode = 'standard' | 'ascension'
@@ -39,6 +42,8 @@ function countFunctions(gameId: string) {
 }
 
 function Stepper({ value, max, onChange, color }: { value: number; max: number; onChange: (v: number) => void; color: string }) {
+  const styles = useStyles()
+  const colors = useColors()
   return (
     <View style={styles.stepper}>
       <Touchable
@@ -73,6 +78,8 @@ function ClueRow({
   value: boolean
   onChange: (value: boolean) => void
 }) {
+  const styles = useStyles()
+  const colors = useColors()
   return (
     <Touchable
       accessibilityRole="switch"
@@ -99,6 +106,10 @@ export default function GameSheet() {
 }
 
 function GameSetupSheet() {
+  const styles = useStyles()
+  const colors = useColors()
+  const { gameColors } = useTheme()
+  const difficultyColors = useDifficultyColors()
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   // `add`: the room the host adds this game to (see multi/add)
@@ -154,13 +165,12 @@ function GameSetupSheet() {
     <View style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={{ padding: space.xl, paddingBottom: space.xl, gap: space.lg }}>
         <View style={styles.titleRow}>
-          <View style={[styles.icon, { backgroundColor: `${game.color}22` }]}>
-            <MaterialCommunityIcons name={game.icon} size={28} color={game.color} />
+          <View style={[styles.icon, { backgroundColor: `${gameColors[game.id]}22` }]}>
+            <GameEmblem game={game.id} variant="glyph" size={28} color={gameColors[game.id]} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text variant="title" style={{ fontSize: 26 }}>
-              {t(game.titleKey)}
-            </Text>
+            <Kicker color={gameColors[game.id]} numberOfLines={1}>{`${t('game_hud.flight', { code: flightCode(game.id) })} · ${t('home.gate')} ${gameGate(game.id)}`}</Kicker>
+            <ScreenTitle size={26}>{t(game.titleKey)}</ScreenTitle>
             <Text variant="caption">{t(game.descKey)}</Text>
           </View>
           <SheetCloseButton />
@@ -189,7 +199,7 @@ function GameSetupSheet() {
               {selection === 'difficulty'
                 ? DIFFICULTIES.map((name) => {
                     const active = difficulty === name
-                    const color = DIFFICULTY_COLORS[name]
+                    const color = difficultyColors[name]
                     return (
                       <Touchable
                         key={name}
@@ -258,7 +268,7 @@ function GameSetupSheet() {
               {Object.entries(caps).map(([name, max]) => (
                 <View key={name} style={styles.phaseRow}>
                   <View>
-                    <Text variant="bodyStrong" color={DIFFICULTY_COLORS[name]}>
+                    <Text variant="bodyStrong" color={difficultyColors[name]}>
                       {t(`difficulties.${name}`)}
                     </Text>
                     <Text variant="caption">max {max}</Text>
@@ -266,7 +276,7 @@ function GameSetupSheet() {
                   <Stepper
                     value={phases[name] ?? 0}
                     max={max}
-                    color={DIFFICULTY_COLORS[name]}
+                    color={difficultyColors[name]}
                     onChange={(value) => setPhases((prev) => ({ ...prev, [name]: value }))}
                   />
                 </View>
@@ -295,7 +305,7 @@ function GameSetupSheet() {
             label={t('mobile.multi.continue')}
             onPress={startMulti}
             disabled={!canPlay}
-            color={game.color}
+            color={gameColors[game.id]}
             icon={<MaterialCommunityIcons name="account-group" size={20} color={colors.onAccent} />}
           />
         ) : (
@@ -333,7 +343,7 @@ function GameSetupSheet() {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: space.lg },
   icon: { width: 56, height: 56, borderRadius: radius.lg, alignItems: 'center', justifyContent: 'center' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
@@ -345,7 +355,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     borderWidth: 1.5,
     borderColor: colors.border,
-    backgroundColor: colors.bg,
+    backgroundColor: colors.board,
     gap: 2,
   },
   optionWide: { flexBasis: '100%' },
@@ -381,8 +391,8 @@ const styles = StyleSheet.create({
   },
   stepper: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   stepperButton: {
-    width: 36,
-    height: 36,
+    width: 44,
+    height: 44,
     borderRadius: radius.sm,
     backgroundColor: colors.surfaceHigh,
     alignItems: 'center',
@@ -397,4 +407,4 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
   },
   footerRow: { flexDirection: 'row', gap: space.md },
-})
+}))

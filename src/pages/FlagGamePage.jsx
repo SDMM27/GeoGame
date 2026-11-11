@@ -13,6 +13,7 @@ import { matchKnownAnswer } from '../utils/answerLexicon'
 import { restartTyping } from '../utils/restartTyping'
 import { getCountryName, getAllCountryNames } from '../utils/getCountryName'
 import { getMissingFlagMask } from '../utils/missingFlag'
+import { GameFlightTag } from '../components/GameEmblem'
 import PhaseIndicator from '../components/PhaseIndicator'
 import Form from './form'
 import AscensionForm from './AscensionForm'
@@ -78,9 +79,10 @@ function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state
 
       <div className={`hud-container${isAscension ? ' hud-container--with-phase' : ''}`}>
         <div className="hud-main">
+          <GameFlightTag game={gameType} className="hud-flight" />
           <div className="hud-row">
             <div className="hud-cell">
-              <span className="hud-value" style={{ color: 'var(--accent)' }}>{score}</span>
+              <span className="hud-value" style={{ color: 'var(--sd-accent-strong)' }}>{score}</span>
               <span className="hud-label">{t('game_hud.score')}</span>
             </div>
             <div className="hud-cell hud-cell--target">
@@ -88,7 +90,7 @@ function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state
               <span className="hud-target-name">?</span>
             </div>
             <div className="hud-cell">
-              <span className="hud-value" style={{ color: 'var(--accent)' }}>{displayTimer}</span>
+              <span className="hud-value" style={{ color: 'var(--sd-accent-strong)' }}>{displayTimer}</span>
               <span className="hud-label">{t('game_hud.time')}</span>
             </div>
           </div>
@@ -165,8 +167,8 @@ function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state
           <div className="game-over-content">
             {onGameFinished ? (
               <div className="mp-game-waiting">
-                <p style={{ color: '#4ade80', fontSize: '1.5rem' }}>{t('game_over.completed')}</p>
-                <p style={{ color: '#94a3b8' }}>{t('game_over.waiting_players')}</p>
+                <p style={{ color: 'var(--gg-success-strong)', fontSize: '1.5rem' }}>{t('game_over.completed')}</p>
+                <p style={{ color: 'var(--sd-muted)' }}>{t('game_over.waiting_players')}</p>
               </div>
             ) : isAscension ? (
               <AscensionForm

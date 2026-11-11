@@ -4,6 +4,7 @@ import { GeoJSON } from 'react-leaflet'
 import countries from '../../data/countriesWithDifficulty_FR.json'
 import { getShiftedFeatures } from '../../pages/game/shiftedFeatures'
 import { MAP_COLORS } from '../../utils/mapColors'
+import './mapTheme'
 
 const LAND_STYLE = { fillColor: MAP_COLORS.land, fillOpacity: 1, stroke: false }
 const LAND_WITH_BORDERS_STYLE = { ...LAND_STYLE, stroke: true, color: MAP_COLORS.stroke, weight: 0.5, opacity: 0.7 }

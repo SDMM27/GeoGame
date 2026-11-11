@@ -8,20 +8,74 @@
   gap: 0.5rem 1rem;
   flex-wrap: wrap;
   padding: 1rem 1.1rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
-  background: rgba(255, 255, 255, 0.04);
+  border-radius: var(--sd-radius-md);
+  border: 1px solid var(--gg-tint-strong);
+  background: var(--gg-tint);
 }
 .league-card p { margin: 0; }
-.league-last { border-color: var(--accent); }
-.league-reward { color: var(--accent); font-weight: 600; font-size: 0.9rem; }
+.league-last { border-color: var(--sd-accent); }
+.league-reward { color: var(--sd-accent-strong); font-weight: 600; font-size: 0.9rem; }
 
 .league-me { justify-content: flex-start; }
-.league-me-rank { font-size: 1.6rem; font-weight: 800; color: var(--accent); }
+.league-me-rank { font-size: 1.6rem; font-weight: 800; color: var(--sd-accent-strong); }
 .league-me-text { display: flex; flex-direction: column; }
-.league-me-text small { color: var(--text-muted); }
-.league-me-gap { margin-left: auto; color: var(--text-muted); font-size: 0.9rem; }
+.league-me-text small { color: var(--sd-muted); }
+.league-me-gap { margin-left: auto; color: var(--sd-muted); font-size: 0.9rem; }
 
 @media (max-width: 600px) {
   .league-me-gap { margin-left: 0; flex-basis: 100%; }
+}
+
+/* « Carnet de vol »: the week as a season, my place as a ticket, the reward as a stamp */
+.league-header .gg-kicker { margin-bottom: 0.4rem; }
+.league-header .account-title.gg-title { font-size: clamp(1.9rem, 4.5vw, 3rem); font-weight: 800; }
+.league-days { font-variant-numeric: tabular-nums; }
+
+.account-tabs { gap: 3px; }
+.account-tab.gg-mono { min-height: 44px; font-size: 0.78rem; }
+
+.league-me.gg-ticket { padding: 0; align-items: stretch; background: var(--sd-surface); }
+.league-me.gg-ticket > .league-me-rank,
+.league-me.gg-ticket > .league-me-text { padding-block: 1rem; }
+.league-me.gg-ticket > .league-me-rank { padding-left: 1.1rem; font-family: var(--sd-font-mono); font-variant-numeric: tabular-nums; align-self: center; }
+.league-me.gg-ticket > .league-me-text { padding-left: 1rem; justify-content: center; }
+.league-me-text strong { font-family: var(--sd-font-mono); font-variant-numeric: tabular-nums; }
+.league-me-gap.gg-ticket-stub {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  font-size: 0.78rem;
+  max-width: 14rem;
+}
+
+.league-last { --gg-stamp-color: var(--sd-accent-strong); }
+.league-stamp { width: 84px; height: 84px; margin-left: auto; }
+
+@media (max-width: 600px) {
+  .league-me-gap.gg-ticket-stub {
+    flex-basis: 100%;
+    max-width: none;
+    border-left: 0;
+    border-top: 2px dashed var(--sd-line);
+    padding: 0.7rem 1.1rem;
+  }
+}
+
+/* Wide screens (validated mockup): the table on the left, my place, last week and the rewards on the right of the 1320px column */
+@media (min-width: 1000px) {
+  .account-main--wide.league-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 420px;
+    column-gap: 32px;
+    row-gap: 16px;
+    align-items: start;
+    align-content: start;
+    max-width: 1320px;
+    padding: 2rem 24px 3rem;
+  }
+  .league-main > .league-header { grid-column: 1 / -1; grid-row: 1; }
+  .league-main > .profile-section { grid-column: 1; grid-row: 2 / span 6; }
+  .league-main > .league-card,
+  .league-main > .profile-muted { grid-column: 2; }
+  .league-main > .league-me { order: -1; }
 }

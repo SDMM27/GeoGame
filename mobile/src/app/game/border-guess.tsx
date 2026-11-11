@@ -4,9 +4,8 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native'
+import { KeyboardAvoidingView, Platform, ScrollView, View, useWindowDimensions } from 'react-native'
 import Animated, { FadeIn, LinearTransition, ZoomIn } from 'react-native-reanimated'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import useBorderGuessState, { ROOM_MAX_ATTEMPTS, roomRoundErrors } from '@shared/hooks/useBorderGuessState'
 import { formatTime } from '@shared/utils/formatTime'
@@ -17,7 +16,7 @@ import { getCountryName } from '@shared/utils/getCountryName'
 import { useAccount } from '@/account/auth'
 import { DailyLeaderboard } from '@/components/game/DailyLeaderboard'
 import { DailyPlayedElsewhere } from '@/components/game/DailyPlayedElsewhere'
-import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
+import { GameHud } from '@/components/game/GameHud'
 import { BorderGuessRow, type BorderGuess } from '@/components/game/GuessCards'
 import { GuessInputBar } from '@/components/game/GuessInputBar'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
@@ -27,13 +26,12 @@ import { Button, Text } from '@/components/ui'
 import { useAnnounceResult } from '@/hooks/useAnnounceResult'
 import { useElapsed } from '@/hooks/useElapsed'
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible'
+import { getGame } from '@/games'
 import { clean } from '@/i18n'
 import { RoomGate, RoomHudPill, Standings, type RoomPlay } from '@/multiplayer/RoomPlay'
 import { useRoomRounds, useRoundResult } from '@/multiplayer/useRoomRounds'
 import { navigate } from '@/shims/react-router-dom'
-import { colors, gameColors, radius, space } from '@/theme'
-
-const ACCENT = gameColors.border_guess
+import { makeStyles, radius, space, useColors, useTheme } from '@/theme'
 
 export default function BorderGuessScreen() {
   const { mode = 'daily', room } = useLocalSearchParams<{ mode?: string; room?: string }>()
@@ -42,8 +40,10 @@ export default function BorderGuessScreen() {
 }
 
 function BorderGuessGame({ mode, play }: { mode: string; play?: RoomPlay }) {
+  const styles = useStyles()
+  const colors = useColors()
+  const ACCENT = useTheme().gameColors.border_guess
   const { t, i18n } = useTranslation()
-  const insets = useSafeAreaInsets()
   const isDaily = mode === 'daily' && !play
   const rounds = useRoomRounds(play)
   const {
@@ -90,7 +90,7 @@ function BorderGuessGame({ mode, play }: { mode: string; play?: RoomPlay }) {
 
   if (elsewhere.checking || elsewhere.game) {
     return (
-      <DailyPlayedElsewhere title={t('games.border_guess.title')} game={elsewhere.game} accent={ACCENT}>
+      <DailyPlayedElsewhere gameId="border_guess" title={t('games.border_guess.title')} game={elsewhere.game} accent={ACCENT}>
         {elsewhere.game && currentCountry && (
           <View style={{ gap: space.sm }}>
             <Text variant="bodyStrong">
@@ -106,10 +106,25 @@ function BorderGuessGame({ mode, play }: { mode: string; play?: RoomPlay }) {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
+      {!(isComplete && isDaily) && !rounds.showResults && (
+        <GameHud
+          game="border_guess"
+          title={t(getGame('border_guess')?.titleKey ?? '')}
+          confirmQuit={!!play}
+          onQuit={play?.exit}
+          right={play ? <RoomHudPill code={play.room.id} gameIndex={play.room.gameIndex} /> : undefined}
+          cells={[
+            { label: t('units.attempt_other').toLocaleUpperCase(), value: play ? `${guesses.length}/${ROOM_MAX_ATTEMPTS}` : String(guesses.length), color: ACCENT },
+            ...(play || (isDaily && hasStarted)
+              ? [{ label: t('mobile.game.time').toLocaleUpperCase(), value: formatTime(play ? (rounds.elapsedTime ?? elapsed) : (elapsedTime ?? elapsed)).slice(0, 5), color: colors.accent }]
+              : []),
+          ]}
+        />
+      )}
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <ScrollView
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={[styles.content, { paddingTop: insets.top + 42 + space.md }]}>
+          contentContainerStyle={[styles.content, { paddingTop: space.md }]}>
           <Animated.View layout={LinearTransition.duration(200)} style={[styles.mapCard, { height: mapHeight }]}>
             <View style={styles.modeTag}>
               <Text variant="label" color={ACCENT} style={{ fontSize: 10 }}>
@@ -189,21 +204,9 @@ function BorderGuessGame({ mode, play }: { mode: string; play?: RoomPlay }) {
         )}
       </KeyboardAvoidingView>
 
-      {!(isComplete && isDaily) && !rounds.showResults && (
-        <GameTopBar confirmQuit={!!play} onQuit={play?.exit}>
-          {play && <RoomHudPill code={play.room.id} gameIndex={play.room.gameIndex} />}
-          {play && <HudPill icon="timer-outline" label={formatTime(rounds.elapsedTime ?? elapsed).slice(0, 5)} />}
-          {isDaily && hasStarted && <HudPill icon="timer-outline" label={formatTime(elapsedTime ?? elapsed).slice(0, 5)} />}
-          <HudPill
-            icon="target"
-            label={play ? `${guesses.length} / ${ROOM_MAX_ATTEMPTS}` : `${guesses.length} ${attemptsLabel}`}
-            color={ACCENT}
-          />
-        </GameTopBar>
-      )}
-
       {play && rounds.showResults && (
         <ResultsSheet
+          game="border_guess"
           score={rounds.tally.solved}
           scoreText={`${rounds.tally.solved}/${rounds.total}`}
           scoreLabel={t('labels.countries_found')}
@@ -228,6 +231,7 @@ function BorderGuessGame({ mode, play }: { mode: string; play?: RoomPlay }) {
 
       {isComplete && isDaily && dailyKey && (
         <ResultsSheet
+          game="border_guess"
           title={isSolved ? t('borderguess.success_message') : t('borderguess.answer_was')}
           score={guesses.length}
           scoreLabel={attemptsLabel}
@@ -271,7 +275,7 @@ function BorderGuessGame({ mode, play }: { mode: string; play?: RoomPlay }) {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   content: { paddingHorizontal: space.xl, paddingBottom: space.xl, gap: space.lg },
   mapCard: {
     borderRadius: radius.xl,
@@ -288,7 +292,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.sm,
     paddingVertical: 3,
     borderRadius: radius.pill,
-    backgroundColor: 'rgba(11,16,32,0.8)',
+    backgroundColor: colors.board,
   },
   start: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: space.lg, padding: space.xl },
   result: {
@@ -300,4 +304,4 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-})
+}))

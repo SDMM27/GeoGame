@@ -1,65 +1,130 @@
+/* « Carnet de vol » : the shared @sdmm/design system, GeoGame theme (--sd-*), plus the site's own tokens (--gg-*).
+   The theme is chosen by data-theme on <html>, set before the first paint by public/theme-init.js (dark unless the
+   player chose light), so the --gg-* tokens only need the light default and the [data-theme="dark"] override. */
+@import '@sdmm/design/css/all-geogame.css';
+
 :root {
-  color-scheme: dark;
+  /* Site tokens, light */
+  --gg-tint: rgba(11, 16, 32, 0.04);          /* faint fill over a surface (rows, chips, inputs) */
+  --gg-tint-strong: rgba(11, 16, 32, 0.08);
+  --gg-line-strong: #b8c1d6;
+  --gg-glass: rgba(243, 245, 250, 0.88);       /* bars and overlays over a map */
+  --gg-scrim: rgba(11, 16, 32, 0.45);          /* behind a modal */
+  --gg-shadow: 0 8px 24px -8px rgba(11, 16, 32, 0.18), 0 2px 6px rgba(11, 16, 32, 0.06);
+  --gg-accent-soft: rgba(20, 168, 107, 0.08); /* light enough for --sd-accent-strong text on it (AA) */
+  --gg-accent-line: rgba(20, 168, 107, 0.4);
+  --gg-highlight: #3557c9;
+  --gg-success: #14a86b;
+  --gg-success-strong: #0b7a4c;
+  --gg-success-soft: rgba(20, 168, 107, 0.12);
+  --gg-warning: #f5b83d;
+  --gg-warning-strong: #8a5a00;
+  --gg-warning-soft: rgba(245, 184, 61, 0.18);
+  --gg-on-warning: #2a1c02;
+  --gg-danger: #e5484d;
+  --gg-danger-strong: #c62828;
+  --gg-danger-soft: rgba(229, 72, 77, 0.12);
+  --gg-on-danger: #ffffff;
+  --gg-gold: #b07d00;                          /* departures board, medals (text-safe) */
+  --gg-stamp-green: #08663f;                   /* passport stamps: small text on --sd-surface-2 */
+  --gg-stamp-violet: #5b2fd6;
 
-  /* "Atlas de nuit", the mobile app's palette (mobile/src/theme/index.ts): keep both in step. */
-  --bg-primary:       #0b1020;
-  --bg-dark:          #0b1020;
-  --bg-secondary:     #141b30;
-  --bg-card:          #141b30;
-  --bg-card-hover:    #1b2440;
-  --bg-glass:         rgba(11, 16, 32, 0.85);
-  --map-ocean:        #060e1f;
+  /* Departures board: white in the light theme, night blue in the dark one (AA on white) */
+  --gg-board: #ffffff;
+  --gg-board-ink: #0b1020;
+  --gg-board-muted: #5a6380;
+  --gg-board-line: #e3e8f2;
+  --gg-board-accent: #8a5a00;
+  --gg-board-boarding: #08663f;
+  --gg-board-hover: rgba(11, 16, 32, 0.04);
 
-  --accent:           #3ddc97;
-  --accent-dim:       rgba(61, 220, 151, 0.15);
-  --accent-border:    rgba(61, 220, 151, 0.35);
-  --on-accent:        #06281a;
-  --highlight:        #7aa2ff;
-  --accent-purple:    #c792ff;
+  /* Game maps (Leaflet) and the hero globe */
+  --gg-ocean: #d3def1;
+  --gg-ocean-deep: #b9c8e4;
+  --gg-land: #ffffff;
+  --gg-land-edge: #94a3c4;   /* same as the light map stroke (src/components/map/mapTheme.js) */
+  --gg-graticule: rgba(90, 99, 128, 0.22);
 
-  --success:          #3ddc97;
-  --success-dim:      rgba(61, 220, 151, 0.15);
-  --warning:          #f5b83d;
-  --warning-dim:      rgba(245, 184, 61, 0.15);
-  --on-warning:       #2a1c02;
-  --danger:           #ff7a6b;
-  --danger-dim:       rgba(255, 122, 107, 0.15);
-  --on-danger:        #3a0d07;
+  /* The hero globe, as in the validated mockup: dark land on a pale ocean (light), light land on navy (dark) */
+  --gg-globe-ocean: #dfe7f5;
+  --gg-globe-ocean-deep: #c4d1ea;
+  --gg-globe-land: #0b1020;
+  --gg-globe-land-edge: rgba(255, 255, 255, 0.4);
 
-  --text-primary:     #eef1f8;
-  --text-secondary:   #7a84a3;
-  --text-muted:       #7a84a3;
-  --text-dim:         #4f5878;
+  /* One color per game, as in the app (src/utils/roomGames.js builds these names). --game-* fills icons, chips and
+     bars; --game-*-ink is the text-safe shade. */
+  --game-placement: #7aa2ff;     --game-placement-ink: #3557c9;
+  --game-flags: #ff7a6b;         --game-flags-ink: #c0392b;
+  --game-capitals: #f5b83d;      --game-capitals-ink: #8a5a00;
+  --game-border-guess: #c792ff;  --game-border-guess-ink: #7c4dff;
+  --game-country-clue: #3ddc97;  --game-country-clue-ink: #0b7a4c;
+  --game-voyage-voyage: #5fd4f4; --game-voyage-voyage-ink: #08617a;
+  --game-ranking: #ff9ec7;       --game-ranking-ink: #b8306f;
+  --game-quiz: #b4e05a;          --game-quiz-ink: #4d6b0e;
+  --game-daily-challenge: #ff9f45; --game-daily-challenge-ink: #a8520a;
+  --game-country-of-day: #2ec4b6;  --game-country-of-day-ink: #0d7a70;
+  --game-survival: #ff5c7a;      --game-survival-ink: #c2213f;
+  --game-hardcore: #ff7a6b;      --game-hardcore-ink: #b42318;
+  --game-missing-flag: #c792ff;  --game-missing-flag-ink: #6b3fd4;
+  --gg-on-game: #0b1020;            /* text on a game fill, both themes */
+}
 
-  --border:           #232c48;
-  --border-color:     #232c48;
-  --border-strong:    #34406a;
-  --border-subtle:    rgba(255, 255, 255, 0.06);
+:root[data-theme="dark"] {
+  --gg-tint: rgba(255, 255, 255, 0.04);
+  --gg-tint-strong: rgba(255, 255, 255, 0.08);
+  --gg-line-strong: #34406a;
+  --gg-glass: rgba(11, 16, 32, 0.85);
+  --gg-scrim: rgba(3, 6, 14, 0.7);
+  --gg-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  --gg-accent-soft: rgba(61, 220, 151, 0.14);
+  --gg-accent-line: rgba(61, 220, 151, 0.35);
+  --gg-highlight: #7aa2ff;
+  --gg-success: #3ddc97;
+  --gg-success-strong: #5fe6ab;
+  --gg-success-soft: rgba(61, 220, 151, 0.15);
+  --gg-warning: #f5b83d;
+  --gg-warning-strong: #f5b83d;
+  --gg-warning-soft: rgba(245, 184, 61, 0.15);
+  --gg-danger: #ff7a6b;
+  --gg-danger-strong: #ff7a6b;
+  --gg-danger-soft: rgba(255, 122, 107, 0.15);
+  --gg-on-danger: #3a0d07;
+  --gg-gold: #f5c84b;
+  --gg-stamp-green: var(--sd-accent-strong);
+  --gg-stamp-violet: var(--sd-accent-2);
 
-  /* One color per game, as in the app */
-  --game-placement:     #7aa2ff;
-  --game-flags:         #ff7a6b;
-  --game-capitals:      #f5b83d;
-  --game-border-guess:  #c792ff;
-  --game-country-clue:  #3ddc97;
-  --game-voyage-voyage: #5fd4f4;
-  --game-ranking:       #ff9ec7;
-  --game-quiz:          #b4e05a;
-  --game-daily-challenge: #ff9f45;
-  --game-country-of-day: #2ec4b6;
-  --game-survival:      #ff5c7a;
+  --gg-board: #070b16;
+  --gg-board-ink: #eef1f8;
+  --gg-board-muted: #8a93b0;
+  --gg-board-line: #1b2440;
+  --gg-board-accent: #f5c84b;
+  --gg-board-boarding: #3ddc97;
+  --gg-board-hover: rgba(255, 255, 255, 0.04);
 
-  --radius-sm:        10px;
-  --radius-md:        14px;
-  --radius-lg:        20px;
-  --radius-xl:        28px;
-  --radius-pill:      999px;
+  --gg-ocean: #060e1f;
+  --gg-ocean-deep: #0e1630;
+  --gg-land: #2a3e66;
+  --gg-land-edge: #6f88bd;
+  --gg-graticule: rgba(138, 147, 176, 0.25);
 
-  --shadow-card:      0 6px 24px rgba(0, 0, 0, 0.35);
-  --shadow-glow:      0 0 20px rgba(61, 220, 151, 0.15);
+  --gg-globe-ocean: #1b2a4d;
+  --gg-globe-ocean-deep: #0e1630;
+  --gg-globe-land: #9aa9cc;
+  --gg-globe-land-edge: rgba(11, 16, 32, 0.5);
 
-  --font-main:        'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-display:     'Bricolage Grotesque', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --game-placement-ink: #7aa2ff;
+  --game-flags-ink: #ff7a6b;
+  --game-capitals-ink: #f5b83d;
+  --game-border-guess-ink: #c792ff;
+  --game-country-clue-ink: #3ddc97;
+  --game-voyage-voyage-ink: #5fd4f4;
+  --game-ranking-ink: #ff9ec7;
+  --game-quiz-ink: #b4e05a;
+  --game-daily-challenge-ink: #ff9f45;
+  --game-country-of-day-ink: #2ec4b6;
+  --game-survival-ink: #ff5c7a;
+  --game-hardcore-ink: #ff7a6b;
+  --game-missing-flag-ink: #c792ff;
 }
 
 * {
@@ -74,14 +139,15 @@ body {
 }
 
 body {
-  /* The site is dark: pages that set no background of their own (scores, 404, errors...) get this one. */
-  font-family: var(--font-main), "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  color: var(--text-primary);
-  background-color: var(--bg-primary);
+  /* Pages that set no background of their own (scores, 404, errors...) get this one. */
+  font-family: var(--sd-font-sans), "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  color: var(--sd-ink);
+  background-color: var(--sd-bg);
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
   min-height: 100dvh;
   overflow-x: hidden;
+  transition: background-color var(--sd-dur-base) var(--sd-ease-out), color var(--sd-dur-base) var(--sd-ease-out);
 }
 
 #root {
@@ -104,7 +170,7 @@ body {
 
 h1, h2, h3 {
   margin-bottom: 0.5rem;
-  font-family: var(--font-display);
+  font-family: var(--sd-font-display);
   font-weight: 700;
   line-height: 1.2;
 }
@@ -133,12 +199,12 @@ ol ol, ul ul, ol ul, ul ol {
 }
 
 a {
-  color: var(--accent);
+  color: var(--sd-accent-strong);
   text-decoration: underline;
 }
 
 a:hover {
-  color: var(--text-primary);
+  color: var(--sd-ink);
 }
 
 strong, b {
@@ -150,9 +216,9 @@ small {
 }
 
 code {
-  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-family: var(--sd-font-mono);
   font-size: 0.875em;
-  color: var(--highlight);
+  color: var(--gg-highlight);
 }
 
 iframe {
@@ -212,9 +278,127 @@ select {
   display: none !important;
 }
 
-/* Game maps: the app's ocean under the filled land (src/components/map/LandLayer.jsx). */
+/* Read by screen readers, not shown */
+.gg-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Small mono caps used across the « carnet de vol » (flight codes, gates, board headers). */
+.gg-mono {
+  font-family: var(--sd-font-mono);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* « Carnet de vol » building blocks shared by the pages (the home page has its own, in pages/home/flight) */
+
+/* Mono kicker above a title: « SALON · 4F2K », « CLASSEMENT · SEMAINE 46 » */
+.gg-kicker {
+  margin: 0;
+  font-family: var(--sd-font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sd-accent-strong);
+}
+
+/* Big display title of a page */
+.gg-title {
+  margin: 0;
+  font-family: var(--sd-font-display);
+  font-weight: 800;
+  font-size: clamp(1.9rem, 4.5vw, 3rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--sd-ink);
+}
+
+/* A ticket: a surface with a dashed tear line before its last child (.gg-ticket-stub) */
+.gg-ticket {
+  display: flex;
+  border-radius: 18px;
+  border: 1px solid var(--sd-line);
+  background: var(--sd-surface);
+}
+
+.gg-ticket-stub {
+  flex-shrink: 0;
+  padding: 16px;
+  border-left: 2px dashed var(--sd-line);
+  font-family: var(--sd-font-mono);
+}
+
+/* A label / value pair in mono, like the fields of a boarding pass */
+.gg-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: var(--sd-font-mono);
+}
+
+.gg-field > small {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sd-muted);
+}
+
+.gg-field > strong {
+  font-size: 1.1rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--sd-ink);
+}
+
+/* A round passport stamp (add .sd-stamp to slam it down; tilt with --sd-stamp-rotate) */
+.gg-stamp {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 96px;
+  padding: 6px;
+  border-radius: 50%;
+  border: 3px double var(--gg-stamp-color, var(--sd-accent-strong));
+  color: var(--gg-stamp-color, var(--sd-accent-strong));
+  font-family: var(--sd-font-mono);
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+  transform: rotate(var(--sd-stamp-rotate, -6deg));
+}
+
+.gg-stamp > strong {
+  font-family: var(--sd-font-display);
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* Header row of a board-like table (leaderboards, manifests) */
+.gg-board-head {
+  font-family: var(--sd-font-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sd-muted);
+}
+
+/* Game maps: the ocean under the filled land (src/components/map/LandLayer.jsx). */
 .leaflet-container.map-night {
-  background: var(--map-ocean);
+  background: var(--gg-ocean);
 }
 
 /* A clicked country takes the focus, and the browser outlines its whole bounding box: a big white rectangle. */
@@ -224,14 +408,20 @@ select {
 
 /* Country name over a game map (Find the Country: found or revealed countries) */
 .leaflet-tooltip.map-tooltip {
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
-  font-family: var(--font-main);
+  background: var(--sd-surface);
+  color: var(--sd-ink);
+  border: 1px solid var(--sd-line);
+  box-shadow: var(--gg-shadow);
+  font-family: var(--sd-font-sans);
   font-weight: 600;
 }
 
 .leaflet-tooltip-top.map-tooltip::before {
-  border-top-color: var(--border-color);
+  border-top-color: var(--sd-line);
+}
+
+.leaflet-container .leaflet-control-zoom a {
+  background: var(--sd-surface);
+  color: var(--sd-ink);
+  border-color: var(--sd-line);
 }

@@ -3,11 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import { colors, space } from '@/theme'
+import { space, useColors } from '@/theme'
 import { Text } from './ui'
 
 export function ComingSoon({ title, icon }: { title: string; icon: keyof typeof MaterialCommunityIcons.glyphMap }) {
   const { t } = useTranslation()
+  const colors = useColors()
   const insets = useSafeAreaInsets()
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg, paddingTop: insets.top + space.lg, paddingHorizontal: space.lg }}>

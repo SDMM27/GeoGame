@@ -49,7 +49,34 @@
     "games_subtitle": "Choisis ta difficulté ou ton continent",
     "daily": "Défi du jour",
     "infinite": "Infini",
-    "multi": "Jouer en multijoueur"
+    "multi": "Jouer en multijoueur",
+    "hero_lead": "{{count}} défis par jour, un passeport à remplir, des salons multijoueurs. Le même monde pour tout le monde, en 9 langues.",
+    "next_departure": "Prochain départ",
+    "globe_score": "Score",
+    "board_cta": "Embarquer pour le défi du jour",
+    "passes_title": "Cartes d’embarquement du jour",
+    "passes_note": "{{count}} vols · mêmes défis pour tous",
+    "boarding_pass": "Carte d’embarquement",
+    "gate": "Porte",
+    "departure": "Départ",
+    "board": "Embarquer",
+    "passport_title": "Ton passeport",
+    "passport_intro": "Chaque mission réussie tamponne ton passeport : XP, niveaux, cadres et couleurs à débloquer. La ligue de la semaine distribue des fragments de drapeaux.",
+    "passport_example": "Exemple de page de passeport",
+    "stamp_level": "Niveau",
+    "stamp_xp": "{{count}} XP",
+    "stamp_streak": "Série",
+    "stamp_today": "Aujourd’hui",
+    "stamp_dailies": "Défis du jour",
+    "stamp_won": "Réussis",
+    "special_flight": "Vol spécial",
+    "board_title": "Tableau des départs",
+    "col_destination": "Destination",
+    "col_brief": "En bref",
+    "col_status": "Statut",
+    "status_boarding": "Embarquement",
+    "status_on_time": "À l’heure",
+    "status_open": "Ouvert"
   },
   "games": {
     "daily_challenge": {
@@ -206,6 +233,7 @@
     "unknown": "Inconnue"
   },
   "game_hud": {
+    "flight": "VOL {{code}}",
     "target_country": "PAYS À TROUVER",
     "score": "SCORE",
     "time": "TEMPS",
@@ -350,7 +378,12 @@
   "not_found": {
     "title": "Page introuvable",
     "message": "Cette page n'existe pas ou a été déplacée.",
-    "home": "Retour à l'accueil"
+    "home": "Retour à l'accueil",
+    "cancelled": "Vol annulé",
+    "flight": "Vol",
+    "gate": "Porte",
+    "status": "Statut",
+    "status_cancelled": "Annulé"
   },
   "units": {
     "pt": "pt",
@@ -396,7 +429,11 @@
     "code_placeholder": "CODE",
     "create_title": "Créer une partie",
     "create_subtitle": "Choisis un jeu, puis invite tes amis avec le code",
-    "recent_title": "Parties récentes"
+    "recent_title": "Parties récentes",
+    "kicker": "Terminal · Multijoueur",
+    "desk_join": "Comptoir A · Enregistrement",
+    "desk_create": "Comptoir B · Nouveau vol",
+    "desk_recent": "Vols récents"
   },
   "lobby": {
     "connecting": "Connexion..."
@@ -404,7 +441,8 @@
   "config": {
     "title": "Configurer la partie",
     "creating": "Création en cours...",
-    "typing_tolerance_note": "⚠️ Pour les jeux de saisie (drapeaux, capitales), la première hésitation par pays est tolérée et n'impacte pas le score — les fautes de frappe arrivent !"
+    "typing_tolerance_note": "⚠️ Pour les jeux de saisie (drapeaux, capitales), la première hésitation par pays est tolérée et n'impacte pas le score — les fautes de frappe arrivent !",
+    "kicker": "Carte d'embarquement"
   },
   "stats": {
     "first_try": "🎯 One tap",
@@ -734,7 +772,9 @@
       "room": "Salon",
       "open_room": "Voir le salon",
       "close": "Fermer"
-    }
+    },
+    "passport": "Passeport",
+    "field_since": "Depuis"
   },
   "friends": {
     "online": "En ligne",
@@ -1122,7 +1162,11 @@
     "next_game": "Lancer le jeu {{n}}",
     "waiting_next": "En attente du jeu suivant…",
     "round_n": "Manche {{n}} / {{total}}",
-    "next_round_soon": "Manche suivante dans un instant…"
+    "next_round_soon": "Manche suivante dans un instant…",
+    "manifest": "Manifeste des passagers",
+    "col_player": "Joueur",
+    "col_result": "Résultat",
+    "standings_kicker": "Tableau d'arrivée"
   },
   "survival": {
     "spectating": "Tu regardes ceux qui restent en jeu",
@@ -1280,7 +1324,8 @@
     "legal": "Mentions légales",
     "delete_account": "Supprimer mon compte",
     "updated": "Dernière mise à jour : {{date}}",
-    "signup_notice": "En créant un compte, tu acceptes les <terms>conditions d’utilisation</terms> et la <privacy>politique de confidentialité</privacy>. Il faut avoir au moins 13 ans (et l’accord d’un parent avant 15 ans)."
+    "signup_notice": "En créant un compte, tu acceptes les <terms>conditions d’utilisation</terms> et la <privacy>politique de confidentialité</privacy>. Il faut avoir au moins 13 ans (et l’accord d’un parent avant 15 ans).",
+    "toc": "Sommaire"
   },
   "invites": {
     "title": "Inviter des amis",
@@ -1301,7 +1346,9 @@
     "leaderboards": "Classements",
     "profile": "Profil",
     "main": "Navigation principale",
-    "language": "Langue"
+    "language": "Langue",
+    "theme_light": "Passer en mode clair",
+    "theme_dark": "Passer en mode sombre"
   },
   "league": {
     "title": "Ligue de la semaine",
@@ -1341,7 +1388,9 @@
     "win_reward_other": "+{{count}} fragments de drapeau",
     "win_champion": "Titre gagné : Champion de la semaine",
     "win_cta": "Voir la ligue",
-    "win_close": "Fermer"
+    "win_close": "Fermer",
+    "season": "Saison en cours",
+    "stamp_label": "Récompense"
   },
   "decorations": {
     "title": "Personnaliser",
@@ -1641,5 +1690,43 @@
     "title_ottoman-empire": "Empire ottoman, 1481-1683",
     "title_russia-growth": "Croissance de la Russie, 1300-1796",
     "title_british-empire-1886": "Empire britannique en 1886"
+  },
+  "globe": {
+    "find": "Trouve : {{city}}",
+    "found": "Trouvé : {{city}}",
+    "hint_drag": "↔ Glisse pour faire tourner le globe",
+    "hint_center": "Centre la ville dans le viseur",
+    "label": "Globe interactif : fais-le tourner (souris, doigt ou flèches) pour trouver {{city}}",
+    "offer_daily": "Défi du jour pas encore fait",
+    "offer_game": "Pas encore joué aujourd’hui",
+    "all_done": "Tous les vols du jour ont décollé",
+    "all_done_hint": "Reviens demain pour de nouveaux défis",
+    "close": "Fermer",
+    "city": {
+      "tokyo": "Tokyo",
+      "rio": "Rio de Janeiro",
+      "cairo": "Le Caire",
+      "sydney": "Sydney",
+      "new_york": "New York",
+      "nairobi": "Nairobi",
+      "paris": "Paris"
+    }
+  },
+  "scores": {
+    "kicker": "Tableau des départs"
+  },
+  "carnet_games": {
+    "kicker_end": "Atterrissage",
+    "kicker_daily": "Vol du jour",
+    "kicker_free": "Vol libre",
+    "kicker_briefing": "Briefing",
+    "kicker_atlas": "Cartes de navigation",
+    "kicker_scrolls": "Archives de bord",
+    "kicker_legal": "Documents de bord",
+    "stamp_landed": "Atterri",
+    "stamp_diverted": "Dérouté"
+  },
+  "route_fallback": {
+    "boarding": "Embarquement en cours"
   }
 }

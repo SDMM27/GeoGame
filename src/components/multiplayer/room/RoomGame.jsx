@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import { useRecordGame } from '../../../auth'
 import { roomGameRecord } from '../../../utils/gameHistory'
 import { GAME_TYPES } from '../../../utils/gameTypes'
@@ -15,11 +14,10 @@ import { PracticeQuiz } from '../../../pages/QuizPage'
 import MultiplayerBorderGuess from '../MultiplayerBorderGuess'
 import MultiplayerCountryClue from '../MultiplayerCountryClue'
 import SurvivalGame from '../../../pages/survival/SurvivalGame'
-import { gameLabel } from '../RoomConfig'
+import { GameLabel } from '../RoomConfig'
 import { Standings, SurvivalStrip } from './Standings'
 
 export default function RoomGame({ room, progress, results, playerId, onDone }) {
-  const { t } = useTranslation()
   // This game's view of the room: its game and its own seed
   const { game, seed, gameIndex } = room
   const content = useMemo(() => getRoomContent(game, seed), [game, seed])
@@ -163,7 +161,7 @@ export default function RoomGame({ room, progress, results, playerId, onDone }) 
       </div>
       <aside className="mpr-sidebar">
         <div className="mpr-card">
-          <h3>{gameLabel(game, t)}</h3>
+          <h3><GameLabel game={game} /></h3>
           <Standings room={room} progress={progress} results={results} playerId={playerId} index={gameIndex} />
         </div>
       </aside>

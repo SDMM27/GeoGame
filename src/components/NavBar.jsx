@@ -9,6 +9,7 @@ import { useFriendships } from '../hooks/usePlayerProfile'
 import { LANGUAGES, toLanguage } from '../i18n/languages'
 import { isGamePath } from '../utils/gamePaths'
 import { LeaderboardIcon, MultiIcon, PlayIcon, ProfileIcon } from './NavIcons'
+import ThemeToggle from './theme/ThemeToggle'
 import './NavBar.css'
 
 const TABS = [
@@ -68,6 +69,7 @@ export default function NavBar() {
           ))}
         </select>
       </label>
+      <ThemeToggle />
     </header>
   )
 }

@@ -5,7 +5,7 @@ import { Image } from 'expo-image'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { TFunction } from 'i18next'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, TextInput, View } from 'react-native'
+import { TextInput, View } from 'react-native'
 import Animated, { FadeIn, ZoomIn } from 'react-native-reanimated'
 
 import { BORDER_GUESS_COUNTRIES } from '@shared/hooks/useBorderGuessState'
@@ -22,9 +22,9 @@ import { CountrySilhouette } from '@/components/map/CountrySilhouette'
 import { WorldMap, type WorldMapHandle } from '@/components/map/WorldMap'
 import { Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
-import { DIFFICULTY_COLORS } from '@/games'
+import { useDifficultyColors } from '@/games'
 import { clean } from '@/i18n'
-import { colors, fonts, gameColors, radius, space } from '@/theme'
+import { fonts, makeStyles, radius, space, useColors, useTheme } from '@/theme'
 
 type Feature = { properties: Record<string, any> }
 // `difficulty`: Facile, Moyen, Difficile or Impossible, rising with the round number
@@ -59,12 +59,11 @@ export function roundAnswer(round: SurvivalRound | null, lang: string, t: TFunct
 
 // ─── Placement: tap the country on the map ─────────────────────────────────
 
-const WRONG = { fillColor: '#ff4d4d', fillOpacity: 0.5, weight: 2 }
-const RIGHT = { fillColor: '#4ade80', fillOpacity: 0.6, weight: 2 }
-const MISSED = { fillColor: colors.warning, fillOpacity: 0.6, color: colors.warning, weight: 2 }
-
 export function PlacementRound({ survival, footer }: { survival: Survival; footer: React.ReactNode }) {
+  const styles = useStyles()
+  const DIFFICULTY_COLORS = useDifficultyColors()
   const { t, i18n } = useTranslation()
+  const colors = useColors()
   const mapRef = useRef<WorldMapHandle>(null)
   const { round, wrongPicks, outcome, clickCountry } = survival
   const target: string = round!.country!.properties.ADMIN
@@ -76,10 +75,12 @@ export function PlacementRound({ survival, footer }: { survival: Survival; foote
     map.geoJson.resetStyle()
     for (const layer of map.geoJson.getLayers()) {
       const name = layer.feature.properties.ADMIN
-      if (outcome && name === target) layer.setStyle(outcome === 'correct' ? RIGHT : MISSED)
-      else if (wrongPicks.includes(name)) layer.setStyle(WRONG)
+      if (outcome && name === target) {
+        const color = outcome === 'correct' ? colors.accent : colors.warning
+        layer.setStyle({ fillColor: color, fillOpacity: 0.6, color, weight: 2 })
+      } else if (wrongPicks.includes(name)) layer.setStyle({ fillColor: colors.danger, fillOpacity: 0.5, weight: 2 })
     }
-  }, [wrongPicks, outcome, target])
+  }, [wrongPicks, outcome, target, colors])
 
   // A new country: back to the world. A missed one: show where it was.
   useEffect(() => {
@@ -90,7 +91,7 @@ export function PlacementRound({ survival, footer }: { survival: Survival; foote
   }, [outcome, target])
 
   return (
-    <View style={StyleSheet.absoluteFill}>
+    <View style={{ flex: 1 }}>
       <WorldMap ref={mapRef} onCountryPress={(layer) => clickCountry(layer.feature.properties.ADMIN)} />
       <View style={styles.mapPanel}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -113,6 +114,9 @@ export function PlacementRound({ survival, footer }: { survival: Survival; foote
 // ─── Flags / Capitals: type the answer ─────────────────────────────────────
 
 export function TypedRound({ survival, onSubmit }: { survival: Survival; onSubmit: (text: string) => string | null }) {
+  const { gameColors } = useTheme()
+  const styles = useStyles()
+  const colors = useColors()
   const { t, i18n } = useTranslation()
   const { round, isPlaying, giveUp } = survival
   const country = round!.country!
@@ -216,6 +220,7 @@ function useSuggestions(pool: Feature[], value: string) {
 
 /** The input bar of a Border Guess round: suggestions, give up (−1 life), submit. */
 export function GuessRoundInput({ survival, pool, onSubmit }: { survival: Survival; pool: Feature[]; onSubmit: (text: string) => string | null }) {
+  const { gameColors } = useTheme()
   const { t } = useTranslation()
   const [value, setValue] = useState('')
   const suggestions = useSuggestions(pool, value)
@@ -242,6 +247,8 @@ export const BORDER_POOL = BORDER_GUESS_COUNTRIES as Feature[]
 
 /** The silhouette of a Border Guess round, read-only (also what a spectator sees). */
 export function BorderSilhouette({ country, height }: { country: Feature; height: number }) {
+  const { gameColors } = useTheme()
+  const styles = useStyles()
   return (
     <View style={[styles.silhouette, { height }]}>
       <Animated.View key={country.properties.ADMIN} entering={ZoomIn.springify().dampingRatio(0.7)} style={{ flex: 1 }}>
@@ -271,6 +278,8 @@ export function BorderRound({ survival, height }: { survival: Survival; height: 
 // ─── Quiz: one multiple-choice question ────────────────────────────────────
 
 export function QuizRound({ survival }: { survival: Survival }) {
+  const styles = useStyles()
+  const colors = useColors()
   const { t, i18n } = useTranslation()
   const { round, outcome, wrongPicks, chooseAnswer, isPlaying } = survival
   const question = round!.question!
@@ -324,13 +333,13 @@ export function QuizRound({ survival }: { survival: Survival }) {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors, { gameColors }) => ({
   mapPanel: {
     position: 'absolute',
     left: space.md,
     right: space.md,
     bottom: space.xl,
-    backgroundColor: 'rgba(11,16,32,0.96)',
+    backgroundColor: colors.surface,
     borderRadius: radius.xl,
     borderWidth: 1,
     borderColor: colors.border,
@@ -413,4 +422,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: colors.surfaceHigh,
   },
-})
+}))

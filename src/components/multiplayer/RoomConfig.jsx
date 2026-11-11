@@ -13,8 +13,9 @@ import { getTotalCountries } from '../../hooks/useGameState'
 import { getTotalFlagCountries } from '../../hooks/useFlagGameState'
 import { getTotalCapitalCountries } from '../../hooks/useCapitalsGameState'
 import { parseSurvivalModes, survivalModesKey } from '../../utils/survivalConfig'
-import SurvivalOptions, { SURVIVAL_ROUND_ICONS, defaultSurvivalOptions, rampLabel, timerLabel } from '../SurvivalOptions'
-import { LISTED_ROOM_GAMES, ROOM_GAMES, roomGameIcon } from '../../utils/roomGames'
+import SurvivalOptions, { defaultSurvivalOptions, rampLabel, timerLabel } from '../SurvivalOptions'
+import { LISTED_ROOM_GAMES, ROOM_GAMES } from '../../utils/roomGames'
+import GameEmblem, { flightCode } from '../GameEmblem'
 import './RoomConfig.css'
 
 const DEFAULT_ASCENSION_PRESET = ASCENSION_PRESETS.find(p => p.name === 'Découverte') ?? ASCENSION_PRESETS[0]
@@ -23,8 +24,8 @@ const SETUP_TYPES = [GAME_TYPES.PLACEMENT, GAME_TYPES.FLAGS, GAME_TYPES.CAPITALS
 const DIFFICULTIES = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
 const ASCENSION_DIFFS = ['Facile', 'Moyen', 'Difficile', 'Impossible']
 const DIFFICULTY_COLORS = {
-  Facile: '#4ade80', Moyen: '#00d4ff', Difficile: '#fbbf24',
-  Impossible: '#f97316', Hardcore: '#f87171',
+  Facile: 'var(--gg-success-strong)', Moyen: 'var(--game-voyage-voyage-ink)', Difficile: 'var(--gg-warning-strong)',
+  Impossible: 'var(--game-daily-challenge-ink)', Hardcore: 'var(--gg-danger-strong)',
 }
 const COUNTS = [5, 10, 15]
 const QUIZ_COUNTS = [5, 10, 20]
@@ -158,13 +159,12 @@ export function buildRoomGame({ gameId, setup, count, quizDifficulty, answerMode
   return game
 }
 
-/** "🚩 Trouve le Drapeau · Moyen", "❤️ Survie · 3 ❤️ · ⏱ 30 s · 🎯 Normale · 🚩🧠" */
+/** "Trouve le Drapeau · Moyen", "Survie · 3 ❤️ · ⏱ 30 s · 🎯 Normale · DRP QIZ" (the rounds as flight codes) */
 export function gameLabel(game, t) {
-  const icon = roomGameIcon(game.id)
   if (game.type === GAME_TYPES.SURVIVAL) {
-    const rounds = parseSurvivalModes(game.modes).map(type => SURVIVAL_ROUND_ICONS[type]).join('')
+    const rounds = parseSurvivalModes(game.modes).map(type => flightCode(type)).join(' ')
     const ramp = game.ramp ? ` · ${rampLabel(game.ramp, t)}` : ''
-    return `${icon} ${t('games.survival.title')} · ${game.lives} ❤️ · ⏱ ${timerLabel(game.timer ?? 0, t)}${ramp} · ${rounds}`
+    return `${t('games.survival.title')} · ${game.lives} ❤️ · ⏱ ${timerLabel(game.timer ?? 0, t)}${ramp} · ${rounds}`
   }
   const settings = game.phases
     ? 'Ascension'
@@ -173,7 +173,18 @@ export function gameLabel(game, t) {
       : (game.difficulty ?? game.quizDifficulty)
         ? t(`difficulties.${game.difficulty ?? game.quizDifficulty}`)
         : null
-  return `${icon} ${t(`games.${game.id}.title`)}${settings ? ` · ${settings}` : ''}${game.count ? ` · ${game.count}` : ''}`
+  return `${t(`games.${game.id}.title`)}${settings ? ` · ${settings}` : ''}${game.count ? ` · ${game.count}` : ''}`
+}
+
+/** A game's label with its emblem in front. */
+export function GameLabel({ game }) {
+  const { t } = useTranslation()
+  return (
+    <span className="rc-game-label">
+      <GameEmblem game={game.id} variant="glyph" size={18} />
+      {gameLabel(game, t)}
+    </span>
+  )
 }
 
 /** One game: which one, and its options. */
@@ -195,7 +206,7 @@ export function GameEditor({ draft, onChange }) {
             className={`rc-game-pick${gameId === g.id ? ' active' : ''}`}
             onClick={() => set({ gameId: g.id, count: 10 })}
           >
-            <span className="rc-game-icon">{g.icon}</span>
+            <GameEmblem game={g.id} size={28} />
             {t(`games.${g.id}.title`)}
           </button>
         ))}
@@ -281,61 +292,79 @@ export default function RoomConfig({ onSubmit, submitting, initialGameId, initia
     onSubmit({ pseudo: pseudo.trim(), mode, games: [...games, buildRoomGame(draft)] })
   }
 
+  const draftGame = buildRoomGame(draft)
+  const gameCount = games.length + 1
+
   return (
     <form className="room-config" onSubmit={handleSubmit}>
-      <h2 className="rc-title">{t('config.title')}</h2>
+      <div className="rc-main">
+        <p className="gg-kicker">{t('config.kicker')}</p>
+        <h2 className="rc-title gg-title">{t('config.title')}</h2>
 
-      <div className="rc-pseudo">
-        <label htmlFor="pseudo-input">{t('labels.your_username')}</label>
-        <input
-          id="pseudo-input"
-          value={pseudo}
-          onChange={e => setTyped(e.target.value)}
-          placeholder={t('placeholders.username')}
-          maxLength={20}
-          aria-invalid={forbiddenPseudo}
-        />
-        {forbiddenPseudo && <p className="rc-hint" role="alert">{t('account.errors.username_forbidden')}</p>}
+        <div className="rc-pseudo">
+          <label htmlFor="pseudo-input">{t('labels.your_username')}</label>
+          <input
+            id="pseudo-input"
+            value={pseudo}
+            onChange={e => setTyped(e.target.value)}
+            placeholder={t('placeholders.username')}
+            maxLength={20}
+            aria-invalid={forbiddenPseudo}
+          />
+          {forbiddenPseudo && <p className="rc-hint" role="alert">{t('account.errors.username_forbidden')}</p>}
+        </div>
+
+        <section className="rc-section">
+          <Choices
+            options={[{ value: 'live', label: t('mp_room.live') }, { value: 'challenge', label: t('mp_room.challenge') }]}
+            value={mode}
+            onChange={setMode}
+          />
+          <p className="rc-hint">{t(mode === 'live' ? 'mp_room.live_hint' : 'mp_room.challenge_hint')}</p>
+        </section>
+
+        <section className="rc-section rc-editor">
+          <h3 className="rc-editor-title">{t('mp_room.game_n', { n: gameCount })}</h3>
+          <GameEditor draft={draft} onChange={setDraft} />
+          <button type="button" className="rc-add-btn" onClick={addAnother} disabled={!draftReady(draft)}>
+            + {t('mp_room.add_another')}
+          </button>
+        </section>
       </div>
 
-      <section className="rc-section">
-        <Choices
-          options={[{ value: 'live', label: t('mp_room.live') }, { value: 'challenge', label: t('mp_room.challenge') }]}
-          value={mode}
-          onChange={setMode}
-        />
-        <p className="rc-hint">{t(mode === 'live' ? 'mp_room.live_hint' : 'mp_room.challenge_hint')}</p>
-      </section>
-
-      {games.length > 0 && (
-        <section className="rc-section">
-          <h3 className="rc-games-title">{t('mp_room.games')}</h3>
-          <ol className="rc-game-list">
-            {games.map((game, index) => (
-              <li key={index}>
-                <span>{gameLabel(game, t)}</span>
-                <button
-                  type="button"
-                  aria-label={t('mp_room.remove_game')}
-                  onClick={() => setGames(previous => previous.filter((_, i) => i !== index))}
-                >✕</button>
-              </li>
-            ))}
-          </ol>
-        </section>
-      )}
-
-      <section className="rc-section">
-        <h3 className="rc-games-title">{t('mp_room.game_n', { n: games.length + 1 })}</h3>
-        <GameEditor draft={draft} onChange={setDraft} />
-        <button type="button" className="rc-add-btn" onClick={addAnother} disabled={!draftReady(draft)}>
-          + {t('mp_room.add_another')}
+      {/* The games of the room as a boarding card: its list, the code it will get, and the button that creates it */}
+      <aside className="rc-ticket">
+        <p className="gg-kicker">{t('config.kicker')}</p>
+        <h3 className="rc-ticket-title">{t('mp_room.games')}</h3>
+        <ol className="rc-game-list">
+          {games.map((game, index) => (
+            <li key={index}>
+              <GameLabel game={game} />
+              <button
+                type="button"
+                aria-label={t('mp_room.remove_game')}
+                onClick={() => setGames(previous => previous.filter((_, i) => i !== index))}
+              >✕</button>
+            </li>
+          ))}
+          <li className="rc-game-list-draft">
+            <GameLabel game={draftGame} />
+          </li>
+        </ol>
+        <p className="rc-ticket-summary">
+          {t(mode === 'live' ? 'mp_room.live' : 'mp_room.challenge')} · {t('mp_room.n_games', { count: gameCount })}
+        </p>
+        <div className="rc-ticket-stub">
+          <span className="gg-field">
+            <small>{t('mp_room.code')}</small>
+            <strong>——————</strong>
+          </span>
+          <span className="rc-ticket-barcode" aria-hidden="true" />
+        </div>
+        <button type="submit" className="rc-submit" disabled={!canSubmit}>
+          {submitting ? t('config.creating') : t('buttons.create_game')}
         </button>
-      </section>
-
-      <button type="submit" className="rc-submit" disabled={!canSubmit}>
-        {submitting ? t('config.creating') : t('buttons.create_game')}
-      </button>
+      </aside>
     </form>
   )
 }

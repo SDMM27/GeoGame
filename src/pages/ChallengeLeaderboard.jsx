@@ -12,8 +12,8 @@ import { useAccount } from '../auth'
 import { useLeaderboardRefresh } from '../hooks/useLeaderboardRefresh'
 import PlayerName, { mineClass } from '../components/PlayerName'
 import './DailyLeaderboard.css'
+import RankBadge from '../components/RankBadge'
 
-const MEDAL = ['🥇', '🥈', '🥉']
 
 function ChallengeRow({ score, index, account, rounds }) {
   const { t } = useTranslation()
@@ -24,7 +24,7 @@ function ChallengeRow({ score, index, account, rounds }) {
   return (
     <div className={`daily-lb__row${index < 3 ? ' daily-lb__row--top' : ''}${mineClass(score, account)}`}>
       <div className="daily-lb__row-main" onClick={() => setOpen((prev) => !prev)}>
-        <span className="daily-lb__rank">{index < 3 ? MEDAL[index] : `#${index + 1}`}</span>
+        <span className="daily-lb__rank"><RankBadge rank={index + 1} /></span>
         <span className="daily-lb__name"><PlayerName entry={score} account={account} reportIn="daily_scores" /></span>
         <span className="daily-lb__attempts">{score.score}/{CHALLENGE_ROUNDS}</span>
         <span className="daily-lb__time">{score.elapsedTime != null ? formatTime(score.elapsedTime) : '—'}</span>
@@ -69,7 +69,7 @@ export default function ChallengeLeaderboard({ dailyKey }) {
 
   return (
     <div className="daily-lb">
-      <h2 className="daily-lb__title">{t('leaderboard.title')}</h2>
+      <h2 className="daily-lb__title gg-kicker">{t('leaderboard.title')}</h2>
 
       <div className="daily-lb__date-nav">
         {days.map(({ key, label }) => (
@@ -104,7 +104,7 @@ export default function ChallengeLeaderboard({ dailyKey }) {
         <p className="daily-lb__empty">{t('leaderboard.no_scores_today')}</p>
       ) : (
         <>
-          <div className="daily-lb__header">
+          <div className="daily-lb__header gg-board-head">
             <span>#</span>
             <span>{t('labels.player')}</span>
             <span>{t('daily_challenge.col_score')}</span>

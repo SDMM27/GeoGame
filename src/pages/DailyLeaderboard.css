@@ -2,44 +2,44 @@
 .daily-form {
   margin-top: 24px;
   padding: 24px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  background: var(--sd-surface);
+  border: 1px solid var(--sd-line);
+  border-radius: var(--sd-radius-card);
 }
 
 .daily-form__title {
   margin: 0 0 6px;
   font-size: 1.1rem;
   font-weight: 800;
-  color: var(--text-primary);
+  color: var(--sd-ink);
 }
 
 .daily-form__stat {
   margin: 0 0 16px;
-  color: var(--text-muted);
+  color: var(--sd-muted);
   font-size: 0.9rem;
 }
 
 .daily-form__blocked {
   margin-bottom: 14px;
   padding: 10px 14px;
-  background: rgba(245, 184, 61, 0.08);
-  border: 1px solid rgba(245, 184, 61, 0.3);
-  border-radius: var(--radius-md, 8px);
+  background: var(--gg-warning-soft);
+  border: 1px solid color-mix(in srgb, var(--gg-warning) 40%, transparent);
+  border-radius: var(--sd-radius-md);
   font-size: 0.85rem;
-  color: var(--text-primary);
+  color: var(--sd-ink);
 }
 
 .daily-form__blocked-hint {
   margin: 4px 0 0;
-  color: var(--text-muted);
+  color: var(--sd-muted);
 }
 
 .daily-form__label {
   display: block;
   margin-bottom: 6px;
   font-size: 0.85rem;
-  color: var(--text-muted);
+  color: var(--sd-muted);
   font-weight: 600;
 }
 
@@ -47,10 +47,10 @@
   width: 100%;
   box-sizing: border-box;
   padding: 10px 14px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md, 8px);
-  color: var(--text-primary);
+  background: var(--sd-surface);
+  border: 1px solid var(--sd-line);
+  border-radius: var(--sd-radius-md);
+  color: var(--sd-ink);
   font-size: 0.95rem;
   margin-bottom: 12px;
 }
@@ -58,10 +58,10 @@
 .daily-form__submit {
   width: 100%;
   padding: 10px;
-  background: var(--accent);
-  color: #000;
+  background: var(--sd-accent);
+  color: var(--sd-accent-ink);
   border: none;
-  border-radius: var(--radius-md, 8px);
+  border-radius: var(--sd-radius-md);
   font-weight: 800;
   font-size: 0.9rem;
   cursor: pointer;
@@ -76,16 +76,16 @@
 .daily-lb {
   margin-top: 20px;
   padding: 24px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  background: var(--sd-surface);
+  border: 1px solid var(--sd-line);
+  border-radius: var(--sd-radius-card);
 }
 
 .daily-lb__title {
   margin: 0 0 16px;
   font-size: 1.1rem;
   font-weight: 800;
-  color: var(--text-primary);
+  color: var(--sd-ink);
 }
 
 .daily-lb__header {
@@ -94,13 +94,13 @@
   padding: 6px 12px;
   font-size: 0.78rem;
   font-weight: 700;
-  color: var(--text-muted);
+  color: var(--sd-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .daily-lb__row {
-  border-radius: var(--radius-md, 8px);
+  border-radius: var(--sd-radius-md);
   overflow: hidden;
   margin-bottom: 4px;
 }
@@ -109,7 +109,7 @@
   display: grid;
   grid-template-columns: 40px minmax(0, 1fr) 80px 90px;
   padding: 10px 12px;
-  background: var(--bg-secondary);
+  background: var(--sd-surface);
   cursor: pointer;
   user-select: none;
   align-items: center;
@@ -117,18 +117,18 @@
 }
 
 .daily-lb__row-main:hover {
-  background: rgba(255,255,255,0.04);
+  background: var(--gg-tint);
 }
 
 .daily-lb__row--top .daily-lb__row-main {
-  background: rgba(61, 220, 151, 0.07);
-  border: 1px solid rgba(61, 220, 151, 0.15);
+  background: var(--gg-accent-soft);
+  border: 1px solid var(--gg-accent-line);
 }
 
 .daily-lb__rank {
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--text-muted);
+  color: var(--sd-muted);
 }
 
 /* The whole name is shown, on as many lines as it needs */
@@ -136,33 +136,33 @@
   min-width: 0;
   overflow-wrap: anywhere;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--sd-ink);
   font-size: 0.95rem;
 }
 
 .daily-lb__attempts,
 .daily-lb__time {
   font-size: 0.9rem;
-  color: var(--text-primary);
+  color: var(--sd-ink);
   text-align: right;
 }
 
 .daily-lb__attempts-detail {
   font-size: 0.75em;
-  color: var(--text-muted);
+  color: var(--sd-muted);
   margin-left: 3px;
 }
 
 .daily-lb__accordion {
   padding: 10px 12px 12px 52px;
-  background: rgba(0,0,0,0.2);
+  background: var(--gg-tint-strong);
   font-size: 0.85rem;
-  color: var(--text-muted);
+  color: var(--sd-muted);
 }
 
 .daily-lb__accordion-title {
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--sd-ink);
   margin-bottom: 6px;
   font-size: 0.82rem;
   text-transform: uppercase;
@@ -179,17 +179,17 @@
 }
 
 .daily-lb__guess-item {
-  color: var(--text-muted);
+  color: var(--sd-muted);
 }
 
 .daily-lb__guess-item--correct {
-  color: var(--success);
+  color: var(--gg-success-strong);
   font-weight: 700;
 }
 
 .daily-lb__loading,
 .daily-lb__empty {
-  color: var(--text-muted);
+  color: var(--sd-muted);
   font-size: 0.9rem;
   text-align: center;
   padding: 12px 0;
@@ -203,10 +203,10 @@
   width: 100%;
   padding: 16px;
   margin-top: 8px;
-  background: var(--accent);
-  color: #000;
+  background: var(--sd-accent);
+  color: var(--sd-accent-ink);
   border: none;
-  border-radius: var(--radius-lg);
+  border-radius: var(--sd-radius-card);
   font-size: 1rem;
   font-weight: 900;
   letter-spacing: 0.04em;
@@ -224,9 +224,9 @@
   justify-content: center;
   height: 100%;
   min-height: 280px;
-  background: rgba(0,0,0,0.25);
-  border-radius: var(--radius-lg);
-  color: var(--text-muted);
+  background: var(--gg-tint-strong);
+  border-radius: var(--sd-radius-card);
+  color: var(--sd-muted);
   font-size: 0.95rem;
 }
 
@@ -240,10 +240,10 @@
 
 .daily-lb__day-btn {
   padding: 5px 12px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md, 8px);
-  color: var(--text-muted);
+  background: var(--sd-surface);
+  border: 1px solid var(--sd-line);
+  border-radius: var(--sd-radius-md);
+  color: var(--sd-muted);
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
@@ -251,14 +251,14 @@
 }
 
 .daily-lb__day-btn:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--text-primary);
+  background: var(--gg-tint);
+  color: var(--sd-ink);
 }
 
 .daily-lb__day-btn--active {
-  background: rgba(61, 220, 151, 0.12);
-  border-color: rgba(61, 220, 151, 0.4);
-  color: var(--accent);
+  background: var(--gg-accent-soft);
+  border-color: var(--gg-accent-line);
+  color: var(--sd-accent-strong);
 }
 
 .daily-lb__history-toggle {
@@ -272,7 +272,7 @@
   background: none;
   border: none;
   padding: 0;
-  color: var(--text-muted);
+  color: var(--sd-muted);
   font-size: 0.8rem;
   cursor: pointer;
   text-decoration: underline;
@@ -281,15 +281,15 @@
 }
 
 .daily-lb__history-link:hover {
-  color: var(--text-primary);
+  color: var(--sd-ink);
 }
 
 .daily-lb__date-picker {
   padding: 5px 10px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md, 8px);
-  color: var(--text-primary);
+  background: var(--sd-surface);
+  border: 1px solid var(--sd-line);
+  border-radius: var(--sd-radius-md);
+  color: var(--sd-ink);
   font-size: 0.85rem;
   cursor: pointer;
 }
@@ -297,9 +297,58 @@
 .daily-lb__tier {
   margin: 10px 0 4px;
   padding-top: 6px;
-  border-top: 1px dashed var(--border-color);
-  color: var(--text-muted);
+  border-top: 1px dashed var(--sd-line);
+  color: var(--sd-muted);
   font-size: 0.72rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
+
+/* ── « Carnet de vol »: the day's leaderboard as a departures board ── */
+.daily-lb .daily-lb__title {
+  margin: 0 0 14px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--sd-accent-strong);
+}
+
+.daily-lb__header {
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  padding-bottom: 8px;
+  margin-bottom: 6px;
+  border-bottom: 2px solid var(--sd-line);
+}
+
+.daily-lb__header > :nth-child(n + 3) { text-align: right; }
+
+.daily-lb__rank,
+.daily-lb__attempts,
+.daily-lb__time {
+  font-family: var(--sd-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.daily-lb__day-btn {
+  min-height: 44px;
+  padding: 5px 14px;
+  border-radius: var(--sd-radius-pill);
+  font-family: var(--sd-font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.daily-lb__day-btn--active {
+  background: var(--sd-accent);
+  border-color: var(--sd-accent);
+  color: var(--sd-accent-ink);
+}
+
+.daily-lb__history-link { min-height: 44px; }
+
+.daily-lb__tier { font-family: var(--sd-font-mono); letter-spacing: 0.1em; }
+
+/* « Your flight »: a boarding-pass bar on the left edge of the player's own row */
+.daily-lb__row.leaderboard-row--mine .daily-lb__row-main { box-shadow: inset 4px 0 0 var(--sd-accent); }

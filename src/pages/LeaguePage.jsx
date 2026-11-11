@@ -20,6 +20,12 @@ function LastWeek({ result }) {
       <div className="league-card league-last">
         <strong>{t('league.last_rank', { rank: result.rank, points: result.points })}</strong>
         {result.reward > 0 && <span className="league-reward">{t('league.last_reward', { count: result.reward })}</span>}
+        {result.reward > 0 && (
+          <span className="gg-stamp sd-stamp league-stamp" aria-hidden="true">
+            {t('league.stamp_label')}
+            <strong>+{result.reward}</strong>
+          </span>
+        )}
       </div>
     )
   }
@@ -46,13 +52,13 @@ function Me({ account, me }) {
     )
   }
   return (
-    <div className="league-card league-me">
+    <div className="league-card league-me gg-ticket">
       <span className="league-me-rank">{t('league.me_rank', { rank: me.rank })}</span>
       <div className="league-me-text">
         <strong>{me.points} {t('units.pts')}</strong>
         <small>{t('league.me_played', { count: me.played })}</small>
       </div>
-      <span className="league-me-gap">{me.ahead ? t('league.me_gap', { gap: me.ahead.gap, name: me.ahead.name }) : t('league.me_leader')}</span>
+      <span className="league-me-gap gg-ticket-stub">{me.ahead ? t('league.me_gap', { gap: me.ahead.gap, name: me.ahead.name }) : t('league.me_leader')}</span>
     </div>
   )
 }
@@ -72,12 +78,13 @@ export default function LeaguePage() {
   return (
     <div className="account-page">
       <NavBar />
-      <main className="account-main account-main--wide">
+      <main className="account-main account-main--wide league-main">
         <header className="league-header">
-          <h1 className="account-title">{t('league.title')}</h1>
+          <p className="gg-kicker">{t('league.season')}</p>
+          <h1 className="account-title gg-title">{t('league.title')}</h1>
           <p className="account-pitch">{t('league.intro')}</p>
           <p className="profile-muted">
-            <strong>{t('league.days_left', { count: league.daysLeft })}</strong> · {t('league.updated_hint')}
+            <strong className="gg-mono league-days">{t('league.days_left', { count: league.daysLeft })}</strong> · {t('league.updated_hint')}
           </p>
         </header>
 
@@ -88,7 +95,7 @@ export default function LeaguePage() {
         <section className="profile-section">
           <div className="account-tabs" role="tablist">
             {['friends', 'world'].map((id) => (
-              <button key={id} type="button" role="tab" aria-selected={tab === id} className={`account-tab${tab === id ? ' active' : ''}`} onClick={() => setChosen(id)}>
+              <button key={id} type="button" role="tab" aria-selected={tab === id} className={`account-tab gg-mono${tab === id ? ' active' : ''}`} onClick={() => setChosen(id)}>
                 {t(`league.tab_${id}`)}
               </button>
             ))}

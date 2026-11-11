@@ -3,7 +3,7 @@
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useBadges } from '@shared/hooks/useBadges'
@@ -12,12 +12,13 @@ import { useFriendships } from '@shared/hooks/usePlayerProfile'
 import { LEAGUE_MIN_PLAYED, LEAGUE_REWARDS } from '@shared/utils/leagueRewards'
 
 import { type Account, useAccount } from '@/account/auth'
+import { BoardingPass, Kicker } from '@/components/flight'
 import { type PlayerBadges } from '@/components/profile/BadgeStrip'
-import { type CandidateMessage, FriendCandidates } from '@/components/profile/FriendCandidates'
+import { type CandidateMessage, FriendCandidates, type Zone } from '@/components/profile/FriendCandidates'
 import { SectionTitle } from '@/components/profile/ProfileSections'
 import { ScreenHeader } from '@/components/ScreenHeader'
 import { Button, Segmented, Text } from '@/components/ui'
-import { colors, radius, space } from '@/theme'
+import { fonts, makeStyles, radius, space, useColors } from '@/theme'
 
 type Tab = 'friends' | 'world'
 type Ranked = { uid: string; name: string; rank: number; points: number }
@@ -36,12 +37,16 @@ type League = {
 
 function LastWeek({ result }: { result: Result }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   if (result.rank != null) {
     return (
-      <View style={[styles.card, { borderColor: colors.accent }]}>
-        <Text variant="bodyStrong">{t('league.last_rank', { rank: result.rank, points: result.points })}</Text>
+      <View style={[styles.lastWeek, { borderColor: colors.accent }]}>
+        <Text variant="bodyStrong" style={{ flex: 1 }}>
+          {t('league.last_rank', { rank: result.rank, points: result.points })}
+        </Text>
         {result.reward > 0 && (
-          <Text variant="caption" color={colors.accent}>
+          <Text variant="caption" color={colors.accent} style={{ flex: 1, textAlign: 'right', fontFamily: fonts.bodyBold }}>
             {t('league.last_reward', { count: result.reward })}
           </Text>
         )}
@@ -54,6 +59,7 @@ function LastWeek({ result }: { result: Result }) {
 
 function MyPlace({ account, me }: { account: Account | null; me: Me | null }) {
   const { t } = useTranslation()
+  const styles = useStyles()
   if (!account?.username) {
     return (
       <View style={styles.card}>
@@ -71,11 +77,10 @@ function MyPlace({ account, me }: { account: Account | null; me: Me | null }) {
     )
   }
   return (
-    <View style={styles.card}>
+    <BoardingPass code={String(me.rank)} gate={String(me.points)} codeLabel={t('mobile.flight.rank').toLocaleUpperCase()} gateLabel={t('units.pts').toLocaleUpperCase()} accessibilityLabel={`${t('league.me_rank', { rank: me.rank })}, ${me.points} ${t('units.pts')}`}>
+      <Kicker>{t('league.title')}</Kicker>
       <View style={styles.meRow}>
-        <Text variant="title" color={colors.accent}>
-          {t('league.me_rank', { rank: me.rank })}
-        </Text>
+        <Text style={styles.rank}>{t('league.me_rank', { rank: me.rank })}</Text>
         <View style={{ flex: 1 }}>
           <Text variant="bodyStrong">
             {me.points} {t('units.pts')}
@@ -84,12 +89,13 @@ function MyPlace({ account, me }: { account: Account | null; me: Me | null }) {
         </View>
       </View>
       <Text variant="caption">{me.ahead ? t('league.me_gap', { gap: me.ahead.gap, name: me.ahead.name }) : t('league.me_leader')}</Text>
-    </View>
+    </BoardingPass>
   )
 }
 
 export default function LeagueScreen() {
   const { t } = useTranslation()
+  const colors = useColors()
   const insets = useSafeAreaInsets()
   const { account } = useAccount()
   const friendships = useFriendships(account?.username ? account.uid : null)
@@ -105,7 +111,23 @@ export default function LeagueScreen() {
     rank: player.rank,
     detail: `${player.points} ${t('units.pts')}`,
     badges: badges[player.uid],
+    // What the rank pays at the end of the week (the world board only: friends compete for pride)
+    reward: tab === 'world' ? (LEAGUE_REWARDS as Record<number, number>)[player.rank] : undefined,
   }))
+  const rewards = LEAGUE_REWARDS as Record<number, number>
+  const zones: Zone[] | undefined =
+    tab === 'world'
+      ? [
+          { fromRank: 1, label: t('mobile.flight.zone_podium').toLocaleUpperCase(), note: t('mobile.flight.zone_podium_note', { rewards: `${rewards[1]} / ${rewards[2]} / ${rewards[3]}` }).toLocaleUpperCase(), color: colors.gold },
+          {
+            fromRank: 4,
+            toRank: Object.keys(rewards).length,
+            label: t('mobile.flight.zone_fragments').toLocaleUpperCase(),
+            note: t('mobile.flight.zone_fragments_note', { reward: rewards[4], from: 4, to: Object.keys(rewards).length }).toLocaleUpperCase(),
+            color: colors.accent,
+          },
+        ]
+      : undefined
 
   return (
     <ScrollView
@@ -115,9 +137,8 @@ export default function LeagueScreen() {
       <ScreenHeader title={t('league.title')} />
       <View style={{ gap: space.xs }}>
         <Text variant="caption">{t('league.intro')}</Text>
-        <Text variant="caption">
-          {t('league.days_left', { count: league.daysLeft })} · {t('league.updated_hint')}
-        </Text>
+        <Kicker color={colors.gold}>{t('league.days_left', { count: league.daysLeft })}</Kicker>
+        <Text variant="caption">{t('league.updated_hint')}</Text>
       </View>
 
       {league.lastResult && <LastWeek result={league.lastResult} />}
@@ -139,7 +160,7 @@ export default function LeagueScreen() {
             {message.text}
           </Text>
         )}
-        <FriendCandidates players={players} account={account} friendships={friendships} onMessage={setMessage} />
+        <FriendCandidates players={players} account={account} friendships={friendships} onMessage={setMessage} zones={zones} />
         {tab === 'friends' && account?.username && friendships.friends.length === 0 && (
           <View style={{ gap: space.sm }}>
             <Text variant="caption">{t('league.friends_empty')}</Text>
@@ -164,7 +185,9 @@ export default function LeagueScreen() {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   card: { gap: space.md, padding: space.lg, borderRadius: radius.xl, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   meRow: { flexDirection: 'row', alignItems: 'center', gap: space.lg },
-})
+  rank: { fontFamily: fonts.displayHeavy, fontSize: 34, lineHeight: 38, color: colors.accent },
+  lastWeek: { flexDirection: 'row', alignItems: 'center', gap: space.md, padding: space.lg, borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1.5 },
+}))

@@ -8,6 +8,7 @@ import { setupGameRecord } from '../../utils/gameHistory'
 import { useRecordGame } from '../../auth'
 import { getCapitalName, getCountryName } from '../../utils/getCountryName'
 import { createAppFillRenderer } from '../../components/map/appFillRenderer'
+import { GameFlightTag } from '../../components/GameEmblem'
 import PhaseIndicator from '../../components/PhaseIndicator'
 import countries from '../../data/countriesWithDifficulty_FR.json'
 import Form from '../form'
@@ -117,9 +118,10 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
 
       <div className={`hud-container${isAscension ? ' hud-container--with-phase' : ''}`}>
         <div className="hud-main">
+          <GameFlightTag game={gameType} className="hud-flight" />
           <div className="hud-row">
             <div className="hud-cell">
-              <span className="hud-value" style={{ color: 'var(--accent)' }}>{score}</span>
+              <span className="hud-value" style={{ color: 'var(--sd-accent-strong)' }}>{score}</span>
               <span className="hud-label">{t('game_hud.score')}</span>
             </div>
             <div className="hud-cell hud-cell--target">
@@ -131,7 +133,7 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
               {capital && <span className="hud-target-capital">{t('game_hud.capital_of_target', { name: capital })}</span>}
             </div>
             <div className="hud-cell">
-              <span className="hud-value" style={{ color: 'var(--accent)' }}>{displayTimer}</span>
+              <span className="hud-value" style={{ color: 'var(--sd-accent-strong)' }}>{displayTimer}</span>
               <span className="hud-label">{t('game_hud.time')}</span>
             </div>
           </div>
@@ -176,8 +178,8 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
           <div className="game-over-content">
             {onGameFinished ? (
               <div className="mp-game-waiting">
-                <p style={{ color: '#4ade80', fontSize: '1.5rem' }}>{t('game_over.completed')}</p>
-                <p style={{ color: '#94a3b8' }}>{t('game_over.waiting_players')}</p>
+                <p style={{ color: 'var(--gg-success-strong)', fontSize: '1.5rem' }}>{t('game_over.completed')}</p>
+                <p style={{ color: 'var(--sd-muted)' }}>{t('game_over.waiting_players')}</p>
               </div>
             ) : isAscension ? (
               <AscensionForm

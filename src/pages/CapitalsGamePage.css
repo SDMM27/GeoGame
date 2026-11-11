@@ -4,7 +4,7 @@
   width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
-  background: var(--bg-primary);
+  background: var(--sd-bg);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -35,13 +35,13 @@
   font-size: 0.7rem;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--text-secondary);
+  color: var(--sd-muted);
 }
 
 .capitals-country-value {
   font-size: 1.6rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--sd-ink);
 }
 
 /* Désactivation des boutons HUD pour cette page */
@@ -85,3 +85,10 @@
     font-size: 2rem;
   }
 }
+
+/* The question dominates: the country in display type */
+@media (min-width: 761px) {
+  .capitals-country-value { font-size: clamp(2rem, 4.5vw, 3.4rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.05; }
+}
+.capitals-game-page .flag-input,
+.capitals-game-page .flag-input-row button { min-height: 44px; }

@@ -9,7 +9,7 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { Easing, cancelAnimation, useDerivedValue, useSharedValue, withTiming, type SharedValue } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
 
-import { colors } from '@/theme'
+import { makeStyles, useColors, type Palette } from '@/theme'
 import {
   BASE_ZOOM,
   WORLD_SIZE,
@@ -81,19 +81,36 @@ const TAP_TOLERANCE_PX = 16
 const TAP_MAX_MOVE_PX = 10
 const INERTIA_MS = 350
 
-// The website's hooks pass Leaflet colors; map them onto the app palette.
-const COLOR_MAP: Record<string, string> = {
-  '#4ade80': colors.accent,
-  '#22c55e': colors.accent,
-  '#ff4d4d': colors.danger,
-  '#ef4444': colors.danger,
-  '#7b2ff7': colors.highlight,
-  '#94a3b8': colors.landStroke,
+// The website's hooks pass Leaflet colors, and some of the app's own dark palette (src/utils/mapColors.js); map
+// them onto the palette of the theme in use, so the light theme repaints them.
+const colorMaps = new WeakMap<Palette, Record<string, string>>()
+
+function colorMap(colors: Palette) {
+  let map = colorMaps.get(colors)
+  if (!map) {
+    map = {
+      '#4ade80': colors.accent,
+      '#22c55e': colors.accent,
+      '#ff4d4d': colors.danger,
+      '#ef4444': colors.danger,
+      '#7b2ff7': colors.highlight,
+      '#94a3b8': colors.landStroke,
+      '#2a3e66': colors.land,
+      '#6f88bd': colors.landStroke,
+      '#7aa2ff': colors.highlight,
+      '#3ddc97': colors.accent,
+      '#ff7a6b': colors.danger,
+      '#f5b83d': colors.warning,
+      '#eef1f8': colors.text,
+    }
+    colorMaps.set(colors, map)
+  }
+  return map
 }
 
-function mapColor(color?: string) {
+function mapColor(color: string | undefined, colors: Palette) {
   if (!color) return undefined
-  return COLOR_MAP[color.toLowerCase()] ?? color
+  return colorMap(colors)[color.toLowerCase()] ?? color
 }
 
 function isVisibleFill(style?: LeafletStyle) {
@@ -141,6 +158,7 @@ export const BaseTile = memo(function BaseTile({
   level: SharedValue<number>
   border?: boolean
 }) {
+  const colors = useColors()
   const path = useDerivedValue(() => levels[level.value])
   return border ? (
     <Path path={path} color={colors.landStroke} style="stroke" strokeWidth={0} />
@@ -239,6 +257,8 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
   ref
 ) {
   const { t } = useTranslation()
+  const colors = useColors()
+  const mapStyles = useMapStyles()
   const shapes = useMemo(() => {
     const all = getCountryShapes()
     if (!countries) return [...all.values()]
@@ -292,27 +312,27 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
       const style = styles[shape.name]
       if (!style) continue
       if (isVisibleFill(style)) {
-        const color = mapColor(style.fillColor)!
+        const color = mapColor(style.fillColor, colors)!
         const opacity = Math.min(1, (style.fillOpacity ?? 0.2) * 1.8)
         const key = `${color}|${opacity}`
         if (!fillGroups.has(key)) fillGroups.set(key, { key, path: Skia.Path.Make(), color, opacity })
         fillGroups.get(key)!.path.addPath(shape.path)
       }
-      const strokeColor = mapColor(style.color)
+      const strokeColor = mapColor(style.color, colors)
       if (strokeColor && strokeColor !== colors.landStroke) {
         const isThick = (style.weight ?? 1) >= 2
         const key = `${strokeColor}|${isThick}`
         if (!strokeGroups.has(key)) strokeGroups.set(key, { key, path: Skia.Path.Make(), color: strokeColor, thick: isThick })
         strokeGroups.get(key)!.path.addPath(shape.path)
       } else if (isVisibleFill(style) && (style.weight ?? 1) >= 2) {
-        const color = mapColor(style.fillColor)!
+        const color = mapColor(style.fillColor, colors)!
         const key = `${color}|true`
         if (!strokeGroups.has(key)) strokeGroups.set(key, { key, path: Skia.Path.Make(), color, thick: true })
         strokeGroups.get(key)!.path.addPath(shape.path)
       }
     }
     return { fills: [...fillGroups.values()], strokes: [...strokeGroups.values()] }
-  }, [shapes, styles])
+  }, [shapes, styles, colors])
 
   // Tiny countries get a tappable dot until zoomed in enough to see them.
   const markers = useMemo(() => {
@@ -325,11 +345,16 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
           name: shape.name,
           x: shape.marker.x,
           y: shape.marker.y,
-          color: isVisibleFill(style) ? mapColor(style!.fillColor)! : colors.text,
+          color: isVisibleFill(style) ? mapColor(style!.fillColor, colors)! : colors.text,
           styled: isVisibleFill(style),
         }
       })
-  }, [shapes, styles, zoomScale, showSmallCountryMarkers])
+  }, [shapes, styles, zoomScale, showSmallCountryMarkers, colors])
+
+  const themedOverlays = useMemo(
+    () => overlays.map((overlay) => ({ ...overlay, color: mapColor(overlay.color, colors) ?? overlay.color })),
+    [overlays, colors]
+  )
 
   // ---- View control -------------------------------------------------------------
   const minScale = useCallback(() => (size.width > 0 ? size.width / WORLD_SIZE : 0.3), [size.width])
@@ -609,11 +634,11 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
       <MapScene tiles={tiles} level={level} fills={fills} strokes={strokes} thick={thick} showBorders={showBorders} />
       {markers.map((marker) => (
         <Group key={marker.name}>
-          <Circle cx={marker.x} cy={marker.y} r={markerRadius} color={marker.styled ? marker.color : '#ffffff'} opacity={marker.styled ? 0.6 : 0.15} />
+          <Circle cx={marker.x} cy={marker.y} r={markerRadius} color={marker.styled ? marker.color : colors.text} opacity={marker.styled ? 0.6 : 0.15} />
           <Circle cx={marker.x} cy={marker.y} r={markerRadius} color={marker.color} style="stroke" strokeWidth={markerStroke} opacity={marker.styled ? 1 : 0.8} />
         </Group>
       ))}
-      {overlays.map((overlay, index) =>
+      {themedOverlays.map((overlay, index) =>
         overlay.type === 'line' ? (
           <OverlayLine key={index} overlay={overlay} scale={scale} />
         ) : (
@@ -644,6 +669,6 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
   )
 })
 
-const mapStyles = StyleSheet.create({
+const useMapStyles = makeStyles((colors) => ({
   container: { flex: 1, backgroundColor: colors.ocean, overflow: 'hidden' },
-})
+}))

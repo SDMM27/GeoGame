@@ -6,9 +6,8 @@ import { Image } from 'expo-image'
 import { useLocalSearchParams } from 'expo-router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native'
+import { KeyboardAvoidingView, Platform, ScrollView, View, useWindowDimensions } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import useMultiplayerRoom from '@shared/hooks/useMultiplayerRoom'
 import useSurvivalState from '@shared/hooks/useSurvivalState'
@@ -33,8 +32,9 @@ import { localizeQuestion } from '@shared/utils/quizQuestions'
 import { SURVIVAL_LATE_MS, othersStillIn, spectatorRows } from '@shared/utils/survivalSync'
 
 import { announce } from '@/a11y'
-import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
+import { GameHud } from '@/components/game/GameHud'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
+import { type EscaleState } from '@/components/flight'
 import {
   BORDER_POOL,
   BorderRound,
@@ -48,16 +48,17 @@ import {
   type Survival,
 } from '@/components/survival/SurvivalRounds'
 import { Button, Text } from '@/components/ui'
-import { DIFFICULTY_COLORS, getGameByType } from '@/games'
+import { useDifficultyColors, getGameByType } from '@/games'
+import { clean } from '@/i18n'
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible'
 import { RoomGate, RoomHudPill, Standings, type RoomPlay } from '@/multiplayer/RoomPlay'
 import { getFlag } from '@/flags'
 import { getPlayerId, type PlayerProgress } from '@/multiplayer/room'
 import { navigate } from '@/shims/react-router-dom'
 import { toast } from '@/shims/react-toastify'
-import { colors, gameColors, radius, space } from '@/theme'
+import GameEmblem from '@/components/GameEmblem'
+import { makeStyles, radius, space, useColors, useTheme } from '@/theme'
 
-const ACCENT = gameColors.survival
 const NO_ENTRIES: unknown[] = []
 const newSeed = () => Math.floor(Math.random() * 2 ** 31)
 
@@ -82,6 +83,9 @@ function Spectator({ round, roundIndex, rows, waiting, maxLives }: {
   waiting: { done: number; total: number }
   maxLives: number
 }) {
+  const { gameColors } = useTheme()
+  const styles = useStyles()
+  const colors = useColors()
   const { t, i18n } = useTranslation()
   const revealed = waiting.total > 0 && waiting.done === waiting.total
   const iso: string | undefined = round?.country?.properties?.ISO_A2
@@ -94,7 +98,7 @@ function Spectator({ round, roundIndex, rows, waiting, maxLives }: {
       <Text variant="label">👀 {t('survival.spectating')}</Text>
       {round && (
         <View style={{ alignItems: 'center', gap: space.sm }}>
-          <Text variant="bodyStrong" color={roundGame?.color}>
+          <Text variant="bodyStrong" color={roundGame ? gameColors[roundGame.id] : undefined}>
             {t('survival.round', { n: roundIndex + 1 })} · {t(`survival.prompt.${round.type}`)}
             {round.difficulty ? ` · ${t(`difficulties.${round.difficulty}`)}` : ''}
           </Text>
@@ -182,8 +186,12 @@ type RunProps = {
 }
 
 function SurvivalRun({ modes, lives, timer, ramp, seed, snapshot = null, snapKey = null, play, sync = null, onReplay }: RunProps) {
+  const { gameColors } = useTheme()
+  const styles = useStyles()
+  const colors = useColors()
+  const ACCENT = useTheme().gameColors.survival
+  const DIFFICULTY_COLORS = useDifficultyColors()
   const { t, i18n } = useTranslation()
-  const insets = useSafeAreaInsets()
   const { height: windowHeight } = useWindowDimensions()
   const keyboardVisible = useKeyboardVisible()
   const synced = Boolean(sync)
@@ -300,8 +308,8 @@ function SurvivalRun({ modes, lives, timer, ramp, seed, snapshot = null, snapKey
 
   const header = round && roundGame && (
     <View style={styles.roundHeader}>
-      <MaterialCommunityIcons name={roundGame.icon} size={18} color={roundGame.color} />
-      <Text variant="label" color={roundGame.color} style={{ flex: 1 }}>
+      <GameEmblem game={roundGame.id} variant="glyph" size={18} color={gameColors[roundGame.id]} />
+      <Text variant="label" color={gameColors[roundGame.id]} style={{ flex: 1 }}>
         {t('survival.round', { n: roundIndex + 1 })} · {t(`survival.round_type.${round.type}`)}
       </Text>
       <Text variant="label" color={DIFFICULTY_COLORS[round.difficulty]}>
@@ -313,8 +321,47 @@ function SurvivalRun({ modes, lives, timer, ramp, seed, snapshot = null, snapKey
   const isPlacement = round?.type === GAME_TYPES.PLACEMENT
   const isBorder = round?.type === GAME_TYPES.BORDER_GUESS
 
+  // One segment per round when the run is short enough: the color of the game played, the current one in gold.
+  const rounds = state.rounds as { type: string }[] | undefined
+  const gameColorOf = (round?: { type: string }) => {
+    const id = round && getGameByType(round.type)?.id
+    return id ? gameColors[id] : 'good'
+  }
+  const states: EscaleState[] =
+    rounds && totalRounds > 0 && totalRounds <= 24
+      ? Array.from({ length: totalRounds }, (_, index) =>
+          index === roundIndex ? 'current' : index < roundIndex ? gameColorOf(rounds[index]) : 'todo',
+        )
+      : []
+  const livesLeft = Math.max(0, state.lives)
+  const hearts = lives <= 5 ? '♥'.repeat(livesLeft) + '♡'.repeat(Math.max(0, lives - livesLeft)) : `♥ ×${livesLeft}`
+
   return (
     <View style={{ flex: 1, backgroundColor: isPlacement ? colors.ocean : colors.bg }}>
+      {!isOver && (
+        <View style={{ backgroundColor: colors.bg }}>
+          <GameHud
+            game="survival"
+            title={t('games.survival.title')}
+            tag={`${modes.length} ${t('mobile.home.games_title')}`.toLocaleUpperCase()}
+            gate=""
+            confirmQuit
+            onQuit={play?.exit}
+            right={play ? <RoomHudPill code={play.room.id} gameIndex={play.room.gameIndex} /> : undefined}
+            cells={[
+              { label: t('mobile.flight.lives').toLocaleUpperCase(), value: hearts, color: colors.danger, accessibilityLabel: t('mobile.a11y.lives_left', { count: livesLeft }) },
+              { label: t('mobile.flight.round').toLocaleUpperCase(), value: String(roundIndex + 1), color: colors.gold },
+              {
+                label: clean(t('labels.time')).replace(/\s*:$/, '').toUpperCase(),
+                value: secondsLeft != null && !outcome ? `${secondsLeft} s` : formatTime(elapsedMs).slice(0, 5),
+                color: secondsLeft != null && !outcome && secondsLeft <= 5 ? colors.danger : colors.accent,
+              },
+            ]}
+            states={states.length > 0 ? states : undefined}
+            progressLabel={t('survival.round', { n: roundIndex + 1 })}
+          />
+        </View>
+      )}
       {round && isPlacement && (
         <PlacementRound
           survival={survival}
@@ -331,7 +378,7 @@ function SurvivalRun({ modes, lives, timer, ramp, seed, snapshot = null, snapKey
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
           <ScrollView
             keyboardShouldPersistTaps="handled"
-            contentContainerStyle={[styles.content, { paddingTop: insets.top + 42 + space.md }]}>
+            contentContainerStyle={styles.content}>
             {header}
             {round.type === GAME_TYPES.FLAGS || round.type === GAME_TYPES.CAPITALS ? (
               <TypedRound key={roundIndex} survival={survival} onSubmit={onSubmit} />
@@ -349,21 +396,11 @@ function SurvivalRun({ modes, lives, timer, ramp, seed, snapshot = null, snapKey
         </KeyboardAvoidingView>
       )}
 
-      {!isOver && (
-        <GameTopBar onQuit={play?.exit}>
-          {play && <RoomHudPill code={play.room.id} gameIndex={play.room.gameIndex} />}
-          <HudPill icon="heart" label={`${state.lives}/${lives}`} color={ACCENT} />
-          {secondsLeft != null && !outcome ? (
-            <HudPill icon="timer-sand" label={`${secondsLeft} s`} color={secondsLeft <= 5 ? colors.danger : colors.text} />
-          ) : (
-            <HudPill icon="timer-outline" label={formatTime(elapsedMs).slice(0, 5)} />
-          )}
-          <HudPill icon="star-four-points-outline" label={String(score)} color={colors.accent} />
-        </GameTopBar>
-      )}
-
       {isOver && (
         <ResultsSheet
+          game="survival"
+          ticketNote={`${modes.length} ${t('mobile.home.games_title')} · ${lives} ${t('mobile.flight.lives')}`}
+          states={states}
           title={isWon ? t(lastStanding ? 'survival.last_standing' : 'survival.victory') : t('survival.game_over')}
           score={score}
           scoreLabel={t('survival.rounds_survived')}
@@ -466,7 +503,7 @@ export default function SurvivalScreen() {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   spectator: {
     gap: space.sm,
     padding: space.lg,
@@ -486,7 +523,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   spectatorRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm, minHeight: 32 },
-  content: { paddingHorizontal: space.xl, paddingBottom: space.xl, gap: space.lg },
+  content: { paddingHorizontal: space.xl, paddingTop: space.sm, paddingBottom: space.xl, gap: space.lg },
   roundHeader: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   outcome: {
     flexDirection: 'row',
@@ -497,4 +534,4 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     backgroundColor: colors.surface,
   },
-})
+}))

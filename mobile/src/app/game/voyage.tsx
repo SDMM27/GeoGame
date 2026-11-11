@@ -5,9 +5,8 @@ import { Image } from 'expo-image'
 import { useLocalSearchParams } from 'expo-router'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native'
+import { KeyboardAvoidingView, Platform, ScrollView, View, useWindowDimensions } from 'react-native'
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import countries from '@shared/data/countriesWithDifficulty_FR.json'
 import useVoyageVoyageState from '@shared/hooks/useVoyageVoyageState'
@@ -20,20 +19,19 @@ import { confirmAction } from '@/components/confirm'
 import { useAccount } from '@/account/auth'
 import { DailyLeaderboard } from '@/components/game/DailyLeaderboard'
 import { DailyPlayedElsewhere } from '@/components/game/DailyPlayedElsewhere'
-import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
+import { GameHud } from '@/components/game/GameHud'
 import { GuessInputBar } from '@/components/game/GuessInputBar'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
 import { type CountryFeature } from '@/components/map/geometry'
-import { ExpandableVoyageMap, VOYAGE_COLORS, type VoyageColor } from '@/components/map/VoyageMap'
+import { ExpandableVoyageMap, type VoyageColor, useVoyageColors } from '@/components/map/VoyageMap'
+import { Stamp, type EscaleState } from '@/components/flight'
 import { Button, Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible'
 import { clean } from '@/i18n'
 import { navigate } from '@/shims/react-router-dom'
 import { toast } from '@/shims/react-toastify'
-import { colors, gameColors, radius, space } from '@/theme'
-
-const ACCENT = gameColors.voyage_voyage
+import { makeStyles, radius, space, useColors, useTheme } from '@/theme'
 
 type Guess = { feature: CountryFeature; color: VoyageColor }
 
@@ -58,7 +56,10 @@ function nameOf(feature: CountryFeature, lang: string) {
 }
 
 function CountryChip({ feature, color, lang }: { feature: CountryFeature; color: VoyageColor | 'missed'; lang: string }) {
-  const tint = color === 'missed' ? colors.textMuted : VOYAGE_COLORS[color]
+  const styles = useStyles()
+  const colors = useColors()
+  const voyageColors = useVoyageColors()
+  const tint = color === 'missed' ? colors.textMuted : voyageColors[color]
   const flag = getFlag(feature.properties.ISO_A2)
   return (
     <View style={[styles.chip, { borderColor: `${tint}88`, backgroundColor: `${tint}1A` }, color === 'missed' && styles.chipMissed]}>
@@ -71,6 +72,8 @@ function CountryChip({ feature, color, lang }: { feature: CountryFeature; color:
 }
 
 function OptimalPath({ path, chain }: { path: CountryFeature[]; chain: CountryFeature[] }) {
+  const styles = useStyles()
+  const colors = useColors()
   const { t, i18n } = useTranslation()
   const guessed = new Set(chain.map((feature) => feature.properties.ISO_A2))
   return (
@@ -89,8 +92,10 @@ function OptimalPath({ path, chain }: { path: CountryFeature[]; chain: CountryFe
 }
 
 export default function VoyageScreen() {
+  const styles = useStyles()
+  const colors = useColors()
+  const ACCENT = useTheme().gameColors.voyage_voyage
   const { t, i18n } = useTranslation()
-  const insets = useSafeAreaInsets()
   const { mode = 'daily' } = useLocalSearchParams<{ mode?: string }>()
   const isDaily = mode === 'daily'
   const {
@@ -134,6 +139,11 @@ export default function VoyageScreen() {
   const hintFeatures = unguessed.filter((feature) => (revealedISOs as Set<string | undefined>).has(feature.properties.ISO_A2))
   const stepsLabel = (count: number) => (count === 1 ? t('units.step_one') : t('units.step_other'))
   const errorsLabel = (count: number) => (count === 1 ? t('units.error_one') : t('units.error_other'))
+
+  // One segment per step of the optimal route: done, the one being played, the rest.
+  const progress: EscaleState[] = Array.from({ length: Math.min(Math.max(optimalLength, 1), 12) }, (_, index) =>
+    index < stepsUsed ? 'good' : index === stepsUsed && !isGameOver ? 'current' : 'todo',
+  )
 
   const suggestions = useMemo(() => {
     const key = normalize(input)
@@ -183,7 +193,7 @@ export default function VoyageScreen() {
 
   if (elsewhere.checking || elsewhere.game) {
     return (
-      <DailyPlayedElsewhere title={t('games.voyage_voyage.title')} game={elsewhere.game} accent={ACCENT}>
+      <DailyPlayedElsewhere gameId="voyage_voyage" title={t('games.voyage_voyage.title')} game={elsewhere.game} accent={ACCENT}>
         <DailyLeaderboard
           gameType={GAME_TYPES.VOYAGE_VOYAGE}
           dailyKey={dailyKey}
@@ -196,11 +206,26 @@ export default function VoyageScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+        {!(isGameOver && isDaily) && (
+          <GameHud
+            game="voyage_voyage"
+            title={t('games.voyage_voyage.title')}
+            tag={(isDaily ? t('mobile.home.daily') : t('mobile.home.infinite')).toLocaleUpperCase()}
+            confirmQuit={false}
+            cells={[
+              { label: stepsLabel(2).toUpperCase(), value: `${Math.max(stepsUsed, 0)}/${optimalLength}`, color: colors.gold },
+              { label: errorsLabel(2).toUpperCase(), value: `${wrongs.length}`, color: wrongs.length ? colors.danger : colors.text },
+              { label: clean(t('labels.hints')).replace(/\s*:$/, '').toUpperCase(), value: `${hintsUsed.length}` },
+            ]}
+            states={progress}
+            progressLabel={`${Math.max(stepsUsed, 0)} / ${optimalLength}`}
+          />
+        )}
         <ScrollView
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={[styles.content, { paddingTop: insets.top + 42 + space.md }]}>
+          contentContainerStyle={styles.content}>
           <Text variant="label" color={ACCENT}>
-            {isDaily ? t('mobile.home.daily') : t('mobile.home.infinite')} · {t('games.voyage_voyage.title')}
+            {isDaily ? t('mobile.home.daily') : t('mobile.home.infinite')}
           </Text>
 
           {startCountry && targetCountry && (
@@ -294,6 +319,7 @@ export default function VoyageScreen() {
           {isGameOver && !isDaily && (
             <Animated.View entering={FadeIn.duration(220)} style={{ gap: space.md }}>
               <View style={styles.card}>
+                <Stamp label={resultTitle.toUpperCase()} color={isPerfect ? colors.accent : colors.gold} />
                 <Text variant="heading" color={isPerfect ? colors.accent : colors.text}>
                   {resultTitle}
                 </Text>
@@ -325,15 +351,11 @@ export default function VoyageScreen() {
         )}
       </KeyboardAvoidingView>
 
-      {!(isGameOver && isDaily) && (
-        <GameTopBar confirmQuit={false}>
-          <HudPill icon="map-marker-path" label={`${Math.max(stepsUsed, 0)} / ${optimalLength}`} color={ACCENT} />
-          <HudPill icon="close-circle-outline" label={`${wrongs.length}`} color={wrongs.length ? colors.danger : colors.text} />
-        </GameTopBar>
-      )}
-
       {isGameOver && isDaily && score != null && (
         <ResultsSheet
+          game="voyage_voyage"
+          ticketNote={`${t('mobile.home.daily')} · ${stepsUsed}/${optimalLength}`}
+          states={progress}
           title={resultTitle}
           score={score}
           scoreText={score.toFixed(1)}
@@ -368,7 +390,7 @@ export default function VoyageScreen() {
           share={{
             gameType: 'VOYAGE_VOYAGE',
             difficulty: 'Daily',
-            scoreLabel: 'PTS',
+            scoreLabel: t('units.pts').toLocaleUpperCase(),
             details: t('share.details_voyage', { steps: stepsUsed, optimal: optimalLength }),
             challenge: { route: '/voyage-voyage', dailyKey, solved: true },
           }}
@@ -397,8 +419,8 @@ export default function VoyageScreen() {
   )
 }
 
-const styles = StyleSheet.create({
-  content: { paddingHorizontal: space.xl, paddingBottom: space.xl, gap: space.lg },
+const useStyles = makeStyles((colors) => ({
+  content: { paddingHorizontal: space.xl, paddingTop: space.sm, paddingBottom: space.xl, gap: space.lg },
   chain: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6 },
   chainItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   chip: {
@@ -433,4 +455,4 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-})
+}))

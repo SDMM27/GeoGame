@@ -9,11 +9,11 @@
   gap: 0.7rem;
   max-width: calc(100vw - 32px);
   padding: 0.6rem 0.9rem;
-  border-radius: var(--radius-lg);
-  background: var(--bg-card-hover);
-  border: 1px solid var(--border-strong);
-  box-shadow: var(--shadow-card);
-  color: var(--text-primary);
+  border-radius: var(--sd-radius-card);
+  background: var(--sd-surface-2);
+  border: 1px solid var(--gg-line-strong);
+  box-shadow: var(--gg-shadow);
+  color: var(--sd-ink);
   animation: seal-toast-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   pointer-events: none;
 }

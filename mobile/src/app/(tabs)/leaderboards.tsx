@@ -38,10 +38,11 @@ import { EloLeaderboard } from '@/components/leaderboards/EloLeaderboard'
 import { FilterChips, type Chip } from '@/components/leaderboards/LeaderboardParts'
 import { SoloLeaderboard } from '@/components/leaderboards/SoloLeaderboard'
 import { SurvivalLeaderboard } from '@/components/leaderboards/SurvivalLeaderboard'
+import { Kicker, ScreenTitle } from '@/components/flight'
 import { LanguageButton } from '@/components/LanguageButton'
-import { Segmented, Text } from '@/components/ui'
-import { LISTED_GAMES, DIFFICULTY_COLORS, getGameByType } from '@/games'
-import { colors, space } from '@/theme'
+import { Segmented } from '@/components/ui'
+import { LISTED_GAMES, getGameByType, useDifficultyColors } from '@/games'
+import { space, useColors, useTheme } from '@/theme'
 
 type Section = 'solo' | 'ascension' | 'elo' | 'daily' | 'survival'
 type SoloMode = 'difficulty' | 'continent'
@@ -57,6 +58,9 @@ const CONTINENT_COLORS = Object.fromEntries(CONTINENTS.map(({ name, color }: { n
 export default function LeaderboardsScreen() {
   const { t, i18n } = useTranslation()
   const insets = useSafeAreaInsets()
+  const colors = useColors()
+  const { gameColors } = useTheme()
+  const difficultyColors = useDifficultyColors()
 
   const [section, setSection] = useState<Section>('solo')
   const [soloGame, setSoloGame] = useState<string>(ALL_GAMES)
@@ -92,7 +96,7 @@ export default function LeaderboardsScreen() {
 
   const gameChips = (games: typeof LISTED_GAMES, withAll: boolean): Chip[] => [
     ...(withAll ? [{ value: ALL_GAMES, label: t('options.all_games'), icon: 'view-grid-outline' as const }] : []),
-    ...games.map((game) => ({ value: game.type, label: t(game.titleKey), color: game.color, icon: game.icon })),
+    ...games.map((game) => ({ value: game.type, label: t(game.titleKey), color: gameColors[game.id], game: game.id })),
   ]
 
   const days = useMemo(() => getLast7Days(todayKey, i18n.language), [todayKey, i18n.language])
@@ -105,7 +109,10 @@ export default function LeaderboardsScreen() {
       contentContainerStyle={{ paddingTop: insets.top + space.lg, paddingHorizontal: space.lg, paddingBottom: space.xxl * 2, gap: space.lg }}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} colors={[colors.accent]} />}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Text variant="title">{t('mobile.tabs.leaderboards')}</Text>
+        <View style={{ flex: 1, gap: 4 }}>
+          <Kicker>{t('home.board_title')}</Kicker>
+          <ScreenTitle size={32}>{t('mobile.tabs.leaderboards')}</ScreenTitle>
+        </View>
         <LanguageButton />
       </View>
 
@@ -136,7 +143,7 @@ export default function LeaderboardsScreen() {
             <FilterChips
               options={[
                 { value: ALL_DIFFICULTIES, label: t('options.all_scores') },
-                ...DIFFICULTIES.map((name: string) => ({ value: name, label: t(`difficulties.${name}`), color: DIFFICULTY_COLORS[name] })),
+                ...DIFFICULTIES.map((name: string) => ({ value: name, label: t(`difficulties.${name}`), color: difficultyColors[name] })),
               ]}
               value={difficulty}
               onChange={setDifficulty}
@@ -183,7 +190,7 @@ export default function LeaderboardsScreen() {
               { value: 'duel', label: t('elo.duel'), icon: 'sword-cross' },
               ...ELO_MODES.map((mode: string) => {
                 const game = getGameByType(mode)!
-                return { value: mode, label: t(game.titleKey), color: game.color, icon: game.icon }
+                return { value: mode, label: t(game.titleKey), color: gameColors[game.id], game: game.id }
               }),
             ]}
             value={eloKey}
@@ -223,7 +230,7 @@ export default function LeaderboardsScreen() {
               { value: ALL_SIX, label: t('survival.all_six'), icon: 'shuffle-variant' },
               ...SURVIVAL_ROUND_TYPES.map((type: string) => {
                 const game = getGameByType(type)
-                return { value: type, label: t(`survival.round_type.${type}`), color: game?.color, icon: game?.icon }
+                return { value: type, label: t(`survival.round_type.${type}`), color: game ? gameColors[game.id] : undefined, game: game?.id }
               }),
             ]}
             value={survivalModes}

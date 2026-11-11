@@ -4,7 +4,7 @@
 import { router } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, View } from 'react-native'
+import { View } from 'react-native'
 
 import { onPublicDataPatched } from '@shared/utils/publicProfile'
 import { fetchScrolls, SCROLLS, SEALS_PER_SCROLL } from '@shared/utils/scrollCollectionData'
@@ -12,12 +12,14 @@ import { fetchScrolls, SCROLLS, SEALS_PER_SCROLL } from '@shared/utils/scrollCol
 import { CollapsibleSection } from '@/components/CollapsibleSection'
 import { waxSeal } from '@/components/scrolls/ScrollImage'
 import { Button, Text } from '@/components/ui'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 
 export type Scrolls = { unlocked: string[]; seals: number }
 
 export function ScrollCollectionView({ scrolls, own = false, sectionId = 'scrolls' }: { scrolls: Scrolls; own?: boolean; sectionId?: string }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const total = SCROLLS.length
   const count = scrolls.unlocked.length
   const progress = t('scrolls.progress', { count, total })
@@ -74,10 +76,10 @@ export function ScrollCollection({ uid, own = false }: { uid: string; own?: bool
   return scrolls?.uid === uid ? <ScrollCollectionView scrolls={scrolls.value} own={own} sectionId={own ? 'own.scrolls' : 'player.scrolls'} /> : null
 }
 
-const styles = StyleSheet.create({
-  card: { gap: space.md, backgroundColor: colors.surface, borderRadius: radius.xl, borderWidth: 1, borderColor: colors.border, padding: space.lg },
+const useStyles = makeStyles((colors) => ({
+  card: { gap: space.md, backgroundColor: colors.board, borderRadius: radius.xl, borderWidth: 1, borderColor: colors.border, padding: space.lg },
   seals: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   pips: { flexDirection: 'row', gap: 6 },
   pip: { width: 18, height: 18, borderRadius: radius.pill, borderWidth: 2, borderColor: colors.borderStrong },
   pipFull: { backgroundColor: waxSeal, borderColor: '#D8664F' },
-})
+}))

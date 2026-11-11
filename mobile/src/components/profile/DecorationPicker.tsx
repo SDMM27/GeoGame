@@ -4,20 +4,23 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native'
+import { Modal, Pressable, ScrollView, View } from 'react-native'
 
 import { useDecoration } from '@shared/hooks/useDecoration'
 import { useXp } from '@shared/hooks/useXp'
 import { DEFAULT_DECORATION, decorationStyle, FRAMES, isUnlocked, NAME_COLORS, saveDecoration } from '@shared/utils/decorations'
 
+import { Kicker, ScreenTitle } from '@/components/flight'
 import { Button, Text, Touchable } from '@/components/ui'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 import { Avatar, type Decoration } from './ProfileSections'
 
 type Item = { id: string; unlock?: { kind: string; level?: number } }
 
 export function DecorationPicker({ uid, username }: { uid: string; username: string }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const level: number = useXp(uid)?.level ?? 1
   const saved: Decoration = useDecoration(uid) ?? DEFAULT_DECORATION
   const [open, setOpen] = useState(false)
@@ -54,7 +57,7 @@ export function DecorationPicker({ uid, username }: { uid: string; username: str
       <Modal transparent visible={open} animationType="fade" onRequestClose={() => setOpen(false)}>
         <Pressable style={styles.backdrop} onPress={() => setOpen(false)} accessibilityLabel={t('decorations.close')}>
           <Pressable style={styles.sheet} onPress={(event) => event.stopPropagation()}>
-            <Text variant="heading">{t('decorations.title')}</Text>
+            <ScreenTitle size={20}>{t('decorations.title')}</ScreenTitle>
             <Text variant="caption">{t('decorations.hint')}</Text>
             <ScrollView style={{ flexGrow: 0 }} contentContainerStyle={{ gap: space.lg }}>
               <View style={styles.preview} accessibilityLabel={t('decorations.preview')}>
@@ -65,7 +68,7 @@ export function DecorationPicker({ uid, username }: { uid: string; username: str
               </View>
 
               <View style={{ gap: space.sm }}>
-                <Text variant="label">{t('decorations.frames')}</Text>
+                <Kicker>{t('decorations.frames')}</Kicker>
                 <View style={styles.options}>
                   {(FRAMES as Item[]).map((item) => {
                     const selected = current.frame === item.id
@@ -94,7 +97,7 @@ export function DecorationPicker({ uid, username }: { uid: string; username: str
               </View>
 
               <View style={{ gap: space.sm }}>
-                <Text variant="label">{t('decorations.colors')}</Text>
+                <Kicker>{t('decorations.colors')}</Kicker>
                 <View style={styles.options}>
                   {(NAME_COLORS as (Item & { value: string | null })[]).map((item) => {
                     const selected = current.color === item.id
@@ -136,8 +139,8 @@ export function DecorationPicker({ uid, username }: { uid: string; username: str
   )
 }
 
-const styles = StyleSheet.create({
-  backdrop: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, backgroundColor: 'rgba(0, 0, 0, 0.6)' },
+const useStyles = makeStyles((colors) => ({
+  backdrop: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, backgroundColor: colors.scrim },
   sheet: {
     width: '100%',
     maxWidth: 420,
@@ -145,7 +148,7 @@ const styles = StyleSheet.create({
     gap: space.sm,
     padding: space.xl,
     borderRadius: radius.lg,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.board,
     borderWidth: 1,
     borderColor: colors.border,
   },
@@ -164,4 +167,4 @@ const styles = StyleSheet.create({
   },
   optionSelected: { borderColor: colors.accent, backgroundColor: `${colors.accent}1F` },
   swatch: { width: 28, height: 28, borderRadius: 14, borderWidth: 1, borderColor: colors.border },
-})
+}))

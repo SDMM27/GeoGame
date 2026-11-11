@@ -27,8 +27,9 @@ export function SurvivalLeaderboard({ filters, refreshKey, onSettled }: { filter
 
   return (
     <LeaderboardCard scores={scores} error={error} emptyText={t('survival.no_scores')}>
-      {visibleRows(scores ?? [], account?.uid, MAX_ROWS).map(({ score, index }) => (
+      {visibleRows(scores ?? [], account?.uid, MAX_ROWS).map(({ score, index }, position, rows) => (
         <LeaderboardRow
+          last={position === rows.length - 1}
           key={`${score.uid ?? score.name}-${score.modes}-${index}`}
           index={index}
           name={score.name}

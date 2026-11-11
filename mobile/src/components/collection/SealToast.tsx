@@ -3,7 +3,7 @@
 import * as Haptics from 'expo-haptics'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, View } from 'react-native'
+import { View } from 'react-native'
 import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -14,13 +14,14 @@ import { useAccount } from '@/account/auth'
 import { haptic, type Claim } from '@/components/collection/claim'
 import { ScrollSeal } from '@/components/scrolls/ScrollSeal'
 import { Text } from '@/components/ui'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space } from '@/theme'
 
 type Card = { id: number; seals: number; progress: number }
 
 const DURATION = 3200
 
 export function SealToast() {
+  const styles = useStyles()
   const { t } = useTranslation()
   const { account } = useAccount()
   const uid = account?.uid
@@ -62,17 +63,17 @@ export function SealToast() {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   host: { position: 'absolute', left: space.lg, right: space.lg, alignItems: 'center', zIndex: 101 },
   card: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: space.md,
-    backgroundColor: colors.surfaceHigh,
+    backgroundColor: colors.board,
     borderColor: colors.borderStrong,
     borderWidth: 1,
     borderRadius: radius.lg,
     padding: space.md,
     maxWidth: '100%',
   },
-})
+}))

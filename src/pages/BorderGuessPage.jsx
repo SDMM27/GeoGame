@@ -6,6 +6,7 @@ import { ToastContainer } from 'react-toastify'
 import { getCountryName } from '../utils/getCountryName'
 import { localeOf } from '../i18n/languages'
 import NavBar from '../components/NavBar'
+import { GameFlightTag } from '../components/GameEmblem'
 import useDesktopAutofocus from '../hooks/useDesktopAutofocus'
 import ShareScoreButton from '../components/ShareScoreButton'
 import ChallengeBanner from '../components/ChallengeBanner'
@@ -24,6 +25,7 @@ import CountryClueMap from './CountryClueMap'
 import { readMapAssistPref, writeMapAssistPref } from '../utils/mapAssist'
 import { formatTime } from '../utils/formatTime'
 import 'leaflet/dist/leaflet.css'
+import '../components/map/mapTheme'
 import 'react-toastify/dist/ReactToastify.css'
 import './BorderGuessPage.css'
 import useSubmitOnPick from '../hooks/useSubmitOnPick'
@@ -190,9 +192,10 @@ export default function BorderGuessPage() {
             result={isComplete ? { score, solved: isSolved, mapAssist: mapAssistUsed } : null}
           />
         )}
+        <GameFlightTag game={GAME_TYPES.BORDER_GUESS} className="game-flight-tag--board" />
         <section className="border-guess-panel border-guess-panel--hero">
           <div>
-            <p className="border-guess-eyebrow">{t('labels.new_game')}</p>
+            <p className="border-guess-eyebrow gg-kicker">{t('labels.new_game')}</p>
             <h1>{title}</h1>
             <p className="border-guess-subtitle">{subtitle}</p>
           </div>

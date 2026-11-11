@@ -1,29 +1,32 @@
 .level-chip {
   display: inline-block;
   padding: 0.1rem 0.6rem;
-  border-radius: var(--radius-pill);
-  background: var(--accent-dim);
-  border: 1px solid var(--accent-border);
-  color: var(--accent);
-  font-size: 0.8rem;
+  border-radius: var(--sd-radius-pill);
+  background: var(--gg-accent-soft);
+  border: 1px solid var(--gg-accent-line);
+  color: var(--sd-accent-strong);
+  font-family: var(--sd-font-mono);
+  font-size: 0.72rem;
   font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
 .xp-bar {
   height: 8px;
-  border-radius: var(--radius-pill);
-  background: var(--border-color);
+  border-radius: var(--sd-radius-pill);
+  background: var(--sd-line);
   overflow: hidden;
 }
 
 .xp-bar-fill {
   height: 100%;
   border-radius: inherit;
-  background: var(--accent);
+  background: var(--sd-accent);
   transition: width 0.4s ease;
 }
 
 .level-badge { display: flex; flex-direction: column; gap: 0.3rem; max-width: 260px; }
 .level-badge-head { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; }
-.level-badge-head small { color: var(--text-muted); font-size: 0.75rem; white-space: nowrap; }
+.level-badge-head small { color: var(--sd-muted); font-family: var(--sd-font-mono); font-size: 0.7rem; font-variant-numeric: tabular-nums; white-space: nowrap; }

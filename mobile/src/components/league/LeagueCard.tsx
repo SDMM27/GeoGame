@@ -4,25 +4,28 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { router } from 'expo-router'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, View } from 'react-native'
+import { View } from 'react-native'
 
 import { useLeague } from '@shared/hooks/useLeague'
 
+import { Kicker } from '@/components/flight'
 import { Text, Touchable } from '@/components/ui'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 
 type Me = { rank: number; points: number; ahead: { name: string; gap: number } | null }
 type League = { me: Me | null; lastResult: { reward: number } | null }
 
 function Row({ children }: { children: ReactNode }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   return (
     <Touchable accessibilityRole="button" onPress={() => router.push('/league')} style={styles.row}>
       <View style={styles.icon}>
         <MaterialCommunityIcons name="trophy-outline" size={28} color={colors.highlight} />
       </View>
       <View style={{ flex: 1, gap: 2 }}>
-        <Text variant="bodyStrong">{t('league.card_title')}</Text>
+        <Kicker color={colors.gold}>{t('league.card_title')}</Kicker>
         {children}
       </View>
       <MaterialCommunityIcons name="chevron-right" size={22} color={colors.textFaint} />
@@ -64,16 +67,16 @@ export function LeagueCard({ uid }: { uid?: string }) {
   return <PlayerLeagueCard uid={uid} />
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: space.lg,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.board,
     borderRadius: radius.xl,
     borderWidth: 1,
     borderColor: colors.border,
     padding: space.lg,
   },
   icon: { width: 56, height: 56, borderRadius: radius.lg, alignItems: 'center', justifyContent: 'center', backgroundColor: `${colors.highlight}22` },
-})
+}))

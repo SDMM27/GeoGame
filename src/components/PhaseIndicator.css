@@ -4,8 +4,8 @@
   top: 8px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
+  background: var(--sd-surface);
+  border: 1px solid var(--sd-line);
   border-radius: 8px;
   padding: 6px 14px;
   z-index: 900;
@@ -17,21 +17,25 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.82em;
+  font-family: var(--sd-font-mono);
+  font-size: 0.74em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   margin-bottom: 4px;
 }
 
 .phase-indicator-label {
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .phase-indicator-count {
-  color: var(--text-muted);
+  color: var(--sd-muted);
+  font-variant-numeric: tabular-nums;
 }
 
 .phase-indicator-track {
   height: 3px;
-  background: var(--border);
+  background: var(--sd-line);
   border-radius: 2px;
   overflow: hidden;
 }

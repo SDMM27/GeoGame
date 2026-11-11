@@ -1,14 +1,16 @@
 // Renders the confirmation dialogs raised with confirmAction(), instead of the plain system alert.
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { useEffect, useState } from 'react'
-import { Modal, Pressable, StyleSheet, View } from 'react-native'
+import { Modal, Pressable, View } from 'react-native'
 import Animated, { ZoomIn } from 'react-native-reanimated'
 
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 import { subscribeConfirm, type ConfirmRequest } from './confirm'
 import { Button, Text } from './ui'
 
 export function ConfirmHost() {
+  const colors = useColors()
+  const styles = useStyles()
   const [request, setRequest] = useState<ConfirmRequest | null>(null)
   useEffect(() => subscribeConfirm(setRequest), [])
 
@@ -51,8 +53,8 @@ export function ConfirmHost() {
   )
 }
 
-const styles = StyleSheet.create({
-  backdrop: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, backgroundColor: 'rgba(3, 6, 14, 0.72)' },
+const useStyles = makeStyles((colors) => ({
+  backdrop: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, backgroundColor: colors.scrim },
   card: {
     width: '100%',
     maxWidth: 380,
@@ -78,4 +80,4 @@ const styles = StyleSheet.create({
   },
   center: { textAlign: 'center' },
   actions: { flexDirection: 'row', alignSelf: 'stretch', gap: space.sm, marginTop: space.md },
-})
+}))

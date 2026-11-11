@@ -3,7 +3,7 @@
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native'
+import { ActivityIndicator, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { findPlayer } from '@shared/utils/friends'
@@ -13,12 +13,15 @@ import { useAccount } from '@/account/auth'
 import { FriendAction } from '@/components/profile/FriendAction'
 import { Avatar } from '@/components/profile/ProfileSections'
 import { ScreenHeader } from '@/components/ScreenHeader'
+import { Kicker, ScreenTitle } from '@/components/flight'
 import { Button, Text } from '@/components/ui'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 
 type Player = { uid: string; username: string }
 
 export default function AddFriendScreen() {
+  const styles = useStyles()
+  const colors = useColors()
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   const { username } = useLocalSearchParams<{ username: string }>()
@@ -50,7 +53,8 @@ export default function AddFriendScreen() {
       ) : (
         <View style={styles.card}>
           <Avatar username={player.username} size={72} />
-          <Text variant="heading">{player.username}</Text>
+          <Kicker>{t('mp_room.col_player')}</Kicker>
+          <ScreenTitle size={26}>{player.username}</ScreenTitle>
           <Text variant="caption" style={{ textAlign: 'center' }}>
             {t('friends.add_page.intro', { username: player.username })}
           </Text>
@@ -85,7 +89,7 @@ export default function AddFriendScreen() {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   card: {
     alignItems: 'center',
     gap: space.md,
@@ -95,4 +99,4 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-})
+}))

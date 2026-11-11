@@ -43,6 +43,8 @@ const STEP_COUNT = COUNTRY_OF_DAY_STEPS.length
 // Caption under each segment of the progress bar (the step's subject, not its question)
 const STEP_CAPTION: Record<string, string> = { borders: 'step_country', flag: 'step_flag', capital: 'step_capital', placement: 'step_map' }
 const STEP_CAPTIONS = (COUNTRY_OF_DAY_STEPS as string[]).map((id) => STEP_CAPTION[id])
+// Stable, so the input bar skips the timer's re-renders
+const NO_SUGGESTIONS: string[] = []
 
 type Game = ReturnType<typeof useCountryOfDayState>
 type Note = { stepIndex: number; kind: 'wrong' | 'unknown' | 'ignored' }
@@ -193,7 +195,7 @@ function Playing({ game }: { game: Game }) {
             value={text}
             onChangeText={setText}
             onSubmit={() => text.trim() && submit(text)}
-            suggestions={[]}
+            suggestions={NO_SUGGESTIONS}
             locked={false}
             placeholder={t(step === 'capital' ? 'country_of_day.placeholder_capital' : 'country_of_day.placeholder_country')}
             accent={ACCENT}

@@ -25,6 +25,7 @@ import { readMapAssistPref, writeMapAssistPref } from '../utils/mapAssist'
 import { formatTime } from '../utils/formatTime'
 import 'react-toastify/dist/ReactToastify.css'
 import './CountryCluePage.css'
+import useSubmitOnPick from '../hooks/useSubmitOnPick'
 
 // The hook's labels are French: show the one of the tone instead, as the app does
 const hintLabel = (t, metric, guess, hint) =>
@@ -148,6 +149,8 @@ export default function CountryCluePage() {
   const attemptsLabel = `${guesses.length} ${guesses.length === 1 ? t('units.attempt_one') : t('units.attempt_other')}`
   const mapAssistStatText = `${attemptsLabel} · 🗺️ ${t('map_assist.stat')} — ${elapsedTime != null ? formatTime(elapsedTime) : '—'}`
 
+  const pickSuggestion = useSubmitOnPick(inputValue, setInputValue, handleSubmit)
+
   const onKeyDown = (event) => {
     if (event.key === 'Enter') {
       handleSubmit()
@@ -233,7 +236,7 @@ export default function CountryCluePage() {
                         key={countryName}
                         type="button"
                         className="country-clue-suggestion"
-                        onClick={() => setInputValue(countryName)}
+                        onClick={() => pickSuggestion(countryName)}
                       >
                         {countryName}
                       </button>

@@ -1,6 +1,6 @@
 // Bottom bar of the "guess a country" daily games: suggestions, input, reveal and submit.
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
-import { useEffect, useEffectEvent, useRef } from 'react'
+import { memo, useCallback, useEffect, useEffectEvent, useLayoutEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -13,18 +13,7 @@ import { Text, Touchable } from '../ui'
 
 type IconName = keyof typeof MaterialCommunityIcons.glyphMap
 
-export function GuessInputBar({
-  value,
-  onChangeText,
-  onSubmit,
-  onReveal,
-  suggestions,
-  locked,
-  placeholder,
-  accent,
-  revealLabel,
-  revealIcon = 'flag-outline',
-}: {
+type GuessInputBarProps = {
   value: string
   onChangeText: (value: string) => void
   // Called after render, so the hook's handleSubmit sees the current input
@@ -36,7 +25,35 @@ export function GuessInputBar({
   accent: string
   revealLabel?: string
   revealIcon?: IconName
-}) {
+}
+
+// The daily games' timer re-renders the screen every second. Re-rendering the controlled
+// TextInput that often makes Android keyboards lose input (a tapped suggestion had to be tapped
+// again in the dailies, see TypingGame's AnswerInput): the bar gets stable callbacks and is
+// memoized, so it only renders when what it shows changes.
+export function GuessInputBar({ onChangeText, onSubmit, onReveal, ...shown }: GuessInputBarProps) {
+  const latest = useRef({ onChangeText, onSubmit, onReveal })
+  useLayoutEffect(() => {
+    latest.current = { onChangeText, onSubmit, onReveal }
+  })
+  const changeText = useCallback((text: string) => latest.current.onChangeText(text), [])
+  const submit = useCallback(() => latest.current.onSubmit(), [])
+  const reveal = useCallback(() => latest.current.onReveal?.(), [])
+  return <GuessInputBarView {...shown} onChangeText={changeText} onSubmit={submit} onReveal={onReveal ? reveal : undefined} />
+}
+
+const GuessInputBarView = memo(function GuessInputBarView({
+  value,
+  onChangeText,
+  onSubmit,
+  onReveal,
+  suggestions,
+  locked,
+  placeholder,
+  accent,
+  revealLabel,
+  revealIcon = 'flag-outline',
+}: GuessInputBarProps) {
   const { t } = useTranslation()
   const colors = useColors()
   const styles = useStyles()
@@ -119,7 +136,7 @@ export function GuessInputBar({
       </View>
     </View>
   )
-}
+})
 
 const useStyles = makeStyles((colors) => ({
   bar: {

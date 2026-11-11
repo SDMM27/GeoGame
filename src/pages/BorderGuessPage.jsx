@@ -28,6 +28,7 @@ import 'leaflet/dist/leaflet.css'
 import '../components/map/mapTheme'
 import 'react-toastify/dist/ReactToastify.css'
 import './BorderGuessPage.css'
+import useSubmitOnPick from '../hooks/useSubmitOnPick'
 
 export function FitCountryBounds({ country }) {
   const map = useMap()
@@ -156,6 +157,8 @@ export default function BorderGuessPage() {
   const attemptsLabel = `${guesses.length} ${guesses.length === 1 ? t('units.attempt_one') : t('units.attempt_other')}`
   const mapAssistStatText = `${attemptsLabel} · 🗺️ ${t('map_assist.stat')} — ${elapsedTime != null ? formatTime(elapsedTime) : '—'}`
 
+  const pickSuggestion = useSubmitOnPick(inputValue, setInputValue, handleSubmit)
+
   const onKeyDown = (event) => {
     if (event.key === 'Enter') {
       handleSubmit()
@@ -269,7 +272,7 @@ export default function BorderGuessPage() {
                         key={countryName}
                         type="button"
                         className="border-guess-suggestion"
-                        onClick={() => setInputValue(countryName)}
+                        onClick={() => pickSuggestion(countryName)}
                       >
                         {countryName}
                       </button>

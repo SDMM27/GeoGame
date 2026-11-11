@@ -5,7 +5,7 @@ import { Image } from 'expo-image'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Keyboard, Platform, ScrollView, StyleSheet, TextInput, View, useWindowDimensions } from 'react-native'
+import { Keyboard, Platform, ScrollView, TextInput, View, useWindowDimensions } from 'react-native'
 import Animated, { FadeIn, FadeInDown, SlideInDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -28,9 +28,9 @@ import { formatMetric, type Metric } from '@/components/atlas/format'
 import { WorldMap, type MapLayer, type WorldMapHandle } from '@/components/map/WorldMap'
 import { Button, Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
-import { DIFFICULTY_COLORS } from '@/games'
+import { useDifficultyColors } from '@/games'
 import { clean } from '@/i18n'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 
 const SELECTED = { fillColor: '#7B2FF7', fillOpacity: 0.65, color: '#C4B5FD', weight: 2 }
 // Closest zoom a selected country is framed at (Malta is then about 50px wide)
@@ -63,6 +63,8 @@ type TimelineEvent = { year: string; text: Record<string, string> }
 
 function Fact({ label, value, rank, onRank }: { label: string; value: string; rank?: Rank; onRank?: () => void }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   return (
     <View style={styles.fact}>
       <Kicker size={9}>{label}</Kicker>
@@ -97,6 +99,9 @@ function CountrySheet({
   maxHeight: number
 }) {
   const { t, i18n } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
+  const difficultyColors = useDifficultyColors()
   const insets = useSafeAreaInsets()
   const lang = i18n.language
   const unknown = t('atlas.unknown')
@@ -224,7 +229,7 @@ function CountrySheet({
                 <Text variant="body" style={{ flex: 1 }}>
                   {label}
                 </Text>
-                <Text variant="bodyStrong" color={DIFFICULTY_COLORS[level as string]}>
+                <Text variant="bodyStrong" color={difficultyColors[level as string]}>
                   {t(`difficulties.${level}`)}
                 </Text>
               </View>
@@ -238,6 +243,8 @@ function CountrySheet({
 
 export default function AtlasScreen() {
   const { t, i18n } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const insets = useSafeAreaInsets()
   const { height } = useWindowDimensions()
   const mapRef = useRef<WorldMapHandle>(null)
@@ -428,7 +435,7 @@ export default function AtlasScreen() {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   top: { position: 'absolute', left: space.lg, right: space.lg, gap: space.sm },
   searchRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   iconButton: {
@@ -456,7 +463,7 @@ const styles = StyleSheet.create({
   searchInput: { flex: 1, color: colors.text, fontSize: 16 },
   results: { marginLeft: 48, borderRadius: radius.md, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
   result: { flexDirection: 'row', alignItems: 'center', gap: space.sm, paddingVertical: space.md, paddingHorizontal: space.md },
-  hint: { marginLeft: 48, textShadowColor: '#000A', textShadowRadius: 4 },
+  hint: { marginLeft: 48, textShadowColor: colors.ocean, textShadowRadius: 4 },
   sheet: {
     position: 'absolute',
     left: 0,
@@ -499,4 +506,4 @@ const styles = StyleSheet.create({
   chipFlag: { width: 22, height: 15, borderRadius: 2 },
   difficultyRow: { flexDirection: 'row', alignItems: 'center' },
   timeline: { gap: space.sm, paddingLeft: space.md, borderLeftWidth: 2, borderLeftColor: colors.border },
-})
+}))

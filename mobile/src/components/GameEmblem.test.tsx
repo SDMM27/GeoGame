@@ -1,6 +1,8 @@
 import { act, create } from 'react-test-renderer'
 
 import { GAMES } from '@/games'
+import { darkGameColors, lightGameColors } from '@/theme'
+
 import GameEmblem, { emblemColor, flightCode } from './GameEmblem'
 
 function render(element: React.ReactElement) {
@@ -29,7 +31,8 @@ describe('GameEmblem', () => {
     for (const game of GAMES) {
       expect(game.code).toMatch(/^[A-Z]{3}$/)
       expect(flightCode(game.id)).toBe(game.code)
-      expect(emblemColor(game.id)).toBe(game.color)
+      expect(emblemColor(game.id)).toBe(darkGameColors[game.id])
+      expect(emblemColor(game.id, lightGameColors)).toBe(lightGameColors[game.id])
     }
   })
 })

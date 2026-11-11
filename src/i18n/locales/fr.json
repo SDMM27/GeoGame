@@ -1697,6 +1697,11 @@
     "hint_drag": "↔ Glisse pour faire tourner le globe",
     "hint_center": "Centre la ville dans le viseur",
     "label": "Globe interactif : fais-le tourner (souris, doigt ou flèches) pour trouver {{city}}",
+    "offer_daily": "Défi du jour pas encore fait",
+    "offer_game": "Pas encore joué aujourd’hui",
+    "all_done": "Tous les vols du jour ont décollé",
+    "all_done_hint": "Reviens demain pour de nouveaux défis",
+    "close": "Fermer",
     "city": {
       "tokyo": "Tokyo",
       "rio": "Rio de Janeiro",

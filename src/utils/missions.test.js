@@ -227,6 +227,7 @@ describe('missions', () => {
     expect(result.day).toBe('2026-10-19')
     expect(result.week).toBe('2026-W43')
     expect(result.todayGames).toBe(1)
+    expect(result.todayTypes).toEqual([games[0].gameType])
     const pool = DAILY_POOL.find((mission) => mission.id === 'flags_20')
     expect(pool.value([game(), game({ gameType: 'CAPITALS' })])).toBe(5)
   })

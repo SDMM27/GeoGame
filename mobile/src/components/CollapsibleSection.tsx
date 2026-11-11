@@ -9,7 +9,7 @@ import useSectionOpen from '@shared/hooks/useSectionOpen'
 
 import { Kicker, ScreenTitle } from '@/components/flight'
 import { Touchable } from '@/components/ui'
-import { colors, space } from '@/theme'
+import { space, useColors } from '@/theme'
 
 export function CollapsibleSection({
   id,
@@ -24,6 +24,7 @@ export function CollapsibleSection({
   defaultOpen?: boolean
   children?: ReactNode
 }) {
+  const colors = useColors()
   const [open, toggle] = useSectionOpen(id, defaultOpen) as [boolean, () => void]
   return (
     <View style={{ gap: space.md }}>

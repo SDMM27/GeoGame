@@ -1,31 +1,40 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { Image } from 'expo-image'
 import { router } from 'expo-router'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import Animated, { FadeInDown, useReducedMotion } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useMissions } from '@shared/hooks/useMissions'
+import { nextFlight } from '@shared/utils/nextFlight'
 
 import { useAccount } from '@/account/auth'
 import { LanguageButton } from '@/components/LanguageButton'
 import { LeagueCard } from '@/components/league/LeagueCard'
 import { LeagueVictoryOverlay } from '@/components/league/LeagueVictoryOverlay'
-import { BoardStrip, BoardingPass, DepartureRow, DeparturesBoard, Kicker, ScreenTitle, type DepartureTone } from '@/components/flight'
+import { BoardStrip, DepartureRow, DeparturesBoard, ExpandableDeparture, Kicker, ScreenTitle, useAccordion, type DepartureTone } from '@/components/flight'
 import GameEmblem from '@/components/GameEmblem'
 import { useDailyCountdown } from '@/components/home/dailyCountdown'
+import { FlightGlobe } from '@/components/home/FlightGlobe'
+import { NextFlightBoard } from '@/components/home/NextFlightBoard'
 import { MissionsCard } from '@/components/missions/MissionsCard'
 import { Text, Touchable } from '@/components/ui'
 import { LISTED_GAMES, type GameDefinition } from '@/games'
 import { startMultiGame } from '@/multiplayer/navigation'
-import { colors, fonts, gameColors, radius, space } from '@/theme'
+import { fonts, makeStyles, radius, space, useColors, useTheme } from '@/theme'
+import type { Palette } from '@/theme'
 
 const DAILY_GAMES = LISTED_GAMES.filter((game) => game.kind === 'daily')
 // Games with a setup sheet first: Placement, Flags, Capitals, Survival
 const SETUP_GAMES = LISTED_GAMES.filter((game) => game.kind === 'setup' || game.kind === 'survival')
 // Gates of the boarding passes, in the order of the dailies
+// What the globe can offer once the city is found (@shared/utils/nextFlight): the dailies first, then the other games
+const GLOBE_FLIGHTS = [
+  ...DAILY_GAMES.map((game) => ({ type: game.type, daily: true, game })),
+  ...SETUP_GAMES.map((game) => ({ type: game.type, daily: false, game })),
+]
 const GATES = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'D1', 'D2']
 
 type DailyStatus = 'won' | 'played' | 'todo'
@@ -37,75 +46,75 @@ function dailyBoardStatus(status: DailyStatus | null, t: (key: string) => string
   return { label: t('home.status_on_time').toLocaleUpperCase(), tone: 'ontime' }
 }
 
-// The selected daily as a boarding pass: « Board » (the daily), infinite mode and multiplayer.
-function DailyPass({ game, index, status }: { game: GameDefinition; index: number; status: DailyStatus | null }) {
-  const { t } = useTranslation()
+// The open daily's boarding pass, in parts (revealed one after the other): kicker, title, description, then
+// « Board » (the daily), infinite mode and multiplayer.
+function passParts(
+  game: GameDefinition,
+  flight: string,
+  status: DailyStatus | null,
+  t: (key: string) => string,
+  colors: Palette,
+  styles: ReturnType<typeof useStyles>,
+) {
   const done = status === 'won' || status === 'played'
-  const flight = `GG-${String(index + 1).padStart(2, '0')}`
-  return (
-    <BoardingPass
-      code={game.code}
-      gate={GATES[index % GATES.length]}
-      codeColor={done ? colors.textMuted : game.color}
-      codeLabel={t('mobile.flight.code').toLocaleUpperCase()}
-      gateLabel={t('home.gate').toLocaleUpperCase()}
-      accessibilityLabel={`${t('home.boarding_pass')} ${flight}, ${t(game.titleKey)}`}>
-      <View style={styles.passTop}>
-        <Kicker numberOfLines={1} style={{ flexShrink: 1 }}>
-          {t('home.boarding_pass')} · {flight}
-        </Kicker>
-        {status && (
-          <View style={styles.passStatus}>
-            {done && <MaterialCommunityIcons name="check" size={12} color={status === 'won' ? colors.accent : colors.text} />}
-            <Kicker color={status === 'won' ? colors.accent : done ? colors.text : colors.textMuted} size={9}>
-              {t(`home.daily_status_${status}`)}
-            </Kicker>
-          </View>
-        )}
-      </View>
-      <View style={styles.passTitle}>
-        <GameEmblem game={game.id} size={36} />
-        <ScreenTitle size={21} style={{ flex: 1 }}>
-          {t(game.titleKey)}
-        </ScreenTitle>
-      </View>
-      <Text variant="caption" numberOfLines={3}>
-        {t(game.descKey)}
-      </Text>
-      <View style={styles.passActions}>
+  return [
+    <View key="top" style={styles.passTop}>
+      <Kicker numberOfLines={1} style={{ flexShrink: 1 }}>
+        {t('home.boarding_pass')} · {flight}
+      </Kicker>
+      {status && (
+        <View style={styles.passStatus}>
+          {done && <MaterialCommunityIcons name="check" size={12} color={status === 'won' ? colors.accent : colors.text} />}
+          <Kicker color={status === 'won' ? colors.accent : done ? colors.text : colors.textMuted} size={9}>
+            {t(`home.daily_status_${status}`)}
+          </Kicker>
+        </View>
+      )}
+    </View>,
+    <View key="title" style={styles.passTitle}>
+      <GameEmblem game={game.id} size={36} />
+      <ScreenTitle size={21} style={{ flex: 1 }}>
+        {t(game.titleKey)}
+      </ScreenTitle>
+    </View>,
+    <Text key="desc" variant="caption" numberOfLines={3}>
+      {t(game.descKey)}
+    </Text>,
+    <View key="actions" style={styles.passActions}>
+      <Touchable
+        accessibilityRole="button"
+        onPress={() => router.push({ pathname: game.route as never, params: { mode: 'daily' } })}
+        style={styles.board}>
+        <Text variant="bodyStrong" numberOfLines={1} color={colors.onAccent} style={{ flexShrink: 1 }}>
+          {t('buttons.play')}
+        </Text>
+        {/* With the infinite / multiplayer buttons beside it, the arrow would squeeze the label */}
+        {game.dailyOnly && !game.multi && <MaterialCommunityIcons name="arrow-right" size={18} color={colors.onAccent} />}
+      </Touchable>
+      {!game.dailyOnly && (
         <Touchable
           accessibilityRole="button"
-          onPress={() => router.push({ pathname: game.route as never, params: { mode: 'daily' } })}
-          style={styles.board}>
-          <Text variant="bodyStrong" numberOfLines={1} color={colors.onAccent} style={{ flexShrink: 1 }}>
-            {t('home.board')}
-          </Text>
-          <MaterialCommunityIcons name="arrow-right" size={18} color={colors.onAccent} />
+          accessibilityLabel={t('mobile.home.infinite')}
+          onPress={() => router.push({ pathname: game.route as never, params: { mode: 'infinite' } })}
+          style={styles.passIcon}>
+          <MaterialCommunityIcons name="infinity" size={20} color={colors.text} />
         </Touchable>
-        {!game.dailyOnly && (
-          <Touchable
-            accessibilityRole="button"
-            accessibilityLabel={t('mobile.home.infinite')}
-            onPress={() => router.push({ pathname: game.route as never, params: { mode: 'infinite' } })}
-            style={styles.passIcon}>
-            <MaterialCommunityIcons name="infinity" size={20} color={colors.text} />
-          </Touchable>
-        )}
-        {game.multi && (
-          <Touchable
-            accessibilityRole="button"
-            accessibilityLabel={t('mobile.multi.title')}
-            onPress={() => startMultiGame(game)}
-            style={styles.passIcon}>
-            <MaterialCommunityIcons name="account-group" size={20} color={colors.text} />
-          </Touchable>
-        )}
-      </View>
-    </BoardingPass>
-  )
+      )}
+      {game.multi && (
+        <Touchable
+          accessibilityRole="button"
+          accessibilityLabel={t('mobile.multi.title')}
+          onPress={() => startMultiGame(game)}
+          style={styles.passIcon}>
+          <MaterialCommunityIcons name="account-group" size={20} color={colors.text} />
+        </Touchable>
+      )}
+    </View>,
+  ]
 }
 
 function SectionHead({ title, note }: { title: string; note?: string }) {
+  const styles = useStyles()
   return (
     <View style={styles.sectionHead}>
       <ScreenTitle size={22}>{title}</ScreenTitle>
@@ -115,6 +124,9 @@ function SectionHead({ title, note }: { title: string; note?: string }) {
 }
 
 export default function HomeScreen() {
+  const styles = useStyles()
+  const colors = useColors()
+  const { gameColors } = useTheme()
   const { t, i18n } = useTranslation()
   const insets = useSafeAreaInsets()
   const reduceMotion = useReducedMotion()
@@ -123,10 +135,25 @@ export default function HomeScreen() {
   // Loaded once for the missions card and the dailies played today (one history read)
   const missions = useMissions(account?.uid ?? null)
   const dailyStatus = missions.dailies?.status ?? null
+  // The player's finds on the globe: each one swings down the board with the next flight to take
+  const [globeFinds, setGlobeFinds] = useState(0)
+  const [offerOpen, setOfferOpen] = useState(false)
+  const onGlobeFind = useCallback(() => {
+    setGlobeFinds((n) => n + 1)
+    setOfferOpen(true)
+  }, [])
+  const offer: (typeof GLOBE_FLIGHTS)[number] | null = offerOpen
+    ? nextFlight(GLOBE_FLIGHTS, { dailyStatus, playedToday: missions.playedToday, turn: globeFinds - 1 })
+    : null
+  const boardOffer = () => {
+    if (!offer) return
+    setOfferOpen(false)
+    if (offer.daily) router.push({ pathname: offer.game.route as never, params: { mode: 'daily' } })
+    else router.push({ pathname: '/play/[game]', params: { game: offer.game.id } })
+  }
   const statusOf = (game: GameDefinition) => (dailyStatus ? ((dailyStatus[game.type] as DailyStatus | undefined) ?? 'todo') : null)
-  const [selectedId, setSelectedId] = useState(DAILY_GAMES[0]?.id)
-  const selectedIndex = Math.max(0, DAILY_GAMES.findIndex((game) => game.id === selectedId))
-  const selected = DAILY_GAMES[selectedIndex]
+  // Nothing open on arrival; tapping a departure unfolds its boarding pass
+  const [openId, toggleOpen] = useAccordion()
   const upper = (text: string) => text.toLocaleUpperCase(i18n.resolvedLanguage)
   const doneCount = DAILY_GAMES.filter((game) => statusOf(game) === 'won' || statusOf(game) === 'played').length
 
@@ -142,6 +169,22 @@ export default function HomeScreen() {
           <Text variant="caption">{t('mobile.home.greeting')}</Text>
         </View>
         <LanguageButton />
+      </View>
+
+      <View style={styles.globe}>
+        <FlightGlobe
+          onFind={onGlobeFind}
+          overlay={
+            offerOpen && (
+              <NextFlightBoard
+                key={globeFinds}
+                flight={offer && { game: offer.game.id, title: t(offer.game.titleKey), daily: offer.daily }}
+                onBoard={boardOffer}
+                onClose={() => setOfferOpen(false)}
+              />
+            )
+          }
+        />
       </View>
 
       <View style={styles.pad}>
@@ -160,31 +203,32 @@ export default function HomeScreen() {
         />
       </View>
 
-      {selected && (
-        <View style={[styles.pad, { marginTop: space.lg }]}>
-          <DailyPass key={selected.id} game={selected} index={selectedIndex} status={statusOf(selected)} />
-        </View>
-      )}
-
       <SectionHead title={t('mobile.home.daily_title')} note={t('mobile.home.daily_subtitle')} />
       <View style={styles.pad}>
         <DeparturesBoard>
           {DAILY_GAMES.map((game, index) => {
             const { label, tone } = dailyBoardStatus(statusOf(game), t)
-            const active = game.id === selected?.id
+            const flight = `GG-${String(index + 1).padStart(2, '0')}`
+            const status = statusOf(game)
+            const done = status === 'won' || status === 'played'
             return (
-              <View key={game.id} style={active ? styles.rowActive : undefined}>
-                <DepartureRow
-                  game={game.id}
-                  code={game.code}
-                  name={upper(t(game.titleKey))}
-                  status={label}
-                  statusTone={tone}
-                  last={index === DAILY_GAMES.length - 1}
-                  onPress={() => setSelectedId(game.id)}
-                  accessibilityLabel={`${t(game.titleKey)}, ${label}`}
-                />
-              </View>
+              <ExpandableDeparture
+                key={game.id}
+                game={game.id}
+                code={game.code}
+                name={upper(t(game.titleKey))}
+                status={label}
+                statusTone={tone}
+                last={index === DAILY_GAMES.length - 1}
+                expanded={openId === game.id}
+                onToggle={() => toggleOpen(game.id)}
+                gate={GATES[index % GATES.length]}
+                codeColor={done ? colors.textMuted : gameColors[game.id]}
+                codeLabel={t('mobile.flight.code').toLocaleUpperCase()}
+                gateLabel={t('home.gate').toLocaleUpperCase()}
+                accessibilityLabel={`${t(game.titleKey)}, ${label}`}>
+                {passParts(game, flight, status, t, colors, styles)}
+              </ExpandableDeparture>
             )
           })}
         </DeparturesBoard>
@@ -253,10 +297,11 @@ export default function HomeScreen() {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors, { gameColors }) => ({
   header: { flexDirection: 'row', alignItems: 'center', gap: space.md, paddingHorizontal: space.lg, marginBottom: space.lg },
   logo: { width: 52, height: 52 },
   pad: { paddingHorizontal: space.lg },
+  globe: { alignItems: 'center', paddingHorizontal: space.lg, marginBottom: space.lg },
   sectionHead: { paddingHorizontal: space.lg, marginTop: space.xxl, marginBottom: space.md, gap: 4 },
   passTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.sm },
   passStatus: { flexDirection: 'row', alignItems: 'center', gap: 3 },
@@ -283,7 +328,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  rowActive: { backgroundColor: colors.boardLine },
   ascension: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -306,4 +350,4 @@ const styles = StyleSheet.create({
   atlasCode: { width: 34, fontFamily: fonts.monoBold, fontSize: 13, color: colors.gold },
   atlasName: { flex: 1, minWidth: 0, fontFamily: fonts.monoBold, fontSize: 12, color: colors.text },
   atlasStatus: { fontFamily: fonts.monoBold, fontSize: 10, letterSpacing: 0.8, color: colors.textMuted },
-})
+}))

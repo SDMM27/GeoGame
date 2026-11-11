@@ -233,6 +233,7 @@ export const pt: MobileStrings = {
     challenge_body: "12 perguntas iguais para todos: encontre países no mapa, reconheça bandeiras e diga capitais. Uma tentativa por dia, compare sua pontuação com a dos seus amigos.",
     ok: "Bora!",
   },
+  theme: { title: 'Tema', light: 'Claro', dark: 'Escuro', system: 'Sistema' },
   common: {
     coming_soon: 'Em breve',
     back: 'Voltar',

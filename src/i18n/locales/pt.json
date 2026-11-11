@@ -1697,6 +1697,11 @@
     "hint_drag": "↔ Arraste para girar o globo",
     "hint_center": "Centre a cidade na mira",
     "label": "Globo interativo: gire-o (rato, dedo ou setas) para encontrar {{city}}",
+    "offer_daily": "Desafio do dia ainda por fazer",
+    "offer_game": "Ainda não jogado hoje",
+    "all_done": "Todos os voos de hoje já decolaram",
+    "all_done_hint": "Volta amanhã para novos desafios",
+    "close": "Fechar",
     "city": {
       "tokyo": "Tóquio",
       "rio": "Rio de Janeiro",

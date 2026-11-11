@@ -4,7 +4,7 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native'
+import { Modal, Pressable, ScrollView, View } from 'react-native'
 
 import { useDecoration } from '@shared/hooks/useDecoration'
 import { useXp } from '@shared/hooks/useXp'
@@ -12,13 +12,15 @@ import { DEFAULT_DECORATION, decorationStyle, FRAMES, isUnlocked, NAME_COLORS, s
 
 import { Kicker, ScreenTitle } from '@/components/flight'
 import { Button, Text, Touchable } from '@/components/ui'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 import { Avatar, type Decoration } from './ProfileSections'
 
 type Item = { id: string; unlock?: { kind: string; level?: number } }
 
 export function DecorationPicker({ uid, username }: { uid: string; username: string }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const level: number = useXp(uid)?.level ?? 1
   const saved: Decoration = useDecoration(uid) ?? DEFAULT_DECORATION
   const [open, setOpen] = useState(false)
@@ -137,8 +139,8 @@ export function DecorationPicker({ uid, username }: { uid: string; username: str
   )
 }
 
-const styles = StyleSheet.create({
-  backdrop: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, backgroundColor: 'rgba(0, 0, 0, 0.6)' },
+const useStyles = makeStyles((colors) => ({
+  backdrop: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, backgroundColor: colors.scrim },
   sheet: {
     width: '100%',
     maxWidth: 420,
@@ -165,4 +167,4 @@ const styles = StyleSheet.create({
   },
   optionSelected: { borderColor: colors.accent, backgroundColor: `${colors.accent}1F` },
   swatch: { width: 28, height: 28, borderRadius: 14, borderWidth: 1, borderColor: colors.border },
-})
+}))

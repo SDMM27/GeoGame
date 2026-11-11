@@ -8,7 +8,7 @@ import { Modal, Pressable, StyleSheet, View } from 'react-native'
 import Animated, { ZoomIn } from 'react-native-reanimated'
 
 import { LANGUAGES as SHARED_LANGUAGES, toLanguage } from '@shared/i18n/languages'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 import { hasPlayedBefore, markSeen, pendingNote } from '@/whatsNew'
 import { Button, Text, Touchable } from './ui'
 
@@ -20,6 +20,8 @@ const playedBefore = hasPlayedBefore(globalThis.localStorage)
 export const whatsNewAtLaunch = pendingNote(globalThis.localStorage, playedBefore) !== null
 
 export function WhatsNew() {
+  const colors = useColors()
+  const styles = useStyles()
   const { t, i18n } = useTranslation()
   const pathname = usePathname()
   const [note, setNote] = useState(() => pendingNote(globalThis.localStorage, playedBefore))
@@ -82,8 +84,8 @@ export function WhatsNew() {
   )
 }
 
-const styles = StyleSheet.create({
-  backdrop: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, backgroundColor: 'rgba(3, 6, 14, 0.72)' },
+const useStyles = makeStyles((colors) => ({
+  backdrop: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, backgroundColor: colors.scrim },
   card: {
     zIndex: 1,
     width: '100%',
@@ -125,4 +127,4 @@ const styles = StyleSheet.create({
   chipSelected: { backgroundColor: colors.accent, borderColor: colors.accent },
   chipText: { fontSize: 13 },
   ok: { alignSelf: 'stretch', marginTop: space.md },
-})
+}))

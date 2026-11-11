@@ -4,7 +4,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { Image } from 'expo-image'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native'
+import { KeyboardAvoidingView, Platform, ScrollView, View, useWindowDimensions } from 'react-native'
 
 import useCountryOfDayState from '@shared/hooks/useCountryOfDayState'
 import { useDailyPlayedElsewhere } from '@shared/hooks/useDailyPlayedElsewhere'
@@ -33,9 +33,12 @@ import { Button, Text } from '@/components/ui'
 import { getFlag } from '@/flags'
 import { clean } from '@/i18n'
 import { navigate } from '@/shims/react-router-dom'
-import { colors, gameColors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors, useTheme } from '@/theme'
 
-const ACCENT = gameColors.country_of_day ?? gameColors.border_guess
+function useAccent() {
+  const { gameColors } = useTheme()
+  return gameColors.country_of_day ?? gameColors.border_guess
+}
 const STEP_COUNT = COUNTRY_OF_DAY_STEPS.length
 // Caption under each segment of the progress bar (the step's subject, not its question)
 const STEP_CAPTION: Record<string, string> = { borders: 'step_country', flag: 'step_flag', capital: 'step_capital', placement: 'step_map' }
@@ -49,6 +52,9 @@ const asGuess = (entry: BorderGuess | string): BorderGuess =>
   typeof entry === 'string' ? { value: entry, iso: null, isCorrect: false, distanceKm: null, direction: null, directionArrow: null } : { ...entry, isCorrect: false }
 
 function Playing({ game }: { game: Game }) {
+  const ACCENT = useAccent()
+  const styles = useStyles()
+  const colors = useColors()
   const { t, i18n } = useTranslation()
   const { height: windowHeight } = useWindowDimensions()
   const { country, mode, step, stepIndex, choices, wrong, triesLeft, resolved, found, steps, score, answer, giveUp, next } = game
@@ -199,6 +205,9 @@ function Playing({ game }: { game: Game }) {
 }
 
 function Done({ game }: { game: Game }) {
+  const ACCENT = useAccent()
+  const styles = useStyles()
+  const colors = useColors()
   const { t, i18n } = useTranslation()
   const [leaderboardVersion, setLeaderboardVersion] = useState(0)
   const { dailyKey, country, mode, steps, score, attempts, errors, solved } = game
@@ -245,6 +254,7 @@ function Done({ game }: { game: Game }) {
 }
 
 export default function CountryOfTheDayScreen() {
+  const ACCENT = useAccent()
   const { t } = useTranslation()
   const game = useCountryOfDayState()
   const { dailyKey, phase } = game
@@ -266,11 +276,11 @@ export default function CountryOfTheDayScreen() {
   return <ModePicker accent={ACCENT} loading={phase === 'loading'} onChoose={game.chooseMode} />
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   content: { paddingHorizontal: space.xl, paddingTop: space.sm, paddingBottom: space.xl, gap: space.lg },
   identity: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   identityFlag: { width: 32, height: 21, borderRadius: 3 },
   silhouette: { borderRadius: radius.xl, backgroundColor: colors.ocean, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
   summary: { alignItems: 'center', gap: 2, padding: space.lg, borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   wrongRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
-})
+}))

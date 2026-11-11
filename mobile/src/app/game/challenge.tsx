@@ -4,7 +4,7 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native'
+import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -24,18 +24,20 @@ import { ResultsSheet } from '@/components/game/ResultsSheet'
 import { PlacementRound, TypedRound, roundAnswer, type Survival, type SurvivalRound } from '@/components/survival/SurvivalRounds'
 import { clean } from '@/i18n'
 import { Button, Text } from '@/components/ui'
-import { DIFFICULTY_COLORS, getGameByType } from '@/games'
+import { useDifficultyColors, getGameByType } from '@/games'
 import { navigate } from '@/shims/react-router-dom'
 import GameEmblem from '@/components/GameEmblem'
 import { type EscaleState } from '@/components/flight'
-import { colors, gameColors, radius, space } from '@/theme'
-
-const ACCENT = gameColors.daily_challenge
+import { makeStyles, radius, space, useColors, useTheme } from '@/theme'
 
 type Challenge = ReturnType<typeof useDailyChallengeState>
 type Result = 'correct' | 'failed' | null
 
 function Playing({ challenge }: { challenge: Challenge }) {
+  const { gameColors } = useTheme()
+  const styles = useStyles()
+  const colors = useColors()
+  const DIFFICULTY_COLORS = useDifficultyColors()
   const { t, i18n } = useTranslation()
   const { round, roundIndex, total, score, results, timeLeftMs, outcome, timedOut, next, giveUp, submitText } = challenge
 
@@ -130,8 +132,8 @@ function Playing({ challenge }: { challenge: Challenge }) {
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={styles.content}>
             <View style={styles.roundHeader}>
-              {roundGame && <GameEmblem game={roundGame.id} variant="glyph" size={18} color={roundGame.color} />}
-              <Text variant="label" color={roundGame?.color} style={{ flex: 1 }}>
+              {roundGame && <GameEmblem game={roundGame.id} variant="glyph" size={18} color={gameColors[roundGame.id]} />}
+              <Text variant="label" color={roundGame ? gameColors[roundGame.id] : undefined} style={{ flex: 1 }}>
                 {t('daily_challenge.round', { n: roundIndex + 1, total })} · {t(`survival.round_type.${round.type}`)}
               </Text>
               <Text variant="label" color={DIFFICULTY_COLORS[round.difficulty]}>
@@ -149,6 +151,9 @@ function Playing({ challenge }: { challenge: Challenge }) {
 }
 
 function Rules({ challenge }: { challenge: Challenge }) {
+  const styles = useStyles()
+  const colors = useColors()
+  const ACCENT = useTheme().gameColors.daily_challenge
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   const { phase, resumed, start, level } = challenge
@@ -198,6 +203,9 @@ function Rules({ challenge }: { challenge: Challenge }) {
 }
 
 function Done({ challenge }: { challenge: Challenge }) {
+  const styles = useStyles()
+  const colors = useColors()
+  const ACCENT = useTheme().gameColors.daily_challenge
   const { t } = useTranslation()
   const { dailyKey, rounds, results, score, elapsedTime, total } = challenge
   const grid = useMemo(() => challengeShareGrid(rounds, results), [rounds, results])
@@ -255,6 +263,7 @@ function Done({ challenge }: { challenge: Challenge }) {
 }
 
 export default function ChallengeScreen() {
+  const ACCENT = useTheme().gameColors.daily_challenge
   const { t } = useTranslation()
   const challenge = useDailyChallengeState()
   const { dailyKey, phase } = challenge
@@ -276,7 +285,7 @@ export default function ChallengeScreen() {
   return <Rules challenge={challenge} />
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   content: { paddingHorizontal: space.xl, paddingTop: space.sm, paddingBottom: space.xl, gap: space.lg },
   roundHeader: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   outcome: {
@@ -297,4 +306,4 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-})
+}))

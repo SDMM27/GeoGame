@@ -241,7 +241,7 @@ const playedTime = (game) => (typeof game.playedAt === 'number' ? game.playedAt 
 
 /**
  * Missions of the day and week of `now` with their progress from `games` (any order, may hold older games):
- * { day, week, daily: [{ mission, progress, done }], weekly: [...], todayGames, dailies: dailiesProgress() }.
+ * { day, week, daily: [{ mission, progress, done }], weekly: [...], todayGames, todayTypes: [gameType] (the game types played today), dailies: dailiesProgress() }.
  */
 export function missionsAt(games, now) {
   const day = missionDayAt(now)
@@ -260,6 +260,7 @@ export function missionsAt(games, now) {
     daily: dailyMissions(day).map(withProgress(ofDay)),
     weekly: weeklyMissions(week).map(withProgress(ofWeek)),
     todayGames: ofDay.length,
+    todayTypes: [...new Set(ofDay.map((game) => game.gameType))],
     dailies: dailiesProgress(games, day),
   }
 }

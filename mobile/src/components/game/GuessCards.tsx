@@ -10,10 +10,8 @@ import { getCountryName } from '@shared/utils/getCountryName'
 
 import { Text } from '@/components/ui'
 import { getFlag } from '@/flags'
-import { colors, gameColors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors, useTheme } from '@/theme'
 
-const BORDER_ACCENT = gameColors.border_guess
-const CLUE_ACCENT = gameColors.country_clue
 
 export type BorderGuess = {
   value: string
@@ -26,6 +24,9 @@ export type BorderGuess = {
 
 // The latest guess is highlighted: it tells where to look next.
 export function BorderGuessRow({ guess, index, latest }: { guess: BorderGuess; index: number; latest: boolean }) {
+  const colors = useColors()
+  const borderStyles = useBorderStyles()
+  const BORDER_ACCENT = useTheme().gameColors.border_guess
   const { t, i18n } = useTranslation()
   const name = (guess.iso && getCountryName(guess.iso, i18n.language)) || guess.value
   const color = guess.isCorrect ? colors.accent : colors.danger
@@ -89,12 +90,6 @@ export type ClueGuess = {
   populationLabel: string
 }
 
-const TONE_COLORS: Record<Tone, string> = {
-  match: colors.accent,
-  higher: colors.warning,
-  lower: colors.warning,
-  neutral: colors.textMuted,
-}
 
 // The hook's hint labels are French-only: rebuild them from the tone.
 function hintLabel(t: (key: string) => string, metric: 'hemisphere' | 'area' | 'population', guess: ClueGuess, hint: Hint) {
@@ -103,6 +98,9 @@ function hintLabel(t: (key: string) => string, metric: 'hemisphere' | 'area' | '
 }
 
 function HintChip({ label, hint, text, detail }: { label: string; hint: Hint; text: string; detail?: string }) {
+  const colors = useColors()
+  const clueStyles = useClueStyles()
+  const TONE_COLORS: Record<Tone, string> = { match: colors.accent, higher: colors.warning, lower: colors.warning, neutral: colors.textMuted }
   const color = TONE_COLORS[hint.tone]
   return (
     <View style={[clueStyles.chip, { borderColor: `${color}55`, backgroundColor: `${color}12` }]}>
@@ -125,6 +123,8 @@ function HintChip({ label, hint, text, detail }: { label: string; hint: Hint; te
 export type ClueProgress = { deltaKm: number | null; closest: boolean }
 
 function ProgressChips({ progress }: { progress?: ClueProgress }) {
+  const colors = useColors()
+  const clueStyles = useClueStyles()
   const { t, i18n } = useTranslation()
   if (!progress || (progress.deltaKm == null && !progress.closest)) return null
   const { deltaKm, closest } = progress
@@ -151,6 +151,9 @@ function ProgressChips({ progress }: { progress?: ClueProgress }) {
 }
 
 export function ClueGuessCard({ guess, index, progress }: { guess: ClueGuess; index: number; progress?: ClueProgress }) {
+  const colors = useColors()
+  const clueStyles = useClueStyles()
+  const CLUE_ACCENT = useTheme().gameColors.country_clue
   const { t, i18n } = useTranslation()
   const name = (guess.isoA2 && getCountryName(guess.isoA2, i18n.language)) || guess.value
   const flag = getFlag(guess.isoA2)
@@ -204,7 +207,7 @@ export function ClueGuessCard({ guess, index, progress }: { guess: ClueGuess; in
   )
 }
 
-const borderStyles = StyleSheet.create({
+const useBorderStyles = makeStyles((colors, theme) => ({
   guess: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -216,15 +219,17 @@ const borderStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  guessLatest: { borderColor: BORDER_ACCENT, backgroundColor: `${BORDER_ACCENT}14` },
+  guessLatest: { borderColor: theme.gameColors.border_guess, backgroundColor: `${theme.gameColors.border_guess}14` },
   hint: { flexDirection: 'row', alignItems: 'center', gap: 6, flexShrink: 1, marginLeft: 'auto' },
-})
+}))
 
 /**
  * The guesses of a finished game, one short line each: number, flag, name, direction and distance, and the change
  * from the previous guess (the full cards stay in the game screen).
  */
 export function ClueGuessSummary({ guesses, progress }: { guesses: ClueGuess[]; progress: ClueProgress[] }) {
+  const colors = useColors()
+  const clueStyles = useClueStyles()
   const { i18n } = useTranslation()
   return (
     <View style={clueStyles.summary}>
@@ -265,7 +270,7 @@ export function ClueGuessSummary({ guesses, progress }: { guesses: ClueGuess[]; 
   )
 }
 
-const clueStyles = StyleSheet.create({
+const useClueStyles = makeStyles((colors) => ({
   summary: {
     borderRadius: radius.md,
     backgroundColor: colors.surface,
@@ -290,4 +295,4 @@ const clueStyles = StyleSheet.create({
   distance: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   chips: { flexDirection: 'row', gap: space.sm },
   chip: { flex: 1, minWidth: 0, gap: 2, padding: space.sm, borderRadius: radius.sm, borderWidth: 1 },
-})
+}))

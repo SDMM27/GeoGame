@@ -9,7 +9,7 @@
 import { Path, G, Circle, Rect, Svg, Text as SvgText } from 'react-native-svg'
 
 import { emblemId, gameEmblem } from '@shared/utils/gameEmblems'
-import { fonts, gameColors } from '@/theme'
+import { darkGameColors, fonts, useTheme, type GameColors } from '@/theme'
 
 export type EmblemVariant = 'tile' | 'stamp' | 'glyph'
 
@@ -29,9 +29,9 @@ function tint(hex: string, alpha: number) {
   return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${alpha})`
 }
 
-export function emblemColor(game: string | null | undefined): string {
-  const id = emblemId(game) as keyof typeof gameColors | null
-  return id ? gameColors[id] : '#A3ACC6'
+export function emblemColor(game: string | null | undefined, gameColors: GameColors = darkGameColors, fallback = '#A3ACC6'): string {
+  const id = emblemId(game) as keyof GameColors | null
+  return (id && gameColors[id]) || fallback
 }
 
 export function flightCode(game: string | null | undefined): string {
@@ -39,9 +39,10 @@ export function flightCode(game: string | null | undefined): string {
 }
 
 export default function GameEmblem({ game, variant = 'tile', size = 40, color, title }: Props) {
+  const theme = useTheme()
   const emblem = gameEmblem(game) as Emblem | null
   if (!emblem) return null
-  const stroke = color ?? emblemColor(game)
+  const stroke = color ?? emblemColor(game, theme.gameColors, theme.colors.textMuted)
   const a11y = title
     ? ({ accessibilityRole: 'image', accessibilityLabel: title, accessible: true } as const)
     : ({ accessible: false, importantForAccessibility: 'no-hide-descendants' } as const)

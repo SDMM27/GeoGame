@@ -3,7 +3,7 @@
 // pressable). A sheet opens only for an owned scroll: `requested` is ignored otherwise.
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, View } from 'react-native'
+import { View } from 'react-native'
 
 import { formatScrollDate, scrollById, scrollsByEra, SCROLLS, SEALS_PER_SCROLL } from '@shared/utils/scrollCollectionData'
 
@@ -12,7 +12,7 @@ import { ScrollImage, parchment } from '@/components/scrolls/ScrollImage'
 import { ScrollSeal } from '@/components/scrolls/ScrollSeal'
 import { ScrollSheet } from '@/components/scrolls/ScrollSheet'
 import { Text, Touchable } from '@/components/ui'
-import { colors, fonts, radius, space } from '@/theme'
+import { fonts, makeStyles, radius, space, useColors } from '@/theme'
 
 export type Scrolls = { unlocked: string[]; seals: number }
 type Tile = { id: string; era: string; family: 'period' | 'atlas'; year: number; owned: boolean }
@@ -20,6 +20,8 @@ type Group = { era: string; scrolls: Tile[] }
 
 export function ScrollGrid({ unlocked, onOpen }: { unlocked: string[]; onOpen: (id: string) => void }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   return (
     <View style={{ gap: space.xl }}>
       {(scrollsByEra(unlocked) as Group[]).map(({ era, scrolls }) => (
@@ -63,6 +65,8 @@ export function ScrollGrid({ unlocked, onOpen }: { unlocked: string[]; onOpen: (
 
 export function ScrollsView({ scrolls, requested = null }: { scrolls: Scrolls; requested?: string | null }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const owned = (id: string | null) => (id && scrolls.unlocked.includes(id) ? (scrollById(id) as Tile | null) : null)
   const [openId, setOpenId] = useState<string | null>(requested)
   const open = owned(openId)
@@ -93,11 +97,11 @@ export function ScrollsView({ scrolls, requested = null }: { scrolls: Scrolls; r
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space.md },
   howTo: { flexDirection: 'row', alignItems: 'flex-start', gap: space.md, padding: space.lg, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface },
   tile: { width: '47.5%', borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, overflow: 'hidden' },
   thumb: { width: '100%', aspectRatio: 4 / 3, backgroundColor: parchment.mid },
   tileText: { padding: space.sm, gap: 2 },
   sealed: { minHeight: 120, alignItems: 'center', justifyContent: 'center', gap: space.sm, padding: space.md, borderStyle: 'dashed', backgroundColor: colors.surfaceHigh },
-})
+}))

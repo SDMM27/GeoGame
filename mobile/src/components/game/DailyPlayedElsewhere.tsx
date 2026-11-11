@@ -4,14 +4,14 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native'
+import { ActivityIndicator, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { formatTime } from '@shared/utils/formatTime'
 import { describeResult } from '@shared/utils/profileFormat'
 
 import { navigate } from '@/shims/react-router-dom'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 import { Button, Text } from '../ui'
 import { GameHud } from './GameHud'
 
@@ -19,6 +19,8 @@ type DailyGame = { solved?: boolean; elapsedTime?: number | null; [field: string
 
 export function DailyPlayedElsewhere({ gameId, title, game, accent, children }: { gameId: string; title: string; game: DailyGame | null; accent: string; children?: ReactNode }) {
   const { t } = useTranslation()
+  const colors = useColors()
+  const styles = useStyles()
   const insets = useSafeAreaInsets()
   const result = game
     ? [describeResult(game, t), game.elapsedTime != null ? formatTime(game.elapsedTime) : null].filter(Boolean).join(' · ')
@@ -71,7 +73,7 @@ export function DailyPlayedElsewhere({ gameId, title, game, accent, children }: 
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   content: { paddingHorizontal: space.xl, gap: space.lg },
   checking: { alignItems: 'center', gap: space.sm, paddingVertical: space.xl },
   card: {
@@ -83,4 +85,4 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-})
+}))

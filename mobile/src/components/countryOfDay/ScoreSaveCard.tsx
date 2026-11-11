@@ -2,7 +2,7 @@
 // its own; otherwise under the name the player types. One score per player and day, even at 0.
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, TextInput, View } from 'react-native'
+import { TextInput, View } from 'react-native'
 
 import { useScoreSave } from '@shared/hooks/useScoreSave'
 import { formatTime } from '@shared/utils/formatTime'
@@ -10,7 +10,7 @@ import { saveCountryOfDayScore } from '@shared/utils/saveScore'
 
 import { useAccount } from '@/account/auth'
 import { Button, Text } from '@/components/ui'
-import { colors, fonts, radius, space } from '@/theme'
+import { fonts, makeStyles, radius, space, useColors } from '@/theme'
 
 const PSEUDO_KEY = 'geogame_pseudo'
 
@@ -18,6 +18,8 @@ type Props = { dailyKey: string; mode: string; steps: number[]; score: number; e
 
 export function ScoreSaveCard({ dailyKey, mode, steps, score, elapsedTime, onSaved }: Props) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const [typedPseudo, setTypedPseudo] = useState(() => globalThis.localStorage?.getItem(PSEUDO_KEY) ?? '')
   // Same key as the other daily games: one save per day
   const savedKey = `daily-saved:COUNTRY_OF_DAY:${dailyKey}`
@@ -105,7 +107,7 @@ export function ScoreSaveCard({ dailyKey, mode, steps, score, elapsedTime, onSav
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   card: { gap: space.sm, padding: space.lg, borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   row: { flexDirection: 'row', gap: space.sm },
   input: {
@@ -121,4 +123,4 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bodyMedium,
     fontSize: 16,
   },
-})
+}))

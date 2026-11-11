@@ -9,11 +9,11 @@
 //   right       optional node on the right (timer, menu...)
 //   style       container style
 import type { ReactNode } from 'react'
-import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native'
+import { Pressable, View, type StyleProp, type ViewStyle } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
 
 import GameEmblem, { flightCode } from '@/components/GameEmblem'
-import { colors } from '@/theme'
+import { makeStyles, useColors } from '@/theme'
 import { Kicker } from './Kicker'
 import { ScreenTitle } from './ScreenTitle'
 
@@ -31,6 +31,8 @@ type Props = {
 }
 
 export function GameHeader({ game, title, gate, tag, onClose, closeLabel, flightLabel = 'VOL', gateLabel = 'PORTE', right, style }: Props) {
+  const colors = useColors()
+  const styles = useStyles()
   return (
     <View style={[styles.header, style]}>
       <Pressable accessibilityRole="button" accessibilityLabel={closeLabel} onPress={onClose} style={styles.close}>
@@ -50,7 +52,7 @@ export function GameHeader({ game, title, gate, tag, onClose, closeLabel, flight
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   header: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingTop: 14, paddingBottom: 10 },
   close: {
     width: 44,
@@ -62,4 +64,4 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-})
+}))

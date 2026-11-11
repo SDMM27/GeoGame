@@ -40,7 +40,7 @@ export default function BoardingPass({ game, index, status = null }) {
         <p className="boarding-pass-desc">{t(game.descKey)}</p>
         <div className="boarding-pass-actions">
           <button type="button" className="boarding-pass-board" onClick={() => navigate(game.route, { state: { mode: 'daily' } })}>
-            {t('home.board')}
+            {t('buttons.play')}
           </button>
           {!game.dailyOnly && (
             <button

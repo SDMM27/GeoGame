@@ -2,13 +2,13 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { useEffect, useEffectEvent, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, TextInput, View } from 'react-native'
+import { ScrollView, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { ANSWER_KEYBOARD_PROPS, useClearedAnswerGuard } from '@/components/game/answerInput'
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible'
 import { clean } from '@/i18n'
-import { colors, fonts, radius, space } from '@/theme'
+import { fonts, makeStyles, radius, space, useColors } from '@/theme'
 import { Text, Touchable } from '../ui'
 
 type IconName = keyof typeof MaterialCommunityIcons.glyphMap
@@ -38,6 +38,8 @@ export function GuessInputBar({
   revealIcon?: IconName
 }) {
   const { t } = useTranslation()
+  const colors = useColors()
+  const styles = useStyles()
   const insets = useSafeAreaInsets()
   // The keyboard covers the home indicator: no bottom inset under the input while typing.
   const keyboardVisible = useKeyboardVisible()
@@ -119,7 +121,7 @@ export function GuessInputBar({
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   bar: {
     gap: space.sm,
     paddingTop: space.md,
@@ -160,4 +162,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-})
+}))

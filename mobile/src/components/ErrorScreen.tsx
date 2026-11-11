@@ -1,7 +1,7 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { View } from 'react-native'
 
-import { colors, space } from '@/theme'
+import { space, useColors } from '@/theme'
 import { Button, Text } from './ui'
 
 type Action = { label: string; onPress: () => void; variant?: 'primary' | 'secondary' }
@@ -19,6 +19,7 @@ export function ErrorScreen({
   message: string
   actions: Action[]
 }) {
+  const colors = useColors()
   return (
     <View
       accessibilityRole="alert"

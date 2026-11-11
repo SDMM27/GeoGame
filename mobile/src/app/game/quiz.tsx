@@ -6,7 +6,7 @@ import { Image } from 'expo-image'
 import { Redirect, router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, View } from 'react-native'
+import { KeyboardAvoidingView, Platform, ScrollView, TextInput, View } from 'react-native'
 import Animated, { FadeIn, FadeInDown, ZoomIn } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -36,14 +36,13 @@ import { ResultsSheet } from '@/components/game/ResultsSheet'
 import { type EscaleState } from '@/components/flight'
 import { Button, Segmented, Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
-import { DIFFICULTY_COLORS } from '@/games'
+import { useDifficultyColors } from '@/games'
 import { useElapsed } from '@/hooks/useElapsed'
 import { clean } from '@/i18n'
 import { RoomGate, RoomHudPill, Standings, useReportFound, type RoomPlay } from '@/multiplayer/RoomPlay'
 import { navigate } from '@/shims/react-router-dom'
-import { colors, fonts, gameColors, radius, space } from '@/theme'
+import { fonts, makeStyles, radius, space, useColors, useTheme } from '@/theme'
 
-const ACCENT = gameColors.quiz
 const MODE_STORAGE_KEY = 'geogame_quiz_mode'
 
 type AnswerMode = 'choices' | 'free'
@@ -59,6 +58,9 @@ function loadMode(): AnswerMode {
 }
 
 function DifficultyBadge({ difficulty }: { difficulty: string }) {
+  const styles = useStyles()
+  const colors = useColors()
+  const DIFFICULTY_COLORS = useDifficultyColors()
   const { t } = useTranslation()
   const color = DIFFICULTY_COLORS[difficulty] ?? colors.textMuted
   return (
@@ -85,6 +87,8 @@ function AnswerInput({
   state?: 'correct' | 'wrong'
   inputRef?: React.RefObject<TextInput | null>
 }) {
+  const styles = useStyles()
+  const colors = useColors()
   const { t } = useTranslation()
   const tint = state === 'correct' ? colors.accent : state === 'wrong' ? colors.danger : null
   return (
@@ -118,6 +122,8 @@ function Feedback({
   lines: (string | null | false | undefined)[]
   spoken: string
 }) {
+  const styles = useStyles()
+  const colors = useColors()
   const tint = correct ? colors.accent : colors.danger
   // Mounted when the answer is revealed.
   useEffect(() => announce(spoken), []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -138,6 +144,9 @@ function Feedback({
 // ─── Daily question ────────────────────────────────────────────────────────
 
 function DailyQuiz() {
+  const styles = useStyles()
+  const colors = useColors()
+  const ACCENT = useTheme().gameColors.quiz
   const { t, i18n } = useTranslation()
   const insets = useSafeAreaInsets()
   const {
@@ -397,6 +406,9 @@ function DifficultyPicker({
   initialTheme: Theme
   country: string | null
 }) {
+  const styles = useStyles()
+  const ACCENT = useTheme().gameColors.quiz
+  const DIFFICULTY_COLORS = useDifficultyColors()
   const { t, i18n } = useTranslation()
   const [mode, setMode] = useState<AnswerMode>(loadMode)
   const [theme, setTheme] = useState<Theme>(initialTheme)
@@ -476,6 +488,9 @@ function PracticeQuiz({
   presetTheme?: Theme
   presetCountry?: string | null
 }) {
+  const styles = useStyles()
+  const colors = useColors()
+  const ACCENT = useTheme().gameColors.quiz
   const { t, i18n } = useTranslation()
   const insets = useSafeAreaInsets()
   const {
@@ -808,7 +823,7 @@ export default function QuizScreen() {
   return mode === 'infinite' ? <PracticeQuiz presetTheme={presetTheme} presetCountry={presetCountry} /> : <DailyQuiz />
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   content: { paddingHorizontal: space.xl, gap: space.lg },
   card: {
     gap: space.lg,
@@ -877,4 +892,4 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: colors.border,
   },
-})
+}))

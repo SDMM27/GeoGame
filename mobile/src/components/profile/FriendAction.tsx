@@ -10,12 +10,13 @@ import { acceptFriendRequest, friendErrorKey, removeFriendship, sendFriendReques
 import { useAccount } from '@/account/auth'
 import { confirmAction } from '@/components/confirm'
 import { Button, Text } from '@/components/ui'
-import { colors, space } from '@/theme'
+import { space, useColors } from '@/theme'
 
 type Player = { uid: string; username: string }
 type Friendship = { id: string; uid: string; username: string; status: 'friend' | 'incoming' | 'outgoing' }
 
 export function FriendAction({ player }: { player: Player }) {
+  const colors = useColors()
   const { t } = useTranslation()
   const { account } = useAccount()
   const friendships = useFriendships(account?.uid)

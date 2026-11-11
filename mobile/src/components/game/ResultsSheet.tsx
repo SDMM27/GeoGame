@@ -22,7 +22,7 @@ import { useRecordGame, type GameRecord } from '@/account/history'
 import GameEmblem, { flightCode } from '@/components/GameEmblem'
 import { BoardStrip, EscaleProgress, Kicker, ScreenTitle, Stamp, type EscaleState } from '@/components/flight'
 import { SITE_ORIGIN } from '@/links'
-import { colors, fonts, radius, space } from '@/theme'
+import { fonts, makeStyles, radius, space, useColors } from '@/theme'
 import { Button, Text } from '../ui'
 import { NudgeFriends } from './NudgeFriends'
 
@@ -96,7 +96,10 @@ const dailySavedKey = (save: SaveConfig | null | undefined) =>
         ? `ranking-saved:${save.dailyKey}`
         : null
 
-export function ResultsSheet({ title, score, scoreText, scoreLabel, accent = colors.accent, stats, save, share, record, onReplay, onHome, homeLabel, onSaved, children, game, ticketNote, states, tone }: Props) {
+export function ResultsSheet({ title, score, scoreText, scoreLabel, accent: accentProp, stats, save, share, record, onReplay, onHome, homeLabel, onSaved, children, game, ticketNote, states, tone }: Props) {
+  const colors = useColors()
+  const styles = useStyles()
+  const accent = accentProp ?? colors.accent
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   const [typedPseudo, setTypedPseudo] = useState(() => globalThis.localStorage?.getItem(PSEUDO_KEY) ?? '')
@@ -355,7 +358,7 @@ export function ResultsSheet({ title, score, scoreText, scoreLabel, accent = col
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   content: { paddingHorizontal: space.xl, gap: space.xl },
   head: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   ticket: { gap: space.md, padding: space.lg, borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
@@ -377,4 +380,4 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bodyMedium,
     fontSize: 16,
   },
-})
+}))

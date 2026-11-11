@@ -4,7 +4,7 @@ import { router } from 'expo-router'
 import type { ComponentProps, ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
-import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native'
+import { ActivityIndicator, ScrollView, View } from 'react-native'
 
 import { useFriendships } from '@shared/hooks/usePlayerProfile'
 import { sendFriendRequestTo } from '@shared/utils/friends'
@@ -12,7 +12,7 @@ import { sendFriendRequestTo } from '@shared/utils/friends'
 import GameEmblem from '@/components/GameEmblem'
 import { Kicker } from '@/components/flight'
 import { loadErrorKey } from '@/leaderboards'
-import { colors, fonts, radius, space } from '@/theme'
+import { fonts, makeStyles, radius, space, useColors } from '@/theme'
 import { Text, Touchable } from '../ui'
 import { DecoratedName } from './DecoratedName'
 import { ReportFlag, type ReportTarget } from './ReportFlag'
@@ -33,6 +33,8 @@ export function FilterChips({
   onChange: (value: string) => void
   label?: string
 }) {
+  const styles = useStyles()
+  const colors = useColors()
   return (
     <View style={{ gap: 6 }}>
       {label ? <Kicker>{label}</Kicker> : null}
@@ -70,6 +72,8 @@ type Me = { uid: string; username: string | null } | null
 // One shared Firestore listener serves every row (see watchSharedFriendships).
 function QuickAdd({ me, uid, name }: { me: { uid: string; username: string }; uid: string; name: string }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const friendships = useFriendships(me.uid)
   const [failed, setFailed] = useState(false)
   if (friendships.loading) return null
@@ -121,6 +125,8 @@ export function LeaderboardRow({
   last?: boolean
 }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const content = (
     <>
       <Text style={[styles.rank, index === 0 && { color: colors.gold }, index === 2 && { color: '#E0905A' }]}>{index + 1}</Text>
@@ -179,6 +185,8 @@ export function LeaderboardCard({
   children: ReactNode
 }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   return (
     <View style={styles.card}>
       {error ? (
@@ -204,7 +212,7 @@ export function LeaderboardCard({
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   quickAdd: { width: 30, height: 30, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.border },
   chip: {
     flexDirection: 'row',
@@ -229,4 +237,4 @@ const styles = StyleSheet.create({
   value: { textAlign: 'right', fontVariant: ['tabular-nums'] },
   valueMain: { fontFamily: fonts.monoBold, fontSize: 14, color: colors.gold },
   valueSecondary: { fontFamily: fonts.mono, fontSize: 11, color: colors.textMuted },
-})
+}))

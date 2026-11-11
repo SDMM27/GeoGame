@@ -3,7 +3,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native'
+import { ActivityIndicator, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useDecoration } from '@shared/hooks/useDecoration'
@@ -20,12 +20,14 @@ import { Avatar, ProfileBody } from '@/components/profile/ProfileSections'
 import { Kicker, ScreenTitle } from '@/components/flight'
 import { ScreenHeader } from '@/components/ScreenHeader'
 import { Text } from '@/components/ui'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 
 type Player = { uid: string; username: string; createdAt: number | null }
 type Friendship = { id: string; uid: string; username: string; status: 'friend' | 'incoming' | 'outgoing' }
 
 export default function PlayerScreen() {
+  const styles = useStyles()
+  const colors = useColors()
   const { t, i18n } = useTranslation()
   const insets = useSafeAreaInsets()
   const { uid } = useLocalSearchParams<{ uid: string }>()
@@ -80,7 +82,9 @@ export default function PlayerScreen() {
               )}
             </View>
           </View>
-          <LevelBar uid={player.uid} />
+          <View style={styles.level}>
+            <LevelBar uid={player.uid} />
+          </View>
           </View>
           <FriendAction player={player} />
           <ProfileBody
@@ -99,10 +103,11 @@ export default function PlayerScreen() {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   passport: { gap: space.lg, paddingBottom: space.lg, borderRadius: radius.xl, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
   passportHead: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: space.lg, paddingVertical: space.sm, backgroundColor: colors.board, borderBottomWidth: 1, borderBottomColor: colors.boardLine },
   header: { flexDirection: 'row', alignItems: 'center', gap: space.lg, paddingHorizontal: space.lg },
+  level: { paddingHorizontal: space.lg },
   friendPill: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -114,4 +119,4 @@ const styles = StyleSheet.create({
     backgroundColor: `${colors.accent}1F`,
     marginTop: space.xs,
   },
-})
+}))

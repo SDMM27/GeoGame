@@ -3,7 +3,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { Image } from 'expo-image'
 import { useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { FlatList, Platform, ScrollView, StyleSheet, View } from 'react-native'
+import { FlatList, Platform, ScrollView, View } from 'react-native'
 import Animated, { FadeInDown, SlideInDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -11,7 +11,7 @@ import { getAtlasRanking } from '@shared/utils/countryInfo'
 
 import { Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 
 import { METRICS, METRIC_LABEL_KEYS, formatMetric, type Metric } from './format'
 
@@ -35,6 +35,8 @@ export function RankingSheet({
   maxHeight: number
 }) {
   const { t, i18n } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const insets = useSafeAreaInsets()
   const lang = i18n.language
   const listRef = useRef<FlatList<Row>>(null)
@@ -116,7 +118,7 @@ export function RankingSheet({
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   sheet: {
     position: 'absolute',
     left: 0,
@@ -153,4 +155,4 @@ const styles = StyleSheet.create({
   rowSelected: { backgroundColor: colors.surfaceHigh },
   rank: { width: 28, textAlign: 'right' },
   flag: { width: 22, height: 15, borderRadius: 2 },
-})
+}))

@@ -7,7 +7,7 @@ import { collection, getDoc, getDocs, query, where } from 'firebase/firestore'
 import type { TFunction } from 'i18next'
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ActivityIndicator, StyleSheet, View } from 'react-native'
+import { ActivityIndicator, View } from 'react-native'
 
 import { firestore } from '@shared/Firebase'
 import useMultiplayerRoom from '@shared/hooks/useMultiplayerRoom'
@@ -25,7 +25,7 @@ import { GAME_TYPES } from '@shared/utils/gameTypes'
 
 import { BadgeStrip, useRoomBadges } from '@/components/profile/BadgeStrip'
 import { Button, Text } from '@/components/ui'
-import { colors, fonts, radius, space } from '@/theme'
+import { fonts, makeStyles, radius, space, useColors } from '@/theme'
 import { getRoomContent, rankRoomResults, scoringMode, type RoomContent } from './content'
 import {
   getPlayerId,
@@ -57,6 +57,8 @@ export const openRoom = (code: string) => router.replace({ pathname: '/multi/[co
 
 // Loads the room and the player's results once, then renders the game they have to play with its content.
 export function RoomGate({ code, children }: { code: string; children: (play: RoomPlay) => ReactNode }) {
+  const styles = useStyles()
+  const colors = useColors()
   const { t } = useTranslation()
   const [room, setRoom] = useState<RoomPlay['room'] | null>(null)
   const [failed, setFailed] = useState(false)
@@ -180,6 +182,8 @@ const MEDALS = ['🥇', '🥈', '🥉']
 // Standings of game `gameIndex`, or of every game ('overall', points by rank summed).
 // Rooms of several games get tabs to switch between them, unless `gameIndex` is fixed by the caller.
 export function Standings({ code, title, gameIndex }: { code: string; title?: string; gameIndex?: number }) {
+  const styles = useStyles()
+  const colors = useColors()
   const { t } = useTranslation()
   const { room, progress, results } = useLiveRoom(code)
   const [tab, setTab] = useState<number | 'overall'>('overall')
@@ -215,6 +219,7 @@ export function Standings({ code, title, gameIndex }: { code: string; title?: st
 }
 
 function OverallRows({ room, results }: { room: Room; results: PlayerResult[] }) {
+  const styles = useStyles()
   const { t } = useTranslation()
   const playerId = getPlayerId()
   const total = roomGames(room).length
@@ -246,6 +251,8 @@ function OverallRows({ room, results }: { room: Room; results: PlayerResult[] })
 }
 
 function GameRows({ room, progress, results, index }: { room: Room; progress: Progress; results: PlayerResult[]; index: number }) {
+  const styles = useStyles()
+  const colors = useColors()
   const { t } = useTranslation()
   const playerId = getPlayerId()
   const game: Room['game'] = roomGames(room)[index]
@@ -302,6 +309,8 @@ function GameRows({ room, progress, results, index }: { room: Room; progress: Pr
 
 // HUD pill: your position among the players of this game, by countries found so far.
 export function RoomHudPill({ code, gameIndex }: { code: string; gameIndex: number }) {
+  const styles = useStyles()
+  const colors = useColors()
   const { room, progress: all } = useLiveRoom(code)
   const playerId = getPlayerId()
   if (!room) return null
@@ -319,7 +328,7 @@ export function RoomHudPill({ code, gameIndex }: { code: string; gameIndex: numb
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   pill: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -340,4 +349,4 @@ const styles = StyleSheet.create({
   rank: { width: 28, textAlign: 'center' },
   tabs: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
   tab: { paddingHorizontal: space.md, paddingVertical: 4, borderRadius: radius.pill, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
-})
+}))

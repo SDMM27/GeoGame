@@ -33,7 +33,7 @@ import { onReplayFlag } from '@/components/collection/replay'
 import { Kicker } from '@/components/flight'
 import { Button, Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
-import { colors, fonts, radius, space } from '@/theme'
+import { fonts, makeStyles, radius, space, useColors } from '@/theme'
 
 // replay: a flag of the collection tapped again, not a new one
 type Item = { id: number; iso: string; count: number | null; replay?: boolean }
@@ -114,6 +114,8 @@ export function FlagUnlockOverlay() {
 }
 
 function FlagReveal({ item, onNext, onView }: { item: Item; onNext: () => void; onView: () => void }) {
+  const colors = useColors()
+  const styles = useStyles()
   const { t, i18n } = useTranslation()
   const reduced = useReducedMotion()
   const rarity = rarityOf(item.iso)
@@ -423,9 +425,10 @@ function Twinkle({ x, y, delay, color }: { x: number; y: number; delay: number; 
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   root: { ...StyleSheet.absoluteFill, zIndex: 1000, elevation: 1000 },
-  backdrop: { backgroundColor: 'rgba(6,10,22,0.94)' },
+  // Near-opaque, in the theme's background: the texts over it use the theme's text colors
+  backdrop: { backgroundColor: `${colors.bg}F0` },
   content: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: space.xl, paddingBottom: space.xxl * 2 },
   stage: { width: W, height: H, marginBottom: space.xxl },
   glowLayer: { alignItems: 'center', justifyContent: 'center' },
@@ -440,4 +443,4 @@ const styles = StyleSheet.create({
   name: { fontFamily: fonts.display, fontSize: 34, lineHeight: 40, letterSpacing: -0.6, color: colors.text, textAlign: 'center' },
   buttons: { alignItems: 'stretch', gap: space.sm, marginTop: space.xl, alignSelf: 'stretch' },
   secondary: { alignSelf: 'center', paddingVertical: space.sm, paddingHorizontal: space.lg },
-})
+}))

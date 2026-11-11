@@ -6,7 +6,7 @@ import { Image } from 'expo-image'
 import { useLocalSearchParams } from 'expo-router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native'
+import { KeyboardAvoidingView, Platform, ScrollView, View, useWindowDimensions } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 
 import useMultiplayerRoom from '@shared/hooks/useMultiplayerRoom'
@@ -48,7 +48,7 @@ import {
   type Survival,
 } from '@/components/survival/SurvivalRounds'
 import { Button, Text } from '@/components/ui'
-import { DIFFICULTY_COLORS, getGameByType } from '@/games'
+import { useDifficultyColors, getGameByType } from '@/games'
 import { clean } from '@/i18n'
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible'
 import { RoomGate, RoomHudPill, Standings, type RoomPlay } from '@/multiplayer/RoomPlay'
@@ -57,9 +57,8 @@ import { getPlayerId, type PlayerProgress } from '@/multiplayer/room'
 import { navigate } from '@/shims/react-router-dom'
 import { toast } from '@/shims/react-toastify'
 import GameEmblem from '@/components/GameEmblem'
-import { colors, gameColors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors, useTheme } from '@/theme'
 
-const ACCENT = gameColors.survival
 const NO_ENTRIES: unknown[] = []
 const newSeed = () => Math.floor(Math.random() * 2 ** 31)
 
@@ -84,6 +83,9 @@ function Spectator({ round, roundIndex, rows, waiting, maxLives }: {
   waiting: { done: number; total: number }
   maxLives: number
 }) {
+  const { gameColors } = useTheme()
+  const styles = useStyles()
+  const colors = useColors()
   const { t, i18n } = useTranslation()
   const revealed = waiting.total > 0 && waiting.done === waiting.total
   const iso: string | undefined = round?.country?.properties?.ISO_A2
@@ -96,7 +98,7 @@ function Spectator({ round, roundIndex, rows, waiting, maxLives }: {
       <Text variant="label">👀 {t('survival.spectating')}</Text>
       {round && (
         <View style={{ alignItems: 'center', gap: space.sm }}>
-          <Text variant="bodyStrong" color={roundGame?.color}>
+          <Text variant="bodyStrong" color={roundGame ? gameColors[roundGame.id] : undefined}>
             {t('survival.round', { n: roundIndex + 1 })} · {t(`survival.prompt.${round.type}`)}
             {round.difficulty ? ` · ${t(`difficulties.${round.difficulty}`)}` : ''}
           </Text>
@@ -184,6 +186,11 @@ type RunProps = {
 }
 
 function SurvivalRun({ modes, lives, timer, ramp, seed, snapshot = null, snapKey = null, play, sync = null, onReplay }: RunProps) {
+  const { gameColors } = useTheme()
+  const styles = useStyles()
+  const colors = useColors()
+  const ACCENT = useTheme().gameColors.survival
+  const DIFFICULTY_COLORS = useDifficultyColors()
   const { t, i18n } = useTranslation()
   const { height: windowHeight } = useWindowDimensions()
   const keyboardVisible = useKeyboardVisible()
@@ -301,8 +308,8 @@ function SurvivalRun({ modes, lives, timer, ramp, seed, snapshot = null, snapKey
 
   const header = round && roundGame && (
     <View style={styles.roundHeader}>
-      <GameEmblem game={roundGame.id} variant="glyph" size={18} color={roundGame.color} />
-      <Text variant="label" color={roundGame.color} style={{ flex: 1 }}>
+      <GameEmblem game={roundGame.id} variant="glyph" size={18} color={gameColors[roundGame.id]} />
+      <Text variant="label" color={gameColors[roundGame.id]} style={{ flex: 1 }}>
         {t('survival.round', { n: roundIndex + 1 })} · {t(`survival.round_type.${round.type}`)}
       </Text>
       <Text variant="label" color={DIFFICULTY_COLORS[round.difficulty]}>
@@ -316,10 +323,14 @@ function SurvivalRun({ modes, lives, timer, ramp, seed, snapshot = null, snapKey
 
   // One segment per round when the run is short enough: the color of the game played, the current one in gold.
   const rounds = state.rounds as { type: string }[] | undefined
+  const gameColorOf = (round?: { type: string }) => {
+    const id = round && getGameByType(round.type)?.id
+    return id ? gameColors[id] : 'good'
+  }
   const states: EscaleState[] =
     rounds && totalRounds > 0 && totalRounds <= 24
       ? Array.from({ length: totalRounds }, (_, index) =>
-          index === roundIndex ? 'current' : index < roundIndex ? (rounds[index] ? getGameByType(rounds[index].type)?.color ?? 'good' : 'good') : 'todo',
+          index === roundIndex ? 'current' : index < roundIndex ? gameColorOf(rounds[index]) : 'todo',
         )
       : []
   const livesLeft = Math.max(0, state.lives)
@@ -492,7 +503,7 @@ export default function SurvivalScreen() {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   spectator: {
     gap: space.sm,
     padding: space.lg,
@@ -523,4 +534,4 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     backgroundColor: colors.surface,
   },
-})
+}))

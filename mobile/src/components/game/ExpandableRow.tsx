@@ -4,10 +4,11 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { useState, type ReactNode } from 'react'
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native'
 
-import { colors, space } from '@/theme'
+import { space, useColors } from '@/theme'
 import { Text, Touchable } from '../ui'
 
 export function ExpandableRow({ style, details, children }: { style: StyleProp<ViewStyle>; details?: ReactNode; children: ReactNode }) {
+  const colors = useColors()
   const [open, setOpen] = useState(false)
   if (!details) return <View style={[style, styles.row]}>{children}</View>
   // No button role: on web that renders a <button>, and the row holds other buttons (report flag).
@@ -24,6 +25,7 @@ export function ExpandableRow({ style, details, children }: { style: StyleProp<V
 
 // Numbered list of answers; the last one is highlighted when it was the right one.
 export function AnswerList({ title, answers, lastCorrect }: { title: string; answers: string[]; lastCorrect?: boolean }) {
+  const colors = useColors()
   return (
     <View style={{ gap: 2 }}>
       <Text variant="label">{title}</Text>

@@ -3,7 +3,7 @@
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useBadges } from '@shared/hooks/useBadges'
@@ -18,7 +18,7 @@ import { type CandidateMessage, FriendCandidates, type Zone } from '@/components
 import { SectionTitle } from '@/components/profile/ProfileSections'
 import { ScreenHeader } from '@/components/ScreenHeader'
 import { Button, Segmented, Text } from '@/components/ui'
-import { colors, fonts, radius, space } from '@/theme'
+import { fonts, makeStyles, radius, space, useColors } from '@/theme'
 
 type Tab = 'friends' | 'world'
 type Ranked = { uid: string; name: string; rank: number; points: number }
@@ -37,6 +37,8 @@ type League = {
 
 function LastWeek({ result }: { result: Result }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   if (result.rank != null) {
     return (
       <View style={[styles.lastWeek, { borderColor: colors.accent }]}>
@@ -57,6 +59,7 @@ function LastWeek({ result }: { result: Result }) {
 
 function MyPlace({ account, me }: { account: Account | null; me: Me | null }) {
   const { t } = useTranslation()
+  const styles = useStyles()
   if (!account?.username) {
     return (
       <View style={styles.card}>
@@ -92,6 +95,7 @@ function MyPlace({ account, me }: { account: Account | null; me: Me | null }) {
 
 export default function LeagueScreen() {
   const { t } = useTranslation()
+  const colors = useColors()
   const insets = useSafeAreaInsets()
   const { account } = useAccount()
   const friendships = useFriendships(account?.username ? account.uid : null)
@@ -181,9 +185,9 @@ export default function LeagueScreen() {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   card: { gap: space.md, padding: space.lg, borderRadius: radius.xl, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   meRow: { flexDirection: 'row', alignItems: 'center', gap: space.lg },
   rank: { fontFamily: fonts.displayHeavy, fontSize: 34, lineHeight: 38, color: colors.accent },
   lastWeek: { flexDirection: 'row', alignItems: 'center', gap: space.md, padding: space.lg, borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1.5 },
-})
+}))

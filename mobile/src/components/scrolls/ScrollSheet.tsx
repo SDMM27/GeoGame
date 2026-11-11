@@ -14,13 +14,15 @@ import { formatScrollDate, formatScrollYear } from '@shared/utils/scrollCollecti
 import { EmpireMap } from '@/components/scrolls/EmpireMap'
 import { ScrollMap } from '@/components/scrolls/ScrollMap'
 import { Text, Touchable } from '@/components/ui'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 
 type Scroll = { id: string; family: 'period' | 'atlas'; year: number }
 type SheetText = { body?: string; detail?: string; credit?: string }
 
 export function ScrollSheet({ scroll, onClose }: { scroll: Scroll; onClose: () => void }) {
   const { t, i18n } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const insets = useSafeAreaInsets()
   const { height } = useWindowDimensions()
   // Texts with the scroll and language they were loaded for: others are not shown
@@ -110,7 +112,7 @@ export function ScrollSheet({ scroll, onClose }: { scroll: Scroll; onClose: () =
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   root: { ...StyleSheet.absoluteFill, zIndex: 50, elevation: 50, backgroundColor: colors.bg },
   top: { flexDirection: 'row', alignItems: 'center', gap: space.md, paddingHorizontal: space.lg, paddingBottom: space.md },
   close: { width: 42, height: 42, borderRadius: radius.pill, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
@@ -118,4 +120,4 @@ const styles = StyleSheet.create({
   view: { flex: 1, minHeight: 40, borderRadius: radius.pill, borderWidth: 1, borderColor: colors.borderStrong, alignItems: 'center', justifyContent: 'center' },
   viewOn: { backgroundColor: colors.accent, borderColor: colors.accent },
   detail: { gap: 4, padding: space.md, borderRadius: radius.md, backgroundColor: colors.surfaceHigh, borderLeftWidth: 3, borderLeftColor: colors.warning },
-})
+}))

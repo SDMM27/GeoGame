@@ -8,18 +8,19 @@
 //   style      container style
 // Barcode (exported too): the decorative bars alone. Props: width (58), height (28), color (text).
 import type { ReactNode } from 'react'
-import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native'
+import { Text, View, type StyleProp, type ViewStyle } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
 
-import { colors, fonts } from '@/theme'
+import { fonts, makeStyles, useColors } from '@/theme'
 
 const BARCODE =
   'M1 0v28M4 0v28M6 0v28M10 0v28M13 0v28M15 0v28M19 0v28M23 0v28M25 0v28M28 0v28M32 0v28M34 0v28M37 0v28M41 0v28M44 0v28M46 0v28M50 0v28M53 0v28M56 0v28'
 
-export function Barcode({ width = 58, height = 28, color = colors.text }: { width?: number; height?: number; color?: string }) {
+export function Barcode({ width = 58, height = 28, color }: { width?: number; height?: number; color?: string }) {
+  const colors = useColors()
   return (
     <Svg width={width} height={height} viewBox="0 0 58 28" preserveAspectRatio="none">
-      <Path d={BARCODE} stroke={color} strokeWidth={1.4} />
+      <Path d={BARCODE} stroke={color ?? colors.text} strokeWidth={1.4} />
     </Svg>
   )
 }
@@ -35,14 +36,16 @@ type Props = {
   style?: StyleProp<ViewStyle>
 }
 
-export function BoardingPass({ children, code, gate, codeColor = colors.gold, codeLabel = 'CODE', gateLabel = 'PORTE', accessibilityLabel, style }: Props) {
+export function BoardingPass({ children, code, gate, codeColor, codeLabel = 'CODE', gateLabel = 'PORTE', accessibilityLabel, style }: Props) {
+  const colors = useColors()
+  const styles = useStyles()
   return (
     <View accessibilityLabel={accessibilityLabel} style={[styles.card, style]}>
       <View style={styles.main}>{children}</View>
       <View style={styles.stub} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
         <View style={{ gap: 2 }}>
           <Text style={styles.label}>{codeLabel}</Text>
-          <Text style={[styles.value, { color: codeColor }]}>{code}</Text>
+          <Text style={[styles.value, { color: codeColor ?? colors.gold }]}>{code}</Text>
         </View>
         <View style={{ gap: 2 }}>
           <Text style={styles.label}>{gateLabel}</Text>
@@ -54,7 +57,7 @@ export function BoardingPass({ children, code, gate, codeColor = colors.gold, co
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   card: { flexDirection: 'row', borderRadius: 20, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
   main: { flex: 1, minWidth: 0, padding: 16, gap: 10 },
   stub: {
@@ -68,4 +71,4 @@ const styles = StyleSheet.create({
   },
   label: { fontFamily: fonts.monoBold, fontSize: 9, lineHeight: 12, letterSpacing: 1.08, color: colors.textMuted },
   value: { fontFamily: fonts.monoBold, fontSize: 20, lineHeight: 26 },
-})
+}))

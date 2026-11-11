@@ -4,10 +4,11 @@ import { useTranslation } from 'react-i18next'
 import { useFriendships } from '@shared/hooks/usePlayerProfile'
 
 import { useAccount } from '@/account/auth'
-import { colors, fonts } from '@/theme'
+import { fonts, useColors } from '@/theme'
 
 export default function TabsLayout() {
   const { t } = useTranslation()
+  const colors = useColors()
   const { account } = useAccount()
   // Friend requests waiting for an answer: a badge on the Profile tab, which leads to the friends screen.
   const requests = useFriendships(account?.uid).incoming.length

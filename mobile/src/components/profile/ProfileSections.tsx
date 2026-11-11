@@ -21,7 +21,7 @@ import { Stamp } from '@/components/flight'
 import { Button, Segmented, Text, Touchable } from '@/components/ui'
 import { getGameByType } from '@/games'
 import GameEmblem from '@/components/GameEmblem'
-import { colors, fonts, radius, space } from '@/theme'
+import { darkColors, fonts, makeStyles, radius, space, useColors, useTheme } from '@/theme'
 import { RING_WIDTH_DOUBLE, ringBorder } from './decorationStyle'
 
 export type Decoration = { frame: string; color: string }
@@ -77,7 +77,7 @@ const RING_ROOM = RING_GAP + RING_WIDTH_DOUBLE
 export function Avatar({ username, size = 44, decoration }: { username: string; size?: number; decoration?: Decoration | null }) {
   const disc = (
     <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: avatarColor(username), alignItems: 'center', justifyContent: 'center' }}>
-      <Text style={{ fontFamily: fonts.display, fontSize: size * 0.45, lineHeight: size * 0.55 }} color={colors.onAccent}>
+      <Text style={{ fontFamily: fonts.display, fontSize: size * 0.45, lineHeight: size * 0.55 }} color={darkColors.onAccent}>
         {username.charAt(0).toUpperCase()}
       </Text>
     </View>
@@ -96,6 +96,7 @@ export function Avatar({ username, size = 44, decoration }: { username: string; 
 }
 
 export function SectionTitle({ title, right }: { title: string; right?: ReactNode }) {
+  const styles = useStyles()
   return (
     <View style={styles.sectionTitle}>
       <Text variant="heading">{title}</Text>
@@ -104,10 +105,11 @@ export function SectionTitle({ title, right }: { title: string; right?: ReactNod
   )
 }
 
-export function LinkButton({ label, onPress, color = colors.accent }: { label: string; onPress: () => void; color?: string }) {
+export function LinkButton({ label, onPress, color }: { label: string; onPress: () => void; color?: string }) {
+  const colors = useColors()
   return (
     <Touchable accessibilityRole="button" onPress={onPress} style={{ paddingVertical: space.xs, paddingHorizontal: space.sm }}>
-      <Text variant="bodyStrong" color={color} style={{ fontSize: 14 }}>
+      <Text variant="bodyStrong" color={color ?? colors.accent} style={{ fontSize: 14 }}>
         {label}
       </Text>
     </Touchable>
@@ -116,6 +118,7 @@ export function LinkButton({ label, onPress, color = colors.accent }: { label: s
 
 // A passport figure: mono value over its label
 function Tile({ value, label }: { value: string; label: string }) {
+  const styles = useStyles()
   return (
     <View accessible accessibilityLabel={`${label}, ${value}`} style={styles.tile}>
       <Text style={styles.tileValue} numberOfLines={1} adjustsFontSizeToFit>
@@ -130,6 +133,7 @@ function Tile({ value, label }: { value: string; label: string }) {
 
 export function StatTiles({ stats }: { stats: ProfileStats }) {
   const { t } = useTranslation()
+  const styles = useStyles()
   return (
     <View style={styles.tiles}>
       <Tile value={String(stats.total)} label={t('profile.games')} />
@@ -142,6 +146,8 @@ export function StatTiles({ stats }: { stats: ProfileStats }) {
 
 export function StreakCard({ stats }: { stats: ProfileStats }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   // Dailies of today that the app knows
   const todayTypes = dailyTypesOn(dayKey()).filter((type: string) => getGameByType(type))
   const doneToday = todayTypes.filter((type: string) => stats.todayDaily[type]).length
@@ -190,20 +196,24 @@ export function DailyChips({
   onSelect?: (type: string) => void
 }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
+  const { gameColors } = useTheme()
   return (
     <View style={{ flexDirection: 'row', gap: space.sm }}>
       {dailyTypesOn(dayKey()).map((type: string) => {
         const game = getGameByType(type)
         const result = today[type]
         if (!game) return null
+        const gameColor = gameColors[game.id]
         const chip = (
           <View
             style={[
               styles.chip,
               { width: size, height: size, borderRadius: size / 3 },
-              result ? { backgroundColor: `${game.color}26`, borderColor: game.color } : { opacity: 0.35 },
+              result ? { backgroundColor: `${gameColor}26`, borderColor: gameColor } : { opacity: 0.35 },
             ]}>
-            <GameEmblem game={game.id} variant="glyph" size={size * 0.5} color={result ? game.color : colors.textMuted} />
+            <GameEmblem game={game.id} variant="glyph" size={size * 0.5} color={result ? gameColor : colors.textMuted} />
             {result && (
               <View style={[styles.chipBadge, { backgroundColor: result.solved === false ? colors.danger : colors.accent }]}>
                 <MaterialCommunityIcons name={result.solved === false ? 'close' : 'check'} size={9} color={colors.bg} />
@@ -225,6 +235,8 @@ export function DailyChips({
 
 export function AchievementsSection({ achievements, scope, uid }: { achievements: Achievement[]; scope: Scope; uid?: string }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const byUid: Record<string, { wins?: number } | undefined> = useBadges([uid])
   const wins = (uid ? byUid[uid]?.wins : 0) ?? 0
   const [expanded, setExpanded] = useState(false)
@@ -295,6 +307,8 @@ export function AchievementsSection({ achievements, scope, uid }: { achievements
 // One achievement in full: the cards of the grid cut long titles and descriptions short.
 function AchievementModal({ achievement, onClose }: { achievement: Achievement; onClose: () => void }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const color = TIER_COLORS[achievement.tier]
   return (
     <Modal transparent visible animationType="fade" onRequestClose={onClose}>
@@ -338,6 +352,8 @@ function AchievementModal({ achievement, onClose }: { achievement: Achievement; 
 
 export function ByGameSection({ stats, scope }: { stats: ProfileStats; scope: Scope }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const { gameColors } = useTheme()
   const entries = Object.entries(stats.byGame).sort((a, b) => b[1].played - a[1].played)
   if (entries.length === 0) return null
   const top = getGameByType(entries[0][0])
@@ -348,11 +364,12 @@ export function ByGameSection({ stats, scope }: { stats: ProfileStats; scope: Sc
         {entries.map(([type, gameStats], index) => {
           const game = getGameByType(type)
           if (!game) return null
+          const gameColor = gameColors[game.id]
           const best = describeBest(gameStats, t, type)
           return (
             <View key={type} style={[styles.listRow, index > 0 && styles.listDivider]}>
-              <View style={[styles.gameIcon, { backgroundColor: `${game.color}1F` }]}>
-                <GameEmblem game={game.id} variant="glyph" size={20} color={game.color} />
+              <View style={[styles.gameIcon, { backgroundColor: `${gameColor}1F` }]}>
+                <GameEmblem game={game.id} variant="glyph" size={20} color={gameColor} />
               </View>
               <View style={{ flex: 1 }}>
                 <Text variant="bodyStrong" numberOfLines={1}>
@@ -368,7 +385,7 @@ export function ByGameSection({ stats, scope }: { stats: ProfileStats; scope: Sc
                 </Text>
               </View>
               {best && (
-                <Text variant="bodyStrong" color={game.color} style={{ fontSize: 13 }}>
+                <Text variant="bodyStrong" color={gameColor} style={{ fontSize: 13 }}>
                   {best}
                 </Text>
               )}
@@ -386,6 +403,9 @@ type RecordsGrid = { rows: { game: string; difficulties: RecordCell[]; continent
 // Best solo score of each game by difficulty or continent: perfect ones in gold, the others with how close they are.
 export function RecordsSection({ uid, scope }: { uid: string; scope: Scope }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
+  const { gameColors } = useTheme()
   const { loading, error, grid, reload } = usePlayerRecords(uid) as { loading: boolean; error: boolean; grid: RecordsGrid | null; reload: () => void }
   const [by, setBy] = useState<'difficulties' | 'continents'>('difficulties')
   // The first load is the hook's own: only the next focuses reload
@@ -424,10 +444,11 @@ export function RecordsSection({ uid, scope }: { uid: string; scope: Scope }) {
         {grid.rows.map((row) => {
           const game = getGameByType(row.game)
           if (!game) return null
+          const gameColor = gameColors[game.id]
           return (
             <View key={row.game} style={{ gap: 4 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.xs }}>
-                <GameEmblem game={game.id} variant="glyph" size={14} color={game.color} />
+                <GameEmblem game={game.id} variant="glyph" size={14} color={gameColor} />
                 <Text variant="caption" numberOfLines={1} style={{ fontSize: 12 }}>
                   {t(game.titleKey)}
                 </Text>
@@ -456,7 +477,7 @@ export function RecordsSection({ uid, scope }: { uid: string; scope: Scope }) {
                         </View>
                         {!cell.isPerfect && (
                           <View style={[styles.track, { alignSelf: 'stretch' }]}>
-                            <View style={[styles.bar, { width: `${cell.ratio * 100}%`, backgroundColor: game.color }]} />
+                            <View style={[styles.bar, { width: `${cell.ratio * 100}%`, backgroundColor: gameColor }]} />
                           </View>
                         )}
                       </>
@@ -477,6 +498,9 @@ type EloEntry = { key: string; rating: number; played: boolean; games?: number; 
 // Elo ratings of the current season: duels, then each solo mode.
 export function EloSection({ uid, scope }: { uid: string; scope: Scope }) {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
+  const { gameColors } = useTheme()
   const { loading, error, season, entries } = usePlayerElo(uid) as { loading: boolean; error: boolean; season: string; entries: EloEntry[] }
   if (loading || error) return null
   const played = entries.filter((entry) => entry.played)
@@ -486,7 +510,7 @@ export function EloSection({ uid, scope }: { uid: string; scope: Scope }) {
       <View style={styles.list}>
         {entries.map((entry, index) => {
           const game = entry.key === 'duel' ? undefined : getGameByType(entry.key)
-          const color = game?.color ?? colors.highlight
+          const color = game ? gameColors[game.id] : colors.highlight
           let detail = t('elo.unplayed')
           if (entry.played) {
             detail = entry.key === 'duel' ? t('elo.duel_detail', { games: entry.games, wins: entry.wins }) : t('elo.found_count', { count: entry.found })
@@ -529,6 +553,8 @@ function boardDate(playedAt: number, language: string) {
 
 export function GameHistoryRow({ game, divider }: { game: HistoryGame; divider?: boolean }) {
   const { t, i18n } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const [open, setOpen] = useState(false)
   const meta = getGameByType(game.gameType)
   if (!meta) return null
@@ -574,6 +600,9 @@ export function GameHistoryRow({ game, divider }: { game: HistoryGame; divider?:
 // Everything recorded for one game of the history. A multiplayer game can reopen its room, with every player's results.
 function GameDetailModal({ game, visible, onClose }: { game: HistoryGame; visible: boolean; onClose: () => void }) {
   const { t, i18n } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
+  const { gameColors } = useTheme()
   const meta = getGameByType(game.gameType)
   if (!meta) return null
   const roomCode = game.mode === 'multi' && typeof game.roomCode === 'string' ? game.roomCode : null
@@ -583,8 +612,8 @@ function GameDetailModal({ game, visible, onClose }: { game: HistoryGame; visibl
       <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel={t('profile.details.close')}>
         <Pressable style={styles.sheet} onPress={(event) => event.stopPropagation()}>
           <View style={styles.sheetHeader}>
-            <View style={[styles.gameIcon, { backgroundColor: `${meta.color}1F` }]}>
-              <MaterialCommunityIcons name={meta.icon} size={20} color={meta.color} />
+            <View style={[styles.gameIcon, { backgroundColor: `${gameColors[meta.id]}1F` }]}>
+              <MaterialCommunityIcons name={meta.icon} size={20} color={gameColors[meta.id]} />
             </View>
             <View style={{ flex: 1 }}>
               <Text variant="heading" numberOfLines={1}>
@@ -622,6 +651,7 @@ function GameDetailModal({ game, visible, onClose }: { game: HistoryGame; visibl
 }
 
 export function HistoryList({ games }: { games: HistoryGame[] }) {
+  const styles = useStyles()
   return (
     <View style={styles.table}>
       {games.map((game, index) => (
@@ -648,6 +678,7 @@ export function ProfileBody({
   onSeeHistory: () => void
 }) {
   const { t } = useTranslation()
+  const colors = useColors()
   const profile = usePlayerProfile(uid, { friendsCount, own })
   const { reload } = profile
   useFocusEffect(useCallback(() => reload(), [reload]))
@@ -721,7 +752,7 @@ export function ProfileView({
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   sectionTitle: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   card: { gap: space.lg, padding: space.lg, borderRadius: radius.xl, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   tiles: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
@@ -770,7 +801,7 @@ const styles = StyleSheet.create({
   rowScore: { fontFamily: fonts.monoBold, fontSize: 12, textAlign: 'right' },
   rowStamp: { alignSelf: 'flex-end', paddingVertical: 2, paddingHorizontal: 6, borderWidth: 1.5, borderRadius: 6 },
   listDivider: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },
-  backdrop: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, backgroundColor: 'rgba(0, 0, 0, 0.6)' },
+  backdrop: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, backgroundColor: colors.scrim },
   sheet: {
     width: '100%',
     maxWidth: 420,
@@ -794,4 +825,4 @@ const styles = StyleSheet.create({
   },
   detailValue: { flexShrink: 1, textAlign: 'right', fontSize: 14 },
   gameIcon: { width: 38, height: 38, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },
-})
+}))

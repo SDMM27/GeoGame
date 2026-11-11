@@ -1697,6 +1697,11 @@
     "hint_drag": "↔ Drag to spin the globe",
     "hint_center": "Center the city in the crosshair",
     "label": "Interactive globe: spin it (mouse, finger or arrow keys) to find {{city}}",
+    "offer_daily": "Daily challenge not done yet",
+    "offer_game": "Not played yet today",
+    "all_done": "All of today’s flights have taken off",
+    "all_done_hint": "Come back tomorrow for new challenges",
+    "close": "Close",
     "city": {
       "tokyo": "Tokyo",
       "rio": "Rio de Janeiro",

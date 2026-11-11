@@ -1,7 +1,7 @@
 // Leaderboard of one daily challenge (fewest attempts, then fastest).
 import { router } from 'expo-router'
 import { useTranslation } from 'react-i18next'
-import { ActivityIndicator, StyleSheet, View } from 'react-native'
+import { ActivityIndicator, View } from 'react-native'
 
 import { formatTime } from '@shared/utils/formatTime'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
@@ -10,7 +10,7 @@ import { fetchDailyScores } from '@shared/utils/saveScore'
 import { useAccount } from '@/account/auth'
 import { useLeaderboard } from '@/hooks/useLeaderboard'
 import { loadErrorKey } from '@/leaderboards'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 import { Text } from '../ui'
 import { DecoratedName } from '../leaderboards/DecoratedName'
 import { ReportFlag } from '../leaderboards/ReportFlag'
@@ -39,6 +39,8 @@ export function DailyLeaderboard({
   formatSecondary?: (elapsedTime: number | null | undefined) => string
 }) {
   const { t } = useTranslation()
+  const colors = useColors()
+  const styles = useStyles()
   const { account } = useAccount()
   const { scores, error } = useLeaderboard<DailyScore>(`${gameType}|${dailyKey}`, () => fetchDailyScores(gameType, dailyKey), refreshKey, onSettled)
 
@@ -112,7 +114,7 @@ export function DailyLeaderboard({
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   card: { gap: space.sm, padding: space.lg, borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   row: { paddingVertical: 6, paddingHorizontal: space.sm, borderRadius: radius.sm },
   rowTop: { backgroundColor: colors.surfaceHigh },
@@ -120,4 +122,4 @@ const styles = StyleSheet.create({
   rank: { width: 28, textAlign: 'center' },
   value: { minWidth: 28, textAlign: 'right', fontVariant: ['tabular-nums'] },
   time: { minWidth: 64, textAlign: 'right', fontVariant: ['tabular-nums'] },
-})
+}))

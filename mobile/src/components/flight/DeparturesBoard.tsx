@@ -10,16 +10,15 @@
 //   accessibilityLabel  default « name, status »
 //   last     hides the bottom divider
 import type { ReactNode } from 'react'
-import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native'
+import { Pressable, Text, View, type StyleProp, type ViewStyle } from 'react-native'
 
 import GameEmblem from '@/components/GameEmblem'
-import { colors, fonts } from '@/theme'
+import { fonts, makeStyles, useColors } from '@/theme'
 
 export type DepartureTone = 'done' | 'boarding' | 'ontime'
 
-const TONE_COLORS: Record<DepartureTone, string> = { done: colors.textMuted, boarding: colors.accent, ontime: colors.text }
-
 export function DeparturesBoard({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
+  const styles = useStyles()
   return <View style={[styles.board, style]}>{children}</View>
 }
 
@@ -36,6 +35,9 @@ type RowProps = {
 }
 
 export function DepartureRow({ game, code, name, status, statusTone = 'ontime', statusColor, onPress, accessibilityLabel, last }: RowProps) {
+  const colors = useColors()
+  const styles = useStyles()
+  const toneColors: Record<DepartureTone, string> = { done: colors.textMuted, boarding: colors.accent, ontime: colors.text }
   return (
     <Pressable
       accessibilityRole={onPress ? 'button' : undefined}
@@ -48,16 +50,16 @@ export function DepartureRow({ game, code, name, status, statusTone = 'ontime', 
       <Text style={styles.name} numberOfLines={1}>
         {name}
       </Text>
-      <Text style={[styles.status, { color: statusColor ?? TONE_COLORS[statusTone] }]}>{status}</Text>
+      <Text style={[styles.status, { color: statusColor ?? toneColors[statusTone] }]}>{status}</Text>
     </Pressable>
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   board: { borderRadius: 16, backgroundColor: colors.board, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
   row: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 52, paddingHorizontal: 12 },
   divider: { borderBottomWidth: 1, borderBottomColor: colors.boardLine },
   code: { width: 34, fontFamily: fonts.monoBold, fontSize: 13, color: colors.gold },
   name: { flex: 1, minWidth: 0, fontFamily: fonts.monoBold, fontSize: 12, color: colors.text },
   status: { fontFamily: fonts.monoBold, fontSize: 10, letterSpacing: 0.8 },
-})
+}))

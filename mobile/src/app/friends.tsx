@@ -3,7 +3,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, View } from 'react-native'
+import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { usePlayerSearch, useRecentPlayers } from '@shared/hooks/usePlayerSearch'
@@ -23,7 +23,7 @@ import { ScreenHeader } from '@/components/ScreenHeader'
 import { Button, Text, Touchable } from '@/components/ui'
 import { getGameByType } from '@/games'
 import { SITE_ORIGIN } from '@/links'
-import { colors, fonts, radius, space } from '@/theme'
+import { fonts, makeStyles, radius, space, useColors } from '@/theme'
 
 type Friendship = { id: string; uid: string; username: string; status: 'friend' | 'incoming' | 'outgoing' }
 
@@ -35,6 +35,7 @@ type Presence = { status: 'playing' | 'online' | 'offline'; room: string | null;
 // Online (green dot) or in game, as seen by the friends list (see @shared/utils/presence).
 function FriendStatus({ presence }: { presence?: Presence }) {
   const { t } = useTranslation()
+  const styles = useStyles()
   if (presence?.status !== 'playing' && presence?.status !== 'online') return null
   const game = presence.status === 'playing' && presence.game ? getGameByType(presence.game) : undefined
   const label =
@@ -55,6 +56,8 @@ function FriendStatus({ presence }: { presence?: Presence }) {
 
 export default function FriendsScreen() {
   const { t } = useTranslation()
+  const styles = useStyles()
+  const colors = useColors()
   const insets = useSafeAreaInsets()
   const { account } = useAccount()
   const friendships = useFriendships(account?.uid)
@@ -292,7 +295,7 @@ export default function FriendsScreen() {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   card: { gap: space.md, padding: space.lg, borderRadius: radius.xl, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   input: {
     flex: 1,
@@ -316,4 +319,4 @@ const styles = StyleSheet.create({
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.accent },
   smallButton: { minHeight: 44, paddingHorizontal: space.md },
   iconButton: { width: 44, height: 44, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surfaceHigh },
-})
+}))

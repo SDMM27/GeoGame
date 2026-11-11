@@ -25,7 +25,7 @@ import { flagsAfter, haptic, rarityColor, rarityOf, rewardLines, type Claim } fr
 import { FlagPiece } from '@/components/collection/FlagPiece'
 import { Text } from '@/components/ui'
 import { toast } from '@/shims/react-toastify'
-import { colors, radius, space } from '@/theme'
+import { makeStyles, radius, space, useColors } from '@/theme'
 
 type Card = { id: number; iso: string; pieces: number; added: number; fragments: number; lines: string[] }
 
@@ -34,6 +34,7 @@ const H = 40
 const DURATION = 3200
 
 export function FragmentToast() {
+  const styles = useStyles()
   const { t } = useTranslation()
   const { account } = useAccount()
   const uid = account?.uid
@@ -82,6 +83,7 @@ export function FragmentToast() {
 
 // The flag in W x H: owned pieces visible, new ones popping in, the others covered.
 function MiniFlag({ card }: { card: Card }) {
+  const styles = useStyles()
   const rarity = rarityOf(card.iso)
   const cost = piecesFor(rarity)
   const { cols, rows } = pieceGrid(cost)
@@ -121,6 +123,8 @@ function PopPiece({ iso, index, cols, rows, delay, color }: { iso: string; index
 }
 
 function FragmentText({ card }: { card: Card }) {
+  const colors = useColors()
+  const styles = useStyles()
   const { t } = useTranslation()
   const rarity = rarityOf(card.iso)
   const cost = piecesFor(rarity)
@@ -147,7 +151,7 @@ function FragmentText({ card }: { card: Card }) {
   )
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   host: { position: 'absolute', left: space.lg, right: space.lg, alignItems: 'center', zIndex: 101 },
   card: {
     flexDirection: 'row',
@@ -165,4 +169,4 @@ const styles = StyleSheet.create({
   texts: { gap: 3, minWidth: 120, flexShrink: 1 },
   track: { height: 4, borderRadius: 2, backgroundColor: colors.border, overflow: 'hidden', marginTop: 2 },
   fill: { height: 4, borderRadius: 2 },
-})
+}))

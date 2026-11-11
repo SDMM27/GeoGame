@@ -4,7 +4,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { Image } from 'expo-image'
 import { memo, useCallback, useEffect, useEffectEvent, useRef, type Ref } from 'react'
 import { useTranslation } from 'react-i18next'
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, View } from 'react-native'
+import { KeyboardAvoidingView, Platform, ScrollView, TextInput, View } from 'react-native'
 import Animated, { FadeIn, FadeInDown, ZoomIn } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -20,11 +20,11 @@ import { Kicker, ScreenTitle } from '@/components/flight'
 import { Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
 import { useKeyboardVisible, useVisibleHeight } from '@/hooks/useKeyboardVisible'
-import { DIFFICULTY_COLORS, getGame } from '@/games'
+import { getGame, useDifficultyColors } from '@/games'
 import { clean } from '@/i18n'
 import { RoomHudPill, Standings, useReportFound, type RoomPlay } from '@/multiplayer/RoomPlay'
 import { navigate } from '@/shims/react-router-dom'
-import { colors, fonts, radius, space } from '@/theme'
+import { fonts, makeStyles, radius, space, useColors } from '@/theme'
 
 type GameState = any
 type Feature = { properties: Record<string, any> }
@@ -79,6 +79,9 @@ export function TypingGame({
   ascension: { presetName: string | null } | null
   play?: RoomPlay
 }) {
+  const colors = useColors()
+  const styles = useStyles()
+  const difficultyColors = useDifficultyColors()
   const { t, i18n } = useTranslation()
   const insets = useSafeAreaInsets()
   const inputRef = useRef<TextInput>(null)
@@ -147,7 +150,7 @@ export function TypingGame({
   const flag = getFlag(targetCountryISO)
   const progress = stats.total ? (stats.found + stats.skipped) / stats.total : 0
   const remaining = stats.total - stats.found - stats.skipped
-  const phaseColor = currentPhase ? DIFFICULTY_COLORS[currentPhase] : null
+  const phaseColor = currentPhase ? difficultyColors[currentPhase] : null
   const locked = !!revealedName || isGameOver
   // While typing, everything must fit between the top bar and the keyboard: tighter spacing,
   // and the flag takes whatever height is left.
@@ -357,6 +360,8 @@ const AnswerInput = memo(function AnswerInput({
   onSubmit: () => void
   placeholder: string
 }) {
+  const colors = useColors()
+  const styles = useStyles()
   return (
     <TextInput
       ref={ref}
@@ -376,7 +381,7 @@ const AnswerInput = memo(function AnswerInput({
   )
 })
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   content: { paddingHorizontal: space.xl, paddingBottom: space.xl, gap: space.xl },
   row: { flexDirection: 'row', justifyContent: 'space-between' },
   flagCard: {
@@ -439,4 +444,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-})
+}))

@@ -6,8 +6,8 @@ import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAccount } from '../auth'
 import { useFriendships } from '../hooks/usePlayerProfile'
-import { LANGUAGES, toLanguage } from '../i18n/languages'
 import { isGamePath } from '../utils/gamePaths'
+import LanguageMenu from './LanguageMenu'
 import { LeaderboardIcon, MultiIcon, PlayIcon, ProfileIcon } from './NavIcons'
 import ThemeToggle from './theme/ThemeToggle'
 import './NavBar.css'
@@ -20,10 +20,9 @@ const TABS = [
 ]
 
 export default function NavBar() {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const { account } = useAccount()
   const { pathname } = useLocation()
-  const current = toLanguage(i18n.resolvedLanguage ?? i18n.language)
   const inGame = isGamePath(pathname)
   // Pending friend requests show on the Profile tab, so they are seen from any page
   const { incoming } = useFriendships(account?.uid ?? null)
@@ -50,25 +49,7 @@ export default function NavBar() {
           </NavLink>
         ))}
       </nav>
-      <label className="navbar-lang" title={t('nav.language')}>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="10" />
-          <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-        </svg>
-        <span aria-hidden="true">{current.toUpperCase()}</span>
-        <select
-          className="navbar-lang-select"
-          value={current}
-          onChange={(event) => i18n.changeLanguage(event.target.value)}
-          aria-label={t('nav.language')}
-        >
-          {LANGUAGES.map(({ code, label }) => (
-            <option key={code} value={code} lang={code}>
-              {label}
-            </option>
-          ))}
-        </select>
-      </label>
+      <LanguageMenu />
       <ThemeToggle />
     </header>
   )

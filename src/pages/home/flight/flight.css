@@ -132,9 +132,12 @@
 /* ---------- Boarding passes ---------- */
 .boarding-passes {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  /* 6 passes: 1, 2 or 3 columns, never 4 or 5, so every row is full (3 + 3 on a wide screen) */
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
 }
+@media (min-width: 760px) { .boarding-passes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1100px) { .boarding-passes { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
 .boarding-pass {
   --notch: 18px;

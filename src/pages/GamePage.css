@@ -417,7 +417,7 @@
     transform: none;
     flex-direction: row;
     align-items: stretch;
-    width: min(1320px, calc(100% - 48px));
+    width: min(var(--gg-page-max), calc(100% - 48px));
     min-width: 0;
     margin: 16px auto 0;
   }

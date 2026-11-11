@@ -61,7 +61,7 @@
   }
 }
 
-/* Wide screens (validated mockup): the table on the left, my place, last week and the rewards on the right of the 1320px column */
+/* Wide screens (validated mockup): the table on the left, my place, last week and the rewards on the right of the content column */
 @media (min-width: 1000px) {
   .account-main--wide.league-main {
     display: grid;
@@ -70,7 +70,7 @@
     row-gap: 16px;
     align-items: start;
     align-content: start;
-    max-width: 1320px;
+    max-width: var(--gg-page-max);
     padding: 2rem 24px 3rem;
   }
   .league-main > .league-header { grid-column: 1 / -1; grid-row: 1; }

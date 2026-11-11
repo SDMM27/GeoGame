@@ -99,7 +99,7 @@
 
 .account-main--wide { max-width: 760px; display: flex; flex-direction: column; gap: 1.75rem; }
 .account-main--wide.profile-main { max-width: 760px; }
-@media (min-width: 960px) { .account-main--wide.profile-main { max-width: 1320px; padding-inline: 24px; } }
+@media (min-width: 960px) { .account-main--wide.profile-main { max-width: var(--gg-page-max); padding-inline: 24px; } }
 .account-pitch { color: var(--sd-muted); text-align: center; margin: -0.75rem 0 1.5rem; }
 .account-section-title { font-size: 1.2rem; font-weight: 700; margin: 0 0 0.25rem; }
 
@@ -128,7 +128,7 @@
 .account-tab { min-height: 44px; }
 .account-link { min-height: 44px; }
 
-/* Signed out, on a wide screen: the pitch on the left and the form card on the 1320px column's right, as in the mockup */
+/* Signed out, on a wide screen: the pitch on the left and the form card on the content column's right, as in the mockup */
 @media (min-width: 900px) {
   .account-main--auth {
     display: grid;
@@ -136,7 +136,7 @@
     column-gap: 64px;
     grid-template-rows: auto auto auto 1fr;
     align-items: start;
-    max-width: 1320px;
+    max-width: var(--gg-page-max);
     padding: 3rem 24px;
   }
   .account-main--auth > .gg-kicker,
@@ -147,8 +147,8 @@
   .account-main--auth > .account-card { grid-column: 2; grid-row: 1 / span 4; }
 }
 
-/* Scrolls: title on the 1320px column's left edge, the collection beneath it at a readable width */
-.account-main--wide.scrolls-main { max-width: 1320px; padding-inline: 24px; }
+/* Scrolls: title on the content column's left edge, the collection beneath it at a readable width */
+.account-main--wide.scrolls-main { max-width: var(--gg-page-max); padding-inline: 24px; }
 .scrolls-main .account-title { text-align: left; margin-bottom: 0.5rem; }
 .scrolls-main .account-pitch { text-align: left; margin: 0; color: var(--sd-accent-strong); font-family: var(--sd-font-mono); font-weight: 700; }
 .scrolls-main > :not(.gg-kicker):not(.account-title) { max-width: 860px; }

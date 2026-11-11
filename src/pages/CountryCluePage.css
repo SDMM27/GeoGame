@@ -8,7 +8,7 @@
 }
 
 .country-clue-main {
-  max-width: 1320px;
+  max-width: var(--gg-page-max);
   margin: 0 auto;
   padding: 32px 20px 48px;
 }

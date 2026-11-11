@@ -73,7 +73,15 @@ export default function LeaguePage() {
   const tab = chosen ?? (friendships.friends.length > 0 ? 'friends' : 'world')
   const shown = tab === 'friends' ? league.friendsBoard : league.world
   const badges = useBadges(shown.map((player) => player.uid))
-  const players = shown.map((player) => ({ uid: player.uid, name: player.name, rank: player.rank, detail: `${player.points} ${t('units.pts')}`, badges: badges[player.uid] }))
+  const players = shown.map((player) => ({
+    uid: player.uid,
+    name: player.name,
+    rank: player.rank,
+    detail: `${player.points} ${t('units.pts')}`,
+    badges: badges[player.uid],
+    // What the rank pays at the end of the week (the world board only: friends compete for pride)
+    reward: tab === 'world' ? LEAGUE_REWARDS[player.rank] : undefined,
+  }))
 
   return (
     <div className="account-page">

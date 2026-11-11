@@ -1,8 +1,9 @@
-// Play tab: the daily and weekly missions of the signed-in player (paying XP, see @shared/utils/missions), the dailies
-// of the day with their fragments and the streak, or an invitation to sign in for a visitor.
+// Play tab: the signed-in player's level, the dailies played and the streak on one line, and the daily and weekly
+// missions (paying XP, see @shared/utils/missions) in a tab each, or an invitation to sign in for a visitor.
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { router } from 'expo-router'
 import type { TFunction } from 'i18next'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 
@@ -11,19 +12,18 @@ import {
   DAILY_BONUS_XP,
   DAILY_MISSION_XP,
   DAILY_MISSIONS,
-  GAME_XP,
-  GAMES_PER_DAY,
   WEEKLY_BONUS_XP,
   WEEKLY_MISSIONS,
   WEEKLY_TIERS,
+  missionResetsIn,
 } from '@shared/utils/missions'
+import { serverNow } from '@shared/utils/serverTime'
 
 import { DAILY_BONUS_FRAGMENTS, DAILY_MISSION_FRAGMENTS, WEEKLY_BONUS_FRAGMENTS } from '@shared/utils/flagCollection'
 
-import { Kicker, ScreenTitle, Stamp } from '@/components/flight'
-import { CollapsibleSection } from '@/components/CollapsibleSection'
-import { XpBar, type Xp } from '@/components/profile/XpBar'
-import { Text, Touchable } from '@/components/ui'
+import { ScreenTitle } from '@/components/flight'
+import type { Xp } from '@/components/profile/XpBar'
+import { Pill, Text, Touchable } from '@/components/ui'
 import { makeStyles, radius, space, useColors } from '@/theme'
 
 type Entry = {
@@ -34,14 +34,18 @@ type Entry = {
 }
 
 type Reward = { xp: number; fragments: number }
-type Dailies = { total: number; played: number; won: number; tiers: { id: string; fragments: number; done: boolean; paid: boolean }[] }
-type Streak = { count: number; next: { count: number; fragments: number } }
+type Dailies = { total: number; played: number }
+type Streak = { count: number }
+type TabId = 'daily' | 'weekly'
+
+const HOUR_MS = 60 * 60 * 1000
+const DAY_MS = 24 * HOUR_MS
 
 const DAILY_REWARD: Reward = { xp: DAILY_MISSION_XP, fragments: DAILY_MISSION_FRAGMENTS }
 
-// "+60 XP" and, when there are some, "· +2 fragments".
+// "+60 XP" and, when there are some, "+150 XP · 1 ◆".
 const rewardText = (t: TFunction, { xp, fragments }: Reward) =>
-  fragments > 0 ? `${t('missions.reward', { xp })} · ${t('missions.fragments', { count: fragments })}` : t('missions.reward', { xp })
+  fragments > 0 ? `${t('missions.reward', { xp })} · ${fragments} ◆` : t('missions.reward', { xp })
 
 function MissionRow({ entry, reward }: { entry: Entry; reward: Reward }) {
   const { t } = useTranslation()
@@ -61,17 +65,9 @@ function MissionRow({ entry, reward }: { entry: Entry; reward: Reward }) {
           <Text variant="bodyStrong" style={styles.missionTitle}>
             {title}
           </Text>
-          <View style={styles.missionMeta}>
-            {mission.tier ? (
-              <Text variant="caption" color={colors.textMuted} style={styles.missionTier}>
-                {t(`missions.tier_${mission.tier}`)}
-              </Text>
-            ) : null}
-            {done ? <Stamp label={t('mobile.flight.visa_ok').toLocaleUpperCase()} rotate={-4} animate={false} size={8} style={styles.visa} /> : null}
-            <Text variant="caption" color={done ? colors.accent : colors.textMuted} style={styles.missionReward}>
-              {rewardText(t, reward)}
-            </Text>
-          </View>
+          <Text variant="caption" numberOfLines={1} color={done ? colors.accent : colors.textMuted} style={styles.missionReward}>
+            {rewardText(t, reward)}
+          </Text>
         </View>
         <View style={styles.progress}>
           <View style={styles.track}>
@@ -86,45 +82,23 @@ function MissionRow({ entry, reward }: { entry: Entry; reward: Reward }) {
   )
 }
 
-// Today's dailies (played, won, the 3 tiers of fragments) and the streak with its next milestone.
-function DailiesRow({ dailies, streak }: { dailies: Dailies; streak: Streak | null }) {
+// Today's dailies played and the streak, on one line.
+function SummaryLine({ dailies, streak }: { dailies: Dailies | null; streak: Streak | null }) {
   const { t } = useTranslation()
   const styles = useStyles()
   const colors = useColors()
   return (
-    <View style={styles.dailies}>
-      <View style={styles.dailiesLine}>
+    <View style={styles.summary}>
+      {dailies ? (
         <Text variant="bodyStrong" style={{ fontSize: 14 }}>
-          {t('missions.dailies_title')}
+          {t('missions.dailies_short', { played: dailies.played, total: dailies.total })}
         </Text>
-        <Text variant="caption" style={{ fontSize: 12 }}>
-          {t('missions.dailies_played', { played: dailies.played, total: dailies.total })} · {t('missions.dailies_won', { won: dailies.won, total: dailies.total })}
-        </Text>
-      </View>
-      <View style={styles.tiers}>
-        {dailies.tiers.map((tier) => {
-          const finished = tier.done || tier.paid
-          return (
-            <View key={tier.id} style={[styles.tier, finished && { borderColor: colors.accent }]}>
-              <MaterialCommunityIcons name={finished ? 'check' : 'flag-variant-outline'} size={14} color={finished ? colors.accent : colors.textMuted} />
-              <Text variant="caption" color={finished ? colors.accent : colors.textMuted} style={{ fontSize: 12 }}>
-                {t(`missions.${tier.id}`)} · {t('missions.fragments', { count: tier.fragments })}
-              </Text>
-            </View>
-          )
-        })}
-      </View>
+      ) : null}
       {streak ? (
-        <View style={styles.dailiesLine}>
+        <View style={styles.streak}>
           <MaterialCommunityIcons name="fire" size={16} color={streak.count > 0 ? colors.warning : colors.textMuted} />
           <Text variant="bodyStrong" style={{ fontSize: 14 }}>
-            {t('missions.streak_title')}
-          </Text>
-          <Text variant="caption" style={{ fontSize: 12 }}>
-            {streak.count > 0 ? t('missions.streak_days', { count: streak.count }) : t('missions.streak_none')}
-          </Text>
-          <Text variant="caption" style={{ fontSize: 12 }}>
-            {t('missions.streak_next', { day: streak.next.count })} · {t('missions.fragments', { count: streak.next.fragments })}
+            {t('missions.streak_short', { count: streak.count })}
           </Text>
         </View>
       ) : null}
@@ -136,13 +110,14 @@ function Bonus({ count, reward, paid }: { count: number; reward: Reward; paid: b
   const { t } = useTranslation()
   const styles = useStyles()
   const colors = useColors()
+  const color = paid ? colors.accent : colors.textMuted
   return (
-    <View style={[styles.bonus, paid && { borderColor: colors.accent }]}>
-      <MaterialCommunityIcons name={paid ? 'check-circle' : 'gift-outline'} size={18} color={paid ? colors.accent : colors.warning} />
-      <Text variant="caption" style={{ flex: 1 }}>
+    <View style={styles.bonus}>
+      {paid ? <MaterialCommunityIcons name="check" size={16} color={color} /> : null}
+      <Text variant="caption" color={color} style={{ flex: 1 }}>
         {t('missions.bonus', { count })}
       </Text>
-      <Text variant="caption" color={paid ? colors.accent : colors.warning} style={{ fontSize: 12 }}>
+      <Text variant="caption" color={color} style={{ fontSize: 12 }}>
         {rewardText(t, reward)}
       </Text>
     </View>
@@ -156,6 +131,7 @@ export function MissionsCard({ uid, missions }: { uid: string | null | undefined
   const { t } = useTranslation()
   const styles = useStyles()
   const colors = useColors()
+  const [selected, setSelected] = useState<TabId>('daily')
 
   if (!uid) {
     return (
@@ -172,45 +148,59 @@ export function MissionsCard({ uid, missions }: { uid: string | null | undefined
 
   const daily = missions.daily as Entry[]
   const weekly = missions.weekly as Entry[]
+  const dailies = missions.dailies as Dailies | null
+  const streak = missions.streak as Streak | null
+  const resets = missionResetsIn(serverNow())
+  const hoursLeft = (ms: number) => t('missions.resets_hours', { count: Math.max(1, Math.ceil(ms / HOUR_MS)) })
+  const tabs: { id: TabId; label: string; entries: Entry[]; left: string }[] = [
+    { id: 'daily', label: t('missions.tab_today'), entries: daily, left: hoursLeft(resets.daily) },
+    {
+      id: 'weekly',
+      label: t('missions.tab_week'),
+      entries: weekly,
+      left: resets.weekly >= DAY_MS ? t('missions.resets_days', { count: Math.max(1, Math.round(resets.weekly / DAY_MS)) }) : hoursLeft(resets.weekly),
+    },
+  ]
+  const entries = selected === 'daily' ? daily : weekly
 
   return (
     <View style={styles.card}>
-      <ScreenTitle size={20}>{t('missions.title')}</ScreenTitle>
-      {missions.xp && <XpBar xp={missions.xp as Xp} />}
-      {missions.dailies ? <DailiesRow dailies={missions.dailies as Dailies} streak={missions.streak as Streak | null} /> : null}
-      {daily.length > 0 && (
-        // Open while a daily mission is left; the player's own choice wins
-        <CollapsibleSection
-          id="home.missions"
-          title={t('missions.details')}
-          summary={t('missions.summary', { daily: doneCount(daily), dailyTotal: daily.length, weekly: doneCount(weekly), weeklyTotal: weekly.length })}
-          defaultOpen={daily.some((entry) => !entry.done)}>
-          <View style={{ gap: space.lg }}>
-            <View style={styles.group}>
-              <Kicker>{t('missions.daily')}</Kicker>
-              {daily.map((entry) => (
-                <MissionRow key={entry.mission.id} entry={entry} reward={DAILY_REWARD} />
-              ))}
-              <Bonus count={DAILY_MISSIONS} reward={{ xp: DAILY_BONUS_XP, fragments: DAILY_BONUS_FRAGMENTS }} paid={Boolean(missions.dailyBonus)} />
-              <Text variant="caption" style={{ fontSize: 12 }}>
-                {t('missions.per_game', { xp: GAME_XP, count: GAMES_PER_DAY })}
+      <View style={styles.head}>
+        <ScreenTitle size={20}>{t('missions.title')}</ScreenTitle>
+        {missions.xp && <Pill label={t('level.label', { level: (missions.xp as Xp).level })} color={colors.onAccent} background={colors.accent} />}
+      </View>
+      {dailies || streak ? <SummaryLine dailies={dailies} streak={streak} /> : null}
+      <View style={styles.tabs} accessibilityRole="tablist">
+        {tabs.map((tab) => {
+          const active = selected === tab.id
+          return (
+            <Touchable
+              key={tab.id}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: active }}
+              onPress={() => setSelected(tab.id)}
+              style={[styles.tab, active && { borderColor: colors.accent }]}>
+              <Text variant="bodyStrong" color={active ? colors.accent : undefined} style={{ fontSize: 14 }}>
+                {`${tab.label} ${doneCount(tab.entries)}/${tab.entries.length}`}
               </Text>
-              <Text variant="caption" style={{ fontSize: 12 }}>
-                {t('missions.resets_daily')}
+              <Text variant="caption" style={{ fontSize: 11 }}>
+                {tab.left}
               </Text>
-            </View>
-            <View style={styles.group}>
-              <Kicker>{t('missions.weekly')}</Kicker>
-              {weekly.map((entry) => (
-                <MissionRow key={entry.mission.id} entry={entry} reward={WEEKLY_TIERS[entry.mission.tier ?? 'easy']} />
-              ))}
-              <Bonus count={WEEKLY_MISSIONS} reward={{ xp: WEEKLY_BONUS_XP, fragments: WEEKLY_BONUS_FRAGMENTS }} paid={Boolean(missions.weeklyBonus)} />
-              <Text variant="caption" style={{ fontSize: 12 }}>
-                {t('missions.resets_weekly')}
-              </Text>
-            </View>
-          </View>
-        </CollapsibleSection>
+            </Touchable>
+          )
+        })}
+      </View>
+      {entries.length > 0 && (
+        <View style={styles.group}>
+          {entries.map((entry) => (
+            <MissionRow key={entry.mission.id} entry={entry} reward={selected === 'daily' ? DAILY_REWARD : WEEKLY_TIERS[entry.mission.tier ?? 'easy']} />
+          ))}
+          {selected === 'daily' ? (
+            <Bonus count={DAILY_MISSIONS} reward={{ xp: DAILY_BONUS_XP, fragments: DAILY_BONUS_FRAGMENTS }} paid={Boolean(missions.dailyBonus)} />
+          ) : (
+            <Bonus count={WEEKLY_MISSIONS} reward={{ xp: WEEKLY_BONUS_XP, fragments: WEEKLY_BONUS_FRAGMENTS }} paid={Boolean(missions.weeklyBonus)} />
+          )}
+        </View>
       )}
     </View>
   )
@@ -226,47 +216,31 @@ const useStyles = makeStyles((colors) => ({
     padding: space.lg,
   },
   invite: { flexDirection: 'row', alignItems: 'center', gap: space.md },
+  head: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.sm },
   group: { gap: space.sm },
-  dailies: {
-    gap: space.sm,
-    padding: space.sm,
+  summary: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', columnGap: space.lg, rowGap: 2 },
+  streak: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  tabs: { flexDirection: 'row', gap: space.sm },
+  tab: {
+    flex: 1,
+    minHeight: 44,
+    justifyContent: 'center',
+    gap: 2,
+    paddingHorizontal: space.md,
+    paddingVertical: space.sm,
     borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.bg,
-  },
-  dailiesLine: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', columnGap: space.sm, rowGap: 2 },
-  tiers: { flexDirection: 'row', flexWrap: 'wrap', gap: space.xs },
-  tier: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: space.sm,
-    paddingVertical: 3,
-    borderRadius: radius.pill,
     borderWidth: 1,
     borderColor: colors.border,
   },
   mission: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   missionIcon: { width: 36, height: 36, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
-  missionTop: { gap: 2 },
+  missionTop: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   missionTitle: { fontSize: 14, lineHeight: 19, flexShrink: 1 },
-  missionMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.sm },
-  missionTier: { fontSize: 11, textTransform: 'uppercase' },
-  missionReward: { fontSize: 12, marginLeft: 'auto' },
+  // The reward never wraps: the title gives way
+  missionReward: { fontSize: 12, marginLeft: 'auto', flexShrink: 0 },
   progress: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   count: { fontSize: 12, fontVariant: ['tabular-nums'] },
-  visa: { paddingVertical: 1, paddingHorizontal: 5, borderWidth: 1.5, borderRadius: 5 },
   track: { flex: 1, height: 6, borderRadius: radius.pill, backgroundColor: colors.stub, overflow: 'hidden' },
   fill: { height: '100%', borderRadius: radius.pill },
-  bonus: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space.sm,
-    padding: space.sm,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.bg,
-  },
+  bonus: { flexDirection: 'row', alignItems: 'center', gap: space.sm, paddingHorizontal: space.xs },
 }))

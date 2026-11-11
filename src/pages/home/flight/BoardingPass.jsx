@@ -1,4 +1,4 @@
-// A daily challenge as a boarding pass: flight number and gate, « Board » (the daily), ∞ (infinite mode) and the
+// A daily challenge as a boarding pass: today's status, « Board » (the daily), ∞ (infinite mode) and the
 // multiplayer button, and a tear-off stub (gate, departure at midnight, barcode) that tilts on hover.
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -13,7 +13,6 @@ const GATES = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'D1', 'D2']
 export default function BoardingPass({ game, index, status = null }) {
   const navigate = useNavigate()
   const { t } = useTranslation()
-  const flight = `GG-${String(index + 1).padStart(2, '0')}`
   const gate = GATES[index % GATES.length]
   const done = status && status !== 'todo'
   return (
@@ -22,17 +21,14 @@ export default function BoardingPass({ game, index, status = null }) {
       style={{ '--game': gameColor(game.id), '--game-ink': gameColor(`${game.id}-ink`), '--i': index }}
     >
       <div className="boarding-pass-main">
-        <div className="boarding-pass-top">
-          <span className="gg-mono boarding-pass-code">
-            {t('home.boarding_pass')} · {flight}
-          </span>
-          {status && (
+        {status && (
+          <div className="boarding-pass-top">
             <span className={`boarding-pass-status boarding-pass-status--${status}`}>
               {done && <span aria-hidden="true">✓ </span>}
               {t(`home.daily_status_${status}`)}
             </span>
-          )}
-        </div>
+          </div>
+        )}
         <h3 className="boarding-pass-title">
           <GameEmblem game={game.id} size={36} />
           {t(game.titleKey)}

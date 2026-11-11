@@ -185,13 +185,8 @@
 .boarding-pass-top {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 8px;
-}
-
-.boarding-pass-code {
-  font-size: 0.62rem;
-  color: var(--sd-muted);
 }
 
 .boarding-pass-status {

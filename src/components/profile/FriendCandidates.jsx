@@ -35,9 +35,11 @@ function CandidateButton({ account, friendships, uid, onMessage }) {
   )
 }
 
-// `players`: [{ uid, name, badges?, rank?, detail? }] (a rank and a detail such as "12 pts" for a leaderboard). Nothing is shown for an empty list. Without an `account` (a visitor) there
+// `players`: [{ uid, name, badges?, rank?, detail?, reward? }] (a rank and a detail such as "12 pts" for a leaderboard; `reward`:
+// the flag fragments the rank pays, league). Nothing is shown for an empty list. Without an `account` (a visitor) there
 // are no buttons, only the list.
 export default function FriendCandidates({ players, account, friendships, onMessage }) {
+  const { t } = useTranslation()
   if (players.length === 0) return null
   return (
     <ul className="profile-list">
@@ -49,6 +51,15 @@ export default function FriendCandidates({ players, account, friendships, onMess
             <span>{player.name}</span>
           </Link>
           {player.badges && <BadgeStrip badges={player.badges} />}
+          {player.reward > 0 && (
+            <span
+              className={`friends-reward${player.rank <= 3 ? ' friends-reward--podium' : ''}`}
+              title={t('league.win_reward', { count: player.reward })}
+              aria-label={t('league.win_reward', { count: player.reward })}
+            >
+              <span aria-hidden="true">🚩 +{player.reward}</span>
+            </span>
+          )}
           {player.detail && <span className="friends-detail">{player.detail}</span>}
           {account?.username && friendships && (
             <CandidateButton account={account} friendships={friendships} uid={player.uid} onMessage={onMessage} />

@@ -23,6 +23,7 @@ import {
   levelCost,
   levelOf,
   missionDayAt,
+  missionResetsIn,
   missionsAt,
   nextStreakReward,
   readXp,
@@ -82,6 +83,26 @@ describe('periods', () => {
     expect(weekKeyOf('2027-01-01')).toBe('2026-W53')
     expect(weekKeyOf('2025-12-29')).toBe('2026-W01')
     expect(weekDays('2026-10-22')).toEqual(['2026-10-19', '2026-10-20', '2026-10-21', '2026-10-22', '2026-10-23', '2026-10-24', '2026-10-25'])
+  })
+})
+
+describe('missionResetsIn', () => {
+  const HOUR = 60 * 60 * 1000
+
+  it('counts down to Paris midnight and to Monday on a normal day', () => {
+    // Wednesday 12:00 in Paris (UTC+2)
+    expect(missionResetsIn(Date.UTC(2026, 6, 15, 10, 0))).toEqual({ daily: 12 * HOUR, weekly: 108 * HOUR })
+  })
+
+  it('has both resets at midnight on a Sunday evening', () => {
+    expect(missionResetsIn(Date.UTC(2026, 6, 19, 20, 0))).toEqual({ daily: 2 * HOUR, weekly: 2 * HOUR })
+  })
+
+  it('follows the clock changes: a 25 hour day in October, a 23 hour one in March', () => {
+    // Sunday 25 October 2026 at 00:00 in Paris (UTC+2), the clocks go back that night
+    expect(missionResetsIn(Date.UTC(2026, 9, 24, 22, 0))).toEqual({ daily: 25 * HOUR, weekly: 25 * HOUR })
+    // Sunday 29 March 2026 at 00:00 in Paris (UTC+1), the clocks go forward that night
+    expect(missionResetsIn(Date.UTC(2026, 2, 28, 23, 0))).toEqual({ daily: 23 * HOUR, weekly: 23 * HOUR })
   })
 })
 

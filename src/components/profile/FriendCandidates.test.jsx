@@ -75,4 +75,24 @@ describe('FriendCandidates', () => {
     )
     expect(container.querySelector('ul')).toBeNull()
   })
+
+  it('shows the flag fragments a league rank pays, gold on the podium, and nothing without a reward', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <FriendCandidates
+          players={[
+            { uid: 'p1', name: 'Ann', rank: 1, reward: 10 },
+            { uid: 'p4', name: 'Dan', rank: 4, reward: 1 },
+            { uid: 'p11', name: 'Kim', rank: 11 },
+          ]}
+          account={null}
+        />
+      </MemoryRouter>
+    )
+    const rewards = [...container.querySelectorAll('.friends-reward')]
+    expect(rewards.map((reward) => reward.textContent)).toEqual(['🚩 +10', '🚩 +1'])
+    expect(rewards[0].classList.contains('friends-reward--podium')).toBe(true)
+    expect(rewards[1].classList.contains('friends-reward--podium')).toBe(false)
+    expect(rewards[0].getAttribute('aria-label')).toContain('league.win_reward')
+  })
 })

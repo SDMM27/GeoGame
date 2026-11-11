@@ -14,7 +14,7 @@ describe('missions and level strings', () => {
     for (const lang of LANGUAGE_CODES) {
       const { missions, level } = locales[lang]
       for (const id of ids) expect(missions[id], `${lang} missions.${id}`).toBeTruthy()
-      for (const key of ['title', 'daily', 'weekly', 'bonus', 'reward', 'per_game', 'sign_in', 'resets_daily', 'resets_weekly']) {
+      for (const key of ['title', 'bonus', 'reward', 'sign_in', 'tab_today', 'tab_week', 'resets_hours', 'dailies_short']) {
         expect(missions[key], `${lang} missions.${key}`).toBeTruthy()
       }
       for (const key of ['label', 'short', 'progress', 'total', 'up', 'gained']) expect(level[key], `${lang} level.${key}`).toBeTruthy()

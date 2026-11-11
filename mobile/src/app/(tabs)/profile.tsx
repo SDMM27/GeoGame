@@ -42,10 +42,6 @@ const signOutDevice = () => forgetDevice().then(() => signOut(auth))
 
 type Mode = 'signin' | 'signup'
 
-// Machine-readable zone of the passport page: capitals and digits only, padded with « < » (purely decorative)
-const mrzLine = (text: string) =>
-  text.normalize('NFD').toUpperCase().replace(/[^A-Z0-9<]+/g, '<').padEnd(30, '<').slice(0, 30)
-
 const openLegal = (path: string) => openBrowserAsync(legalUrl(path)).catch(() => {})
 
 // Shown wherever an account gets created (email form, or username choice after a first Google sign-in).
@@ -463,7 +459,7 @@ function Profile({ account }: { account: Account }) {
 
   return (
     <View style={{ gap: space.xl }}>
-      {/* Identity page of the passport: name, member since, level, and the machine-readable lines */}
+      {/* Identity page of the passport: name, member since, level */}
       <View style={styles.passport}>
         <View style={styles.passportBar}>
           <Kicker size={9}>{t('mobile.tabs.profile')}</Kicker>
@@ -484,14 +480,6 @@ function Profile({ account }: { account: Account }) {
             </View>
           </View>
           <LevelBar uid={account.uid} />
-        </View>
-        <View style={styles.mrz} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-          <Text style={styles.mrzLine} numberOfLines={1}>
-            {mrzLine(`P<GGM<${username}`)}
-          </Text>
-          <Text style={styles.mrzLine} numberOfLines={1}>
-            {mrzLine(account.uid)}
-          </Text>
         </View>
       </View>
       <DecorationPicker uid={account.uid} username={username} />
@@ -596,8 +584,6 @@ const useStyles = makeStyles((colors) => ({
     borderBottomColor: colors.border,
   },
   passportBody: { gap: space.lg, padding: space.lg },
-  mrz: { gap: 2, paddingHorizontal: space.lg, paddingVertical: space.md, backgroundColor: colors.board, borderTopWidth: 2, borderTopColor: colors.stub },
-  mrzLine: { fontFamily: fonts.mono, fontSize: 11, letterSpacing: 1.5, color: colors.textFaint },
   friendsCard: { flexDirection: 'row', alignItems: 'center', gap: space.md, paddingVertical: space.md },
   legalLinks: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: space.md },
   friendsIcon: { width: 44, height: 44, borderRadius: radius.md, backgroundColor: `${colors.highlight}1F`, alignItems: 'center', justifyContent: 'center' },

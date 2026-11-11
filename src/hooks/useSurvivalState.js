@@ -101,7 +101,7 @@ function reducer(state, action) {
  * SURVIVAL_RAMPS). `snapshot` / `snapshotKey` (multiplayer): resume the run after a refresh,
  * and save it as it goes (with `extraSnapshot`). `autoAdvance` false, `deadline` (local ms) and `deadlineRound` (the
  * round that deadline is for): see useSurvivalSync. `clockStopsOnAnswer`: elapsedMs leaves out the time the answers
- * are shown (the Daily Challenge, where "Next" is up to the player).
+ * are shown (the Daily Challenge).
  * `maxRounds` / `distinctCountries`: see buildSurvivalRounds (the Daily Challenge: 12 rounds, all different countries).
  * `paused`: nothing runs (no clock, no timer, no answer) until it turns false, which then starts the run from `snapshot`
  * (a snapshot saved by the caller: { index, errors, score, results, elapsedMs }, outcome of its round null).

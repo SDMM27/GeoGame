@@ -5,7 +5,8 @@ import { fetchSurvivalScores } from '../../utils/saveScore'
 import { formatTime } from '../../utils/formatTime'
 import { useAccount } from '../../auth'
 import PlayerName, { mineClass } from '../../components/PlayerName'
-import { SURVIVAL_RAMP_ICONS, SURVIVAL_ROUND_ICONS, timerLabel } from '../../components/SurvivalOptions'
+import { SURVIVAL_RAMP_ICONS, timerLabel } from '../../components/SurvivalOptions'
+import { flightCode } from '../../components/GameEmblem'
 import {
   DEFAULT_SURVIVAL_LIVES,
   DEFAULT_SURVIVAL_RAMP,
@@ -18,12 +19,13 @@ import {
   survivalModesKey,
 } from '../../utils/survivalConfig'
 import '../scoreboard.css'
+import RankBadge from '../../components/RankBadge'
 
-const MEDAL = ['🥇', '🥈', '🥉']
 const ALL = 'all'
 const ALL_SIX = survivalModesKey(SURVIVAL_ROUND_TYPES)
 
-const modesIcons = (key) => parseSurvivalModes(key).map((type) => SURVIVAL_ROUND_ICONS[type]).join(' ')
+// The games of a run as flight codes (« DRP BRD ») - an option's text can't hold an emblem
+const modesIcons = (key) => parseSurvivalModes(key).map((type) => flightCode(type)).join(' ')
 
 export default function SurvivalScoreboard({ initialLives = null, initialTimer = null, initialRamp = null, initialModes = null }) {
   const { t } = useTranslation()
@@ -43,7 +45,7 @@ export default function SurvivalScoreboard({ initialLives = null, initialTimer =
     const options = [
       { value: ALL, label: t('survival.all_combinations') },
       { value: ALL_SIX, label: `${modesIcons(ALL_SIX)} ${t('survival.all_six')}` },
-      ...SURVIVAL_ROUND_TYPES.map((type) => ({ value: type, label: `${SURVIVAL_ROUND_ICONS[type]} ${t(`survival.round_type.${type}`)}` })),
+      ...SURVIVAL_ROUND_TYPES.map((type) => ({ value: type, label: `${flightCode(type)} · ${t(`survival.round_type.${type}`)}` })),
     ]
     if (!options.some((option) => option.value === startModes)) options.push({ value: startModes, label: modesIcons(startModes) })
     return options
@@ -111,7 +113,7 @@ export default function SurvivalScoreboard({ initialLives = null, initialTimer =
           </div>
           {scores.map((score, index) => (
             <div key={score.id} className={`scoreboard-row ${index < 3 ? 'scoreboard-row--top' : ''}${mineClass(score, account)}`}>
-              <span className="scoreboard-rank">{index < 3 ? MEDAL[index] : `#${index + 1}`}</span>
+              <span className="scoreboard-rank"><RankBadge rank={index + 1} /></span>
               <span className="scoreboard-name"><PlayerName entry={score} account={account} reportIn="survival_scores" /></span>
               <span className="scoreboard-score">{score.score}</span>
               <span className="scoreboard-time">{score.elapsedTime != null ? formatTime(score.elapsedTime) : '—'}</span>

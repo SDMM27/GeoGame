@@ -9,7 +9,8 @@ import { useAccount } from '../../auth'
 import useInvites, { acceptInvite } from '../../hooks/useInvites'
 import { dismissInvite } from '../../utils/invites'
 import { getRecentRooms } from '../../utils/recentRooms'
-import { LISTED_ROOM_GAMES, gameColor, roomGameIcon } from '../../utils/roomGames'
+import { LISTED_ROOM_GAMES, gameColor } from '../../utils/roomGames'
+import GameEmblem, { flightCode } from '../../components/GameEmblem'
 import '../../components/multiplayer/Invites.css'
 import './MultiplayerHomePage.css'
 
@@ -86,7 +87,7 @@ export default function MultiplayerHomePage() {
           </div>
         </form>
 
-        <section className="mp-section">
+        <section className="mp-section mp-section--create">
           <div className="mp-section-head">
             <p className="gg-kicker">{t('multiplayer.desk_create')}</p>
             <h2>{t('multiplayer.create_title')}</h2>
@@ -101,8 +102,9 @@ export default function MultiplayerHomePage() {
                 style={{ '--game': gameColor(game.id) }}
                 onClick={() => navigate('/multiplayer/create', { state: { gameId: game.id } })}
               >
-                <span className="mp-row-icon" aria-hidden="true">{game.icon}</span>
+                <GameEmblem game={game.id} size={44} />
                 <span className="mp-row-title">{t(`games.${game.id}.title`)}</span>
+                <span className="mp-row-flight gg-mono">{flightCode(game.id)}</span>
                 <span className="mp-row-end"><PlusIcon /></span>
               </button>
             ))}
@@ -110,7 +112,7 @@ export default function MultiplayerHomePage() {
         </section>
 
         {recent.length > 0 && (
-          <section className="mp-section">
+          <section className="mp-section mp-section--recent">
             <div className="mp-section-head">
               <p className="gg-kicker">{t('multiplayer.desk_recent')}</p>
               <h2>{t('multiplayer.recent_title')}</h2>
@@ -124,7 +126,7 @@ export default function MultiplayerHomePage() {
                   style={{ '--game': gameColor(room.gameId) }}
                   onClick={() => navigate(`/multiplayer/room/${room.code}`)}
                 >
-                  <span className="mp-row-icon" aria-hidden="true">{roomGameIcon(room.gameId)}</span>
+                  <GameEmblem game={room.gameId} size={44} />
                   <span className="mp-row-text">
                     <span className="mp-row-title">{t(`games.${room.gameId}.title`)}</span>
                     <span className="mp-row-desc">

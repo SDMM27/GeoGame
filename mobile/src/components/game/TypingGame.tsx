@@ -14,12 +14,13 @@ import { getMissingFlagMask } from '@shared/utils/missingFlag'
 import { announce } from '@/a11y'
 import { setupGameRecord } from '@/account/history'
 import { ANSWER_KEYBOARD_PROPS, useClearedAnswerGuard } from '@/components/game/answerInput'
-import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
+import { GameHud } from '@/components/game/GameHud'
 import { ResultsSheet, type SaveConfig } from '@/components/game/ResultsSheet'
+import { Kicker, ScreenTitle } from '@/components/flight'
 import { Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
 import { useKeyboardVisible, useVisibleHeight } from '@/hooks/useKeyboardVisible'
-import { DIFFICULTY_COLORS } from '@/games'
+import { DIFFICULTY_COLORS, getGame } from '@/games'
 import { clean } from '@/i18n'
 import { RoomHudPill, Standings, useReportFound, type RoomPlay } from '@/multiplayer/RoomPlay'
 import { navigate } from '@/shims/react-router-dom'
@@ -29,6 +30,8 @@ type GameState = any
 type Feature = { properties: Record<string, any> }
 
 export type TypingGameConfig = {
+  // Game id (header emblem, title and flight code)
+  game: string
   // Shared code identifiers (scores, share texts)
   gameType: string
   scoreGameType: string
@@ -151,28 +154,29 @@ export function TypingGame({
   const typing = useKeyboardVisible()
   const visibleHeight = useVisibleHeight()
   const gap = typing ? space.md : space.xl
-  const paddingTop = insets.top + 42 + (typing ? space.sm : space.lg)
+  // The board header (close, strip, progress) sits above the scroll area
+  const paddingTop = space.md
+  const hudHeight = insets.top + 150
   // The keyboard covers the home indicator: no bottom inset under the input while typing.
   const inputBarPadding = typing ? space.md : Math.max(insets.bottom, space.md)
   const inputBarHeight = 52 + space.md + inputBarPadding
   const otherBlocks =
     (currentPhase ? 16 + gap : 0) + // phase row
-    30 + gap + // progress
     (config.clue ? 56 : 16) + gap + // question (+ country name)
     (revealedName ? 40 + gap : 0) // revealed answer
   const flagHeight = Math.min(
     280,
-    Math.max(60, visibleHeight - inputBarHeight - paddingTop - space.md - otherBlocks)
+    Math.max(60, visibleHeight - inputBarHeight - hudHeight - paddingTop - space.md - otherBlocks)
   )
 
   const question = (
     <View style={{ alignItems: 'center', gap: space.xs }}>
-      <Text variant="label">{t(config.promptKey)}</Text>
+      <Kicker>{t(config.promptKey)}</Kicker>
       {config.clue && targetCountry && (
         <Animated.View key={targetCountryISO} entering={FadeIn.duration(220)}>
-          <Text variant="title" numberOfLines={2} adjustsFontSizeToFit style={{ textAlign: 'center' }}>
+          <ScreenTitle size={36} numberOfLines={2} adjustsFontSizeToFit style={{ textAlign: 'center' }}>
             {config.clue(targetCountry, i18n.language)}
-          </Text>
+          </ScreenTitle>
         </Animated.View>
       )}
     </View>
@@ -188,6 +192,21 @@ export function TypingGame({
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
+      {!isGameOver && (
+        <GameHud
+          game={config.game}
+          title={t(getGame(config.game)?.titleKey ?? '')}
+          onQuit={play?.exit}
+          right={play ? <RoomHudPill code={play.room.id} gameIndex={play.room.gameIndex} /> : undefined}
+          cells={[
+            { label: t('mobile.game.found').toLocaleUpperCase(), value: `${stats.found}/${stats.total}`, color: colors.gold },
+            ...(isTraining ? [] : [{ label: t('mobile.game.score').toLocaleUpperCase(), value: String(score) }]),
+            { label: t('mobile.game.time').toLocaleUpperCase(), value: displayTimer, color: colors.accent },
+          ]}
+          progress={progress}
+          progressLabel={`${stats.found}/${stats.total} ${t('mobile.game.found')} · ${remaining} ${t('mobile.game.remaining')}`}
+        />
+      )}
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <ScrollView
           keyboardShouldPersistTaps="always"
@@ -202,15 +221,6 @@ export function TypingGame({
               </Text>
             </View>
           )}
-
-          <View style={{ gap: 6 }}>
-            <View style={styles.track}>
-              <View style={[styles.bar, { width: `${progress * 100}%`, backgroundColor: config.accent }]} />
-            </View>
-            <Text variant="caption">
-              {stats.found}/{stats.total} {t('mobile.game.found')} · {remaining} {t('mobile.game.remaining')}
-            </Text>
-          </View>
 
           {/* Capitals: the country name comes first, the keyboard would hide it under the flag */}
           {config.clue && question}
@@ -284,17 +294,11 @@ export function TypingGame({
         )}
       </KeyboardAvoidingView>
 
-      {!isGameOver && (
-        <GameTopBar onQuit={play?.exit}>
-          {play && <RoomHudPill code={play.room.id} gameIndex={play.room.gameIndex} />}
-          <HudPill icon="timer-outline" label={displayTimer} />
-          {!isTraining && <HudPill icon="star-four-points-outline" label={String(score)} color={colors.accent} />}
-        </GameTopBar>
-      )}
-
       {isGameOver && (
         <ResultsSheet
           score={score}
+          game={config.game}
+          ticketNote={[difficulty ? t(`difficulties.${difficulty}`) : null, continent ? t(`continents.${continent}`) : null].filter(Boolean).join(' · ') || undefined}
           accent={config.accent}
           stats={[
             { label: t('labels.countries_found'), value: `${stats.found}/${stats.total}`, color: colors.accent },
@@ -375,8 +379,6 @@ const AnswerInput = memo(function AnswerInput({
 const styles = StyleSheet.create({
   content: { paddingHorizontal: space.xl, paddingBottom: space.xl, gap: space.xl },
   row: { flexDirection: 'row', justifyContent: 'space-between' },
-  track: { height: 6, borderRadius: 3, backgroundColor: colors.border, overflow: 'hidden' },
-  bar: { height: 6, borderRadius: 3 },
   flagCard: {
     alignSelf: 'center',
     width: '100%',
@@ -392,7 +394,7 @@ const styles = StyleSheet.create({
   },
   flagWrap: { width: '100%', height: '100%' },
   flag: { width: '100%', height: '100%' },
-  missingBand: { position: 'absolute', backgroundColor: '#202944', borderColor: '#ffffff55' },
+  missingBand: { position: 'absolute', backgroundColor: colors.stub, borderColor: colors.textFaint },
   reveal: {
     flexDirection: 'row',
     alignItems: 'center',

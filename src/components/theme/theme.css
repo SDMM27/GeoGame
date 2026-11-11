@@ -1,20 +1,4 @@
-/* Logo and theme switch of the « carnet de vol » */
-.gg-compass {
-  color: var(--sd-accent);
-  flex-shrink: 0;
-}
-
-.gg-compass-needle {
-  transform-origin: 50% 50%;
-  transform-box: fill-box;
-  animation: gg-needle 4s ease-in-out infinite;
-}
-
-@keyframes gg-needle {
-  0%, 100% { transform: rotate(-14deg); }
-  50% { transform: rotate(18deg); }
-}
-
+/* Theme switch of the « carnet de vol » */
 .gg-theme-toggle {
   display: grid;
   place-items: center;
@@ -34,10 +18,4 @@
 
 .gg-theme-toggle:active {
   transform: rotate(-20deg) scale(0.94);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .gg-compass-needle {
-    animation: none;
-  }
 }

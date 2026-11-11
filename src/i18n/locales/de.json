@@ -233,6 +233,7 @@
     "unknown": "Unbekannt"
   },
   "game_hud": {
+    "flight": "FLUG {{code}}",
     "target_country": "GESUCHTES LAND",
     "score": "PUNKTE",
     "time": "ZEIT",
@@ -1323,7 +1324,8 @@
     "legal": "Impressum",
     "delete_account": "Mein Konto löschen",
     "updated": "Zuletzt aktualisiert: {{date}}",
-    "signup_notice": "Mit der Erstellung eines Kontos akzeptierst du die <terms>Nutzungsbedingungen</terms> und die <privacy>Datenschutzerklärung</privacy>. Du musst mindestens 13 Jahre alt sein (und unter 15 die Zustimmung eines Elternteils haben)."
+    "signup_notice": "Mit der Erstellung eines Kontos akzeptierst du die <terms>Nutzungsbedingungen</terms> und die <privacy>Datenschutzerklärung</privacy>. Du musst mindestens 13 Jahre alt sein (und unter 15 die Zustimmung eines Elternteils haben).",
+    "toc": "Inhalt"
   },
   "invites": {
     "title": "Freunde einladen",

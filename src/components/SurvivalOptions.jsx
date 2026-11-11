@@ -16,15 +16,8 @@ import {
   matchSurvivalRamp,
 } from '../utils/survivalConfig'
 import { DIFFICULTY_COLORS } from '../pages/quiz/constants'
+import GameEmblem from './GameEmblem'
 import './SurvivalOptions.css'
-
-export const SURVIVAL_ROUND_ICONS = {
-  PLACEMENT: '🌍',
-  FLAGS: '🚩',
-  CAPITALS: '🏛️',
-  BORDER_GUESS: '🧭',
-  QUIZ: '🧠',
-}
 
 export const SURVIVAL_RAMP_ICONS = { express: '⚡', normal: '🎯', gentle: '🌱', expert: '🔥', hardcore: '💀', custom: '🛠️' }
 
@@ -73,7 +66,7 @@ export default function SurvivalOptions({ options, onChange }) {
             aria-pressed={modes.includes(type)}
             onClick={() => toggle(type)}
           >
-            <span aria-hidden="true">{SURVIVAL_ROUND_ICONS[type]}</span>
+            <GameEmblem game={type} variant="glyph" size={18} />
             {t(`survival.round_type.${type}`)}
           </button>
         ))}

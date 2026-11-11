@@ -85,3 +85,10 @@
     font-size: 2rem;
   }
 }
+
+/* The question dominates: the country in display type */
+@media (min-width: 761px) {
+  .capitals-country-value { font-size: clamp(2rem, 4.5vw, 3.4rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.05; }
+}
+.capitals-game-page .flag-input,
+.capitals-game-page .flag-input-row button { min-height: 44px; }

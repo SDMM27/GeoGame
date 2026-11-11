@@ -47,9 +47,18 @@ function GoogleButton({ onError }) {
   return (
     <button type="button" className="account-google" onClick={handleClick} disabled={pending}>
       <svg viewBox="0 0 48 48" width="18" height="18" aria-hidden="true">
-        <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.6-.4-3.5z" />
-        <path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z" />
-        <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z" />
+        <path
+          fill="#FFC107"
+          d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.6-.4-3.5z"
+        />
+        <path
+          fill="#FF3D00"
+          d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"
+        />
+        <path
+          fill="#4CAF50"
+          d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"
+        />
         <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.6-.4-3.5z" />
       </svg>
       {t('account.google')}
@@ -117,7 +126,9 @@ function AuthForm() {
       <p className="account-intro">{t(`account.${mode}_intro`)}</p>
 
       <GoogleButton onError={setError} />
-      <div className="account-divider"><span>{t('account.or')}</span></div>
+      <div className="account-divider">
+        <span>{t('account.or')}</span>
+      </div>
 
       <form onSubmit={handleSubmit} className="account-form">
         {mode === 'signup' && (
@@ -181,7 +192,10 @@ function SignupNotice() {
     <p className="account-legal">
       <Trans
         i18nKey="legal.signup_notice"
-        components={{ terms: <Link to={LEGAL_PATHS.terms} />, privacy: <Link to={LEGAL_PATHS.privacy} /> }}
+        components={{
+          terms: <Link to={LEGAL_PATHS.terms} />,
+          privacy: <Link to={LEGAL_PATHS.privacy} />,
+        }}
       />
     </p>
   )
@@ -189,7 +203,10 @@ function SignupNotice() {
 
 // Google's name, trimmed to what a username allows, as a starting suggestion.
 function suggestUsername() {
-  return (auth.currentUser?.displayName ?? '').replace(/[^\p{L}\p{N} _.-]/gu, '').trim().slice(0, USERNAME_MAX)
+  return (auth.currentUser?.displayName ?? '')
+    .replace(/[^\p{L}\p{N} _.-]/gu, '')
+    .trim()
+    .slice(0, USERNAME_MAX)
 }
 
 function ChooseUsername() {
@@ -309,23 +326,25 @@ function Profile({ account }) {
   const decoration = useDecoration(account.uid)
 
   return (
-    <>
-      <ProfileHeader player={account} decoration={decoration} />
-      <DecorationPicker account={account} />
-      <ProfileBody
-        uid={account.uid}
-        own
-        friendsCount={friendships.loading ? undefined : friendships.friends.length}
-        collection={
-          <>
-            <FlagCollection uid={account.uid} own />
-            <ScrollCollection uid={account.uid} own />
-          </>
-        }
-        friends={<FriendsPanel account={account} friendships={friendships} />}
-      />
-      <AccountSettings account={account} />
-    </>
+    <ProfileBody
+      uid={account.uid}
+      header={
+        <>
+          <ProfileHeader player={account} decoration={decoration} />
+          <DecorationPicker account={account} />
+        </>
+      }
+      aside={<AccountSettings account={account} />}
+      own
+      friendsCount={friendships.loading ? undefined : friendships.friends.length}
+      collection={
+        <>
+          <FlagCollection uid={account.uid} own />
+          <ScrollCollection uid={account.uid} own />
+        </>
+      }
+      friends={<FriendsPanel account={account} friendships={friendships} />}
+    />
   )
 }
 
@@ -337,7 +356,7 @@ export default function AccountPage() {
   return (
     <div className="account-page">
       <NavBar />
-      <main className={`account-main${signedIn ? ' account-main--wide' : ''}`}>
+      <main className={`account-main${signedIn ? ' account-main--wide profile-main' : ' account-main--auth'}`}>
         {!signedIn && !loading && (
           <>
             <p className="gg-kicker account-kicker">{t('profile.passport')}</p>

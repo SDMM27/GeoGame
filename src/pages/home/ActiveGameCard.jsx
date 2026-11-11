@@ -8,6 +8,7 @@ import {
   getDifficultiesForGame,
   getDifficultyCaps,
 } from "./gameData";
+import GameEmblem from "../../components/GameEmblem";
 import MultiButton from "./MultiButton";
 import { GAME_TYPES } from "../../utils/gameTypes";
 import { usePlacementClues } from "../../utils/placementClues";
@@ -75,7 +76,7 @@ export default function ActiveGameCard({ game, initialMode = "standard" }) {
 
   return (
     <div className="game-card game-card--active">
-      <div className="game-card-icon">{game.icon}</div>
+      <div className="game-card-icon"><GameEmblem game={game.id} size={44} /></div>
       <h2 className="game-card-title">{t(game.titleKey)}</h2>
       <p className="game-card-desc">{t(game.descKey)}</p>
       <div className="game-card-controls">

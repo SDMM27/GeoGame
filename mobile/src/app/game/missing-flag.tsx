@@ -9,6 +9,7 @@ import { TypingGame, type TypingGameConfig } from '@/components/game/TypingGame'
 import { gameColors } from '@/theme'
 
 const CONFIG: TypingGameConfig = {
+  game: 'missing_flag',
   gameType: GAME_TYPES.MISSING_FLAG,
   scoreGameType: GAME_TYPES.MISSING_FLAG,
   accent: gameColors.missing_flag,

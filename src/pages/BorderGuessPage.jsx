@@ -6,6 +6,7 @@ import { ToastContainer } from 'react-toastify'
 import { getCountryName } from '../utils/getCountryName'
 import { localeOf } from '../i18n/languages'
 import NavBar from '../components/NavBar'
+import { GameFlightTag } from '../components/GameEmblem'
 import useDesktopAutofocus from '../hooks/useDesktopAutofocus'
 import ShareScoreButton from '../components/ShareScoreButton'
 import ChallengeBanner from '../components/ChallengeBanner'
@@ -188,6 +189,7 @@ export default function BorderGuessPage() {
             result={isComplete ? { score, solved: isSolved, mapAssist: mapAssistUsed } : null}
           />
         )}
+        <GameFlightTag game={GAME_TYPES.BORDER_GUESS} className="game-flight-tag--board" />
         <section className="border-guess-panel border-guess-panel--hero">
           <div>
             <p className="border-guess-eyebrow gg-kicker">{t('labels.new_game')}</p>

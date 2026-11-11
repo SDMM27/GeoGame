@@ -7,7 +7,6 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native'
 import Animated, { FadeIn } from 'react-native-reanimated'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import useCountryClueState from '@shared/hooks/useCountryClueState'
 import { formatTime } from '@shared/utils/formatTime'
@@ -19,7 +18,7 @@ import { getCapitalName, getCountryName } from '@shared/utils/getCountryName'
 import { useAccount } from '@/account/auth'
 import { DailyLeaderboard } from '@/components/game/DailyLeaderboard'
 import { DailyPlayedElsewhere } from '@/components/game/DailyPlayedElsewhere'
-import { GameTopBar, HudPill } from '@/components/game/GameTopBar'
+import { GameHud } from '@/components/game/GameHud'
 import { ClueGuessCard, ClueGuessSummary, type ClueGuess, type ClueProgress } from '@/components/game/GuessCards'
 import { GuessInputBar } from '@/components/game/GuessInputBar'
 import { ResultsSheet } from '@/components/game/ResultsSheet'
@@ -28,6 +27,7 @@ import { Button, Text } from '@/components/ui'
 import { getFlag } from '@/flags'
 import { useElapsed } from '@/hooks/useElapsed'
 import { useAnnounceResult } from '@/hooks/useAnnounceResult'
+import { getGame } from '@/games'
 import { clean } from '@/i18n'
 import { RoomGate, RoomHudPill, Standings, type RoomPlay } from '@/multiplayer/RoomPlay'
 import { useRoomRounds, useRoundResult } from '@/multiplayer/useRoomRounds'
@@ -62,7 +62,6 @@ export default function CountryClueScreen() {
 
 function CountryClueGame({ mode, play }: { mode: string; play?: RoomPlay }) {
   const { t, i18n } = useTranslation()
-  const insets = useSafeAreaInsets()
   const isDaily = mode === 'daily' && !play
   const rounds = useRoomRounds(play)
   const {
@@ -127,7 +126,7 @@ function CountryClueGame({ mode, play }: { mode: string; play?: RoomPlay }) {
 
   if (elsewhere.checking || elsewhere.game) {
     return (
-      <DailyPlayedElsewhere title={t('games.country_clue.title')} game={elsewhere.game} accent={ACCENT}>
+      <DailyPlayedElsewhere gameId="country_clue" title={t('games.country_clue.title')} game={elsewhere.game} accent={ACCENT}>
         {elsewhere.game && (
           <View style={{ gap: space.md }}>
             <AnswerCard iso={currentCountryISO} name={answer} capital={capital} solved={elsewhere.game.solved !== false} />
@@ -141,10 +140,25 @@ function CountryClueGame({ mode, play }: { mode: string; play?: RoomPlay }) {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
+      {!(isComplete && isDaily) && !rounds.showResults && (
+        <GameHud
+          game="country_clue"
+          title={t(getGame('country_clue')?.titleKey ?? '')}
+          confirmQuit={!!play}
+          onQuit={play?.exit}
+          right={play ? <RoomHudPill code={play.room.id} gameIndex={play.room.gameIndex} /> : undefined}
+          cells={[
+            { label: t('units.attempt_other').toLocaleUpperCase(), value: String(guesses.length), color: ACCENT },
+            ...(play || (isDaily && hasStarted)
+              ? [{ label: t('mobile.game.time').toLocaleUpperCase(), value: formatTime(play ? (rounds.elapsedTime ?? elapsed) : (elapsedTime ?? elapsed)).slice(0, 5), color: colors.accent }]
+              : []),
+          ]}
+        />
+      )}
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <ScrollView
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={[styles.content, { paddingTop: insets.top + 42 + space.md }]}>
+          contentContainerStyle={[styles.content, { paddingTop: space.md }]}>
           <View style={{ gap: space.xs }}>
             <Text variant="label" color={ACCENT}>
               {play
@@ -207,17 +221,9 @@ function CountryClueGame({ mode, play }: { mode: string; play?: RoomPlay }) {
         )}
       </KeyboardAvoidingView>
 
-      {!(isComplete && isDaily) && !rounds.showResults && (
-        <GameTopBar confirmQuit={!!play} onQuit={play?.exit}>
-          {play && <RoomHudPill code={play.room.id} gameIndex={play.room.gameIndex} />}
-          {play && <HudPill icon="timer-outline" label={formatTime(rounds.elapsedTime ?? elapsed).slice(0, 5)} />}
-          {isDaily && hasStarted && <HudPill icon="timer-outline" label={formatTime(elapsedTime ?? elapsed).slice(0, 5)} />}
-          <HudPill icon="target" label={`${guesses.length} ${attemptsLabel}`} color={ACCENT} />
-        </GameTopBar>
-      )}
-
       {play && rounds.showResults && (
         <ResultsSheet
+          game="country_clue"
           score={rounds.tally.solved}
           scoreText={`${rounds.tally.solved}/${rounds.total}`}
           scoreLabel={t('labels.countries_found')}
@@ -242,6 +248,7 @@ function CountryClueGame({ mode, play }: { mode: string; play?: RoomPlay }) {
 
       {isComplete && isDaily && dailyKey && (
         <ResultsSheet
+          game="country_clue"
           title={isSolved ? t('country_clue.correct') : t('borderguess.answer_was')}
           score={guesses.length}
           scoreLabel={attemptsLabel}

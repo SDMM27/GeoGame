@@ -13,6 +13,7 @@ import { useAccount } from '@/account/auth'
 import { FriendAction } from '@/components/profile/FriendAction'
 import { Avatar } from '@/components/profile/ProfileSections'
 import { ScreenHeader } from '@/components/ScreenHeader'
+import { Kicker, ScreenTitle } from '@/components/flight'
 import { Button, Text } from '@/components/ui'
 import { colors, radius, space } from '@/theme'
 
@@ -50,7 +51,8 @@ export default function AddFriendScreen() {
       ) : (
         <View style={styles.card}>
           <Avatar username={player.username} size={72} />
-          <Text variant="heading">{player.username}</Text>
+          <Kicker>{t('mp_room.col_player')}</Kicker>
+          <ScreenTitle size={26}>{player.username}</ScreenTitle>
           <Text variant="caption" style={{ textAlign: 'center' }}>
             {t('friends.add_page.intro', { username: player.username })}
           </Text>

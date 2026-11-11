@@ -101,7 +101,7 @@
 
 .flight-globe-placeholder {
   width: 100%;
-  max-width: 480px;
+  max-width: 560px;
   aspect-ratio: 1;
   margin-inline: auto;
 }
@@ -222,16 +222,6 @@
   color: var(--sd-ink);
 }
 
-.boarding-pass-icon {
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--game) 16%, transparent);
-  font-size: 1.15rem;
-}
 
 .boarding-pass-desc {
   flex-grow: 1;
@@ -321,6 +311,14 @@
 .boarding-pass-field .boarding-pass-gate {
   font-size: 1.4rem;
   color: var(--sd-accent-strong);
+}
+
+.boarding-pass-flight {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  color: var(--game-ink);
 }
 
 .boarding-pass-barcode {
@@ -449,7 +447,7 @@
   color: var(--sd-accent-2);
 }
 
-/* ---------- Departures board: dark in both themes, like the real thing ---------- */
+/* ---------- Departures board: white in light, night blue in dark (tokens in src/styles/theme.css) ---------- */
 .departures {
   border-radius: 18px;
   overflow: hidden;
@@ -483,7 +481,7 @@
 
 .departures-row:hover,
 .departures-row:focus-within {
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--gg-board-hover);
 }
 
 .departures-table td {
@@ -497,7 +495,9 @@
 
 /* The button covers the whole row: one target per game */
 .departures-button {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   min-height: 52px;
   padding: 14px 0;
   border: 0;
@@ -508,6 +508,22 @@
   font-weight: 700;
   letter-spacing: 0.06em;
   text-align: left;
+}
+
+.departures-emblem {
+  display: block;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+}
+
+/* The flight code, in gold like the rest of the board's accents */
+.departures-code {
+  flex-shrink: 0;
+  min-width: 3ch;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  color: var(--gg-board-accent);
 }
 
 .departures-button::after {
@@ -541,7 +557,7 @@
 }
 
 .departures-status--boarding {
-  color: #3ddc97;
+  color: var(--gg-board-boarding);
   animation: departures-blink 1.2s steps(2) infinite;
 }
 

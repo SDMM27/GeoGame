@@ -17,7 +17,7 @@ const TABS: { name: string; labelKey: string; icon: IconName; iconSelected: Icon
   { name: 'index', labelKey: 'mobile.tabs.play', icon: 'earth', iconSelected: 'earth' },
   { name: 'multiplayer', labelKey: 'mobile.tabs.multiplayer', icon: 'account-group-outline', iconSelected: 'account-group' },
   { name: 'leaderboards', labelKey: 'mobile.tabs.leaderboards', icon: 'trophy-outline', iconSelected: 'trophy' },
-  { name: 'profile', labelKey: 'mobile.tabs.profile', icon: 'account-circle-outline', iconSelected: 'account-circle' },
+  { name: 'profile', labelKey: 'profile.passport', icon: 'account-circle-outline', iconSelected: 'account-circle' },
 ]
 
 export default function TabsLayout() {

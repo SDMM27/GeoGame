@@ -13,7 +13,7 @@ import { useRecordGame } from '../../auth'
 import { formatTime } from '../../utils/formatTime'
 import { GAME_TYPES } from '../../utils/gameTypes'
 import { matchSurvivalRamp, survivalModesKey } from '../../utils/survivalConfig'
-import { SURVIVAL_ROUND_ICONS } from '../../components/SurvivalOptions'
+import GameEmblem, { GameFlightTag } from '../../components/GameEmblem'
 import { DIFFICULTY_COLORS } from '../quiz/constants'
 import SurvivalForm from './SurvivalForm'
 import { BorderRound, PlacementRound, QuizRound, TypedRound, roundAnswer } from './SurvivalRounds'
@@ -142,6 +142,7 @@ export default function SurvivalGame({
   return (
     <div className={`survival-game${round?.type === GAME_TYPES.PLACEMENT ? ' survival-game--map' : ''}`}>
       <header className="survival-hud">
+        <GameFlightTag game={GAME_TYPES.SURVIVAL} className="survival-hud-flight" />
         <Hearts lives={survival.lives} maxLives={lives} />
         <div className="survival-hud-round">
           <span className="survival-hud-label">
@@ -153,7 +154,7 @@ export default function SurvivalGame({
             )}
           </span>
           {round && (
-            <strong>{SURVIVAL_ROUND_ICONS[round.type]} {t(`survival.prompt.${round.type}`)}</strong>
+            <strong><GameEmblem game={round.type} variant="glyph" size={16} /> {t(`survival.prompt.${round.type}`)}</strong>
           )}
         </div>
         <div className="survival-hud-stats">

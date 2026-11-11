@@ -9,6 +9,7 @@ import 'leaflet/dist/leaflet.css'
 import NavBar from '../../components/NavBar'
 import countries from '../../data/countriesWithDifficulty_FR.json'
 import LandLayer from '../../components/map/LandLayer'
+import KeepRenderersCovered from '../../components/map/KeepRenderersCovered'
 import { getFocusCountry } from '../../utils/borderGuessMap'
 import { ATLAS_COUNTRIES, countryDisplayName, findAtlasCountry, getCountryInfo, searchAtlasCountries } from '../../utils/countryInfo'
 import { getShiftedFeatures } from '../game/shiftedFeatures'
@@ -89,6 +90,7 @@ export default function AtlasPage() {
   const { t, i18n } = useTranslation()
   const [params, setParams] = useSearchParams()
   const [map, setMap] = useState(null)
+  const atlasRenderer = useMemo(() => L.svg({ padding: 0.5 }), [])
   const layersRef = useRef(new Map()) // ADMIN -> its layers (the map and its two copies left and right)
   const selectedRef = useRef(null)
   const isoParam = params.get('country')?.toUpperCase() ?? null
@@ -105,6 +107,16 @@ export default function AtlasPage() {
   }, [])
 
   const select = useCallback((admin) => setSelected(admin), [])
+
+  // The sheet and the ranking panel sit beside the map: opening or closing them changes the map's width, which
+  // Leaflet does not notice by itself (it only watches the window). Without this it keeps drawing the countries for
+  // its old size, and part of the map stays empty once the user pans.
+  useEffect(() => {
+    if (!map) return undefined
+    const observer = new ResizeObserver(() => map.invalidateSize({ pan: false }))
+    observer.observe(map.getContainer())
+    return () => observer.disconnect()
+  }, [map])
 
   // Highlight the selected country, frame it, and keep it in the URL
   useEffect(() => {
@@ -183,6 +195,10 @@ export default function AtlasPage() {
             maxZoom={9}
             zoomSnap={0.5}
             worldCopyJump
+            // Countries are redrawn only when a drag ends: draw half a screen around the view (like the land canvas)
+            // so a long drag does not reveal empty ocean, and cap the fling so the map does not fly off empty
+            renderer={atlasRenderer}
+            inertiaMaxSpeed={1500}
             attributionControl={false}
             style={{ width: '100%', height: '100%' }}
             ref={setMap}
@@ -192,10 +208,17 @@ export default function AtlasPage() {
             <GeoJSON data={countries.features} style={STYLE} onEachFeature={onEachFeature(0)} />
             <GeoJSON data={shifted.right} style={STYLE} onEachFeature={onEachFeature(1)} />
             <SmallCountryDots selected={selected} onSelect={select} />
+            <KeepRenderersCovered />
           </MapContainer>
           <div className="atlas-overlay">
             <p className="gg-kicker atlas-kicker">{t('carnet_games.kicker_atlas')}</p>
-            <h1 className="atlas-title">🗺️ {t('atlas.title')}</h1>
+            <h1 className="atlas-title">
+              <svg className="atlas-title-icon" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" strokeLinecap="round" aria-hidden="true">
+                <path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20z" />
+                <path d="M9 4v13.5M15 6.5V20" />
+              </svg>
+              {t('atlas.title')}
+            </h1>
             <Search onSelect={(admin) => { setRanking(null); setBackMetric(null); select(admin) }} />
             <button type="button" className="atlas-rankings-button" onClick={() => openRanking('population')}>
               {t('atlas.rankings_button')}

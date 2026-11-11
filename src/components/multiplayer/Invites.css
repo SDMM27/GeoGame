@@ -27,16 +27,6 @@
   background: var(--sd-surface);
   color: var(--sd-ink);
 }
-.invite-icon {
-  flex-shrink: 0;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 10px;
-  display: grid;
-  place-items: center;
-  font-size: 1.3rem;
-  background: var(--gg-accent-soft);
-}
 .invite-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.1rem; }
 .invite-text strong { font-size: 0.95rem; overflow-wrap: anywhere; }
 .invite-text span { font-size: 0.8rem; color: var(--sd-muted); }

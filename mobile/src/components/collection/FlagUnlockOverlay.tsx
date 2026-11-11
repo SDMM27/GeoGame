@@ -30,6 +30,7 @@ import { flagsAfter, haptic, rarityColor, rarityOf, type Claim, type Rarity } fr
 import { FlagPiece } from '@/components/collection/FlagPiece'
 import { setFlagOverlayOpen } from '@/components/collection/busy'
 import { onReplayFlag } from '@/components/collection/replay'
+import { Kicker } from '@/components/flight'
 import { Button, Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
 import { colors, fonts, radius, space } from '@/theme'
@@ -258,9 +259,7 @@ function FlagReveal({ item, onNext, onView }: { item: Item; onNext: () => void; 
         <Animated.View style={[styles.texts, textStyle]} accessibilityLiveRegion="polite">
           <View style={[styles.chip, { backgroundColor: `${color}26`, borderColor: `${color}80` }]}>
             {rarity === 'legendary' && <MaterialCommunityIcons name="star" size={14} color={color} aria-hidden />}
-            <Text variant="label" color={color}>
-              {rarityLabel}
-            </Text>
+            <Kicker color={color}>{rarityLabel}</Kicker>
           </View>
           {!item.replay && (
             <Text variant="bodyStrong" color={colors.textMuted}>

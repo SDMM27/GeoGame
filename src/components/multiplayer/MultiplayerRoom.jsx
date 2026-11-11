@@ -20,7 +20,7 @@ import { clearPresenceRoom, setPresenceRoom } from '../../utils/presence'
 import { rememberPlayers } from '../../utils/recentPlayers'
 import { rememberRoom } from '../../utils/recentRooms'
 import { gameColor } from '../../utils/roomGames'
-import { gameLabel } from './RoomConfig'
+import { GameLabel, gameLabel } from './RoomConfig'
 import AddGame from './room/AddGame'
 import GameList from './room/GameList'
 import InviteFriends from './room/InviteFriends'
@@ -143,117 +143,126 @@ export default function MultiplayerRoom({ room, progress, gameResults, playerId,
     }
   }
 
+  // Wide screens: the code, actions and players on the left, the standings on the right (`main`)
+  let side
+  let main = null
+  if (spectating) {
+    side = (
+      <>
+        <div className="mpr-card">
+          <p className="mpr-watching">👀 {t('mp_room.spectator')}</p>
+          <p className="mpr-muted">{t('mp_room.spectator_hint')}</p>
+        </div>
+        <Players room={room} playerId={playerId} readOnly />
+      </>
+    )
+    main = <StandingsCard key={current} room={room} progress={progress} results={results} playerId={playerId} defaultTab={current} />
+  } else if (!joined) {
+    side = (
+      <>
+        <JoinForm room={room} playerId={playerId} />
+        {room.status === 'playing' && (
+          <button type="button" className="mpr-link-btn" onClick={() => setWatching(true)}>
+            👀 {t('mp_room.watch')}
+          </button>
+        )}
+      </>
+    )
+  } else if (room.status === 'lobby') {
+    side = (
+      <>
+        <Players room={room} playerId={playerId} />
+        <InviteFriends room={room} />
+        {isHost ? (
+          <>
+            <AddGame room={room} playerId={playerId} />
+            <button type="button" className="mpr-btn" onClick={() => onLaunch(() => launchRoom(room.id, playerId))} disabled={launching}>
+              ▶ {t('mp_room.launch')}
+            </button>
+          </>
+        ) : (
+          <p className="mpr-waiting">{t('mp_room.waiting_host')}</p>
+        )}
+      </>
+    )
+  } else if (counting) {
+    side = (
+      <div className="mpr-countdown">
+        <span className="mpr-label">
+          {games.length > 1 ? `${t('mp_room.game_n', { n: current + 1 })} · ` : ''}{t('mp_room.starting_in')}
+        </span>
+        <strong key={Math.ceil(remaining / 1000)}>{Math.ceil(remaining / 1000)}</strong>
+      </div>
+    )
+  } else {
+    side = (
+      <>
+        {toPlay != null && (
+          <div className="mpr-card">
+            <p className="mpr-muted">
+              {games.length > 1 && <strong>{t('mp_room.game_n', { n: toPlay + 1 })} · {gameLabel(games[toPlay], t)}<br /></strong>}
+              {t(room.mode === 'live' ? 'mp_room.late_hint' : 'mp_room.challenge_play_hint')}
+            </p>
+            {playable(toPlay) ? (
+              <button type="button" className="mpr-btn" onClick={() => setPlayingIndex(toPlay)}>
+                ▶ {t('mp_room.play')}
+              </button>
+            ) : (
+              <p className="mpr-muted">{t('mp_room.unsupported')}</p>
+            )}
+          </div>
+        )}
+        {late && <p className="mpr-muted">{t('mp_room.joined_late')}</p>}
+        {toPlay == null && room.mode === 'live' && hasNextLive && !isHost && (
+          <p className="mpr-waiting">{t('mp_room.waiting_next')}</p>
+        )}
+        {allPlayed && !late && !hasNextLive && <p className="mpr-finished">✓ {t('mp_room.finished')}</p>}
+        {isHost && hasNextLive && (
+          <button type="button" className="mpr-btn" onClick={() => onLaunch(() => launchNextGame(room, playerId))} disabled={launching}>
+            ▶ {t('mp_room.next_game', { n: current + 2 })} · {gameLabel(games[current + 1], t)}
+          </button>
+        )}
+        {isHost && <AddGame room={room} playerId={playerId} />}
+        {room.mode === 'challenge' && <InviteFriends room={room} />}
+        <Players room={room} playerId={playerId} strangersOnly />
+      </>
+    )
+    main = (
+      <StandingsCard room={room} progress={progress} results={results} playerId={playerId} defaultTab={games.length > 1 ? 'overall' : 0} />
+    )
+  }
+
   return (
     // The room takes the color of its current game, like in the app
     <div className="mpr" style={{ '--game': gameColor(games[current]?.id ?? 'placement') }}>
       <header className="mpr-header">
-        <span className="mpr-label gg-kicker">
-          {t('multiplayer.title')} · {t(room.mode === 'live' ? 'mp_room.live' : 'mp_room.challenge')}
-        </span>
-        <h2>{games.length === 1 ? gameLabel(games[0], t) : t('mp_room.n_games', { count: games.length })}</h2>
-        {room.createdOn !== 'web' && <p className="mpr-muted">📱 {t('mp_room.from_app')}</p>}
+        <div className="mpr-header-text">
+          <span className="mpr-label gg-kicker">
+            {t('multiplayer.title')} · {t(room.mode === 'live' ? 'mp_room.live' : 'mp_room.challenge')}
+          </span>
+          <h2>{games.length === 1 ? <GameLabel game={games[0]} /> : t('mp_room.n_games', { count: games.length })}</h2>
+          {room.createdOn !== 'web' && <p className="mpr-muted">📱 {t('mp_room.from_app')}</p>}
+        </div>
+        {games.length > 1 && <GameList room={room} results={known} playerId={playerId} />}
       </header>
 
-      {games.length > 1 && <GameList room={room} results={known} playerId={playerId} />}
-
-      <div className="mpr-card mpr-code gg-ticket">
-        <div className="mpr-code-main gg-field">
-          <small>{t('mp_room.code')}</small>
-          <code>{room.id}</code>
-        </div>
-        <div className="mpr-code-stub gg-ticket-stub">
-          <button type="button" className="mpr-link-btn" onClick={onCopyLink}>
-            {copied ? `✓ ${t('mp_room.link_copied')}` : `🔗 ${t('mp_room.copy_link')}`}
-          </button>
-        </div>
-      </div>
-
-      {spectating ? (
-        <>
-          <div className="mpr-card">
-            <p className="mpr-watching">👀 {t('mp_room.spectator')}</p>
-            <p className="mpr-muted">{t('mp_room.spectator_hint')}</p>
-          </div>
-          <Players room={room} playerId={playerId} readOnly />
-          <StandingsCard
-            key={current}
-            room={room}
-            progress={progress}
-            results={results}
-            playerId={playerId}
-            defaultTab={current}
-          />
-        </>
-      ) : !joined ? (
-        <>
-          <JoinForm room={room} playerId={playerId} />
-          {room.status === 'playing' && (
-            <button type="button" className="mpr-link-btn" onClick={() => setWatching(true)}>
-              👀 {t('mp_room.watch')}
-            </button>
-          )}
-        </>
-      ) : room.status === 'lobby' ? (
-        <>
-          <Players room={room} playerId={playerId} />
-          <InviteFriends room={room} />
-          {isHost ? (
-            <>
-              <AddGame room={room} playerId={playerId} />
-              <button type="button" className="mpr-btn" onClick={() => onLaunch(() => launchRoom(room.id, playerId))} disabled={launching}>
-                ▶ {t('mp_room.launch')}
-              </button>
-            </>
-          ) : (
-            <p className="mpr-waiting">{t('mp_room.waiting_host')}</p>
-          )}
-        </>
-      ) : counting ? (
-        <div className="mpr-countdown">
-          <span className="mpr-label">
-            {games.length > 1 ? `${t('mp_room.game_n', { n: current + 1 })} · ` : ''}{t('mp_room.starting_in')}
-          </span>
-          <strong key={Math.ceil(remaining / 1000)}>{Math.ceil(remaining / 1000)}</strong>
-        </div>
-      ) : (
-        <>
-          {toPlay != null && (
-            <div className="mpr-card">
-              <p className="mpr-muted">
-                {games.length > 1 && <strong>{t('mp_room.game_n', { n: toPlay + 1 })} · {gameLabel(games[toPlay], t)}<br /></strong>}
-                {t(room.mode === 'live' ? 'mp_room.late_hint' : 'mp_room.challenge_play_hint')}
-              </p>
-              {playable(toPlay) ? (
-                <button type="button" className="mpr-btn" onClick={() => setPlayingIndex(toPlay)}>
-                  ▶ {t('mp_room.play')}
-                </button>
-              ) : (
-                <p className="mpr-muted">{t('mp_room.unsupported')}</p>
-              )}
+      <div className={`mpr-layout${main ? '' : ' mpr-layout--solo'}`}>
+        <div className="mpr-col mpr-col--side">
+          <div className="mpr-card mpr-code gg-ticket">
+            <div className="mpr-code-main gg-field">
+              <small>{t('mp_room.code')}</small>
+              <code>{room.id}</code>
             </div>
-          )}
-          {late && <p className="mpr-muted">{t('mp_room.joined_late')}</p>}
-          {toPlay == null && room.mode === 'live' && hasNextLive && !isHost && (
-            <p className="mpr-waiting">{t('mp_room.waiting_next')}</p>
-          )}
-          {allPlayed && !late && !hasNextLive && <p className="mpr-finished">✓ {t('mp_room.finished')}</p>}
-          {isHost && hasNextLive && (
-            <button type="button" className="mpr-btn" onClick={() => onLaunch(() => launchNextGame(room, playerId))} disabled={launching}>
-              ▶ {t('mp_room.next_game', { n: current + 2 })} · {gameLabel(games[current + 1], t)}
-            </button>
-          )}
-          {isHost && <AddGame room={room} playerId={playerId} />}
-          {room.mode === 'challenge' && <InviteFriends room={room} />}
-          <Players room={room} playerId={playerId} strangersOnly />
-          <StandingsCard
-            room={room}
-            progress={progress}
-            results={results}
-            playerId={playerId}
-            defaultTab={games.length > 1 ? 'overall' : 0}
-          />
-        </>
-      )}
+            <div className="mpr-code-stub gg-ticket-stub">
+              <button type="button" className="mpr-link-btn" onClick={onCopyLink}>
+                {copied ? `✓ ${t('mp_room.link_copied')}` : `🔗 ${t('mp_room.copy_link')}`}
+              </button>
+            </div>
+          </div>
+          {side}
+        </div>
+        {main && <div className="mpr-col mpr-col--main">{main}</div>}
+      </div>
     </div>
   )
 }

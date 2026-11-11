@@ -37,27 +37,29 @@ export default function PlayerPage() {
   return (
     <div className="account-page">
       <NavBar />
-      <main className="account-main account-main--wide">
+      <main className="account-main account-main--wide profile-main">
         {player === undefined ? (
           <p className="profile-muted profile-center">…</p>
         ) : player === null ? (
           <p className="profile-muted profile-center">{t('profile.not_found')}</p>
         ) : (
-          <>
-            <ProfileHeader player={player} decoration={decoration}>
-              {isFriend && <span className="profile-friend-pill">✓ {t('friends.is_friend')}</span>}
-            </ProfileHeader>
-            <FriendAction account={account} player={player} friendships={friendships} />
-            <ProfileBody
-              uid={player.uid}
-              collection={
-                <>
-                  <FlagCollection uid={player.uid} />
-                  <ScrollCollection uid={player.uid} />
-                </>
-              }
-            />
-          </>
+          <ProfileBody
+            uid={player.uid}
+            header={
+              <>
+                <ProfileHeader player={player} decoration={decoration}>
+                  {isFriend && <span className="profile-friend-pill">✓ {t('friends.is_friend')}</span>}
+                </ProfileHeader>
+                <FriendAction account={account} player={player} friendships={friendships} />
+              </>
+            }
+            collection={
+              <>
+                <FlagCollection uid={player.uid} />
+                <ScrollCollection uid={player.uid} />
+              </>
+            }
+          />
         )}
       </main>
     </div>

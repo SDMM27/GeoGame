@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { COUNTRY_OF_DAY_MAX_SCORE } from '@shared/utils/countryOfDay'
 
-import { GameTopBar } from '@/components/game/GameTopBar'
+import { GameHud } from '@/components/game/GameHud'
 import { Button, Text, Touchable } from '@/components/ui'
 import { colors, radius, space } from '@/theme'
 
@@ -23,9 +23,10 @@ export function ModePicker({ accent, loading, onChoose }: { accent: string; load
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
-      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + 42 + space.md, paddingBottom: insets.bottom + space.xl }]}>
+      <GameHud game="country_of_day" title={t('games.country_of_day.title')} tag={t('mobile.home.daily').toLocaleUpperCase()} gate="" confirmQuit={false} />
+      <ScrollView contentContainerStyle={[styles.content, { paddingTop: space.sm, paddingBottom: insets.bottom + space.xl }]}>
         <Text variant="label" color={accent}>
-          {t('mobile.home.daily')} · {t('games.country_of_day.title')}
+          {t('mobile.home.daily')}
         </Text>
         {loading ? (
           <Text variant="caption">{t('messages.loading')}</Text>
@@ -66,7 +67,6 @@ export function ModePicker({ accent, loading, onChoose }: { accent: string; load
           </>
         )}
       </ScrollView>
-      <GameTopBar confirmQuit={false} />
     </View>
   )
 }

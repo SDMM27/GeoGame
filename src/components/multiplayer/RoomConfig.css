@@ -10,7 +10,7 @@
 .rc-game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.5rem; }
 .rc-game-pick { display: flex; align-items: center; gap: 0.5rem; padding: 0.7rem 0.8rem; border-radius: 10px; border: 1px solid var(--sd-line); background: var(--sd-surface); color: var(--sd-ink); font-size: 0.95rem; font-weight: 600; text-align: left; cursor: pointer; }
 .rc-game-pick.active { border-color: var(--sd-accent); background: var(--gg-accent-soft); }
-.rc-game-icon { font-size: 1.3rem; }
+.rc-game-label { display: inline-flex; align-items: center; gap: 0.45rem; }
 .rc-mode-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .rc-mode-tab { min-height: 44px; padding: 0.35rem 0.9rem; font-family: var(--sd-font-mono); border-radius: 20px; border: 1px solid var(--gg-line-strong); background: transparent; color: var(--sd-muted); cursor: pointer; font-size: 0.85rem; }
 .rc-mode-tab.active { background: var(--gg-accent-soft); border-color: var(--sd-accent); color: var(--sd-accent-strong); }
@@ -37,3 +37,26 @@
 .rc-submit:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .rc-add-btn { min-height: 44px; }
+
+/* Configuration: the form on the left, the boarding card of the room's games on the right (below it on a phone) */
+.rc-main { min-width: 0; }
+.rc-editor { padding: 1.1rem; border-radius: var(--sd-radius-card); border: 1px solid var(--sd-line); background: var(--sd-surface); }
+.rc-editor-title { margin: 0; font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
+.rc-ticket {
+  position: relative; display: flex; flex-direction: column; gap: 0.75rem; min-width: 0;
+  padding: 1.1rem; border-radius: 18px; border: 1px solid var(--sd-line); background: var(--sd-surface);
+}
+.rc-ticket-title { margin: 0; font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
+.rc-game-list-draft { border-style: dashed !important; background: transparent !important; }
+.rc-ticket-summary { margin: 0; font-family: var(--sd-font-mono); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gg-warning-strong); }
+.rc-ticket-stub { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; padding-top: 0.9rem; border-top: 2px dashed var(--sd-line); }
+.rc-ticket-stub .gg-field > strong { color: var(--sd-muted); letter-spacing: 0.15em; }
+.rc-ticket-barcode { flex: 0 0 96px; height: 30px; background: repeating-linear-gradient(90deg, var(--sd-ink) 0 2px, transparent 2px 4px, var(--sd-ink) 4px 5px, transparent 5px 8px); opacity: 0.85; }
+@media (min-width: 960px) {
+  .room-config { max-width: 1320px; padding: 2.5rem 24px; display: grid; grid-template-columns: minmax(0, 1fr) 400px; column-gap: 48px; align-items: start; }
+  .rc-ticket { position: sticky; top: 88px; }
+  .rc-title { font-size: clamp(2.4rem, 4vw, 3.4rem); }
+}
+@media (prefers-reduced-motion: reduce) { .rc-ticket { position: static; } }
+.rc-game-list button { min-width: 44px; min-height: 44px; }
+.rc-mode-tab, .rc-game-pick, .rc-diff-btn, .rc-preset { min-height: 44px; }

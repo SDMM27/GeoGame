@@ -24,11 +24,11 @@ export const VOYAGE_COLORS: Record<VoyageColor, string> = {
 }
 
 function styleFor(color: VoyageColor): LeafletStyle {
-  if (color === 'hint') return { fillColor: VOYAGE_COLORS.hint, fillOpacity: 0.08, color: '#EEF1F8', weight: 2 }
+  if (color === 'hint') return { fillColor: VOYAGE_COLORS.hint, fillOpacity: 0.08, color: colors.text, weight: 2 }
   return { fillColor: VOYAGE_COLORS[color], fillOpacity: color === 'red' ? 0.4 : 0.55, color: VOYAGE_COLORS[color], weight: 2 }
 }
 
-const GRATICULE_COLOR = '#1E3A5F'
+const GRATICULE_COLOR = colors.stub
 const GRATICULE: Overlay[] = [
   ...[-60, -30, 0, 30, 60].map((lat) => ({
     type: 'line' as const,

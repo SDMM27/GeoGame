@@ -42,8 +42,9 @@ export function SoloLeaderboard({
 
   return (
     <LeaderboardCard scores={scores} error={error} emptyText={t('mobile.leaderboards.empty')}>
-      {visibleRows(scores ?? [], account?.uid, MAX_ROWS).map(({ score, index }) => (
+      {visibleRows(scores ?? [], account?.uid, MAX_ROWS).map(({ score, index }, position, rows) => (
         <LeaderboardRow
+          last={position === rows.length - 1}
           key={`${score.uid ?? score.name}-${score.gameType}-${score.difficulty}-${index}`}
           index={index}
           name={score.name}

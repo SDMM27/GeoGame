@@ -10,8 +10,8 @@ import { useLeaderboardRefresh } from '../../hooks/useLeaderboardRefresh'
 import PlayerName, { mineClass } from '../PlayerName'
 import '../../pages/DailyLeaderboard.css'
 import '../../pages/ChallengeRoundList.css'
+import RankBadge from '../RankBadge'
 
-const MEDAL = ['🥇', '🥈', '🥉']
 
 function Row({ score, index, account }) {
   const { t } = useTranslation()
@@ -21,7 +21,7 @@ function Row({ score, index, account }) {
   return (
     <div className={`daily-lb__row${index < 3 ? ' daily-lb__row--top' : ''}${mineClass(score, account)}`}>
       <div className="daily-lb__row-main" onClick={() => setOpen((prev) => !prev)}>
-        <span className="daily-lb__rank">{index < 3 ? MEDAL[index] : `#${index + 1}`}</span>
+        <span className="daily-lb__rank"><RankBadge rank={index + 1} /></span>
         <span className="daily-lb__name"><PlayerName entry={score} account={account} reportIn="daily_scores" /></span>
         <span className="daily-lb__attempts">{score.score}</span>
         <span className="daily-lb__time">{score.elapsedTime != null ? formatTime(score.elapsedTime) : '—'}</span>

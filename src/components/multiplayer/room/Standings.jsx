@@ -4,6 +4,7 @@ import { useBadges } from '../../../hooks/useBadges'
 import BadgeStrip from '../../profile/BadgeStrip'
 import { formatTime } from '../../../utils/formatTime'
 import { GAME_TYPES } from '../../../utils/gameTypes'
+import RankBadge from '../../RankBadge'
 import {
   overallStandings,
   progressForGame,
@@ -13,7 +14,6 @@ import {
   roomScoringMode,
 } from '../../../utils/multiplayerRoom'
 
-const MEDALS = ['🥇', '🥈', '🥉']
 
 // The badges of the room's players, by player id.
 function useRoomBadges(room) {
@@ -89,7 +89,7 @@ export function Standings({ room, progress, results, playerId, index }) {
           key={result.playerId}
           className={`mpr-row${i < 3 ? ' mpr-row--top' : ''}${result.playerId === playerId ? ' mpr-row--me' : ''}`}
         >
-          <span className="mpr-rank">{MEDALS[result.rank - 1] ?? result.rank}</span>
+          <span className="mpr-rank"><RankBadge rank={result.rank} plain /></span>
           <span className="mpr-name">
             {result.pseudo}
             {result.playerId === playerId && ` (${t('mp_room.you')})`}
@@ -130,7 +130,7 @@ function OverallStandings({ room, results, playerId }) {
           key={entry.playerId}
           className={`mpr-row${i < 3 ? ' mpr-row--top' : ''}${entry.playerId === playerId ? ' mpr-row--me' : ''}`}
         >
-          <span className="mpr-rank">{MEDALS[entry.rank - 1] ?? entry.rank}</span>
+          <span className="mpr-rank"><RankBadge rank={entry.rank} plain /></span>
           <span className="mpr-name">
             {entry.pseudo}
             {entry.playerId === playerId && ` (${t('mp_room.you')})`}

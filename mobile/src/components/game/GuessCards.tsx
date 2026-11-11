@@ -129,7 +129,7 @@ function ProgressChips({ progress }: { progress?: ClueProgress }) {
   if (!progress || (progress.deltaKm == null && !progress.closest)) return null
   const { deltaKm, closest } = progress
   const km = deltaKm == null ? '' : Math.abs(deltaKm).toLocaleString(i18n.language)
-  const color = deltaKm == null ? colors.textMuted : deltaKm < 0 ? colors.accent : deltaKm > 0 ? '#60A5FA' : colors.textMuted
+  const color = deltaKm == null ? colors.textMuted : deltaKm < 0 ? colors.accent : deltaKm > 0 ? colors.info : colors.textMuted
   return (
     <View style={clueStyles.progress}>
       {deltaKm != null && (
@@ -248,7 +248,7 @@ export function ClueGuessSummary({ guesses, progress }: { guesses: ClueGuess[]; 
             ) : (
               <>
                 {delta != null && delta !== 0 && (
-                  <Text variant="caption" color={delta < 0 ? colors.accent : '#60A5FA'} style={{ fontVariant: ['tabular-nums'] }}>
+                  <Text variant="caption" color={delta < 0 ? colors.accent : colors.info} style={{ fontVariant: ['tabular-nums'] }}>
                     {delta < 0 ? '−' : '+'}
                     {Math.abs(delta).toLocaleString(i18n.language)}
                   </Text>

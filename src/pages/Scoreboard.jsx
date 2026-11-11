@@ -8,9 +8,11 @@ import PlayerName, { mineClass } from '../components/PlayerName'
 import { GAME_TYPES } from '../utils/gameTypes'
 import { CONTINENTS } from '../utils/continents'
 import { ALL_CONTINENTS, ALL_DIFFICULTIES, DIFFICULTIES } from '../utils/leaderboards'
+import GamePicker from '../components/GamePicker'
+import GameEmblem from '../components/GameEmblem'
 import './scoreboard.css'
+import RankBadge from '../components/RankBadge'
 
-const MEDAL = ['\uD83E\uDD47', '\uD83E\uDD48', '\uD83E\uDD49']
 const ACTIVE_GAMES = [
   { id: GAME_TYPES.PLACEMENT, labelKey: 'games.placement.title' },
   { id: GAME_TYPES.HARDCORE, labelKey: 'games.hardcore.title' },
@@ -18,6 +20,8 @@ const ACTIVE_GAMES = [
   { id: GAME_TYPES.MISSING_FLAG, labelKey: 'games.missing_flag.title' },
   { id: GAME_TYPES.CAPITALS, labelKey: 'games.capitals.title' },
 ]
+const ALL_GAMES_VALUE = 'AllGames'
+const GAME_LABEL_KEYS = Object.fromEntries(ACTIVE_GAMES.map((game) => [game.id, game.labelKey]))
 
 export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT, continentMode = false }) {
   const { t } = useTranslation()
@@ -57,22 +61,16 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT, contine
     }
   }, [selectedGame, continentMode, selectedDifficulty, selectedContinent])
 
+  // « All games » mixes the games' scores: each row then says which game it was
+  const showGame = selectedGame === ALL_GAMES_VALUE
+
   return (
     <div className="scoreboard">
       <p className="gg-kicker">{t('scores.kicker')}</p>
       <h1 className="scoreboard-title gg-title">{t('scoreboard.title')}</h1>
 
       <div className="scoreboard-filters">
-        <select
-          className="scoreboard-select"
-          value={selectedGame}
-          onChange={(event) => setSelectedGame(event.target.value)}
-        >
-          {ACTIVE_GAMES.map((game) => (
-            <option key={game.id} value={game.id}>{t(game.labelKey)}</option>
-          ))}
-          <option value="AllGames">{t('options.all_games')}</option>
-        </select>
+        <GamePicker games={ACTIVE_GAMES} value={selectedGame} onChange={setSelectedGame} allValue={ALL_GAMES_VALUE} />
 
         {continentMode ? (
           <select
@@ -106,13 +104,14 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT, contine
       ) : scores.length === 0 ? (
         <p className="scoreboard-empty">{t('scoreboard.no_ascension_scores')}</p>
       ) : (
-        <div className="scoreboard-table">
+        <div className={`scoreboard-table${showGame ? ' scoreboard-table--games' : ''}`}>
           <div className="scoreboard-header gg-board-head">
             <span>#</span>
             <span>{t('labels.player')}</span>
+            {showGame && <span>{t('labels.game')}</span>}
             <span>{t('profile.details.score')}</span>
             <span>{t('leaderboard.time')}</span>
-            <span>{t('mp_room.difficulty')}</span>
+            <span>{continentMode ? t('atlas.continent') : t('mp_room.difficulty')}</span>
           </div>
           {scores.map((score, index) => (
             <div
@@ -120,16 +119,25 @@ export default function Scoreboard({ defaultGame = GAME_TYPES.PLACEMENT, contine
               className={`scoreboard-row ${index < 3 ? 'scoreboard-row--top' : ''}${mineClass(score, account)}`}
             >
               <span className="scoreboard-rank">
-                {index < 3 ? MEDAL[index] : `#${index + 1}`}
+                <RankBadge rank={index + 1} />
               </span>
               <span className="scoreboard-name"><PlayerName entry={score} account={account} reportIn="scores" /></span>
+              {showGame && (
+                <span className="scoreboard-game">
+                  <GameEmblem game={score.gameType} size={22} />
+                  <span>{GAME_LABEL_KEYS[score.gameType] ? t(GAME_LABEL_KEYS[score.gameType]) : score.gameType}</span>
+                </span>
+              )}
               <span className="scoreboard-score">{score.score} {t('units.pts')}</span>
               <span className="scoreboard-time">
                 {score.elapsedTime != null ? formatTime(score.elapsedTime) : '—'}
               </span>
               <span className="scoreboard-difficulty">
+                {/* A continent score stores its continent as its difficulty too: show it once */}
                 {score.continent
-                  ? `${t(`difficulties.${score.difficulty}`, score.difficulty)} · ${t(`continents.${score.continent}`, score.continent)}`
+                  ? score.difficulty === score.continent
+                    ? t(`continents.${score.continent}`, score.continent)
+                    : `${t(`difficulties.${score.difficulty}`, score.difficulty)} · ${t(`continents.${score.continent}`, score.continent)}`
                   : t(`difficulties.${score.difficulty}`, score.difficulty)}
               </span>
             </div>

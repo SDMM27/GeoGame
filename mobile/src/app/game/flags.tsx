@@ -11,6 +11,7 @@ import { RoomGate, type RoomPlay } from '@/multiplayer/RoomPlay'
 import { gameColors } from '@/theme'
 
 const CONFIG: TypingGameConfig = {
+  game: 'flags',
   gameType: GAME_TYPES.FLAGS,
   scoreGameType: 'FLAGS',
   accent: gameColors.flags,

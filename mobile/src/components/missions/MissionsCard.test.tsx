@@ -9,9 +9,9 @@ jest.mock('@/components/ui', () => {
   const { Pressable, Text } = require('react-native')
   return { Text, Touchable: Pressable, Pill: ({ label }: { label: string }) => <Text>{label}</Text> }
 })
-// Reanimated and worklets need native code: their jest mocks (no useReducedMotion needed here)
+// Reanimated and worklets need native code: their jest mocks (the Stamp of a done mission reads useReducedMotion)
 /* eslint-disable @typescript-eslint/no-require-imports */
-jest.mock('react-native-reanimated', () => require('react-native-reanimated/mock'))
+jest.mock('react-native-reanimated', () => ({ ...require('react-native-reanimated/mock'), useReducedMotion: () => false }))
 jest.mock('react-native-worklets', () => require('react-native-worklets/lib/module/mock'))
 /* eslint-enable @typescript-eslint/no-require-imports */
 // The icon font loads asynchronously and updates state outside act

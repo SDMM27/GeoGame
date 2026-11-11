@@ -10,27 +10,33 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { dismissInvite } from '@shared/utils/invites'
 
 import { useAccount } from '@/account/auth'
+import { Barcode, DeparturesBoard, Kicker, ScreenTitle } from '@/components/flight'
 import { Button, Text, Touchable } from '@/components/ui'
 import { getGame, MULTI_GAMES, type GameDefinition } from '@/games'
 import { acceptInvite, useInvites, type Invite } from '@/multiplayer/invites'
 import { startMultiGame } from '@/multiplayer/navigation'
 import { getRecentRooms, normalizeCode, type RecentRoom } from '@/multiplayer/room'
+import GameEmblem from '@/components/GameEmblem'
 import { colors, fonts, radius, space } from '@/theme'
 
 const openRoom = (code: string) => router.push({ pathname: '/multi/[code]', params: { code } })
 
-function GameRow({ game, index }: { game: GameDefinition; index: number }) {
+// A game of the « create » board: emblem, flight code, name, plus
+function GameRow({ game, index, last }: { game: GameDefinition; index: number; last: boolean }) {
   const { t } = useTranslation()
   return (
     <Animated.View entering={FadeInDown.delay(60 + index * 50).springify().damping(18)}>
-      <Touchable accessibilityRole="button" onPress={() => startMultiGame(game)} style={styles.row}>
-        <View style={[styles.icon, { backgroundColor: `${game.color}1F` }]}>
-          <MaterialCommunityIcons name={game.icon} size={24} color={game.color} />
-        </View>
-        <Text variant="bodyStrong" style={{ flex: 1 }}>
+      <Touchable
+        accessibilityRole="button"
+        accessibilityLabel={t(game.titleKey)}
+        onPress={() => startMultiGame(game)}
+        style={[styles.boardRow, !last && styles.boardDivider]}>
+        <GameEmblem game={game.id} size={30} />
+        <Text style={styles.boardCode}>{game.code}</Text>
+        <Text style={styles.boardName} numberOfLines={1}>
           {t(game.titleKey)}
         </Text>
-        <MaterialCommunityIcons name="plus" size={22} color={colors.textFaint} />
+        <MaterialCommunityIcons name="plus" size={22} color={colors.text} />
       </Touchable>
     </Animated.View>
   )
@@ -43,7 +49,7 @@ function RecentRow({ recent }: { recent: RecentRoom }) {
   return (
     <Touchable accessibilityRole="button" onPress={() => openRoom(recent.code)} style={styles.row}>
       <View style={[styles.icon, { backgroundColor: `${game.color}1F` }]}>
-        <MaterialCommunityIcons name={game.icon} size={24} color={game.color} />
+        <GameEmblem game={game.id} variant="glyph" size={24} color={game.color} />
       </View>
       <View style={{ flex: 1 }}>
         <Text variant="bodyStrong">{t(game.titleKey)}</Text>
@@ -66,7 +72,7 @@ function InviteRow({ invite }: { invite: Invite }) {
   return (
     <Animated.View entering={FadeInDown.springify().damping(18)} style={[styles.row, { borderColor: `${game.color}66` }]}>
       <View style={[styles.icon, { backgroundColor: `${game.color}1F` }]}>
-        <MaterialCommunityIcons name={game.icon} size={24} color={game.color} />
+        <GameEmblem game={game.id} variant="glyph" size={24} color={game.color} />
       </View>
       <View style={{ flex: 1 }}>
         <Text variant="bodyStrong" numberOfLines={1}>
@@ -106,14 +112,15 @@ export default function MultiplayerScreen() {
       style={{ flex: 1, backgroundColor: colors.bg }}
       keyboardShouldPersistTaps="handled"
       contentContainerStyle={{ paddingTop: insets.top + space.lg, paddingHorizontal: space.lg, paddingBottom: space.xxl * 2, gap: space.xl }}>
-      <View style={{ gap: 2 }}>
-        <Text variant="title">{t('mobile.multi.title')}</Text>
+      <View style={{ gap: 4 }}>
+        <Kicker>{t('home.board_title')}</Kicker>
+        <ScreenTitle size={32}>{t('mobile.multi.title')}</ScreenTitle>
         <Text variant="caption">{t('mobile.multi.subtitle')}</Text>
       </View>
 
       {invites.length > 0 && (
         <View style={{ gap: space.md }}>
-          <Text variant="heading">{t('mobile.invites.received_title')}</Text>
+          <ScreenTitle size={20}>{t('mobile.invites.received_title')}</ScreenTitle>
           {invites.map((invite) => (
             <InviteRow key={invite.id} invite={invite} />
           ))}
@@ -121,7 +128,10 @@ export default function MultiplayerScreen() {
       )}
 
       <View style={styles.joinCard}>
-        <Text variant="heading">{t('mobile.multi.join_title')}</Text>
+        <View style={styles.joinHead}>
+          <ScreenTitle size={20}>{t('mobile.multi.join_title')}</ScreenTitle>
+          <Barcode width={52} height={24} color={colors.textMuted} />
+        </View>
         <View style={{ flexDirection: 'row', gap: space.sm }}>
           <TextInput
             value={code}
@@ -142,17 +152,19 @@ export default function MultiplayerScreen() {
 
       <View style={{ gap: space.md }}>
         <View style={{ gap: 2 }}>
-          <Text variant="heading">{t('mobile.multi.create_title')}</Text>
+          <ScreenTitle size={20}>{t('mobile.multi.create_title')}</ScreenTitle>
           <Text variant="caption">{t('mobile.multi.create_subtitle')}</Text>
         </View>
-        {MULTI_GAMES.map((game, index) => (
-          <GameRow key={game.id} game={game} index={index} />
-        ))}
+        <DeparturesBoard>
+          {MULTI_GAMES.map((game, index) => (
+            <GameRow key={game.id} game={game} index={index} last={index === MULTI_GAMES.length - 1} />
+          ))}
+        </DeparturesBoard>
       </View>
 
       {recent.length > 0 && (
         <View style={{ gap: space.md }}>
-          <Text variant="heading">{t('mobile.multi.recent_title')}</Text>
+          <ScreenTitle size={20}>{t('mobile.multi.recent_title')}</ScreenTitle>
           {recent.map((item) => (
             <RecentRow key={item.code} recent={item} />
           ))}
@@ -163,7 +175,7 @@ export default function MultiplayerScreen() {
 }
 
 const styles = StyleSheet.create({
-  joinCard: { gap: space.md, padding: space.lg, borderRadius: radius.xl, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
+  joinCard: { gap: space.md, padding: space.lg, borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   codeInput: {
     flex: 1,
     minWidth: 0,
@@ -174,10 +186,15 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     paddingHorizontal: space.lg,
     color: colors.text,
-    fontFamily: fonts.display,
+    fontFamily: fonts.monoBold,
     fontSize: 22,
-    letterSpacing: 4,
+    letterSpacing: 6,
   },
+  joinHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  boardRow: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 52, paddingHorizontal: 12 },
+  boardDivider: { borderBottomWidth: 1, borderBottomColor: colors.boardLine },
+  boardCode: { width: 34, fontFamily: fonts.monoBold, fontSize: 13, color: colors.gold },
+  boardName: { flex: 1, minWidth: 0, fontFamily: fonts.bodyBold, fontSize: 14, color: colors.text },
   row: {
     flexDirection: 'row',
     alignItems: 'center',

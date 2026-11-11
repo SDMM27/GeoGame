@@ -8,6 +8,7 @@ import { setupGameRecord } from '../../utils/gameHistory'
 import { useRecordGame } from '../../auth'
 import { getCapitalName, getCountryName } from '../../utils/getCountryName'
 import { createAppFillRenderer } from '../../components/map/appFillRenderer'
+import { GameFlightTag } from '../../components/GameEmblem'
 import PhaseIndicator from '../../components/PhaseIndicator'
 import countries from '../../data/countriesWithDifficulty_FR.json'
 import Form from '../form'
@@ -117,6 +118,7 @@ export default function PlacementGameLayout({ difficulty, isTraining, isAscensio
 
       <div className={`hud-container${isAscension ? ' hud-container--with-phase' : ''}`}>
         <div className="hud-main">
+          <GameFlightTag game={gameType} className="hud-flight" />
           <div className="hud-row">
             <div className="hud-cell">
               <span className="hud-value" style={{ color: 'var(--sd-accent-strong)' }}>{score}</span>

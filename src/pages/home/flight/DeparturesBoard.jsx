@@ -3,8 +3,10 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import FlapText from './FlapText'
+import GameEmblem, { flightCode } from '../../../components/GameEmblem'
 
-// `rows`: { id, title, description, status: 'boarding' | 'on_time' | 'open', onClick }
+// `rows`: { id, title, description, status: 'boarding' | 'on_time' | 'open', onClick, game? } (`game`: the emblem and
+// flight code to show, none for a row that is not a game)
 export default function DeparturesBoard({ rows, labelledBy }) {
   const { t, i18n } = useTranslation()
   const upper = (text) => text.toLocaleUpperCase(i18n.resolvedLanguage)
@@ -23,6 +25,8 @@ export default function DeparturesBoard({ rows, labelledBy }) {
             <tr key={row.id} className="departures-row">
               <td className="departures-name">
                 <button type="button" className="departures-button" onClick={row.onClick}>
+                  <span className="departures-emblem">{row.game && <GameEmblem game={row.game} size={28} />}</span>
+                  <span className="gg-mono departures-code" aria-hidden="true">{row.game ? flightCode(row.game) : ''}</span>
                   <FlapText text={upper(row.title)} delay={i * 90} duration={700} />
                 </button>
               </td>

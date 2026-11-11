@@ -243,11 +243,14 @@
 
 .scoreboard-note { text-align: left; margin: -8px 0 16px; max-width: none; }
 .scoreboard-filters { justify-content: flex-start; margin-bottom: 24px; }
+.scoreboard-filters .game-picker { justify-content: flex-start; }
 
 .scoreboard-mode-tabs {
   justify-content: flex-start;
   flex-wrap: wrap;
-  max-width: 700px;
+  /* On the same 1320px column as the board below, so the tabs line up with its left edge */
+  max-width: 1320px;
+  box-sizing: border-box;
 }
 
 .scoreboard-mode-tab {
@@ -293,3 +296,65 @@
 
 /* 44px touch targets */
 .scoreboard-select { min-height: 44px; }
+
+/* Validated mockup: on the 1320px column, the filters in a board panel and the table as one board with hairlines,
+   both the column's full width */
+.scoreboard { max-width: 1320px; }
+.scoreboard-filters {
+  padding: 12px 16px;
+  border: 1px solid var(--sd-line);
+  border-radius: var(--sd-radius-card);
+  background: var(--sd-surface);
+}
+.scoreboard-table {
+  gap: 0;
+  border: 1px solid var(--sd-line);
+  border-radius: var(--sd-radius-card);
+  background: var(--sd-surface);
+  overflow: hidden;
+}
+.scoreboard-table > .scoreboard-header { padding: 14px 16px; }
+.scoreboard-table > .scoreboard-row {
+  border: 0;
+  border-top: 1px solid var(--sd-line);
+  border-radius: 0;
+  background: transparent;
+}
+.scoreboard-table > .scoreboard-row:hover { background: var(--sd-surface-2); }
+.scoreboard-table > .scoreboard-row--top { background: var(--gg-accent-soft); }
+.scoreboard-note { max-width: 720px; }
+@media (max-width: 520px) {
+  .scoreboard-filters { padding: 10px; }
+}
+
+/* « All games »: a game column (its emblem and name) after the player */
+.scoreboard-table--games .scoreboard-header,
+.scoreboard-table--games .scoreboard-row {
+  grid-template-columns: 48px minmax(0, 1fr) minmax(0, 220px) 110px 100px 120px;
+}
+.scoreboard-game {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  color: var(--sd-muted);
+  font-size: 0.82rem;
+}
+.scoreboard-game > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.scoreboard-game .game-emblem { flex-shrink: 0; }
+
+@media (max-width: 520px) {
+  .scoreboard-table--games .scoreboard-row {
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    grid-template-areas:
+      'rank name score'
+      '. game game'
+      '. time extra';
+  }
+  .scoreboard-game { grid-area: game; }
+}

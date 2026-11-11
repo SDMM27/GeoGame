@@ -3,6 +3,7 @@ import type MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIco
 
 import { isGameHidden } from '@shared/utils/gameAvailability'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
+import { gameEmblem } from '@shared/utils/gameEmblems'
 import { gameColors } from '@/theme'
 
 type IconName = ComponentProps<typeof MaterialCommunityIcons>['name']
@@ -16,6 +17,8 @@ export type GameDefinition = {
   titleKey: string
   descKey: string
   icon: IconName
+  // Flight code (« VOL DRP »), from the shared emblems
+  code: string
   color: string
   route: string
   // 'setup': difficulty/continent/ascension sheet. 'daily': daily + infinite modes.
@@ -35,6 +38,7 @@ export const GAMES: GameDefinition[] = [
     titleKey: 'games.daily_challenge.title',
     descKey: 'games.daily_challenge.description',
     icon: 'target',
+    code: gameEmblem('daily_challenge')?.code ?? '',
     color: gameColors.daily_challenge,
     route: '/game/challenge',
     kind: 'daily',
@@ -47,6 +51,7 @@ export const GAMES: GameDefinition[] = [
     titleKey: 'games.country_of_day.title',
     descKey: 'games.country_of_day.description',
     icon: 'earth',
+    code: gameEmblem('country_of_day')?.code ?? '',
     color: gameColors.country_of_day,
     route: '/game/country-of-the-day',
     kind: 'daily',
@@ -59,6 +64,7 @@ export const GAMES: GameDefinition[] = [
     titleKey: 'games.placement.title',
     descKey: 'games.placement.description',
     icon: 'map-marker-radius-outline',
+    code: gameEmblem('placement')?.code ?? '',
     color: gameColors.placement,
     route: '/game/placement',
     kind: 'setup',
@@ -70,6 +76,7 @@ export const GAMES: GameDefinition[] = [
     titleKey: 'games.flags.title',
     descKey: 'games.flags.description',
     icon: 'flag-variant-outline',
+    code: gameEmblem('flags')?.code ?? '',
     color: gameColors.flags,
     route: '/game/flags',
     kind: 'setup',
@@ -81,6 +88,7 @@ export const GAMES: GameDefinition[] = [
     titleKey: 'games.capitals.title',
     descKey: 'games.capitals.description',
     icon: 'bank-outline',
+    code: gameEmblem('capitals')?.code ?? '',
     color: gameColors.capitals,
     route: '/game/capitals',
     kind: 'setup',
@@ -92,6 +100,7 @@ export const GAMES: GameDefinition[] = [
     titleKey: 'games.border_guess.title',
     descKey: 'games.border_guess.description',
     icon: 'vector-polygon',
+    code: gameEmblem('border_guess')?.code ?? '',
     color: gameColors.border_guess,
     route: '/game/border-guess',
     kind: 'daily',
@@ -103,6 +112,7 @@ export const GAMES: GameDefinition[] = [
     titleKey: 'games.country_clue.title',
     descKey: 'games.country_clue.description',
     icon: 'compass-outline',
+    code: gameEmblem('country_clue')?.code ?? '',
     color: gameColors.country_clue,
     route: '/game/country-clue',
     kind: 'daily',
@@ -114,6 +124,7 @@ export const GAMES: GameDefinition[] = [
     titleKey: 'games.voyage_voyage.title',
     descKey: 'games.voyage_voyage.description',
     icon: 'airplane-takeoff',
+    code: gameEmblem('voyage_voyage')?.code ?? '',
     color: gameColors.voyage_voyage,
     route: '/game/voyage',
     kind: 'daily',
@@ -125,6 +136,7 @@ export const GAMES: GameDefinition[] = [
     titleKey: 'games.ranking.title',
     descKey: 'games.ranking.description',
     icon: 'sort-descending',
+    code: gameEmblem('ranking')?.code ?? '',
     color: gameColors.ranking,
     route: '/game/ranking',
     kind: 'daily',
@@ -136,6 +148,7 @@ export const GAMES: GameDefinition[] = [
     titleKey: 'games.quiz.title',
     descKey: 'games.quiz.description',
     icon: 'help-circle-outline',
+    code: gameEmblem('quiz')?.code ?? '',
     color: gameColors.quiz,
     route: '/game/quiz',
     kind: 'daily',
@@ -147,6 +160,7 @@ export const GAMES: GameDefinition[] = [
     titleKey: 'games.survival.title',
     descKey: 'games.survival.description',
     icon: 'heart-pulse',
+    code: gameEmblem('survival')?.code ?? '',
     color: gameColors.survival,
     route: '/game/survival',
     kind: 'survival',
@@ -158,6 +172,7 @@ export const GAMES: GameDefinition[] = [
     titleKey: 'games.hardcore.title',
     descKey: 'games.hardcore.description',
     icon: 'skull-outline',
+    code: gameEmblem('hardcore')?.code ?? '',
     color: gameColors.hardcore,
     route: '/game/placement',
     kind: 'setup',
@@ -169,6 +184,7 @@ export const GAMES: GameDefinition[] = [
     titleKey: 'games.missing_flag.title',
     descKey: 'games.missing_flag.description',
     icon: 'puzzle-outline',
+    code: gameEmblem('missing_flag')?.code ?? '',
     color: gameColors.missing_flag,
     route: '/game/missing-flag',
     kind: 'setup',

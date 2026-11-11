@@ -13,11 +13,11 @@ import { describeResult } from '@shared/utils/profileFormat'
 import { navigate } from '@/shims/react-router-dom'
 import { colors, radius, space } from '@/theme'
 import { Button, Text } from '../ui'
-import { GameTopBar } from './GameTopBar'
+import { GameHud } from './GameHud'
 
 type DailyGame = { solved?: boolean; elapsedTime?: number | null; [field: string]: unknown }
 
-export function DailyPlayedElsewhere({ title, game, accent, children }: { title: string; game: DailyGame | null; accent: string; children?: ReactNode }) {
+export function DailyPlayedElsewhere({ gameId, title, game, accent, children }: { gameId: string; title: string; game: DailyGame | null; accent: string; children?: ReactNode }) {
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   const result = game
@@ -26,7 +26,8 @@ export function DailyPlayedElsewhere({ title, game, accent, children }: { title:
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
-      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + 42 + space.md, paddingBottom: insets.bottom + space.xl }]}>
+      <GameHud game={gameId} title={title} tag={t('mobile.home.daily').toLocaleUpperCase()} gate="" confirmQuit={false} />
+      <ScrollView contentContainerStyle={[styles.content, { paddingTop: space.lg, paddingBottom: insets.bottom + space.xl }]}>
         <Text variant="label" color={accent}>
           {t('mobile.home.daily')} · {title}
         </Text>
@@ -66,7 +67,6 @@ export function DailyPlayedElsewhere({ title, game, accent, children }: { title:
           </>
         )}
       </ScrollView>
-      <GameTopBar confirmQuit={false} />
     </View>
   )
 }

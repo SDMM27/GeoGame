@@ -13,6 +13,7 @@ import { matchKnownAnswer } from '../utils/answerLexicon'
 import { restartTyping } from '../utils/restartTyping'
 import { getCountryName, getAllCountryNames } from '../utils/getCountryName'
 import { getMissingFlagMask } from '../utils/missingFlag'
+import { GameFlightTag } from '../components/GameEmblem'
 import PhaseIndicator from '../components/PhaseIndicator'
 import Form from './form'
 import AscensionForm from './AscensionForm'
@@ -78,6 +79,7 @@ function FlagGameLayout({ difficulty, isTraining, isAscension, presetName, state
 
       <div className={`hud-container${isAscension ? ' hud-container--with-phase' : ''}`}>
         <div className="hud-main">
+          <GameFlightTag game={gameType} className="hud-flight" />
           <div className="hud-row">
             <div className="hud-cell">
               <span className="hud-value" style={{ color: 'var(--sd-accent-strong)' }}>{score}</span>

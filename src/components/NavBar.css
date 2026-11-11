@@ -4,7 +4,8 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 0.6rem 2rem;
+  /* Full-width bar, but its content sits on the pages' 1320px column (.home-main: max-width 1320px, 24px padding) */
+  padding: 0.6rem max(24px, calc((100% - 1320px) / 2 + 24px));
   border-bottom: 1px solid var(--sd-line);
   background: var(--sd-bg);
 }
@@ -20,6 +21,17 @@
 
 .navbar-logo:hover {
   color: var(--sd-ink);
+}
+
+.navbar-logo-img {
+  height: 40px;
+  width: auto;
+  display: block;
+  transition: transform 0.2s;
+}
+
+.navbar-logo:hover .navbar-logo-img {
+  transform: scale(1.05);
 }
 
 .navbar-logo-name {
@@ -137,6 +149,10 @@
 
   .navbar-logo {
     margin-right: auto;
+  }
+
+  .navbar-logo-img {
+    height: 34px;
   }
 
   .navbar-logo-name {

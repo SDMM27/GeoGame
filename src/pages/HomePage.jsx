@@ -47,6 +47,7 @@ export default function HomePage() {
   const boardRows = [
     ...SETUP_GAMES.map((game, i) => ({
       id: game.id,
+      game: game.id,
       title: t(game.titleKey),
       description: t(game.descKey),
       status: i === 0 ? "boarding" : "on_time",

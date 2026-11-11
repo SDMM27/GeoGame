@@ -29,12 +29,14 @@
   --gg-stamp-green: #08663f;                   /* passport stamps: small text on --sd-surface-2 */
   --gg-stamp-violet: #5b2fd6;
 
-  /* Departures board: dark in both themes, like the real thing */
-  --gg-board: #0b1020;
-  --gg-board-ink: #eef1f8;
-  --gg-board-muted: #8a93b0;
-  --gg-board-line: #1b2440;
-  --gg-board-accent: #f5c84b;
+  /* Departures board: white in the light theme, night blue in the dark one (AA on white) */
+  --gg-board: #ffffff;
+  --gg-board-ink: #0b1020;
+  --gg-board-muted: #5a6380;
+  --gg-board-line: #e3e8f2;
+  --gg-board-accent: #8a5a00;
+  --gg-board-boarding: #08663f;
+  --gg-board-hover: rgba(11, 16, 32, 0.04);
 
   /* Game maps (Leaflet) and the hero globe */
   --gg-ocean: #d3def1;
@@ -62,6 +64,8 @@
   --game-daily-challenge: #ff9f45; --game-daily-challenge-ink: #a8520a;
   --game-country-of-day: #2ec4b6;  --game-country-of-day-ink: #0d7a70;
   --game-survival: #ff5c7a;      --game-survival-ink: #c2213f;
+  --game-hardcore: #ff7a6b;      --game-hardcore-ink: #b42318;
+  --game-missing-flag: #c792ff;  --game-missing-flag-ink: #6b3fd4;
   --gg-on-game: #0b1020;            /* text on a game fill, both themes */
 }
 
@@ -90,6 +94,12 @@
   --gg-stamp-violet: var(--sd-accent-2);
 
   --gg-board: #070b16;
+  --gg-board-ink: #eef1f8;
+  --gg-board-muted: #8a93b0;
+  --gg-board-line: #1b2440;
+  --gg-board-accent: #f5c84b;
+  --gg-board-boarding: #3ddc97;
+  --gg-board-hover: rgba(255, 255, 255, 0.04);
 
   --gg-ocean: #060e1f;
   --gg-ocean-deep: #0e1630;
@@ -99,8 +109,8 @@
 
   --gg-globe-ocean: #1b2a4d;
   --gg-globe-ocean-deep: #0e1630;
-  --gg-globe-land: #eef1f8;
-  --gg-globe-land-edge: rgba(11, 16, 32, 0.4);
+  --gg-globe-land: #9aa9cc;
+  --gg-globe-land-edge: rgba(11, 16, 32, 0.5);
 
   --game-placement-ink: #7aa2ff;
   --game-flags-ink: #ff7a6b;
@@ -113,6 +123,8 @@
   --game-daily-challenge-ink: #ff9f45;
   --game-country-of-day-ink: #2ec4b6;
   --game-survival-ink: #ff5c7a;
+  --game-hardcore-ink: #ff7a6b;
+  --game-missing-flag-ink: #c792ff;
 }
 
 * {

@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import NavBar from '../components/NavBar'
+import { GameFlightTag } from '../components/GameEmblem'
 import RankingLeaderboard from './RankingLeaderboard'
 import ShareScoreButton from '../components/ShareScoreButton'
 import ChallengeBanner from '../components/ChallengeBanner'
@@ -167,6 +168,7 @@ export default function RankingGamePage() {
     <div className="ranking-game-page">
       <NavBar />
       <div className="ranking-game-main">
+        <GameFlightTag game={GAME_TYPES.RANKING} className="game-flight-tag--board" />
         <p className="gg-kicker">{t(isSubmitted ? 'carnet_games.kicker_end' : mode === 'daily' ? 'carnet_games.kicker_daily' : 'carnet_games.kicker_free')}</p>
         <h1 className="ranking-game-title">{t('ranking.title')}</h1>
 

@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { GeoJSON, MapContainer } from 'react-leaflet'
 import NavBar from '../components/NavBar'
+import { GameFlightTag } from '../components/GameEmblem'
 import ShareScoreButton from '../components/ShareScoreButton'
 import DailyPlayedElsewhere from '../components/DailyPlayedElsewhere'
 import PlacementMap from '../components/countryOfDay/PlacementMap'
@@ -302,6 +303,7 @@ export default function CountryOfDayPage() {
     <div className="quiz-page">
       <NavBar />
       <main className="quiz-main">
+        <GameFlightTag game={GAME_TYPES.COUNTRY_OF_DAY} className="game-flight-tag--board" />
         <header className="quiz-header">
           <div className="quiz-header__title">
             <p className="gg-kicker">{t(done ? 'carnet_games.kicker_end' : 'carnet_games.kicker_daily')}</p>

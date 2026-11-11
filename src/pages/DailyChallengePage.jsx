@@ -15,7 +15,7 @@ import { useAccount, useRecordGame } from '../auth'
 import { GAME_TYPES } from '../utils/gameTypes'
 import { CHALLENGE_TIMER, challengeShareGrid } from '../utils/dailyChallenge'
 import { formatTime } from '../utils/formatTime'
-import { SURVIVAL_ROUND_ICONS } from '../components/SurvivalOptions'
+import GameEmblem, { GameFlightTag } from '../components/GameEmblem'
 import { DIFFICULTY_COLORS } from './quiz/constants'
 import { PlacementRound, TypedRound, roundAnswer } from './survival/SurvivalRounds'
 import ChallengeForm from './ChallengeForm'
@@ -54,6 +54,7 @@ function Playing({ challenge }) {
       <NavBar />
       <div className={`survival-game${round.type === GAME_TYPES.PLACEMENT ? ' survival-game--map' : ''}`}>
         <header className="survival-hud">
+          <GameFlightTag game={GAME_TYPES.DAILY_CHALLENGE} className="survival-hud-flight" />
           <Progress results={results} current={roundIndex} />
           <div className="survival-hud-round">
             <span className="survival-hud-label">
@@ -62,7 +63,7 @@ function Playing({ challenge }) {
                 {' · '}{t(`difficulties.${round.difficulty}`)}
               </span>
             </span>
-            <strong>{SURVIVAL_ROUND_ICONS[round.type]} {t(`survival.prompt.${round.type}`)}</strong>
+            <strong><GameEmblem game={round.type} variant="glyph" size={16} /> {t(`survival.prompt.${round.type}`)}</strong>
           </div>
           <div className="survival-hud-stats">
             <span><strong>{score}</strong> {t('daily_challenge.correct_short')}</span>

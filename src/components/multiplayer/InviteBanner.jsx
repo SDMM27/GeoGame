@@ -5,14 +5,14 @@ import { useTranslation } from 'react-i18next'
 import { useAccount } from '../../auth'
 import useInvites, { acceptInvite } from '../../hooks/useInvites'
 import { isGamePath } from '../../utils/gamePaths'
-import { roomGameIcon } from '../../utils/roomGames'
+import GameEmblem from '../GameEmblem'
 import './Invites.css'
 
 export function InviteRow({ invite, onJoin, onClose, closeLabel }) {
   const { t } = useTranslation()
   return (
     <div className="invite-row">
-      <span className="invite-icon" aria-hidden="true">{roomGameIcon(invite.gameId)}</span>
+      <GameEmblem game={invite.gameId} size={40} />
       <div className="invite-text">
         <strong>{t('invites.banner', { username: invite.fromUsername, game: t(`games.${invite.gameId}.title`) })}</strong>
         <span>{t(invite.mode === 'live' ? 'mp_room.live' : 'mp_room.challenge')}</span>

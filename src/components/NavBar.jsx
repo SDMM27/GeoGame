@@ -9,7 +9,6 @@ import { useFriendships } from '../hooks/usePlayerProfile'
 import { LANGUAGES, toLanguage } from '../i18n/languages'
 import { isGamePath } from '../utils/gamePaths'
 import { LeaderboardIcon, MultiIcon, PlayIcon, ProfileIcon } from './NavIcons'
-import CompassLogo from './theme/CompassLogo'
 import ThemeToggle from './theme/ThemeToggle'
 import './NavBar.css'
 
@@ -32,7 +31,7 @@ export default function NavBar() {
   return (
     <header className="navbar">
       <Link to="/" className="navbar-logo">
-        <CompassLogo size={30} />
+        <img src="/logo.png" alt="" className="navbar-logo-img" />
         <span className="navbar-logo-name">GeoGame</span>
       </Link>
       <nav className={`navbar-tabs${inGame ? ' navbar-tabs--in-game' : ''}`} aria-label={t('nav.main')}>

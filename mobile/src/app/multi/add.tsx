@@ -4,10 +4,12 @@ import { useLocalSearchParams } from 'expo-router'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, View } from 'react-native'
 
+import { Kicker, ScreenTitle } from '@/components/flight'
 import { SheetCloseButton } from '@/components/SheetCloseButton'
 import { Text, Touchable } from '@/components/ui'
 import { MULTI_GAMES } from '@/games'
 import { startMultiGame } from '@/multiplayer/navigation'
+import GameEmblem from '@/components/GameEmblem'
 import { colors, radius, space } from '@/theme'
 
 export default function AddGameSheet() {
@@ -17,20 +19,28 @@ export default function AddGameSheet() {
   return (
     <ScrollView contentContainerStyle={{ padding: space.xl, gap: space.md }}>
       <View style={styles.titleRow}>
-        <Text variant="title" style={{ flex: 1, fontSize: 26 }}>
+        <ScreenTitle size={28} style={{ flex: 1 }}>
           {t('mp_room.add_game')}
-        </Text>
+        </ScreenTitle>
         <SheetCloseButton />
       </View>
       {MULTI_GAMES.map((game) => (
-        <Touchable key={game.id} accessibilityRole="button" onPress={() => startMultiGame(game, code)} style={styles.row}>
+        <Touchable
+          key={game.id}
+          accessibilityRole="button"
+          accessibilityLabel={t(game.titleKey)}
+          onPress={() => startMultiGame(game, code)}
+          style={styles.row}>
           <View style={[styles.icon, { backgroundColor: `${game.color}1F` }]}>
-            <MaterialCommunityIcons name={game.icon} size={24} color={game.color} />
+            <GameEmblem game={game.id} variant="glyph" size={24} color={game.color} />
           </View>
-          <Text variant="bodyStrong" style={{ flex: 1 }}>
-            {t(game.titleKey)}
-          </Text>
-          <MaterialCommunityIcons name="chevron-right" size={22} color={colors.textFaint} />
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text variant="bodyStrong" numberOfLines={1}>
+              {t(game.titleKey)}
+            </Text>
+            <Kicker color={game.color}>VOL {game.code}</Kicker>
+          </View>
+          <MaterialCommunityIcons name="chevron-right" size={22} color={colors.textMuted} />
         </Touchable>
       ))}
     </ScrollView>
@@ -43,9 +53,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: space.md,
+    minHeight: 68,
     padding: space.md,
     borderRadius: radius.lg,
-    backgroundColor: colors.bg,
+    backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
   },

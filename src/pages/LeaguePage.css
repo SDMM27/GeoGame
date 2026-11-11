@@ -60,3 +60,22 @@
     padding: 0.7rem 1.1rem;
   }
 }
+
+/* Wide screens (validated mockup): the table on the left, my place, last week and the rewards on the right of the 1320px column */
+@media (min-width: 1000px) {
+  .account-main--wide.league-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 420px;
+    column-gap: 32px;
+    row-gap: 16px;
+    align-items: start;
+    align-content: start;
+    max-width: 1320px;
+    padding: 2rem 24px 3rem;
+  }
+  .league-main > .league-header { grid-column: 1 / -1; grid-row: 1; }
+  .league-main > .profile-section { grid-column: 1; grid-row: 2 / span 6; }
+  .league-main > .league-card,
+  .league-main > .profile-muted { grid-column: 2; }
+  .league-main > .league-me { order: -1; }
+}

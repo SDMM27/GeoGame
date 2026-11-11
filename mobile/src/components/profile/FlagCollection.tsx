@@ -12,6 +12,7 @@ import { onPublicDataPatched } from '@shared/utils/publicProfile'
 import { FlagPiece } from '@/components/collection/FlagPiece'
 import { CollapsibleSection } from '@/components/CollapsibleSection'
 import { replayFlag } from '@/components/collection/replay'
+import { Kicker } from '@/components/flight'
 import { Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
 import { colors, radius, space } from '@/theme'
@@ -118,7 +119,7 @@ export function FlagCollectionView({ collection, sectionId = 'collection' }: { c
           <View style={styles.current}>
             <PieceFlag iso={flags.current} pieces={flags.pieces} cost={cost} />
             <View style={{ flex: 1, gap: 2 }}>
-              <Text variant="label">{t('collection.current')}</Text>
+              <Kicker>{t('collection.current')}</Kicker>
               <Text variant="bodyStrong">?</Text>
               <Text variant="caption" color={colors.accent}>
                 {t('collection.pieces', { count: flags.pieces, total: cost })}
@@ -132,7 +133,7 @@ export function FlagCollectionView({ collection, sectionId = 'collection' }: { c
 
         {sorted.length > 0 && (
           <>
-            <Text variant="label">{t('collection.unlocked')}</Text>
+            <Kicker>{t('collection.unlocked')}</Kicker>
             <View style={styles.rarities}>
               {RARITY_ORDER.map((rarity) => (
                 <RarityCount key={rarity} rarity={rarity} count={counts[rarity]} />
@@ -166,7 +167,7 @@ export function FlagCollectionView({ collection, sectionId = 'collection' }: { c
         )}
 
         <View style={styles.legend}>
-          <Text variant="label">{t('collection.legend_progress', { count: mastery.found, total: mastery.total })}</Text>
+          <Kicker>{t('collection.legend_progress', { count: mastery.found, total: mastery.total })}</Kicker>
           {modes.map(([mode, progress]) => (
             <View key={mode} style={styles.modeRow}>
               <Text variant="caption" style={{ flex: 1 }}>
@@ -206,7 +207,7 @@ const CELL = 44
 const styles = StyleSheet.create({
   card: {
     gap: space.md,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.board,
     borderRadius: radius.xl,
     borderWidth: 1,
     borderColor: colors.border,

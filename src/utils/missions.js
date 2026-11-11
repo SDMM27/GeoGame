@@ -192,6 +192,26 @@ export function weekDays(day) {
   return Array.from({ length: 7 }, (_, index) => dayOf(monday + index * DAY_MS))
 }
 
+// The instant (ms) Paris time reads 00:00 on `day`: Paris is UTC+1 or UTC+2, and DST changes at night, never at midnight.
+function parisMidnight(day) {
+  const previous = missionDayAt(dayTime(day) - 12 * 60 * 60 * 1000)
+  for (const hours of [1, 2]) {
+    const time = dayTime(day) - hours * 60 * 60 * 1000
+    if (missionDayAt(time) === day && missionDayAt(time - 1) === previous) return time
+  }
+  return dayTime(day) - 60 * 60 * 1000
+}
+
+/** Time left, in ms, before the next missions at `now`: { daily: next Paris midnight, weekly: next Monday 00:00 Paris }. */
+export function missionResetsIn(now) {
+  const day = missionDayAt(now)
+  const weekday = (new Date(dayTime(day)).getUTCDay() + 6) % 7
+  return {
+    daily: parisMidnight(dayOf(dayTime(day) + DAY_MS)) - now,
+    weekly: parisMidnight(dayOf(dayTime(day) + (7 - weekday) * DAY_MS)) - now,
+  }
+}
+
 // ---------- Missions of a period ----------
 
 function seedOf(text) {

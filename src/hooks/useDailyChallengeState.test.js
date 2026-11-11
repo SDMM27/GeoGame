@@ -101,22 +101,24 @@ describe('useDailyChallengeState', () => {
     expect(result.current.phase).toBe('playing')
   })
 
-  it('keeps the answer on screen until "Next", and leaves that time out of the total', () => {
+  it('shows the answer a moment, moves on by itself, and leaves that time out of the total', () => {
     const { result } = startedChallenge()
     act(() => { vi.advanceTimersByTime(3000) })
     act(() => { result.current.giveUp() })
     const atAnswer = result.current.elapsedTime
     expect(atAnswer).toBeGreaterThanOrEqual(3000)
-    act(() => { vi.advanceTimersByTime(30000) })
+    act(() => { vi.advanceTimersByTime(1000) })
     expect(result.current.roundIndex).toBe(0)
     expect(result.current.outcome).toBe('failed')
     expect(result.current.elapsedTime).toBe(atAnswer)
-    nextRound(result)
+    // The next round came 2.2 s after the answer: 0.8 s of it has gone by
+    act(() => { vi.advanceTimersByTime(2000) })
     expect(result.current.roundIndex).toBe(1)
-    expect(result.current.timeLeftMs).toBe(CHALLENGE_TIMER * 1000)
+    expect(result.current.outcome).toBe(null)
+    expect(result.current.timeLeftMs).toBe(CHALLENGE_TIMER * 1000 - 800)
     act(() => { vi.advanceTimersByTime(2000) })
     expect(result.current.elapsedTime).toBeGreaterThanOrEqual(atAnswer + 2000)
-    expect(result.current.elapsedTime).toBeLessThan(atAnswer + 2500)
+    expect(result.current.elapsedTime).toBeLessThan(atAnswer + 3300)
   })
 
   it('ends after the 12th round with the score, the results and the time, and keeps them', () => {

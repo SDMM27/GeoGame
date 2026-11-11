@@ -39,7 +39,7 @@ function Playing({ challenge }: { challenge: Challenge }) {
   const colors = useColors()
   const DIFFICULTY_COLORS = useDifficultyColors()
   const { t, i18n } = useTranslation()
-  const { round, roundIndex, total, score, results, timeLeftMs, outcome, timedOut, next, giveUp, submitText } = challenge
+  const { round, roundIndex, total, score, results, timeLeftMs, outcome, timedOut, giveUp, submitText } = challenge
 
   // Spoken: each round's result, then the timer turning red
   const fiveLeft = timeLeftMs != null && Math.ceil(timeLeftMs / 1000) === 5 && !outcome
@@ -57,7 +57,6 @@ function Playing({ challenge }: { challenge: Challenge }) {
   // The survival rounds read a few more fields than a challenge has: a round is a single try
   const survival = { ...challenge, guesses: [], chooseAnswer: () => null } as unknown as Survival
   const secondsLeft = timeLeftMs == null ? null : Math.ceil(timeLeftMs / 1000)
-  const last = roundIndex === total - 1
   const isPlacement = round.type === GAME_TYPES.PLACEMENT
   const roundGame = getGameByType(round.type)
   const answer = roundAnswer(round, i18n.language, t)
@@ -75,12 +74,6 @@ function Playing({ challenge }: { challenge: Challenge }) {
       <Text variant="bodyStrong" color={outcome === 'correct' ? colors.accent : colors.warning} style={{ flex: 1 }}>
         {outcome === 'correct' ? t('survival.correct') : `${timedOut ? `${t('survival.time_up')} ` : ''}${t('survival.answer_was', { answer })}`}
       </Text>
-      <Button
-        label={t(last ? 'buttons.see_results' : 'survival.next')}
-        variant="secondary"
-        onPress={next}
-        style={{ minHeight: 40, paddingHorizontal: space.lg }}
-      />
     </Animated.View>
   )
 

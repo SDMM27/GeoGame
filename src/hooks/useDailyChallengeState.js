@@ -109,8 +109,8 @@ export default function useDailyChallengeState() {
     ramp: challengeRamp(known ? dailyKey : ''),
     maxRounds: CHALLENGE_ROUNDS,
     distinctCountries: true,
-    // The answer stays on screen until "Next", and the time it is shown doesn't count
-    autoAdvance: false,
+    // The answer is shown a moment, then the next round comes on its own; the time it is shown doesn't count
+    autoAdvance: true,
     clockStopsOnAnswer: true,
     paused: !(running && known && !finished),
     snapshot,

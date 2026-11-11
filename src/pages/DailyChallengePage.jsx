@@ -44,9 +44,8 @@ function Progress({ results, current }) {
 
 function Playing({ challenge }) {
   const { t, i18n } = useTranslation()
-  const { round, roundIndex, total, results, score, timeLeftMs, outcome, timedOut, next, giveUp, submitText } = challenge
+  const { round, roundIndex, total, results, score, timeLeftMs, outcome, timedOut, giveUp, submitText } = challenge
   const secondsLeft = timeLeftMs == null ? null : Math.ceil(timeLeftMs / 1000)
-  const last = roundIndex === total - 1
   if (!round) return null
 
   return (
@@ -89,7 +88,6 @@ function Playing({ challenge }) {
                   ? t('survival.correct')
                   : `${timedOut ? `${t('survival.time_up')} ` : ''}${t('survival.answer_was', { answer: roundAnswer(round, i18n.language, t) })}`}
               </span>
-              <button className="survival-btn" onClick={next}>{t(last ? 'buttons.see_results' : 'survival.next')}</button>
             </div>
           ) : (
             <button className="survival-btn survival-btn--danger" onClick={giveUp}>{t('daily_challenge.skip')}</button>

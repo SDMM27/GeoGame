@@ -50,7 +50,6 @@ function dailyBoardStatus(status: DailyStatus | null, t: (key: string) => string
 // « Board » (the daily), infinite mode and multiplayer.
 function passParts(
   game: GameDefinition,
-  flight: string,
   status: DailyStatus | null,
   t: (key: string) => string,
   colors: Palette,
@@ -58,19 +57,18 @@ function passParts(
 ) {
   const done = status === 'won' || status === 'played'
   return [
-    <View key="top" style={styles.passTop}>
-      <Kicker numberOfLines={1} style={{ flexShrink: 1 }}>
-        {t('home.boarding_pass')} · {flight}
-      </Kicker>
-      {status && (
-        <View style={styles.passStatus}>
-          {done && <MaterialCommunityIcons name="check" size={12} color={status === 'won' ? colors.accent : colors.text} />}
-          <Kicker color={status === 'won' ? colors.accent : done ? colors.text : colors.textMuted} size={9}>
-            {t(`home.daily_status_${status}`)}
-          </Kicker>
-        </View>
-      )}
-    </View>,
+    ...(status
+      ? [
+          <View key="top" style={styles.passTop}>
+            <View style={styles.passStatus}>
+              {done && <MaterialCommunityIcons name="check" size={12} color={status === 'won' ? colors.accent : colors.text} />}
+              <Kicker color={status === 'won' ? colors.accent : done ? colors.text : colors.textMuted} size={9}>
+                {t(`home.daily_status_${status}`)}
+              </Kicker>
+            </View>
+          </View>,
+        ]
+      : []),
     <View key="title" style={styles.passTitle}>
       <GameEmblem game={game.id} size={36} />
       <ScreenTitle size={21} style={{ flex: 1 }}>
@@ -208,7 +206,6 @@ export default function HomeScreen() {
         <DeparturesBoard>
           {DAILY_GAMES.map((game, index) => {
             const { label, tone } = dailyBoardStatus(statusOf(game), t)
-            const flight = `GG-${String(index + 1).padStart(2, '0')}`
             const status = statusOf(game)
             const done = status === 'won' || status === 'played'
             return (
@@ -227,7 +224,7 @@ export default function HomeScreen() {
                 codeLabel={t('mobile.flight.code').toLocaleUpperCase()}
                 gateLabel={t('home.gate').toLocaleUpperCase()}
                 accessibilityLabel={`${t(game.titleKey)}, ${label}`}>
-                {passParts(game, flight, status, t, colors, styles)}
+                {passParts(game, status, t, colors, styles)}
               </ExpandableDeparture>
             )
           })}
@@ -303,7 +300,7 @@ const useStyles = makeStyles((colors, { gameColors }) => ({
   pad: { paddingHorizontal: space.lg },
   globe: { alignItems: 'center', paddingHorizontal: space.lg, marginBottom: space.lg },
   sectionHead: { paddingHorizontal: space.lg, marginTop: space.xxl, marginBottom: space.md, gap: 4 },
-  passTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.sm },
+  passTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: space.sm },
   passStatus: { flexDirection: 'row', alignItems: 'center', gap: 3 },
   passTitle: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   passActions: { flexDirection: 'row', gap: space.sm, marginTop: space.xs },

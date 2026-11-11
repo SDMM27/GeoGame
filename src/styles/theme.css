@@ -4,6 +4,7 @@
 @import '@sdmm/design/css/all-geogame.css';
 
 :root {
+  --gg-page-max: 1600px;                      /* width of the pages' content column (and the nav bar's content) */
   /* Site tokens, light */
   --gg-tint: rgba(11, 16, 32, 0.04);          /* faint fill over a surface (rows, chips, inputs) */
   --gg-tint-strong: rgba(11, 16, 32, 0.08);

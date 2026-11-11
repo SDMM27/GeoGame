@@ -113,9 +113,9 @@
   .atlas-page { height: calc(100dvh - 64px - env(safe-area-inset-bottom)); }
 }
 
-/* Wide screens (validated mockup): the map and the sheet as two cards on the 1320px column */
+/* Wide screens (validated mockup): the map and the sheet as two cards on the content column */
 @media (min-width: 900px) {
-  .atlas-body { width: 100%; max-width: 1320px; margin: 0 auto; padding: 16px 24px 24px; gap: 16px; box-sizing: border-box; }
+  .atlas-body { width: 100%; max-width: var(--gg-page-max); margin: 0 auto; padding: 16px 24px 24px; gap: 16px; box-sizing: border-box; }
   .atlas-map { border: 1px solid var(--sd-line); border-radius: var(--sd-radius-card); overflow: hidden; }
   .atlas-sheet { border: 1px solid var(--sd-line); border-radius: var(--sd-radius-card); background: var(--sd-surface); padding: 20px; }
   .atlas-sheet-title h2 { font-family: var(--sd-font-display); font-weight: 800; letter-spacing: -0.02em; font-size: 1.6rem; }

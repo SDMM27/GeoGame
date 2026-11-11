@@ -4,8 +4,8 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  /* Full-width bar, but its content sits on the pages' 1320px column (.home-main: max-width 1320px, 24px padding) */
-  padding: 0.6rem max(24px, calc((100% - 1320px) / 2 + 24px));
+  /* Full-width bar, but its content sits on the pages' content column (.home-main: max-width var(--gg-page-max), 24px padding) */
+  padding: 0.6rem max(24px, calc((100% - var(--gg-page-max)) / 2 + 24px));
   border-bottom: 1px solid var(--sd-line);
   background: var(--sd-bg);
 }
@@ -103,41 +103,13 @@
   text-align: center;
 }
 
-/* Language picker: a native select (7 languages), drawn as a pill with the current code */
-.navbar-lang {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  height: 44px;
-  padding: 0 14px;
-  background: var(--sd-surface);
-  border: 1px solid var(--sd-line);
-  border-radius: var(--sd-radius-pill);
-  color: var(--sd-ink);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  transition: border-color 0.15s;
-}
-
-.navbar-lang:hover,
-.navbar-lang:focus-within {
-  border-color: var(--sd-accent);
-}
-
-.navbar-lang svg {
-  color: var(--sd-muted);
-}
-
-/* The select covers the pill, invisible: the browser's own list opens on click or tap */
-.navbar-lang-select {
-  position: absolute;
-  inset: -1px; /* over the pill's border too: a 44px target */
-  width: 100%;
-  opacity: 0;
-  cursor: pointer;
-  font-size: 16px;
+/* Tablets: the logo, four labelled tabs, the language pill and the theme switch need ~810px. Drop the logo's name
+   and tighten the tabs; past that (long labels in some languages), the labels shorten instead of pushing the bar wide. */
+@media (min-width: 721px) and (max-width: 1023px) {
+  .navbar-logo-name { display: none; }
+  .navbar-tabs { min-width: 0; }
+  .navbar-tab { min-width: 0; padding: 0.5rem 0.6rem; }
+  .navbar-tab-label { min-width: 0; }
 }
 
 /* Phones: the tabs become the app's bottom tab bar */

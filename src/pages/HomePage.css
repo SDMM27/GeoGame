@@ -9,7 +9,7 @@
 .home-main {
   flex: 1;
   width: 100%;
-  max-width: 1320px;
+  max-width: var(--gg-page-max);
   margin: 0 auto;
   padding: 8px 24px 64px;
   display: flex;

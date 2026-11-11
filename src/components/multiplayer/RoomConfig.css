@@ -53,7 +53,7 @@
 .rc-ticket-stub .gg-field > strong { color: var(--sd-muted); letter-spacing: 0.15em; }
 .rc-ticket-barcode { flex: 0 0 96px; height: 30px; background: repeating-linear-gradient(90deg, var(--sd-ink) 0 2px, transparent 2px 4px, var(--sd-ink) 4px 5px, transparent 5px 8px); opacity: 0.85; }
 @media (min-width: 960px) {
-  .room-config { max-width: 1320px; padding: 2.5rem 24px; display: grid; grid-template-columns: minmax(0, 1fr) 400px; column-gap: 48px; align-items: start; }
+  .room-config { max-width: var(--gg-page-max); padding: 2.5rem 24px; display: grid; grid-template-columns: minmax(0, 1fr) 400px; column-gap: 48px; align-items: start; }
   .rc-ticket { position: sticky; top: 88px; }
   .rc-title { font-size: clamp(2.4rem, 4vw, 3.4rem); }
 }

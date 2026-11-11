@@ -63,7 +63,7 @@
   .mp-join-stub { display: none; }
 }
 
-/* Wide screens (validated mockup): on the 1320px column, joining and recent flights on the left, the game list on the right */
+/* Wide screens (validated mockup): on the content column, joining and recent flights on the left, the game list on the right */
 @media (min-width: 1000px) {
   .mp-home-main {
     display: grid;
@@ -72,7 +72,7 @@
     align-items: start;
     column-gap: 40px;
     row-gap: 28px;
-    max-width: 1320px;
+    max-width: var(--gg-page-max);
   }
   .mp-home-header,
   .mp-home-main > .invite-list { grid-column: 1 / -1; }

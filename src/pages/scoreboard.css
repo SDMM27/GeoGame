@@ -248,8 +248,8 @@
 .scoreboard-mode-tabs {
   justify-content: flex-start;
   flex-wrap: wrap;
-  /* On the same 1320px column as the board below, so the tabs line up with its left edge */
-  max-width: 1320px;
+  /* On the same content column as the board below, so the tabs line up with its left edge */
+  max-width: var(--gg-page-max);
   box-sizing: border-box;
 }
 
@@ -297,9 +297,9 @@
 /* 44px touch targets */
 .scoreboard-select { min-height: 44px; }
 
-/* Validated mockup: on the 1320px column, the filters in a board panel and the table as one board with hairlines,
+/* Validated mockup: on the content column, the filters in a board panel and the table as one board with hairlines,
    both the column's full width */
-.scoreboard { max-width: 1320px; }
+.scoreboard { max-width: var(--gg-page-max); }
 .scoreboard-filters {
   padding: 12px 16px;
   border: 1px solid var(--sd-line);

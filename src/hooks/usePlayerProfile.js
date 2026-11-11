@@ -3,7 +3,9 @@ import { computeAchievements } from '../utils/achievements'
 import { fetchChallenges, syncBadges } from '../utils/badges'
 import { fetchCollection } from '../utils/flagCollectionData'
 import { fetchCachedDailyGames, fetchCachedGames, fetchDailyGames, fetchGames } from '../utils/gameHistory'
-import { computeStats, dayKey } from '../utils/profileStats'
+import { computeStats, dayKey, withStoredStreak } from '../utils/profileStats'
+import { streakNow } from '../utils/missions'
+import { useXp } from './useXp'
 import { watchSharedFriendships } from '../utils/friends'
 
 // A player's history with its stats and achievements. `reload` fetches it again (e.g. on focus).
@@ -67,7 +69,13 @@ export function usePlayerProfile(uid, { friendsCount, own = false } = {}) {
     }
   }, [uid])
 
-  const stats = useMemo(() => computeStats(state.games), [state.games])
+  // The streak as the server counts it (public, like the rest of users/{uid}), which goes back further than the history.
+  const xp = useXp(uid)
+  const storedStreak = xp ? streakNow(xp.streak, xp.day) : 0
+  const stats = useMemo(() => {
+    const computed = computeStats(state.games)
+    return { ...computed, streak: withStoredStreak(computed.streak, storedStreak) }
+  }, [state.games, storedStreak])
   const achievements = useMemo(
     () => computeAchievements({ stats, games: state.games, friendsCount, remembered, collection }),
     [stats, state.games, friendsCount, remembered, collection]

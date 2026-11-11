@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { COUNTRY_OF_DAY_SINCE, DAILY_GAME_TYPES, computeStats, computeStreaks, dailyTypesOn, formatPlayTime, previousDayKey } from './profileStats'
+import { COUNTRY_OF_DAY_SINCE, DAILY_GAME_TYPES, computeStats, computeStreaks, dailyTypesOn, formatPlayTime, previousDayKey, withStoredStreak } from './profileStats'
 import { computeAchievements } from './achievements'
 import { splitFriendships } from './friends'
 
@@ -121,5 +121,19 @@ describe('splitFriendships', () => {
       ['b', 'Bob', 'outgoing'],
       ['a', 'Zoé', 'incoming'],
     ])
+  })
+})
+
+describe('withStoredStreak', () => {
+  it('takes the server streak when the history is too short to see its start', () => {
+    expect(withStoredStreak({ current: 31, best: 31 }, 36)).toEqual({ current: 36, best: 36 })
+  })
+
+  it('keeps the history when the server has not counted a game just played', () => {
+    expect(withStoredStreak({ current: 5, best: 12 }, 4)).toEqual({ current: 5, best: 12 })
+  })
+
+  it('keeps the history without a stored streak', () => {
+    expect(withStoredStreak({ current: 0, best: 9 }, undefined)).toEqual({ current: 0, best: 9 })
   })
 })

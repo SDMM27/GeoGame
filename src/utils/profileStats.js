@@ -42,6 +42,14 @@ export function computeStreaks(dailyKeys, todayKey = dayKey()) {
   return { current, best }
 }
 
+// The history only holds the last games (HISTORY_LIMIT in gameHistory.js), so a long streak can start before it. The
+// server keeps counting it (users/{uid}.xp.streak, streakNow in missions.js): `storedCount` is that length today. The
+// longer of the two wins (the server may not have counted a game just played yet), and the record is at least as long.
+export function withStoredStreak(streak, storedCount) {
+  const current = Math.max(streak.current, storedCount ?? 0)
+  return { current, best: Math.max(streak.best, current) }
+}
+
 function emptyGameStats() {
   return { played: 0, wins: 0, dailies: 0, bestScore: null, bestAttempts: null, totalTime: 0 }
 }

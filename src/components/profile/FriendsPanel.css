@@ -52,6 +52,19 @@
 
 .friends-rank { width: 1.75rem; text-align: center; flex-shrink: 0; }
 .friends-detail { color: var(--sd-muted); font-size: 0.85rem; font-weight: 600; white-space: nowrap; }
+/* League: the flag fragments the rank pays at the end of the week (gold on the podium) */
+.friends-reward {
+  padding: 2px 8px;
+  border: 1px solid var(--gg-accent-line);
+  border-radius: 999px;
+  background: var(--gg-accent-soft);
+  color: var(--sd-accent-strong);
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.friends-reward--podium { border-color: var(--gg-gold); background: transparent; color: var(--gg-gold); }
 .friends-state { color: var(--sd-muted); font-size: 0.85rem; font-weight: 600; white-space: nowrap; }
 .friends-invite,
 .friends-pending {

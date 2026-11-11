@@ -118,7 +118,7 @@ export default function LeagueScreen() {
   const zones: Zone[] | undefined =
     tab === 'world'
       ? [
-          { fromRank: 1, label: t('mobile.flight.zone_podium').toLocaleUpperCase(), note: t('mobile.flight.zone_podium_note', { rewards: `${rewards[1]} / ${rewards[2]} / ${rewards[3]}` }).toLocaleUpperCase(), color: colors.gold },
+          { fromRank: 1, toRank: 3, label: t('mobile.flight.zone_podium').toLocaleUpperCase(), note: t('mobile.flight.zone_podium_note', { rewards: `${rewards[1]} / ${rewards[2]} / ${rewards[3]}` }).toLocaleUpperCase(), color: colors.gold },
           {
             fromRank: 4,
             toRank: Object.keys(rewards).length,

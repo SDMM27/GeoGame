@@ -1,0 +1,73 @@
+name: Google Play Release
+
+# Every app change queues a build and submission, independently of OTA updates or native runtime.
+# EAS uses remote Android credentials and the profiles in mobile/eas.json.
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'mobile/**'
+      - 'src/**'
+      - 'packages/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/play-store.yml'
+      - '!**/*.test.*'
+      - '!**/*.spec.*'
+      - '!**/__tests__/**'
+      - '!**/__mocks__/**'
+      - '!**/docs/**'
+      - '!**/*.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: play-store-production
+  cancel-in-progress: false
+
+jobs:
+  production:
+    name: Build and submit to Google Play
+    runs-on: ubuntu-latest
+    # Allow for free EAS queues. Internal auto-submission stays on EAS even if this job times out.
+    timeout-minutes: 360
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      - run: npm ci
+      - name: Build with automatic internal submission
+        id: build
+        run: |
+          eas build --platform android --profile production --auto-submit-with-profile play-internal --non-interactive --wait --json > build.json
+          cat build.json
+          jq -e 'type == "array" and length == 1' build.json > /dev/null
+          build_id=$(jq -er '.[0].id | select(type == "string") | select(test("^[A-Za-z0-9-]+$"))' build.json)
+          echo "build_id=$build_id" >> "$GITHUB_OUTPUT"
+          {
+            echo '## Google Play Release'
+            echo 'Android build completed. Automatic submission to Google Play internal testing is queued on EAS; build completion does not confirm submission completion.'
+            echo 'Public production submission runs only when PLAY_PRODUCTION_ENABLED is true, using this same build.'
+            echo 'Availability remains subject to successful submission and any required Google review; this workflow does not confirm user-facing publication.'
+            echo "Build ID: $build_id"
+            echo "[EAS build](https://expo.dev/accounts/sdmm27/projects/geogame/builds/$build_id)"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Submit the same build to public production when enabled
+        if: vars.PLAY_PRODUCTION_ENABLED == 'true'
+        env:
+          BUILD_ID: ${{ steps.build.outputs.build_id }}
+        run: |
+          eas submit --platform android --profile production --id "$BUILD_ID" --non-interactive --wait
+          echo 'Public production submission completed for the same build. This does not confirm user-facing publication.' >> "$GITHUB_STEP_SUMMARY"

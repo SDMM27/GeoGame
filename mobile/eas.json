@@ -18,10 +18,24 @@
     },
     "production": {
       "autoIncrement": true,
+      "environment": "production",
       "channel": "production"
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "android": {
+        "track": "production",
+        "releaseStatus": "completed",
+        "changesNotSentForReview": false
+      }
+    },
+    "play-internal": {
+      "android": {
+        "track": "internal",
+        "releaseStatus": "completed",
+        "changesNotSentForReview": false
+      }
+    }
   }
 }

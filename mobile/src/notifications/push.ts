@@ -1,9 +1,8 @@
 // Push notifications (room invites, friend requests, daily challenge reminder, friends' daily nudges): registers this device under the account, and opens the right
 // screen when one is tapped. The pushes themselves are sent by the website's API: api/invite-push (src/utils/invites.js),
 // api/friend-push (src/utils/friends.js), api/daily-nudge (src/utils/dailyNudge.js) and api/daily-reminder (once a day).
-import Constants from 'expo-constants'
+import Constants, { ExecutionEnvironment } from 'expo-constants'
 import * as Device from 'expo-device'
-import * as Notifications from 'expo-notifications'
 import { router } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { AppState, Linking, Platform } from 'react-native'
@@ -16,6 +15,18 @@ import { saveDevice } from './device'
 
 export { forgetDevice, useDailyReminder } from './device'
 
+// Importing expo-notifications itself throws in Android Expo Go. Keep it lazy
+// so the app (including the globe) can be tested there without remote push.
+const Notifications: typeof import('expo-notifications') | null =
+  Platform.OS === 'android' && Constants.executionEnvironment === ExecutionEnvironment.StoreClient
+    ? null
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    : require('expo-notifications')
+
+// The environment is fixed for the process. Always call the same hook, including
+// in Expo Go where there is no notification module to subscribe to.
+const useLastNotificationResponse = Notifications?.useLastNotificationResponse ?? (() => null)
+
 // Android channels, one per kind, so each can be muted on its own in the system settings.
 const CHANNELS = { invites: 'mobile.invites.channel', friends: 'mobile.invites.friends_channel', daily: 'mobile.invites.daily_channel' }
 
@@ -23,7 +34,7 @@ type PushData = { type?: string; room?: string; uid?: string; gameType?: string;
 
 // In the foreground the in-app banner (InviteBanner) already shows an invite, and the daily reminder is pointless;
 // friend requests and friends' "come beat me" nudges still show up.
-Notifications.setNotificationHandler({
+Notifications?.setNotificationHandler({
   handleNotification: async (notification) => {
     const type = (notification.request.content.data as PushData | undefined)?.type
     const show = type === 'friend_request' || type === 'friend_accepted' || type === 'daily_nudge' || type === 'challenge_result'
@@ -33,7 +44,7 @@ Notifications.setNotificationHandler({
 
 // Shows the permission prompt if it hasn't been answered yet (unless ask is false): friend requests can come in from the first day.
 async function registerDevice(uid: string, ask = true) {
-  if (!Device.isDevice) return
+  if (!Notifications || !Device.isDevice) return
   if (Platform.OS === 'android') {
     // Android 13+ only shows the permission prompt once a channel exists.
     for (const [id, name] of Object.entries(CHANNELS)) {
@@ -51,7 +62,7 @@ async function registerDevice(uid: string, ask = true) {
 
 export function usePushNotifications(uid: string | null | undefined) {
   useEffect(() => {
-    if (!uid) return
+    if (!uid || !Notifications) return
     registerDevice(uid).catch((error) => console.warn('[push]', error?.code, error))
     // Back from the settings with notifications allowed: registers the device without asking again.
     const subscription = AppState.addEventListener('change', (state) => {
@@ -61,9 +72,9 @@ export function usePushNotifications(uid: string | null | undefined) {
   }, [uid])
 
   // Tapped notification (app in the background or closed): straight to the room, the requests, or the new friend.
-  const response = Notifications.useLastNotificationResponse()
+  const response = useLastNotificationResponse()
   useEffect(() => {
-    if (!response || response.actionIdentifier !== Notifications.DEFAULT_ACTION_IDENTIFIER) return
+    if (!Notifications || !response || response.actionIdentifier !== Notifications.DEFAULT_ACTION_IDENTIFIER) return
     const data = response.notification.request.content.data as PushData | undefined
     if (data?.type === 'invite' && data.room) {
       Notifications.clearLastNotificationResponseAsync()
@@ -106,7 +117,7 @@ export function useWebPushPermission(_uid: string | null | undefined) {
 export function usePushPermission(uid: string | null | undefined) {
   const [state, setState] = useState<WebPushState>('unsupported')
   useEffect(() => {
-    if (!uid || !Device.isDevice) return
+    if (!uid || !Notifications || !Device.isDevice) return
     const check = () =>
       Notifications.getPermissionsAsync()
         .then((permission) => setState(permission.granted ? 'granted' : permission.canAskAgain ? 'unsupported' : 'denied'))

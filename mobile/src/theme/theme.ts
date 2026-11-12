@@ -1,7 +1,7 @@
 // The theme in use: the player's choice (light, dark, or the system's), remembered in the key-value store behind
 // localStorage (src/polyfills.ts). A provider shares the resolved theme; isolated components can still read the store.
 import { createContext, createElement, useContext, useSyncExternalStore, type ReactNode } from 'react'
-import { Platform, StyleSheet, useColorScheme } from 'react-native'
+import { StyleSheet, useColorScheme } from 'react-native'
 
 import { persistTheme } from './persistence'
 
@@ -40,7 +40,7 @@ export function setThemePreference(next: ThemePreference) {
   if (next === preference) return
   preference = next
   listeners.forEach((listener) => listener())
-  void persistTheme(next, Platform.OS === 'web')
+  void persistTheme(next)
 }
 
 const getPreference = () => preference

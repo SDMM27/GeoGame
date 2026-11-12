@@ -94,3 +94,5 @@ jobs:
       - run: npm run typecheck
       - run: npm run lint
       - run: npx jest --ci
+      # Exercise platform-specific imports used by the Vercel app preview.
+      - run: npx expo export --platform web --max-workers 2

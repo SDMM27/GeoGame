@@ -1,20 +1,23 @@
 // The home screen's interactive globe (port of the website's FlightGlobe): turn it with a drag, tilt it up and down, to
 // put the city in the reticle. It runs entirely on the UI thread: the scene state lives in one shared value, a frame
-// callback steps it, and each Skia path / position is a derived value that rotates and projects the precomputed unit
-// vectors (globeGeometry.ts, globeMath.ts). The JS thread only hears about discrete events: a new target, a find.
+// callback steps it. Land and graticule use an inverse-projection GPU shader;
+// only routes and city markers project vectors on UI. JS only hears discrete events.
 import {
   Canvas,
   Circle,
   DashPathEffect,
   FillType,
   Group,
+  ImageShader,
   Path,
   RadialGradient,
   Rect,
   Skia,
+  Shader,
   Text as SkiaText,
   TwoPointConicalGradient,
   useFont,
+  useImage,
   vec,
   type SkFont,
   type SkPath,
@@ -22,7 +25,7 @@ import {
 import { useFocusEffect } from 'expo-router'
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Text, View, useWindowDimensions } from 'react-native'
+import { AppState, Text, View, useWindowDimensions } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { useDerivedValue, useFrameCallback, useReducedMotion, useSharedValue, type SharedValue } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
@@ -30,7 +33,8 @@ import { scheduleOnRN } from 'react-native-worklets'
 import { fonts, makeStyles, radius, space, useTheme } from '@/theme'
 
 import { CITY_VECTORS, FLIGHT_PATH, GRATICULE, LAND, ROUTES_ACCENT, ROUTES_ACCENT2 } from './globeGeometry'
-import { createPathRing, framePath } from './framePaths'
+import { createPathRing, finishFramePath, framePath } from './framePaths'
+import { GLOBE_LAND_SHADER } from './globeShader'
 import { appendLines, appendRings, rotate, sampleAt, toScreen, viewBasis } from './globeMath'
 import {
   CITIES,
@@ -46,6 +50,8 @@ import {
 } from './globeModel'
 
 const MAX_SIZE = 340
+const LAND_EFFECT = Skia.RuntimeEffect.Make(GLOBE_LAND_SHADER)
+const EMPTY_PATH = Skia.Path.Make()
 
 // The globe's colors come from the theme, like the web's --gg-globe-* tokens: light land on navy in the dark theme,
 // dark land on a pale ocean in the light one. The glow around it is the accent, fainter on the light background.
@@ -100,7 +106,7 @@ function CityMark({ index, scene, font, reduced, ink }: { index: number; scene: 
 }
 
 // `onFind` runs when the player (not the globe on its own) finds the city; `overlay` is drawn over the bottom of the globe.
-export function FlightGlobe({ onFind, overlay = null }: { onFind?: () => void; overlay?: ReactNode } = {}) {
+export function FlightGlobe({ onFind, overlay = null, visible }: { onFind?: () => void; overlay?: ReactNode; visible?: SharedValue<boolean> } = {}) {
   const { t } = useTranslation()
   const { colors, scheme } = useTheme()
   const styles = useStyles()
@@ -122,9 +128,23 @@ export function FlightGlobe({ onFind, overlay = null }: { onFind?: () => void; o
 
   const codeFont = useFont(monoBold, Math.max(9, size * 0.026))
   const burstFont = useFont(monoBold, Math.max(13, size * 0.042))
+  const landImage = useImage(require('@/assets/images/globe-mask.png'))
+  const texturedLand = !!landImage && !!LAND_EFFECT
+  const landColor = useMemo(() => Array.from(Skia.Color(colors.globeLand)), [colors.globeLand])
+  const edgeColor = useMemo(() => Array.from(Skia.Color(colors.globeLandEdge)), [colors.globeLandEdge])
+  const gridColor = useMemo(() => Array.from(Skia.Color(colors.globeGraticule)), [colors.globeGraticule])
 
   const state = useSharedValue<GlobeState>(createGlobeState())
-  const basis = useDerivedValue(() => viewBasis(state.value.lon, state.value.lat))
+  // Clock/ping updates must not rebuild the projected map while rotation is
+  // stationary (for example during the pause after finding a city).
+  const longitude = useDerivedValue(() => state.value.lon)
+  const latitude = useDerivedValue(() => state.value.lat)
+  const basis = useDerivedValue(() => viewBasis(longitude.value, latitude.value))
+  const landUniforms = useDerivedValue(() => ({
+    center: [c, c], radius: r,
+    east: basis.value.slice(0, 3), north: basis.value.slice(3, 6), forward: basis.value.slice(6, 9),
+    landColor, edgeColor, gridColor,
+  }))
   const scene: Scene = { state, basis, c, r }
 
   // The only things that cross threads: a new target, a find (only the player's own finds change the score)
@@ -162,6 +182,7 @@ export function FlightGlobe({ onFind, overlay = null }: { onFind?: () => void; o
   // Under reduced motion nothing moves; the frame callback only lets the pause after a find run out (cheap early return)
   const frameCallback = useFrameCallback((info) => {
     'worklet'
+    if (visible && !visible.value) return
     const current = state.value
     if (current.reduced && current.phase !== 'found') return
     const dt = Math.min((info.timeSincePreviousFrame ?? 16) / 1000, 0.1)
@@ -175,8 +196,12 @@ export function FlightGlobe({ onFind, overlay = null }: { onFind?: () => void; o
   // The Home tab stays mounted under the other tabs: stop stepping while it is not the one in front
   useFocusEffect(
     useCallback(() => {
-      frameCallback.setActive(true)
-      return () => frameCallback.setActive(false)
+      frameCallback.setActive(AppState.currentState === 'active')
+      const subscription = AppState.addEventListener('change', (next) => frameCallback.setActive(next === 'active'))
+      return () => {
+        subscription.remove()
+        frameCallback.setActive(false)
+      }
     }, [frameCallback]),
   )
 
@@ -214,33 +239,34 @@ export function FlightGlobe({ onFind, overlay = null }: { onFind?: () => void; o
     [state, size, emit],
   )
 
-  // On the web each of these paths frees the ones it made a few frames ago (framePaths.ts)
-  const rings = useMemo(
+  // Shared ownership prevents worklets from capturing a frozen JS-side ring.
+  const [initialRings] = useState(
     () => ({ land: createPathRing(), graticule: createPathRing(), routesAccent: createPathRing(), routesAccent2: createPathRing() }),
-    [],
   )
+  const rings = useSharedValue(initialRings)
   const landPath = useDerivedValue<SkPath>(() => {
-    const path = framePath(rings.land)
-    // Set the fill rule on the owned path: the web renderer's fillType prop creates
-    // temporary PathBuilders/paths every frame without disposing them (Skia 2.6.2).
+    if (texturedLand) return EMPTY_PATH
+    const path = framePath(rings.value.land)
+    // Set the fill rule before building the immutable snapshot.
     path.setFillType(FillType.EvenOdd)
     appendRings(path, land, basis.value, c, c, r)
-    return path
+    return finishFramePath(rings.value.land)
   })
   const graticulePath = useDerivedValue<SkPath>(() => {
-    const path = framePath(rings.graticule)
+    if (texturedLand) return EMPTY_PATH
+    const path = framePath(rings.value.graticule)
     appendLines(path, graticule, basis.value, c, c, r)
-    return path
+    return finishFramePath(rings.value.graticule)
   })
   const accentPath = useDerivedValue<SkPath>(() => {
-    const path = framePath(rings.routesAccent)
+    const path = framePath(rings.value.routesAccent)
     appendLines(path, routesAccent, basis.value, c, c, r)
-    return path
+    return finishFramePath(rings.value.routesAccent)
   })
   const accent2Path = useDerivedValue<SkPath>(() => {
-    const path = framePath(rings.routesAccent2)
+    const path = framePath(rings.value.routesAccent2)
     appendLines(path, routesAccent2, basis.value, c, c, r)
-    return path
+    return finishFramePath(rings.value.routesAccent2)
   })
   // Routes: dashes that run along the arcs
   const dashPhase = useDerivedValue(() => (((-state.value.clock * 20) % 10) + 10) % 10)
@@ -266,13 +292,15 @@ export function FlightGlobe({ onFind, overlay = null }: { onFind?: () => void; o
 
   const ret = r * 0.09
   const reticlePath = useMemo(() => {
-    const path = Skia.Path.Make()
+    const path = Skia.PathBuilder.Make()
     path.addCircle(c, c, ret)
     for (const [dx, dy] of [[0, -1], [0, 1], [-1, 0], [1, 0]]) {
       path.moveTo(c + dx * (ret + 6), c + dy * (ret + 6))
       path.lineTo(c + dx * (ret + 14), c + dy * (ret + 14))
     }
-    return path
+    const snapshot = path.build()
+    path.dispose()
+    return snapshot
   }, [c, ret])
   const reticleColor = useDerivedValue(() => (state.value.phase === 'found' ? accentColor : textColor))
   const reticleOpacity = useDerivedValue(() => (state.value.phase === 'found' ? 1 : 0.7))
@@ -303,9 +331,19 @@ export function FlightGlobe({ onFind, overlay = null }: { onFind?: () => void; o
               <Circle cx={c} cy={c} r={r}>
                 <TwoPointConicalGradient start={vec(c - r * 0.35, c - r * 0.4)} startR={r * 0.1} end={vec(c, c)} endR={r * 1.05} colors={[colors.globeOcean, colors.globeOceanDeep]} />
               </Circle>
-              <Path path={graticulePath} style="stroke" strokeWidth={0.6} color={colors.globeGraticule} />
-              <Path path={landPath} color={colors.globeLand} />
-              <Path path={landPath} style="stroke" strokeWidth={0.7} color={colors.globeLandEdge} />
+              {!texturedLand && <Path path={graticulePath} style="stroke" strokeWidth={0.6} color={colors.globeGraticule} />}
+              {texturedLand && LAND_EFFECT ? (
+                <Circle cx={c} cy={c} r={r}>
+                  <Shader source={LAND_EFFECT} uniforms={landUniforms}>
+                    <ImageShader image={landImage!} tx="repeat" ty="clamp" />
+                  </Shader>
+                </Circle>
+              ) : (
+                <>
+                  <Path path={landPath} color={colors.globeLand} />
+                  <Path path={landPath} style="stroke" strokeWidth={0.7} color={colors.globeLandEdge} />
+                </>
+              )}
               <Circle cx={c} cy={c} r={r} style="stroke" strokeWidth={1.2} color={colors.borderStrong} />
               <Path path={accentPath} style="stroke" strokeWidth={1.8} strokeCap="round" color={colors.accent}>
                 {!reduced && <DashPathEffect intervals={[5, 5]} phase={dashPhase} />}

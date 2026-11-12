@@ -93,8 +93,13 @@ export function appendRings(path: PathSink, data: Rings, basis: number[], cx: nu
       px = vx
       py = vy
       pz = vz
-      if (vz <= 0 && Math.hypot(vx, vy) < 1e-9) continue
-      const [sx, sy] = toScreen(vx, vy, vz, cx, cy, r)
+      // This loop visits thousands of vertices per frame. Project with scalars
+      // instead of allocating a toScreen/onLimb tuple for every vertex.
+      const length2 = vx * vx + vy * vy
+      if (vz <= 0 && length2 < 1e-18) continue
+      const scale = vz > 0 ? r : r / Math.sqrt(length2)
+      const sx = cx + scale * vx
+      const sy = cy - scale * vy
       if (started) path.lineTo(sx, sy)
       else {
         path.moveTo(sx, sy)

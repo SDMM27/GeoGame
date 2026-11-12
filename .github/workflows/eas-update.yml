@@ -8,13 +8,26 @@ name: EAS Update
 # see runtimeVersion in mobile/app.json). When a change alters it (a native module added or upgraded, a config plugin…),
 # no APK can receive the update: the apk job then builds one and publishes it as the latest release of
 # GeoGame-releases, where the website's download link and the app's "new version" banner point. Google Play
-# builds and submissions are queued independently by the Google Play Release workflow (play-store.yml).
+# builds and submissions are queued by the dependent store job only if no compatible native runtime exists.
 # Needs the repository secrets EXPO_TOKEN (expo.dev → Account settings → Access tokens) and RELEASES_TOKEN (a GitHub
 # fine-grained token with Contents: read and write on SDMM27/GeoGame-releases).
 on:
   push:
     branches: [master]
-    paths: ['mobile/**', 'src/**', '.github/workflows/eas-update.yml', '!src/**/*.test.js', '!mobile/**/*.test.ts', '!mobile/**/*.test.tsx', '!mobile/README.md']
+    paths:
+      - 'mobile/**'
+      - 'src/**'
+      - 'packages/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/eas-update.yml'
+      - '.github/workflows/play-store.yml'
+      - '!**/*.test.*'
+      - '!**/*.spec.*'
+      - '!**/__tests__/**'
+      - '!**/__mocks__/**'
+      - '!**/docs/**'
+      - '!**/*.md'
   workflow_dispatch:
     inputs:
       channel:
@@ -47,6 +60,8 @@ jobs:
     outputs:
       # The runtime of the preview update, empty when only production was published
       preview_runtime: ${{ steps.publish.outputs.preview_runtime }}
+      # Empty for a preview-only dispatch, so the store workflow is skipped.
+      production_runtime: ${{ steps.publish.outputs.production_runtime }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -67,16 +82,26 @@ jobs:
           for channel in $CHANNELS; do
             eas update --channel "$channel" --environment "$channel" --message "$MESSAGE" --json > "update-$channel.json"
             cat "update-$channel.json"
-            runtime=$(jq -r 'map(select(.platform == "android"))[0].runtimeVersion' "update-$channel.json")
+            runtime=$(jq -er 'map(select(.platform == "android"))[0].runtimeVersion | select(type == "string" and length > 0 and . != "null")' "update-$channel.json")
             if [ "$channel" = preview ]; then echo "preview_runtime=$runtime" >> "$GITHUB_OUTPUT"; fi
             if [ "$channel" = production ]; then
-              echo "::notice::Google Play builds and submissions to the configured track are queued independently on app-affecting master pushes by the Google Play Release workflow (.github/workflows/play-store.yml). This OTA update only reaches builds with native runtime $runtime."
+              echo "production_runtime=$runtime" >> "$GITHUB_OUTPUT"
+              echo "::notice::Production OTA published for native runtime $runtime. The dependent store job checks whether a native build is needed: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
             fi
           done
         env:
           # After a merge there are no inputs: both channels, and the merge's commit message.
           CHANNELS: ${{ inputs.channel || 'both' }}
           MESSAGE: ${{ inputs.message || github.event.head_commit.message }}
+
+  store:
+    name: Check and release the production native runtime
+    needs: update
+    if: needs.update.outputs.production_runtime != ''
+    uses: ./.github/workflows/play-store.yml
+    with:
+      runtime: ${{ needs.update.outputs.production_runtime }}
+    secrets: inherit
 
   apk:
     name: Build an APK if the native runtime changed

@@ -217,7 +217,7 @@
   font-weight: 800;
   font-size: 1.4rem;
   letter-spacing: -0.01em;
-  color: var(--sd-ink);
+  color: var(--game-ink);
 }
 
 
@@ -227,6 +227,28 @@
   font-size: 0.88rem;
   line-height: 1.5;
   color: var(--sd-muted);
+}
+
+/* Reserve the final title's dimensions; rolling letters never resize the card. */
+.boarding-pass-title-label {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.boarding-pass-title-measure {
+  display: block;
+  visibility: hidden;
+}
+
+.boarding-pass-title-label .flap-text {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.boarding-pass-title-label .flap-text-visual {
+  white-space: normal;
 }
 
 .boarding-pass-actions {

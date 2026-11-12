@@ -1,11 +1,12 @@
 // A daily challenge as a boarding pass: today's status, « Board » (the daily), ∞ (infinite mode) and the
 // multiplayer button, and a tear-off stub (gate, departure at midnight, barcode) that tilts on hover.
-import React from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { MultiIcon } from '../../../components/NavIcons'
 import { gameColor } from '../../../utils/roomGames'
 import GameEmblem, { flightCode } from '../../../components/GameEmblem'
+import FlapText from './FlapText'
 
 const GATES = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'D1', 'D2']
 
@@ -13,12 +14,24 @@ const GATES = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'D1', 'D2']
 export default function BoardingPass({ game, index, status = null }) {
   const navigate = useNavigate()
   const { t } = useTranslation()
+  const [hovered, setHovered] = useState(false)
+  const [focused, setFocused] = useState(false)
+  const title = t(game.titleKey)
   const gate = GATES[index % GATES.length]
   const done = status && status !== 'todo'
   return (
     <article
       className={`boarding-pass sd-punch${done ? ' boarding-pass--done' : ''}`}
       style={{ '--game': gameColor(game.id), '--game-ink': gameColor(`${game.id}-ink`), '--i': index }}
+      onPointerEnter={(event) => {
+        if (event.pointerType === 'mouse' || event.pointerType === 'pen') setHovered(true)
+      }}
+      onPointerLeave={() => setHovered(false)}
+      onPointerCancel={() => setHovered(false)}
+      onFocusCapture={() => setFocused(true)}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false)
+      }}
     >
       <div className="boarding-pass-main">
         {status && (
@@ -31,7 +44,10 @@ export default function BoardingPass({ game, index, status = null }) {
         )}
         <h3 className="boarding-pass-title">
           <GameEmblem game={game.id} size={36} />
-          {t(game.titleKey)}
+          <span className="boarding-pass-title-label">
+            <span className="boarding-pass-title-measure" aria-hidden="true">{title}</span>
+            <FlapText text={title} active={hovered || focused} />
+          </span>
         </h3>
         <p className="boarding-pass-desc">{t(game.descKey)}</p>
         <div className="boarding-pass-actions">

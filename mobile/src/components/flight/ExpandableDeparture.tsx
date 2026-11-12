@@ -6,8 +6,8 @@
 //   children   main part of the pass; each direct child is revealed in turn (fade + rise)
 //   accessibilityLabel   label of the row button (default « name, status »)
 //   last       hides the bottom divider
-// Everything animates on the UI thread from a single progress value (0 closed, 1 open): the height follows
-// the measured content (no hard-coded height), so the rows below slide with it.
+// The pass swings down with the same flap motion as the globe's next-flight board. A separate progress value
+// drives the measured height (no hard-coded height), so the rows below slide with it on the UI thread.
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import * as Haptics from 'expo-haptics'
 import { Children, useCallback, useEffect, useState, type ReactNode } from 'react'
@@ -28,6 +28,7 @@ import { fonts, makeStyles, useColors } from '@/theme'
 
 import { Barcode } from './BoardingPass'
 import type { DepartureTone } from './DeparturesBoard'
+import { useFlapStyle } from './useFlapStyle'
 
 
 /** Single-open accordion state: toggling the open id closes it, toggling another one switches. */
@@ -85,6 +86,7 @@ export function ExpandableDeparture({
   const styles = useStyles()
   const toneColors: Record<DepartureTone, string> = { done: colors.textMuted, boarding: colors.accent, ontime: colors.text }
   const reduce = useReducedMotion()
+  const flapStyle = useFlapStyle(expanded, reduce)
   const progress = useSharedValue(expanded ? 1 : 0)
   const measured = useSharedValue(0)
 
@@ -124,11 +126,11 @@ export function ExpandableDeparture({
         style={styles.row}>
         <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.tint, tintStyle]} />
         <GameEmblem game={game} size={30} />
-        <Animated.Text style={[styles.code, codeStyle]}>{code}</Animated.Text>
-        <Text style={styles.name} numberOfLines={1}>
-          {name}
-        </Text>
-        <Text style={[styles.status, { color: statusColor ?? toneColors[statusTone] }]}>{status}</Text>
+        <Animated.Text style={[styles.code, { color: codeColor ?? colors.gold }, codeStyle]}>{code}</Animated.Text>
+        <View style={styles.details}>
+          <Text style={[styles.name, { color: codeColor ?? colors.gold }]}>{name}</Text>
+          <Text style={[styles.status, { color: statusColor ?? toneColors[statusTone] }]}>{status}</Text>
+        </View>
         <Animated.View style={chevronStyle}>
           <MaterialCommunityIcons name="chevron-down" size={18} color={colors.textMuted} />
         </Animated.View>
@@ -140,7 +142,7 @@ export function ExpandableDeparture({
         accessibilityElementsHidden={!expanded}
         importantForAccessibility={expanded ? 'auto' : 'no-hide-descendants'}>
         <View style={styles.measure} onLayout={(event) => (measured.value = event.nativeEvent.layout.height)}>
-          <View style={styles.pass}>
+          <Animated.View style={[styles.pass, flapStyle]}>
             <View style={styles.main}>
               {Children.toArray(children).map((child, index) => (
                 <Reveal key={index} progress={progress} index={index} reduce={reduce}>
@@ -160,7 +162,7 @@ export function ExpandableDeparture({
               </View>
               <Barcode />
             </View>
-          </View>
+          </Animated.View>
         </View>
       </Animated.View>
     </View>
@@ -169,14 +171,15 @@ export function ExpandableDeparture({
 
 const useStyles = makeStyles((colors) => ({
   divider: { borderBottomWidth: 1, borderBottomColor: colors.boardLine },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 52, paddingHorizontal: 12 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 52, paddingHorizontal: 12, paddingVertical: 10 },
   tint: { backgroundColor: colors.boardLine },
-  code: { width: 34, fontFamily: fonts.monoBold, fontSize: 13, color: colors.gold, transformOrigin: 'left center' },
-  name: { flex: 1, minWidth: 0, fontFamily: fonts.monoBold, fontSize: 12, color: colors.text },
+  code: { width: 34, flexShrink: 0, fontFamily: fonts.monoBold, fontSize: 13, color: colors.gold, transformOrigin: 'left center' },
+  details: { flex: 1, minWidth: 0, gap: 4 },
+  name: { fontFamily: fonts.monoBold, fontSize: 12, color: colors.text },
   status: { fontFamily: fonts.monoBold, fontSize: 10, letterSpacing: 0.8 },
   body: { overflow: 'hidden' },
   measure: { position: 'absolute', top: 0, left: 0, right: 0 },
-  pass: { flexDirection: 'row', backgroundColor: colors.surface, borderTopWidth: 1, borderTopColor: colors.boardLine },
+  pass: { flexDirection: 'row', backgroundColor: colors.surface, borderTopWidth: 1, borderTopColor: colors.boardLine, transformOrigin: 'top' },
   main: { flex: 1, minWidth: 0, padding: 16, gap: 10 },
   stub: { width: 84, paddingVertical: 16, paddingHorizontal: 12, justifyContent: 'space-between' },
   perforation: { position: 'absolute', left: 0, top: 0, width: 2, borderLeftWidth: 2, borderLeftColor: colors.stub, borderStyle: 'dashed' },

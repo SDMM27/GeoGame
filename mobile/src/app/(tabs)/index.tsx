@@ -18,7 +18,7 @@ import { BoardStrip, DepartureRow, DeparturesBoard, ExpandableDeparture, Kicker,
 import GameEmblem from '@/components/GameEmblem'
 import { useDailyCountdown } from '@/components/home/dailyCountdown'
 import { FlightGlobe } from '@/components/home/FlightGlobe'
-import { NextFlightBoard } from '@/components/home/NextFlightBoard'
+import { NextFlightBoard, useFlapText } from '@/components/home/NextFlightBoard'
 import { MissionsCard } from '@/components/missions/MissionsCard'
 import { Text, Touchable } from '@/components/ui'
 import { LISTED_GAMES, type GameDefinition } from '@/games'
@@ -39,6 +39,22 @@ const GATES = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'D1', 'D2']
 
 type DailyStatus = 'won' | 'played' | 'todo'
 
+function DailyPassTitle({ title, expanded, color }: { title: string; expanded: boolean; color: string }) {
+  const reduced = useReducedMotion()
+  const shown = useFlapText(title, { delay: 260, reduced: reduced || !expanded })
+  return (
+    <View accessible accessibilityRole="header" accessibilityLabel={title} style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+      {/* Reserve the complete title's height, including wrapping on a narrow screen. */}
+      <ScreenTitle size={21} color={color} accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={{ opacity: 0 }}>
+        {title}
+      </ScreenTitle>
+      <ScreenTitle size={21} color={color} accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
+        {shown || ' '}
+      </ScreenTitle>
+    </View>
+  )
+}
+
 // Departure-board status of a daily: landed (done), boarding (to do) or on time (status unknown: visitor, loading)
 function dailyBoardStatus(status: DailyStatus | null, t: (key: string) => string): { label: string; tone: DepartureTone } {
   if (status === 'won' || status === 'played') return { label: t(`home.daily_status_${status}`).toLocaleUpperCase(), tone: 'done' }
@@ -54,6 +70,8 @@ function passParts(
   t: (key: string) => string,
   colors: Palette,
   styles: ReturnType<typeof useStyles>,
+  expanded: boolean,
+  titleColor: string,
 ) {
   const done = status === 'won' || status === 'played'
   return [
@@ -71,9 +89,7 @@ function passParts(
       : []),
     <View key="title" style={styles.passTitle}>
       <GameEmblem game={game.id} size={36} />
-      <ScreenTitle size={21} style={{ flex: 1 }}>
-        {t(game.titleKey)}
-      </ScreenTitle>
+      <DailyPassTitle key={expanded ? 'open' : 'closed'} title={t(game.titleKey)} expanded={expanded} color={titleColor} />
     </View>,
     <Text key="desc" variant="caption" numberOfLines={3}>
       {t(game.descKey)}
@@ -208,6 +224,7 @@ export default function HomeScreen() {
             const { label, tone } = dailyBoardStatus(statusOf(game), t)
             const status = statusOf(game)
             const done = status === 'won' || status === 'played'
+            const codeColor = done ? colors.textMuted : gameColors[game.id]
             return (
               <ExpandableDeparture
                 key={game.id}
@@ -220,11 +237,11 @@ export default function HomeScreen() {
                 expanded={openId === game.id}
                 onToggle={() => toggleOpen(game.id)}
                 gate={GATES[index % GATES.length]}
-                codeColor={done ? colors.textMuted : gameColors[game.id]}
+                codeColor={codeColor}
                 codeLabel={t('mobile.flight.code').toLocaleUpperCase()}
                 gateLabel={t('home.gate').toLocaleUpperCase()}
                 accessibilityLabel={`${t(game.titleKey)}, ${label}`}>
-                {passParts(game, status, t, colors, styles)}
+                {passParts(game, status, t, colors, styles, openId === game.id, codeColor)}
               </ExpandableDeparture>
             )
           })}

@@ -2,46 +2,18 @@
 // departures-board flap swings down and its letters roll to the next flight, a daily not played today or else a game not
 // played today (@shared/utils/nextFlight). `flight` null: every flight of the day was played.
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Pressable, Text, View } from 'react-native'
 import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withSequence, withTiming } from 'react-native-reanimated'
 
 import { useFlapStyle } from '@/components/flight/useFlapStyle'
+import { FlapText } from '@/components/flight/FlapText'
 import GameEmblem, { flightCode } from '@/components/GameEmblem'
 import { Button } from '@/components/ui'
 import { fonts, makeStyles, radius, useColors } from '@/theme'
 
 export type NextFlight = { game: string; title: string; daily: boolean }
-
-const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-
-/** The split-flap letters of `text`: they spin through the alphabet, then settle from left to right (like FlapText.jsx). */
-export function useFlapText(text: string, { delay = 0, duration = 900, reduced = false } = {}) {
-  const [shown, setShown] = useState('')
-  useEffect(() => {
-    if (reduced) return undefined
-    let frame = 0
-    let start: number | null = null
-    const tick = (now: number) => {
-      start ??= now
-      const k = (now - start - delay) / duration
-      if (k >= 1) {
-        setShown(text)
-        return
-      }
-      const settled = Math.max(0, Math.floor(text.length * k))
-      const spin = Math.floor((now - start) / 45)
-      setShown(
-        [...text].map((ch, i) => (i < settled || /[\s·.\-'’]/.test(ch) ? ch : GLYPHS[(i * 7 + spin) % GLYPHS.length])).join(''),
-      )
-      frame = requestAnimationFrame(tick)
-    }
-    frame = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(frame)
-  }, [text, delay, duration, reduced])
-  return reduced ? text : shown
-}
 
 export function NextFlightBoard({ flight, onBoard, onClose }: { flight: NextFlight | null; onBoard: () => void; onClose: () => void }) {
   const { t, i18n } = useTranslation()
@@ -50,7 +22,7 @@ export function NextFlightBoard({ flight, onBoard, onClose }: { flight: NextFlig
   const reduced = useReducedMotion()
   const flapStyle = useFlapStyle(true, reduced)
   const upper = (text: string) => text.toLocaleUpperCase(i18n.resolvedLanguage)
-  const title = useFlapText(upper(flight ? flight.title : t('globe.all_done')), { delay: 260, reduced })
+  const title = upper(flight ? flight.title : t('globe.all_done'))
   const code = flight ? flightCode(flight.game) : ''
 
   // The boarding light blinks
@@ -74,9 +46,7 @@ export function NextFlightBoard({ flight, onBoard, onClose }: { flight: NextFlig
       </View>
       <View style={styles.body}>
         {flight && <GameEmblem game={flight.game} size={34} />}
-        <Text style={styles.title} numberOfLines={2}>
-          {title || ' '}
-        </Text>
+        <FlapText text={title} color={colors.gold} numberOfLines={2} />
       </View>
       <View style={styles.foot}>
         <View style={styles.status}>
@@ -121,7 +91,6 @@ const useStyles = makeStyles((colors) => ({
   code: { fontFamily: fonts.monoBold, fontSize: 10, letterSpacing: 1.2, color: colors.gold },
   close: { marginLeft: 'auto', width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
   body: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12, paddingTop: 10, paddingBottom: 4, minHeight: 52 },
-  title: { flex: 1, fontFamily: fonts.monoBold, fontSize: 16, letterSpacing: 1, color: colors.gold },
   foot: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingLeft: 12, paddingRight: 8, paddingBottom: 8, paddingTop: 4 },
   status: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6 },
   dot: { width: 7, height: 7, borderRadius: 4, backgroundColor: colors.accent },

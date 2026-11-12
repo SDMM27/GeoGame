@@ -1,10 +1,10 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { Image } from 'expo-image'
 import { router } from 'expo-router'
-import { useCallback, useState } from 'react'
+import { memo, useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ScrollView, View } from 'react-native'
-import Animated, { FadeInDown, useReducedMotion } from 'react-native-reanimated'
+import { View } from 'react-native'
+import Animated, { FadeInDown, useAnimatedScrollHandler, useDerivedValue, useReducedMotion, useSharedValue } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useMissions } from '@shared/hooks/useMissions'
@@ -16,9 +16,10 @@ import { LeagueCard } from '@/components/league/LeagueCard'
 import { LeagueVictoryOverlay } from '@/components/league/LeagueVictoryOverlay'
 import { BoardStrip, DepartureRow, DeparturesBoard, ExpandableDeparture, Kicker, ScreenTitle, useAccordion, type DepartureTone } from '@/components/flight'
 import GameEmblem from '@/components/GameEmblem'
+import { FlapText } from '@/components/flight/FlapText'
 import { useDailyCountdown } from '@/components/home/dailyCountdown'
 import { FlightGlobe } from '@/components/home/FlightGlobe'
-import { NextFlightBoard, useFlapText } from '@/components/home/NextFlightBoard'
+import { NextFlightBoard } from '@/components/home/NextFlightBoard'
 import { MissionsCard } from '@/components/missions/MissionsCard'
 import { Text, Touchable } from '@/components/ui'
 import { LISTED_GAMES, type GameDefinition } from '@/games'
@@ -40,19 +41,8 @@ const GATES = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'D1', 'D2']
 type DailyStatus = 'won' | 'played' | 'todo'
 
 function DailyPassTitle({ title, expanded, color }: { title: string; expanded: boolean; color: string }) {
-  const reduced = useReducedMotion()
-  const shown = useFlapText(title, { delay: 260, reduced: reduced || !expanded })
-  return (
-    <View accessible accessibilityRole="header" accessibilityLabel={title} style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
-      {/* Reserve the complete title's height, including wrapping on a narrow screen. */}
-      <ScreenTitle size={21} color={color} accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={{ opacity: 0 }}>
-        {title}
-      </ScreenTitle>
-      <ScreenTitle size={21} color={color} accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
-        {shown || ' '}
-      </ScreenTitle>
-    </View>
-  )
+  const { i18n } = useTranslation()
+  return <FlapText text={title.toLocaleUpperCase(i18n.resolvedLanguage)} active={expanded} color={color} />
 }
 
 // Departure-board status of a daily: landed (done), boarding (to do) or on time (status unknown: visitor, loading)
@@ -89,7 +79,7 @@ function passParts(
       : []),
     <View key="title" style={styles.passTitle}>
       <GameEmblem game={game.id} size={36} />
-      <DailyPassTitle key={expanded ? 'open' : 'closed'} title={t(game.titleKey)} expanded={expanded} color={titleColor} />
+      <DailyPassTitle title={t(game.titleKey)} expanded={expanded} color={titleColor} />
     </View>,
     <Text key="desc" variant="caption" numberOfLines={3}>
       {t(game.descKey)}
@@ -127,6 +117,37 @@ function passParts(
   ]
 }
 
+// Opening a pass only re-renders it and the pass being closed, not every SVG,
+// title and button in the departure board.
+const DailyDeparture = memo(function DailyDeparture({ game, index, status, expanded, toggle }: {
+  game: GameDefinition; index: number; status: DailyStatus | null; expanded: boolean; toggle: (id: string) => void
+}) {
+  const styles = useStyles()
+  const { colors, gameColors } = useTheme()
+  const { t, i18n } = useTranslation()
+  const { label, tone } = dailyBoardStatus(status, t)
+  const done = status === 'won' || status === 'played'
+  const codeColor = done ? colors.textMuted : gameColors[game.id]
+  return (
+    <ExpandableDeparture
+      game={game.id}
+      code={game.code}
+      name={t(game.titleKey).toLocaleUpperCase(i18n.resolvedLanguage)}
+      status={label}
+      statusTone={tone}
+      last={index === DAILY_GAMES.length - 1}
+      expanded={expanded}
+      onToggle={() => toggle(game.id)}
+      gate={GATES[index % GATES.length]}
+      codeColor={codeColor}
+      codeLabel={t('mobile.flight.code').toLocaleUpperCase()}
+      gateLabel={t('home.gate').toLocaleUpperCase()}
+      accessibilityLabel={`${t(game.titleKey)}, ${label}`}>
+      {passParts(game, status, t, colors, styles, expanded, codeColor)}
+    </ExpandableDeparture>
+  )
+})
+
 function SectionHead({ title, note }: { title: string; note?: string }) {
   const styles = useStyles()
   return (
@@ -137,6 +158,26 @@ function SectionHead({ title, note }: { title: string; note?: string }) {
   )
 }
 
+// Only this strip changes each second. Keep the countdown out of HomeScreen's
+// state so the globe, accordions and cards don't reconcile on every clock tick.
+function HomeBoardStrip({ dailyStatus, doneCount }: { dailyStatus: boolean; doneCount: number }) {
+  const countdown = useDailyCountdown()
+  const colors = useColors()
+  const { t, i18n } = useTranslation()
+  const upper = (text: string) => text.toLocaleUpperCase(i18n.resolvedLanguage)
+  return <BoardStrip cells={[
+    { label: upper(t('home.next_departure')), value: countdown, color: colors.gold },
+    {
+      label: upper(t('home.stamp_dailies')),
+      value: dailyStatus ? `${doneCount} / ${DAILY_GAMES.length}` : String(DAILY_GAMES.length),
+      color: colors.accent,
+      accessibilityLabel: dailyStatus
+        ? `${t('home.stamp_dailies')}, ${t('home.stamp_won')} ${doneCount} / ${DAILY_GAMES.length}`
+        : `${t('home.stamp_dailies')}, ${DAILY_GAMES.length}`,
+    },
+  ]} />
+}
+
 export default function HomeScreen() {
   const styles = useStyles()
   const colors = useColors()
@@ -144,7 +185,10 @@ export default function HomeScreen() {
   const { t, i18n } = useTranslation()
   const insets = useSafeAreaInsets()
   const reduceMotion = useReducedMotion()
-  const countdown = useDailyCountdown()
+  const scrollY = useSharedValue(0)
+  const globeBottom = useSharedValue(Infinity)
+  const globeVisible = useDerivedValue(() => scrollY.value < globeBottom.value)
+  const onScroll = useAnimatedScrollHandler((event) => { scrollY.value = event.contentOffset.y })
   const { account } = useAccount()
   // Loaded once for the missions card and the dailies played today (one history read)
   const missions = useMissions(account?.uid ?? null)
@@ -172,7 +216,9 @@ export default function HomeScreen() {
   const doneCount = DAILY_GAMES.filter((game) => statusOf(game) === 'won' || statusOf(game) === 'played').length
 
   return (
-    <ScrollView
+    <Animated.ScrollView
+      onScroll={onScroll}
+      scrollEventThrottle={16}
       style={{ flex: 1, backgroundColor: colors.bg }}
       contentContainerStyle={{ paddingTop: insets.top + space.lg, paddingBottom: space.xxl * 2 }}
       showsVerticalScrollIndicator={false}>
@@ -185,8 +231,9 @@ export default function HomeScreen() {
         <LanguageButton />
       </View>
 
-      <View style={styles.globe}>
+      <View style={styles.globe} onLayout={(event) => { globeBottom.value = event.nativeEvent.layout.y + event.nativeEvent.layout.height }}>
         <FlightGlobe
+          visible={globeVisible}
           onFind={onGlobeFind}
           overlay={
             offerOpen && (
@@ -202,49 +249,15 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.pad}>
-        <BoardStrip
-          cells={[
-            { label: upper(t('home.next_departure')), value: countdown, color: colors.gold },
-            {
-              label: upper(t('home.stamp_dailies')),
-              value: dailyStatus ? `${doneCount} / ${DAILY_GAMES.length}` : String(DAILY_GAMES.length),
-              color: colors.accent,
-              accessibilityLabel: dailyStatus
-                ? `${t('home.stamp_dailies')}, ${t('home.stamp_won')} ${doneCount} / ${DAILY_GAMES.length}`
-                : `${t('home.stamp_dailies')}, ${DAILY_GAMES.length}`,
-            },
-          ]}
-        />
+        <HomeBoardStrip dailyStatus={!!dailyStatus} doneCount={doneCount} />
       </View>
 
       <SectionHead title={t('mobile.home.daily_title')} note={t('mobile.home.daily_subtitle')} />
       <View style={styles.pad}>
         <DeparturesBoard>
-          {DAILY_GAMES.map((game, index) => {
-            const { label, tone } = dailyBoardStatus(statusOf(game), t)
-            const status = statusOf(game)
-            const done = status === 'won' || status === 'played'
-            const codeColor = done ? colors.textMuted : gameColors[game.id]
-            return (
-              <ExpandableDeparture
-                key={game.id}
-                game={game.id}
-                code={game.code}
-                name={upper(t(game.titleKey))}
-                status={label}
-                statusTone={tone}
-                last={index === DAILY_GAMES.length - 1}
-                expanded={openId === game.id}
-                onToggle={() => toggleOpen(game.id)}
-                gate={GATES[index % GATES.length]}
-                codeColor={codeColor}
-                codeLabel={t('mobile.flight.code').toLocaleUpperCase()}
-                gateLabel={t('home.gate').toLocaleUpperCase()}
-                accessibilityLabel={`${t(game.titleKey)}, ${label}`}>
-                {passParts(game, status, t, colors, styles, openId === game.id, codeColor)}
-              </ExpandableDeparture>
-            )
-          })}
+          {DAILY_GAMES.map((game, index) => (
+            <DailyDeparture key={game.id} game={game} index={index} status={statusOf(game)} expanded={openId === game.id} toggle={toggleOpen} />
+          ))}
         </DeparturesBoard>
       </View>
 
@@ -307,7 +320,7 @@ export default function HomeScreen() {
       </View>
 
       <LeagueVictoryOverlay uid={account?.username ? account.uid : undefined} />
-    </ScrollView>
+    </Animated.ScrollView>
   )
 }
 

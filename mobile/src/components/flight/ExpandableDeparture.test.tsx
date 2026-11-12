@@ -7,6 +7,13 @@ import { ExpandableDeparture, useAccordion } from './ExpandableDeparture'
 /* eslint-disable @typescript-eslint/no-require-imports */
 jest.mock('react-native-reanimated', () => ({ ...require('react-native-reanimated/mock'), useReducedMotion: () => false }))
 jest.mock('react-native-worklets', () => require('react-native-worklets/lib/module/mock'))
+jest.mock('react-native', () => {
+  const native = jest.requireActual('react-native')
+  return Object.create(native, {
+    Platform: { value: { ...native.Platform, OS: 'android' } },
+    LayoutAnimation: { value: { ...native.LayoutAnimation, configureNext: jest.fn() } },
+  })
+})
 /* eslint-enable @typescript-eslint/no-require-imports */
 jest.mock('expo-haptics', () => ({
   impactAsync: jest.fn(() => Promise.resolve()),

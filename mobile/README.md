@@ -21,24 +21,32 @@ npm start          # ou npm run android / ios / web
 
 ## Publication Google Play
 
-Le workflow GitHub **Google Play Release** construit un AAB à chaque push sur
-`master` qui modifie l'app ou son code partagé, même si le runtime natif ne change
-pas. Il utilise les identifiants Android et la clé Google Play conservés sur EAS,
+Le workflow **EAS Update** publie les mises à jour OTA des changements de l'app
+et du code partagé. À runtime natif identique, les changements JavaScript et UI
+arrivent par OTA aux applications compatibles, sans nouveau build AAB.
+Un lancement manuel limité au canal preview ne déclenche pas de publication Play.
+
+Après l'OTA production, le workflow réutilisable **Google Play Release** recherche
+les builds Android du profil `production` pour ce runtime. Il ne construit un AAB
+avec soumission automatique que si aucun build compatible terminé avec une archive,
+ni aucun build en attente ou en cours, n'existe. Un nouveau runtime natif déclenche
+donc un build ; les builds déjà en file sont dédupliqués. Les builds en erreur ou
+annulés permettent une nouvelle tentative ; un statut inconnu bloque la détection.
+Il utilise les identifiants Android et la clé Google Play conservés sur EAS,
 ainsi que le secret GitHub `EXPO_TOKEN`.
 
-Le build utilise le profil `production`, puis est envoyé automatiquement au
-**test interne** avec le profil d'envoi `play-internal`. Le nom du profil de build
-ne détermine pas la piste Google Play. Les OTA du workflow **EAS Update** continuent
-en parallèle. Chaque changement déclenche donc un build EAS supplémentaire.
+Par défaut, le build utilise le profil `production` et le profil d'envoi
+`play-internal` pour le **test interne**. Le nom du profil de build ne détermine
+pas la piste Google Play.
 
 Lorsque Google a accordé l'accès à la production, définir la variable du dépôt
 GitHub `PLAY_PRODUCTION_ENABLED` à `true` (Settings → Secrets and variables →
-Actions → Variables). Un second build du même code est alors automatiquement
-construit et soumis à la piste **production** avec le profil d'envoi `production`.
-Chaque piste reçoit un code de version distinct : Google refuse de téléverser
-deux fois le même AAB. Cela consomme deux builds EAS par changement lorsque la
-production est activée.
-Sans cette variable, seule la piste interne reçoit les builds.
+Actions → Variables). Lorsqu'un runtime nécessite un nouveau build natif, deux
+builds du même code sont alors construits et soumis : test interne et piste
+**production** (profil d'envoi `production`). Chaque piste reçoit un code de
+version distinct. La décision est prise une seule fois avant ces deux builds.
+Activer cette variable pour un runtime existant ne reconstruit pas l'app :
+promouvoir manuellement la version existante dans la Play Console.
 
 Pour les comptes personnels créés après le 13 novembre 2023, l'accès à la
 production nécessite au moins 12 testeurs inscrits au **test fermé** pendant
@@ -48,4 +56,8 @@ dans la Play Console. Voir les [conditions Google](https://support.google.com/go
 
 Le résumé du workflow contient le lien de suivi EAS. Un build réussi ne confirme
 pas à lui seul la publication : vérifier aussi le résultat de la soumission et
-les éventuelles validations demandées dans la Play Console.
+les éventuelles validations demandées dans la Play Console. Un build compatible
+ne prouve ni son installation ni l'acceptation de sa soumission par Google Play.
+En cas d'échec de soumission lié aux identifiants ou aux autorisations Play,
+corriger ces paramètres et relancer la soumission du build existant, sans
+reconstruire l'app : les autorisations de publication sont indépendantes du runtime.

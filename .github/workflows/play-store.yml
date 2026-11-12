@@ -1,35 +1,93 @@
 name: Google Play Release
 
-# Every app change queues a build and submission, independently of OTA updates or native runtime.
-# EAS uses remote Android credentials and the profiles in mobile/eas.json.
+# Called by EAS Update after publishing the production Android runtime.
 on:
-  push:
-    branches: [master]
-    paths:
-      - 'mobile/**'
-      - 'src/**'
-      - 'packages/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - '.github/workflows/play-store.yml'
-      - '!**/*.test.*'
-      - '!**/*.spec.*'
-      - '!**/__tests__/**'
-      - '!**/__mocks__/**'
-      - '!**/docs/**'
-      - '!**/*.md'
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      runtime:
+        description: Production Android native runtime
+        required: true
+        type: string
 
 permissions:
   contents: read
 
-concurrency:
-  group: play-store-production
-  cancel-in-progress: false
-
 jobs:
+  check-runtime:
+    name: Check for a compatible native runtime
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: mobile
+    env:
+      RUNTIME: ${{ inputs.runtime }}
+    outputs:
+      needs_build: ${{ steps.check.outputs.needs_build }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      - run: npm ci
+      - name: Check finished and queued production builds
+        id: check
+        run: |
+          if [ -z "$RUNTIME" ] || [ "$RUNTIME" = null ]; then
+            echo '::error::A nonempty production runtime is required.'
+            exit 1
+          fi
+          eas build:list --platform android --build-profile production --runtime-version "$RUNTIME" --limit 50 --json --non-interactive > compatible-builds.json
+          node <<'NODE'
+          const fs = require('node:fs');
+          const builds = JSON.parse(fs.readFileSync('compatible-builds.json', 'utf8'));
+          if (!Array.isArray(builds)) throw new Error('Expected a build array');
+          let compatible = false;
+          for (const build of builds) {
+            const runtime = build.runtime?.version ?? build.runtimeVersion ?? build.fingerprint?.hash;
+            if (runtime !== process.env.RUNTIME) continue;
+            switch (build.status) {
+              case 'FINISHED':
+                compatible ||= [build.artifacts?.buildUrl, build.artifacts?.applicationArchiveUrl]
+                  .some(url => typeof url === 'string' && url.length > 0);
+                break;
+              case 'NEW':
+              case 'IN_QUEUE':
+              case 'IN_PROGRESS':
+              case 'PENDING_CANCEL':
+                compatible = true;
+                break;
+              case 'ERRORED':
+              case 'CANCELED':
+                break;
+              default:
+                throw new Error('Unrecognized build status: ' + build.status);
+            }
+          }
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, 'needs_build=' + !compatible + '\n');
+          NODE
+          needs_build=$(sed -n 's/^needs_build=//p' "$GITHUB_OUTPUT" | tail -n 1)
+          {
+            echo '## Google Play native runtime'
+            echo "Requested runtime: $RUNTIME"
+            if [ "$needs_build" = true ]; then
+              echo 'No usable finished or active compatible build found; queueing build and automatic submission.'
+            else
+              echo 'Compatible finished or active build found: OTA suffices; no new build is needed.'
+              echo 'This does not prove the app is installed or that Google Play accepted a submission.'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
   production:
     name: Queue Google Play (${{ matrix.submit_profile }})
+    needs: check-runtime
+    if: needs.check-runtime.outputs.needs_build == 'true'
     runs-on: ubuntu-latest
     # Each track gets its own build and version code. EAS owns the queued build and submission.
     strategy:
@@ -56,6 +114,7 @@ jobs:
       - name: Queue a build with automatic submission
         id: build
         env:
+          RUNTIME: ${{ inputs.runtime }}
           SUBMIT_PROFILE: ${{ matrix.submit_profile }}
         run: |
           eas build --platform android --profile production --auto-submit-with-profile "$SUBMIT_PROFILE" --non-interactive --no-wait --json > build.json
@@ -65,6 +124,7 @@ jobs:
           echo "build_id=$build_id" >> "$GITHUB_OUTPUT"
           {
             echo '## Google Play Release'
+            echo "Requested runtime: $RUNTIME"
             echo "Android build + submission queued on EAS using submit profile: $SUBMIT_PROFILE."
             echo 'Public production is queued only when PLAY_PRODUCTION_ENABLED is true, as a separately versioned build from the same source commit.'
             echo 'Availability remains subject to successful submission and any required Google review; this workflow does not confirm user-facing publication.'

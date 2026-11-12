@@ -33,8 +33,11 @@ en parallèle. Chaque changement déclenche donc un build EAS supplémentaire.
 
 Lorsque Google a accordé l'accès à la production, définir la variable du dépôt
 GitHub `PLAY_PRODUCTION_ENABLED` à `true` (Settings → Secrets and variables →
-Actions → Variables). Les nouveaux builds sont alors aussi soumis à la piste
-**production** avec le profil d'envoi `production`, sans seconde compilation.
+Actions → Variables). Un second build du même code est alors automatiquement
+construit et soumis à la piste **production** avec le profil d'envoi `production`.
+Chaque piste reçoit un code de version distinct : Google refuse de téléverser
+deux fois le même AAB. Cela consomme deux builds EAS par changement lorsque la
+production est activée.
 Sans cette variable, seule la piste interne reçoit les builds.
 
 Pour les comptes personnels créés après le 13 novembre 2023, l'accès à la

@@ -94,7 +94,7 @@ jobs:
       fail-fast: false
       max-parallel: 1
       matrix:
-        submit_profile: ${{ fromJSON(vars.PLAY_PRODUCTION_ENABLED == 'true' && '["play-internal","production"]' || '["play-internal"]') }}
+        submit_profile: ${{ fromJSON(vars.PLAY_PRODUCTION_ENABLED == 'true' && '["play-alpha","production"]' || '["play-alpha"]') }}
     timeout-minutes: 30
     defaults:
       run:

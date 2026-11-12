@@ -6,6 +6,7 @@ import {
   Canvas,
   Circle,
   DashPathEffect,
+  FillType,
   Group,
   Path,
   RadialGradient,
@@ -220,6 +221,9 @@ export function FlightGlobe({ onFind, overlay = null }: { onFind?: () => void; o
   )
   const landPath = useDerivedValue<SkPath>(() => {
     const path = framePath(rings.land)
+    // Set the fill rule on the owned path: the web renderer's fillType prop creates
+    // temporary PathBuilders/paths every frame without disposing them (Skia 2.6.2).
+    path.setFillType(FillType.EvenOdd)
     appendRings(path, land, basis.value, c, c, r)
     return path
   })
@@ -300,7 +304,7 @@ export function FlightGlobe({ onFind, overlay = null }: { onFind?: () => void; o
                 <TwoPointConicalGradient start={vec(c - r * 0.35, c - r * 0.4)} startR={r * 0.1} end={vec(c, c)} endR={r * 1.05} colors={[colors.globeOcean, colors.globeOceanDeep]} />
               </Circle>
               <Path path={graticulePath} style="stroke" strokeWidth={0.6} color={colors.globeGraticule} />
-              <Path path={landPath} fillType="evenOdd" color={colors.globeLand} />
+              <Path path={landPath} color={colors.globeLand} />
               <Path path={landPath} style="stroke" strokeWidth={0.7} color={colors.globeLandEdge} />
               <Circle cx={c} cy={c} r={r} style="stroke" strokeWidth={1.2} color={colors.borderStrong} />
               <Path path={accentPath} style="stroke" strokeWidth={1.8} strokeCap="round" color={colors.accent}>

@@ -6,6 +6,7 @@
 //   size     width and height in px (default 40)
 //   color    overrides the game's color (e.g. a muted glyph for an inactive filter)
 //   title    accessible name; without it the emblem is hidden from screen readers
+import { Platform } from 'react-native'
 import { Path, G, Circle, Rect, Svg, Text as SvgText } from 'react-native-svg'
 
 import { emblemId, gameEmblem } from '@shared/utils/gameEmblems'
@@ -43,9 +44,13 @@ export default function GameEmblem({ game, variant = 'tile', size = 40, color, t
   const emblem = gameEmblem(game) as Emblem | null
   if (!emblem) return null
   const stroke = color ?? emblemColor(game, theme.gameColors, theme.colors.textMuted)
-  const a11y = title
-    ? ({ accessibilityRole: 'image', accessibilityLabel: title, accessible: true } as const)
-    : ({ accessible: false, importantForAccessibility: 'no-hide-descendants' } as const)
+  const a11y = Platform.OS === 'web'
+    ? title
+      ? ({ role: 'img', 'aria-label': title, focusable: false } as const)
+      : ({ 'aria-hidden': true, focusable: false } as const)
+    : title
+      ? ({ accessibilityRole: 'image', accessibilityLabel: title, accessible: true } as const)
+      : ({ accessible: false, importantForAccessibility: 'no-hide-descendants' } as const)
 
   const paths = (
     <>

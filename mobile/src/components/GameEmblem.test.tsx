@@ -1,4 +1,6 @@
 import { act, create } from 'react-test-renderer'
+import { Platform } from 'react-native'
+import { Svg } from 'react-native-svg'
 
 import { GAMES } from '@/games'
 import { darkGameColors, lightGameColors } from '@/theme'
@@ -14,6 +16,24 @@ function render(element: React.ReactElement) {
 }
 
 describe('GameEmblem', () => {
+  it.each([undefined, 'Drapeau'])('uses valid web SVG accessibility attributes (title: %s)', (title) => {
+    jest.replaceProperty(Platform, 'OS', 'web')
+    try {
+      const props = render(<GameEmblem game="flags" title={title} />).root.findByType(Svg).props
+      expect(props.accessible).toBeUndefined()
+      expect(props.importantForAccessibility).toBeUndefined()
+      expect(props.accessibilityRole).toBeUndefined()
+      if (title) {
+        expect(props.role).toBe('img')
+        expect(props['aria-label']).toBe(title)
+      } else {
+        expect(props['aria-hidden']).toBe(true)
+      }
+    } finally {
+      jest.restoreAllMocks()
+    }
+  })
+
   it.each(['tile', 'stamp', 'glyph'] as const)('renders the %s variant', (variant) => {
     expect(render(<GameEmblem game="flags" variant={variant} title="Drapeau" />).toJSON()).not.toBeNull()
   })

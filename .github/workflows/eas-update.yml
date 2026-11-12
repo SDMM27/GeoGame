@@ -7,14 +7,14 @@ name: EAS Update
 # An installed APK only receives the updates made for its native runtime version (the fingerprint of its native code,
 # see runtimeVersion in mobile/app.json). When a change alters it (a native module added or upgraded, a config plugin…),
 # no APK can receive the update: the apk job then builds one and publishes it as the latest release of
-# GeoGame-releases, where the website's download link and the app's "new version" banner point. The Play Store builds
-# can't be built and submitted from here: the update job only warns that a new store build is needed.
+# GeoGame-releases, where the website's download link and the app's "new version" banner point. Google Play
+# builds and submissions are queued independently by the Google Play Release workflow (play-store.yml).
 # Needs the repository secrets EXPO_TOKEN (expo.dev → Account settings → Access tokens) and RELEASES_TOKEN (a GitHub
 # fine-grained token with Contents: read and write on SDMM27/GeoGame-releases).
 on:
   push:
     branches: [master]
-    paths: ['mobile/**', 'src/**', '!src/**/*.test.js', '!mobile/**/*.test.ts', '!mobile/**/*.test.tsx', '!mobile/README.md']
+    paths: ['mobile/**', 'src/**', '.github/workflows/eas-update.yml', '!src/**/*.test.js', '!mobile/**/*.test.ts', '!mobile/**/*.test.tsx', '!mobile/README.md']
   workflow_dispatch:
     inputs:
       channel:
@@ -69,12 +69,8 @@ jobs:
             cat "update-$channel.json"
             runtime=$(jq -r 'map(select(.platform == "android"))[0].runtimeVersion' "update-$channel.json")
             if [ "$channel" = preview ]; then echo "preview_runtime=$runtime" >> "$GITHUB_OUTPUT"; fi
-            # A Play Store build only gets the updates of its own native runtime: say when none can receive this one.
             if [ "$channel" = production ]; then
-              eas build:list --platform android --build-profile production --runtime-version "$runtime" --status finished --limit 1 --json > store.json
-              if [ "$(jq length store.json)" -eq 0 ]; then
-                echo "::warning::No Play Store build has the native runtime $runtime: this production update reaches no one until a new store build (eas build --profile production, then eas submit) is published."
-              fi
+              echo "::notice::Google Play builds and submissions to the configured track are queued independently on app-affecting master pushes by the Google Play Release workflow (.github/workflows/play-store.yml). This OTA update only reaches builds with native runtime $runtime."
             fi
           done
         env:

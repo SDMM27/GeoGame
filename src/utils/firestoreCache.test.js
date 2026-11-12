@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { canUsePersistentCache } from './firestoreCache'
 
 const IPHONE_SAFARI = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1'
@@ -9,6 +9,15 @@ const WINDOWS_CHROME = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/53
 const ANDROID_CHROME = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36'
 
 describe('canUsePersistentCache', () => {
+  beforeEach(() => vi.stubGlobal('indexedDB', {}))
+  afterEach(() => vi.unstubAllGlobals())
+
+  it('uses memory when IndexedDB is unavailable, including React Native', () => {
+    vi.stubGlobal('indexedDB', undefined)
+    expect(canUsePersistentCache(undefined)).toBe(false)
+    expect(canUsePersistentCache(WINDOWS_CHROME)).toBe(false)
+  })
+
   it('keeps the cache in memory on iPhone and iPad browsers', () => {
     expect(canUsePersistentCache(IPHONE_SAFARI)).toBe(false)
     expect(canUsePersistentCache(IPHONE_CHROME)).toBe(false)

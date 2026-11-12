@@ -35,7 +35,7 @@ import { ToastHost } from '@/components/ToastHost'
 import { UpdateBanner } from '@/components/UpdateBanner'
 import { WhatsNew } from '@/components/WhatsNew'
 import { XpToasts } from '@/components/XpToasts'
-import { useTheme, type Theme } from '@/theme'
+import { AppThemeProvider, useTheme, type Theme } from '@/theme'
 import { useLaunchUpdate } from '@/updates'
 
 SplashScreen.preventAutoHideAsync()
@@ -93,6 +93,10 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
 }
 
 export default function RootLayout() {
+  return <AppThemeProvider><RootNavigator /></AppThemeProvider>
+}
+
+function RootNavigator() {
   const [fontsLoaded] = useFonts({
     BricolageGrotesque_600SemiBold,
     BricolageGrotesque_700Bold,

@@ -1,8 +1,9 @@
 // The theme in use: the player's choice (light, dark, or the system's), remembered in the key-value store behind
-// localStorage (src/polyfills.ts), and followed live by every screen, without a provider: a small external store, so
-// changing it re-renders whoever reads it, and components rendered alone (tests) get the dark default.
-import { useSyncExternalStore } from 'react'
-import { StyleSheet, useColorScheme } from 'react-native'
+// localStorage (src/polyfills.ts). A provider shares the resolved theme; isolated components can still read the store.
+import { createContext, createElement, useContext, useSyncExternalStore, type ReactNode } from 'react'
+import { Platform, StyleSheet, useColorScheme } from 'react-native'
+
+import { persistTheme } from './persistence'
 
 import { darkColors, darkGameColors, lightColors, lightGameColors, type GameColors, type Palette } from './palettes'
 
@@ -38,12 +39,8 @@ const subscribe = (listener: () => void) => {
 export function setThemePreference(next: ThemePreference) {
   if (next === preference) return
   preference = next
-  try {
-    globalThis.localStorage?.setItem(STORAGE_KEY, next)
-  } catch {
-    // storage unavailable: the choice lasts until the app closes
-  }
   listeners.forEach((listener) => listener())
+  void persistTheme(next, Platform.OS === 'web')
 }
 
 const getPreference = () => preference
@@ -58,12 +55,23 @@ const THEMES: Record<'light' | 'dark', Theme> = {
   light: { scheme: 'light', colors: lightColors, gameColors: lightGameColors },
 }
 
+export const ThemeContext = createContext<Theme | null>(null)
+const noSubscription = () => () => {}
+const defaultPreference = () => DEFAULT
+
+export function AppThemeProvider({ children }: { children: ReactNode }) {
+  const theme = useTheme()
+  return createElement(ThemeContext.Provider, { value: theme }, children)
+}
+
 /** The theme in use. */
 export function useTheme(): Theme {
-  const [chosen] = useThemePreference()
+  const context = useContext(ThemeContext)
+  // Share one resolved palette across navigation and every mounted screen.
+  const chosen = useSyncExternalStore(context ? noSubscription : subscribe, context ? defaultPreference : getPreference, defaultPreference)
   const system = useColorScheme()
   const scheme = chosen === 'system' ? (system === 'light' ? 'light' : 'dark') : chosen
-  return THEMES[scheme]
+  return context ?? THEMES[scheme]
 }
 
 /** The colors of the theme in use. */

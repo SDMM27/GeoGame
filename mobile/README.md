@@ -9,6 +9,16 @@ npm install
 npm start          # ou npm run android / ios / web
 ```
 
+Pour tester en Wi-Fi sur Android, lancer `npx expo start --go --lan`, puis scanner
+le QR code avec Expo Go. Installer une version d’Expo Go correspondant au SDK du
+projet depuis [expo.dev/go](https://expo.dev/go). La connexion Google native et
+les notifications push Android nécessitent un build de l’app ; elles sont
+désactivées dans Expo Go.
+
+Pour mesurer les FPS du fil UI pendant un diagnostic, démarrer Expo avec
+`EXPO_PUBLIC_FRAME_DIAGNOSTICS=1`. Les mesures par écran apparaissent dans les
+logs de développement ; ce diagnostic est désactivé par défaut.
+
 ## Scripts
 
 | Commande | Rôle |
@@ -18,6 +28,7 @@ npm start          # ou npm run android / ios / web
 | `npm run build:countries` | Régénère les données pays embarquées |
 | `npm run build:flags` | Régénère les drapeaux embarqués |
 | `npm run build:silhouettes` | Régénère les silhouettes de pays |
+| `node scripts/build-globe-mask.mjs` | Régénère la texture GPU du globe après une modification des données pays |
 
 ## Publication Google Play
 

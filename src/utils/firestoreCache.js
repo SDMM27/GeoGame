@@ -8,6 +8,9 @@
 const SDK_SAFARI_BUG_VERSIONS = /(?:Version|Mobile)\/1[456]/
 
 export function canUsePersistentCache(userAgent = globalThis.navigator?.userAgent, appVersion = globalThis.navigator?.appVersion) {
+  // The Firebase JS SDK's persistent cache needs IndexedDB, which React Native
+  // does not provide. Select memory immediately instead of failing at startup.
+  if (typeof globalThis.indexedDB === 'undefined') return false
   if (!userAgent) return true
   const sdkSafari = userAgent.includes('Safari') && !userAgent.includes('Chrome')
   return !(sdkSafari && (SDK_SAFARI_BUG_VERSIONS.test(userAgent) || SDK_SAFARI_BUG_VERSIONS.test(appVersion ?? '')))

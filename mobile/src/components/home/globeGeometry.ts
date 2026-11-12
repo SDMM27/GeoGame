@@ -30,8 +30,9 @@ const ROUTE_STEPS = 48
 const routes = (pairs: [string, string][]) => flatten(pairs.map(([a, b]) => arc(cityAt(a), cityAt(b), ROUTE_STEPS)))
 
 export const LAND: Rings = landData()
-// The web's graticule10 sampled every 5 degrees instead of 2.5: the same lines with half the vertices
-export const GRATICULE: Lines = flatten(geoGraticule().precision(5).lines().map((line) => line.coordinates as [number, number][]))
+// A 10-degree chord deviates by at most ~0.5 pt at this globe's 136 pt radius.
+// Keep the same meridians/parallels with fewer native path commands per frame.
+export const GRATICULE: Lines = flatten(geoGraticule().precision(10).lines().map((line) => line.coordinates as [number, number][]))
 export const ROUTES_ACCENT: Lines = routes([['PAR', 'TYO'], ['NYC', 'PAR'], ['CAI', 'SYD']])
 export const ROUTES_ACCENT2: Lines = routes([['NYC', 'RIO'], ['RIO', 'CAI'], ['CAI', 'NBO']])
 // The plane flies Paris -> Tokyo along its route

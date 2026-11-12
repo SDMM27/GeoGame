@@ -114,7 +114,10 @@ export function decayVelocity(velocity: number, dt: number) {
   return velocity * Math.pow(0.04, dt)
 }
 
-function centered(s: GlobeState, within = FOUND_RADIANS) {
+// Worklet closures are restored inside the function body, after default arguments
+// are evaluated. A module constant in a default argument is undefined on the UI
+// runtime, even though the same call succeeds on the JS thread and in plain Jest.
+function centered(s: GlobeState, within: number) {
   'worklet'
   return angularDistance(s.lon, s.lat, CITY_LON[s.target], CITY_LAT[s.target]) < within
 }
@@ -155,7 +158,7 @@ export function stepGlobe(s: GlobeState, dt: number, reduced: boolean) {
     s.velocity = 0
   }
   if (s.phase === 'manual') {
-    if (centered(s)) return found(s)
+    if (centered(s, FOUND_RADIANS)) return found(s)
     if (s.idle > 3 && !s.velocity) {
       s.phase = 'search'
       s.phaseTime = 0
@@ -205,7 +208,7 @@ export function dragMove(s: GlobeState, dxPx: number, dyPx: number, sizePx: numb
   s.phase = 'manual'
   s.manualFind = true
   // Under reduced motion `stepGlobe` does not move the view: a drag that lands on the city still finds it
-  return s.reduced && centered(s) ? found(s) : 0
+  return s.reduced && centered(s, FOUND_RADIANS) ? found(s) : 0
 }
 
 export function dragEnd(s: GlobeState, timeMs: number) {

@@ -14,6 +14,9 @@ export default function TabsLayout() {
   const requests = useFriendships(account?.uid).incoming.length
   return (
     <NativeTabs
+      disableIndicator
+      labelVisibilityMode="labeled"
+      rippleColor="transparent"
       backgroundColor={colors.bg}
       tintColor={colors.accent}
       iconColor={{ default: colors.textMuted, selected: colors.accent }}

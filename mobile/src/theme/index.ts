@@ -3,7 +3,7 @@
 // useColors() or makeStyles() (./theme.ts); fonts, radii and spacing don't change with it.
 import { Platform } from 'react-native'
 
-export { makeStyles, setThemePreference, useColors, useTheme, useThemePreference } from './theme'
+export { AppThemeProvider, makeStyles, setThemePreference, useColors, useTheme, useThemePreference } from './theme'
 export type { Theme, ThemePreference } from './theme'
 export { darkColors, gameFills, lightColors, darkGameColors, lightGameColors } from './palettes'
 export type { GameColors, Palette } from './palettes'

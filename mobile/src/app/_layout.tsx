@@ -21,6 +21,7 @@ import { Dimensions, Platform } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 import { ErrorScreen } from '@/components/ErrorScreen'
+import { FrameDiagnostics } from '@/components/FrameDiagnostics'
 import { InstallHint } from '@/components/InstallHint'
 import { InviteBanner } from '@/components/InviteBanner'
 import { NotificationPrompt } from '@/components/NotificationPrompt'
@@ -35,7 +36,7 @@ import { ToastHost } from '@/components/ToastHost'
 import { UpdateBanner } from '@/components/UpdateBanner'
 import { WhatsNew } from '@/components/WhatsNew'
 import { XpToasts } from '@/components/XpToasts'
-import { useTheme, type Theme } from '@/theme'
+import { AppThemeProvider, useTheme, type Theme } from '@/theme'
 import { useLaunchUpdate } from '@/updates'
 
 SplashScreen.preventAutoHideAsync()
@@ -93,6 +94,10 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
 }
 
 export default function RootLayout() {
+  return <AppThemeProvider><RootNavigator /></AppThemeProvider>
+}
+
+function RootNavigator() {
   const [fontsLoaded] = useFonts({
     BricolageGrotesque_600SemiBold,
     BricolageGrotesque_700Bold,
@@ -124,6 +129,7 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.bg }}>
       <ThemeProvider value={navigation}>
+        {__DEV__ && process.env.EXPO_PUBLIC_FRAME_DIAGNOSTICS === '1' && <FrameDiagnostics />}
         <StatusBar style={theme.scheme === 'light' ? 'dark' : 'light'} />
         <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
           <Stack.Screen name="(tabs)" />

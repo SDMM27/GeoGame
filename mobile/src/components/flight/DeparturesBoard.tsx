@@ -47,19 +47,20 @@ export function DepartureRow({ game, code, name, status, statusTone = 'ontime', 
       style={[styles.row, !last && styles.divider]}>
       <GameEmblem game={game} size={30} />
       <Text style={styles.code}>{code}</Text>
-      <Text style={styles.name} numberOfLines={1}>
-        {name}
-      </Text>
-      <Text style={[styles.status, { color: statusColor ?? toneColors[statusTone] }]}>{status}</Text>
+      <View style={styles.details}>
+        <Text style={styles.name}>{name}</Text>
+        <Text style={[styles.status, { color: statusColor ?? toneColors[statusTone] }]}>{status}</Text>
+      </View>
     </Pressable>
   )
 }
 
 const useStyles = makeStyles((colors) => ({
   board: { borderRadius: 16, backgroundColor: colors.board, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 52, paddingHorizontal: 12 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 52, paddingHorizontal: 12, paddingVertical: 10 },
   divider: { borderBottomWidth: 1, borderBottomColor: colors.boardLine },
-  code: { width: 34, fontFamily: fonts.monoBold, fontSize: 13, color: colors.gold },
-  name: { flex: 1, minWidth: 0, fontFamily: fonts.monoBold, fontSize: 12, color: colors.text },
+  code: { width: 34, flexShrink: 0, fontFamily: fonts.monoBold, fontSize: 13, color: colors.gold },
+  details: { flex: 1, minWidth: 0, gap: 4 },
+  name: { fontFamily: fonts.monoBold, fontSize: 12, color: colors.text },
   status: { fontFamily: fonts.monoBold, fontSize: 10, letterSpacing: 0.8 },
 }))

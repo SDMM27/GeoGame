@@ -5,8 +5,9 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Pressable, Text, View } from 'react-native'
-import Animated, { Keyframe, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withSequence, withTiming } from 'react-native-reanimated'
+import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withSequence, withTiming } from 'react-native-reanimated'
 
+import { useFlapStyle } from '@/components/flight/useFlapStyle'
 import GameEmblem, { flightCode } from '@/components/GameEmblem'
 import { Button } from '@/components/ui'
 import { fonts, makeStyles, radius, useColors } from '@/theme'
@@ -42,19 +43,12 @@ export function useFlapText(text: string, { delay = 0, duration = 900, reduced =
   return reduced ? text : shown
 }
 
-// The flap swings down from its top edge, overshoots a little and settles
-const flapIn = new Keyframe({
-  0: { opacity: 0, transform: [{ perspective: 700 }, { rotateX: '-100deg' }] },
-  35: { opacity: 1 },
-  70: { transform: [{ perspective: 700 }, { rotateX: '14deg' }] },
-  100: { opacity: 1, transform: [{ perspective: 700 }, { rotateX: '0deg' }] },
-}).duration(620)
-
 export function NextFlightBoard({ flight, onBoard, onClose }: { flight: NextFlight | null; onBoard: () => void; onClose: () => void }) {
   const { t, i18n } = useTranslation()
   const colors = useColors()
   const styles = useStyles()
   const reduced = useReducedMotion()
+  const flapStyle = useFlapStyle(true, reduced)
   const upper = (text: string) => text.toLocaleUpperCase(i18n.resolvedLanguage)
   const title = useFlapText(upper(flight ? flight.title : t('globe.all_done')), { delay: 260, reduced })
   const code = flight ? flightCode(flight.game) : ''
@@ -68,10 +62,9 @@ export function NextFlightBoard({ flight, onBoard, onClose }: { flight: NextFlig
 
   return (
     <Animated.View
-      entering={reduced ? undefined : flapIn}
       accessibilityLiveRegion="polite"
       accessibilityLabel={flight ? `${t('home.next_departure')}, ${flight.title}` : t('globe.all_done')}
-      style={styles.board}>
+      style={[styles.board, flapStyle]}>
       <View style={styles.head}>
         <Text style={styles.kicker}>{upper(t('home.next_departure'))}</Text>
         {!!code && <Text style={styles.code}>{code}</Text>}

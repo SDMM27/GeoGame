@@ -21,6 +21,7 @@ import { Dimensions, Platform } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 import { ErrorScreen } from '@/components/ErrorScreen'
+import { FrameDiagnostics } from '@/components/FrameDiagnostics'
 import { InstallHint } from '@/components/InstallHint'
 import { InviteBanner } from '@/components/InviteBanner'
 import { NotificationPrompt } from '@/components/NotificationPrompt'
@@ -128,6 +129,7 @@ function RootNavigator() {
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.bg }}>
       <ThemeProvider value={navigation}>
+        {__DEV__ && process.env.EXPO_PUBLIC_FRAME_DIAGNOSTICS === '1' && <FrameDiagnostics />}
         <StatusBar style={theme.scheme === 'light' ? 'dark' : 'light'} />
         <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
           <Stack.Screen name="(tabs)" />

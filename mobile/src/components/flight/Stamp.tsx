@@ -19,7 +19,7 @@ type Props = { label: string; tone?: StampTone; color?: string; rotate?: number;
 export function Stamp({ label, tone = 'ok', color, rotate = -6, animate = true, size = 12, style }: Props) {
   const colors = useColors()
   const reduceMotion = useReducedMotion()
-  const ink = color ?? (tone === 'bad' ? colors.danger : colors.accent)
+  const ink = color ?? (tone === 'bad' ? colors.danger : colors.success)
   return (
     <Animated.View
       entering={animate && !reduceMotion ? ZoomIn.springify().damping(12).stiffness(260) : undefined}

@@ -6,7 +6,11 @@
 // Every item says how it is unlocked: `starter` items from the start, `level` items at a player level (XP, see
 // missions.js); flag fragments (step 6 of docs/plan-fonctionnalites.md) will add more kinds. firestore.rules keeps
 // the level of each `level` item (decorationLevel) and refuses a locked one; a test checks both lists match.
-import { doc, updateDoc } from 'firebase/firestore'
+//
+// users/{uid}.avatarFlag: the ISO code of a flag of the player's collection (flagCollection.js), shown as the profile
+// picture instead of the initial; absent for none. A field of its own, not part of `decoration`, so an older app
+// saving { frame, color } can't wipe it. firestore.rules (validAvatarFlag) only takes a flag in flags.unlocked.
+import { deleteField, doc, updateDoc } from 'firebase/firestore'
 import { firestore } from '../Firebase'
 import { cachedPublicData, fetchPublicData, patchPublicData } from './publicProfile'
 
@@ -46,7 +50,7 @@ export const NAME_COLORS = [
   { id: 'gilded', value: '#FFD447', unlock: atLevel(25) },
 ]
 
-export const DEFAULT_DECORATION = { frame: 'none', color: 'default' }
+export const DEFAULT_DECORATION = { frame: 'none', color: 'default', flag: null }
 
 const FRAMES_BY_ID = Object.fromEntries(FRAMES.map((item) => [item.id, item]))
 const COLORS_BY_ID = Object.fromEntries(NAME_COLORS.map((item) => [item.id, item]))
@@ -63,26 +67,48 @@ export function isUnlocked(item, progress = {}) {
   }
 }
 
+// The flag a users/{uid} document wears: an ISO code of its own collection, or null.
+export function readAvatarFlag(data) {
+  const iso = data?.avatarFlag
+  const unlocked = data?.flags?.unlocked
+  return typeof iso === 'string' && Array.isArray(unlocked) && unlocked.includes(iso) ? iso : null
+}
+
 // The ids stored on a users/{uid} document, cleaned up: unknown or malformed ids fall back to the default.
 export function readDecoration(data) {
   const raw = data?.decoration
   return {
     frame: typeof raw?.frame === 'string' && FRAMES_BY_ID[raw.frame] ? raw.frame : DEFAULT_DECORATION.frame,
     color: typeof raw?.color === 'string' && COLORS_BY_ID[raw.color] ? raw.color : DEFAULT_DECORATION.color,
+    flag: readAvatarFlag(data),
   }
 }
 
-// What to draw for a decoration ({ frame, color } ids): { frame: { color, style } | null, nameColor: '#hex' | null }.
+// What to draw for a decoration ({ frame, color, flag }): { frame: { color, style } | null, nameColor: '#hex' | null,
+// flag: 'ISO' | null }.
 export function decorationStyle(decoration) {
   const frame = FRAMES_BY_ID[decoration?.frame]
   return {
     frame: frame?.color ? { color: frame.color, style: frame.style } : null,
     nameColor: COLORS_BY_ID[decoration?.color]?.value ?? null,
+    flag: typeof decoration?.flag === 'string' ? decoration.flag : null,
   }
 }
 
 export const isDefaultDecoration = (decoration) =>
-  decoration?.frame === DEFAULT_DECORATION.frame && decoration?.color === DEFAULT_DECORATION.color
+  decoration?.frame === DEFAULT_DECORATION.frame && decoration?.color === DEFAULT_DECORATION.color && !decoration?.flag
+
+// The image of a flag (public/flags on the website; the app maps it to its own copy).
+export const flagImagePath = (iso) => `/flags/${iso.toLowerCase()}.png`
+
+// Wears a flag of the collection (`iso`), or takes it off (null). Throws on a flag not in `unlocked`, or when the
+// write fails.
+export async function saveAvatarFlag(uid, iso, unlocked = []) {
+  if (iso !== null && !unlocked.includes(iso)) throw new Error('locked flag')
+  await updateDoc(doc(firestore, 'users', uid), { avatarFlag: iso ?? deleteField() })
+  patchPublicData(uid, { avatarFlag: iso ?? undefined })
+  return iso
+}
 
 // Saves the player's choice on their own document. Throws on a locked or unknown item, or when the write fails.
 export async function saveDecoration(uid, decoration, progress = {}) {
@@ -94,7 +120,7 @@ export async function saveDecoration(uid, decoration, progress = {}) {
   const value = { frame: frame.id, color: color.id }
   await updateDoc(doc(firestore, 'users', uid), { decoration: value })
   patchPublicData(uid, { decoration: value })
-  return value
+  return { ...value, flag: decoration.flag ?? null }
 }
 
 // The decoration of one account (the default for a visitor or when it can't be read).

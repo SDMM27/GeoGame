@@ -183,7 +183,7 @@
 }
 
 .boarding-pass--done {
-  --ticket-line: var(--gg-accent-line);
+  --ticket-line: color-mix(in srgb, var(--gg-success) 40%, transparent);
 }
 
 .boarding-pass-main {

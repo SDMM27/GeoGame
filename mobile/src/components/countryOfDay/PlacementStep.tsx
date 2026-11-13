@@ -44,7 +44,7 @@ export function PlacementStep({
     for (const layer of map.geoJson.getLayers()) {
       const name = layer.feature.properties.ADMIN
       if (resolved && name === admin) {
-        const color = found ? colors.accent : colors.warning
+        const color = found ? colors.success : colors.warning
         layer.setStyle({ fillColor: color, fillOpacity: 0.6, color, weight: 2 })
       } else if (wrong.includes(name)) {
         layer.setStyle({ fillColor: colors.danger, fillOpacity: 0.5, color: colors.danger, weight: 1.5 })

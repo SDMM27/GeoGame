@@ -17,7 +17,7 @@ export type VoyageColor = 'start' | 'green' | 'yellow' | 'red' | 'target' | 'hin
 export function voyageColors(colors: Palette, gameColors: ReturnType<typeof useTheme>['gameColors']): Record<VoyageColor, string> {
   return {
     start: gameColors.voyage_voyage,
-    green: colors.accent,
+    green: colors.success,
     yellow: colors.warning,
     red: colors.danger,
     target: gameColors.ranking,

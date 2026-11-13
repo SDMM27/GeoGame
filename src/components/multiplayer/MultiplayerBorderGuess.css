@@ -125,7 +125,7 @@
 }
 
 .mp-bg-chip--correct {
-    background: var(--sd-accent-ink);
+    background: var(--gg-on-success);
     border: 1px solid var(--gg-success);
     color: var(--gg-success-strong);
 }

@@ -319,8 +319,8 @@ export default function VoyageScreen() {
           {isGameOver && !isDaily && (
             <Animated.View entering={FadeIn.duration(220)} style={{ gap: space.md }}>
               <View style={styles.card}>
-                <Stamp label={resultTitle.toUpperCase()} color={isPerfect ? colors.accent : colors.gold} />
-                <Text variant="heading" color={isPerfect ? colors.accent : colors.text}>
+                <Stamp label={resultTitle.toUpperCase()} color={isPerfect ? colors.success : colors.gold} />
+                <Text variant="heading" color={isPerfect ? colors.success : colors.text}>
                   {resultTitle}
                 </Text>
                 <Text variant="caption">
@@ -360,7 +360,7 @@ export default function VoyageScreen() {
           score={score}
           scoreText={score.toFixed(1)}
           scoreLabel={t('units.pts')}
-          accent={isPerfect ? colors.accent : ACCENT}
+          accent={isPerfect ? colors.success : ACCENT}
           stats={[
             { label: stepsLabel(stepsUsed), value: `${stepsUsed}` },
             { label: clean(t('labels.optimal')).replace(/\s*:$/, ''), value: `${optimalLength}` },

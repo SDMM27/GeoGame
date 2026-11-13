@@ -12,6 +12,8 @@ import {
   dragMove,
   dragStart,
   releaseVelocity,
+  startParty,
+  PARTY_SECONDS,
   stepGlobe,
   wrap,
   type GlobeState,
@@ -53,6 +55,20 @@ describe('globeModel', () => {
     expect(s.phase).toBe('found')
     expect(s.score).toBe(100)
     expect(s.scored).toBe(true)
+  })
+
+  it('spins and holds the next target while the party lasts, then resumes', () => {
+    const s = createGlobeState()
+    run(s, 10, () => s.phase === 'found')
+    startParty(s)
+    expect(s.party).toBe(PARTY_SECONDS)
+    const lon = s.lon
+    run(s, FOUND_DELAY + 1) // well past the usual pause
+    expect(s.phase).toBe('found')
+    expect(s.lon).not.toBe(lon)
+    expect(s.party).toBeGreaterThan(0)
+    expect(run(s, PARTY_SECONDS, () => s.phase !== 'found') & EVENT_TARGET).toBe(EVENT_TARGET)
+    expect(s.party).toBe(0)
   })
 
   it('moves on to the next target after the found delay', () => {

@@ -29,7 +29,7 @@ export function BorderGuessRow({ guess, index, latest }: { guess: BorderGuess; i
   const BORDER_ACCENT = useTheme().gameColors.border_guess
   const { t, i18n } = useTranslation()
   const name = (guess.iso && getCountryName(guess.iso, i18n.language)) || guess.value
-  const color = guess.isCorrect ? colors.accent : colors.danger
+  const color = guess.isCorrect ? colors.success : colors.danger
   return (
     <Animated.View
       entering={FadeInDown.springify().damping(18)}
@@ -100,7 +100,7 @@ function hintLabel(t: (key: string) => string, metric: 'hemisphere' | 'area' | '
 function HintChip({ label, hint, text, detail }: { label: string; hint: Hint; text: string; detail?: string }) {
   const colors = useColors()
   const clueStyles = useClueStyles()
-  const TONE_COLORS: Record<Tone, string> = { match: colors.accent, higher: colors.warning, lower: colors.warning, neutral: colors.textMuted }
+  const TONE_COLORS: Record<Tone, string> = { match: colors.success, higher: colors.warning, lower: colors.warning, neutral: colors.textMuted }
   const color = TONE_COLORS[hint.tone]
   return (
     <View style={[clueStyles.chip, { borderColor: `${color}55`, backgroundColor: `${color}12` }]}>
@@ -129,7 +129,7 @@ function ProgressChips({ progress }: { progress?: ClueProgress }) {
   if (!progress || (progress.deltaKm == null && !progress.closest)) return null
   const { deltaKm, closest } = progress
   const km = deltaKm == null ? '' : Math.abs(deltaKm).toLocaleString(i18n.language)
-  const color = deltaKm == null ? colors.textMuted : deltaKm < 0 ? colors.accent : deltaKm > 0 ? colors.info : colors.textMuted
+  const color = deltaKm == null ? colors.textMuted : deltaKm < 0 ? colors.success : deltaKm > 0 ? colors.info : colors.textMuted
   return (
     <View style={clueStyles.progress}>
       {deltaKm != null && (
@@ -161,7 +161,7 @@ export function ClueGuessCard({ guess, index, progress }: { guess: ClueGuess; in
     <Animated.View
       entering={FadeInDown.springify().damping(18)}
       layout={LinearTransition.springify()}
-      style={[clueStyles.card, guess.isCorrect && { borderColor: colors.accent }]}>
+      style={[clueStyles.card, guess.isCorrect && { borderColor: colors.success }]}>
       <View style={clueStyles.cardHeader}>
         <Text variant="caption" style={{ width: 18 }}>
           {index + 1}
@@ -171,7 +171,7 @@ export function ClueGuessCard({ guess, index, progress }: { guess: ClueGuess; in
           {name}
         </Text>
         {guess.isCorrect ? (
-          <MaterialCommunityIcons name="check-circle" size={20} color={colors.accent} />
+          <MaterialCommunityIcons name="check-circle" size={20} color={colors.success} />
         ) : (
           <View style={clueStyles.distance}>
             <Text variant="bodyStrong" color={CLUE_ACCENT}>
@@ -249,11 +249,11 @@ export function ClueGuessSummary({ guesses, progress }: { guesses: ClueGuess[]; 
               {name}
             </Text>
             {guess.isCorrect ? (
-              <MaterialCommunityIcons name="check-circle" size={18} color={colors.accent} />
+              <MaterialCommunityIcons name="check-circle" size={18} color={colors.success} />
             ) : (
               <>
                 {delta != null && delta !== 0 && (
-                  <Text variant="caption" color={delta < 0 ? colors.accent : colors.info} style={{ fontVariant: ['tabular-nums'] }}>
+                  <Text variant="caption" color={delta < 0 ? colors.success : colors.info} style={{ fontVariant: ['tabular-nums'] }}>
                     {delta < 0 ? '−' : '+'}
                     {Math.abs(delta).toLocaleString(i18n.language)}
                   </Text>

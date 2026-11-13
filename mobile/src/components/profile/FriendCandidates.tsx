@@ -11,7 +11,7 @@ import { friendErrorKey, sendFriendRequestTo } from '@shared/utils/friends'
 import { type Account } from '@/account/auth'
 import { Kicker } from '@/components/flight'
 import { BadgeStrip, type PlayerBadges } from '@/components/profile/BadgeStrip'
-import { Avatar } from '@/components/profile/ProfileSections'
+import { UserAvatar } from '@/components/profile/ProfileSections'
 import { Button, Text, Touchable } from '@/components/ui'
 import { fonts, makeStyles, radius, space, useColors } from '@/theme'
 
@@ -111,7 +111,7 @@ export function FriendCandidates({
             accessibilityRole="button"
             onPress={() => router.push({ pathname: '/player/[uid]', params: { uid: player.uid } })}
             style={styles.who}>
-            <Avatar username={player.name} size={40} />
+            <UserAvatar uid={player.uid} username={player.name} size={40} />
             <Text variant="bodyStrong" numberOfLines={1} style={{ flexShrink: 1 }} color={mine ? colors.accent : colors.text}>
               {player.name}
             </Text>

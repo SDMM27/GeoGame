@@ -18,6 +18,7 @@
   --gg-success: #14a86b;
   --gg-success-strong: #0b7a4c;
   --gg-success-soft: rgba(20, 168, 107, 0.12);
+  --gg-on-success: #04261a;                    /* text on a --gg-success fill, both themes */
   --gg-warning: #f5b83d;
   --gg-warning-strong: #8a5a00;
   --gg-warning-soft: rgba(245, 184, 61, 0.18);
@@ -91,7 +92,7 @@
   --gg-danger-soft: rgba(255, 122, 107, 0.15);
   --gg-on-danger: #3a0d07;
   --gg-gold: #f5c84b;
-  --gg-stamp-green: var(--sd-accent-strong);
+  --gg-stamp-green: var(--gg-success-strong);   /* fixed green: the stamps never follow the globe skin accent */
   --gg-stamp-violet: var(--sd-accent-2);
 
   --gg-board: #070b16;

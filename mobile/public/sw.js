@@ -4,6 +4,14 @@
 self.addEventListener('install', () => self.skipWaiting())
 self.addEventListener('activate', (event) => event.waitUntil(self.clients.claim()))
 
+// Pages always come from the network: iOS restores a home screen web app from its disk cache without asking the server,
+// which brought back an index.html (and the bundle it names) from an older deployment. Offline, the cache still serves.
+// Everything else (hashed bundles, images) goes through the browser as usual.
+self.addEventListener('fetch', (event) => {
+  if (event.request.mode !== 'navigate') return
+  event.respondWith(fetch(event.request, { cache: 'no-store' }).catch(() => fetch(event.request)))
+})
+
 self.addEventListener('push', (event) => {
   let message = {}
   try {

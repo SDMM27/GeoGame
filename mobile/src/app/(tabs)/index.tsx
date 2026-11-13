@@ -69,8 +69,8 @@ function passParts(
       ? [
           <View key="top" style={styles.passTop}>
             <View style={styles.passStatus}>
-              {done && <MaterialCommunityIcons name="check" size={12} color={status === 'won' ? colors.accent : colors.text} />}
-              <Kicker color={status === 'won' ? colors.accent : done ? colors.text : colors.textMuted} size={9}>
+              {done && <MaterialCommunityIcons name="check" size={12} color={status === 'won' ? colors.success : colors.text} />}
+              <Kicker color={status === 'won' ? colors.success : done ? colors.text : colors.textMuted} size={9}>
                 {t(`home.daily_status_${status}`)}
               </Kicker>
             </View>
@@ -233,6 +233,7 @@ export default function HomeScreen() {
 
       <View style={styles.globe} onLayout={(event) => { globeBottom.value = event.nativeEvent.layout.y + event.nativeEvent.layout.height }}>
         <FlightGlobe
+          uid={account?.uid ?? null}
           visible={globeVisible}
           onFind={onGlobeFind}
           overlay={

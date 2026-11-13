@@ -1431,7 +1431,13 @@
       "violet": "Violet",
       "crimson": "Crimson",
       "gilded": "Gilded"
-    }
+    },
+    "flag_section": "Flag",
+    "flag_none": "None",
+    "flag_hint": "Wear a flag from your collection: it becomes your profile picture.",
+    "flag_empty": "No flag unlocked yet. Earn fragments to grow your collection.",
+    "flag_search": "Search a flag…",
+    "flag_alt": "Flag: {{country}}"
   },
   "elo": {
     "tab": "Elo",
@@ -1691,6 +1697,25 @@
     "all_done": "All of today’s flights have taken off",
     "all_done_hint": "Come back tomorrow for new challenges",
     "close": "Close",
+    "skins_open": "Customize the globe",
+    "skins_title": "Globe skins",
+    "skins_hint": "Level up to unlock new globes.",
+    "skins_locked": "Level {{level}}",
+    "skins_signin": "Sign in to unlock skins as you level up.",
+    "easter_title": "Around the world!",
+    "easter_body": "{{score}} points: you unlocked the secret “Disco ball” skin.",
+    "skin": {
+      "classic": "Classic",
+      "parchment": "Parchment",
+      "tropical": "Tropical",
+      "glacier": "Glacier",
+      "volcano": "Volcano",
+      "neon": "Neon",
+      "aurora": "Aurora",
+      "gold": "Gold",
+      "disco": "Disco ball"
+    },
+    "skins_accent": "Use the globe’s color across the site",
     "city": {
       "tokyo": "Tokyo",
       "rio": "Rio de Janeiro",

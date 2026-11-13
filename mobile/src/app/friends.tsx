@@ -17,7 +17,7 @@ import { useAccount } from '@/account/auth'
 import { shareInvite } from '@/account/shareInvite'
 import { confirmAction } from '@/components/confirm'
 import { FriendCandidates } from '@/components/profile/FriendCandidates'
-import { Avatar, DailyChips, SectionTitle } from '@/components/profile/ProfileSections'
+import { DailyChips, SectionTitle, UserAvatar } from '@/components/profile/ProfileSections'
 import { Kicker } from '@/components/flight'
 import { ScreenHeader } from '@/components/ScreenHeader'
 import { Button, Text, Touchable } from '@/components/ui'
@@ -136,7 +136,7 @@ export default function FriendsScreen() {
               {friendships.incoming.map((request: Friendship, index: number) => (
                 <View key={request.id} style={[styles.row, index > 0 && styles.divider]}>
                   <Touchable accessibilityRole="button" onPress={() => openPlayer(request.uid)} style={styles.who}>
-                    <Avatar username={request.username} size={40} />
+                    <UserAvatar uid={request.uid} username={request.username} size={40} />
                     <Text variant="bodyStrong" numberOfLines={1} style={{ flex: 1 }}>
                       {request.username}
                     </Text>
@@ -242,7 +242,7 @@ export default function FriendsScreen() {
                     {friendships.friends.map((friend: Friendship, index: number) => (
                       <View key={friend.id} style={[styles.row, index > 0 && styles.divider]}>
                         <Touchable accessibilityRole="button" onPress={() => openPlayer(friend.uid)} style={styles.who}>
-                          <Avatar username={friend.username} size={40} />
+                          <UserAvatar uid={friend.uid} username={friend.username} size={40} />
                           <View style={{ flex: 1, gap: space.xs }}>
                             <Text variant="bodyStrong" numberOfLines={1}>
                               {friend.username}
@@ -277,7 +277,7 @@ export default function FriendsScreen() {
                   {friendships.outgoing.map((request: Friendship, index: number) => (
                     <View key={request.id} style={[styles.row, index > 0 && styles.divider]}>
                       <Touchable accessibilityRole="button" onPress={() => openPlayer(request.uid)} style={styles.who}>
-                        <Avatar username={request.username} size={40} />
+                        <UserAvatar uid={request.uid} username={request.username} size={40} />
                         <Text variant="bodyStrong" numberOfLines={1} style={{ flex: 1 }}>
                           {request.username}
                         </Text>

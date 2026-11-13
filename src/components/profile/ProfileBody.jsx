@@ -3,12 +3,15 @@ import React, { useEffect, useId, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useDecoration } from '../../hooks/useDecoration'
 import { useBadges } from '../../hooks/useBadges'
 import { usePlayerProfile } from '../../hooks/usePlayerProfile'
 import { TIER_COLORS } from '../../utils/achievements'
 import { badgeSummary, readBadges } from '../../utils/badges'
 import { decorationStyle } from '../../utils/decorations'
+import FlagTile from '../FlagTile'
 import { GAME_TYPES } from '../../utils/gameTypes'
+import { getCountryName } from '../../utils/getCountryName'
 import GameEmblem from '../GameEmblem'
 import { describeBest, describeDetails, describeMode, describeResult, formatPlayedAt } from '../../utils/profileFormat'
 import { dailyTypesOn, dayKey, formatPlayTime } from '../../utils/profileStats'
@@ -35,25 +38,50 @@ export const GAME_META = {
 
 const AVATAR_COLORS = ['country-clue', 'placement', 'flags', 'capitals', 'border-guess', 'voyage-voyage', 'ranking', 'quiz'].map((id) => `var(--game-${id})`)
 
-// `decoration` ({ frame, color } ids): draws the frame as a ring inside the avatar's box, so the size never changes.
+// The flag worn as a profile picture. Goes back to the initial when the image fails to load.
+function AvatarFlag({ iso, size, fallback }) {
+  const { t, i18n } = useTranslation()
+  const [failed, setFailed] = useState(false)
+  useEffect(() => setFailed(false), [iso])
+  if (failed) return fallback
+  const country = getCountryName(iso, i18n.language) ?? iso
+  return (
+    <FlagTile
+      iso={iso}
+      blur={Math.max(2, Math.round(size / 10))}
+      className="profile-avatar__flag"
+      title={t('decorations.flag_alt', { country })}
+      onError={() => setFailed(true)}
+    />
+  )
+}
+
+// `decoration` ({ frame, color, flag }): draws the frame as a ring inside the avatar's box, so the size never changes.
+// With a flag, the flag replaces the initial.
 export function Avatar({ username, size = 44, decoration }) {
   let hash = 0
   for (const char of username) hash = (hash * 31 + char.charCodeAt(0)) | 0
-  const frame = decorationStyle(decoration).frame
+  const { frame, flag } = decorationStyle(decoration)
   const ring = frame && {
     boxSizing: 'border-box',
     border: `${frame.style === 'double' ? 5 : 3}px ${frame.style} ${frame.color}`,
     padding: 2,
     backgroundClip: 'content-box',
   }
+  const initial = username.charAt(0).toUpperCase()
   return (
     <span
-      className="profile-avatar"
+      className={`profile-avatar${flag ? ' profile-avatar--flag' : ''}`}
       style={{ width: size, height: size, fontSize: size * 0.45, background: AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length], ...ring }}
     >
-      {username.charAt(0).toUpperCase()}
+      {flag ? <AvatarFlag iso={flag} size={size} fallback={initial} /> : initial}
     </span>
   )
+}
+
+// Avatar of an account whose decoration (frame, flag) is not at hand: reads it (cached per account, see useDecoration).
+export function UserAvatar({ uid, ...props }) {
+  return <Avatar {...props} decoration={useDecoration(uid)} />
 }
 
 // One chip per daily challenge: colored when done, with a ✓ / ✗ badge.

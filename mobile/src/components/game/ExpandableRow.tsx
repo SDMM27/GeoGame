@@ -32,7 +32,7 @@ export function AnswerList({ title, answers, lastCorrect }: { title: string; ans
       {answers.map((answer, index) => {
         const correct = lastCorrect && index === answers.length - 1
         return (
-          <Text key={`${answer}-${index}`} variant={correct ? 'bodyStrong' : 'caption'} color={correct ? colors.accent : undefined}>
+          <Text key={`${answer}-${index}`} variant={correct ? 'bodyStrong' : 'caption'} color={correct ? colors.success : undefined}>
             {index + 1}. {answer}
           </Text>
         )

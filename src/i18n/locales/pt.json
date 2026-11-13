@@ -1431,7 +1431,13 @@
       "violet": "Violeta",
       "crimson": "Carmesim",
       "gilded": "Dourado"
-    }
+    },
+    "flag_section": "Bandeira",
+    "flag_none": "Nenhuma",
+    "flag_hint": "Usa uma bandeira da tua coleção: ela passa a ser a tua foto de perfil.",
+    "flag_empty": "Ainda não desbloqueaste nenhuma bandeira. Ganha fragmentos para aumentar a tua coleção.",
+    "flag_search": "Procurar uma bandeira…",
+    "flag_alt": "Bandeira: {{country}}"
   },
   "elo": {
     "tab": "Elo",
@@ -1691,6 +1697,25 @@
     "all_done": "Todos os voos de hoje já decolaram",
     "all_done_hint": "Volta amanhã para novos desafios",
     "close": "Fechar",
+    "skins_open": "Personalizar o globo",
+    "skins_title": "Skins do globo",
+    "skins_hint": "Ao subir de nível, você desbloqueia novos globos.",
+    "skins_locked": "Nível {{level}}",
+    "skins_signin": "Entre na conta para desbloquear skins ao subir de nível.",
+    "easter_title": "Volta ao mundo!",
+    "easter_body": "{{score}} pontos: você desbloqueou o skin secreto «Bola de discoteca».",
+    "skin": {
+      "classic": "Clássico",
+      "parchment": "Pergaminho",
+      "tropical": "Tropical",
+      "glacier": "Glaciar",
+      "volcano": "Vulcão",
+      "neon": "Neon",
+      "aurora": "Aurora",
+      "gold": "Dourado",
+      "disco": "Bola de discoteca"
+    },
+    "skins_accent": "Usar a cor do globo em todo o site",
     "city": {
       "tokyo": "Tóquio",
       "rio": "Rio de Janeiro",

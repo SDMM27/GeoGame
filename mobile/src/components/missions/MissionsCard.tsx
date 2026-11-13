@@ -53,7 +53,7 @@ function MissionRow({ entry, reward }: { entry: Entry; reward: Reward }) {
   const colors = useColors()
   const { mission, progress, done, paid } = entry
   const shown = Math.min(progress, mission.target)
-  const color = done ? colors.accent : colors.highlight
+  const color = done ? colors.success : colors.highlight
   const title = t(`missions.${mission.id}`, { count: mission.target })
   return (
     <View style={[styles.mission, paid && { opacity: 0.7 }]} accessibilityLabel={`${title} ${shown}/${mission.target}`}>
@@ -65,7 +65,7 @@ function MissionRow({ entry, reward }: { entry: Entry; reward: Reward }) {
           <Text variant="bodyStrong" style={styles.missionTitle}>
             {title}
           </Text>
-          <Text variant="caption" numberOfLines={1} color={done ? colors.accent : colors.textMuted} style={styles.missionReward}>
+          <Text variant="caption" numberOfLines={1} color={done ? colors.success : colors.textMuted} style={styles.missionReward}>
             {rewardText(t, reward)}
           </Text>
         </View>
@@ -110,7 +110,7 @@ function Bonus({ count, reward, paid }: { count: number; reward: Reward; paid: b
   const { t } = useTranslation()
   const styles = useStyles()
   const colors = useColors()
-  const color = paid ? colors.accent : colors.textMuted
+  const color = paid ? colors.success : colors.textMuted
   return (
     <View style={styles.bonus}>
       {paid ? <MaterialCommunityIcons name="check" size={16} color={color} /> : null}

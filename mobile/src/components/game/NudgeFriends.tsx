@@ -9,7 +9,7 @@ import { NUDGE_SEARCH_MIN_FRIENDS, filterNudgeFriends, nudgeFriend } from '@shar
 
 import { useAccount } from '@/account/auth'
 import { makeStyles, radius, space, useColors } from '@/theme'
-import { Avatar } from '../profile/ProfileSections'
+import { UserAvatar } from '../profile/ProfileSections'
 import { Text, Touchable } from '../ui'
 
 type Friend = { uid: string; username: string }
@@ -79,7 +79,7 @@ export function NudgeFriends({ gameType, recent = false }: { gameType: string; r
               accessibilityRole="button"
               accessibilityLabel={`${t('mobile.nudge.title')} ${friend.username}`}
               style={[styles.chip, done && { borderColor: colors.accent }]}>
-              <Avatar username={friend.username} size={28} />
+              <UserAvatar uid={friend.uid} username={friend.username} size={28} />
               <Text variant="bodyStrong" numberOfLines={1}>
                 {friend.username}
               </Text>

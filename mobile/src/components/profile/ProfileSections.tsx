@@ -3,9 +3,10 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { router, useFocusEffect } from 'expo-router'
 import { useCallback, useRef, useState, type ComponentProps, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native'
+import { ActivityIndicator, Image, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native'
 
 import { useBadges } from '@shared/hooks/useBadges'
+import { useDecoration } from '@shared/hooks/useDecoration'
 import { usePlayerElo } from '@shared/hooks/usePlayerElo'
 import { usePlayerRecords } from '@shared/hooks/usePlayerRecords'
 import { usePlayerProfile } from '@shared/hooks/usePlayerProfile'
@@ -19,12 +20,13 @@ import { CollapsibleSection } from '@/components/CollapsibleSection'
 import { BadgeStrip } from '@/components/profile/BadgeStrip'
 import { Stamp } from '@/components/flight'
 import { Button, Segmented, Text, Touchable } from '@/components/ui'
+import { getFlag } from '@/flags'
 import { getGameByType } from '@/games'
 import GameEmblem from '@/components/GameEmblem'
 import { darkColors, fonts, makeStyles, radius, space, useColors, useTheme } from '@/theme'
 import { RING_WIDTH_DOUBLE, ringBorder } from './decorationStyle'
 
-export type Decoration = { frame: string; color: string }
+export type Decoration = { frame: string; color: string; flag?: string | null }
 
 // Whose profile: it keeps the folded state of the sections apart (see ProfileView).
 type Scope = 'own' | 'player'
@@ -72,27 +74,77 @@ const RING_GAP = 2
 // Room around a decorated avatar, whatever its frame: the same for every frame (or none) so the layout never jumps.
 const RING_ROOM = RING_GAP + RING_WIDTH_DOUBLE
 
-// With `decoration` ({ frame, color } ids, see @shared/utils/decorations) the avatar gets room for a frame ring, drawn
-// when the decoration has one. Without it (lists, other screens) the avatar is just the disc.
-export function Avatar({ username, size = 44, decoration }: { username: string; size?: number; decoration?: Decoration | null }) {
-  const disc = (
-    <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: avatarColor(username), alignItems: 'center', justifyContent: 'center' }}>
-      <Text style={{ fontFamily: fonts.display, fontSize: size * 0.45, lineHeight: size * 0.55 }} color={darkColors.onAccent}>
-        {username.charAt(0).toUpperCase()}
-      </Text>
+
+// A worn flag is a rounded square, not a disc: a circle would cut the corners, where many flags carry their canton or
+// emblem. The frame ring follows the same shape.
+export const flagRadius = (size: number) => Math.round(size * 0.24)
+
+// A flag shown whole in a rounded-square avatar, or null when the app has no image for it. Most flags are 2:1, so
+// cropping them to the square lost half of them (the canton of the US, the stars of Australia...): the whole flag sits
+// over a blurred, enlarged, darkened copy of itself that fills the bands above and below.
+export function FlagDisc({ iso, size }: { iso: string; size: number }) {
+  const source = getFlag(iso)
+  if (source == null) return null
+  const blur = Math.max(2, Math.round(size / 10))
+  return (
+    <View testID="avatar-flag" style={{ width: size, height: size, borderRadius: flagRadius(size), overflow: 'hidden', backgroundColor: '#000' }}>
+      <Image
+        source={source}
+        blurRadius={blur}
+        resizeMode="cover"
+        style={{ position: 'absolute', width: size, height: size, opacity: 0.75, transform: [{ scale: 1.3 }] }}
+        accessible={false}
+        alt=""
+      />
+      <Image source={source} resizeMode="contain" style={{ width: size, height: size }} accessible={false} alt="" />
     </View>
   )
+}
+
+// With `decoration` ({ frame, color, flag } ids, see @shared/utils/decorations) the avatar gets room for a frame ring,
+// drawn when the decoration has one. Without it (lists, other screens) the avatar is just the disc; `flag` alone (an ISO
+// code) puts a worn flag on that bare disc. A worn flag replaces the initial.
+export function Avatar({
+  username,
+  size = 44,
+  decoration,
+  flag,
+}: {
+  username: string
+  size?: number
+  decoration?: Decoration | null
+  flag?: string | null
+}) {
+  const worn = flag ?? decorationStyle(decoration).flag
+  const disc =
+    worn && getFlag(worn) != null ? (
+      <FlagDisc iso={worn} size={size} />
+    ) : (
+      <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: avatarColor(username), alignItems: 'center', justifyContent: 'center' }}>
+        <Text style={{ fontFamily: fonts.display, fontSize: size * 0.45, lineHeight: size * 0.55 }} color={darkColors.onAccent}>
+          {username.charAt(0).toUpperCase()}
+        </Text>
+      </View>
+    )
   if (decoration === undefined) return disc
   const ring = ringBorder(decorationStyle(decoration).frame)
   const outer = size + RING_ROOM * 2
   const ringSize = size + (RING_GAP + (ring?.borderWidth ?? 0)) * 2
+  const squared = Boolean(worn && getFlag(worn) != null)
   return (
     <View style={{ width: outer, height: outer, alignItems: 'center', justifyContent: 'center' }}>
-      <View style={[{ width: ringSize, height: ringSize, borderRadius: ringSize / 2, alignItems: 'center', justifyContent: 'center' }, ring]}>
+      <View style={[{ width: ringSize, height: ringSize, borderRadius: squared ? flagRadius(ringSize) : ringSize / 2, alignItems: 'center', justifyContent: 'center' }, ring]}>
         {disc}
       </View>
     </View>
   )
+}
+
+// The avatar of an account in a list: the flag they wear (see useDecoration, cached per account) on the bare disc, so the
+// rows keep their size.
+export function UserAvatar({ uid, username, size }: { uid?: string; username: string; size?: number }) {
+  const { flag } = decorationStyle(useDecoration(uid))
+  return <Avatar username={username} size={size} flag={flag} />
 }
 
 export function SectionTitle({ title, right }: { title: string; right?: ReactNode }) {
@@ -215,7 +267,7 @@ export function DailyChips({
             ]}>
             <GameEmblem game={game.id} variant="glyph" size={size * 0.5} color={result ? gameColor : colors.textMuted} />
             {result && (
-              <View style={[styles.chipBadge, { backgroundColor: result.solved === false ? colors.danger : colors.accent }]}>
+              <View style={[styles.chipBadge, { backgroundColor: result.solved === false ? colors.danger : colors.success }]}>
                 <MaterialCommunityIcons name={result.solved === false ? 'close' : 'check'} size={9} color={colors.bg} />
               </View>
             )}
@@ -317,7 +369,7 @@ function AchievementModal({ achievement, onClose }: { achievement: Achievement; 
           <View style={[styles.achievementBig, { backgroundColor: achievement.unlocked ? `${color}26` : colors.surfaceHigh, borderColor: achievement.unlocked ? color : colors.border }]}>
             <MaterialCommunityIcons name={achievement.icon} size={40} color={achievement.unlocked ? color : colors.textFaint} />
             {achievement.unlocked && (
-              <View style={[styles.chipBadge, { width: 22, height: 22, borderRadius: 11, backgroundColor: colors.accent }]}>
+              <View style={[styles.chipBadge, { width: 22, height: 22, borderRadius: 11, backgroundColor: colors.success }]}>
                 <MaterialCommunityIcons name="check" size={14} color={colors.bg} />
               </View>
             )}

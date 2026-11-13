@@ -20,7 +20,12 @@ export default defineConfig(async ({ mode }) => {
   return {
     plugins: [react(), seo(), ...analyze],
     // __DEV__: dev server only, so utils/xp exposes __emitXpClaimed to preview the rewards
-    define: { __DEV__: JSON.stringify(mode === 'development'), __USE_EMULATORS__: JSON.stringify(process.env.VITE_USE_EMULATORS === '1') },
+    // __PREVIEW_TOOLS__: everywhere but the production deployment, so utils/testMode.js can unlock the cosmetics to try them
+    define: {
+      __DEV__: JSON.stringify(mode === 'development'),
+      __USE_EMULATORS__: JSON.stringify(process.env.VITE_USE_EMULATORS === '1'),
+      __PREVIEW_TOOLS__: JSON.stringify(process.env.VERCEL_ENV !== 'production'),
+    },
     resolve: {
       alias: [
         // The full-resolution dataset (~90 MB) never goes into the bundle. The games import it under its
@@ -37,7 +42,8 @@ export default defineConfig(async ({ mode }) => {
       setupFiles: ['./src/setupTests.js'],
       globals: true,
       // tests/emulator needs the Firebase emulators: npm run test:emulator
-      exclude: ['**/node_modules/**', '**/.worktrees/**', 'mobile/**', ...(process.env.FIRESTORE_EMULATOR_HOST ? [] : ['tests/emulator/**'])],
+      // Other checkouts (git worktrees under .worktrees and .claude/worktrees) are not this project's tests
+      exclude: ['**/node_modules/**', '**/.worktrees/**', '**/.claude/**', 'mobile/**', ...(process.env.FIRESTORE_EMULATOR_HOST ? [] : ['tests/emulator/**'])],
     },
   }
 })

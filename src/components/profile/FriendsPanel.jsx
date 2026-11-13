@@ -12,13 +12,13 @@ import { shareInviteLink } from '../../utils/shareInvite'
 import { GAMES } from '../../pages/home/gameData'
 import CollapsibleSection from '../CollapsibleSection'
 import FriendCandidates from './FriendCandidates'
-import { Avatar, DailyChips } from './ProfileBody'
+import { UserAvatar, DailyChips } from './ProfileBody'
 import './FriendsPanel.css'
 
 function PlayerName({ friend }) {
   return (
     <Link to={`/player/${friend.uid}`} className="friends-who">
-      <Avatar username={friend.username} size={36} />
+      <UserAvatar uid={friend.uid} username={friend.username} size={36} />
       <span>{friend.username}</span>
     </Link>
   )

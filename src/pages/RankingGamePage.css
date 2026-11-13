@@ -358,7 +358,7 @@
 
 .ranking-result-row--correct {
   background: var(--gg-success-soft);
-  border: 1px solid color-mix(in srgb, var(--sd-accent) 28%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gg-success) 28%, transparent);
 }
 
 .ranking-result-row--wrong {
@@ -380,7 +380,7 @@
 }
 
 .ranking-result-index--correct {
-  background: color-mix(in srgb, var(--sd-accent) 35%, transparent);
+  background: color-mix(in srgb, var(--gg-success) 35%, transparent);
 }
 
 .ranking-result-index--wrong {

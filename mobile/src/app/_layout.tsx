@@ -15,7 +15,7 @@ import * as ScreenOrientation from 'expo-screen-orientation'
 import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import * as SystemUI from 'expo-system-ui'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Dimensions, Platform } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
@@ -33,13 +33,18 @@ import { ScrollUnlockOverlay } from '@/components/collection/ScrollUnlockOverlay
 import { SealToast } from '@/components/collection/SealToast'
 import { ConfirmHost } from '@/components/ConfirmHost'
 import { ToastHost } from '@/components/ToastHost'
+import { TestModeBadge } from '@/components/TestModeBadge'
 import { UpdateBanner } from '@/components/UpdateBanner'
 import { WhatsNew } from '@/components/WhatsNew'
 import { XpToasts } from '@/components/XpToasts'
+import { useAccount } from '@/account/auth'
+import { useAccentEnabled, useActiveGlobeSkin } from '@/hooks/useActiveGlobeSkin'
+import { initTestMode } from '@/testMode'
 import { AppThemeProvider, useTheme, type Theme } from '@/theme'
 import { useLaunchUpdate } from '@/updates'
 
 SplashScreen.preventAutoHideAsync()
+initTestMode()
 
 // The manifest leaves orientation free (Google Play flags locked games on large screens, and Android 16 ignores the lock
 // there anyway): phones stay in portrait, tablets and foldables rotate.
@@ -94,7 +99,16 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
 }
 
 export default function RootLayout() {
-  return <AppThemeProvider><RootNavigator /></AppThemeProvider>
+  return <SkinThemeProvider><RootNavigator /></SkinThemeProvider>
+}
+
+// The worn globe skin recolors the app's accent (unless turned off in the skin picker)
+function SkinThemeProvider({ children }: { children: ReactNode }) {
+  const { account } = useAccount()
+  const { skin } = useActiveGlobeSkin(account?.uid ?? null)
+  const enabled = useAccentEnabled()
+  const skinAccent = enabled ? (skin.accent ?? null) : null
+  return <AppThemeProvider skinAccent={skinAccent}>{children}</AppThemeProvider>
 }
 
 function RootNavigator() {
@@ -163,6 +177,7 @@ function RootNavigator() {
         {/* The flag overlay first: a claim that unlocks both plays the flags, then the scrolls */}
         <FlagUnlockOverlay />
         <ScrollUnlockOverlay />
+        <TestModeBadge />
       </ThemeProvider>
     </GestureHandlerRootView>
   )

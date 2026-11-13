@@ -28,7 +28,7 @@ export function GuessesMap({
     () =>
       guesses.flatMap((guess) => {
         const center = CENTERS.get(guess.name)
-        return center ? [{ type: 'circle' as const, center: [center[1], center[0]] as [number, number], radius: 4, color: guess.correct ? colors.accent : colors.danger }] : []
+        return center ? [{ type: 'circle' as const, center: [center[1], center[0]] as [number, number], radius: 4, color: guess.correct ? colors.success : colors.danger }] : []
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [signature, colors]
@@ -38,7 +38,7 @@ export function GuessesMap({
     const map = mapRef.current
     if (!ready || !map) return
     const wrong = { fillColor: colors.danger, fillOpacity: 0.55, color: colors.danger, weight: 2 }
-    const right = { fillColor: colors.accent, fillOpacity: 0.6, color: colors.accent, weight: 2 }
+    const right = { fillColor: colors.success, fillOpacity: 0.6, color: colors.success, weight: 2 }
     const byName = new Map(guesses.map((guess) => [guess.name, guess.correct]))
     map.geoJson.resetStyle()
     for (const layer of map.geoJson.getLayers()) {

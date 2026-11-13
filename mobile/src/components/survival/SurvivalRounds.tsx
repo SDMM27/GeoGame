@@ -76,7 +76,7 @@ export function PlacementRound({ survival, footer }: { survival: Survival; foote
     for (const layer of map.geoJson.getLayers()) {
       const name = layer.feature.properties.ADMIN
       if (outcome && name === target) {
-        const color = outcome === 'correct' ? colors.accent : colors.warning
+        const color = outcome === 'correct' ? colors.success : colors.warning
         layer.setStyle({ fillColor: color, fillOpacity: 0.6, color, weight: 2 })
       } else if (wrongPicks.includes(name)) layer.setStyle({ fillColor: colors.danger, fillOpacity: 0.5, weight: 2 })
     }
@@ -287,7 +287,7 @@ export function QuizRound({ survival }: { survival: Survival }) {
 
   const choiceStyle = (id: string) => {
     if (!outcome) return null
-    if (id === question.correctId) return { borderColor: colors.accent, backgroundColor: `${colors.accent}1F` }
+    if (id === question.correctId) return { borderColor: colors.success, backgroundColor: `${colors.success}1F` }
     if (wrongPicks.includes(id)) return { borderColor: colors.danger, backgroundColor: `${colors.danger}1F` }
     return { opacity: 0.45 }
   }
@@ -321,7 +321,7 @@ export function QuizRound({ survival }: { survival: Survival }) {
             <Text variant="bodyStrong" style={{ flex: 1 }}>
               {choice.label}
             </Text>
-            {outcome && choice.id === question.correctId && <MaterialCommunityIcons name="check-circle" size={20} color={colors.accent} />}
+            {outcome && choice.id === question.correctId && <MaterialCommunityIcons name="check-circle" size={20} color={colors.success} />}
             {outcome && choice.id !== question.correctId && wrongPicks.includes(choice.id) && (
               <MaterialCommunityIcons name="close-circle" size={20} color={colors.danger} />
             )}

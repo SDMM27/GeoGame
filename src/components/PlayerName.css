@@ -19,6 +19,11 @@
   vertical-align: -1px;
 }
 
+/* With a flag: a bigger mini avatar, the frame color as border (a subtle one without a frame) */
+.player-name__ring--flag { width: 16px; height: 16px; overflow: hidden; vertical-align: -3px; border-radius: 4px; }
+.player-name__ring--plain { border: 1px solid var(--gg-tint-strong); }
+.player-name__flag { width: 100%; height: 100%; }
+
 .player-name__link:hover {
   color: var(--sd-accent-strong);
   text-decoration: underline;

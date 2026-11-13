@@ -55,3 +55,35 @@
 .decoration-swatch { width: 28px; height: 28px; margin: 6px 0; border-radius: 50%; border: 1px solid var(--sd-line); }
 
 .decoration-status { min-height: 1.2em; margin: 0.8rem 0 0; font-size: 0.8rem; color: var(--sd-muted); }
+
+.decoration-flag-hint { margin: 0 0 0.5rem; color: var(--sd-muted); font-size: 0.8rem; }
+
+.decoration-flag-search {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 0.5rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: var(--sd-radius-pill);
+  border: 1px solid var(--sd-line);
+  background: var(--sd-surface);
+  color: var(--sd-ink);
+  font: inherit;
+  font-size: 0.85rem;
+}
+
+.decoration-flag-grid { max-height: 220px; overflow-y: auto; padding: 2px; }
+
+.decoration-flag-option { width: 84px; min-width: 0; }
+.decoration-flag-option span:last-child { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.decoration-flag-thumb {
+  width: 40px;
+  height: 40px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 1px solid var(--sd-line);
+  object-fit: cover;
+}
+
+.decoration-flag-thumb:not(.decoration-flag-thumb--none) { border-radius: 24%; }
+.decoration-flag-thumb--none { display: block; background: var(--sd-surface); }

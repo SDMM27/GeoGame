@@ -7,6 +7,7 @@ import {
   decorationStyle,
   isDefaultDecoration,
   isUnlocked,
+  readAvatarFlag,
   readDecoration,
 } from './decorations'
 
@@ -20,19 +21,30 @@ describe('decorations', () => {
   })
 
   it('reads known ids and falls back to the default for anything else', () => {
-    expect(readDecoration({ decoration: { frame: 'gold', color: 'sky' } })).toEqual({ frame: 'gold', color: 'sky' })
+    expect(readDecoration({ decoration: { frame: 'gold', color: 'sky' } })).toEqual({ frame: 'gold', color: 'sky', flag: null })
     expect(readDecoration({ decoration: { frame: 'unknown', color: 3 } })).toEqual(DEFAULT_DECORATION)
     expect(readDecoration({ decoration: 'gold' })).toEqual(DEFAULT_DECORATION)
     expect(readDecoration(undefined)).toEqual(DEFAULT_DECORATION)
+  })
+
+  it('reads the avatar flag only when it is in the collection', () => {
+    expect(readAvatarFlag({ avatarFlag: 'FR', flags: { unlocked: ['FR', 'JP'] } })).toBe('FR')
+    expect(readAvatarFlag({ avatarFlag: 'BR', flags: { unlocked: ['FR'] } })).toBe(null)
+    expect(readAvatarFlag({ avatarFlag: 'FR' })).toBe(null)
+    expect(readAvatarFlag({ avatarFlag: 3, flags: { unlocked: [3] } })).toBe(null)
+    expect(readDecoration({ avatarFlag: 'JP', flags: { unlocked: ['JP'] } })).toEqual({ ...DEFAULT_DECORATION, flag: 'JP' })
   })
 
   it('gives what to draw', () => {
     expect(decorationStyle({ frame: 'gold', color: 'sky' })).toEqual({
       frame: { color: '#F5B83D', style: 'double' },
       nameColor: '#7AA2FF',
+      flag: null,
     })
-    expect(decorationStyle(DEFAULT_DECORATION)).toEqual({ frame: null, nameColor: null })
-    expect(decorationStyle(null)).toEqual({ frame: null, nameColor: null })
+    expect(decorationStyle({ frame: 'none', color: 'default', flag: 'JP' }).flag).toBe('JP')
+    expect(decorationStyle(DEFAULT_DECORATION)).toEqual({ frame: null, nameColor: null, flag: null })
+    expect(decorationStyle(null)).toEqual({ frame: null, nameColor: null, flag: null })
+    expect(isDefaultDecoration({ ...DEFAULT_DECORATION, flag: 'FR' })).toBe(false)
     expect(isDefaultDecoration(DEFAULT_DECORATION)).toBe(true)
     expect(isDefaultDecoration({ frame: 'gold', color: 'default' })).toBe(false)
   })

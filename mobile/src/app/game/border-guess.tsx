@@ -162,7 +162,7 @@ function BorderGuessGame({ mode, play }: { mode: string; play?: RoomPlay }) {
           {isComplete && !isDaily && (
             <Animated.View entering={FadeIn.duration(220)} style={styles.result}>
               <Text variant="caption">{isSolved ? t('borderguess.success_message') : t('borderguess.answer_was')}</Text>
-              <Text variant="title" color={isSolved ? colors.accent : colors.warning}>
+              <Text variant="title" color={isSolved ? colors.success : colors.warning}>
                 {answer}
               </Text>
               <Button
@@ -237,7 +237,7 @@ function BorderGuessGame({ mode, play }: { mode: string; play?: RoomPlay }) {
           scoreLabel={attemptsLabel}
           accent={isSolved ? ACCENT : colors.warning}
           stats={[
-            { label: t('labels.country'), value: answer, color: isSolved ? colors.accent : colors.warning },
+            { label: t('labels.country'), value: answer, color: isSolved ? colors.success : colors.warning },
             { label: t('mobile.game.time'), value: elapsedTime != null ? formatTime(elapsedTime).slice(0, 5) : '—' },
           ]}
           record={{ gameType: GAME_TYPES.BORDER_GUESS, mode: 'daily', dailyKey, solved: isSolved, attempts: guesses.length, elapsedTime }}

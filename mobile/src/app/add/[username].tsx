@@ -11,7 +11,7 @@ import { setPendingInvite } from '@shared/utils/inviteLink'
 
 import { useAccount } from '@/account/auth'
 import { FriendAction } from '@/components/profile/FriendAction'
-import { Avatar } from '@/components/profile/ProfileSections'
+import { UserAvatar } from '@/components/profile/ProfileSections'
 import { ScreenHeader } from '@/components/ScreenHeader'
 import { Kicker, ScreenTitle } from '@/components/flight'
 import { Button, Text } from '@/components/ui'
@@ -52,7 +52,7 @@ export default function AddFriendScreen() {
         <Text variant="caption">{t('friends.add_page.not_found')}</Text>
       ) : (
         <View style={styles.card}>
-          <Avatar username={player.username} size={72} />
+          <UserAvatar uid={player.uid} username={player.username} size={72} />
           <Kicker>{t('mp_room.col_player')}</Kicker>
           <ScreenTitle size={26}>{player.username}</ScreenTitle>
           <Text variant="caption" style={{ textAlign: 'center' }}>

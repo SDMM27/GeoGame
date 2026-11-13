@@ -1,11 +1,15 @@
 // The home page's interactive globe: turn it with the mouse, a finger or the arrow keys to put the city in the
 // reticle. The land (world-atlas, ~55 kB) and the drawing code load after the page, in their own chunk.
 // `onFind` runs when the player (not the globe on its own) finds the city; `overlay` is drawn over the globe.
+// `uid` (or null) gives the level that unlocks the globe skins; reaching EASTER_EGG_SCORE unlocks the secret one.
 import React, { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useActiveGlobeSkin } from '../../hooks/useActiveGlobeSkin'
+import { EASTER_EGG_SCORE, SECRET_SKIN, activeSkin, reachesEasterEgg, saveSecretFound, saveSkinChoice } from '../../utils/globeSkins'
+import GlobeSkinPicker from './GlobeSkinPicker'
 import './FlightGlobe.css'
 
-export default function FlightGlobe({ onScore, onFind, overlay = null }) {
+export default function FlightGlobe({ onScore, onFind, overlay = null, uid = null }) {
   const { t } = useTranslation()
   const box = useRef(null)
   const hooks = useRef(null)
@@ -13,6 +17,11 @@ export default function FlightGlobe({ onScore, onFind, overlay = null }) {
   const [found, setFound] = useState(false)
   const [touched, setTouched] = useState(false)
   const [cities, setCities] = useState(null)
+  const { skin, level, secret, pick: pickSkin } = useActiveGlobeSkin(uid)
+  const [party, setParty] = useState(0) // bumped on each celebration: restarts the banner
+  const skinRef = useRef(skin)
+  skinRef.current = skin
+  const lastScore = useRef(0)
   const onScoreRef = useRef(onScore)
   onScoreRef.current = onScore
   const onFindRef = useRef(onFind)
@@ -34,6 +43,14 @@ export default function FlightGlobe({ onScore, onFind, overlay = null }) {
         onFound: (_index, score, manual) => {
           setFound(true)
           onScoreRef.current?.(score)
+          if (reachesEasterEgg(lastScore.current, score)) {
+            saveSecretFound()
+            saveSkinChoice(SECRET_SKIN)
+            setParty((n) => n + 1)
+            hooks.current?.setSkin(activeSkin(SECRET_SKIN, { secret: true }))
+            hooks.current?.celebrate()
+          }
+          lastScore.current = score
           if (manual) onFindRef.current?.()
         },
       })
@@ -41,6 +58,7 @@ export default function FlightGlobe({ onScore, onFind, overlay = null }) {
       cleanup = mountCanvas(box.current, (s) => {
         const h = setup(s)
         hooks.current = { ...h, state: s }
+        h.setSkin(skinRef.current)
         return h
       })
     })
@@ -48,6 +66,26 @@ export default function FlightGlobe({ onScore, onFind, overlay = null }) {
       cancelled = true
       cleanup()
     }
+  }, [])
+
+  // Reduced motion has no frame loop: redraw by hand when the skin changes
+  useEffect(() => {
+    const h = hooks.current
+    if (!h) return
+    h.setSkin(skin)
+    if (h.state.reduced) h.frame(h.state, 0)
+  }, [skin])
+
+  // The site's accent (set on <html> by SiteAccent) is drawn by the globe too: repaint when it changes
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      const h = hooks.current
+      if (!h) return
+      h.setSkin(skinRef.current)
+      if (h.state.reduced) h.frame(h.state, 0)
+    })
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['style'] })
+    return () => observer.disconnect()
   }, [])
 
   const cityName = cities ? t(`globe.city.${cities[target].key}`) : ''
@@ -75,6 +113,13 @@ export default function FlightGlobe({ onScore, onFind, overlay = null }) {
       {cities && (
         <p className={`flight-globe-chip${found ? ' flight-globe-chip--found' : ''}`} aria-live="polite">
           {found ? `✓ ${t('globe.found', { city: cityName })}` : t('globe.find', { city: cityName })}
+        </p>
+      )}
+      <GlobeSkinPicker choice={skin.id} level={level} secret={secret} signedIn={Boolean(uid)} onPick={pickSkin} />
+      {party > 0 && (
+        <p key={party} className="flight-globe-party" role="status">
+          <strong>{t('globe.easter_title')}</strong>
+          {t('globe.easter_body', { score: EASTER_EGG_SCORE })}
         </p>
       )}
       {overlay}

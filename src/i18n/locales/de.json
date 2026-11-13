@@ -1431,7 +1431,13 @@
       "violet": "Violett",
       "crimson": "Karminrot",
       "gilded": "Golden"
-    }
+    },
+    "flag_section": "Flagge",
+    "flag_none": "Keine",
+    "flag_hint": "Trage eine Flagge aus deiner Sammlung: sie wird dein Profilbild.",
+    "flag_empty": "Noch keine Flagge freigeschaltet. Sammle Fragmente, um deine Sammlung zu erweitern.",
+    "flag_search": "Flagge suchen…",
+    "flag_alt": "Flagge: {{country}}"
   },
   "elo": {
     "tab": "Elo",
@@ -1691,6 +1697,25 @@
     "all_done": "Alle Flüge von heute sind gestartet",
     "all_done_hint": "Komm morgen für neue Herausforderungen wieder",
     "close": "Schließen",
+    "skins_open": "Globus anpassen",
+    "skins_title": "Globus-Skins",
+    "skins_hint": "Steig im Level auf, um neue Globen freizuschalten.",
+    "skins_locked": "Level {{level}}",
+    "skins_signin": "Melde dich an, um mit steigendem Level Skins freizuschalten.",
+    "easter_title": "Einmal um die Welt!",
+    "easter_body": "{{score}} Punkte: Du hast den geheimen Skin „Discokugel“ freigeschaltet.",
+    "skin": {
+      "classic": "Klassisch",
+      "parchment": "Pergament",
+      "tropical": "Tropisch",
+      "glacier": "Gletscher",
+      "volcano": "Vulkan",
+      "neon": "Neon",
+      "aurora": "Polarlicht",
+      "gold": "Gold",
+      "disco": "Discokugel"
+    },
+    "skins_accent": "Die Farbe des Globus auf der ganzen Seite verwenden",
     "city": {
       "tokyo": "Tokio",
       "rio": "Rio de Janeiro",

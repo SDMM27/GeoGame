@@ -135,7 +135,7 @@ function Spectator({ round, roundIndex, rows, waiting, maxLives }: {
                     key={choice.id}
                     style={[
                       styles.spectatorChoice,
-                      correct && { borderColor: colors.accent, backgroundColor: `${colors.accent}1F` },
+                      correct && { borderColor: colors.success, backgroundColor: `${colors.success}1F` },
                       revealed && !correct && { opacity: 0.45 },
                     ]}>
                     <Text variant="caption">{index + 1}</Text>
@@ -145,7 +145,7 @@ function Spectator({ round, roundIndex, rows, waiting, maxLives }: {
               })}
             </View>
           )}
-          <Text variant={revealed ? 'bodyStrong' : 'caption'} color={revealed ? colors.accent : undefined} style={{ textAlign: 'center' }}>
+          <Text variant={revealed ? 'bodyStrong' : 'caption'} color={revealed ? colors.success : undefined} style={{ textAlign: 'center' }}>
             {revealed ? t('survival.answer_was', { answer: roundAnswer(round, i18n.language, t) }) : t('survival.waiting_players', waiting)}
           </Text>
         </View>
@@ -161,7 +161,7 @@ function Spectator({ round, roundIndex, rows, waiting, maxLives }: {
               <MaterialCommunityIcons
                 name={row.answered ? 'check-circle' : 'dots-horizontal-circle-outline'}
                 size={18}
-                color={row.answered ? colors.accent : colors.textMuted}
+                color={row.answered ? colors.success : colors.textMuted}
               />
             </>
           )}
@@ -281,9 +281,9 @@ function SurvivalRun({ modes, lives, timer, ramp, seed, snapshot = null, snapKey
   const outcomeBanner = outcome && !isOver && (
     <Animated.View
       entering={FadeInDown.springify().damping(18)}
-      style={[styles.outcome, { borderColor: outcome === 'correct' ? colors.accent : colors.warning }]}>
+      style={[styles.outcome, { borderColor: outcome === 'correct' ? colors.success : colors.warning }]}>
       <View style={{ flex: 1, gap: 2 }}>
-        <Text variant="bodyStrong" color={outcome === 'correct' ? colors.accent : colors.warning}>
+        <Text variant="bodyStrong" color={outcome === 'correct' ? colors.success : colors.warning}>
           {outcome === 'correct'
             ? t('survival.correct')
             : `${timedOut ? `${t('survival.time_up')} ` : ''}${t('survival.answer_was', { answer })}`}

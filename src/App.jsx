@@ -5,10 +5,12 @@ import HomePage from "./pages/HomePage";
 import RouteFallback from "./components/RouteFallback";
 import RouteMeta from "./components/RouteMeta";
 import XpToast from "./components/XpToast";
+import TestModeBadge from "./components/TestModeBadge";
 import FragmentToast from "./components/collection/FragmentToast";
 import FlagUnlockOverlay from "./components/collection/FlagUnlockOverlay";
 import SealToast from "./components/collection/SealToast";
 import ScrollUnlockOverlay from "./components/collection/ScrollUnlockOverlay";
+import SiteAccent from "./components/SiteAccent";
 import PresenceHeartbeat from "./components/PresenceHeartbeat";
 import InviteBanner from "./components/multiplayer/InviteBanner";
 import RouteErrorBoundary, { ErrorBoundary } from "./components/RouteErrorBoundary";
@@ -47,6 +49,7 @@ export default function App() {
   return (
     <ErrorBoundary>
       <Router>
+        <SiteAccent />
         <RouteMeta />
         <InviteBanner />
         <XpToast />
@@ -56,6 +59,7 @@ export default function App() {
         <FlagUnlockOverlay />
         <ScrollUnlockOverlay />
         <PresenceHeartbeat />
+        {/* global __PREVIEW_TOOLS__ */ __PREVIEW_TOOLS__ && <TestModeBadge />}
         <RouteErrorBoundary>
           <Suspense fallback={<RouteFallback />}>
             <Routes>

@@ -5,7 +5,7 @@ import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import NavBar from '../components/NavBar'
 import FriendAction from '../components/profile/FriendAction'
-import { Avatar } from '../components/profile/ProfileBody'
+import { UserAvatar } from '../components/profile/ProfileBody'
 import { useAccount } from '../auth'
 import { useFriendships } from '../hooks/usePlayerProfile'
 import { findPlayer } from '../utils/friends'
@@ -43,7 +43,7 @@ export default function AddFriendPage() {
           <p className="profile-muted profile-center">{t('friends.add_page.not_found')}</p>
         ) : (
           <div className="account-card" style={{ alignItems: 'center', textAlign: 'center' }}>
-            <Avatar username={player.username} size={72} />
+            <UserAvatar uid={player.uid} username={player.username} size={72} />
             <h1 className="account-section-title">{player.username}</h1>
             <p className="account-intro">{t('friends.add_page.intro', { username: player.username })}</p>
             {own && <p className="account-notice">{t('friends.add_page.own')}</p>}

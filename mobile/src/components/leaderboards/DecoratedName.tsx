@@ -50,6 +50,6 @@ export function DecoratedName({
 
 const useStyles = makeStyles((colors) => ({
   name: { flexShrink: 1, flexDirection: 'row', alignItems: 'center', gap: 6 },
-  flagMarker: { alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
+  flagMarker: { alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderRadius: 3 },
   marker: { width: 12, height: 12, borderRadius: 6, borderColor: colors.border },
 }))

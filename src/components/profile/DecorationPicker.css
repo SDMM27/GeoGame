@@ -85,5 +85,6 @@
   object-fit: cover;
 }
 
+.decoration-flag-thumb:not(.decoration-flag-thumb--none) { border-radius: 24%; }
 .decoration-flag-thumb--whole { object-fit: contain; background: var(--sd-surface-2, #fff); }
 .decoration-flag-thumb--none { display: block; background: var(--sd-surface); }

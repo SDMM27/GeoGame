@@ -77,7 +77,11 @@ const RING_ROOM = RING_GAP + RING_WIDTH_DOUBLE
 // Background behind a flag shown whole (UNCROPPED_FLAGS)
 const FLAG_BACKDROP = '#E9ECEF'
 
-// A flag filling a round avatar (the whole picture on a plain background for the uncropped ones), or null when the app
+// A worn flag is a rounded square, not a disc: a circle would cut the corners, where many flags carry their canton or
+// emblem. The frame ring follows the same shape.
+export const flagRadius = (size: number) => Math.round(size * 0.24)
+
+// A flag filling a rounded-square avatar (the whole picture on a plain background for the uncropped ones), or null when the app
 // has no image for it.
 export function FlagDisc({ iso, size }: { iso: string; size: number }) {
   const source = getFlag(iso)
@@ -86,7 +90,7 @@ export function FlagDisc({ iso, size }: { iso: string; size: number }) {
   return (
     <View
       testID="avatar-flag"
-      style={{ width: size, height: size, borderRadius: size / 2, overflow: 'hidden', backgroundColor: whole ? FLAG_BACKDROP : undefined }}>
+      style={{ width: size, height: size, borderRadius: flagRadius(size), overflow: 'hidden', backgroundColor: whole ? FLAG_BACKDROP : undefined }}>
       <Image source={source} style={{ width: size, height: size }} resizeMode={whole ? 'contain' : 'cover'} accessible={false} alt="" />
     </View>
   )
@@ -121,9 +125,10 @@ export function Avatar({
   const ring = ringBorder(decorationStyle(decoration).frame)
   const outer = size + RING_ROOM * 2
   const ringSize = size + (RING_GAP + (ring?.borderWidth ?? 0)) * 2
+  const squared = Boolean(worn && getFlag(worn) != null)
   return (
     <View style={{ width: outer, height: outer, alignItems: 'center', justifyContent: 'center' }}>
-      <View style={[{ width: ringSize, height: ringSize, borderRadius: ringSize / 2, alignItems: 'center', justifyContent: 'center' }, ring]}>
+      <View style={[{ width: ringSize, height: ringSize, borderRadius: squared ? flagRadius(ringSize) : ringSize / 2, alignItems: 'center', justifyContent: 'center' }, ring]}>
         {disc}
       </View>
     </View>

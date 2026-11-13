@@ -4,11 +4,8 @@
 // `uid` (or null) gives the level that unlocks the globe skins; reaching EASTER_EGG_SCORE unlocks the secret one.
 import React, { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useXp } from '../../hooks/useXp'
-import {
-  EASTER_EGG_SCORE, SECRET_SKIN, activeSkin, loadSecretFound, loadSkinChoice, reachesEasterEgg, saveSecretFound, saveSkinChoice,
-} from '../../utils/globeSkins'
-import { isTestMode } from '../../utils/testMode'
+import { useActiveGlobeSkin } from '../../hooks/useActiveGlobeSkin'
+import { EASTER_EGG_SCORE, SECRET_SKIN, activeSkin, reachesEasterEgg, saveSecretFound, saveSkinChoice } from '../../utils/globeSkins'
 import GlobeSkinPicker from './GlobeSkinPicker'
 import './FlightGlobe.css'
 
@@ -20,15 +17,8 @@ export default function FlightGlobe({ onScore, onFind, overlay = null, uid = nul
   const [found, setFound] = useState(false)
   const [touched, setTouched] = useState(false)
   const [cities, setCities] = useState(null)
-  const xpLevel = useXp(uid)?.level ?? 0
-  // The preview's test mode unlocks every skin, the secret one included
-  const testMode = isTestMode()
-  const level = testMode ? 99 : xpLevel
-  const [choice, setChoice] = useState(loadSkinChoice)
-  const [foundSecret, setSecret] = useState(loadSecretFound)
-  const secret = testMode || foundSecret
+  const { skin, level, secret, pick: pickSkin } = useActiveGlobeSkin(uid)
   const [party, setParty] = useState(0) // bumped on each celebration: restarts the banner
-  const skin = activeSkin(choice, { level, secret })
   const skinRef = useRef(skin)
   skinRef.current = skin
   const lastScore = useRef(0)
@@ -56,8 +46,6 @@ export default function FlightGlobe({ onScore, onFind, overlay = null, uid = nul
           if (reachesEasterEgg(lastScore.current, score)) {
             saveSecretFound()
             saveSkinChoice(SECRET_SKIN)
-            setSecret(true)
-            setChoice(SECRET_SKIN)
             setParty((n) => n + 1)
             hooks.current?.setSkin(activeSkin(SECRET_SKIN, { secret: true }))
             hooks.current?.celebrate()
@@ -88,10 +76,17 @@ export default function FlightGlobe({ onScore, onFind, overlay = null, uid = nul
     if (h.state.reduced) h.frame(h.state, 0)
   }, [skin])
 
-  const pickSkin = (id) => {
-    saveSkinChoice(id)
-    setChoice(id)
-  }
+  // The site's accent (set on <html> by SiteAccent) is drawn by the globe too: repaint when it changes
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      const h = hooks.current
+      if (!h) return
+      h.setSkin(skinRef.current)
+      if (h.state.reduced) h.frame(h.state, 0)
+    })
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['style'] })
+    return () => observer.disconnect()
+  }, [])
 
   const cityName = cities ? t(`globe.city.${cities[target].key}`) : ''
 

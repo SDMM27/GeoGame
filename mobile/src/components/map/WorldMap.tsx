@@ -89,8 +89,8 @@ function colorMap(colors: Palette) {
   let map = colorMaps.get(colors)
   if (!map) {
     map = {
-      '#4ade80': colors.accent,
-      '#22c55e': colors.accent,
+      '#4ade80': colors.success,
+      '#22c55e': colors.success,
       '#ff4d4d': colors.danger,
       '#ef4444': colors.danger,
       '#7b2ff7': colors.highlight,
@@ -98,7 +98,7 @@ function colorMap(colors: Palette) {
       '#2a3e66': colors.land,
       '#6f88bd': colors.landStroke,
       '#7aa2ff': colors.highlight,
-      '#3ddc97': colors.accent,
+      '#3ddc97': colors.success,
       '#ff7a6b': colors.danger,
       '#f5b83d': colors.warning,
       '#eef1f8': colors.text,

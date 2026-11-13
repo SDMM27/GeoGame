@@ -90,7 +90,7 @@ function AnswerInput({
   const styles = useStyles()
   const colors = useColors()
   const { t } = useTranslation()
-  const tint = state === 'correct' ? colors.accent : state === 'wrong' ? colors.danger : null
+  const tint = state === 'correct' ? colors.success : state === 'wrong' ? colors.danger : null
   return (
     <TextInput
       ref={inputRef}
@@ -124,7 +124,7 @@ function Feedback({
 }) {
   const styles = useStyles()
   const colors = useColors()
-  const tint = correct ? colors.accent : colors.danger
+  const tint = correct ? colors.success : colors.danger
   // Mounted when the answer is revealed.
   useEffect(() => announce(spoken), []) // eslint-disable-line react-hooks/exhaustive-deps
   return (
@@ -574,7 +574,7 @@ function PracticeQuiz({
   const choiceStyle = (id: string) => {
     if (hidden.includes(id)) return { opacity: 0.2 }
     if (!isAnswered || !current) return null
-    if (id === current.correctId) return { borderColor: colors.accent, backgroundColor: `${colors.accent}1A` }
+    if (id === current.correctId) return { borderColor: colors.success, backgroundColor: `${colors.success}1A` }
     if (id === selectedId) return { borderColor: colors.danger, backgroundColor: `${colors.danger}1A` }
     return { opacity: 0.45 }
   }
@@ -706,7 +706,7 @@ function PracticeQuiz({
                       </Text>
                       {isAnswered && choice.id === current.correctId && (
                         <Animated.View entering={ZoomIn.springify()}>
-                          <MaterialCommunityIcons name="check-circle" size={20} color={colors.accent} />
+                          <MaterialCommunityIcons name="check-circle" size={20} color={colors.success} />
                         </Animated.View>
                       )}
                       {isAnswered && choice.id === selectedId && choice.id !== current.correctId && (

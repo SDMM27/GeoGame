@@ -15,7 +15,7 @@ export function ToastHost() {
   const colors = useColors()
   const styles = useStyles()
   const kindStyles: Record<ToastKind, ToastKindStyle> = {
-    success: { color: colors.accent, icon: 'check-circle' },
+    success: { color: colors.success, icon: 'check-circle' },
     error: { color: colors.danger, icon: 'close-circle' },
     info: { color: colors.highlight, icon: 'information' },
     warning: { color: colors.warning, icon: 'alert' },

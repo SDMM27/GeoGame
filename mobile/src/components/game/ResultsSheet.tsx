@@ -99,7 +99,7 @@ const dailySavedKey = (save: SaveConfig | null | undefined) =>
 export function ResultsSheet({ title, score, scoreText, scoreLabel, accent: accentProp, stats, save, share, record, onReplay, onHome, homeLabel, onSaved, children, game, ticketNote, states, tone }: Props) {
   const colors = useColors()
   const styles = useStyles()
-  const accent = accentProp ?? colors.accent
+  const accent = accentProp ?? colors.success
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   const [typedPseudo, setTypedPseudo] = useState(() => globalThis.localStorage?.getItem(PSEUDO_KEY) ?? '')
@@ -232,12 +232,12 @@ export function ResultsSheet({ title, score, scoreText, scoreLabel, accent: acce
                 <>
                   {saver.status === 'saving' && <Text variant="caption">{t('score_save.saving')}</Text>}
                   {saver.status === 'saved' && (
-                    <Text variant="caption" color={colors.accent}>
+                    <Text variant="caption" color={colors.success}>
                       {saver.name ? t('score_save.saved_as', { name: saver.name }) : t('form.score_saved')}
                     </Text>
                   )}
                   {saver.status === 'updated' && (
-                    <Text variant="caption" color={colors.accent}>
+                    <Text variant="caption" color={colors.success}>
                       {t('score_save.updated_as', { name: saver.name })}
                     </Text>
                   )}
@@ -281,7 +281,7 @@ export function ResultsSheet({ title, score, scoreText, scoreLabel, accent: acce
                     />
                   </View>
                   {saver.done && (
-                    <Text variant="caption" color={colors.accent}>
+                    <Text variant="caption" color={colors.success}>
                       {t('form.score_saved')}
                     </Text>
                   )}

@@ -4,12 +4,13 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDecoration } from '../../hooks/useDecoration'
 import { useXp } from '../../hooks/useXp'
-import { DEFAULT_DECORATION, FRAMES, NAME_COLORS, UNCROPPED_FLAGS, decorationStyle, flagImagePath, isUnlocked, saveAvatarFlag, saveDecoration } from '../../utils/decorations'
+import { DEFAULT_DECORATION, FRAMES, NAME_COLORS, decorationStyle, isUnlocked, saveAvatarFlag, saveDecoration } from '../../utils/decorations'
 import { FLAG_POOL } from '../../utils/flagCollectionData'
 import { readFlags } from '../../utils/flagCollection'
 import { getCountryName } from '../../utils/getCountryName'
 import { fetchPublicData, patchPublicData } from '../../utils/publicProfile'
 import { isTestMode } from '../../utils/testMode'
+import FlagTile from '../FlagTile'
 import { Avatar } from './ProfileBody'
 import './DecorationPicker.css'
 
@@ -30,13 +31,7 @@ const SEARCH_FROM = 12
 function FlagOption({ iso, name, selected, onPick }) {
   return (
     <button type="button" className="decoration-option decoration-flag-option" aria-pressed={selected} onClick={onPick} title={name}>
-      <img
-        className={`decoration-flag-thumb${UNCROPPED_FLAGS.has(iso) ? ' decoration-flag-thumb--whole' : ''}`}
-        src={flagImagePath(iso)}
-        alt=""
-        loading="lazy"
-        draggable={false}
-      />
+      <FlagTile iso={iso} blur={4} className="decoration-flag-thumb" />
       <span>{name}</span>
     </button>
   )

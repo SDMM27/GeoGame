@@ -526,7 +526,7 @@ export default function RoomScreen() {
                 </View>
               )}
               {toPlay == null && !late && !hasNextLive && (
-                <Text variant="bodyStrong" color={colors.accent} style={{ textAlign: 'center' }}>
+                <Text variant="bodyStrong" color={colors.success} style={{ textAlign: 'center' }}>
                   ✓ {t('mp_room.finished')}
                 </Text>
               )}
@@ -567,9 +567,9 @@ function GameList({ room, results, playerId }: { room: Room; results: PlayerResu
         const done = played.has(i)
         return (
           <View key={i} style={[styles.manifestRow, i > 0 && styles.manifestDivider]}>
-            <View style={[styles.gameNumber, done && { backgroundColor: `${colors.accent}33` }, isCurrent && { borderColor: (definition && gameColors[definition.id]) || colors.accent }]}>
+            <View style={[styles.gameNumber, done && { backgroundColor: `${colors.success}33` }, isCurrent && { borderColor: (definition && gameColors[definition.id]) || colors.success }]}>
               {done ? (
-                <MaterialCommunityIcons name="check" size={14} color={colors.accent} />
+                <MaterialCommunityIcons name="check" size={14} color={colors.success} />
               ) : (
                 <Text variant="caption">{i + 1}</Text>
               )}

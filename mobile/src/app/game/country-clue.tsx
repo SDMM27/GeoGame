@@ -43,7 +43,7 @@ function AnswerCard({ iso, name, capital, solved }: { iso: string | null; name: 
     <View style={styles.answer}>
       {flag && <Image source={flag} contentFit="contain" style={styles.answerFlag} accessible={false} alt="" />}
       <View style={{ flex: 1 }}>
-        <Text variant="title" color={solved ? colors.accent : colors.warning} numberOfLines={2} adjustsFontSizeToFit>
+        <Text variant="title" color={solved ? colors.success : colors.warning} numberOfLines={2} adjustsFontSizeToFit>
           {name}
         </Text>
         <Text variant="caption">

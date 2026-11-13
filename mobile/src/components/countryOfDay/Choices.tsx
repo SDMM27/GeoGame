@@ -26,7 +26,7 @@ function stateOf(admin: string, { wrong, target, resolved }: Pick<ChoiceProps, '
 }
 
 const stateStyle = (state: State, colors: Palette) => [
-  state === 'right' && { borderColor: colors.accent, borderWidth: 2 },
+  state === 'right' && { borderColor: colors.success, borderWidth: 2 },
   state === 'wrong' && { borderColor: colors.danger, opacity: 0.4 },
   state === 'dim' && { opacity: 0.45 },
 ]
@@ -47,7 +47,7 @@ export function ChoiceList({ label, ...props }: ChoiceProps & { label: (feature:
             disabled={state !== 'idle'}
             onPress={() => props.onPick(admin)}
             style={[styles.choice, stateStyle(state, colors)]}>
-            <Text variant="bodyStrong" color={state === 'right' ? colors.accent : state === 'wrong' ? colors.textMuted : colors.text}>
+            <Text variant="bodyStrong" color={state === 'right' ? colors.success : state === 'wrong' ? colors.textMuted : colors.text}>
               {label(choice)}
             </Text>
           </Touchable>

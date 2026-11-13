@@ -101,10 +101,6 @@ export const isDefaultDecoration = (decoration) =>
 // The image of a flag (public/flags on the website; the app maps it to its own copy).
 export const flagImagePath = (iso) => `/flags/${iso.toLowerCase()}.png`
 
-// Flags whose picture can't be cropped to a circle without losing it (Nepal is not a rectangle):
-// the avatar shows them whole, centered on a plain background.
-export const UNCROPPED_FLAGS = new Set(['NP'])
-
 // Wears a flag of the collection (`iso`), or takes it off (null). Throws on a flag not in `unlocked`, or when the
 // write fails.
 export async function saveAvatarFlag(uid, iso, unlocked = []) {

@@ -2,7 +2,7 @@
 // the level that unlocks them, the secret one only appears once found.
 import React, { useEffect, useId, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { isSkinUnlocked, visibleSkins } from '../../utils/globeSkins'
+import { isSkinUnlocked, loadAccentEnabled, saveAccentEnabled, visibleSkins } from '../../utils/globeSkins'
 import './GlobeSkinPicker.css'
 
 const swatchStyle = (skin) => ({
@@ -14,6 +14,7 @@ export default function GlobeSkinPicker({ choice, level, secret, signedIn, onPic
   const [open, setOpen] = useState(false)
   const box = useRef(null)
   const titleId = useId()
+  const [accent, setAccent] = useState(loadAccentEnabled)
 
   useEffect(() => {
     if (!open) return undefined
@@ -63,6 +64,14 @@ export default function GlobeSkinPicker({ choice, level, secret, signedIn, onPic
               )
             })}
           </div>
+          <label className="globe-skins-accent">
+            <input
+              type="checkbox"
+              checked={accent}
+              onChange={(event) => { setAccent(event.target.checked); saveAccentEnabled(event.target.checked) }}
+            />
+            {t('globe.skins_accent')}
+          </label>
         </div>
       )}
     </div>

@@ -13,6 +13,10 @@ import {
   saveSecretFound,
   saveSkinChoice,
   visibleSkins,
+  loadAccentEnabled,
+  onGlobeSkinChange,
+  saveAccentEnabled,
+  skinAccent,
 } from './globeSkins'
 
 describe('globe skins', () => {
@@ -70,5 +74,44 @@ describe('globe skins', () => {
     expect(loadSecretFound()).toBe(false)
     saveSecretFound()
     expect(loadSecretFound()).toBe(true)
+  })
+})
+
+describe('globe skin accents', () => {
+  it('gives every skin but classic an accent in both themes', () => {
+    for (const skin of GLOBE_SKINS) {
+      if (skin.id === 'classic') expect(skin.accent).toBeUndefined()
+      else for (const scheme of ['dark', 'light']) expect(Object.keys(skin.accent[scheme]).sort()).toEqual(['accent', 'ink', 'strong'])
+    }
+  })
+
+  it('keeps every accent readable (WCAG AA) on the theme background', () => {
+    const lum = (hex) => {
+      const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4))
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b
+    }
+    const contrast = (a, b) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lum(b)) + 0.05)
+    const pages = { dark: ['#0B1020', '#141B30'], light: ['#F3F5FA', '#FFFFFF'] }
+    for (const skin of GLOBE_SKINS.filter((s) => s.accent)) {
+      for (const scheme of ['dark', 'light']) {
+        const { accent, strong, ink } = skin.accent[scheme]
+        expect(contrast(ink, accent)).toBeGreaterThanOrEqual(4.5)
+        for (const page of pages[scheme]) expect(contrast(strong, page)).toBeGreaterThanOrEqual(4.5)
+      }
+    }
+  })
+
+  it('gives no accent when turned off or for classic, and tells listeners about changes', () => {
+    expect(skinAccent(globeSkin('classic'), 'dark')).toBe(null)
+    expect(skinAccent(globeSkin('gold'), 'dark', false)).toBe(null)
+    expect(skinAccent(globeSkin('gold'), 'light').accent).toBe('#8A6500')
+    let calls = 0
+    const stop = onGlobeSkinChange(() => calls++)
+    saveSkinChoice('gold')
+    saveAccentEnabled(false)
+    expect(loadAccentEnabled()).toBe(false)
+    stop()
+    saveAccentEnabled(true)
+    expect(calls).toBe(2)
   })
 })

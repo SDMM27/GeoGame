@@ -59,8 +59,33 @@ export const ThemeContext = createContext<Theme | null>(null)
 const noSubscription = () => () => {}
 const defaultPreference = () => DEFAULT
 
-export function AppThemeProvider({ children }: { children: ReactNode }) {
-  const theme = useTheme()
+/** A skin's accent colors in one scheme (@shared/utils/globeSkins): `accent` fills, `strong` is accent text on the page, `ink` is text on a fill. */
+export type SkinAccent = { accent: string; strong: string; ink: string }
+export type SkinAccents = { dark: SkinAccent; light: SkinAccent }
+
+// One theme object per (scheme, skin accent): makeStyles caches its sheets by theme identity.
+const recolored = new Map<string, Theme>()
+
+/**
+ * The theme with the worn skin's accent: a fill in the dark theme, the darker `strong` shade in the light one (the app's
+ * accent is also used as text). `success` and `onSuccess` keep the theme's own green. No skin accent: the theme itself.
+ */
+export function withSkinAccent(theme: Theme, skinAccent: SkinAccents | null | undefined): Theme {
+  const pair = skinAccent?.[theme.scheme]
+  if (!pair) return theme
+  const accent = theme.scheme === 'dark' ? pair.accent : pair.strong
+  const key = `${theme.scheme}:${accent}:${pair.ink}`
+  let next = recolored.get(key)
+  if (!next) {
+    next = { ...theme, colors: { ...theme.colors, accent, onAccent: pair.ink } }
+    recolored.set(key, next)
+  }
+  return next
+}
+
+/** `skinAccent`: the accent colors of the skin worn (null: the theme's own). */
+export function AppThemeProvider({ children, skinAccent = null }: { children: ReactNode; skinAccent?: SkinAccents | null }) {
+  const theme = withSkinAccent(useTheme(), skinAccent)
   return createElement(ThemeContext.Provider, { value: theme }, children)
 }
 

@@ -37,7 +37,8 @@ const render = (element: React.ReactElement) => {
   return tree
 }
 const images = (tree: ReturnType<typeof create>) => tree.root.findAll((node) => node.props.testID === 'avatar-flag')
-const resizeMode = (tree: ReturnType<typeof create>) => tree.root.findAllByType('Image' as never)[0]?.props.resizeMode
+// The flag tile: a blurred copy that fills the square (cover), then the whole flag over it (contain)
+const resizeModes = (tree: ReturnType<typeof create>) => tree.root.findAllByType('Image' as never).map((image) => image.props.resizeMode)
 const text = (tree: ReturnType<typeof create>) => JSON.stringify(tree.toJSON())
 
 describe('Avatar', () => {
@@ -47,16 +48,16 @@ describe('Avatar', () => {
     expect(text(tree)).toContain('"A"')
   })
 
-  it('shows the worn flag instead of the initial, cropped to the circle', () => {
+  it('shows the worn flag instead of the initial, whole over a blurred copy of itself', () => {
     const tree = render(<Avatar username="alice" decoration={{ frame: 'none', color: 'default', flag: 'FR' }} />)
     expect(images(tree).length).toBeGreaterThan(0)
     expect(text(tree)).not.toContain('"A"')
-    expect(resizeMode(tree)).toBe('cover')
+    expect(resizeModes(tree)).toEqual(['cover', 'contain'])
   })
 
-  it('shows an uncropped flag whole', () => {
+  it('shows a non-rectangular flag (Nepal) whole too', () => {
     const tree = render(<Avatar username="alice" decoration={{ frame: 'none', color: 'default', flag: 'NP' }} />)
-    expect(resizeMode(tree)).toBe('contain')
+    expect(resizeModes(tree)).toEqual(['cover', 'contain'])
   })
 
   it('falls back to the initial when the flag has no image', () => {

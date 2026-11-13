@@ -8,7 +8,8 @@ import { useBadges } from '../../hooks/useBadges'
 import { usePlayerProfile } from '../../hooks/usePlayerProfile'
 import { TIER_COLORS } from '../../utils/achievements'
 import { badgeSummary, readBadges } from '../../utils/badges'
-import { UNCROPPED_FLAGS, decorationStyle, flagImagePath } from '../../utils/decorations'
+import { decorationStyle } from '../../utils/decorations'
+import FlagTile from '../FlagTile'
 import { GAME_TYPES } from '../../utils/gameTypes'
 import { getCountryName } from '../../utils/getCountryName'
 import GameEmblem from '../GameEmblem'
@@ -37,22 +38,19 @@ export const GAME_META = {
 
 const AVATAR_COLORS = ['country-clue', 'placement', 'flags', 'capitals', 'border-guess', 'voyage-voyage', 'ranking', 'quiz'].map((id) => `var(--game-${id})`)
 
-// The flag worn as a profile picture: fills the circle, or shows whole on a neutral background when it can't be cropped.
-// Goes back to the initial when the image fails to load.
-function AvatarFlag({ iso, fallback }) {
+// The flag worn as a profile picture. Goes back to the initial when the image fails to load.
+function AvatarFlag({ iso, size, fallback }) {
   const { t, i18n } = useTranslation()
   const [failed, setFailed] = useState(false)
   useEffect(() => setFailed(false), [iso])
   if (failed) return fallback
   const country = getCountryName(iso, i18n.language) ?? iso
   return (
-    <img
-      className={`profile-avatar__flag${UNCROPPED_FLAGS.has(iso) ? ' profile-avatar__flag--whole' : ''}`}
-      src={flagImagePath(iso)}
-      alt=""
+    <FlagTile
+      iso={iso}
+      blur={Math.max(2, Math.round(size / 10))}
+      className="profile-avatar__flag"
       title={t('decorations.flag_alt', { country })}
-      loading="lazy"
-      draggable={false}
       onError={() => setFailed(true)}
     />
   )
@@ -76,7 +74,7 @@ export function Avatar({ username, size = 44, decoration }) {
       className={`profile-avatar${flag ? ' profile-avatar--flag' : ''}`}
       style={{ width: size, height: size, fontSize: size * 0.45, background: AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length], ...ring }}
     >
-      {flag ? <AvatarFlag iso={flag} fallback={initial} /> : initial}
+      {flag ? <AvatarFlag iso={flag} size={size} fallback={initial} /> : initial}
     </span>
   )
 }

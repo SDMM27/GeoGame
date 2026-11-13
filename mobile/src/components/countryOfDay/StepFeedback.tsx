@@ -21,7 +21,7 @@ export function StepFeedback({
   const { t } = useTranslation()
   const styles = useStyles()
   const colors = useColors()
-  const color = found ? colors.accent : colors.warning
+  const color = found ? colors.success : colors.warning
   return (
     <Animated.View entering={FadeInDown.springify().damping(18)} style={[styles.box, { borderColor: color }]}>
       <Text variant="bodyStrong" color={color} style={{ flex: 1 }}>

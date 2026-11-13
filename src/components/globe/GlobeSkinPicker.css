@@ -61,3 +61,6 @@
 .globe-skins-option small { color: var(--sd-muted); font-size: 0.7rem; }
 
 .globe-skins-swatch { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--sd-line); }
+
+.globe-skins-accent { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.7rem; font-size: 0.85rem; cursor: pointer; }
+.globe-skins-accent input { accent-color: var(--sd-accent); }

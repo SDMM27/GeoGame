@@ -67,7 +67,7 @@ const useStyles = makeStyles((colors) => ({
     borderRadius: radius.sm,
     borderWidth: 1,
   },
-  itemRight: { borderColor: colors.accent, backgroundColor: `${colors.accent}1F` },
+  itemRight: { borderColor: colors.success, backgroundColor: `${colors.success}1F` },
   itemWrong: { borderColor: colors.danger, backgroundColor: `${colors.danger}1F` },
   label: { flex: 1 },
 }))

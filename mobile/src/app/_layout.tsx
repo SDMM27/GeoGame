@@ -15,7 +15,7 @@ import * as ScreenOrientation from 'expo-screen-orientation'
 import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import * as SystemUI from 'expo-system-ui'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Dimensions, Platform } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
@@ -37,6 +37,8 @@ import { TestModeBadge } from '@/components/TestModeBadge'
 import { UpdateBanner } from '@/components/UpdateBanner'
 import { WhatsNew } from '@/components/WhatsNew'
 import { XpToasts } from '@/components/XpToasts'
+import { useAccount } from '@/account/auth'
+import { useAccentEnabled, useActiveGlobeSkin } from '@/hooks/useActiveGlobeSkin'
 import { initTestMode } from '@/testMode'
 import { AppThemeProvider, useTheme, type Theme } from '@/theme'
 import { useLaunchUpdate } from '@/updates'
@@ -97,7 +99,16 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
 }
 
 export default function RootLayout() {
-  return <AppThemeProvider><RootNavigator /></AppThemeProvider>
+  return <SkinThemeProvider><RootNavigator /></SkinThemeProvider>
+}
+
+// The worn globe skin recolors the app's accent (unless turned off in the skin picker)
+function SkinThemeProvider({ children }: { children: ReactNode }) {
+  const { account } = useAccount()
+  const { skin } = useActiveGlobeSkin(account?.uid ?? null)
+  const enabled = useAccentEnabled()
+  const skinAccent = enabled ? (skin.accent ?? null) : null
+  return <AppThemeProvider skinAccent={skinAccent}>{children}</AppThemeProvider>
 }
 
 function RootNavigator() {

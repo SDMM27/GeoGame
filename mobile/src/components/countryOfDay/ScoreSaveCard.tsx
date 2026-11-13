@@ -52,7 +52,7 @@ export function ScoreSaveCard({ dailyKey, mode, steps, score, elapsedTime, onSav
       <Text variant="bodyStrong">{t('buttons.save_score')}</Text>
       {saver.status === 'saving' && <Text variant="caption">{t('score_save.saving')}</Text>}
       {saver.done && (
-        <Text variant="caption" color={colors.accent}>
+        <Text variant="caption" color={colors.success}>
           {saver.name ? t('score_save.saved_as', { name: saver.name }) : t('form.score_saved')}
         </Text>
       )}

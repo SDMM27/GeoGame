@@ -81,7 +81,7 @@ function CountryRow({
   const styles = useStyles()
   const colors = useColors()
   const flag = getFlag(country.properties.ISO_A2)
-  const tint = state === 'correct' ? colors.accent : state === 'wrong' ? colors.danger : null
+  const tint = state === 'correct' ? colors.success : state === 'wrong' ? colors.danger : null
   const { t } = useTranslation()
   const name = getCountryName(country.properties.ISO_A2, lang) || country.properties.ADMIN
   return (
@@ -125,7 +125,7 @@ function CorrectRanking({
         const flag = getFlag(country.properties.ISO_A2)
         return (
           <Animated.View key={keyOf(country)} entering={FadeInDown.delay(index * 40).springify().damping(18)} style={styles.resultRow}>
-            <Text variant="bodyStrong" color={correct ? colors.accent : colors.danger} style={styles.rowIndex}>
+            <Text variant="bodyStrong" color={correct ? colors.success : colors.danger} style={styles.rowIndex}>
               {index + 1}
             </Text>
             {flag && <Image source={flag} contentFit="cover" style={styles.flag} accessible={false} alt="" />}
@@ -133,7 +133,7 @@ function CorrectRanking({
               <Text variant="bodyStrong" numberOfLines={1}>
                 {getCountryName(country.properties.ISO_A2, i18n.language) || country.properties.ADMIN}
               </Text>
-              <Text variant="caption" color={correct ? colors.accent : colors.warning} numberOfLines={1}>
+              <Text variant="caption" color={correct ? colors.success : colors.warning} numberOfLines={1}>
                 {correct
                   ? t('mobile.ranking.well_placed')
                   : t('mobile.ranking.placed_at', { position: playerIndex + 1, gap: Math.abs(playerIndex - index) })}
@@ -432,7 +432,7 @@ export default function RankingScreen() {
           accent={score > 0 ? ACCENT : colors.warning}
           stats={[
             { label: t('mobile.ranking.attempts'), value: `${attemptsUsed} / ${stageCount * maxAttempts}` },
-            { label: clean(t('ranking.total_error')).replace(/\s*:$/, ''), value: `${totalError}`, color: totalError ? colors.warning : colors.accent },
+            { label: clean(t('ranking.total_error')).replace(/\s*:$/, ''), value: `${totalError}`, color: totalError ? colors.warning : colors.success },
           ]}
           record={{
             gameType: GAME_TYPES.RANKING,

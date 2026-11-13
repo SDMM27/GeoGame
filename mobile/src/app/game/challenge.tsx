@@ -70,8 +70,8 @@ function Playing({ challenge }: { challenge: Challenge }) {
   const outcomeBanner = outcome && (
     <Animated.View
       entering={FadeInDown.springify().damping(18)}
-      style={[styles.outcome, { borderColor: outcome === 'correct' ? colors.accent : colors.warning }]}>
-      <Text variant="bodyStrong" color={outcome === 'correct' ? colors.accent : colors.warning} style={{ flex: 1 }}>
+      style={[styles.outcome, { borderColor: outcome === 'correct' ? colors.success : colors.warning }]}>
+      <Text variant="bodyStrong" color={outcome === 'correct' ? colors.success : colors.warning} style={{ flex: 1 }}>
         {outcome === 'correct' ? t('survival.correct') : `${timedOut ? `${t('survival.time_up')} ` : ''}${t('survival.answer_was', { answer })}`}
       </Text>
     </Animated.View>

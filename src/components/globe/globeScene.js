@@ -77,6 +77,11 @@ export function createGlobeScene(land, events) {
       landEdge: readVar('--gg-globe-land-edge', 'rgba(11,16,32,.4)'),
       graticule: readVar('--gg-graticule', 'rgba(138,147,176,.25)'),
       plane: readVar('--gg-board-accent', '#f5c84b'),
+      // The site's accent follows the worn skin; a found city stays the success green
+      accent: readVar('--sd-accent', s.colors.accent),
+      accentStrong: readVar('--sd-accent-strong', s.colors.accentStrong),
+      success: readVar('--gg-success', '#3ddc97'),
+      successStrong: readVar('--gg-success-strong', '#5fe6ab'),
       dark: document.documentElement.dataset.theme !== 'light',
     }
     // The reticle is stroked over a wider halo in the ocean's color so it stays readable over the land too
@@ -241,17 +246,17 @@ export function createGlobeScene(land, events) {
     ctx.strokeStyle = colors.reticleHalo
     ctx.stroke()
     ctx.lineWidth = 1.6
-    ctx.strokeStyle = phase === 'found' ? colors.accent : colors.reticle
+    ctx.strokeStyle = phase === 'found' ? colors.success : colors.reticle
     ctx.stroke()
     if (burst > 0) {
       const b = 1 - burst
       ctx.globalAlpha = burst
       ctx.beginPath(); ctx.arc(cx, cy, ret + b * r * 0.55, 0, Math.PI * 2)
-      ctx.lineWidth = 3; ctx.strokeStyle = colors.accent; ctx.stroke()
+      ctx.lineWidth = 3; ctx.strokeStyle = colors.success; ctx.stroke()
       if (scored) {
         ctx.font = mono(Math.max(13, size * 0.042), 700)
         ctx.textAlign = 'center'
-        ctx.fillStyle = colors.accentStrong
+        ctx.fillStyle = colors.successStrong
         ctx.fillText('+100', cx, cy - ret - 12 - b * 20)
         ctx.textAlign = 'start'
       }

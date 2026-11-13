@@ -44,9 +44,9 @@
 }
 
 .flight-globe-chip--found {
-  background: var(--sd-accent);
-  border-color: var(--sd-accent);
-  color: var(--sd-accent-ink);
+  background: var(--gg-success);
+  border-color: var(--gg-success);
+  color: var(--gg-on-success);
 }
 
 .flight-globe-hint {

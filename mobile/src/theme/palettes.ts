@@ -13,6 +13,9 @@ export const darkColors = {
 
   accent: '#3DDC97',
   onAccent: '#06281A',
+  // Correct / found / won: stays green whatever skin recolors the accent
+  success: '#3DDC97',
+  onSuccess: '#06281A',
   danger: '#FF7A6B',
   onDanger: '#3A0D07',
   warning: '#F5B83D',
@@ -62,6 +65,8 @@ export const lightColors: Palette = {
 
   accent: '#0B7A4C',
   onAccent: '#FFFFFF',
+  success: '#0B7A4C',
+  onSuccess: '#FFFFFF',
   danger: '#C62828',
   onDanger: '#FFFFFF',
   warning: '#8A5A00',

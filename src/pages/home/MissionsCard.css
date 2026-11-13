@@ -50,9 +50,9 @@
 }
 
 .mission-line { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.mission-row--done { border-color: var(--gg-accent-line); }
+.mission-row--done { border-color: color-mix(in srgb, var(--gg-success) 40%, transparent); }
 .mission-row--done .mission-title { color: var(--sd-muted); text-decoration: line-through; }
-.mission-row--done .mission-emoji { background: var(--gg-accent-soft); color: var(--sd-accent-strong); font-weight: 800; }
+.mission-row--done .mission-emoji { background: var(--gg-success-soft); color: var(--gg-success-strong); font-weight: 800; }
 
 .mission-emoji {
   flex-shrink: 0;
@@ -82,7 +82,7 @@
   font-size: 0.8rem;
 }
 
-.missions-bonus--done { color: var(--sd-accent-strong); }
+.missions-bonus--done { color: var(--gg-success-strong); }
 .missions-bonus .mission-reward { color: inherit; font-weight: 600; }
 
 .missions-card--visitor {

@@ -34,8 +34,8 @@
 /* Flag as profile picture: a rounded square (a circle would cut the corners, where many flags carry their canton or
    emblem), inside the frame ring (the ring is the border + padding), which follows the same shape */
 .profile-avatar--flag { overflow: hidden; border-radius: 24%; }
-.profile-avatar__flag { width: 100%; height: 100%; border-radius: 18%; object-fit: cover; object-position: center; }
-.profile-avatar__flag--whole { object-fit: contain; background: var(--sd-surface-2, #fff); }
+.profile-avatar__flag { width: 100%; height: 100%; border-radius: 18%; }
+
 
 .profile-card {
   background: var(--sd-surface);

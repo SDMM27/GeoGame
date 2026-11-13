@@ -10,6 +10,7 @@ import FragmentToast from "./components/collection/FragmentToast";
 import FlagUnlockOverlay from "./components/collection/FlagUnlockOverlay";
 import SealToast from "./components/collection/SealToast";
 import ScrollUnlockOverlay from "./components/collection/ScrollUnlockOverlay";
+import SiteAccent from "./components/SiteAccent";
 import PresenceHeartbeat from "./components/PresenceHeartbeat";
 import InviteBanner from "./components/multiplayer/InviteBanner";
 import RouteErrorBoundary, { ErrorBoundary } from "./components/RouteErrorBoundary";
@@ -48,6 +49,7 @@ export default function App() {
   return (
     <ErrorBoundary>
       <Router>
+        <SiteAccent />
         <RouteMeta />
         <InviteBanner />
         <XpToast />

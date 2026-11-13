@@ -11,7 +11,7 @@ import { usePlayerElo } from '@shared/hooks/usePlayerElo'
 import { usePlayerRecords } from '@shared/hooks/usePlayerRecords'
 import { usePlayerProfile } from '@shared/hooks/usePlayerProfile'
 import { TIER_COLORS } from '@shared/utils/achievements'
-import { decorationStyle, UNCROPPED_FLAGS } from '@shared/utils/decorations'
+import { decorationStyle } from '@shared/utils/decorations'
 import { formatSeason } from '@shared/utils/elo'
 import { describeBest, describeDetails, describeMode, describeResult } from '@shared/utils/profileFormat'
 import { dailyTypesOn, dayKey, formatPlayTime } from '@shared/utils/profileStats'
@@ -74,24 +74,29 @@ const RING_GAP = 2
 // Room around a decorated avatar, whatever its frame: the same for every frame (or none) so the layout never jumps.
 const RING_ROOM = RING_GAP + RING_WIDTH_DOUBLE
 
-// Background behind a flag shown whole (UNCROPPED_FLAGS)
-const FLAG_BACKDROP = '#E9ECEF'
 
 // A worn flag is a rounded square, not a disc: a circle would cut the corners, where many flags carry their canton or
 // emblem. The frame ring follows the same shape.
 export const flagRadius = (size: number) => Math.round(size * 0.24)
 
-// A flag filling a rounded-square avatar (the whole picture on a plain background for the uncropped ones), or null when the app
-// has no image for it.
+// A flag shown whole in a rounded-square avatar, or null when the app has no image for it. Most flags are 2:1, so
+// cropping them to the square lost half of them (the canton of the US, the stars of Australia...): the whole flag sits
+// over a blurred, enlarged, darkened copy of itself that fills the bands above and below.
 export function FlagDisc({ iso, size }: { iso: string; size: number }) {
   const source = getFlag(iso)
   if (source == null) return null
-  const whole = UNCROPPED_FLAGS.has(iso.toUpperCase())
+  const blur = Math.max(2, Math.round(size / 10))
   return (
-    <View
-      testID="avatar-flag"
-      style={{ width: size, height: size, borderRadius: flagRadius(size), overflow: 'hidden', backgroundColor: whole ? FLAG_BACKDROP : undefined }}>
-      <Image source={source} style={{ width: size, height: size }} resizeMode={whole ? 'contain' : 'cover'} accessible={false} alt="" />
+    <View testID="avatar-flag" style={{ width: size, height: size, borderRadius: flagRadius(size), overflow: 'hidden', backgroundColor: '#000' }}>
+      <Image
+        source={source}
+        blurRadius={blur}
+        resizeMode="cover"
+        style={{ position: 'absolute', width: size, height: size, opacity: 0.75, transform: [{ scale: 1.3 }] }}
+        accessible={false}
+        alt=""
+      />
+      <Image source={source} resizeMode="contain" style={{ width: size, height: size }} accessible={false} alt="" />
     </View>
   )
 }
@@ -262,7 +267,7 @@ export function DailyChips({
             ]}>
             <GameEmblem game={game.id} variant="glyph" size={size * 0.5} color={result ? gameColor : colors.textMuted} />
             {result && (
-              <View style={[styles.chipBadge, { backgroundColor: result.solved === false ? colors.danger : colors.accent }]}>
+              <View style={[styles.chipBadge, { backgroundColor: result.solved === false ? colors.danger : colors.success }]}>
                 <MaterialCommunityIcons name={result.solved === false ? 'close' : 'check'} size={9} color={colors.bg} />
               </View>
             )}
@@ -364,7 +369,7 @@ function AchievementModal({ achievement, onClose }: { achievement: Achievement; 
           <View style={[styles.achievementBig, { backgroundColor: achievement.unlocked ? `${color}26` : colors.surfaceHigh, borderColor: achievement.unlocked ? color : colors.border }]}>
             <MaterialCommunityIcons name={achievement.icon} size={40} color={achievement.unlocked ? color : colors.textFaint} />
             {achievement.unlocked && (
-              <View style={[styles.chipBadge, { width: 22, height: 22, borderRadius: 11, backgroundColor: colors.accent }]}>
+              <View style={[styles.chipBadge, { width: 22, height: 22, borderRadius: 11, backgroundColor: colors.success }]}>
                 <MaterialCommunityIcons name="check" size={14} color={colors.bg} />
               </View>
             )}

@@ -140,7 +140,7 @@ function PlacementGame({
     const prev = seen.current
     const errors = stats.totalErrors ?? 0
     let next: { text: string; color: string } | null = null
-    if (stats.found > prev.found) next = { text: t('mobile.a11y.map_found', { name: prev.name }), color: colors.accent }
+    if (stats.found > prev.found) next = { text: t('mobile.a11y.map_found', { name: prev.name }), color: colors.success }
     else if (stats.skipped > prev.skipped) next = { text: t('mobile.a11y.map_missed', { name: prev.name }), color: colors.warning }
     else if (errors > prev.errors) next = { text: t('mobile.a11y.wrong'), color: colors.danger }
     seen.current = { found: stats.found, skipped: stats.skipped, errors, name: targetName }
@@ -247,7 +247,7 @@ function PlacementGame({
           ticketNote={[difficulty ? t(`difficulties.${difficulty}`) : null, continent ? t(`continents.${continent}`) : null].filter(Boolean).join(' · ') || undefined}
           accent={gameType === GAME_TYPES.HARDCORE ? gameColors.hardcore : gameColors.placement}
           stats={[
-            { label: t('labels.countries_found'), value: `${stats.found}/${stats.total}`, color: colors.accent },
+            { label: t('labels.countries_found'), value: `${stats.found}/${stats.total}`, color: colors.success },
             { label: t('mobile.game.time'), value: formatDuration(timer) },
             { label: clean(t('stats.first_try')), value: String(stats.foundFirstTry ?? 0) },
           ]}

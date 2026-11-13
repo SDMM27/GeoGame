@@ -304,7 +304,7 @@ export function TypingGame({
           ticketNote={[difficulty ? t(`difficulties.${difficulty}`) : null, continent ? t(`continents.${continent}`) : null].filter(Boolean).join(' · ') || undefined}
           accent={config.accent}
           stats={[
-            { label: t('labels.countries_found'), value: `${stats.found}/${stats.total}`, color: colors.accent },
+            { label: t('labels.countries_found'), value: `${stats.found}/${stats.total}`, color: colors.success },
             { label: t('mobile.game.time'), value: formatDuration(timer) },
             { label: clean(t('stats.first_try')), value: String(stats.foundFirstTry ?? 0) },
           ]}

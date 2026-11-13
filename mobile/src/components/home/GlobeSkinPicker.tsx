@@ -4,10 +4,11 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import * as Haptics from 'expo-haptics'
-import { Modal, Pressable, ScrollView, View } from 'react-native'
+import { Modal, Pressable, ScrollView, Switch, View } from 'react-native'
 
-import { isSkinUnlocked, visibleSkins } from '@shared/utils/globeSkins'
+import { isSkinUnlocked, saveAccentEnabled, visibleSkins } from '@shared/utils/globeSkins'
 
+import { useAccentEnabled } from '@/hooks/useActiveGlobeSkin'
 import { ScreenTitle } from '@/components/flight'
 import { Button, Text, Touchable } from '@/components/ui'
 import { isTestMode, setTestMode, testModeAvailable } from '@/testMode'
@@ -32,6 +33,7 @@ export function GlobeSkinPicker({
   const styles = useStyles()
   const colors = useColors()
   const [open, setOpen] = useState(false)
+  const accentEnabled = useAccentEnabled()
   const progress = { level, secret }
   // Test mode (non-production builds only): a long press on the button turns it on or off
   const toggleTestMode = () => {
@@ -82,6 +84,16 @@ export function GlobeSkinPicker({
                 )
               })}
             </ScrollView>
+            <View style={styles.switchRow}>
+              <Text variant="body" style={{ flex: 1 }}>{t('globe.skins_accent')}</Text>
+              <Switch
+                value={accentEnabled}
+                onValueChange={saveAccentEnabled}
+                trackColor={{ false: colors.surfaceHigh, true: colors.accent }}
+                thumbColor={accentEnabled ? colors.onAccent : colors.textMuted}
+                accessibilityLabel={t('globe.skins_accent')}
+              />
+            </View>
             <Button label={t('decorations.close')} variant="secondary" onPress={() => setOpen(false)} />
           </Pressable>
         </Pressable>
@@ -116,6 +128,7 @@ const useStyles = makeStyles((colors) => ({
     borderWidth: 1,
     borderColor: colors.border,
   },
+  switchRow: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   options: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
   option: {
     minWidth: 76,

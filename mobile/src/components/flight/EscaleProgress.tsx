@@ -23,7 +23,7 @@ export function EscaleProgress({
   accessibilityLabel?: string
 }) {
   const colors = useColors()
-  const stateColors: Record<string, string> = { good: colors.accent, bad: colors.danger, current: colors.gold, todo: colors.stub }
+  const stateColors: Record<string, string> = { good: colors.success, bad: colors.danger, current: colors.gold, todo: colors.stub }
   const a11y = accessibilityLabel
     ? ({ accessible: true, accessibilityRole: 'progressbar', accessibilityLabel } as const)
     : ({ accessible: false, importantForAccessibility: 'no-hide-descendants' } as const)

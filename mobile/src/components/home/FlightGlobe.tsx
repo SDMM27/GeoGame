@@ -31,19 +31,15 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, { FadeIn, FadeOut, useDerivedValue, useFrameCallback, useReducedMotion, useSharedValue, type SharedValue } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
 
-import { useXp } from '@shared/hooks/useXp'
 import {
   EASTER_EGG_SCORE,
   SECRET_SKIN,
-  activeSkin,
-  loadSecretFound,
-  loadSkinChoice,
   reachesEasterEgg,
   saveSecretFound,
   saveSkinChoice,
 } from '@shared/utils/globeSkins'
 
-import { useTestMode } from '@/testMode'
+import { useActiveGlobeSkin } from '@/hooks/useActiveGlobeSkin'
 import { fonts, makeStyles, radius, space, useTheme } from '@/theme'
 
 import { CITY_VECTORS, FLIGHT_PATH, GRATICULE, LAND, ROUTES_ACCENT, ROUTES_ACCENT2 } from './globeGeometry'
@@ -166,14 +162,7 @@ export function FlightGlobe({
   const { t } = useTranslation()
   const { colors, scheme } = useTheme()
   const styles = useStyles()
-  const testMode = useTestMode()
-  const realLevel: number = useXp(uid)?.level ?? 0
-  const [choice, setChoice] = useState<string>(() => loadSkinChoice())
-  const [foundSecret, setSecret] = useState<boolean>(() => loadSecretFound())
-  // Test mode: every skin unlocked, the disco one included
-  const level = testMode ? 99 : realLevel
-  const secret = testMode || foundSecret
-  const skin = activeSkin(choice, { level, secret }) as { id: string; palette: Record<string, string> | null }
+  const { skin, choice, level, secret } = useActiveGlobeSkin(uid)
   const disco = skin.id === SECRET_SKIN
   // Classic keeps the theme's colors; the other skins bring their own (the reticle and the city codes sit on a halo)
   const look = useMemo(() => {
@@ -244,8 +233,6 @@ export function FlightGlobe({
           // The 1000-point easter egg: unlock the disco skin, wear it, and celebrate (no spin or confetti under reduced motion)
           saveSecretFound()
           saveSkinChoice(SECRET_SKIN)
-          setSecret(true)
-          setChoice(SECRET_SKIN)
           setBanner(true)
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {})
           if (!reduced) {
@@ -275,10 +262,7 @@ export function FlightGlobe({
     return () => clearTimeout(timer)
   }, [banner])
 
-  const chooseSkin = useCallback((id: string) => {
-    setChoice(id)
-    saveSkinChoice(id)
-  }, [])
+  const chooseSkin = useCallback((id: string) => saveSkinChoice(id), [])
 
   useEffect(() => {
     state.modify((s) => {
@@ -541,10 +525,10 @@ const useStyles = makeStyles((colors) => ({
     borderColor: colors.border,
     backgroundColor: colors.surface,
   },
-  chipFound: { backgroundColor: colors.accent, borderColor: colors.accent },
+  chipFound: { backgroundColor: colors.success, borderColor: colors.success },
   chipText: { fontFamily: fonts.monoBold, fontSize: 13, color: colors.text },
   chipCity: { flexShrink: 1 },
   chipScore: { fontFamily: fonts.monoBold, fontSize: 13, color: colors.gold },
-  chipTextFound: { color: colors.onAccent },
+  chipTextFound: { color: colors.onSuccess },
   hint: { fontFamily: fonts.mono, fontSize: 11, color: colors.textMuted, textAlign: 'center' },
 }))

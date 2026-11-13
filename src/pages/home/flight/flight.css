@@ -142,47 +142,65 @@
 .boarding-pass {
   --notch: 18px;
   --stub: 104px;
+  --ticket-line: var(--sd-line);
   position: relative;
   display: flex;
   border-radius: 18px;
-  border: 1px solid var(--sd-line);
-  background: var(--sd-surface);
+  background: transparent;
   transition: transform var(--sd-dur-base) var(--sd-ease-spring), box-shadow var(--sd-dur-base), border-color var(--sd-dur-base);
 }
 
-/* The two notches where the stub tears off */
-.boarding-pass::before,
-.boarding-pass::after {
-  content: '';
-  position: absolute;
-  right: calc(var(--stub) - var(--notch) / 2);
-  width: var(--notch);
-  height: var(--notch);
-  border-radius: 50%;
-  background: var(--sd-bg);
-  border: 1px solid var(--sd-line);
+/* Let the browser release the scaled entrance layer once it has finished. */
+.boarding-pass.sd-punch {
+  animation-fill-mode: backwards;
 }
 
-.boarding-pass::before { top: calc(var(--notch) / -2); clip-path: inset(50% 0 0 0); }
-.boarding-pass::after { bottom: calc(var(--notch) / -2); clip-path: inset(0 0 50% 0); }
+/* Each piece owns its paper and half of the notches. They follow the fold,
+   instead of painting fixed circles over the full ticket. Only the paper is
+   masked, keeping the printed SVG outside the mask's composited layer. */
+.boarding-pass-main::before,
+.boarding-pass-stub::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border: 1px solid var(--ticket-line);
+  background:
+    radial-gradient(circle at var(--ticket-cut) top, transparent calc(var(--notch) / 2), var(--ticket-line) calc(var(--notch) / 2) calc(var(--notch) / 2 + 1px), transparent calc(var(--notch) / 2 + 1px)),
+    radial-gradient(circle at var(--ticket-cut) bottom, transparent calc(var(--notch) / 2), var(--ticket-line) calc(var(--notch) / 2) calc(var(--notch) / 2 + 1px), transparent calc(var(--notch) / 2 + 1px)),
+    var(--ticket-paper, var(--sd-surface));
+  mask:
+    radial-gradient(circle at var(--ticket-cut) top, transparent calc(var(--notch) / 2), #000 calc(var(--notch) / 2 + 0.5px)) top / 100% 51% no-repeat,
+    radial-gradient(circle at var(--ticket-cut) bottom, transparent calc(var(--notch) / 2), #000 calc(var(--notch) / 2 + 0.5px)) bottom / 100% 51% no-repeat;
+  transition: border-color var(--sd-dur-base);
+  pointer-events: none;
+}
 
 .boarding-pass:hover {
   transform: translateY(-4px);
   box-shadow: var(--gg-shadow);
-  border-color: color-mix(in srgb, var(--game) 50%, var(--sd-line));
+  --ticket-line: color-mix(in srgb, var(--game) 50%, var(--sd-line));
 }
 
 .boarding-pass--done {
-  border-color: var(--gg-accent-line);
+  --ticket-line: var(--gg-accent-line);
 }
 
 .boarding-pass-main {
+  --ticket-cut: 100%;
+  position: relative;
+  isolation: isolate;
   flex: 1 1 auto;
   min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 10px;
   padding: 20px;
+}
+
+.boarding-pass-main::before {
+  border-radius: 18px 0 0 18px;
+  border-right: 0;
 }
 
 .boarding-pass-top {
@@ -293,20 +311,55 @@
 }
 
 .boarding-pass-stub {
+  --ticket-cut: 0%;
+  --ticket-paper: var(--sd-surface);
+  position: relative;
+  isolation: isolate;
   flex: 0 0 var(--stub);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   gap: 8px;
   padding: 20px 14px;
-  border-left: 2px dashed var(--sd-line);
   font-family: var(--sd-font-mono);
-  transform-origin: 0 50%;
+  transform-origin: left center;
   transition: transform var(--sd-dur-slow) var(--sd-ease-spring);
 }
 
-.boarding-pass:hover .boarding-pass-stub {
-  transform: rotate(3deg) translateX(4px);
+/* Flat paper color, with a cast shadow to emphasize the fold. */
+.boarding-pass-stub::before {
+  border-radius: 0 17px 17px 0;
+  border-left: 0;
+  transform-origin: left center;
+  transform: perspective(600px) rotateY(-5deg);
+  box-shadow: 4px 3px 8px -7px var(--sd-ink);
+  transition: transform 320ms ease-out, box-shadow 320ms ease-out, border-color var(--sd-dur-base);
+  pointer-events: none;
+}
+
+.boarding-pass-stub::after {
+  content: '';
+  position: absolute;
+  inset: calc(var(--notch) / 2 + 1px) auto calc(var(--notch) / 2 + 1px) 0;
+  width: 0;
+  border-left: 2px dashed var(--ticket-line);
+  pointer-events: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .boarding-pass:hover .boarding-pass-stub {
+    transform: rotate(3deg) translateX(4px);
+  }
+
+  .boarding-pass:hover .boarding-pass-barcode {
+    transform: rotate(-3deg);
+  }
+
+  .boarding-pass:hover .boarding-pass-stub::before {
+    transform: perspective(600px) rotateY(-12deg);
+    box-shadow: 8px 5px 12px -9px var(--sd-ink);
+  }
+
 }
 
 .boarding-pass-field {
@@ -342,9 +395,16 @@
 }
 
 .boarding-pass-barcode {
+  display: block;
+  width: 100%;
   height: 34px;
+  flex-shrink: 0;
+  color: var(--sd-ink);
+  fill: currentColor;
   opacity: 0.8;
-  background: repeating-linear-gradient(90deg, var(--sd-ink) 0 2px, transparent 2px 4px, var(--sd-ink) 4px 5px, transparent 5px 8px);
+  /* Cancel the stub's rotation at the same pace: narrow bars remain vertical. */
+  transform-origin: center;
+  transition: transform var(--sd-dur-slow) var(--sd-ease-spring);
 }
 
 /* ---------- Passport ---------- */
@@ -645,8 +705,19 @@
 @media (prefers-reduced-motion: reduce) {
   .boarding-pass,
   .boarding-pass:hover,
-  .boarding-pass:hover .boarding-pass-stub {
+  .boarding-pass:hover .boarding-pass-stub,
+  .boarding-pass:hover .boarding-pass-barcode,
+  .boarding-pass-stub::before,
+  .boarding-pass:hover .boarding-pass-stub::before {
     transform: none;
+  }
+
+  .boarding-pass,
+  .boarding-pass-stub,
+  .boarding-pass-barcode,
+  .boarding-pass-stub::before,
+  .boarding-pass-stub::after {
+    transition: none;
   }
 
   .departures-status--boarding {

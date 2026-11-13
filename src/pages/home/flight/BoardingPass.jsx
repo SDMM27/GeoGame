@@ -1,5 +1,5 @@
 // A daily challenge as a boarding pass: today's status, « Board » (the daily), ∞ (infinite mode) and the
-// multiplayer button, and a tear-off stub (gate, departure at midnight, barcode) that tilts on hover.
+// multiplayer button, and a tear-off stub with a paper fold and a crisp decorative barcode.
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -9,6 +9,7 @@ import GameEmblem, { flightCode } from '../../../components/GameEmblem'
 import FlapText from './FlapText'
 
 const GATES = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'D1', 'D2']
+const BARCODE_BARS = [[0, 2], [4, 1], [7, 3], [12, 1], [15, 2], [19, 1], [22, 3], [27, 2], [31, 1], [34, 2], [38, 1], [41, 3], [46, 1], [49, 2], [53, 3], [58, 1], [61, 2], [65, 1], [68, 3], [73, 1], [76, 2]]
 
 // `status`: today's daily 'won', 'played' or 'todo' (signed-in player), null when unknown (visitor, loading)
 export default function BoardingPass({ game, index, status = null }) {
@@ -88,7 +89,9 @@ export default function BoardingPass({ game, index, status = null }) {
           <small>{t('home.departure')}</small>
           <strong>00:00</strong>
         </span>
-        <span className="boarding-pass-barcode" />
+        <svg className="boarding-pass-barcode" viewBox="0 0 80 34" preserveAspectRatio="none" shapeRendering="crispEdges" aria-hidden="true" focusable="false">
+          {BARCODE_BARS.map(([x, width]) => <rect key={x} x={x} y={0} width={width} height={34} />)}
+        </svg>
       </div>
     </article>
   )

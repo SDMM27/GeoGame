@@ -46,6 +46,7 @@ export type GlobeState = {
   dragLat: number
   dragT: number // ms of the last drag move
   dragLastX: number
+  party: number // seconds of easter-egg celebration left (0 = none)
 }
 
 // What a step or a drag move tells the caller (a bit mask)
@@ -72,8 +73,12 @@ export function createGlobeState(): GlobeState {
     dragLat: 0,
     dragT: 0,
     dragLastX: 0,
+    party: 0,
   }
 }
+
+export const PARTY_SECONDS = 4
+const PARTY_SPIN = 180 // degrees/s
 
 export function wrap(deg: number) {
   'worklet'
@@ -142,6 +147,12 @@ function nextTarget(s: GlobeState) {
   return EVENT_TARGET
 }
 
+// The easter egg's celebration: the globe spins and confetti flies for PARTY_SECONDS
+export function startParty(s: GlobeState) {
+  'worklet'
+  s.party = PARTY_SECONDS
+}
+
 // Advances the scene by dt seconds. Under reduced motion nothing moves: only the pause after a find still runs out.
 export function stepGlobe(s: GlobeState, dt: number, reduced: boolean) {
   'worklet'
@@ -149,6 +160,12 @@ export function stepGlobe(s: GlobeState, dt: number, reduced: boolean) {
   if (reduced) return s.phase === 'found' && s.phaseTime > FOUND_DELAY ? nextTarget(s) : 0
   s.clock += dt
   s.burst = Math.max(0, s.burst - dt * 1.3)
+  if (s.party > 0) {
+    // The pause after a find waits for the party to end (phaseTime keeps counting, so the next target follows at once)
+    s.party = Math.max(0, s.party - dt)
+    if (!s.dragging) s.lon = wrap(s.lon + dt * PARTY_SPIN)
+    return 0
+  }
   if (s.dragging) return 0
   s.idle += dt
   if (Math.abs(s.velocity) > 1) {

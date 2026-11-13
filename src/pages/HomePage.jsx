@@ -112,6 +112,7 @@ export default function HomePage() {
             <Suspense fallback={<div className="flight-globe-placeholder" aria-hidden="true" />}>
               <FlightGlobe
                 onScore={setGlobeScore}
+                uid={account?.uid ?? null}
                 onFind={onGlobeFind}
                 overlay={offerOpen && (
                   <NextFlightBoard

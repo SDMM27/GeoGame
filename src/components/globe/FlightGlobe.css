@@ -55,3 +55,37 @@
   color: var(--sd-muted);
   text-align: center;
 }
+
+.flight-globe-party {
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  z-index: 2;
+  width: min(80%, 22rem);
+  margin: 0;
+  padding: 0.8rem 1rem;
+  transform: translateX(-50%);
+  border-radius: var(--sd-radius-card);
+  border: 1px solid var(--sd-accent);
+  background: var(--sd-surface);
+  color: var(--sd-ink);
+  text-align: center;
+  font-size: 0.9rem;
+  box-shadow: var(--gg-shadow);
+  pointer-events: none;
+  animation: flight-globe-party 5s ease forwards;
+}
+
+.flight-globe-party strong { display: block; font-size: 1.1rem; }
+
+@keyframes flight-globe-party {
+  0% { opacity: 0; transform: translateX(-50%) scale(0.9); }
+  8% { opacity: 1; transform: translateX(-50%) scale(1); }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flight-globe-party { animation-name: flight-globe-party-still; }
+  @keyframes flight-globe-party-still { 0%, 80% { opacity: 1; } 100% { opacity: 0; } }
+}

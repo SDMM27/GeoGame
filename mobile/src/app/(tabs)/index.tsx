@@ -233,6 +233,7 @@ export default function HomeScreen() {
 
       <View style={styles.globe} onLayout={(event) => { globeBottom.value = event.nativeEvent.layout.y + event.nativeEvent.layout.height }}>
         <FlightGlobe
+          uid={account?.uid ?? null}
           visible={globeVisible}
           onFind={onGlobeFind}
           overlay={

@@ -27,4 +27,14 @@ describe('globe mini-game', () => {
     step(6)
     expect(onFound).toHaveBeenCalledWith(0, 0, false)
   })
+
+  it('applies a skin palette and celebrates without a canvas to draw on', () => {
+    const s = state()
+    const hooks = createGlobeScene(LAND, {})(s)
+    expect(() => {
+      hooks.setSkin({ id: 'x', palette: { ocean: '#000', oceanDeep: '#000', land: '#fff', landEdge: '#fff', graticule: '#fff', reticle: '#fff', reticleHalo: '#000' } })
+      hooks.celebrate()
+      hooks.setSkin(null)
+    }).not.toThrow()
+  })
 })

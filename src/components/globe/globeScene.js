@@ -4,6 +4,7 @@
 // player drags: no spin, no plane, no dash animation, but the game still works by hand.
 import { geoDistance, geoGraticule10, geoInterpolate, geoOrthographic, geoPath } from 'd3-geo'
 import { alpha, mono } from '@sdmm/design/js'
+import { discoRgb } from '../../utils/globeSkins'
 
 export const CITIES = [
   { code: 'TYO', key: 'tokyo', at: [139.7, 35.7] },
@@ -25,6 +26,17 @@ const FLIGHT_SECONDS = 9
 function arc(a, b) {
   const at = geoInterpolate(a, b)
   return Array.from({ length: 49 }, (_, i) => at(i / 48))
+}
+
+const PARTY_SECONDS = 4 // the easter egg's victory lap
+const PARTY_DEGREES_PER_SECOND = 180
+const CONFETTI = 60
+const CONFETTI_HUES = [48, 330, 190, 140, 20, 270]
+
+// Deterministic 0..1 noise from an index, so the confetti needs no state (same trick as a cheap shader hash)
+const noise = (i, salt) => {
+  const x = Math.sin(i * 127.1 + salt * 311.7) * 43758.5453
+  return x - Math.floor(x)
 }
 
 const FOUND_RADIANS = 0.06 // ~3.4°: the city is « in » the reticle
@@ -51,8 +63,12 @@ export function createGlobeScene(land, events) {
   let burst = 0
   let colors = {}
   let manualFind = false
+  let skin = null // a globeSkins entry with a palette, or null for the theme's own colors
+  let party = 0 // seconds left of the easter egg's celebration
+  let latest = null // the mountCanvas state, to recolor when the skin changes
 
   const readColors = (s) => {
+    latest = s
     colors = {
       ...s.colors,
       ocean: readVar('--gg-globe-ocean', '#1b2a4d'),
@@ -63,6 +79,11 @@ export function createGlobeScene(land, events) {
       plane: readVar('--gg-board-accent', '#f5c84b'),
       dark: document.documentElement.dataset.theme !== 'light',
     }
+    // The reticle is stroked over a wider halo in the ocean's color so it stays readable over the land too
+    colors.reticle = colors.ink
+    colors.reticleHalo = colors.oceanDeep
+    // A skin overrides the theme's globe colors, and keeps doing so when the theme changes
+    if (skin?.palette) Object.assign(colors, skin.palette)
   }
 
   const goal = () => CITIES[target].at
@@ -90,6 +111,11 @@ export function createGlobeScene(land, events) {
   const step = (s, dt) => {
     phaseTime += dt
     burst = Math.max(0, burst - dt * 1.3)
+    if (party > 0) {
+      party = Math.max(0, party - dt)
+      if (!drag) view.lon = wrap(view.lon + PARTY_DEGREES_PER_SECOND * dt)
+      return // the target cycling waits for the lap to end
+    }
     if (drag) return
     idle += dt
     if (Math.abs(velocity) > 1) {
@@ -138,7 +164,11 @@ export function createGlobeScene(land, events) {
     ctx.lineWidth = 1.2; ctx.strokeStyle = colors.line; ctx.stroke()
 
     ctx.beginPath(); path(graticule); ctx.lineWidth = 0.6; ctx.strokeStyle = colors.graticule; ctx.stroke()
-    ctx.beginPath(); path(land); ctx.fillStyle = colors.land; ctx.fill()
+    const disco = skin?.disco && !s.reduced
+    const [dr, dg, db] = disco ? discoRgb(s.time) : []
+    ctx.beginPath(); path(land)
+    ctx.fillStyle = disco ? `rgb(${Math.round(dr * 255)}, ${Math.round(dg * 255)}, ${Math.round(db * 255)})` : colors.land
+    ctx.fill()
     ctx.lineWidth = 0.7; ctx.strokeStyle = colors.landEdge; ctx.stroke()
 
     // Routes: dashes that run along the arcs
@@ -206,8 +236,12 @@ export function createGlobeScene(land, events) {
       ctx.moveTo(cx + dx * (ret + 6), cy + dy * (ret + 6))
       ctx.lineTo(cx + dx * (ret + 14), cy + dy * (ret + 14))
     }
+    ctx.lineJoin = 'round'
+    ctx.lineWidth = 4
+    ctx.strokeStyle = colors.reticleHalo
+    ctx.stroke()
     ctx.lineWidth = 1.6
-    ctx.strokeStyle = phase === 'found' ? colors.accent : alpha(colors.ink, 0.7)
+    ctx.strokeStyle = phase === 'found' ? colors.accent : colors.reticle
     ctx.stroke()
     if (burst > 0) {
       const b = 1 - burst
@@ -223,6 +257,29 @@ export function createGlobeScene(land, events) {
       }
       ctx.globalAlpha = 1
     }
+
+    // Confetti bursting from the center, then falling, for the easter egg
+    if (party > 0 && !s.reduced) {
+      const t = PARTY_SECONDS - party
+      const fade = Math.min(1, party / 1)
+      for (let i = 0; i < CONFETTI; i++) {
+        const angle = noise(i, 1) * Math.PI * 2
+        const speed = (0.25 + noise(i, 2) * 0.6) * r
+        const x = cx + Math.cos(angle) * speed * Math.min(t, 1.2)
+        const y = cy + Math.sin(angle) * speed * Math.min(t, 1.2) + 0.12 * r * t * t * 2
+        ctx.save()
+        ctx.translate(x, y)
+        ctx.rotate(t * (2 + noise(i, 3) * 6) + i)
+        ctx.globalAlpha = fade
+        ctx.fillStyle = `hsl(${CONFETTI_HUES[i % CONFETTI_HUES.length]} 95% 60%)`
+        if (i % 3 === 0) {
+          ctx.beginPath(); ctx.arc(0, 0, 3, 0, Math.PI * 2); ctx.fill()
+        } else {
+          ctx.fillRect(-4, -2, 8, 4)
+        }
+        ctx.restore()
+      }
+    }
   }
 
   return (s) => {
@@ -234,6 +291,14 @@ export function createGlobeScene(land, events) {
         draw(state)
       },
       theme: readColors,
+      setSkin(next) {
+        skin = next?.palette ? next : null
+        if (latest) readColors(latest)
+      },
+      // The easter egg's victory lap (no spin or confetti under reduced motion)
+      celebrate() {
+        if (!latest?.reduced) party = PARTY_SECONDS
+      },
       pointerdown(state, e) {
         drag = { x: e.clientX, y: e.clientY, lon: view.lon, lat: view.lat, t: performance.now(), lastX: e.clientX }
         velocity = 0

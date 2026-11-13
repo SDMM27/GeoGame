@@ -1431,7 +1431,13 @@
       "violet": "Violet",
       "crimson": "Karmozijn",
       "gilded": "Verguld"
-    }
+    },
+    "flag_section": "Vlag",
+    "flag_none": "Geen",
+    "flag_hint": "Draag een vlag uit je verzameling: hij wordt je profielfoto.",
+    "flag_empty": "Nog geen vlag ontgrendeld. Verdien fragmenten om je verzameling uit te breiden.",
+    "flag_search": "Zoek een vlag…",
+    "flag_alt": "Vlag: {{country}}"
   },
   "elo": {
     "tab": "Elo",

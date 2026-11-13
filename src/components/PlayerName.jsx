@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import ReportButton from './ReportButton'
 import { useDecoration } from '../hooks/useDecoration'
-import { decorationStyle } from '../utils/decorations'
+import { UNCROPPED_FLAGS, decorationStyle, flagImagePath } from '../utils/decorations'
 import './PlayerName.css'
 
 // Whether a leaderboard entry belongs to the signed-in account.
@@ -50,7 +50,7 @@ function QuickAdd({ account, entry }) {
 // entries that came with their id), the other players' entries get a discreet report button.
 export default function PlayerName({ entry, account, reportIn }) {
   const { t } = useTranslation()
-  const { frame, nameColor } = decorationStyle(useDecoration(entry.uid))
+  const { frame, nameColor, flag } = decorationStyle(useDecoration(entry.uid))
   return (
     <>
       {entry.uid ? (
@@ -60,12 +60,23 @@ export default function PlayerName({ entry, account, reportIn }) {
           style={nameColor ? { '--name-color': nameColor } : undefined}
           onClick={(event) => event.stopPropagation()}
         >
-          {frame && (
+          {(frame || flag) && (
             <span
-              className="player-name__ring"
-              style={{ borderColor: frame.color, borderStyle: frame.style === 'dashed' ? 'dashed' : 'solid' }}
+              className={`player-name__ring${flag ? ' player-name__ring--flag' : ''}${flag && !frame ? ' player-name__ring--plain' : ''}`}
+              style={frame ? { borderColor: frame.color, borderStyle: frame.style === 'dashed' ? 'dashed' : 'solid' } : undefined}
               aria-hidden="true"
-            />
+            >
+              {flag && (
+                <img
+                  src={flagImagePath(flag)}
+                  alt=""
+                  loading="lazy"
+                  draggable={false}
+                  className={UNCROPPED_FLAGS.has(flag) ? 'player-name__flag--whole' : undefined}
+                  onError={(event) => { event.currentTarget.style.display = 'none' }}
+                />
+              )}
+            </span>
           )}
           {entry.name}
         </Link>

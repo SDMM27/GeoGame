@@ -24,7 +24,7 @@ import { useAccount, type Account } from '@/account/auth'
 import { SITE_ORIGIN } from '@/links'
 import { BoardingPass, Kicker, ScreenTitle, Stamp } from '@/components/flight'
 import { BadgeStrip, useRoomBadges } from '@/components/profile/BadgeStrip'
-import { Avatar } from '@/components/profile/ProfileSections'
+import { UserAvatar } from '@/components/profile/ProfileSections'
 import { Button, Pill, Text, Touchable } from '@/components/ui'
 import { getGame } from '@/games'
 import { notifyInvite } from '@/multiplayer/invites'
@@ -132,7 +132,7 @@ function Players({ room }: { room: Room }) {
           const me = id === playerId
           return (
             <Animated.View key={id} entering={FadeIn.duration(250)} style={[styles.manifestRow, index > 0 && styles.manifestDivider]}>
-              <Avatar username={player.pseudo} size={32} />
+              <UserAvatar uid={id} username={player.pseudo} size={32} />
               <Text variant="bodyStrong" numberOfLines={1} color={me ? colors.accent : colors.text} style={{ flex: 1 }}>
                 {player.pseudo}
                 {me ? ` (${t('mobile.multi.you')})` : ''}
@@ -209,7 +209,7 @@ function InviteFriends({ room, account, color }: { room: Room; account: Account;
           const state = inRoom.has(friend.uid) ? 'joined' : invited[friend.uid]
           return (
             <View key={friend.id} style={styles.playerRow}>
-              <Avatar username={friend.username} size={32} />
+              <UserAvatar uid={friend.uid} username={friend.username} size={32} />
               <Text variant="body" numberOfLines={1} style={{ flex: 1 }}>
                 {friend.username}
               </Text>
@@ -237,7 +237,7 @@ function InviteFriends({ room, account, color }: { room: Room; account: Account;
             const status = known.get(uid)?.status
             return (
               <View key={uid} style={styles.playerRow}>
-                <Avatar username={pseudo} size={32} />
+                <UserAvatar uid={uid} username={pseudo} size={32} />
                 <Text variant="body" numberOfLines={1} style={{ flex: 1 }}>
                   {pseudo}
                 </Text>

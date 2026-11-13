@@ -176,14 +176,22 @@ service cloud.firestore {
         && level is int && decorationLevel(decoration.frame) <= level && decorationLevel(decoration.color) <= level;
     }
 
+    // users/{uid}.avatarFlag (src/utils/decorations.js): the flag shown as the profile picture, removed for none. Only a
+    // flag of the account's own collection (users/{uid}.flags.unlocked, written by the server only).
+    function validAvatarFlag(next, current) {
+      return !('avatarFlag' in next)
+        || (next.avatarFlag is string && next.avatarFlag in current.get('flags', {}).get('unlocked', []));
+    }
+
     // users/{uid}.xp (src/utils/missions.js), users/{uid}.flags (src/utils/flagCollection.js) and users/{uid}.scrolls
     // (src/utils/scrollCollection.js): XP, missions paid and the flag and scroll collections, written by the server only;
     // the hasOnly below keeps them out of any client update.
     match /users/{uid} {
       allow read: if true;
       allow update: if request.auth != null && request.auth.uid == uid
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['badges', 'challenges', 'decoration'])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['badges', 'challenges', 'decoration', 'avatarFlag'])
         && (!('decoration' in request.resource.data.diff(resource.data).affectedKeys()) || validDecoration(request.resource.data.decoration, playerLevel(resource.data)))
+        && (!('avatarFlag' in request.resource.data.diff(resource.data).affectedKeys()) || validAvatarFlag(request.resource.data, resource.data))
         && (!('badges' in request.resource.data.diff(resource.data).affectedKeys()) || validBadges(request.resource.data.badges))
         && (!('challenges' in request.resource.data.diff(resource.data).affectedKeys()) || validChallenges(request.resource.data.challenges));
       // Community directory (src/utils/community.js): users/{uid}.communityAt is the opt-in. Joining stamps the

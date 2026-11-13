@@ -1431,7 +1431,13 @@
       "violet": "Violeta",
       "crimson": "Carmesí",
       "gilded": "Dorado"
-    }
+    },
+    "flag_section": "Bandera",
+    "flag_none": "Ninguna",
+    "flag_hint": "Lleva una bandera de tu colección: se convertirá en tu foto de perfil.",
+    "flag_empty": "Aún no has desbloqueado ninguna bandera. Gana fragmentos para ampliar tu colección.",
+    "flag_search": "Buscar una bandera…",
+    "flag_alt": "Bandera: {{country}}"
   },
   "elo": {
     "tab": "Elo",

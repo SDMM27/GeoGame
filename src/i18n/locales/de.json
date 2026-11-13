@@ -1431,7 +1431,13 @@
       "violet": "Violett",
       "crimson": "Karminrot",
       "gilded": "Golden"
-    }
+    },
+    "flag_section": "Flagge",
+    "flag_none": "Keine",
+    "flag_hint": "Trage eine Flagge aus deiner Sammlung: sie wird dein Profilbild.",
+    "flag_empty": "Noch keine Flagge freigeschaltet. Sammle Fragmente, um deine Sammlung zu erweitern.",
+    "flag_search": "Flagge suchen…",
+    "flag_alt": "Flagge: {{country}}"
   },
   "elo": {
     "tab": "Elo",

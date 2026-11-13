@@ -1431,7 +1431,13 @@
       "violet": "Violet",
       "crimson": "Cramoisi",
       "gilded": "Doré"
-    }
+    },
+    "flag_section": "Drapeau",
+    "flag_none": "Aucun",
+    "flag_hint": "Équipe un drapeau de ta collection : il remplace ta photo de profil.",
+    "flag_empty": "Aucun drapeau débloqué pour l’instant. Gagne des fragments pour compléter ta collection.",
+    "flag_search": "Chercher un drapeau…",
+    "flag_alt": "Drapeau : {{country}}"
   },
   "elo": {
     "tab": "Elo",

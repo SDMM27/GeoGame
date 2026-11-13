@@ -1431,7 +1431,13 @@
       "violet": "Viola",
       "crimson": "Cremisi",
       "gilded": "Dorato"
-    }
+    },
+    "flag_section": "Bandiera",
+    "flag_none": "Nessuna",
+    "flag_hint": "Indossa una bandiera della tua collezione: diventerà la tua foto profilo.",
+    "flag_empty": "Nessuna bandiera sbloccata per ora. Guadagna frammenti per ampliare la tua collezione.",
+    "flag_search": "Cerca una bandiera…",
+    "flag_alt": "Bandiera: {{country}}"
   },
   "elo": {
     "tab": "Elo",

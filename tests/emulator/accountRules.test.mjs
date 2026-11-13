@@ -279,6 +279,31 @@ describe('profile decoration', () => {
   })
 })
 
+describe('avatar flag', () => {
+  const unlock = (flags) =>
+    env.withSecurityRulesDisabled((context) => context.firestore().doc('users/alice').update({ flags: { unlocked: flags, current: null, pieces: 0 } }))
+
+  it('lets an account wear a flag of its own collection, change it and take it off', async () => {
+    await unlock(['FR', 'JP'])
+    await assertSucceeds(as('alice').doc('users/alice').update({ avatarFlag: 'FR' }))
+    await assertSucceeds(as('alice').doc('users/alice').update({ avatarFlag: 'JP', decoration: { frame: 'gold', color: 'sky' } }))
+    await assertSucceeds(as('alice').doc('users/alice').update({ avatarFlag: firebase.firestore.FieldValue.delete() }))
+  })
+
+  it('refuses a flag not unlocked, a malformed one, and on someone else', async () => {
+    await assertFails(as('alice').doc('users/alice').update({ avatarFlag: 'FR' }))
+    await unlock(['FR'])
+    await assertFails(as('alice').doc('users/alice').update({ avatarFlag: 'BR' }))
+    await assertFails(as('alice').doc('users/alice').update({ avatarFlag: ['FR'] }))
+    await assertFails(as('alice').doc('users/alice').update({ avatarFlag: null }))
+    await assertFails(as('mallory').doc('users/alice').update({ avatarFlag: 'FR' }))
+  })
+
+  it('refuses unlocking a flag along with wearing it', async () => {
+    await assertFails(as('alice').doc('users/alice').update({ avatarFlag: 'BR', flags: { unlocked: ['BR'], current: null, pieces: 0 } }))
+  })
+})
+
 describe('XP', () => {
   it('refuses the player writing their own XP, alone or along with something they may write', async () => {
     const xp = { total: 999999, level: 99 }

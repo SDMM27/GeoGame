@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { friendErrorKey, sendFriendRequestTo } from '../../utils/friends'
 import BadgeStrip from './BadgeStrip'
-import { Avatar } from './ProfileBody'
+import { UserAvatar } from './ProfileBody'
 import './FriendsPanel.css'
 import RankBadge from '../RankBadge'
 
@@ -47,7 +47,7 @@ export default function FriendCandidates({ players, account, friendships, onMess
         <li key={player.uid} className="friends-row">
           {player.rank != null && <span className="friends-rank"><RankBadge rank={player.rank} plain /></span>}
           <Link to={`/player/${player.uid}`} className="friends-who">
-            <Avatar username={player.name} size={36} />
+            <UserAvatar uid={player.uid} username={player.name} size={36} />
             <span>{player.name}</span>
           </Link>
           {player.badges && <BadgeStrip badges={player.badges} />}

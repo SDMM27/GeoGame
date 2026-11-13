@@ -31,6 +31,11 @@
   font-weight: 800;
 }
 
+/* Flag as profile picture: clipped to the circle, inside the frame ring (the ring is the border + padding) */
+.profile-avatar--flag { overflow: hidden; }
+.profile-avatar__flag { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; object-position: center; }
+.profile-avatar__flag--whole { object-fit: contain; background: var(--sd-surface-2, #fff); }
+
 .profile-card {
   background: var(--sd-surface);
   border: 1px solid var(--gg-tint-strong);

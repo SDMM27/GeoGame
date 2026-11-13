@@ -1431,7 +1431,13 @@
       "violet": "Violet",
       "crimson": "Crimson",
       "gilded": "Gilded"
-    }
+    },
+    "flag_section": "Flag",
+    "flag_none": "None",
+    "flag_hint": "Wear a flag from your collection: it becomes your profile picture.",
+    "flag_empty": "No flag unlocked yet. Earn fragments to grow your collection.",
+    "flag_search": "Search a flag…",
+    "flag_alt": "Flag: {{country}}"
   },
   "elo": {
     "tab": "Elo",

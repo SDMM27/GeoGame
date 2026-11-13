@@ -37,7 +37,8 @@ export default defineConfig(async ({ mode }) => {
       setupFiles: ['./src/setupTests.js'],
       globals: true,
       // tests/emulator needs the Firebase emulators: npm run test:emulator
-      exclude: ['**/node_modules/**', '**/.worktrees/**', 'mobile/**', ...(process.env.FIRESTORE_EMULATOR_HOST ? [] : ['tests/emulator/**'])],
+      // Other checkouts (git worktrees under .worktrees and .claude/worktrees) are not this project's tests
+      exclude: ['**/node_modules/**', '**/.worktrees/**', '**/.claude/**', 'mobile/**', ...(process.env.FIRESTORE_EMULATOR_HOST ? [] : ['tests/emulator/**'])],
     },
   }
 })

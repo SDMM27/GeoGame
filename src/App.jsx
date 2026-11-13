@@ -5,6 +5,7 @@ import HomePage from "./pages/HomePage";
 import RouteFallback from "./components/RouteFallback";
 import RouteMeta from "./components/RouteMeta";
 import XpToast from "./components/XpToast";
+import TestModeBadge from "./components/TestModeBadge";
 import FragmentToast from "./components/collection/FragmentToast";
 import FlagUnlockOverlay from "./components/collection/FlagUnlockOverlay";
 import SealToast from "./components/collection/SealToast";
@@ -56,6 +57,7 @@ export default function App() {
         <FlagUnlockOverlay />
         <ScrollUnlockOverlay />
         <PresenceHeartbeat />
+        {/* global __PREVIEW_TOOLS__ */ __PREVIEW_TOOLS__ && <TestModeBadge />}
         <RouteErrorBoundary>
           <Suspense fallback={<RouteFallback />}>
             <Routes>

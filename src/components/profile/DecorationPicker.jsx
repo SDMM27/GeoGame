@@ -8,7 +8,8 @@ import { DEFAULT_DECORATION, FRAMES, NAME_COLORS, UNCROPPED_FLAGS, decorationSty
 import { FLAG_POOL } from '../../utils/flagCollectionData'
 import { readFlags } from '../../utils/flagCollection'
 import { getCountryName } from '../../utils/getCountryName'
-import { fetchPublicData } from '../../utils/publicProfile'
+import { fetchPublicData, patchPublicData } from '../../utils/publicProfile'
+import { isTestMode } from '../../utils/testMode'
 import { Avatar } from './ProfileBody'
 import './DecorationPicker.css'
 
@@ -51,6 +52,9 @@ function PickerDialog({ account, onClose }) {
   const [saving, setSaving] = useState(false)
   const [failed, setFailed] = useState(false)
   const [unlocked, setUnlocked] = useState(null)
+  const [rawFlags, setRawFlags] = useState(null)
+  // The preview's test mode lists every flag; the ones not really unlocked are only tried on locally
+  const testMode = isTestMode()
   const [query, setQuery] = useState('')
   const current = choice ?? saved ?? DEFAULT_DECORATION
 
@@ -63,7 +67,11 @@ function PickerDialog({ account, onClose }) {
   // The flags of the player's collection (the same source as the profile's collection section).
   useEffect(() => {
     let cancelled = false
-    fetchPublicData(account.uid).then((data) => !cancelled && setUnlocked(readFlags(data, FLAG_POOL).unlocked))
+    fetchPublicData(account.uid).then((data) => {
+      if (cancelled) return
+      setRawFlags(data?.flags ?? null)
+      setUnlocked(readFlags(data, FLAG_POOL).unlocked)
+    })
     return () => {
       cancelled = true
     }
@@ -71,8 +79,9 @@ function PickerDialog({ account, onClose }) {
 
   const flags = useMemo(() => {
     const collator = (a, b) => a.name.localeCompare(b.name, language)
-    return (unlocked ?? []).map((iso) => ({ iso, name: getCountryName(iso, language) ?? iso })).sort(collator)
-  }, [unlocked, language])
+    const isos = testMode && unlocked ? FLAG_POOL.map((flag) => flag.iso) : unlocked ?? []
+    return isos.map((iso) => ({ iso, name: getCountryName(iso, language) ?? iso })).sort(collator)
+  }, [unlocked, language, testMode])
   const needle = query.trim().toLowerCase()
   const shownFlags = needle ? flags.filter((flag) => flag.name.toLowerCase().includes(needle)) : flags
 
@@ -101,6 +110,12 @@ function PickerDialog({ account, onClose }) {
     setFailed(false)
     setSaving(true)
     try {
+      if (testMode && iso !== null && !(unlocked ?? []).includes(iso)) {
+        // Test mode, a flag not in the collection: shown on this device only (firestore.rules would refuse it)
+        const flags = { unlocked: [], current: null, pieces: 0, ...rawFlags }
+        patchPublicData(account.uid, { avatarFlag: iso, flags: { ...flags, unlocked: [...(unlocked ?? []), iso] } })
+        return
+      }
       await saveAvatarFlag(account.uid, iso, unlocked ?? [])
     } catch (error) {
       console.warn('[decorations]', error?.code, error)

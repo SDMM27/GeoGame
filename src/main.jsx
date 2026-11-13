@@ -16,6 +16,9 @@ import './index.css'
 import { i18nReady } from './i18n/index.js'
 import App from './App'
 import { redirectIphoneToApp } from './utils/appLinks'
+import { initTestMode } from './utils/testMode'
+
+initTestMode()
 
 // Rendered once the player's language is loaded (only languages other than French and English take a request).
 // A failed load still renders: missing strings fall back to English.

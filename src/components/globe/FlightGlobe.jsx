@@ -8,6 +8,7 @@ import { useXp } from '../../hooks/useXp'
 import {
   EASTER_EGG_SCORE, SECRET_SKIN, activeSkin, loadSecretFound, loadSkinChoice, reachesEasterEgg, saveSecretFound, saveSkinChoice,
 } from '../../utils/globeSkins'
+import { isTestMode } from '../../utils/testMode'
 import GlobeSkinPicker from './GlobeSkinPicker'
 import './FlightGlobe.css'
 
@@ -19,9 +20,13 @@ export default function FlightGlobe({ onScore, onFind, overlay = null, uid = nul
   const [found, setFound] = useState(false)
   const [touched, setTouched] = useState(false)
   const [cities, setCities] = useState(null)
-  const level = useXp(uid)?.level ?? 0
+  const xpLevel = useXp(uid)?.level ?? 0
+  // The preview's test mode unlocks every skin, the secret one included
+  const testMode = isTestMode()
+  const level = testMode ? 99 : xpLevel
   const [choice, setChoice] = useState(loadSkinChoice)
-  const [secret, setSecret] = useState(loadSecretFound)
+  const [foundSecret, setSecret] = useState(loadSecretFound)
+  const secret = testMode || foundSecret
   const [party, setParty] = useState(0) // bumped on each celebration: restarts the banner
   const skin = activeSkin(choice, { level, secret })
   const skinRef = useRef(skin)

@@ -9,12 +9,13 @@ import { Modal, Pressable, ScrollView, TextInput, View } from 'react-native'
 import { useDecoration } from '@shared/hooks/useDecoration'
 import { useXp } from '@shared/hooks/useXp'
 import { DEFAULT_DECORATION, decorationStyle, FRAMES, isUnlocked, NAME_COLORS, saveAvatarFlag, saveDecoration } from '@shared/utils/decorations'
-import { fetchCollection } from '@shared/utils/flagCollectionData'
+import { FLAG_POOL, readFlags } from '@shared/utils/flagCollectionData'
 import { getCountryName } from '@shared/utils/getCountryName'
-import { onPublicDataPatched } from '@shared/utils/publicProfile'
+import { fetchPublicData, onPublicDataPatched, patchPublicData } from '@shared/utils/publicProfile'
 
 import { Kicker, ScreenTitle } from '@/components/flight'
 import { Button, Text, Touchable } from '@/components/ui'
+import { useTestMode } from '@/testMode'
 import { makeStyles, radius, space, useColors } from '@/theme'
 import { Avatar, FlagDisc, type Decoration } from './ProfileSections'
 
@@ -24,14 +25,16 @@ type Item = { id: string; unlock?: { kind: string; level?: number } }
 const FLAGS_SHOWN = 36
 const SEARCH_FROM = 12
 
-// The flags of the player's collection, sorted by name in `lang`; empty until loaded.
-function useUnlockedFlags(uid: string, lang: string): string[] {
-  const [unlocked, setUnlocked] = useState<string[]>([])
+// The flags of the player's collection (and the raw `flags` of their document), loaded once and again after a patch.
+function useCollectionFlags(uid: string) {
+  const [state, setState] = useState<{ unlocked: string[]; raw: Record<string, unknown> | null }>({ unlocked: [], raw: null })
   useEffect(() => {
     let cancelled = false
     const load = () =>
-      fetchCollection(uid)
-        .then((collection: { flags: { unlocked: string[] } }) => !cancelled && setUnlocked(collection.flags.unlocked))
+      fetchPublicData(uid)
+        .then((data: { flags?: Record<string, unknown> } | null) => {
+          if (!cancelled) setState({ unlocked: readFlags(data, FLAG_POOL).unlocked, raw: data?.flags ?? null })
+        })
         .catch((error: unknown) => console.warn('[decoration]', error))
     load()
     const stop = onPublicDataPatched((patched: string) => patched === uid && load())
@@ -40,10 +43,16 @@ function useUnlockedFlags(uid: string, lang: string): string[] {
       stop()
     }
   }, [uid])
+  return state
+}
+
+// The flags to list, sorted by name in `lang`: the collection's, or in test mode every flag; empty until loaded (outside test mode).
+function useListedFlags(unlocked: string[], testMode: boolean, lang: string): string[] {
   return useMemo(() => {
     const name = (iso: string) => (getCountryName(iso, lang) as string) || iso
-    return [...unlocked].sort((a, b) => name(a).localeCompare(name(b), lang))
-  }, [unlocked, lang])
+    const isos = testMode ? (FLAG_POOL as { iso: string }[]).map((flag) => flag.iso) : unlocked
+    return [...isos].sort((a, b) => name(a).localeCompare(name(b), lang))
+  }, [unlocked, testMode, lang])
 }
 
 // Lower case without accents, so "ecosse" finds "Écosse"
@@ -53,7 +62,9 @@ export function DecorationPicker({ uid, username }: { uid: string; username: str
   const { t, i18n } = useTranslation()
   const styles = useStyles()
   const colors = useColors()
-  const flags = useUnlockedFlags(uid, i18n.language)
+  const testMode = useTestMode()
+  const { unlocked, raw } = useCollectionFlags(uid)
+  const flags = useListedFlags(unlocked, testMode, i18n.language)
   const [search, setSearch] = useState('')
   const [showAll, setShowAll] = useState(false)
   const level: number = useXp(uid)?.level ?? 1
@@ -83,7 +94,12 @@ export function DecorationPicker({ uid, username }: { uid: string; username: str
     setPending({ ...current, flag: iso })
     setFailed(false)
     try {
-      await saveAvatarFlag(uid, iso, flags)
+      if (testMode && iso !== null && !unlocked.includes(iso)) {
+        // Test mode, a flag not in the collection: shown on this device only (firestore.rules would refuse it)
+        patchPublicData(uid, { avatarFlag: iso, flags: { current: null, pieces: 0, ...raw, unlocked: [...unlocked, iso] } })
+        return
+      }
+      await saveAvatarFlag(uid, iso, unlocked)
     } catch (error) {
       console.warn('[decoration]', error)
       setFailed(true)

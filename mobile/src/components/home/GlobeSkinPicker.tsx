@@ -3,12 +3,14 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import * as Haptics from 'expo-haptics'
 import { Modal, Pressable, ScrollView, View } from 'react-native'
 
 import { isSkinUnlocked, visibleSkins } from '@shared/utils/globeSkins'
 
 import { ScreenTitle } from '@/components/flight'
 import { Button, Text, Touchable } from '@/components/ui'
+import { isTestMode, setTestMode, testModeAvailable } from '@/testMode'
 import { makeStyles, radius, space, useColors } from '@/theme'
 
 type Skin = { id: string; unlock: { kind: string; level?: number }; swatch: [string, string] | null }
@@ -31,10 +33,19 @@ export function GlobeSkinPicker({
   const colors = useColors()
   const [open, setOpen] = useState(false)
   const progress = { level, secret }
+  // Test mode (non-production builds only): a long press on the button turns it on or off
+  const toggleTestMode = () => {
+    setTestMode(!isTestMode())
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {})
+  }
 
   return (
     <>
-      <Pressable accessibilityRole="button" accessibilityLabel={t('globe.skins_open')} onPress={() => setOpen(true)} hitSlop={6} style={styles.button}>
+      <Pressable accessibilityRole="button" accessibilityLabel={t('globe.skins_open')} onPress={() => setOpen(true)}
+        onLongPress={testModeAvailable ? toggleTestMode : undefined}
+        delayLongPress={800}
+        hitSlop={6}
+        style={styles.button}>
         <MaterialCommunityIcons name="palette" size={20} color={colors.text} />
       </Pressable>
       <Modal transparent visible={open} animationType="fade" onRequestClose={() => setOpen(false)}>

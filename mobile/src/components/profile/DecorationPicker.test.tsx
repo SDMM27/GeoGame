@@ -2,7 +2,8 @@ import { Text, TextInput } from 'react-native'
 import { act, create } from 'react-test-renderer'
 
 import { saveAvatarFlag, saveDecoration } from '@shared/utils/decorations'
-import { fetchCollection } from '@shared/utils/flagCollectionData'
+import { fetchPublicData, patchPublicData } from '@shared/utils/publicProfile'
+import { useTestMode } from '@/testMode'
 
 import { Touchable } from '@/components/ui'
 
@@ -20,8 +21,12 @@ jest.mock('@shared/utils/decorations', () => {
     saveDecoration: jest.fn(() => Promise.resolve()),
   }
 })
-jest.mock('@shared/utils/flagCollectionData', () => ({ fetchCollection: jest.fn() }))
-jest.mock('@shared/utils/publicProfile', () => ({ onPublicDataPatched: () => () => {} }))
+jest.mock('@shared/utils/flagCollectionData', () => ({
+  FLAG_POOL: Array.from({ length: 100 }, (_, i) => ({ iso: `f${String(i).padStart(2, '0')}` })),
+  readFlags: (data: { flags?: { unlocked?: string[] } } | null) => ({ unlocked: data?.flags?.unlocked ?? [] }),
+}))
+jest.mock('@shared/utils/publicProfile', () => ({ fetchPublicData: jest.fn(), patchPublicData: jest.fn(), onPublicDataPatched: () => () => {} }))
+jest.mock('@/testMode', () => ({ useTestMode: jest.fn(() => false) }))
 jest.mock('@shared/utils/getCountryName', () => ({ getCountryName: (iso: string) => iso.toUpperCase() }))
 jest.mock('@shared/hooks/useXp', () => ({ useXp: () => ({ level: 1 }) }))
 jest.mock('@shared/hooks/useDecoration', () => ({ useDecoration: () => ({ frame: 'none', color: 'default', flag: 'f01' }) }))
@@ -39,7 +44,7 @@ jest.mock('react-i18next', () => ({
 }))
 
 async function open(count: number) {
-  ;(fetchCollection as jest.Mock).mockResolvedValue({ flags: { unlocked: mockUnlocked(count) } })
+  ;(fetchPublicData as jest.Mock).mockResolvedValue({ flags: { unlocked: mockUnlocked(count), pieces: 2 } })
   let tree!: ReturnType<typeof create>
   await act(async () => {
     tree = create(<DecorationPicker uid="u1" username="alice" />)
@@ -53,7 +58,10 @@ const options = (tree: ReturnType<typeof create>) => tree.root.findAll((node) =>
 const searchBox = (tree: ReturnType<typeof create>) => tree.root.findAll((node) => node.type === TextInput)
 const text = (tree: ReturnType<typeof create>) => JSON.stringify(tree.root.findAllByType(Text).map((node) => node.props.children))
 
-beforeEach(() => jest.clearAllMocks())
+beforeEach(() => {
+  jest.clearAllMocks()
+  ;(useTestMode as jest.Mock).mockReturnValue(false)
+})
 
 describe('DecorationPicker flags', () => {
   it('says so when no flag is unlocked', async () => {
@@ -107,5 +115,49 @@ describe('DecorationPicker flags', () => {
       options(tree)[0].props.onPress()
     })
     expect(text(tree)).toContain('decorations.error')
+  })
+
+  describe('test mode', () => {
+    beforeEach(() => (useTestMode as jest.Mock).mockReturnValue(true))
+
+    it('lists every flag of the pool', async () => {
+      const tree = await open(5)
+      await act(async () => {
+        tree.root.findAllByProps({ accessibilityLabel: 'collection.show_all' })[0]?.props.onPress?.()
+      })
+      expect(searchBox(tree)).toHaveLength(1)
+      expect(options(tree)).toHaveLength(36)
+      await act(async () => {
+        searchBox(tree)[0].props.onChangeText('f99')
+      })
+      expect(options(tree).map((node) => node.props.testID)).toEqual(['flag-option-f99'])
+    })
+
+    it('tries a locked flag on this device only', async () => {
+      const tree = await open(5)
+      await act(async () => {
+        searchBox(tree)[0].props.onChangeText('f99')
+      })
+      await act(async () => {
+        options(tree)[0].props.onPress()
+      })
+      expect(saveAvatarFlag).not.toHaveBeenCalled()
+      expect(patchPublicData).toHaveBeenCalledWith('u1', {
+        avatarFlag: 'f99',
+        flags: { current: null, pieces: 2, unlocked: [...mockUnlocked(5), 'f99'] },
+      })
+    })
+
+    it('still saves a really unlocked flag', async () => {
+      const tree = await open(5)
+      await act(async () => {
+        searchBox(tree)[0].props.onChangeText('f02')
+      })
+      await act(async () => {
+        options(tree)[0].props.onPress()
+      })
+      expect(saveAvatarFlag).toHaveBeenCalledWith('u1', 'f02', mockUnlocked(5))
+      expect(patchPublicData).not.toHaveBeenCalled()
+    })
   })
 })

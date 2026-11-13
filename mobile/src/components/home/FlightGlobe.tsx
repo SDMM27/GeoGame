@@ -43,6 +43,7 @@ import {
   saveSkinChoice,
 } from '@shared/utils/globeSkins'
 
+import { useTestMode } from '@/testMode'
 import { fonts, makeStyles, radius, space, useTheme } from '@/theme'
 
 import { CITY_VECTORS, FLIGHT_PATH, GRATICULE, LAND, ROUTES_ACCENT, ROUTES_ACCENT2 } from './globeGeometry'
@@ -165,9 +166,13 @@ export function FlightGlobe({
   const { t } = useTranslation()
   const { colors, scheme } = useTheme()
   const styles = useStyles()
-  const level: number = useXp(uid)?.level ?? 0
+  const testMode = useTestMode()
+  const realLevel: number = useXp(uid)?.level ?? 0
   const [choice, setChoice] = useState<string>(() => loadSkinChoice())
-  const [secret, setSecret] = useState<boolean>(() => loadSecretFound())
+  const [foundSecret, setSecret] = useState<boolean>(() => loadSecretFound())
+  // Test mode: every skin unlocked, the disco one included
+  const level = testMode ? 99 : realLevel
+  const secret = testMode || foundSecret
   const skin = activeSkin(choice, { level, secret }) as { id: string; palette: Record<string, string> | null }
   const disco = skin.id === SECRET_SKIN
   // Classic keeps the theme's colors; the other skins bring their own (the reticle and the city codes sit on a halo)

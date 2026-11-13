@@ -33,13 +33,16 @@ import { ScrollUnlockOverlay } from '@/components/collection/ScrollUnlockOverlay
 import { SealToast } from '@/components/collection/SealToast'
 import { ConfirmHost } from '@/components/ConfirmHost'
 import { ToastHost } from '@/components/ToastHost'
+import { TestModeBadge } from '@/components/TestModeBadge'
 import { UpdateBanner } from '@/components/UpdateBanner'
 import { WhatsNew } from '@/components/WhatsNew'
 import { XpToasts } from '@/components/XpToasts'
+import { initTestMode } from '@/testMode'
 import { AppThemeProvider, useTheme, type Theme } from '@/theme'
 import { useLaunchUpdate } from '@/updates'
 
 SplashScreen.preventAutoHideAsync()
+initTestMode()
 
 // The manifest leaves orientation free (Google Play flags locked games on large screens, and Android 16 ignores the lock
 // there anyway): phones stay in portrait, tablets and foldables rotate.
@@ -163,6 +166,7 @@ function RootNavigator() {
         {/* The flag overlay first: a claim that unlocks both plays the flags, then the scrolls */}
         <FlagUnlockOverlay />
         <ScrollUnlockOverlay />
+        <TestModeBadge />
       </ThemeProvider>
     </GestureHandlerRootView>
   )

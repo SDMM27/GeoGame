@@ -17,6 +17,14 @@
       ]
     },
     {
+      "source": "/((?!_expo/|assets/)[^.]*)",
+      "headers": [{ "key": "Cache-Control", "value": "no-store, max-age=0" }]
+    },
+    {
+      "source": "/(index\\.html|sw\\.js|manifest\\.json)",
+      "headers": [{ "key": "Cache-Control", "value": "no-store, max-age=0" }]
+    },
+    {
       "source": "/_expo/static/(.*)",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
     },

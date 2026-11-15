@@ -13,6 +13,9 @@ const TIERS = ['Facile', 'Moyen', 'Difficile', 'Impossible', 'Hardcore']
 export const RECORD_XP = { Facile: 15, Moyen: 25, Difficile: 40, Impossible: 50, Hardcore: 60, continent: 25 }
 export const PERFECT_XP = { Facile: 75, Moyen: 125, Difficile: 200, Impossible: 250, Hardcore: 400, continent: 150 }
 export const PERFECT_FRAGMENTS = { Facile: 1, Moyen: 2, Difficile: 3, Impossible: 4, Hardcore: 6, continent: 2 }
+// Records paid a day, all cells together: the scores are written by the client (bounded by the rules), so a forged
+// +1 point every day on every cell must not outweigh what the games pay. The perfect scores are paid once ever.
+export const RECORDS_PER_DAY = 3
 
 // { game, mode } of a key; MISSING_FLAG holds an underscore, so the game is found in RECORD_GAMES.
 export function splitKey(key) {
@@ -93,7 +96,7 @@ export function grantRecords(state, bests, day) {
     if (isPerfect && !perfect.includes(key)) {
       pay('perfect', key, score, previous)
       perfect.push(key)
-    } else if (previous != null && !perfect.includes(key) && !dayPaid.includes(key)) {
+    } else if (previous != null && !perfect.includes(key) && !dayPaid.includes(key) && dayPaid.length < RECORDS_PER_DAY) {
       // A perfect cell pays nothing more: a score above it only comes from a scoring change or a forged one
       pay('record', key, score, previous)
       dayPaid.push(key)

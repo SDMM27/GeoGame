@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { PERFECT_SCORES } from './perfectScores'
-import { PERFECT_XP, PERFECT_FRAGMENTS, RECORD_XP, bestScoresOf, grantRecords, readRecords, rewardText, splitKey, tierOf } from './recordRewards'
+import { PERFECT_XP, PERFECT_FRAGMENTS, RECORD_XP, RECORDS_PER_DAY,bestScoresOf, grantRecords, readRecords, rewardText, splitKey, tierOf } from './recordRewards'
 
 const DAY = '2026-10-19'
 const seededState = (best = {}, extra = {}) => readRecords({ records: { best, perfect: [], day: DAY, dayPaid: [], ...extra } }, DAY)
@@ -67,6 +67,15 @@ describe('grantRecords', () => {
     expect(second.changed).toBe(true)
     const nextDay = grantRecords(readRecords({ records: second.state }, '2026-10-20'), { PLACEMENT_Moyen: 26 }, '2026-10-20')
     expect(nextDay.gained).toBe(RECORD_XP.Moyen)
+  })
+
+  it('pays at most RECORDS_PER_DAY records a day, all cells together', () => {
+    const keys = ['PLACEMENT_Moyen', 'FLAGS_Moyen', 'CAPITALS_Moyen', 'HARDCORE_Moyen', 'MISSING_FLAG_Moyen']
+    const before = Object.fromEntries(keys.map((key) => [key, 10]))
+    const after = Object.fromEntries(keys.map((key) => [key, 20]))
+    const grant = grantRecords(seededState(before), after, DAY)
+    expect(grant.rewards).toHaveLength(RECORDS_PER_DAY)
+    expect(grant.state.best).toEqual(after)
   })
 
   it('pays the perfect score once ever, and not together with a record', () => {

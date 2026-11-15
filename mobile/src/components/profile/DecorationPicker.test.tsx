@@ -21,9 +21,9 @@ jest.mock('@shared/utils/decorations', () => {
     saveDecoration: jest.fn(() => Promise.resolve()),
   }
 })
+// Only the pool is mocked: the real readFlags runs, imported from the module that exports it
 jest.mock('@shared/utils/flagCollectionData', () => ({
-  FLAG_POOL: Array.from({ length: 100 }, (_, i) => ({ iso: `f${String(i).padStart(2, '0')}` })),
-  readFlags: (data: { flags?: { unlocked?: string[] } } | null) => ({ unlocked: data?.flags?.unlocked ?? [] }),
+  FLAG_POOL: Array.from({ length: 100 }, (_, i) => ({ iso: `f${String(i).padStart(2, '0')}`, rarity: 'common' })),
 }))
 jest.mock('@shared/utils/publicProfile', () => ({ fetchPublicData: jest.fn(), patchPublicData: jest.fn(), onPublicDataPatched: () => () => {} }))
 jest.mock('@/testMode', () => ({ useTestMode: jest.fn(() => false) }))

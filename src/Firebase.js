@@ -15,6 +15,8 @@ const firebaseConfig = {
   measurementId: "G-969YD8D38B"
 };
 
+// Also names the key of the session the Expo app's JS SDK used to store (account/migrateSession).
+export const FIREBASE_API_KEY = firebaseConfig.apiKey;
 export const app = initializeApp(firebaseConfig);
 // App Check goes before any other service, so that Firestore and Auth pick its token up (no-op without a site key).
 // VITE_USE_EMULATORS=1 (website dev server only) talks to the local Firebase emulators (npm run emulators) instead of production.

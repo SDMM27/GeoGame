@@ -1,19 +1,15 @@
-// App Auth instance: the session survives restarts thanks to expo-sqlite's key-value store.
-import * as firebaseAuth from 'firebase/auth'
-import { connectAuthEmulator, initializeAuth, type Persistence } from 'firebase/auth'
-import Storage from 'expo-sqlite/kv-store'
+// App Auth instance: React Native Firebase (native SDK), which restores the session itself, without a network round trip.
+// The web build has its own (auth.web.ts).
+import { connectAuthEmulator, getAuth } from 'firebase/auth'
 
 import { app } from '@shared/Firebase'
 import { useAccountState } from '@shared/hooks/useAccount'
 
 import { EMULATOR_HOST } from '@/emulators'
 
-// Exported by Firebase's React Native build, but missing from the typings (they're the browser ones).
-const { getReactNativePersistence } = firebaseAuth as typeof firebaseAuth & {
-  getReactNativePersistence: (storage: typeof Storage) => Persistence
-}
+import { migrateLegacySession } from './migrateSession'
 
-export const auth = initializeAuth(app, { persistence: getReactNativePersistence(Storage) })
+export const auth = getAuth(app)
 if (EMULATOR_HOST) connectAuthEmulator(auth, `http://${EMULATOR_HOST}:9099`, { disableWarnings: true })
 
 export type Account = {
@@ -26,4 +22,5 @@ export type Account = {
   createdAt: number | null
 }
 
-export const useAccount = (): { loading: boolean; account: Account | null } => useAccountState(auth)
+// The first account is reported once a session left by the JS SDK has been carried over (no signed-out flash).
+export const useAccount = (): { loading: boolean; account: Account | null } => useAccountState(auth, migrateLegacySession(auth))

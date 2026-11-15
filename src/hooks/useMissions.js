@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { fetchGames } from '../utils/gameHistory'
+import { cachedGamesSync, fetchGames } from '../utils/gameHistory'
 import { BONUS_ID, missionsAt, nextStreakReward, streakNow } from '../utils/missions'
 import { serverNow } from '../utils/serverTime'
 import { claimXp, onXpClaimed } from '../utils/xp'
@@ -7,6 +7,12 @@ import { useXp } from './useXp'
 
 // Most games a week can hold that matter here (the week's games are the most recent ones).
 const RECENT_GAMES = 300
+
+// The progress from the games kept on this device (shown until the network load replaces it), or null.
+function cachedProgress(uid) {
+  const games = cachedGamesSync(uid)
+  return games ? missionsAt(games, serverNow()) : null
+}
 
 /**
  * The signed-in player's missions of today and this week, with their progress, plus their XP:
@@ -19,7 +25,7 @@ const RECENT_GAMES = 300
  */
 export function useMissions(uid) {
   const xp = useXp(uid)
-  const [progress, setProgress] = useState(null)
+  const [progress, setProgress] = useState(() => cachedProgress(uid))
 
   const load = useCallback(async () => {
     if (!uid) return
@@ -31,7 +37,7 @@ export function useMissions(uid) {
   }, [uid])
 
   useEffect(() => {
-    setProgress(null)
+    setProgress(cachedProgress(uid))
     if (!uid) return undefined
     load()
     claimXp(uid)

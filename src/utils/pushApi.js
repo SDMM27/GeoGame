@@ -12,7 +12,10 @@ export function setPushApiOrigin(origin) {
 // Calls the endpoint as the signed-in player. Returns { status, body }, or null when signed out or offline.
 export async function callPush(path, body) {
   try {
-    const idToken = await getAuth(app).currentUser?.getIdToken()
+    const auth = getAuth(app)
+    // The account can show before Firebase restored the session: wait for it instead of finding nobody.
+    await auth.authStateReady?.()
+    const idToken = await auth.currentUser?.getIdToken()
     if (!idToken) return null
     const response = await fetch(`${apiOrigin}/api/${path}`, {
       method: 'POST',

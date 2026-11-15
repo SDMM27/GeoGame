@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { onXpClaimed } from '../utils/xp'
+import { rewardText } from '../utils/recordRewards'
 import { useAccount } from '../auth'
 import { flagsAfter, rewardLines } from './collection/claim'
 import './XpToast.css'
@@ -18,11 +19,11 @@ export default function XpToast() {
   useEffect(
     () =>
       onXpClaimed((claim) => {
-        const { gained, levelUp, level, fragments = 0, unlockedFlags = [] } = claim
+        const { gained, levelUp, level, fragments = 0, unlockedFlags = [], records = [] } = claim
         // Fragments get a card of their own (FragmentToast) when the current flag is known
         const text = fragments > 0 && unlockedFlags.length === 0 && !flagsAfter(claim, uid)?.current ? fragments : 0
-        if (!(gained > 0) && !levelUp && !(text > 0)) return
-        setToast({ id: Date.now(), gained, levelUp, level, fragments: text, lines: text > 0 ? rewardLines(t, claim) : [] })
+        if (!(gained > 0) && !levelUp && !(text > 0) && records.length === 0) return
+        setToast({ id: Date.now(), gained, levelUp, level, fragments: text, lines: text > 0 ? rewardLines(t, claim) : [], records: records.map((reward) => rewardText(t, reward)) })
       }),
     [uid, t]
   )
@@ -40,6 +41,9 @@ export default function XpToast() {
       {toast.levelUp && <span>{t('level.up', { level: toast.level })}</span>}
       {toast.fragments > 0 && <span>{t('level.fragments', { count: toast.fragments })}</span>}
       {toast.lines.map((line) => (
+        <span key={line}>{line}</span>
+      ))}
+      {toast.records.map((line) => (
         <span key={line}>{line}</span>
       ))}
     </div>

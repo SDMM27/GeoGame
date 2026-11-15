@@ -37,4 +37,17 @@ describe('XpToasts', () => {
     mockListener?.({ gained: 0, levelUp: false, level: 1, fragments: 2, unlockedFlags: ['fr'] })
     expect(mockToast.success).not.toHaveBeenCalled()
   })
+
+  it('announces each record reward', () => {
+    mockListener?.({
+      gained: 15,
+      levelUp: false,
+      level: 1,
+      records: [{ kind: 'record', game: 'FLAGS', mode: 'Facile', xp: 15, fragments: 0 }],
+    })
+    expect(mockToast.success.mock.calls.map(([text]) => text)).toEqual([
+      'level.gained {"xp":15}',
+      'records.reward_record {"game":"games.flags.title","mode":"difficulties.Facile","xp":15}',
+    ])
+  })
 })

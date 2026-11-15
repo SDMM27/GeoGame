@@ -1552,6 +1552,11 @@
     "reward_dailies_won_all": "Alle dagelijkse uitdagingen gewonnen",
     "reward_streak": "Reeks van {{days}} dagen"
   },
+  "records": {
+    "reward_record": "Nieuw record · {{game}} {{mode}}: +{{xp}} XP",
+    "reward_perfect_one": "Perfecte score! · {{game}} {{mode}}: +{{xp}} XP, +{{count}} fragment",
+    "reward_perfect_other": "Perfecte score! · {{game}} {{mode}}: +{{xp}} XP, +{{count}} fragmenten"
+  },
   "level": {
     "label": "Niveau {{level}}",
     "short": "Niv. {{level}}",

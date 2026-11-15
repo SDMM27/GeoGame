@@ -1606,6 +1606,13 @@
     "reward_dailies_won_all": "Все задания дня выиграны",
     "reward_streak": "Серия: {{days}} дн."
   },
+  "records": {
+    "reward_record": "Новый рекорд · {{game}} {{mode}}: +{{xp}} XP",
+    "reward_perfect_one": "Идеальный результат! · {{game}} {{mode}}: +{{xp}} XP, +{{count}} фрагмент",
+    "reward_perfect_few": "Идеальный результат! · {{game}} {{mode}}: +{{xp}} XP, +{{count}} фрагмента",
+    "reward_perfect_many": "Идеальный результат! · {{game}} {{mode}}: +{{xp}} XP, +{{count}} фрагментов",
+    "reward_perfect_other": "Идеальный результат! · {{game}} {{mode}}: +{{xp}} XP, +{{count}} фрагмента"
+  },
   "level": {
     "label": "Уровень {{level}}",
     "short": "Ур. {{level}}",

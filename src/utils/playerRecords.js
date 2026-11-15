@@ -1,12 +1,12 @@
 import { collection, getDocs, query, where } from 'firebase/firestore'
 import { firestore } from '../Firebase'
-import { GAME_TYPES } from './gameTypes'
+import { RECORD_GAMES } from './recordRewards'
 import { CONTINENT_NAMES, DIFFICULTIES } from './leaderboards'
 import { PERFECT_SCORES } from './perfectScores'
 
 // A player's all-time best solo scores, as a grid of games x difficulties (or continents) with the perfect ones marked.
 
-export const RECORD_GAMES = [GAME_TYPES.PLACEMENT, GAME_TYPES.HARDCORE, GAME_TYPES.FLAGS, GAME_TYPES.MISSING_FLAG, GAME_TYPES.CAPITALS]
+export { RECORD_GAMES }
 
 // The player's best solo scores by "GAME_difficulty" (the difficulty is the continent name by continent): { score, elapsedTime }.
 export async function fetchPlayerRecords(uid) {

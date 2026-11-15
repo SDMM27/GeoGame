@@ -1552,6 +1552,11 @@
     "reward_dailies_won_all": "All daily challenges won",
     "reward_streak": "{{days}}-day streak"
   },
+  "records": {
+    "reward_record": "New record · {{game}} {{mode}}: +{{xp}} XP",
+    "reward_perfect_one": "Perfect score! · {{game}} {{mode}}: +{{xp}} XP, +{{count}} fragment",
+    "reward_perfect_other": "Perfect score! · {{game}} {{mode}}: +{{xp}} XP, +{{count}} fragments"
+  },
   "level": {
     "label": "Level {{level}}",
     "short": "Lv. {{level}}",

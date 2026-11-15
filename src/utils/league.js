@@ -4,6 +4,7 @@
 import { doc, getDoc } from 'firebase/firestore'
 import { firestore } from '../Firebase'
 import { previousDayKey } from './dailyGames'
+import { readSnapshot, writeSnapshot } from './localSnapshot'
 import { missionDayAt, weekDays, weekKeyOf } from './missions'
 
 // Players shown in the world board, and in the podium of the last week.
@@ -28,8 +29,13 @@ const readWeek = (snapshot, ...fields) => {
 // players of a `current` written before the league existed are in `entries`.
 export async function fetchLeague() {
   const [current, last] = await Promise.all([getDoc(doc(firestore, 'weeklyTop', 'current')), getDoc(doc(firestore, 'weeklyTop', 'last'))])
-  return { current: readWeek(current, 'players', 'entries'), last: readWeek(last, 'players') }
+  const league = { current: readWeek(current, 'players', 'entries'), last: readWeek(last, 'players') }
+  writeSnapshot('league', league)
+  return league
 }
+
+// The league kept from the last run (maybe stale), or null.
+export const cachedLeague = () => readSnapshot('league')
 
 // Only the finished week: { week, players } | null (one read).
 export async function fetchLastWeek() {

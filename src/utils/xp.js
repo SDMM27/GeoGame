@@ -21,7 +21,7 @@ export function cachedXp(uid) {
 
 const claimListeners = new Set()
 
-// Called with { gained, levelUp, level, fragments, rewards, unlockedFlags, seals, scrolls, unlockedScrolls } each time the server answered a
+// Called with { gained, levelUp, level, fragments, rewards, records, unlockedFlags, seals, scrolls, unlockedScrolls } each time the server answered a
 // claim (gained may be 0); `rewards`: the fragments of the dailies and the streak, [{ kind, fragments, streak? }] (grantXp in
 // missions.js); `seals`: the scroll seals paid, `scrolls`: the account's scrolls after it ({ unlocked, seals }),
 // `unlockedScrolls`: the scrolls the seals (or the starter gift) opened.
@@ -38,15 +38,17 @@ let inFlight = null
 
 // Asks the server to pay the signed-in player `uid`. Resolves with { xp, gained, levelUp, flags, fragments, rewards, unlockedFlags, seals,
 // scrolls, unlockedScrolls }, or null (signed out,
-// offline, refused). Calls made while one runs share it.
-export function claimXp(uid) {
-  if (!uid) return Promise.resolve(null)
+// offline, refused). Calls made while one runs share it, unless `again` is set: a new score may have been saved after the
+// running claim read the scores, so that call waits for it and starts another.
+export async function claimXp(uid, { again = false } = {}) {
+  if (!uid) return null
+  if (again && inFlight) await inFlight.catch(() => {})
   inFlight ??= (async () => {
     try {
       pushApi ??= import('./pushApi')
       const response = await (await pushApi).callPush('xp', {})
       if (response?.status !== 200 || !response.body?.xp) return null
-      const { xp, gained, levelUp, flags, fragments, rewards, unlockedFlags, seals, scrolls, unlockedScrolls } = response.body
+      const { xp, gained, levelUp, flags, fragments, rewards, records, unlockedFlags, seals, scrolls, unlockedScrolls } = response.body
       // An older server answers without flags or scrolls: keep what the cache holds
       patchPublicData(uid, { xp, ...(flags && { flags }), ...(scrolls && { scrolls }) })
       claimListeners.forEach((listener) =>
@@ -56,6 +58,7 @@ export function claimXp(uid) {
           level: xp.level,
           fragments: fragments ?? 0,
           rewards: rewards ?? [],
+          records: records ?? [],
           unlockedFlags: unlockedFlags ?? [],
           seals: seals ?? 0,
           scrolls: scrolls ?? null,

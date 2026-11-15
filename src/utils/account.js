@@ -24,6 +24,7 @@ import {
   serverTimestamp,
 } from 'firebase/firestore'
 import { firestore } from '../Firebase'
+import { setOwnUid, writeSnapshot } from './localSnapshot'
 import { containsProfanity } from './profanity'
 
 export const USERNAME_MIN = 3
@@ -136,14 +137,24 @@ function rememberPseudo(username) {
 }
 
 // Calls back with the account (see loadAccount) or null on every sign-in, sign-out and username change.
-export function watchAccount(auth, callback) {
+// `ready` (optional): awaited before the first emit, so that a session being migrated doesn't flash as signed out.
+export function watchAccount(auth, callback, { ready } = {}) {
   let latest = 0
+  let waiting = ready
   const emit = async () => {
     if (signingUp) return
     const request = ++latest
+    if (waiting) {
+      await waiting.catch(() => {})
+      waiting = null
+      if (request !== latest) return
+    }
     const account = await loadAccount(auth.currentUser)
     if (request !== latest) return
     rememberPseudo(account?.username)
+    // Next start draws this account at once (useAccountState); signing out forgets it.
+    writeSnapshot('account', account)
+    setOwnUid(account?.uid ?? null)
     callback(account)
   }
   const unsubscribe = onAuthStateChanged(auth, emit)

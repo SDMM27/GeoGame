@@ -1552,6 +1552,11 @@
     "reward_dailies_won_all": "Todos los retos del día ganados",
     "reward_streak": "Racha de {{days}} días"
   },
+  "records": {
+    "reward_record": "Nuevo récord · {{game}} {{mode}}: +{{xp}} XP",
+    "reward_perfect_one": "¡Puntuación perfecta! · {{game}} {{mode}}: +{{xp}} XP, +{{count}} fragmento",
+    "reward_perfect_other": "¡Puntuación perfecta! · {{game}} {{mode}}: +{{xp}} XP, +{{count}} fragmentos"
+  },
   "level": {
     "label": "Nivel {{level}}",
     "short": "Niv. {{level}}",

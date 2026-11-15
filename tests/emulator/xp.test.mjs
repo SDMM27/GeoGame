@@ -10,6 +10,8 @@ import countriesMeta from '../../src/data/countries.meta.json' with { type: 'jso
 import { flagPool, piecesOf } from '../../src/utils/flagCollection.js'
 import { SCROLLS } from '../../src/data/scrolls.js'
 import { GAMES_PER_DAY, GAME_XP, grantXp, levelCost, levelOf, missionDayAt, readXp, weekKeyOf } from '../../src/utils/missions.js'
+import { PERFECT_SCORES } from '../../src/utils/perfectScores.js'
+import { PERFECT_FRAGMENTS, PERFECT_XP } from '../../src/utils/recordRewards.js'
 import { STARTER_SCROLL } from '../../src/utils/scrollCollection.js'
 
 const POOL = flagPool(countriesMeta.features)
@@ -227,3 +229,18 @@ describe('paying XP', () => {
     expect(data).toMatchObject({ username: 'Alice', decoration: { frame: 'gold', color: 'sky' } })
   })
 })
+
+describe('solo records', () => {
+  it('pays a perfect score once, with its fragments, and seeds the records', async () => {
+    await db.collection('scores').add({ uid: 'alice', name: 'Alice', gameType: 'PLACEMENT', difficulty: 'Facile', score: PERFECT_SCORES.PLACEMENT_Facile, elapsedTime: 60 })
+    const first = await call('alice')
+    expect(first.body.records).toMatchObject([{ kind: 'perfect', key: 'PLACEMENT_Facile', xp: PERFECT_XP.Facile, fragments: PERFECT_FRAGMENTS.Facile }])
+    expect(first.body.gained).toBe(PERFECT_XP.Facile)
+    expect(first.body.fragments).toBeGreaterThanOrEqual(PERFECT_FRAGMENTS.Facile)
+    expect((await xpOf('alice')).total).toBe(PERFECT_XP.Facile)
+    const stored = (await db.doc('users/alice').get()).data().records
+    expect(stored).toMatchObject({ best: { PLACEMENT_Facile: PERFECT_SCORES.PLACEMENT_Facile }, perfect: ['PLACEMENT_Facile'], day: '2026-10-19' })
+    expect(await call('alice')).toMatchObject({ body: { records: [], gained: 0 } })
+  })
+})
+

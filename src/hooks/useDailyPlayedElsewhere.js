@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { fetchDailyGame } from '../utils/gameHistory'
+import { cachedGamesSync, fetchDailyGame } from '../utils/gameHistory'
 
 // Without network, getDoc can wait a long time before failing: the game is then playable.
 const LOOKUP_TIMEOUT_MS = 4000
@@ -36,6 +36,9 @@ export function useDailyPlayedElsewhere(accountState, { gameType, dailyKey, star
   }, [lookupKey, started, uid, gameType, dailyKey])
 
   if (!enabled || !dailyKey || started) return { checking: false, game: null }
+  // Already in the history kept on this device: no need to wait for the network.
+  const known = lookupKey ? cachedGamesSync(uid)?.find((game) => game.id === `daily_${gameType}_${dailyKey}` && game.mode === 'daily') : null
+  if (known) return { checking: false, game: known }
   if (accountState.loading) return { checking: true, game: null }
   if (!lookupKey) return { checking: false, game: null }
   if (result.key !== lookupKey) return { checking: true, game: null }

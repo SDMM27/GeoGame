@@ -26,6 +26,7 @@ import {
 } from 'firebase/firestore'
 import { firestore } from '../Firebase'
 import { GAME_TYPES } from './gameTypes'
+import { ownUid, readSnapshot, writeSnapshot } from './localSnapshot'
 
 export const HISTORY_LIMIT = 300
 
@@ -48,19 +49,32 @@ function withoutEmptyFields(record) {
   )
 }
 
+// The saved games kept for the next start (own account only): the new game goes first, so the home is up to date
+// without waiting for the next fetchGames.
+function rememberNewGame(uid, id, record) {
+  if (!id || uid !== ownUid()) return
+  const games = readSnapshot(`games:${uid}`)
+  if (!games) return
+  const rest = games.filter((game) => game.id !== id)
+  writeSnapshot(`games:${uid}`, [{ id, ...withoutEmptyFields(record), playedAt: Date.now() }, ...rest].slice(0, HISTORY_LIMIT))
+}
+
 // Resolves with the account's uid once the game is saved, null otherwise.
 export async function recordGame(auth, record) {
   try {
     const user = await currentUser(auth)
     if (!user) return null
     const data = { ...withoutEmptyFields(record), playedAt: serverTimestamp() }
+    let id
     if (record.mode === 'daily' && record.dailyKey) {
       const ref = doc(gamesCollection(user.uid), `daily_${record.gameType}_${record.dailyKey}`)
       if ((await getDoc(ref)).exists()) return null
       await setDoc(ref, data)
+      id = ref.id
     } else {
-      await addDoc(gamesCollection(user.uid), data)
+      id = (await addDoc(gamesCollection(user.uid), data))?.id
     }
+    rememberNewGame(user.uid, id, record)
     return user.uid
   } catch (error) {
     // History is a bonus: never break the end of a game for it.
@@ -78,7 +92,15 @@ const fromSnapshot = (snapshot) => {
 // Most recent first.
 export async function fetchGames(uid, max = HISTORY_LIMIT) {
   const snapshot = await getDocs(query(gamesCollection(uid), orderBy('playedAt', 'desc'), limit(max)))
-  return snapshot.docs.map(fromSnapshot)
+  const games = snapshot.docs.map(fromSnapshot)
+  // Only a full history is worth keeping for the next start (a short read would hide older games).
+  if (max >= HISTORY_LIMIT && uid === ownUid()) writeSnapshot(`games:${uid}`, games)
+  return games
+}
+
+// The games kept from the last run (own account only, maybe stale): null when there are none.
+export function cachedGamesSync(uid) {
+  return uid && uid === ownUid() ? readSnapshot(`games:${uid}`) : null
 }
 
 // The player's game of one daily challenge (null if not played), whatever the device it was played on.

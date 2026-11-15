@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { fetchLeague, leagueView } from '../utils/league'
+import { cachedLeague, fetchLeague, leagueView } from '../utils/league'
 import { serverNow } from '../utils/serverTime'
 
 /**
@@ -8,10 +8,14 @@ import { serverNow } from '../utils/serverTime'
  * loaded the lists are empty and `error` is set.
  */
 export function useLeague(uid, friends = [], username = '') {
-  const [state, setState] = useState({ league: { current: null, last: null }, loading: true, error: false })
+  const [state, setState] = useState(() => {
+    const league = cachedLeague()
+    return { league: league ?? { current: null, last: null }, loading: !league, error: false }
+  })
 
-  const load = useCallback(() => {
-    setState((previous) => ({ ...previous, loading: true, error: false }))
+  // `quiet`: refresh behind what is already shown (the league kept from the last run) without a loading state.
+  const refresh = useCallback((quiet) => {
+    setState((previous) => ({ ...previous, loading: !quiet, error: false }))
     return fetchLeague()
       .then((league) => setState({ league, loading: false, error: false }))
       .catch((error) => {
@@ -19,10 +23,11 @@ export function useLeague(uid, friends = [], username = '') {
         setState((previous) => ({ ...previous, loading: false, error: true }))
       })
   }, [])
+  const load = useCallback(() => refresh(false), [refresh])
 
   useEffect(() => {
-    load()
-  }, [load])
+    refresh(Boolean(cachedLeague()))
+  }, [refresh])
 
   const friendsKey = friends.map((friend) => `${friend.uid}:${friend.username}`).join(',')
   const view = useMemo(

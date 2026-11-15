@@ -23,7 +23,18 @@ const REDIRECTS = {
   leaflet: shim('leaflet.ts'),
 }
 
+// Native builds use React Native Firebase; the web app keeps the JS SDK. The shims import @react-native-firebase/*, which
+// is not redirected.
+const NATIVE_REDIRECTS = {
+  'firebase/app': shim('firebase-app.ts'),
+  'firebase/firestore': shim('firebase-firestore.ts'),
+  'firebase/auth': shim('firebase-auth.ts'),
+}
+
 config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (platform !== 'web' && NATIVE_REDIRECTS[moduleName]) {
+    return { type: 'sourceFile', filePath: NATIVE_REDIRECTS[moduleName] }
+  }
   if (REDIRECTS[moduleName]) {
     return { type: 'sourceFile', filePath: REDIRECTS[moduleName] }
   }

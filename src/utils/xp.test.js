@@ -37,4 +37,27 @@ describe('claimXp', () => {
     expect(patchPublicData).toHaveBeenCalledWith('u1', { xp })
     expect(heard).toHaveBeenCalledWith(expect.objectContaining({ seals: 0, scrolls: null, unlockedScrolls: [] }))
   })
+
+  it('forwards the record rewards to the listeners', async () => {
+    const records = [{ kind: 'record', game: 'FLAGS', mode: 'Facile', xp: 15, fragments: 0 }]
+    callPush.mockResolvedValue({ status: 200, body: { xp, gained: 15, records } })
+    const heard = vi.fn()
+    const off = onXpClaimed(heard)
+    await claimXp('u1')
+    off()
+    expect(heard).toHaveBeenCalledWith(expect.objectContaining({ records }))
+  })
+
+  it('starts another claim after the running one with again, and shares it otherwise', async () => {
+    let release
+    callPush.mockImplementationOnce(() => new Promise((resolve) => (release = () => resolve({ status: 200, body: { xp, gained: 0 } }))))
+    callPush.mockResolvedValue({ status: 200, body: { xp, gained: 0 } })
+    const first = claimXp('u1')
+    await vi.waitFor(() => expect(callPush).toHaveBeenCalledTimes(1))
+    const shared = claimXp('u1')
+    const second = claimXp('u1', { again: true })
+    release()
+    await Promise.all([first, shared, second])
+    expect(callPush).toHaveBeenCalledTimes(2)
+  })
 })

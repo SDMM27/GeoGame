@@ -59,9 +59,10 @@ async function saveBest(collectionName, player, filters, data, isBetterThan, toE
   return { status: 'saved' }
 }
 
-// Solo score: best one per player, difficulty and game (and continent).
-export function saveScore({ name, uid, score, difficulty, elapsedTime, gameType, continent }) {
-  return saveBest(
+// Solo score: best one per player, difficulty and game (and continent). A signed-in player's saved score may be a record:
+// the server is asked to pay it (utils/xp.js, imported on demand), without waiting and whatever happens.
+export async function saveScore({ name, uid, score, difficulty, elapsedTime, gameType, continent }) {
+  const result = await saveBest(
     'scores',
     { name, uid },
     { difficulty, gameType, ...(continent != null && { continent }) },
@@ -69,6 +70,10 @@ export function saveScore({ name, uid, score, difficulty, elapsedTime, gameType,
     (next, previous) => isBetter(next.score, next.elapsedTime, previous.score, previous.elapsedTime),
     (previous) => ({ score: previous.score, elapsedTime: previous.elapsedTime })
   )
+  if (uid && (result.status === 'saved' || result.status === 'updated')) {
+    import('./xp').then(({ claimXp }) => claimXp(uid, { again: true })).catch(() => {})
+  }
+  return result
 }
 
 // Ascension score: best one per player, game and preset.

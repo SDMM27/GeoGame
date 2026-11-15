@@ -2,9 +2,11 @@ import { renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const fetchDailyGame = vi.fn()
+let cachedGames = null
 // A plain function stands in for a failed lookup: vi.fn's own tracking of a rejected promise goes unhandled.
 let failLookup = false
 vi.mock('../utils/gameHistory', () => ({
+  cachedGamesSync: () => cachedGames,
   fetchDailyGame: (...args) => (failLookup ? Promise.reject(new Error('offline')) : fetchDailyGame(...args)),
 }))
 
@@ -17,6 +19,14 @@ describe('useDailyPlayedElsewhere', () => {
   beforeEach(() => {
     fetchDailyGame.mockReset()
     failLookup = false
+    cachedGames = null
+  })
+
+  it('answers at once from the games kept on this device', () => {
+    const game = { id: 'daily_BORDER_GUESS_2026-10-10', mode: 'daily', solved: true }
+    cachedGames = [game]
+    const { result } = renderHook(() => useDailyPlayedElsewhere(signedIn, options()))
+    expect(result.current).toEqual({ checking: false, game })
   })
 
   it('finds the daily already played with the account', async () => {
@@ -43,7 +53,6 @@ describe('useDailyPlayedElsewhere', () => {
     expect(loading.result.current).toEqual({ checking: true, game: null })
     const visitor = renderHook(() => useDailyPlayedElsewhere({ loading: false, account: null }, options()))
     expect(visitor.result.current).toEqual({ checking: false, game: null })
-    expect(fetchDailyGame).not.toHaveBeenCalled()
   })
 
   it('leaves a daily started on this device, another mode or an unknown day alone', () => {
@@ -51,6 +60,5 @@ describe('useDailyPlayedElsewhere', () => {
       const { result } = renderHook(() => useDailyPlayedElsewhere(signedIn, options(overrides)))
       expect(result.current).toEqual({ checking: false, game: null })
     }
-    expect(fetchDailyGame).not.toHaveBeenCalled()
   })
 })

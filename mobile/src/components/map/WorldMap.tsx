@@ -4,7 +4,7 @@
 import { Canvas, Circle, Group, Path, Skia, type SkPath } from '@shopify/react-native-skia'
 import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, View, type LayoutChangeEvent } from 'react-native'
+import { Platform, StyleSheet, View, type LayoutChangeEvent } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { Easing, cancelAnimation, useDerivedValue, useSharedValue, withTiming, type SharedValue } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
@@ -80,6 +80,7 @@ const TAP_TOLERANCE_PX = 16
 // A finger that moves further than this is dragging the map, not tapping a country
 const TAP_MAX_MOVE_PX = 10
 const INERTIA_MS = 350
+const PATH_RELEASE_DELAY_MS = 1000
 
 // The website's hooks pass Leaflet colors, and some of the app's own dark palette (src/utils/mapColors.js); map
 // them onto the palette of the theme in use, so the light theme repaints them.
@@ -333,6 +334,31 @@ export const WorldMap = forwardRef<WorldMapHandle, Props>(function WorldMap(
     }
     return { fills: [...fillGroups.values()], strokes: [...strokeGroups.values()] }
   }, [shapes, styles, colors])
+
+  // Web: these paths live in CanvasKit's WebAssembly memory, which the browser's garbage collector does not see.
+  // Every found country rebuilt them without freeing the old ones: a whole "find the country" game grew that memory
+  // by ~200 MB, until Safari on iPhone killed the tab and reloaded it, starting the game over. They are freed once
+  // replaced, a little later so that a frame still being drawn never meets a deleted path. The native app is left as
+  // it was.
+  const drawnPaths = useRef<{ fills: typeof fills; strokes: typeof strokes }>({ fills, strokes })
+  useEffect(
+    () => () => {
+      drawnPaths.current = { fills: [], strokes: [] }
+    },
+    []
+  )
+  useEffect(() => {
+    if (Platform.OS !== 'web') return undefined
+    drawnPaths.current = { fills, strokes }
+    return () => {
+      setTimeout(() => {
+        const inUse = new Set([...drawnPaths.current.fills, ...drawnPaths.current.strokes].map((group) => group.path))
+        ;[...fills, ...strokes].forEach((group) => {
+          if (!inUse.has(group.path)) group.path.dispose()
+        })
+      }, PATH_RELEASE_DELAY_MS)
+    }
+  }, [fills, strokes])
 
   // Tiny countries get a tappable dot until zoomed in enough to see them.
   const markers = useMemo(() => {

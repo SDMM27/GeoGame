@@ -5,7 +5,8 @@
 // - the service worker (public/sw.js) loads every page from the network first, and the HTML is never cached
 //   (vercel.json);
 // - at launch and each time the app comes back to the foreground, the bundle the server lists is compared with the one
-//   running, and the page reloads on the new one.
+//   running, and the page reloads on the new one, but never in the middle of a game: then once the player leaves it.
+import { usePathname } from 'expo-router'
 import { useEffect } from 'react'
 
 export const updatesEnabled = false
@@ -21,6 +22,20 @@ function runningBundle(): string | null {
 }
 
 let reloading = false
+// A newer deployment found during a game: the page reloads once the player leaves it
+let outdated = false
+
+// A game or a multiplayer room: a reload there threw away the round being played (a daily challenge had to be
+// started again).
+export function isPlaying(pathname: string): boolean {
+  return pathname.startsWith('/game/') || pathname.startsWith('/multi/')
+}
+
+function reloadUnlessPlaying() {
+  if (reloading || isPlaying(window.location.pathname)) return
+  reloading = true
+  window.location.reload()
+}
 
 async function reloadIfOutdated() {
   const running = runningBundle()
@@ -30,8 +45,8 @@ async function reloadIfOutdated() {
     if (!response.ok) return
     const latest = (await response.text()).match(BUNDLE)?.[0]
     if (latest && latest !== running) {
-      reloading = true
-      window.location.reload()
+      outdated = true
+      reloadUnlessPlaying()
     }
   } catch {
     // Offline: keep the version in hand.
@@ -40,6 +55,11 @@ async function reloadIfOutdated() {
 
 /** Always ready on the web; checks for a newer deployment instead. */
 export function useLaunchUpdate(): boolean {
+  const pathname = usePathname()
+  useEffect(() => {
+    if (outdated) reloadUnlessPlaying()
+  }, [pathname])
+
   useEffect(() => {
     if (__DEV__ || typeof window === 'undefined') return undefined
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {})

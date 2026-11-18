@@ -259,15 +259,16 @@ export default function LeaderboardsScreen() {
             onChange={setDay}
           />
           {dailyGame === GAME_TYPES.DAILY_CHALLENGE ? (
-            <ChallengeLeaderboard dailyKey={day} refreshKey={refreshKey} maxRows={50} onSettled={onSettled} />
+            <ChallengeLeaderboard dailyKey={day} todayKey={todayKey} refreshKey={refreshKey} maxRows={50} onSettled={onSettled} />
           ) : dailyGame === GAME_TYPES.COUNTRY_OF_DAY ? (
             <CountryOfDayLeaderboard dailyKey={day} refreshKey={refreshKey} maxRows={50} />
           ) : dailyGame === GAME_TYPES.RANKING ? (
-            <RankingLeaderboard dailyKey={day} refreshKey={refreshKey} maxRows={50} onSettled={onSettled} />
+            <RankingLeaderboard dailyKey={day} todayKey={todayKey} refreshKey={refreshKey} maxRows={50} onSettled={onSettled} />
           ) : (
             <DailyLeaderboard
               gameType={dailyDefinition.type}
               dailyKey={day}
+              todayKey={todayKey}
               refreshKey={refreshKey}
               maxRows={50}
               onSettled={onSettled}

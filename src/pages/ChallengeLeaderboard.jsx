@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { fetchChallengeScores } from '../utils/saveScore'
+import { GAME_TYPES } from '../utils/gameTypes'
 import { formatTime } from '../utils/formatTime'
 import { getLast7Days } from '../utils/dateUtils'
 import { CHALLENGE_ROUNDS } from '../utils/dailyChallenge'
@@ -10,12 +11,13 @@ import { challengeRounds } from '../utils/dailyChallengeRounds'
 import ChallengeRoundList from './ChallengeRoundList'
 import { useAccount } from '../auth'
 import { useLeaderboardRefresh } from '../hooks/useLeaderboardRefresh'
+import { useDailyAnswers } from '../hooks/useDailyAnswers'
 import PlayerName, { mineClass } from '../components/PlayerName'
 import './DailyLeaderboard.css'
 import RankBadge from '../components/RankBadge'
 
 
-function ChallengeRow({ score, index, account, rounds }) {
+function ChallengeRow({ score, index, account, rounds, answers }) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const hasRounds = Array.isArray(score.results) && rounds.length > 0 && score.results.length === rounds.length
@@ -29,7 +31,12 @@ function ChallengeRow({ score, index, account, rounds }) {
         <span className="daily-lb__attempts">{score.score}/{CHALLENGE_ROUNDS}</span>
         <span className="daily-lb__time">{score.elapsedTime != null ? formatTime(score.elapsedTime) : '—'}</span>
       </div>
-      {open && hasRounds && (
+      {open && hasRounds && answers.locked && (
+        <div className="daily-lb__accordion">
+          <p className="daily-lb__accordion-hints">{t(answers.signedIn ? 'leaderboard.answers_locked' : 'leaderboard.answers_locked_signed_out')}</p>
+        </div>
+      )}
+      {open && hasRounds && !answers.locked && (
         <div className="daily-lb__accordion">
           <p className="daily-lb__accordion-title">{t(mine ? 'daily_challenge.rounds_title' : 'daily_challenge.player_rounds_title')}</p>
           <ChallengeRoundList rounds={rounds} rights={score.results} />
@@ -47,6 +54,8 @@ export default function ChallengeLeaderboard({ dailyKey }) {
   const [scores, setScores] = useState([])
   const [loading, setLoading] = useState(true)
   const [showPicker, setShowPicker] = useState(false)
+  // The round list gives the day's 12 answers away: locked like the answers of the other dailies
+  const answers = useDailyAnswers({ gameType: GAME_TYPES.DAILY_CHALLENGE, day: selectedDate, todayKey: dailyKey, uid: account?.uid, refreshKey })
 
   const days = useMemo(() => (dailyKey ? getLast7Days(dailyKey, i18n.language) : []), [dailyKey, i18n.language])
   // The kinds of round of the day shown, for the grids
@@ -111,7 +120,7 @@ export default function ChallengeLeaderboard({ dailyKey }) {
             <span>{t('leaderboard.time')}</span>
           </div>
           {scores.map((score, index) => (
-            <ChallengeRow key={score.id ?? `${score.name}-${index}`} score={score} index={index} account={account} rounds={rounds} />
+            <ChallengeRow key={score.id ?? `${score.name}-${index}`} score={score} index={index} account={account} rounds={rounds} answers={answers} />
           ))}
         </>
       )}

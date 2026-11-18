@@ -8,15 +8,19 @@ import { sortRankingScores } from '../utils/rankingScores'
 import { getLast7Days } from '../utils/dateUtils'
 import { useAccount } from '../auth'
 import { useLeaderboardRefresh } from '../hooks/useLeaderboardRefresh'
+import { useDailyAnswers } from '../hooks/useDailyAnswers'
+import { answersOf } from '../utils/dailyAnswers'
 import PlayerName, { mineClass } from '../components/PlayerName'
 import './DailyLeaderboard.css'
 import './RankingLeaderboard.css'
 import RankBadge from '../components/RankBadge'
 
 
-function AccordionRow({ score, index, account }) {
+function AccordionRow({ score, index, account, answers }) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
+  // null while today's answers are locked: never the order the score may still carry from an old app
+  const shown = answersOf(score, answers)
 
   return (
     <div className={`daily-lb__row${index < 3 ? ' daily-lb__row--top' : ''}${mineClass(score, account)}`}>
@@ -33,11 +37,16 @@ function AccordionRow({ score, index, account }) {
           {score.attemptsUsed != null ? t('quiz.attempts_count', { count: score.attemptsUsed }) : '—'}
         </span>
       </div>
-      {open && Array.isArray(score.playerOrder) && score.playerOrder.length > 0 && (
+      {open && !shown && (
+        <div className="daily-lb__accordion">
+          <p className="daily-lb__accordion-hints">{t(answers.signedIn ? 'leaderboard.answers_locked' : 'leaderboard.answers_locked_signed_out')}</p>
+        </div>
+      )}
+      {open && Array.isArray(shown?.playerOrder) && shown.playerOrder.length > 0 && (
         <div className="daily-lb__accordion">
           <p className="daily-lb__accordion-title">{t('leaderboard.played_order')}</p>
           <ol className="daily-lb__guess-list">
-            {score.playerOrder.map((country, i) => (
+            {shown.playerOrder.map((country, i) => (
               <li key={`${country}-${i}`} className="daily-lb__guess-item">
                 {i + 1}. {country}
               </li>
@@ -57,6 +66,7 @@ export default function RankingLeaderboard({ dailyKey }) {
   const [scores, setScores] = useState([])
   const [loading, setLoading] = useState(true)
   const [showPicker, setShowPicker] = useState(false)
+  const answers = useDailyAnswers({ gameType: GAME_TYPES.RANKING, day: selectedDate, todayKey: dailyKey, uid: account?.uid, refreshKey })
 
   const days = useMemo(() => (dailyKey ? getLast7Days(dailyKey, i18n.language) : []), [dailyKey, i18n.language])
 
@@ -71,7 +81,7 @@ export default function RankingLeaderboard({ dailyKey }) {
             where('dailyKey', '==', selectedDate)
           )
         )
-        setScores(sortRankingScores(snapshot.docs.map((doc) => doc.data())))
+        setScores(sortRankingScores(snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }))))
       } finally {
         setLoading(false)
       }
@@ -134,6 +144,7 @@ export default function RankingLeaderboard({ dailyKey }) {
               score={score}
               index={index}
               account={account}
+              answers={answers}
             />
           ))}
         </>

@@ -9,6 +9,7 @@ import { challengeRounds } from '@shared/utils/dailyChallengeRounds'
 import { formatTime } from '@shared/utils/formatTime'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
 import { fetchChallengeScores } from '@shared/utils/saveScore'
+import { useDailyAnswers } from '@shared/hooks/useDailyAnswers'
 
 import { useAccount } from '@/account/auth'
 import { useLeaderboard } from '@/hooks/useLeaderboard'
@@ -29,11 +30,14 @@ const DEFAULT_MAX_ROWS = 20
 
 export function ChallengeLeaderboard({
   dailyKey,
+  todayKey = dailyKey,
   refreshKey,
   maxRows = DEFAULT_MAX_ROWS,
   onSettled,
 }: {
   dailyKey: string
+  // The current daily key when `dailyKey` is a past day shown (its rounds are open); by default the day is today
+  todayKey?: string
   refreshKey?: unknown
   maxRows?: number
   onSettled?: () => void
@@ -48,11 +52,14 @@ export function ChallengeLeaderboard({
     refreshKey,
     onSettled
   )
+  // The round list gives the day's 12 answers away: locked like the answers of the other dailies
+  const answers = useDailyAnswers({ gameType: GAME_TYPES.DAILY_CHALLENGE, day: dailyKey, todayKey, uid: account?.uid, refreshKey }) as { locked: boolean; signedIn: boolean }
   // The kinds of round of the day, for the grids
   const rounds = useMemo(() => (dailyKey ? challengeRounds(dailyKey) : []), [dailyKey])
 
   const details = (score: ChallengeScore) => {
     if (!Array.isArray(score.results) || score.results.length !== rounds.length) return undefined
+    if (answers.locked) return <Text variant="caption">{t(answers.signedIn ? 'leaderboard.answers_locked' : 'leaderboard.answers_locked_signed_out')}</Text>
     const mine = Boolean(score.uid) && score.uid === account?.uid
     return (
       <>

@@ -422,3 +422,97 @@ describe('survival scores', () => {
     await assertFails(as('alice').doc(ref.path).set(survivals({ score: 20, ramp: 'express' })))
   })
 })
+
+// Answers of the dailies (guesses, order played), kept out of the public daily_scores: readable once the day is over, or
+// by the player who saved their own entry that day.
+describe('daily answers', () => {
+  const today = new Date().toISOString().slice(0, 10)
+  const past = '2026-10-08'
+  const answersPath = (dailyKey, entryId, gameType = 'BORDER_GUESS') => `daily_answers/${dailyKey}/${gameType}/${entryId}`
+  const answers = (scoreId, overrides = {}) => clean({ scoreId, uid: 'alice', guesses: ['A', 'B', 'C', 'D'], ...overrides })
+  // The score a client saves first, then the id its answers point at
+  const saveScoreOf = async (db, overrides) => (await db.collection('daily_scores').add(dailies(overrides))).id
+  // An entry written with the rules off, to read it back under the rules
+  const seed = (dailyKey, entryId, data, gameType = 'BORDER_GUESS') =>
+    env.withSecurityRulesDisabled((context) => context.firestore().doc(answersPath(dailyKey, entryId, gameType)).set(data))
+
+  it('is written by the owner of the score, for an account or a visitor', async () => {
+    const mine = await saveScoreOf(as('alice'), { dailyKey: today })
+    await assertSucceeds(as('alice').doc(answersPath(today, 'alice')).set(answers(mine)))
+    const noUid = await saveScoreOf(as('alice'), { dailyKey: past, gameType: 'COUNTRY_CLUE' })
+    await assertSucceeds(as('alice').doc(answersPath(past, 'alice', 'COUNTRY_CLUE')).set({ scoreId: noUid, guesses: ['A'] }))
+    const visitor = await saveScoreOf(anonymous(), { dailyKey: today, name: 'Zoe', uid: undefined })
+    await assertSucceeds(anonymous().doc(answersPath(today, `v_${visitor}`)).set({ scoreId: visitor, guesses: ['A', 'B'] }))
+    const ranking = (await as('alice').collection('daily_scores').add(rankings({ dailyKey: today }))).id
+    await assertSucceeds(as('alice').doc(answersPath(today, 'alice', 'RANKING')).set({ scoreId: ranking, uid: 'alice', playerOrder: ['A', 'B', 'C', 'D', 'E'] }))
+  })
+
+  it('is refused when it does not match the score, or the account', async () => {
+    const mine = await saveScoreOf(as('alice'), { dailyKey: today })
+    const visitor = await saveScoreOf(anonymous(), { dailyKey: today, name: 'Zoe', uid: undefined })
+    const db = as('alice')
+    // another account's score, another uid as entry, a score that doesn't exist
+    await assertFails(as('bob').doc(answersPath(today, 'bob')).set(answers(mine, { uid: 'bob' })))
+    await assertFails(db.doc(answersPath(today, 'bob')).set(answers(mine)))
+    await assertFails(db.doc(answersPath(today, 'alice')).set(answers('nothing')))
+    await assertFails(db.doc(answersPath(today, 'alice')).set(answers(mine, { uid: 'bob' })))
+    // another game or day than the score's
+    await assertFails(db.doc(answersPath(today, 'alice', 'COUNTRY_CLUE')).set(answers(mine)))
+    await assertFails(db.doc(answersPath(past, 'alice')).set(answers(mine)))
+    // a visitor's entry is v_ and the score's id, and an account's score is not a visitor's
+    await assertFails(anonymous().doc(answersPath(today, 'v_other')).set({ scoreId: visitor, guesses: ['A'] }))
+    await assertFails(anonymous().doc(answersPath(today, 'alice')).set(answers(mine)))
+    await assertFails(db.doc(answersPath(today, `v_${visitor}`)).set({ scoreId: visitor, uid: 'alice' }))
+    await assertFails(db.doc(answersPath(today, `v_${mine}`)).set({ scoreId: mine }))
+    // unknown fields, lists too long
+    await assertFails(db.doc(answersPath(today, 'alice')).set(answers(mine, { extra: 1 })))
+    await assertFails(db.doc(answersPath(today, 'alice')).set(answers(mine, { guesses: new Array(601).fill('A') })))
+    await assertFails(db.doc(answersPath(today, 'alice')).set(answers(mine, { guesses: 'A' })))
+    await assertSucceeds(db.doc(answersPath(today, 'alice')).set(answers(mine, { guesses: new Array(600).fill('A') })))
+  })
+
+  it('is never changed or deleted', async () => {
+    const mine = await saveScoreOf(as('alice'), { dailyKey: today })
+    await as('alice').doc(answersPath(today, 'alice')).set(answers(mine))
+    await assertFails(as('alice').doc(answersPath(today, 'alice')).set(answers(mine, { guesses: ['Z'] })))
+    await assertFails(as('alice').doc(answersPath(today, 'alice')).update({ guesses: ['Z'] }))
+    await assertFails(as('alice').doc(answersPath(today, 'alice')).delete())
+  })
+
+  it("hides today's from a visitor, and from an account that has not played", async () => {
+    await seed(today, 'bob', { scoreId: 's', uid: 'bob', guesses: ['A'] })
+    await assertFails(anonymous().doc(answersPath(today, 'bob')).get())
+    await assertFails(anonymous().collection(`daily_answers/${today}/BORDER_GUESS`).get())
+    await assertFails(as('alice').doc(answersPath(today, 'bob')).get())
+    await assertFails(as('alice').collection(`daily_answers/${today}/BORDER_GUESS`).get())
+  })
+
+  it("shows today's to an account that saved its own entry, for that game only", async () => {
+    await seed(today, 'bob', { scoreId: 's', uid: 'bob', guesses: ['A'] })
+    await seed(today, 'alice', { scoreId: 't', uid: 'alice', guesses: ['B'] })
+    await assertSucceeds(as('alice').doc(answersPath(today, 'bob')).get())
+    // a list query reads the whole day's entries of the game, not only the player's own
+    const snapshot = await assertSucceeds(as('alice').collection(`daily_answers/${today}/BORDER_GUESS`).get())
+    expect(snapshot.size).toBe(2)
+    await assertFails(as('alice').collection(`daily_answers/${today}/COUNTRY_CLUE`).get())
+  })
+
+  it('shows the answers of a day that is over to everyone', async () => {
+    await seed(past, 'bob', { scoreId: 's', uid: 'bob', guesses: ['A'] })
+    await assertSucceeds(anonymous().doc(answersPath(past, 'bob')).get())
+    const snapshot = await assertSucceeds(anonymous().collection(`daily_answers/${past}/BORDER_GUESS`).get())
+    expect(snapshot.size).toBe(1)
+    await assertSucceeds(as('alice').collection(`daily_answers/${past}/BORDER_GUESS`).get())
+    // yesterday (UTC) is over too, a malformed day is not a day
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10)
+    await assertSucceeds(anonymous().collection(`daily_answers/${yesterday}/BORDER_GUESS`).get())
+    await assertFails(anonymous().collection('daily_answers/x/BORDER_GUESS').get())
+    await assertFails(anonymous().collection('daily_answers/2026-13-45/BORDER_GUESS').get())
+  })
+
+  it('still takes the answers in the public score during the transition, and the score without them', async () => {
+    await assertSucceeds(as('alice').collection('daily_scores').add(dailies({ dailyKey: today, guesses: ['A', 'B'] })))
+    await assertSucceeds(anonymous().collection('daily_scores').add(rankings({ name: 'Zoe', uid: undefined, dailyKey: today, playerOrder: ['A', 'B', 'C', 'D', 'E'] })))
+    await assertSucceeds(as('alice').collection('daily_scores').add(dailies({ dailyKey: 'new', guesses: undefined })))
+  })
+})

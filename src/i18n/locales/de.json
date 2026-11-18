@@ -420,7 +420,9 @@
     "hints_used": "Benutzte Hinweise:",
     "no_hints": "keine",
     "attempted_countries": "Getippte Länder",
-    "played_order": "Gespielte Reihenfolge"
+    "played_order": "Gespielte Reihenfolge",
+    "answers_locked": "🔒 Schließe die Tagesherausforderung ab, um die Antworten der anderen Spieler zu sehen.",
+    "answers_locked_signed_out": "🔒 Melde dich an und schließe die Tagesherausforderung ab, um die Antworten der anderen Spieler zu sehen."
   },
   "multiplayer": {
     "title": "Mehrspieler",

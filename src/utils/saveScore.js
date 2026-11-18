@@ -8,6 +8,7 @@ import { GAME_TYPES } from './gameTypes'
 import { normalizeUsername } from './account'
 import { containsProfanity } from './profanity'
 import { refreshLeague } from './leagueRefresh'
+import { saveDailyAnswers } from './dailyAnswers'
 
 // Every save takes the player as { name, uid? }:
 //  - signed in: uid and the account's username. One entry per account, owned by it (see firestore.rules).
@@ -31,8 +32,9 @@ export async function isNameTaken(name) {
 }
 
 // Saves `data` as the player's entry among the documents matching `filters`, unless their existing
-// entry is better. `toExisting` turns that entry into what `blocked` reports.
-async function saveBest(collectionName, player, filters, data, isBetterThan, toExisting) {
+// entry is better. `toExisting` turns that entry into what `blocked` reports. `afterCreate(ref)` runs once a new
+// document is created (never for a replaced or blocked one) and may not fail the save.
+async function saveBest(collectionName, player, filters, data, isBetterThan, toExisting, afterCreate) {
   const { uid } = player
   // Spaces normalized like usernames, so the rules' check against usernames/ sees the same key.
   const name = uid ? player.name : normalizeUsername(player.name)
@@ -54,7 +56,8 @@ async function saveBest(collectionName, player, filters, data, isBetterThan, toE
     return { status: 'updated' }
   }
 
-  await addDoc(ref, entry)
+  const created = await addDoc(ref, entry)
+  await afterCreate?.(created)
   if (collectionName === 'daily_scores' && uid) refreshLeague()
   return { status: 'saved' }
 }
@@ -100,27 +103,31 @@ export function saveAscensionScore({ name, uid, gameType, presetName, timer, sco
 const neverReplace = () => false
 
 // Daily-challenge score: one per player, game and day. `mapAssist` is only written when true (a missing one means
-// no map), so a game without the map saves under rules that don't know the field yet.
+// no map), so a game without the map saves under rules that don't know the field yet. The guesses aren't part of the
+// public score: they go to daily_answers (utils/dailyAnswers.js) once it is created.
 export function saveDailyScore({ name, uid, gameType, dailyKey, attempts, elapsedTime, guesses, hints, mapAssist }) {
   return saveBest(
     'daily_scores',
     { name, uid },
     { gameType, dailyKey },
-    { attempts, elapsedTime, guesses, ...(hints != null && { hints }), ...(mapAssist === true && { mapAssist }) },
+    { attempts, elapsedTime, ...(hints != null && { hints }), ...(mapAssist === true && { mapAssist }) },
     neverReplace,
-    (previous) => ({ attempts: previous.attempts, elapsedTime: previous.elapsedTime })
+    (previous) => ({ attempts: previous.attempts, elapsedTime: previous.elapsedTime }),
+    (created) => saveDailyAnswers({ gameType, dailyKey, scoreId: created.id, uid, guesses })
   )
 }
 
-// Country Ranking daily score (ranked by higher score, then the smaller total error): one per player and day.
+// Country Ranking daily score (ranked by higher score, then the smaller total error): one per player and day. The order
+// played goes to daily_answers, like the guesses of the other dailies.
 export function saveRankingScore({ name, uid, dailyKey, score, totalError, attemptsUsed, playerOrder }) {
   return saveBest(
     'daily_scores',
     { name, uid },
     { gameType: GAME_TYPES.RANKING, dailyKey },
-    { score, totalError, attemptsUsed, playerOrder },
+    { score, totalError, attemptsUsed },
     neverReplace,
-    (previous) => previous
+    (previous) => previous,
+    (created) => saveDailyAnswers({ gameType: GAME_TYPES.RANKING, dailyKey, scoreId: created.id, uid, playerOrder })
   )
 }
 

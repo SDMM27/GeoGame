@@ -420,7 +420,9 @@
     "hints_used": "Indizi usati:",
     "no_hints": "nessuno",
     "attempted_countries": "Paesi proposti",
-    "played_order": "Ordine giocato"
+    "played_order": "Ordine giocato",
+    "answers_locked": "🔒 Completa la sfida del giorno per vedere le risposte degli altri giocatori.",
+    "answers_locked_signed_out": "🔒 Accedi e completa la sfida del giorno per vedere le risposte degli altri giocatori."
   },
   "multiplayer": {
     "title": "Multigiocatore",

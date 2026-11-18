@@ -420,7 +420,9 @@
     "hints_used": "Gebruikte hints:",
     "no_hints": "geen",
     "attempted_countries": "Geprobeerde landen",
-    "played_order": "Speelvolgorde"
+    "played_order": "Speelvolgorde",
+    "answers_locked": "🔒 Voltooi de dagelijkse uitdaging om de antwoorden van andere spelers te zien.",
+    "answers_locked_signed_out": "🔒 Log in en voltooi de dagelijkse uitdaging om de antwoorden van andere spelers te zien."
   },
   "multiplayer": {
     "title": "Multiplayer",

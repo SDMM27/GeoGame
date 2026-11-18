@@ -420,7 +420,9 @@
     "hints_used": "Indices utilisés :",
     "no_hints": "aucun",
     "attempted_countries": "Pays tentés",
-    "played_order": "Classement joué"
+    "played_order": "Classement joué",
+    "answers_locked": "🔒 Termine le défi du jour pour voir les réponses des autres joueurs.",
+    "answers_locked_signed_out": "🔒 Connecte-toi et termine le défi du jour pour voir les réponses des autres joueurs."
   },
   "multiplayer": {
     "title": "Multijoueur",

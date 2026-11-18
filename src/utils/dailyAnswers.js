@@ -25,26 +25,39 @@ export async function saveDailyAnswers({ gameType, dailyKey, scoreId, uid, guess
 }
 
 // The answers of one day and game, as a Map scoreId -> { guesses, playerOrder }. null when Firestore refuses them
-// (permission-denied): the day isn't over and the player hasn't played it, so they're locked.
-export async function fetchDailyAnswers(gameType, dailyKey) {
+// (permission-denied). For a signed-in player, an existing score can repair a missing answers entry.
+export async function fetchDailyAnswers(gameType, dailyKey, uid) {
+  let snapshot
   try {
-    const snapshot = await getLeaderboardDocs(collection(firestore, 'daily_answers', dailyKey, gameType))
-    return new Map(snapshot.docs.map((entry) => {
-      const { scoreId, guesses, playerOrder } = entry.data()
-      return [scoreId, { guesses, playerOrder }]
-    }))
+    snapshot = await getLeaderboardDocs(collection(firestore, 'daily_answers', dailyKey, gameType))
   } catch (error) {
-    if (error?.code === 'permission-denied') return null
-    throw error
+    if (error?.code !== 'permission-denied') throw error
+    if (!uid) return null
+
+    const score = await findDailyScore(uid, gameType, dailyKey)
+    if (!score) return null
+
+    const { guesses, playerOrder } = score.data()
+    await saveDailyAnswers({ gameType, dailyKey, scoreId: score.id, uid, guesses, playerOrder })
+    // A concurrent request may have created the entry. Firestore still decides whether the answers can be read.
+    return fetchDailyAnswers(gameType, dailyKey)
   }
+  return new Map(snapshot.docs.map((entry) => {
+    const { scoreId, guesses, playerOrder } = entry.data()
+    return [scoreId, { guesses, playerOrder }]
+  }))
+}
+
+async function findDailyScore(uid, gameType, dailyKey) {
+  const snapshot = await getDocs(
+    query(collection(firestore, 'daily_scores'), where('uid', '==', uid), where('gameType', '==', gameType), where('dailyKey', '==', dailyKey), limit(1))
+  )
+  return snapshot.docs[0]
 }
 
 // Whether the player saved a score for that game and day.
 export async function hasPlayedDaily(uid, gameType, dailyKey) {
-  const snapshot = await getDocs(
-    query(collection(firestore, 'daily_scores'), where('uid', '==', uid), where('gameType', '==', gameType), where('dailyKey', '==', dailyKey), limit(1))
-  )
-  return !snapshot.empty
+  return Boolean(await findDailyScore(uid, gameType, dailyKey))
 }
 
 // What a leaderboard does with the answers of the day it shows:

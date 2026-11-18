@@ -18,7 +18,7 @@ export function useDailyAnswers({ gameType, day, todayKey, uid, refreshKey }) {
     let cancelled = false
     const request = challenge
       ? hasPlayedDaily(uid, gameType, day).then((played) => ({ locked: !played, answers: null }))
-      : fetchDailyAnswers(gameType, day).then((answers) => ({ locked: answers === null, answers }))
+      : fetchDailyAnswers(gameType, day, access === 'check' ? uid : undefined).then((answers) => ({ locked: answers === null, answers }))
     request
       .catch((error) => {
         console.error(error)

@@ -2,7 +2,7 @@
 // each, 20 s per round, no lives. Rules → rounds (components/survival/SurvivalRounds) → result, leaderboard and sharing.
 // The run itself is the website's useDailyChallengeState.
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
@@ -204,11 +204,14 @@ function Done({ challenge }: { challenge: Challenge }) {
   const grid = useMemo(() => challengeShareGrid(rounds, results), [rounds, results])
   const time = formatTime(elapsedTime)
   const scoreText = `${score}/${total}`
+  // Bumped once the score is saved: the leaderboard reloads and unlocks today's answers (useDailyAnswers).
+  const [leaderboardVersion, setLeaderboardVersion] = useState(0)
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
       <ResultsSheet
         game="daily_challenge"
+        onSaved={() => setLeaderboardVersion((version) => version + 1)}
         ticketNote={`${t('mobile.home.daily')} · ${total} ${t('mobile.flight.stops')}`}
         states={(results as Result[]).map((result) => (result === 'correct' ? 'good' : 'bad'))}
         title={t('daily_challenge.result_title')}
@@ -249,7 +252,7 @@ function Done({ challenge }: { challenge: Challenge }) {
             {t('daily_challenge.come_back')}
           </Text>
         </View>
-        <ChallengeLeaderboard dailyKey={dailyKey} />
+        <ChallengeLeaderboard dailyKey={dailyKey} refreshKey={leaderboardVersion} />
       </ResultsSheet>
     </View>
   )

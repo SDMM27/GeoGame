@@ -420,7 +420,9 @@
     "hints_used": "Pistas usadas:",
     "no_hints": "ninguna",
     "attempted_countries": "Países propuestos",
-    "played_order": "Orden jugado"
+    "played_order": "Orden jugado",
+    "answers_locked": "🔒 Completa el desafío del día para ver las respuestas de los demás jugadores.",
+    "answers_locked_signed_out": "🔒 Inicia sesión y completa el desafío del día para ver las respuestas de los demás jugadores."
   },
   "multiplayer": {
     "title": "Multijugador",

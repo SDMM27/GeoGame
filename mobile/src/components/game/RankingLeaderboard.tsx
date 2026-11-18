@@ -3,6 +3,10 @@ import { router } from 'expo-router'
 import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, View } from 'react-native'
 
+import { answersOf } from '@shared/utils/dailyAnswers'
+import { GAME_TYPES } from '@shared/utils/gameTypes'
+import { useDailyAnswers } from '@shared/hooks/useDailyAnswers'
+
 import { fetchRankingScores, type RankingScore } from '@/rankingScores'
 import { useAccount } from '@/account/auth'
 import { useLeaderboard } from '@/hooks/useLeaderboard'
@@ -16,12 +20,33 @@ import { visibleRows } from './leaderboardRows'
 const MEDALS = ['🥇', '🥈', '🥉']
 const DEFAULT_MAX_ROWS = 20
 
-export function RankingLeaderboard({ dailyKey, refreshKey, maxRows = DEFAULT_MAX_ROWS, onSettled }: { dailyKey: string; refreshKey?: unknown; maxRows?: number; onSettled?: () => void }) {
+// `todayKey`: the current daily key when `dailyKey` is a past day shown (its answers are open); by default the day is today.
+export function RankingLeaderboard({
+  dailyKey,
+  todayKey = dailyKey,
+  refreshKey,
+  maxRows = DEFAULT_MAX_ROWS,
+  onSettled,
+}: {
+  dailyKey: string
+  todayKey?: string
+  refreshKey?: unknown
+  maxRows?: number
+  onSettled?: () => void
+}) {
   const { t } = useTranslation()
   const colors = useColors()
   const styles = useStyles()
   const { account } = useAccount()
   const { scores, error } = useLeaderboard<RankingScore>(dailyKey, () => fetchRankingScores(dailyKey), refreshKey, onSettled)
+  const answers = useDailyAnswers({ gameType: GAME_TYPES.RANKING, day: dailyKey, todayKey, uid: account?.uid, refreshKey }) as { locked: boolean; signedIn: boolean; answers: Map<string, { playerOrder?: string[] }> | null }
+
+  // The order played, or a lock message while today's answers are locked
+  const rowDetails = (score: RankingScore) => {
+    const shown = answersOf(score, answers) as { playerOrder?: string[] } | null
+    if (!shown) return <Text variant="caption">{t(answers.signedIn ? 'leaderboard.answers_locked' : 'leaderboard.answers_locked_signed_out')}</Text>
+    return Array.isArray(shown.playerOrder) && shown.playerOrder.length > 0 ? <AnswerList title={t('leaderboard.played_order')} answers={shown.playerOrder} /> : undefined
+  }
 
   return (
     <View style={styles.card}>
@@ -39,11 +64,7 @@ export function RankingLeaderboard({ dailyKey, refreshKey, maxRows = DEFAULT_MAX
           <ExpandableRow
             key={`${score.name}-${index}`}
             style={[styles.row, index < 3 && styles.rowTop, Boolean(score.uid) && score.uid === account?.uid && styles.rowMine]}
-            details={
-              Array.isArray(score.playerOrder) && score.playerOrder.length > 0 ? (
-                <AnswerList title={t('leaderboard.played_order')} answers={score.playerOrder} />
-              ) : undefined
-            }>
+            details={rowDetails(score)}>
             <Text variant="bodyStrong" style={styles.rank}>
               {MEDALS[index] ?? `${index + 1}`}
             </Text>

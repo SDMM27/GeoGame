@@ -5,14 +5,18 @@ import { formatTime } from '../utils/formatTime'
 import { getLast7Days } from '../utils/dateUtils'
 import { useAccount } from '../auth'
 import { useLeaderboardRefresh } from '../hooks/useLeaderboardRefresh'
+import { useDailyAnswers } from '../hooks/useDailyAnswers'
+import { answersOf } from '../utils/dailyAnswers'
 import PlayerName, { mineClass } from '../components/PlayerName'
 import './DailyLeaderboard.css'
 import RankBadge from '../components/RankBadge'
 
 
-function AccordionRow({ score, index, account, secondaryFormatter, guessesTitle }) {
+function AccordionRow({ score, index, account, secondaryFormatter, guessesTitle, answers }) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
+  // null while today's answers are locked: never the guesses the score may still carry from an old app
+  const shown = answersOf(score, answers)
 
   return (
     <div className={`daily-lb__row${index < 3 ? ' daily-lb__row--top' : ''}${mineClass(score, account)}`}>
@@ -37,14 +41,17 @@ function AccordionRow({ score, index, account, secondaryFormatter, guessesTitle 
               {t('leaderboard.hints_used')} <strong>{score.hints === 0 ? t('leaderboard.no_hints') : `${score.hints}`}</strong>
             </p>
           )}
-          {Array.isArray(score.guesses) && score.guesses.length > 0 && (
+          {!shown && (
+            <p className="daily-lb__accordion-hints">{t(answers.signedIn ? 'leaderboard.answers_locked' : 'leaderboard.answers_locked_signed_out')}</p>
+          )}
+          {Array.isArray(shown?.guesses) && shown.guesses.length > 0 && (
             <>
               <p className="daily-lb__accordion-title">{guessesTitle ?? t('leaderboard.attempted_countries')}</p>
               <ol className="daily-lb__guess-list">
-                {score.guesses.map((country, i) => (
+                {shown.guesses.map((country, i) => (
                   <li
                     key={`${country}-${i}`}
-                    className={`daily-lb__guess-item${i === score.guesses.length - 1 ? ' daily-lb__guess-item--correct' : ''}`}
+                    className={`daily-lb__guess-item${i === shown.guesses.length - 1 ? ' daily-lb__guess-item--correct' : ''}`}
                   >
                     {i + 1}. {country}
                   </li>
@@ -66,6 +73,7 @@ export default function DailyLeaderboard({ gameType, dailyKey, columnLabels, sec
   const [scores, setScores] = useState([])
   const [loading, setLoading] = useState(true)
   const [showPicker, setShowPicker] = useState(false)
+  const answers = useDailyAnswers({ gameType, day: selectedDate, todayKey: dailyKey, uid: account?.uid, refreshKey })
 
   const days = useMemo(() => (dailyKey ? getLast7Days(dailyKey, i18n.language) : []), [dailyKey, i18n.language])
 
@@ -146,7 +154,7 @@ export default function DailyLeaderboard({ gameType, dailyKey, columnLabels, sec
               {score.mapAssist === true && index === firstAssistedIndex && (
                 <div className="daily-lb__tier">{t('map_assist.leaderboard_tier')}</div>
               )}
-              <AccordionRow score={score} index={index} account={account} secondaryFormatter={secondaryFormatter} guessesTitle={guessesTitle} />
+              <AccordionRow score={score} index={index} account={account} secondaryFormatter={secondaryFormatter} guessesTitle={guessesTitle} answers={answers} />
             </React.Fragment>
           ))}
         </>

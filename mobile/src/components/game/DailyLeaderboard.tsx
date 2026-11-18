@@ -5,7 +5,9 @@ import { ActivityIndicator, View } from 'react-native'
 
 import { formatTime } from '@shared/utils/formatTime'
 import { GAME_TYPES } from '@shared/utils/gameTypes'
+import { answersOf } from '@shared/utils/dailyAnswers'
 import { fetchDailyScores } from '@shared/utils/saveScore'
+import { useDailyAnswers } from '@shared/hooks/useDailyAnswers'
 
 import { useAccount } from '@/account/auth'
 import { useLeaderboard } from '@/hooks/useLeaderboard'
@@ -25,6 +27,7 @@ const DEFAULT_MAX_ROWS = 20
 export function DailyLeaderboard({
   gameType,
   dailyKey,
+  todayKey = dailyKey,
   refreshKey,
   maxRows = DEFAULT_MAX_ROWS,
   onSettled,
@@ -32,6 +35,8 @@ export function DailyLeaderboard({
 }: {
   gameType: string
   dailyKey: string
+  // The current daily key when `dailyKey` is a past day shown (its answers are open); by default the day is today
+  todayKey?: string
   refreshKey?: unknown
   maxRows?: number
   onSettled?: () => void
@@ -43,11 +48,13 @@ export function DailyLeaderboard({
   const styles = useStyles()
   const { account } = useAccount()
   const { scores, error } = useLeaderboard<DailyScore>(`${gameType}|${dailyKey}`, () => fetchDailyScores(gameType, dailyKey), refreshKey, onSettled)
+  const answers = useDailyAnswers({ gameType, day: dailyKey, todayKey, uid: account?.uid, refreshKey }) as { locked: boolean; signedIn: boolean; answers: Map<string, { guesses?: string[] }> | null }
 
-  // What opens under a row: hints used and the answers tried, when the score was saved with them.
+  // What opens under a row: hints used and the answers tried (a lock message while today's are locked).
   const details = (score: DailyScore) => {
-    const guesses = Array.isArray(score.guesses) ? score.guesses : []
-    if (score.hints == null && guesses.length === 0) return undefined
+    const shown = answersOf(score, answers) as { guesses?: string[] } | null
+    const guesses = shown?.guesses ?? []
+    if (score.hints == null && guesses.length === 0 && shown) return undefined
     return (
       <>
         {score.hints != null && (
@@ -58,6 +65,7 @@ export function DailyLeaderboard({
             </Text>
           </Text>
         )}
+        {!shown && <Text variant="caption">{t(answers.signedIn ? 'leaderboard.answers_locked' : 'leaderboard.answers_locked_signed_out')}</Text>}
         {guesses.length > 0 && (
           <AnswerList
             title={t(gameType === GAME_TYPES.QUIZ ? 'quiz.guesses_title' : 'leaderboard.attempted_countries')}

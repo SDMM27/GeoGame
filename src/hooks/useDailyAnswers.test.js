@@ -34,6 +34,7 @@ describe('useDailyAnswers', () => {
     const { result } = renderHook(() => useDailyAnswers(options()))
     expect(result.current.locked).toBe(true)
     await waitFor(() => expect(result.current.locked).toBe(false))
+    expect(fetchDailyAnswers).toHaveBeenCalledWith('BORDER_GUESS', TODAY, 'alice')
     expect(result.current.answers).toBe(answers)
   })
 
@@ -48,7 +49,7 @@ describe('useDailyAnswers', () => {
     fetchDailyAnswers.mockResolvedValue(new Map())
     const { result } = renderHook(() => useDailyAnswers(options({ day: '2026-11-17', uid: undefined })))
     expect(result.current.locked).toBe(false)
-    await waitFor(() => expect(fetchDailyAnswers).toHaveBeenCalledWith('BORDER_GUESS', '2026-11-17'))
+    await waitFor(() => expect(fetchDailyAnswers).toHaveBeenCalledWith('BORDER_GUESS', '2026-11-17', undefined))
   })
 
   it("unlocks today's Daily Challenge from the player's own score", async () => {

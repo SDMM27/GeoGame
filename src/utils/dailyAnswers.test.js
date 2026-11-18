@@ -1,9 +1,62 @@
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { getDocs, setDoc } from 'firebase/firestore'
 
-vi.mock('firebase/firestore', () => ({}))
+vi.mock('firebase/firestore', () => ({
+  collection: (_db, ...path) => path.join('/'),
+  doc: (_db, ...path) => path.join('/'),
+  limit: (count) => count,
+  query: (ref, ...constraints) => [ref, ...constraints],
+  where: (...constraint) => constraint,
+  getDocs: vi.fn(),
+  setDoc: vi.fn(),
+}))
 vi.mock('../Firebase', () => ({ firestore: {} }))
 
-const { answersAccess, answersOf, answersEntryId } = await import('./dailyAnswers')
+const { answersAccess, answersOf, answersEntryId, fetchDailyAnswers } = await import('./dailyAnswers')
+
+describe('fetchDailyAnswers', () => {
+  const day = '2026-11-18'
+  const game = 'COUNTRY_CLUE'
+  const denied = { code: 'permission-denied' }
+
+  beforeEach(() => {
+    getDocs.mockReset().mockRejectedValueOnce(denied)
+    setDoc.mockReset().mockResolvedValue(undefined)
+  })
+
+  it('restores access from a score saved before answers were stored separately', async () => {
+    const guesses = ['A', 'B']
+    getDocs
+      .mockResolvedValueOnce({ docs: [{ id: 'old-score', data: () => ({ guesses }) }] })
+      .mockResolvedValueOnce({ docs: [{ data: () => ({ scoreId: 'other-score', guesses: ['C', 'B'] }) }] })
+
+    const answers = await fetchDailyAnswers(game, day, 'alice')
+
+    expect(getDocs).toHaveBeenNthCalledWith(2, [
+      'daily_scores', ['uid', '==', 'alice'], ['gameType', '==', game], ['dailyKey', '==', day], 1,
+    ])
+    expect(setDoc).toHaveBeenCalledWith(`daily_answers/${day}/${game}/alice`, { scoreId: 'old-score', uid: 'alice', guesses })
+    expect(getDocs).toHaveBeenNthCalledWith(3, `daily_answers/${day}/${game}`)
+    expect(answers.get('other-score').guesses).toEqual(['C', 'B'])
+  })
+
+  it('keeps the answers locked when the player has no score for that game and day', async () => {
+    getDocs.mockResolvedValueOnce({ docs: [] })
+
+    await expect(fetchDailyAnswers(game, day, 'alice')).resolves.toBeNull()
+    expect(setDoc).not.toHaveBeenCalled()
+  })
+
+  it('keeps the answers locked when Firestore still refuses the read after repair', async () => {
+    getDocs
+      .mockResolvedValueOnce({ docs: [{ id: 'saved-score', data: () => ({}) }] })
+      .mockRejectedValueOnce(denied)
+
+    await expect(fetchDailyAnswers(game, day, 'alice')).resolves.toBeNull()
+    expect(setDoc).toHaveBeenCalledWith(`daily_answers/${day}/${game}/alice`, { scoreId: 'saved-score', uid: 'alice' })
+    expect(getDocs).toHaveBeenCalledTimes(3)
+  })
+})
 
 describe('answersAccess', () => {
   it('opens a past day to everyone', () => {

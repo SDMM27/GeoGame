@@ -20,11 +20,13 @@ const SECRET = { kind: 'secret' }
 //
 // Every palette keeps the reticle readable over its land and its ocean: `reticle` is drawn over a wider
 // `reticleHalo` stroke, the way the city codes are.
+// `fixedWebPalette`: the website keeps the full palette in both color schemes.
 // `swatch`: [ocean, land] for the picker's little preview disc. `disco`: the land cycles through the hues (discoRgb).
 export const GLOBE_SKINS = [
   { id: 'classic', unlock: STARTER, palette: null, swatch: null },
   {
     id: 'parchment',
+    fixedWebPalette: true,
     accent: {
       dark: { accent: '#E0B072', strong: '#F0C892', ink: '#2A1A08' },
       light: { accent: '#9A6A2E', strong: '#7A5230', ink: '#FFFFFF' },
@@ -38,6 +40,7 @@ export const GLOBE_SKINS = [
   },
   {
     id: 'tropical',
+    fixedWebPalette: true,
     accent: {
       dark: { accent: '#22C7DF', strong: '#5FDCEB', ink: '#032C35' },
       light: { accent: '#0E7F94', strong: '#0B6475', ink: '#FFFFFF' },
@@ -51,6 +54,7 @@ export const GLOBE_SKINS = [
   },
   {
     id: 'glacier',
+    fixedWebPalette: true,
     accent: {
       dark: { accent: '#8DC6EA', strong: '#B5DCF5', ink: '#0D2A40' },
       light: { accent: '#2F78AE', strong: '#1F5F8E', ink: '#FFFFFF' },

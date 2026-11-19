@@ -87,8 +87,13 @@ export function createGlobeScene(land, events) {
     // The reticle is stroked over a wider halo in the ocean's color so it stays readable over the land too
     colors.reticle = colors.ink
     colors.reticleHalo = colors.oceanDeep
-    // A skin overrides the theme's globe colors, and keeps doing so when the theme changes
-    if (skin?.palette) Object.assign(colors, skin.palette)
+    if (skin?.fixedWebPalette) {
+      Object.assign(colors, skin.palette)
+    } else if (skin?.palette) {
+      // Skinned land keeps a coastline that contrasts with the site's ocean.
+      const { land, reticle, reticleHalo } = skin.palette
+      Object.assign(colors, { land, reticle, reticleHalo, landEdge: alpha(colors.ink, 0.55) })
+    }
   }
 
   const goal = () => CITIES[target].at

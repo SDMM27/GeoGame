@@ -3,22 +3,20 @@
    player chose light), so the --gg-* tokens only need the light default and the [data-theme="dark"] override. */
 @import '@sdmm/design/css/all-geogame.css';
 
-@property --gg-disco-hue {
-  syntax: '<angle>';
-  inherits: false;
-  initial-value: 0deg;
-}
-
 @keyframes gg-disco-hue {
-  from { --gg-disco-hue: 0deg; }
-  to { --gg-disco-hue: 360deg; }
+  /* Legacy HSL colors interpolate in sRGB, following each linear segment of the globe's hue wheel. */
+  0%, 100% { background-color: hsl(0, 80%, var(--gg-disco-lightness, 26%)); }
+  16.666667% { background-color: hsl(60, 80%, var(--gg-disco-lightness, 26%)); }
+  33.333333% { background-color: hsl(120, 80%, var(--gg-disco-lightness, 26%)); }
+  50% { background-color: hsl(180, 80%, var(--gg-disco-lightness, 26%)); }
+  66.666667% { background-color: hsl(240, 80%, var(--gg-disco-lightness, 26%)); }
+  83.333333% { background-color: hsl(300, 80%, var(--gg-disco-lightness, 26%)); }
 }
 
 @media (prefers-reduced-motion: no-preference) {
   /* Match the globe's four-second cycle and limit repaints to the main flight buttons. */
   body[data-disco-accent] :is(.flight-cta, .boarding-pass-board, .next-flight-board) {
     animation: gg-disco-hue 4s linear infinite;
-    background-color: hsl(var(--gg-disco-hue) 80% var(--gg-disco-lightness, 26%));
   }
 
   :root[data-theme='dark'] body[data-disco-accent] {

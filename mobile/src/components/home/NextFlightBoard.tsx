@@ -5,7 +5,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Pressable, Text, View } from 'react-native'
-import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withSequence, withTiming } from 'react-native-reanimated'
+import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withSequence, withTiming, type SharedValue } from 'react-native-reanimated'
 
 import { useFlapStyle } from '@/components/flight/useFlapStyle'
 import { FlapText } from '@/components/flight/FlapText'
@@ -13,14 +13,19 @@ import GameEmblem, { flightCode } from '@/components/GameEmblem'
 import { Button } from '@/components/ui'
 import { fonts, makeStyles, radius, useColors } from '@/theme'
 
+import { useDiscoButtonStyle } from './discoAccent'
+
 export type NextFlight = { game: string; title: string; daily: boolean }
 
-export function NextFlightBoard({ flight, onBoard, onClose }: { flight: NextFlight | null; onBoard: () => void; onClose: () => void }) {
+export function NextFlightBoard({ flight, onBoard, onClose, discoHue }: {
+  flight: NextFlight | null; onBoard: () => void; onClose: () => void; discoHue?: SharedValue<number>
+}) {
   const { t, i18n } = useTranslation()
   const colors = useColors()
   const styles = useStyles()
   const reduced = useReducedMotion()
   const flapStyle = useFlapStyle(true, reduced)
+  const buttonStyle = useDiscoButtonStyle(flight ? discoHue : undefined)
   const upper = (text: string) => text.toLocaleUpperCase(i18n.resolvedLanguage)
   const title = upper(flight ? flight.title : t('globe.all_done'))
   const code = flight ? flightCode(flight.game) : ''
@@ -55,7 +60,7 @@ export function NextFlightBoard({ flight, onBoard, onClose }: { flight: NextFlig
             {flight ? t(flight.daily ? 'globe.offer_daily' : 'globe.offer_game') : t('globe.all_done_hint')}
           </Text>
         </View>
-        {flight && <Button label={t('home.board')} onPress={onBoard} style={styles.button} />}
+        {flight && <Button label={t('home.board')} onPress={onBoard} style={[styles.button, buttonStyle]} />}
       </View>
     </Animated.View>
   )

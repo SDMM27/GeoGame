@@ -4,7 +4,7 @@
 // player drags: no spin, no plane, no dash animation, but the game still works by hand.
 import { geoDistance, geoGraticule10, geoInterpolate, geoOrthographic, geoPath } from 'd3-geo'
 import { alpha, mono } from '@sdmm/design/js'
-import { discoRgb } from '../../utils/globeSkins'
+import { discoFrameTime, discoRgb } from '../../utils/globeSkins'
 
 export const CITIES = [
   { code: 'TYO', key: 'tokyo', at: [139.7, 35.7] },
@@ -175,7 +175,7 @@ export function createGlobeScene(land, events) {
 
     ctx.beginPath(); path(graticule); ctx.lineWidth = 0.6; ctx.strokeStyle = colors.graticule; ctx.stroke()
     const disco = skin?.disco && !s.reduced
-    const [dr, dg, db] = disco ? discoRgb(s.time) : []
+    const [dr, dg, db] = disco ? discoRgb(discoFrameTime()) : []
     ctx.beginPath(); path(land)
     ctx.fillStyle = disco ? `rgb(${Math.round(dr * 255)}, ${Math.round(dg * 255)}, ${Math.round(db * 255)})` : colors.land
     ctx.fill()

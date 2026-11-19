@@ -59,4 +59,51 @@ describe('SiteAccent', () => {
     unmount()
     NAMES.forEach((name) => expect(read(name)).toBe(''))
   })
+
+  it('aligns each disco animation to the document clock once and removes the effect when disabled', () => {
+    const timeline = {}
+    const originalTimeline = Object.getOwnPropertyDescriptor(document, 'timeline')
+    Object.defineProperty(document, 'timeline', { configurable: true, value: timeline })
+
+    try {
+      saveSecretFound()
+      saveSkinChoice('disco')
+      const { getByRole } = render(<><SiteAccent /><button>Board</button></>)
+      expect(document.body.hasAttribute('data-disco-accent')).toBe(true)
+      expect(read('--sd-accent')).toBe(globeSkin('disco').accent.dark.accent)
+
+      const button = getByRole('button')
+      let startTime = 9000
+      const setStartTime = vi.fn((time) => { startTime = time })
+      const animation = {
+        animationName: 'gg-disco-hue',
+        timeline,
+        get startTime() { return startTime },
+        set startTime(time) { setStartTime(time) },
+      }
+      const differentTimeline = { ...animation, timeline: {} }
+      const unrelated = { ...animation, animationName: 'another-animation' }
+      button.getAnimations = () => [differentTimeline, unrelated, animation]
+      const dispatchStart = (animationName) => button.dispatchEvent(Object.assign(
+        new Event('animationstart', { bubbles: true }), { animationName },
+      ))
+
+      dispatchStart('another-animation')
+      dispatchStart('gg-disco-hue')
+      dispatchStart('gg-disco-hue')
+      expect(setStartTime).toHaveBeenCalledTimes(1)
+      expect(setStartTime).toHaveBeenCalledWith(0)
+      expect(differentTimeline.startTime).toBe(9000)
+      expect(unrelated.startTime).toBe(9000)
+
+      act(() => saveAccentEnabled(false))
+      expect(document.body.hasAttribute('data-disco-accent')).toBe(false)
+      animation.startTime = 5000
+      dispatchStart('gg-disco-hue')
+      expect(animation.startTime).toBe(5000)
+    } finally {
+      if (originalTimeline) Object.defineProperty(document, 'timeline', originalTimeline)
+      else delete document.timeline
+    }
+  })
 })

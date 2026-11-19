@@ -39,7 +39,7 @@ import {
   saveSkinChoice,
 } from '@shared/utils/globeSkins'
 
-import { useActiveGlobeSkin } from '@/hooks/useActiveGlobeSkin'
+import type { useActiveGlobeSkin } from '@/hooks/useActiveGlobeSkin'
 import { fonts, makeStyles, radius, space, useTheme } from '@/theme'
 
 import { CITY_VECTORS, FLIGHT_PATH, GRATICULE, LAND, ROUTES_ACCENT, ROUTES_ACCENT2 } from './globeGeometry'
@@ -86,12 +86,12 @@ const PARTY_PIECES = 40
 const CONFETTI = ['#FF2BD6', '#FFD447', '#3DDC97', '#22B8CF', '#FF6B3D', '#FFFFFF']
 const BANNER_MS = 5000
 
-// The disco land at `time` seconds (a local copy of the shared discoRgb: worklets from ../src are not guaranteed a babel pass)
-function discoLand(time: number) {
+// Matches the website's discoRgb; worklets from ../src are not guaranteed a Babel pass.
+function discoLand(hue: number) {
   'worklet'
-  const h = (((time / 4) % 1) + 1) % 1
+  const h = hue / 30
   const channel = (n: number) => {
-    const k = (n + h * 12) % 12
+    const k = (n + h) % 12
     return 0.6 - 0.4 * Math.max(-1, Math.min(k - 3, 9 - k, 1))
   }
   return [channel(0), channel(8), channel(4), 1]
@@ -158,12 +158,17 @@ export function FlightGlobe({
   onFind,
   overlay = null,
   visible,
+  globeSkin,
+  discoHue,
   uid = null,
-}: { onFind?: () => void; overlay?: ReactNode; visible?: SharedValue<boolean>; uid?: string | null } = {}) {
+}: {
+  onFind?: () => void; overlay?: ReactNode; visible?: SharedValue<boolean>; uid?: string | null;
+  globeSkin: ReturnType<typeof useActiveGlobeSkin>; discoHue: SharedValue<number>
+}) {
   const { t } = useTranslation()
   const { colors, scheme } = useTheme()
   const styles = useStyles()
-  const { skin, choice, level, secret } = useActiveGlobeSkin(uid)
+  const { skin, choice, level, secret } = globeSkin
   const disco = skin.id === SECRET_SKIN
   const look = useMemo(() => resolveGlobePalette(skin, colors, scheme), [skin, colors, scheme])
   const ink: Ink = useMemo(
@@ -197,12 +202,13 @@ export function FlightGlobe({
   const longitude = useDerivedValue(() => state.value.lon)
   const latitude = useDerivedValue(() => state.value.lat)
   const basis = useDerivedValue(() => viewBasis(longitude.value, latitude.value))
-  // Constant 0 unless the disco skin is on, so the uniforms do not follow the clock for the other skins
-  const discoClock = useDerivedValue(() => (disco && !reduced ? state.value.clock : 0))
+  // Keep the offscreen canvas still while the home buttons continue to follow the shared hue.
+  const visibleHue = useDerivedValue(() => (disco && !reduced && (!visible || visible.value) ? discoHue.value : 0))
+  const landPaint = useDerivedValue(() => (disco && !reduced ? discoLand(visibleHue.value) : landColor))
   const landUniforms = useDerivedValue(() => ({
     center: [c, c], radius: r,
     east: basis.value.slice(0, 3), north: basis.value.slice(3, 6), forward: basis.value.slice(6, 9),
-    landColor: disco && !reduced ? discoLand(discoClock.value) : landColor, edgeColor, gridColor,
+    landColor: landPaint.value, edgeColor, gridColor,
   }))
   // The party's progress, 0 -> 1 (-1 when there is none): the confetti only moves when it changes
   const partyProgress = useDerivedValue(() => (state.value.party > 0 ? 1 - state.value.party / PARTY_SECONDS : -1))
@@ -266,6 +272,10 @@ export function FlightGlobe({
   // Under reduced motion nothing moves; the frame callback only lets the pause after a find run out (cheap early return)
   const frameCallback = useFrameCallback((info) => {
     'worklet'
+    // One turn every four seconds; focus and app-state handling below also pause this clock.
+    if (disco && !reduced && info.timeSincePreviousFrame) {
+      discoHue.set((discoHue.get() + info.timeSincePreviousFrame * (360 / 4000)) % 360)
+    }
     if (visible && !visible.value) return
     const current = state.value
     if (current.reduced && current.phase !== 'found') return
@@ -423,7 +433,7 @@ export function FlightGlobe({
                 </Circle>
               ) : (
                 <>
-                  <Path path={landPath} color={look.land} />
+                  <Path path={landPath} color={landPaint} />
                   <Path path={landPath} style="stroke" strokeWidth={0.7} color={look.landEdge} />
                 </>
               )}

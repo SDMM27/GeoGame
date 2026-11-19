@@ -87,7 +87,7 @@ export function createGlobeScene(land, events) {
     // The reticle is stroked over a wider halo in the ocean's color so it stays readable over the land too
     colors.reticle = colors.ink
     colors.reticleHalo = colors.oceanDeep
-    if (skin?.fixedWebPalette) {
+    if (skin?.fixedPalette) {
       Object.assign(colors, skin.palette)
     } else if (skin?.palette) {
       // Skinned land keeps a coastline that contrasts with the site's ocean.

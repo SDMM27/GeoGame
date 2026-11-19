@@ -8,9 +8,13 @@ import { activeSkin, loadAccentEnabled, loadSecretFound, loadSkinChoice, onGlobe
 import { useTestMode } from '@/testMode'
 import type { SkinAccents } from '@/theme'
 
+export type GlobePalette = Record<'ocean' | 'oceanDeep' | 'land' | 'landEdge' | 'graticule' | 'reticle' | 'reticleHalo', string>
+
 export type GlobeSkin = {
   id: string
-  palette: Record<string, string> | null
+  palette: GlobePalette | null
+  fixedPalette?: boolean
+  swatch: [string, string] | null
   accent?: SkinAccents
 }
 

@@ -8,13 +8,15 @@ import { Modal, Pressable, ScrollView, Switch, View } from 'react-native'
 
 import { isSkinUnlocked, saveAccentEnabled, visibleSkins } from '@shared/utils/globeSkins'
 
-import { useAccentEnabled } from '@/hooks/useActiveGlobeSkin'
+import { useAccentEnabled, type GlobeSkin } from '@/hooks/useActiveGlobeSkin'
 import { ScreenTitle } from '@/components/flight'
 import { Button, Text, Touchable } from '@/components/ui'
 import { isTestMode, setTestMode, testModeAvailable } from '@/testMode'
 import { makeStyles, radius, space, useColors } from '@/theme'
 
-type Skin = { id: string; unlock: { kind: string; level?: number }; swatch: [string, string] | null }
+import { resolveGlobeSwatch } from './globePalette'
+
+type Skin = Pick<GlobeSkin, 'id' | 'fixedPalette' | 'swatch'> & { unlock: { kind: string; level?: number } }
 
 export function GlobeSkinPicker({
   uid,
@@ -60,7 +62,7 @@ export function GlobeSkinPicker({
               {(visibleSkins(progress) as Skin[]).map((skin) => {
                 const selected = choice === skin.id
                 const locked = !isSkinUnlocked(skin, progress)
-                const [ocean, land] = skin.swatch ?? [colors.globeOcean, colors.globeLand]
+                const [ocean, land] = resolveGlobeSwatch(skin, colors)
                 return (
                   <Touchable
                     key={skin.id}

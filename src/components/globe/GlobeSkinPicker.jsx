@@ -6,7 +6,7 @@ import { isSkinUnlocked, loadAccentEnabled, saveAccentEnabled, visibleSkins } fr
 import './GlobeSkinPicker.css'
 
 const swatchStyle = (skin) => {
-  const ocean = skin.fixedWebPalette ? skin.swatch[0] : 'var(--gg-globe-ocean)'
+  const ocean = skin.fixedPalette ? skin.swatch[0] : 'var(--gg-globe-ocean)'
   const land = skin.swatch?.[1] ?? 'var(--gg-globe-land)'
   return { background: `linear-gradient(135deg, ${ocean} 50%, ${land} 50%)` }
 }

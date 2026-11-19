@@ -67,6 +67,7 @@ export default function RoomGame({ room, progress, results, playerId, onDone }) 
   // Survival: rounds cleared and lives left as they change (and the round, in a live room), then the rounds
   // cleared as the score
   const survivalRoom = useMemo(() => ({
+    mode: room.mode,
     onProgress: ({ score, ...state }) => {
       if (doneRef.current) return
       reportProgress(room.id, playerId, { gameIndex, found: score, total, finished: false, ...state }).catch(console.error)
@@ -74,7 +75,7 @@ export default function RoomGame({ room, progress, results, playerId, onDone }) 
     onFinished: ({ score, errors, elapsedTime }, options) =>
       onGameFinished({ weightedScore: score, countriesSolved: score, attempts: errors, elapsedTime }, options),
     onExit: () => onDone(gameIndex),
-  }), [room.id, playerId, gameIndex, total, onGameFinished, onDone])
+  }), [room.id, room.mode, playerId, gameIndex, total, onGameFinished, onDone])
 
   const quizRoom = useMemo(() => ({
     seed,

@@ -18,7 +18,7 @@
   /* Match the globe's four-second cycle and limit repaints to the main flight buttons. */
   body[data-disco-accent] :is(.flight-cta, .boarding-pass-board, .next-flight-board) {
     animation: gg-disco-hue 4s linear infinite;
-    background-color: hsl(var(--gg-disco-hue) 80% var(--gg-disco-lightness, 28%));
+    background-color: hsl(var(--gg-disco-hue) 80% var(--gg-disco-lightness, 26%));
   }
 
   :root[data-theme='dark'] body[data-disco-accent] {

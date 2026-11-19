@@ -4,10 +4,11 @@ import { router } from 'expo-router'
 import { memo, useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
-import Animated, { FadeInDown, useAnimatedScrollHandler, useDerivedValue, useReducedMotion, useSharedValue } from 'react-native-reanimated'
+import Animated, { FadeInDown, useAnimatedScrollHandler, useDerivedValue, useReducedMotion, useSharedValue, type SharedValue } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useMissions } from '@shared/hooks/useMissions'
+import { SECRET_SKIN } from '@shared/utils/globeSkins'
 import { nextFlight } from '@shared/utils/nextFlight'
 
 import { useAccount } from '@/account/auth'
@@ -18,11 +19,13 @@ import { BoardStrip, DepartureRow, DeparturesBoard, ExpandableDeparture, Kicker,
 import GameEmblem from '@/components/GameEmblem'
 import { FlapText } from '@/components/flight/FlapText'
 import { useDailyCountdown } from '@/components/home/dailyCountdown'
+import { useDiscoButtonStyle } from '@/components/home/discoAccent'
 import { FlightGlobe } from '@/components/home/FlightGlobe'
 import { NextFlightBoard } from '@/components/home/NextFlightBoard'
 import { MissionsCard } from '@/components/missions/MissionsCard'
 import { Text, Touchable } from '@/components/ui'
 import { LISTED_GAMES, type GameDefinition } from '@/games'
+import { useAccentEnabled, useActiveGlobeSkin } from '@/hooks/useActiveGlobeSkin'
 import { startMultiGame } from '@/multiplayer/navigation'
 import { fonts, makeStyles, radius, space, useColors, useTheme } from '@/theme'
 import type { Palette } from '@/theme'
@@ -62,6 +65,7 @@ function passParts(
   styles: ReturnType<typeof useStyles>,
   expanded: boolean,
   titleColor: string,
+  boardStyle: ReturnType<typeof useDiscoButtonStyle>,
 ) {
   const done = status === 'won' || status === 'played'
   return [
@@ -88,7 +92,7 @@ function passParts(
       <Touchable
         accessibilityRole="button"
         onPress={() => router.push({ pathname: game.route as never, params: { mode: 'daily' } })}
-        style={styles.board}>
+        style={[styles.board, boardStyle]}>
         <Text variant="bodyStrong" numberOfLines={1} color={colors.onAccent} style={{ flexShrink: 1 }}>
           {t('buttons.play')}
         </Text>
@@ -119,8 +123,8 @@ function passParts(
 
 // Opening a pass only re-renders it and the pass being closed, not every SVG,
 // title and button in the departure board.
-const DailyDeparture = memo(function DailyDeparture({ game, index, status, expanded, toggle }: {
-  game: GameDefinition; index: number; status: DailyStatus | null; expanded: boolean; toggle: (id: string) => void
+const DailyDeparture = memo(function DailyDeparture({ game, index, status, expanded, toggle, discoHue }: {
+  game: GameDefinition; index: number; status: DailyStatus | null; expanded: boolean; toggle: (id: string) => void; discoHue?: SharedValue<number>
 }) {
   const styles = useStyles()
   const { colors, gameColors } = useTheme()
@@ -128,6 +132,7 @@ const DailyDeparture = memo(function DailyDeparture({ game, index, status, expan
   const { label, tone } = dailyBoardStatus(status, t)
   const done = status === 'won' || status === 'played'
   const codeColor = done ? colors.textMuted : gameColors[game.id]
+  const boardStyle = useDiscoButtonStyle(expanded ? discoHue : undefined)
   return (
     <ExpandableDeparture
       game={game.id}
@@ -143,7 +148,7 @@ const DailyDeparture = memo(function DailyDeparture({ game, index, status, expan
       codeLabel={t('mobile.flight.code').toLocaleUpperCase()}
       gateLabel={t('home.gate').toLocaleUpperCase()}
       accessibilityLabel={`${t(game.titleKey)}, ${label}`}>
-      {passParts(game, status, t, colors, styles, expanded, codeColor)}
+      {passParts(game, status, t, colors, styles, expanded, codeColor, boardStyle)}
     </ExpandableDeparture>
   )
 })
@@ -190,6 +195,10 @@ export default function HomeScreen() {
   const globeVisible = useDerivedValue(() => scrollY.value < globeBottom.value)
   const onScroll = useAnimatedScrollHandler((event) => { scrollY.value = event.contentOffset.y })
   const { account } = useAccount()
+  const globeSkin = useActiveGlobeSkin(account?.uid)
+  const discoHue = useSharedValue(0)
+  const accentEnabled = useAccentEnabled()
+  const buttonHue = accentEnabled && globeSkin.skin.id === SECRET_SKIN && !reduceMotion ? discoHue : undefined
   // Loaded once for the missions card and the dailies played today (one history read)
   const missions = useMissions(account?.uid ?? null)
   const dailyStatus = missions.dailies?.status ?? null
@@ -234,6 +243,8 @@ export default function HomeScreen() {
       <View style={styles.globe} onLayout={(event) => { globeBottom.value = event.nativeEvent.layout.y + event.nativeEvent.layout.height }}>
         <FlightGlobe
           uid={account?.uid ?? null}
+          globeSkin={globeSkin}
+          discoHue={discoHue}
           visible={globeVisible}
           onFind={onGlobeFind}
           overlay={
@@ -243,6 +254,7 @@ export default function HomeScreen() {
                 flight={offer && { game: offer.game.id, title: t(offer.game.titleKey), daily: offer.daily }}
                 onBoard={boardOffer}
                 onClose={() => setOfferOpen(false)}
+                discoHue={buttonHue}
               />
             )
           }
@@ -257,7 +269,7 @@ export default function HomeScreen() {
       <View style={styles.pad}>
         <DeparturesBoard>
           {DAILY_GAMES.map((game, index) => (
-            <DailyDeparture key={game.id} game={game} index={index} status={statusOf(game)} expanded={openId === game.id} toggle={toggleOpen} />
+            <DailyDeparture key={game.id} game={game} index={index} status={statusOf(game)} expanded={openId === game.id} toggle={toggleOpen} discoHue={buttonHue} />
           ))}
         </DeparturesBoard>
       </View>

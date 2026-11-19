@@ -1,6 +1,6 @@
 // Small design-system primitives for the app.
 import * as Haptics from 'expo-haptics'
-import type { ReactNode } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import {
   ActivityIndicator,
   Pressable,
@@ -42,6 +42,7 @@ export function Text({
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
+type PressableStyle = ComponentProps<typeof Animated.View>['style']
 
 // Pressable with a spring "press" scale and haptic tick.
 export function Touchable({
@@ -52,7 +53,7 @@ export function Touchable({
   onPressOut,
   onPress,
   ...props
-}: PressableProps & { style?: StyleProp<ViewStyle>; haptic?: boolean; children?: ReactNode }) {
+}: Omit<PressableProps, 'style'> & { style?: PressableStyle; haptic?: boolean; children?: ReactNode }) {
   const pressed = useSharedValue(1)
   const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: pressed.get() }] }))
   return (
@@ -94,7 +95,7 @@ export function Button({
   icon?: ReactNode
   disabled?: boolean
   loading?: boolean
-  style?: StyleProp<ViewStyle>
+  style?: PressableStyle
   color?: string
 }) {
   const colors = useColors()

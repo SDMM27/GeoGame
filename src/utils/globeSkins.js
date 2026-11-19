@@ -164,13 +164,21 @@ export const activeSkin = (id, progress = {}) => {
 // Whether a score change crosses the easter egg's threshold (fires once, on the find that reaches it).
 export const reachesEasterEgg = (previous, next) => previous < EASTER_EGG_SCORE && next >= EASTER_EGG_SCORE
 
-// The disco land at `time` seconds: [r, g, b] in 0..1, one turn of the hue wheel every 4 s. A worklet, so the app's
-// UI thread can feed it to the land shader each frame (the directive is a plain string on the website).
+// The browser gives every animation callback in a frame the same document time, even when the globe remounts.
+export const discoFrameTime = () => (document.timeline?.currentTime ?? performance.now()) / 1000
+
+// One turn of the hue wheel every 4 seconds.
+export function discoHue(time) {
+  'worklet'
+  return ((((time / 4) % 1) + 1) % 1) * 360
+}
+
+// The disco land at `time` seconds: [r, g, b] in 0..1.
 export function discoRgb(time) {
   'worklet'
-  const h = (((time / 4) % 1) + 1) % 1
+  const h = discoHue(time) / 30
   const channel = (n) => {
-    const k = (n + h * 12) % 12
+    const k = (n + h) % 12
     return 0.6 - 0.4 * Math.max(-1, Math.min(k - 3, 9 - k, 1))
   }
   return [channel(0), channel(8), channel(4)]

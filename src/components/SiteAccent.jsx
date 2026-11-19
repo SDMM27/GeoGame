@@ -22,6 +22,7 @@ export default function SiteAccent() {
   useEffect(() => onGlobeSkinChange(() => setEnabled(loadAccentEnabled())), [])
 
   const colors = skinAccent(skin, scheme, enabled)
+  const disco = Boolean(colors && skin.disco)
   useEffect(() => {
     const style = document.documentElement.style
     if (!colors) {
@@ -36,6 +37,24 @@ export default function SiteAccent() {
     style.setProperty('--gg-accent-line', rgba(colors.accent, dark ? 0.35 : 0.4))
     return () => VARS.forEach((name) => style.removeProperty(name))
   }, [colors, scheme])
+
+  useEffect(() => {
+    if (!disco) return undefined
+    const { body } = document
+    const sync = (event) => {
+      if (event.animationName !== 'gg-disco-hue' || event.pseudoElement) return
+      const animation = event.target.getAnimations?.().find((entry) =>
+        entry.animationName === event.animationName && entry.timeline === document.timeline)
+      // The globe computes its hue from the document clock, whose origin is zero.
+      if (animation && animation.startTime !== 0) animation.startTime = 0
+    }
+    body.addEventListener('animationstart', sync)
+    body.setAttribute('data-disco-accent', '')
+    return () => {
+      body.removeEventListener('animationstart', sync)
+      body.removeAttribute('data-disco-accent')
+    }
+  }, [disco])
 
   return null
 }

@@ -181,7 +181,7 @@ export default function SurvivalGame({
               <span className="survival-waiting">
                 {t('survival.waiting_players', { done: shared.waiting.done, total: shared.waiting.total })}
               </span>
-            ) : (
+            ) : room?.mode === 'live' && (
               <button className="survival-btn" onClick={next}>{t('survival.next')}</button>
             ))}
           </div>

@@ -45,6 +45,7 @@ import { fonts, makeStyles, radius, space, useTheme } from '@/theme'
 import { CITY_VECTORS, FLIGHT_PATH, GRATICULE, LAND, ROUTES_ACCENT, ROUTES_ACCENT2 } from './globeGeometry'
 import { createPathRing, finishFramePath, framePath } from './framePaths'
 import { GlobeSkinPicker } from './GlobeSkinPicker'
+import { resolveGlobePalette } from './globePalette'
 import { GLOBE_LAND_SHADER } from './globeShader'
 import { appendLines, appendRings, rotate, sampleAt, toScreen, viewBasis } from './globeMath'
 import {
@@ -164,17 +165,7 @@ export function FlightGlobe({
   const styles = useStyles()
   const { skin, choice, level, secret } = useActiveGlobeSkin(uid)
   const disco = skin.id === SECRET_SKIN
-  // Classic keeps the theme's colors; the other skins bring their own (the reticle and the city codes sit on a halo)
-  const look = useMemo(() => {
-    const palette = skin.palette
-    if (!palette) {
-      return {
-        ocean: colors.globeOcean, oceanDeep: colors.globeOceanDeep, land: colors.globeLand, landEdge: colors.globeLandEdge,
-        graticule: colors.globeGraticule, reticle: colors.text, reticleHalo: scheme === 'light' ? colors.surface : colors.globeOceanDeep,
-      }
-    }
-    return palette as Record<'ocean' | 'oceanDeep' | 'land' | 'landEdge' | 'graticule' | 'reticle' | 'reticleHalo', string>
-  }, [skin, colors, scheme])
+  const look = useMemo(() => resolveGlobePalette(skin, colors, scheme), [skin, colors, scheme])
   const ink: Ink = useMemo(
     () => ({ accent: colors.accent, muted: colors.textMuted, text: look.reticle, halo: look.reticleHalo }),
     [colors, look]

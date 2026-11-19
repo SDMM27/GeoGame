@@ -1,8 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
+import { globeSkin } from '../../utils/globeSkins'
 import { createGlobeScene } from './globeScene'
 
 const LAND = { type: 'FeatureCollection', features: [] }
-const state = () => ({ colors: {}, w: 400, h: 400, reduced: true, time: 0, canvas: {} })
+const state = () => ({ colors: { ink: '#111111', accent: '#007700' }, w: 400, h: 400, reduced: true, time: 0, canvas: {} })
 
 describe('globe mini-game', () => {
   it('finds the city when the arrow keys bring it near the reticle, and scores it', () => {
@@ -36,5 +37,36 @@ describe('globe mini-game', () => {
       hooks.celebrate()
       hooks.setSkin(null)
     }).not.toThrow()
+  })
+
+  it('draws the site ocean and the selected land after a theme switch', () => {
+    const addColorStop = vi.fn()
+    const fills = []
+    const methods = 'clearRect fillRect beginPath arc moveTo lineTo closePath stroke save setLineDash restore strokeText fillText'
+    const ctx = {
+      createRadialGradient: () => ({ addColorStop }),
+      fill() { fills.push(this.fillStyle) },
+      ...Object.fromEntries(methods.split(' ').map((method) => [method, () => {}])),
+    }
+    const s = { ...state(), ctx }
+    const hooks = createGlobeScene(LAND, {})(s)
+    const skin = globeSkin('neon')
+    hooks.setSkin(skin)
+    const root = document.documentElement
+    const originalStyle = root.getAttribute('style')
+    try {
+      for (const [ocean, deep] of [['#dfe7f5', '#c4d1ea'], ['#1b2a4d', '#0e1630']]) {
+        root.style.setProperty('--gg-globe-ocean', ocean)
+        root.style.setProperty('--gg-globe-ocean-deep', deep)
+        hooks.theme(s)
+        hooks.frame(s, 0)
+        expect(addColorStop.mock.calls.slice(-2)).toEqual([[0, ocean], [1, deep]])
+        expect(fills).toContain(skin.palette.land)
+        fills.length = 0
+      }
+    } finally {
+      if (originalStyle === null) root.removeAttribute('style')
+      else root.setAttribute('style', originalStyle)
+    }
   })
 })

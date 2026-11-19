@@ -6,7 +6,7 @@ import { isSkinUnlocked, loadAccentEnabled, saveAccentEnabled, visibleSkins } fr
 import './GlobeSkinPicker.css'
 
 const swatchStyle = (skin) => ({
-  background: `linear-gradient(135deg, ${skin.swatch?.[0] ?? 'var(--gg-globe-ocean)'} 50%, ${skin.swatch?.[1] ?? 'var(--gg-globe-land)'} 50%)`,
+  background: `linear-gradient(135deg, var(--gg-globe-ocean) 50%, ${skin.swatch?.[1] ?? 'var(--gg-globe-land)'} 50%)`,
 })
 
 export default function GlobeSkinPicker({ choice, level, secret, signedIn, onPick }) {

@@ -292,7 +292,9 @@ function SurvivalRun({ modes, lives, timer, ramp, seed, snapshot = null, snapKey
           <Text variant="caption">{t('survival.waiting_players', { done: shared.waiting.done, total: shared.waiting.total })}</Text>
         )}
       </View>
-      {!synced && <Button label={t('survival.next')} variant="secondary" onPress={next} style={{ minHeight: 40, paddingHorizontal: space.lg }} />}
+      {!synced && play?.room.mode === 'live' && (
+        <Button label={t('survival.next')} variant="secondary" onPress={next} style={{ minHeight: 40, paddingHorizontal: space.lg }} />
+      )}
     </Animated.View>
   )
 

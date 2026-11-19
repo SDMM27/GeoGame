@@ -5,9 +5,11 @@ import { useTranslation } from 'react-i18next'
 import { isSkinUnlocked, loadAccentEnabled, saveAccentEnabled, visibleSkins } from '../../utils/globeSkins'
 import './GlobeSkinPicker.css'
 
-const swatchStyle = (skin) => ({
-  background: `linear-gradient(135deg, var(--gg-globe-ocean) 50%, ${skin.swatch?.[1] ?? 'var(--gg-globe-land)'} 50%)`,
-})
+const swatchStyle = (skin) => {
+  const ocean = skin.fixedWebPalette ? skin.swatch[0] : 'var(--gg-globe-ocean)'
+  const land = skin.swatch?.[1] ?? 'var(--gg-globe-land)'
+  return { background: `linear-gradient(135deg, ${ocean} 50%, ${land} 50%)` }
+}
 
 export default function GlobeSkinPicker({ choice, level, secret, signedIn, onPick }) {
   const { t } = useTranslation()

@@ -158,7 +158,7 @@ export const WEEKLY_POOL = [
   { id: 'week_challenge_10', family: 'challenge', tier: 'hard', untilWeek: '2026-W45', emoji: '🥇', icon: 'bullseye', target: 1, value: (games) => count(games, isChallengeOf10) },
   { id: 'week_daily_wins_30', family: 'daily_wins', tier: 'hard', sinceWeek: '2026-W45', emoji: '🏆', icon: 'trophy-outline', target: 30, value: (games) => count(games, (game) => isDaily(game) && game.solved) },
   { id: 'week_perfect_6', family: 'perfect', tier: 'hard', sinceWeek: '2026-W45', emoji: '💠', icon: 'star-four-points-outline', target: 6, value: (games) => count(games, isPerfect) },
-  { id: 'week_found_2500', family: 'found', tier: 'hard', sinceWeek: '2026-W45', emoji: '🌏', icon: 'earth-arrow-right', target: 2500, value: allFound },
+  { id: 'week_found_2500', family: 'found', tier: 'hard', sinceWeek: '2026-W45', emoji: '🌏', icon: 'earth-arrow-right', target: 1000, value: allFound },
   { id: 'week_play_70', family: 'volume', tier: 'hard', sinceWeek: '2026-W45', emoji: '🎮', icon: 'gamepad-variant-outline', target: 70, value: (games) => games.length },
   { id: 'week_perfect_hard_3', family: 'perfect', tier: 'hard', sinceWeek: '2026-W45', emoji: '👑', icon: 'crown-outline', target: 3, value: (games) => count(games, (game) => isPerfect(game) && isHardDifficulty(game)) },
   { id: 'week_challenge_10_days_5', family: 'challenge', tier: 'hard', sinceWeek: '2026-W45', emoji: '🥇', icon: 'bullseye', target: 5, value: (games) => distinct(games.filter(isChallengeOf10).map((game) => game.dailyKey)) },

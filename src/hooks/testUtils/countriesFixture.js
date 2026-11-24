@@ -2,7 +2,7 @@
 // Géométrie : un carré de 4° autour du centre donné.
 const MISSING_FLAG_SHIFT = { Facile: 'Moyen', Moyen: 'Difficile', Difficile: 'Facile' }
 
-function country({ admin, isoA2, isoA3, center: [lng, lat], difficulty, capital, population, aliases = [] }) {
+export function country({ admin, isoA2, isoA3, center: [lng, lat], difficulty, capital, population, aliases = [] }) {
   const ring = [[lng - 2, lat - 2], [lng + 2, lat - 2], [lng + 2, lat + 2], [lng - 2, lat + 2], [lng - 2, lat - 2]]
   return {
     type: 'Feature',

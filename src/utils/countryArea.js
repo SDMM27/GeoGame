@@ -48,14 +48,23 @@ export function getCountryAreaKm2(country) {
   }, 0)
 }
 
-// Mean of all ring vertices on the unit sphere. Uses the precomputed `center`
-// property when present (the mobile app ships simplified geometries).
+// Mean of the outer-ring vertices of the largest polygon, on the unit sphere. Uses the
+// precomputed `center` property when present (the mobile app ships simplified geometries).
+// Only the mainland is averaged: distant islands (Azores, Canaries, overseas territories)
+// would drag the mean into the ocean — Portugal's mean centre falls in the Atlantic,
+// making it look closer to France than to Spain.
 export function getGeographicCenter(country) {
   const precomputed = country?.properties?.center
   if (precomputed) return { lat: precomputed[1], lng: precomputed[0] }
 
-  const coordinates = collectCoordinates(country.geometry).flat(2)
-  if (coordinates.length === 0) return { lat: 0, lng: 0 }
+  const polygons = collectCoordinates(country.geometry)
+  if (polygons.length === 0) return { lat: 0, lng: 0 }
+
+  const mainRing = polygons.reduce((largest, polygon) =>
+    getRingAreaKm2(polygon[0]) > getRingAreaKm2(largest[0]) ? polygon : largest
+  )[0]
+
+  const coordinates = mainRing
 
   let x = 0
   let y = 0

@@ -21,7 +21,7 @@ import Animated, {
 } from 'react-native-reanimated'
 
 import { pieceGrid, piecesFor } from '@shared/utils/flagCollection'
-import { HISTORICAL_FLAGS, HISTORICAL_FLAG_COLOR, HISTORICAL_FLAG_COST } from '@shared/data/historicalFlags'
+import { HISTORICAL_FLAGS } from '@shared/data/historicalFlags'
 import { FLAG_POOL } from '@shared/utils/flagCollectionData'
 import { getCountryName } from '@shared/utils/getCountryName'
 import { onLeagueFlagReveal } from '@shared/utils/leagueFlagReveal'
@@ -31,12 +31,12 @@ import { useFlagRevealQueue } from '@shared/hooks/useFlagRevealQueue'
 import { useAccount } from '@/account/auth'
 import { flagsAfter, haptic, rarityColor, rarityOf, type Claim, type Rarity } from '@/components/collection/claim'
 import { FlagPiece } from '@/components/collection/FlagPiece'
+import { HistoricalFlagReveal } from '@/components/collection/HistoricalFlagReveal'
 import { setFlagOverlayOpen } from '@/components/collection/busy'
 import { onReplayFlag } from '@/components/collection/replay'
 import { Kicker } from '@/components/flight'
 import { Button, Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
-import { getHistoricalFlag } from '@/historicalFlags'
 import { fonts, makeStyles, radius, space, useColors } from '@/theme'
 
 // replay: a flag of the collection tapped again, not a new one
@@ -96,16 +96,22 @@ export function FlagUnlockOverlay() {
   const item = queue[0]
   if (!item) return null
   const advance = () => store.advance(item.id)
+  const historical = HISTORICAL_FLAGS.find(({ id }: { id: string }) => id === item.iso)
+  const onView = queue.length === 1 ? () => {
+    advance()
+    if (!store.getSnapshot().length) router.push('/(tabs)/profile')
+  } : undefined
+  const onSkip = queue.length > 1 ? () => store.skipThrough(queue[queue.length - 1].id) : undefined
+  if (historical) {
+    return <HistoricalFlagReveal key={`${uid}:${item.id}`} flag={historical} replay={item.replay} onNext={advance} onSkip={onSkip} onView={onView} />
+  }
   return (
     <FlagReveal
       key={`${uid}:${item.id}`}
       item={item}
       onNext={advance}
-      onSkip={queue.length > 1 ? () => store.skipThrough(queue[queue.length - 1].id) : undefined}
-      onView={queue.length === 1 ? () => {
-        advance()
-        if (!store.getSnapshot().length) router.push('/(tabs)/profile')
-      } : undefined}
+      onSkip={onSkip}
+      onView={onView}
     />
   )
 }
@@ -115,15 +121,13 @@ function FlagReveal({ item, onNext, onView, onSkip }: { item: Item; onNext: () =
   const styles = useStyles()
   const { t, i18n } = useTranslation()
   const reduced = useReducedMotion()
-  const historical = HISTORICAL_FLAGS.find(({ id }: { id: string }) => id === item.iso)
-  const rarity = historical ? 'legendary' : rarityOf(item.iso)
-  const color = historical ? HISTORICAL_FLAG_COLOR : rarityColor(rarity)
-  const cost = historical ? HISTORICAL_FLAG_COST : piecesFor(rarity)
-  const { cols, rows } = historical ? { cols: 5, rows: 2 } : pieceGrid(cost)
-  const language = i18n.language?.startsWith('fr') ? 'fr' : 'en'
-  const name = historical?.name[language] ?? ((getCountryName(item.iso, i18n.language) as string) || item.iso)
-  const rarityLabel = t(historical ? 'collection.historical.title' : `collection.rarity.${rarity}`)
-  const source = historical ? getHistoricalFlag(item.iso) : getFlag(item.iso)
+  const rarity = rarityOf(item.iso)
+  const color = rarityColor(rarity)
+  const cost = piecesFor(rarity)
+  const { cols, rows } = pieceGrid(cost)
+  const name = (getCountryName(item.iso, i18n.language) as string) || item.iso
+  const rarityLabel = t(`collection.rarity.${rarity}`)
+  const source = getFlag(item.iso)
   const [ready, setReady] = useState(false)
   const exitTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   // Where each piece flies in from

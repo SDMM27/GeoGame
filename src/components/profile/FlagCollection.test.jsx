@@ -35,10 +35,10 @@ describe('FlagCollectionView', () => {
     render(<FlagCollectionView flags={flags} historicalAlbum={historicalAlbum} own />)
     expect(screen.getByText(/"count":2,"total":47/)).toBeTruthy()
     expect(screen.getByRole('button', { name: /Soviet Union/ })).toBeTruthy()
-    expect(grid()).toEqual(['name-F00'])
+    expect(grid()).toEqual(['Soviet Union', 'name-F00'])
     fireEvent.click(screen.getByRole('button', { name: 'collection.historical.title' }))
     expect(screen.getByText(/"count":1,"total":7/)).toBeTruthy()
-    expect(grid()).toEqual([])
+    expect(grid()).toEqual(['Soviet Union'])
     fireEvent.click(screen.getByRole('button', { name: 'collection.filter_classic' }))
     expect(screen.queryByRole('button', { name: /Soviet Union/ })).toBeNull()
     expect(grid()).toEqual(['name-F00'])
@@ -49,9 +49,19 @@ describe('FlagCollectionView', () => {
     const pieces = [...document.querySelectorAll('.flag-piece')]
     expect(pieces).toHaveLength(3)
     expect(pieces.map((piece) => piece.classList.contains('flag-piece--hidden'))).toEqual([false, false, true])
-    expect(screen.getByText('?')).toBeTruthy()
+    expect(screen.getByText('⚑')).toBeTruthy()
     expect(screen.queryByText(/name-F01/)).toBeNull()
     expect(screen.getByText(/collection\.pieces/).textContent).toContain('"count":2,"total":3')
+  })
+
+  it('shows historical fragments without loading even a legacy target image', () => {
+    const flags = { unlocked: [], current: null, pieces: 0 }
+    const historicalAlbum = { state: { active: 'ussr', unlocked: [], progress: { ussr: 9 } } }
+    render(<FlagCollectionView flags={flags} historicalAlbum={historicalAlbum} own />)
+    const progress = screen.getByTestId('flag-pieces')
+    expect(progress.querySelector('img')).toBeNull()
+    expect(progress.querySelectorAll('.flag-piece--historical')).toHaveLength(9)
+    expect(screen.getByText(/collection\.pieces/).textContent).toContain('"count":9,"total":10')
   })
 
   it('cuts the flag into as many pieces as its rarity costs', () => {
@@ -99,7 +109,11 @@ describe('FlagCollectionView', () => {
   it('replays the flag clicked in the collection', () => {
     const replayed = vi.fn()
     const off = onReplayFlag(replayed)
-    view({ unlocked: ['F02', 'F03'], current: null, pieces: 0 })
+    const flags = { unlocked: ['F02', 'F03'], current: null, pieces: 0 }
+    const historicalAlbum = { state: { active: null, unlocked: ['ussr'], progress: {} } }
+    render(<FlagCollectionView flags={flags} historicalAlbum={historicalAlbum} own />)
+    fireEvent.click(screen.getByRole('button', { name: /Soviet Union/ }))
+    expect(replayed).toHaveBeenCalledWith('ussr')
     fireEvent.click(screen.getByRole('button', { name: 'name-F02 · collection.rarity.rare' }))
     expect(replayed).toHaveBeenCalledWith('F02')
     off()

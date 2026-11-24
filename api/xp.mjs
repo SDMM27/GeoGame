@@ -1,6 +1,6 @@
 // POST /api/xp  with  Authorization: Bearer <Firebase ID token>
-// Pays the signed-in player the XP of their missions and games, or sets the target of future flag fragments
-// (see _lib/xp.mjs). Called from the site and the app. Env: FIREBASE_SERVICE_ACCOUNT as for api/invite-push. Against the emulators,
+// Pays the signed-in player the XP of their missions and games, flag fragments included (see _lib/xp.mjs).
+// Called from the site and the app. Env: FIREBASE_SERVICE_ACCOUNT as for api/invite-push. Against the emulators,
 // FIRESTORE_EMULATOR_HOST / FIREBASE_AUTH_EMULATOR_HOST replace the key.
 import { cert, getApps, initializeApp } from 'firebase-admin/app'
 import { getAuth } from 'firebase-admin/auth'

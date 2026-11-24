@@ -3,6 +3,7 @@ import { revealLeagueFlags } from '@shared/utils/leagueFlagReveal'
 
 import { FlagUnlockOverlay } from './FlagUnlockOverlay'
 import { FragmentToast } from './FragmentToast'
+import { replayFlag } from './replay'
 
 // Reanimated's jest mock has no useReducedMotion
 /* eslint-disable @typescript-eslint/no-require-imports */
@@ -47,6 +48,24 @@ jest.mock('react-i18next', () => ({
 }))
 
 const texts = (tree: ReturnType<typeof create>) => JSON.stringify(tree.toJSON())
+// The revealed name is animated letter by letter: the header carries it as its accessibility label.
+const headerText = (tree: ReturnType<typeof create>) =>
+  tree.root.findAll((node) => node.props.accessibilityRole === 'header')[0].props.accessibilityLabel as string
+// The details and buttons stay in the layout from the start (so nothing shifts at the end), hidden until revealed.
+const styleOf = (tree: ReturnType<typeof create>, testID: string) => {
+  const found = tree.root.findAllByProps({ testID })
+  if (!found.length) return null // not a historical reveal
+  const style = found[0].props.style
+  return Array.isArray(style) ? Object.assign({}, ...style.filter(Boolean)) : style
+}
+const detailsHidden = (tree: ReturnType<typeof create>) => {
+  const found = tree.root.findAllByProps({ testID: 'reveal-history-details' })
+  return !found.length || found[0].props.accessibilityElementsHidden === true
+}
+const buttonsHidden = (tree: ReturnType<typeof create>) => {
+  const style = styleOf(tree, 'reveal-buttons')
+  return style == null || style.opacity === 0
+}
 const claim = (extra: Record<string, unknown>) => ({ gained: 0, levelUp: false, level: 1, fragments: 0, unlockedFlags: [], ...extra })
 
 describe('FlagUnlockOverlay', () => {
@@ -101,18 +120,39 @@ describe('FlagUnlockOverlay', () => {
     act(() => revealLeagueFlags('u1', { unlocked: ['fr'], collectionCount: 1, historical: ['ussr'] }))
     expect(texts(tree)).toContain('France')
     act(() => { jest.advanceTimersByTime(4000) })
-    expect(texts(tree)).not.toContain('collection.view_collection')
+    expect(buttonsHidden(tree)).toBe(true)
     const button = tree.root.findAll((node) => node.props.accessibilityLabel === 'collection.tap_to_continue' && typeof node.props.onPress === 'function')[0]
     act(() => {
       button.props.onPress()
       button.props.onPress()
     })
     act(() => { jest.advanceTimersByTime(300) })
-    expect(texts(tree)).toContain('Union soviétique')
-    expect(texts(tree)).not.toContain('collection.view_collection')
+    expect(texts(tree)).toContain('collection.historical.current')
+    expect(headerText(tree)).toBe('collection.historical.current')
+    expect(detailsHidden(tree)).toBe(true)
+    expect(texts(tree)).toContain('Le marteau et la faucille') // in the layout, but hidden
+    expect(buttonsHidden(tree)).toBe(true)
     act(() => { jest.advanceTimersByTime(4000) })
+    expect(headerText(tree)).toBe('Union soviétique')
+    expect(detailsHidden(tree)).toBe(false)
+    expect(buttonsHidden(tree)).toBe(false)
+    expect(texts(tree)).toContain('1955–1991')
     expect(texts(tree)).toContain('collection.view_collection')
     expect(mockPush).not.toHaveBeenCalled()
+    act(() => tree.unmount())
+  })
+
+  it('opens the historical archive on replay and lets it close during the animation', () => {
+    let tree!: ReturnType<typeof create>
+    act(() => { tree = create(<FlagUnlockOverlay />) })
+    act(() => replayFlag('ussr'))
+    expect(texts(tree)).toContain('historical-flag-frame')
+    expect(texts(tree)).toContain('historical-flag-sparks')
+    expect(detailsHidden(tree)).toBe(true)
+    expect(texts(tree)).not.toContain('collection.new_flag')
+    const close = tree.root.findAll((node) => node.props.accessibilityLabel === 'collection.historical.close_details' && typeof node.props.onPress === 'function')[0]
+    act(() => close.props.onPress())
+    expect(tree.toJSON()).toBeNull()
     act(() => tree.unmount())
   })
 })

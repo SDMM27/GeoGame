@@ -192,8 +192,11 @@
   gap: 0.5rem;
   align-self: stretch;
   margin-top: 1.5rem;
-  animation: flag-reveal-rise 0.35s ease-out both;
+  /* Space reserved from the start; the buttons only become visible once the reveal is over. */
+  visibility: hidden;
 }
+
+.flag-reveal-buttons--ready { visibility: visible; animation: flag-reveal-rise 0.35s ease-out both; }
 
 .flag-reveal-view {
   padding: 0.75rem 1.4rem;
@@ -221,6 +224,401 @@
 .flag-reveal-view:focus-visible, .flag-reveal-continue:focus-visible { outline: 2px solid var(--rarity); outline-offset: 3px; }
 
 .flag-reveal-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+.flag-reveal--historical {
+  --archive-gold: #efca84;
+  color: #fff1d7;
+  overflow: auto;
+  overflow-x: hidden;
+}
+
+.flag-reveal--historical .flag-reveal-backdrop {
+  position: fixed;
+  background: radial-gradient(ellipse at 50% 34%, #3d2522 0%, #211717 44%, #131114 80%);
+  animation: flag-reveal-fade 0.25s ease-out both, archive-backdrop-pulse 1.8s var(--landed) ease-out both;
+}
+
+@keyframes archive-backdrop-pulse {
+  0% { filter: brightness(1); }
+  30% { filter: brightness(1.4); }
+  100% { filter: brightness(1); }
+}
+
+.flag-reveal--historical .flag-reveal-content {
+  width: min(100%, 540px);
+  padding: 32px 24px;
+  margin-block: auto;
+}
+
+.flag-reveal-tunnel {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, #ba915462, #1a1418 54%, #100e11 78%);
+  animation: archive-tunnel-out 360ms calc(var(--archive-intro) - 200ms) ease-in both;
+}
+
+.flag-reveal-runway {
+  position: absolute;
+  inset: 50% -40% -58%;
+  transform-origin: top;
+  transform: perspective(360px) rotateX(57deg);
+  background: repeating-linear-gradient(90deg, transparent 0 8.9%, #efca8438 9% 9.3%, transparent 9.4% 14%);
+  mask-image: linear-gradient(transparent, #000 40%, transparent);
+}
+
+.flag-reveal-portal {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(68vw, 530px);
+  height: min(58vh, 380px);
+  border: 2px solid #efca84;
+  border-radius: 7px;
+  box-shadow: inset 0 0 25px #eeaa5340, 0 0 22px #f2bf7385;
+  animation: archive-portal 1040ms var(--portal-delay) cubic-bezier(.38,.08,.72,1) both;
+}
+
+.flag-reveal-seal {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  border: 2px solid #efca84;
+  color: #fff1d7;
+  background: #3d2b23;
+  box-shadow: 0 0 44px #ffc77665, inset 0 0 18px #ffc77638;
+  animation: archive-seal var(--archive-intro) ease-in-out both;
+}
+
+.flag-reveal-seal-sigil {
+  width: 42px;
+  height: 42px;
+  animation: archive-sigil-spin 9s linear infinite;
+}
+
+.flag-reveal-seal-sigil circle, .flag-reveal-seal-sigil ellipse, .flag-reveal-seal-sigil line {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
+
+.flag-reveal-seal-ring {
+  position: absolute;
+  inset: -2px;
+  border: 2px solid #efca84;
+  opacity: 0;
+  animation: archive-seal-ring calc(var(--archive-intro) * 0.16) calc(var(--archive-intro) * 0.84) ease-out both;
+}
+
+@keyframes archive-sigil-spin {
+  from { transform: rotate(-45deg); }
+  to { transform: rotate(315deg); }
+}
+
+@keyframes archive-seal-ring {
+  0% { opacity: .85; transform: scale(1); }
+  100% { opacity: 0; transform: scale(2.15); }
+}
+
+/* The same sigil, cut in two halves riding on the shutters: it cracks apart when they part, then fades as they slide off. */
+.flag-reveal-shutter-sigil {
+  position: absolute;
+  top: 50%;
+  width: 30px;
+  height: 60px;
+  margin-top: -30px;
+  overflow: hidden;
+  animation: archive-sigil-fade var(--archive-open-duration) calc(var(--archive-impact) + 120ms) ease-in forwards;
+}
+
+.flag-reveal-shutter-sigil svg {
+  width: 60px;
+  height: 60px;
+}
+
+.flag-reveal-shutter-sigil svg circle, .flag-reveal-shutter-sigil svg ellipse, .flag-reveal-shutter-sigil svg line {
+  fill: none;
+  stroke: var(--archive-gold);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
+
+.flag-reveal-shutter-sigil--left { right: 0; }
+.flag-reveal-shutter-sigil--right { left: 0; }
+.flag-reveal-shutter-sigil--right svg { margin-left: -30px; }
+
+@keyframes archive-sigil-fade { to { opacity: 0; } }
+
+.flag-reveal-mote {
+  position: absolute;
+  width: var(--mote-size);
+  height: var(--mote-size);
+  border-radius: 50%;
+  background: #fff0c3;
+  box-shadow: 0 0 8px 2px #ffae53a6;
+  animation: archive-mote calc(var(--archive-intro) - var(--mote-delay)) var(--mote-delay) ease-out both;
+}
+
+@keyframes archive-mote {
+  0% { opacity: 0; transform: scale(.4); }
+  32% { opacity: .72; }
+  68% { opacity: .49; }
+  100% { opacity: 0; transform: translate(var(--mote-x), var(--mote-y)) scale(1.1); }
+}
+
+@keyframes archive-portal {
+  0% { transform: translate(-50%, -50%) scale(.13); opacity: 0; }
+  24% { opacity: .88; }
+  100% { transform: translate(-50%, -50%) scale(2.6); opacity: 0; }
+}
+
+@keyframes archive-seal {
+  0% { transform: translate(-50%, -50%) rotate(45deg) scale(.36); opacity: 0; }
+  18% { opacity: 1; }
+  42% { transform: translate(-50%, -50%) rotate(45deg) scale(.98); }
+  58% { transform: translate(-50%, -50%) rotate(45deg) scale(1.07); opacity: 1; }
+  75% { transform: translate(-50%, -50%) rotate(45deg) scale(1.05); opacity: 1; }
+  100% { transform: translate(-50%, -50%) rotate(45deg) scale(1.33); opacity: 0; }
+}
+
+@keyframes archive-tunnel-out { to { opacity: 0; } }
+
+.flag-reveal-archive {
+  width: min(100%, 370px);
+  height: auto;
+  aspect-ratio: 3 / 2;
+  margin-bottom: 26px;
+  padding: 12px;
+  background: #1d1718;
+  border: 1px solid #a48052;
+  box-shadow: 0 18px 60px #0009, 0 0 65px #f6a95926;
+  animation: archive-arrive 0.45s calc(var(--archive-intro) * .8) ease-out both;
+}
+
+.flag-reveal-archive-frame {
+  position: relative;
+  height: 100%;
+  padding: 4px;
+  border: 1px solid #634e3a;
+  animation: archive-impact 620ms var(--archive-impact) both;
+}
+
+.flag-reveal-archive-frame::after {
+  content: '';
+  position: absolute;
+  inset: -17px;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--archive-gold), var(--archive-gold)) top left / 14px 2px,
+    linear-gradient(var(--archive-gold), var(--archive-gold)) top right / 14px 2px,
+    linear-gradient(var(--archive-gold), var(--archive-gold)) bottom left / 14px 2px,
+    linear-gradient(var(--archive-gold), var(--archive-gold)) bottom right / 14px 2px,
+    linear-gradient(var(--archive-gold), var(--archive-gold)) top left / 2px 14px,
+    linear-gradient(var(--archive-gold), var(--archive-gold)) top right / 2px 14px,
+    linear-gradient(var(--archive-gold), var(--archive-gold)) bottom left / 2px 14px,
+    linear-gradient(var(--archive-gold), var(--archive-gold)) bottom right / 2px 14px;
+  background-repeat: no-repeat;
+}
+
+.flag-reveal-archive-window {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 100%;
+  overflow: hidden;
+  background: #151216;
+}
+
+.flag-reveal-archive-window img { width: 100%; height: 100%; min-height: 0; object-fit: contain; animation: archive-kenburns 10s var(--archive-impact) ease-out both; }
+
+.flag-reveal--reduced .flag-reveal-archive-window img { animation: none; }
+
+@keyframes archive-kenburns { from { transform: scale(1); } to { transform: scale(1.07); } }
+
+/* Letterbox bars while the tunnel runs, retracted once the details arrive. */
+.flag-reveal-bar { position: fixed; left: 0; right: 0; height: 7vh; min-height: 34px; background: #0b090a; pointer-events: none; }
+.flag-reveal-bar--top { top: 0; animation: archive-bar-top calc(var(--landed) + 1200ms) linear both; }
+.flag-reveal-bar--bottom { bottom: 0; animation: archive-bar-bottom calc(var(--landed) + 1200ms) linear both; }
+
+@keyframes archive-bar-top { 0% { transform: translateY(-100%); } 8%, 76% { transform: translateY(0); } 86%, 100% { transform: translateY(-100%); } }
+@keyframes archive-bar-bottom { 0% { transform: translateY(100%); } 8%, 76% { transform: translateY(0); } 86%, 100% { transform: translateY(100%); } }
+
+/* The revealed name cascades letter by letter, blurred to sharp. The placeholder sits on top of the
+   (always laid out) letters until the reveal, so the heading height never changes. */
+.flag-reveal-name { position: relative; }
+.flag-reveal-name-placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+.flag-reveal-letter { display: inline-block; opacity: 0; animation: archive-letter 460ms calc(var(--landed) + var(--letter-delay)) cubic-bezier(.2,.7,.3,1) both; }
+
+@keyframes archive-letter {
+  from { opacity: 0; transform: translateY(0.55em) rotate(5deg); filter: blur(5px); }
+  to { opacity: 1; transform: translateY(0) rotate(0); filter: blur(0); }
+}
+
+.flag-reveal--reduced .flag-reveal-letter { animation: none; opacity: 1; }
+
+.flag-reveal-shutter {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50.5%;
+  background:
+    repeating-linear-gradient(135deg, #eac89617 0 1px, transparent 1px 7px),
+    linear-gradient(150deg, #3c2a29, #241a1b);
+  animation:
+    archive-crack var(--archive-crack-duration) var(--archive-crack) ease-out both,
+    archive-open var(--archive-open-duration) var(--archive-impact) cubic-bezier(.22,.85,.27,1) forwards;
+}
+
+.flag-reveal-shutter--left { left: 0; border-right: 2px solid var(--archive-gold); --archive-slit: -8%; --archive-slide: -104%; }
+.flag-reveal-shutter--right { right: 0; border-left: 2px solid var(--archive-gold); --archive-slit: 8%; --archive-slide: 104%; }
+
+.flag-reveal-archive-flare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, #fff4d2, #f3b85b45 55%, transparent 75%);
+  animation: archive-flare 540ms var(--archive-impact) both;
+}
+
+.flag-reveal-archive-sheen {
+  position: absolute;
+  inset: -30% auto -30% -34%;
+  width: 28%;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, #ffe4a54d 34%, #fff6dcaa 50%, #ffe4a543 65%, transparent);
+  animation: archive-sheen 560ms var(--archive-sheen) ease-in-out both;
+}
+
+@keyframes archive-sheen {
+  0% { opacity: 0; transform: translateX(0) skewX(-18deg); }
+  24%, 72% { opacity: .8; }
+  100% { opacity: 0; transform: translateX(510%) skewX(-18deg); }
+}
+
+@keyframes archive-impact {
+  0%, 100% { transform: scale(1); box-shadow: none; }
+  28% { transform: scale(1.055); box-shadow: 0 0 45px #efbd7570, inset 0 0 26px #ffca7a3d; }
+}
+
+/* A shaft of light washing over the flag as the shutters open, then slowly swaying. */
+.flag-reveal-archive-beam {
+  position: absolute;
+  top: -14%;
+  left: 50%;
+  width: 135%;
+  height: 135%;
+  transform: translateX(-50%);
+  transform-origin: top center;
+  pointer-events: none;
+  background: linear-gradient(176deg, #fff3cf40 0%, #ffe4a51c 36%, transparent 64%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation:
+    archive-beam-in 1.4s var(--archive-impact) ease-out both,
+    archive-beam-sway 8s calc(var(--archive-impact) + 1.4s) ease-in-out infinite alternate;
+}
+
+@keyframes archive-beam-in { from { opacity: 0; } to { opacity: 0.55; } }
+@keyframes archive-beam-sway { from { rotate: -2.5deg; } to { rotate: 2.5deg; } }
+
+/* Dust motes drifting up in the light. */
+.flag-reveal-archive-dust {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #ffedbe;
+  box-shadow: 0 0 6px 1px #ffca7a88;
+  opacity: 0;
+  pointer-events: none;
+  animation: archive-dust 5s ease-in-out infinite;
+}
+
+.flag-reveal-archive-dust--1 { left: 30%; top: 72%; animation-delay: calc(var(--archive-impact) + 300ms); }
+.flag-reveal-archive-dust--2 { left: 56%; top: 82%; animation-delay: calc(var(--archive-impact) + 1500ms); }
+.flag-reveal-archive-dust--3 { left: 73%; top: 64%; animation-delay: calc(var(--archive-impact) + 2600ms); }
+
+@keyframes archive-dust {
+  0% { opacity: 0; translate: 0 0; }
+  25% { opacity: 0.85; }
+  100% { opacity: 0; translate: -14px -90px; }
+}
+
+@keyframes archive-flare {
+  0%, 100% { opacity: 0; }
+  20% { opacity: .52; }
+}
+
+.flag-reveal-archive-sparks { position: absolute; inset: 0; pointer-events: none; }
+
+.flag-reveal-archive-spark {
+  position: absolute;
+  width: var(--spark-length);
+  height: 2px;
+  border-radius: 100%;
+  background: linear-gradient(90deg, transparent, var(--spark-color) 70%, #fff7df);
+  box-shadow: 2px 0 8px var(--spark-color);
+  opacity: 0;
+  animation: archive-spark var(--spark-duration) calc(var(--archive-impact) + var(--spark-delay)) ease-out both;
+}
+
+.flag-reveal-archive-spark--ember {
+  height: var(--spark-length);
+  background: var(--spark-color);
+  box-shadow: 0 0 10px 2px var(--spark-color);
+}
+
+@keyframes archive-spark {
+  0% { opacity: 0; transform: rotate(var(--spark-angle)) scaleX(0.25); }
+  12% { opacity: 1; }
+  60% {
+    opacity: 0.88;
+    transform: translate(calc(var(--spark-x) * 0.82), calc(var(--spark-y) * 0.85)) rotate(var(--spark-angle));
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--spark-x), calc(var(--spark-y) + 18px)) rotate(var(--spark-angle)) scaleX(0.36);
+  }
+}
+
+.flag-reveal--historical .flag-reveal-texts {
+  width: 100%;
+  gap: 0.5rem;
+  animation-delay: var(--landed);
+}
+
+.flag-reveal--historical .flag-reveal-chip { color: var(--archive-gold); border-color: #a48052; background: #3d2b24; }
+.flag-reveal--historical .flag-reveal-new { color: #dbc4a6; }
+.flag-reveal--historical .flag-reveal-name { font-family: Georgia, serif; font-size: clamp(1.8rem, 5vw, 3rem); overflow-wrap: anywhere; }
+.flag-reveal-history { width: 100%; max-width: 410px; min-height: 120px; color: #e9d7bf; pointer-events: auto; }
+.flag-reveal-period { color: var(--archive-gold); font-size: 0.83rem; font-weight: 700; letter-spacing: 0.13em; }
+.flag-reveal-history p { margin: 0.8rem 0 0.55rem; border-top: 1px solid #715840; padding-top: 0.8rem; line-height: 1.55; }
+.flag-reveal-sources { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.5rem 1rem; font-size: 0.78rem; }
+.flag-reveal-sources a { color: var(--archive-gold); pointer-events: auto; }
+.flag-reveal--historical .flag-reveal-buttons { margin-top: 1rem; }
+.flag-reveal--historical .flag-reveal-continue { color: #e9d7bf; }
+.flag-reveal--historical .flag-reveal-view { color: #211717; background: var(--archive-gold); }
+
+@keyframes archive-arrive {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes archive-crack {
+  from { transform: none; }
+  to { transform: translateX(var(--archive-slit)); }
+}
+
+@keyframes archive-open {
+  from { transform: translateX(var(--archive-slit)); }
+  to { transform: translateX(var(--archive-slide)); }
+}
 
 @keyframes flag-reveal-fade { from { opacity: 0; } }
 @keyframes flag-reveal-out { to { opacity: 0; } }
@@ -283,10 +681,14 @@
 
 /* No flight, rays or burst: the flag fades in */
 @media (prefers-reduced-motion: reduce) {
+  .flag-reveal-archive, .flag-reveal-archive-frame, .flag-reveal--historical .flag-reveal-texts { opacity: 1; animation: none; }
+  .flag-reveal-shutter, .flag-reveal-archive-sparks { display: none; }
   .flag-reveal-glow { animation: flag-reveal-fade 0.25s ease-out both; }
   .flag-reveal-rays, .flag-reveal-pieces, .flag-reveal-ring, .flag-reveal-particle, .flag-reveal-twinkle, .flag-reveal-flash, .flag-reveal-shine { display: none; }
   .flag-reveal-box { animation: none; }
   .flag-reveal-flag { animation: flag-reveal-show 0.3s both; }
   .flag-reveal-texts { animation: flag-reveal-fade 0.4s 0.25s both; }
-  .flag-reveal-buttons { animation: flag-reveal-fade 0.35s both; }
+  .flag-reveal-buttons--ready { animation: flag-reveal-fade 0.35s both; }
+  .flag-reveal-archive-beam, .flag-reveal-archive-dust { display: none; }
+  .flag-reveal--historical .flag-reveal-backdrop { animation: flag-reveal-fade 0.25s ease-out both; }
 }

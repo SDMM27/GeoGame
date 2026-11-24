@@ -15,6 +15,7 @@ import countriesMeta from '../../src/data/countries.meta.json' with { type: 'jso
 import { previousDayKey } from '../../src/utils/dailyGames.js'
 import { flagPool } from '../../src/utils/flagCollection.js'
 import { GAME_TYPES } from '../../src/utils/gameTypes.js'
+import { randomInt } from 'node:crypto'
 import { awardFlagFragments } from '../../src/utils/historicalFlagCollection.js'
 import { LEAGUE_MIN_PLAYED, LEAGUE_REWARDS } from '../../src/utils/leagueRewards.js'
 import { missionDayAt, weekDays, weekKeyOf } from '../../src/utils/missions.js'
@@ -102,8 +103,8 @@ async function closeLastWeek({ db, today, now }) {
     for (const user of users) {
       if (!user.exists || !user.data().username) continue
       const reward = rewarded.find((player) => player.uid === user.id).reward
-      const { flags, historicalFlags, unlockedFlags, unlockedHistoricalFlags, classicFragments } = awardFlagFragments(user.data(), reward, POOL, user.id)
-      const update = { ...(classicFragments > 0 && { flags }), ...(historicalFlags && { historicalFlags }) }
+      const { flags, historicalFlags, unlockedFlags, unlockedHistoricalFlags } = awardFlagFragments(user.data(), reward, POOL, user.id, { drawPackIndex: randomInt })
+      const update = { flags, ...(historicalFlags && { historicalFlags }) }
       if (user.id === champion) {
         update.league = { wins: winsOf(user.data()) + 1, lastWin: week }
         update.scrolls = payScrolls(user.data(), LEAGUE_WIN_SEALS, SCROLLS, user.id).state

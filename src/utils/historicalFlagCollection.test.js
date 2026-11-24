@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest'
-import { awardFlagFragments, HISTORICAL_FLAG_COST, readHistoricalFlags } from './historicalFlagCollection'
+import { describe, expect, it, vi } from 'vitest'
+import { HISTORICAL_FLAGS } from '../data/historicalFlags.js'
+import { awardFlagFragments, HISTORICAL_FLAG_COST, HISTORICAL_PACK, readHistoricalFlags } from './historicalFlagCollection'
 
 const pool = [{ iso: 'fr', rarity: 'rare' }, { iso: 'de', rarity: 'common' }]
 const flags = { current: 'fr', pieces: 2, unlocked: [] }
@@ -52,5 +53,57 @@ describe('the historical flag collection', () => {
       flags: { current: 'fr', pieces: 3, unlocked: [] }, historicalFlags: null, historicalFragments: 0,
     })
     expect(paused.progress).toEqual({ ussr: 8, qing: 3 })
+  })
+
+  it('queues the mystery pack after the current flag when the weekly bonus is paid', () => {
+    const first = awardFlagFragments({ flags }, 0, pool, 'sample', { weeklyChoice: true })
+    expect(first.historicalFlags).toEqual({ active: null, progress: {}, unlocked: [], next: HISTORICAL_PACK })
+    expect(first.historicalPackQueued).toBe(true)
+    // A second bonus while a pack is already queued changes nothing.
+    const second = awardFlagFragments({ flags, historicalFlags: first.historicalFlags }, 0, pool, 'sample', { weeklyChoice: true })
+    expect(second.historicalFlags).toBeNull()
+    expect(second.historicalPackQueued).toBe(true)
+    // The queued pack becomes the active target once the current flag completes.
+    const award = awardFlagFragments({ flags, historicalFlags: first.historicalFlags }, 3, pool, 'sample')
+    expect(award.unlockedFlags).toEqual(['fr'])
+    expect(award.historicalFlags).toEqual({ active: HISTORICAL_PACK, progress: { [HISTORICAL_PACK]: 1 }, unlocked: [] })
+  })
+
+  it('activates the mystery pack at once when nothing is being assembled', () => {
+    const result = awardFlagFragments({}, 0, pool, 'sample', { weeklyChoice: true })
+    expect(result.historicalFlags).toEqual({ active: HISTORICAL_PACK, progress: {}, unlocked: [] })
+    expect(result.historicalPackQueued).toBe(true)
+  })
+
+  it('queues no pack when every historical flag is already unlocked', () => {
+    const all = { active: null, progress: {}, unlocked: HISTORICAL_FLAGS.map(({ id }) => id) }
+    const result = awardFlagFragments({ historicalFlags: all }, 0, pool, 'sample', { weeklyChoice: true })
+    expect(result.historicalFlags).toBeNull()
+    expect(result.historicalPackQueued).toBeUndefined()
+  })
+
+  it('draws an unowned flag only on fragment ten', () => {
+    const drawPackIndex = vi.fn(() => 0)
+    const historicalFlags = { active: HISTORICAL_PACK, unlocked: ['ussr'] }
+    const ninth = awardFlagFragments({ historicalFlags }, 9, pool, 'sample', { drawPackIndex })
+    expect(ninth.historicalFlags).toEqual({ active: HISTORICAL_PACK, progress: { [HISTORICAL_PACK]: 9 }, unlocked: ['ussr'] })
+    expect(ninth.unlockedHistoricalFlags).toEqual([])
+    expect(drawPackIndex).not.toHaveBeenCalled()
+    const tenth = awardFlagFragments(ninth, 1, pool, 'sample', { drawPackIndex })
+    expect(drawPackIndex).toHaveBeenCalledWith(6)
+    expect(tenth.unlockedHistoricalFlags).toEqual(['east-germany'])
+  })
+
+  it('keeps the combined weight of all historical flags below the last legendary flag', () => {
+    const legendary = [{ iso: 'fr', rarity: 'legendary' }]
+    let historicalDraws = 0
+    for (let seed = 0; seed < 500; seed += 1) {
+      const result = awardFlagFragments({}, 1, legendary, String(seed))
+      if (result.historicalFlags?.active === HISTORICAL_PACK) historicalDraws += 1
+    }
+    expect(historicalDraws).toBeGreaterThan(0)
+    expect(historicalDraws).toBeLessThan(250)
+    const result = awardFlagFragments({ flags: { unlocked: ['fr'] } }, 1, legendary, 'sample')
+    expect(result.historicalFlags.active).toBe(HISTORICAL_PACK)
   })
 })

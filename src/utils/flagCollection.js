@@ -92,14 +92,15 @@ export function seedOf(text) {
 }
 
 // The next flag among those not unlocked (weighted by rarity), or null when none is left. Same seed, same flag.
-function drawFlag(unlocked, pool, seed) {
+export function drawFlag(unlocked, pool, seed) {
   const taken = new Set(unlocked)
   const left = pool.filter((flag) => !taken.has(flag.iso))
   if (left.length === 0) return null
-  const total = left.reduce((sum, flag) => sum + RARITY_WEIGHTS[flag.rarity], 0)
+  const weight = (flag) => flag.weight ?? RARITY_WEIGHTS[flag.rarity]
+  const total = left.reduce((sum, flag) => sum + weight(flag), 0)
   let roll = mulberry32(seedOf(seed))() * total
   for (const flag of left) {
-    roll -= RARITY_WEIGHTS[flag.rarity]
+    roll -= weight(flag)
     if (roll < 0) return flag.iso
   }
   return left[left.length - 1].iso

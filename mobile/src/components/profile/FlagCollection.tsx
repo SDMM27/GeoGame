@@ -5,21 +5,23 @@ import { useTranslation } from 'react-i18next'
 import { Image, StyleSheet, View } from 'react-native'
 
 import { fetchCollection, FLAG_POOL } from '@shared/utils/flagCollectionData'
-import { HISTORICAL_FLAGS } from '@shared/data/historicalFlags'
+import { HISTORICAL_FLAGS, HISTORICAL_FLAG_COLOR, HISTORICAL_FLAG_COST } from '@shared/data/historicalFlags'
 import { pieceGrid, piecesFor, RARITIES, RARITY_COLORS } from '@shared/utils/flagCollection'
 import { getCountryName } from '@shared/utils/getCountryName'
 import { useHistoricalFlags } from '@shared/utils/historicalFlagCollectionData'
 import { onPublicDataPatched } from '@shared/utils/publicProfile'
 
+import ArchiveSigil from '@/components/collection/ArchiveSigil'
 import { FlagPiece } from '@/components/collection/FlagPiece'
 import { CollapsibleSection } from '@/components/CollapsibleSection'
 import { replayFlag } from '@/components/collection/replay'
 import { Kicker } from '@/components/flight'
 import { Segmented, Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
+import { getHistoricalFlag } from '@/historicalFlags'
 import { makeStyles, radius, space, useColors } from '@/theme'
 
-import { HistoricalFlagAlbumView, type HistoricalAlbum } from './HistoricalFlagAlbum'
+import { HistoricalPackStatus, type HistoricalAlbum, type HistoricalCard } from './HistoricalFlagAlbum'
 
 type Rarity = 'common' | 'uncommon' | 'rare' | 'legendary'
 type Progress = { found: number; total: number }
@@ -41,9 +43,9 @@ export function sortFlags(unlocked: string[], lang: string): string[] {
 }
 
 // The pieces of a flag (cost pieces, cut by pieceGrid), left to right then top to bottom; the pieces not won yet are covered.
-function PieceFlag({ iso, pieces, cost }: { iso: string; pieces: number; cost: number }) {
+function PieceFlag({ iso, pieces, cost, historical }: { iso: string; pieces: number; cost: number; historical: boolean }) {
   const styles = useStyles()
-  const { cols, rows } = pieceGrid(cost)
+  const { cols, rows } = historical ? { cols: 5, rows: 2 } : pieceGrid(cost)
   const quarters = Array.from({ length: cost }, (_, index) => index)
   return (
     <View style={styles.pieceFlag} testID="piece-flag">
@@ -61,7 +63,7 @@ function PieceFlag({ iso, pieces, cost }: { iso: string; pieces: number; cost: n
             },
           ]}
         >
-          <FlagPiece iso={iso} index={index} cols={cols} rows={rows} />
+          {index < pieces && (historical ? <View style={styles.mysteryPiece} /> : <FlagPiece iso={iso} index={index} cols={cols} rows={rows} />)}
           {index >= pieces && <View style={styles.cover} />}
         </View>,
       )}
@@ -70,14 +72,14 @@ function PieceFlag({ iso, pieces, cost }: { iso: string; pieces: number; cost: n
 }
 
 // A rarity spelled out with its colour (the border of its flags below) and how many of its flags are unlocked.
-function RarityCount({ rarity, count }: { rarity: Rarity; count: number }) {
+function RarityCount({ rarity, count }: { rarity: Rarity | 'historical'; count: number }) {
   const { t } = useTranslation()
   const styles = useStyles()
   return (
     <View style={styles.rarityItem}>
-      <View style={[styles.dot, { backgroundColor: COLORS[rarity] }]} />
+      <View style={[styles.dot, { backgroundColor: rarity === 'historical' ? HISTORICAL_FLAG_COLOR : COLORS[rarity] }]} />
       <Text variant="caption" style={{ fontSize: 12 }}>
-        {t(`collection.rarity.${rarity}`)} · {count}
+        {t(rarity === 'historical' ? 'collection.historical.title' : `collection.rarity.${rarity}`)} · {count}
       </Text>
     </View>
   )
@@ -104,10 +106,15 @@ export function FlagCollectionView({ collection, sectionId = 'collection', histo
     for (const iso of flags.unlocked) result[RARITY_OF.get(iso) ?? 'common'] += 1
     return result
   }, [flags.unlocked])
-  const shown = showAll ? sorted : sorted.slice(0, FIRST)
+  const historicalTiles = (HISTORICAL_FLAGS as HistoricalCard[]).filter(({ id }) => historicalAlbum?.state?.unlocked.includes(id))
+  const tiles = [...(activeFilter === 'classic' ? [] : historicalTiles.map(({ id }) => id)), ...(activeFilter === 'historical' ? [] : sorted)]
+  const shown = showAll ? tiles : tiles.slice(0, FIRST)
   const complete = flags.unlocked.length >= total && count >= shownTotal
-  const cost = piecesFor(flags.current ? RARITY_OF.get(flags.current) : undefined)
-  const nothing = flags.unlocked.length === 0 && !flags.current
+  const historicalCurrent = own && historicalAlbum?.state?.active
+  const current = historicalCurrent || flags.current
+  const pieces = historicalCurrent ? historicalAlbum?.state?.progress[historicalCurrent] ?? 0 : flags.pieces
+  const cost = historicalCurrent ? HISTORICAL_FLAG_COST : piecesFor(current ? RARITY_OF.get(current) : undefined)
+  const language = i18n.language?.startsWith('fr') ? 'fr' : 'en'
   const modes = [
     ['placement', mastery.placement],
     ['flags', mastery.flags],
@@ -134,56 +141,58 @@ export function FlagCollectionView({ collection, sectionId = 'collection', histo
             { value: 'historical', label: t('collection.historical.title') },
           ]}
         />}
-        {hasHistorical && activeFilter !== 'classic' && <HistoricalFlagAlbumView album={historicalAlbum} own={own} />}
-        {activeFilter !== 'historical' && <View style={styles.card}>
+        <View style={styles.card}>
+        {own && historicalAlbum && <HistoricalPackStatus album={historicalAlbum} />}
         {complete ? (
           <Text variant="bodyStrong" color={colors.accent}>
             {t('collection.complete')}
           </Text>
-        ) : nothing ? (
-          <Text variant="caption">{t('collection.empty')}</Text>
-        ) : flags.current ? (
+        ) : current && (activeFilter === 'all' || (activeFilter === 'historical') === Boolean(historicalCurrent)) ? (
           <View style={styles.current}>
-            <PieceFlag iso={flags.current} pieces={flags.pieces} cost={cost} />
+            <PieceFlag iso={current} pieces={pieces} cost={cost} historical={Boolean(historicalCurrent)} />
             <View style={{ flex: 1, gap: 2 }}>
-              <Kicker>{t(own && historicalAlbum?.state?.active ? 'collection.historical.classic_paused' : 'collection.current')}</Kicker>
-              <Text variant="bodyStrong">?</Text>
+              <Kicker>{t(historicalCurrent ? 'collection.historical.current' : 'collection.current')}</Kicker>
+              {historicalCurrent
+                ? <ArchiveSigil size={22} color="#EFCB86" />
+                : <Text variant="bodyStrong" accessibilityElementsHidden>⚑</Text>}
               <Text variant="caption" color={colors.accent}>
-                {t('collection.pieces', { count: flags.pieces, total: cost })}
+                {t('collection.pieces', { count: pieces, total: cost })}
               </Text>
-              <Text variant="caption" style={{ fontSize: 12 }}>
+              {!historicalCurrent && <Text variant="caption" style={{ fontSize: 12 }}>
                 {t('collection.hint')}
-              </Text>
+              </Text>}
             </View>
           </View>
-        ) : null}
+        ) : !tiles.length ? <Text variant="caption">{t('collection.empty')}</Text> : null}
 
-        {sorted.length > 0 && (
+        {tiles.length > 0 && (
           <>
             <Kicker>{t('collection.unlocked')}</Kicker>
             <View style={styles.rarities}>
-              {RARITY_ORDER.map((rarity) => (
+              {activeFilter !== 'classic' && historicalTiles.length > 0 && <RarityCount rarity="historical" count={historicalCount} />}
+              {activeFilter !== 'historical' && RARITY_ORDER.map((rarity) => (
                 <RarityCount key={rarity} rarity={rarity} count={counts[rarity]} />
               ))}
             </View>
             <View style={styles.grid}>
               {shown.map((iso) => {
-                const source = getFlag(iso)
+                const historical = historicalTiles.find(({ id }) => id === iso)
+                const source = historical ? getHistoricalFlag(iso) : getFlag(iso)
                 return (
                   <Touchable
                     key={iso}
                     testID={`flag-${iso}`}
                     accessibilityRole="button"
-                    accessibilityLabel={getCountryName(iso, i18n.language) as string}
+                    accessibilityLabel={historical ? `${historical.name[language]} · ${t('collection.historical.title')}` : getCountryName(iso, i18n.language) as string}
                     onPress={() => replayFlag(iso)}
-                    style={[styles.cell, { borderColor: COLORS[RARITY_OF.get(iso) ?? 'common'] }]}
+                    style={[styles.cell, { borderColor: historical ? HISTORICAL_FLAG_COLOR : COLORS[RARITY_OF.get(iso) ?? 'common'] }]}
                   >
-                    {source != null && <Image source={source} style={styles.cellImage} resizeMode="cover" accessible={false} alt="" />}
+                    {source != null && <Image source={source} style={styles.cellImage} resizeMode={historical ? 'contain' : 'cover'} accessible={false} alt="" />}
                   </Touchable>
                 )
               })}
             </View>
-            {sorted.length > FIRST && (
+            {tiles.length > FIRST && (
               <Touchable accessibilityRole="button" onPress={() => setShowAll(!showAll)}>
                 <Text variant="caption" color={colors.highlight}>
                   {t(showAll ? 'collection.show_less' : 'collection.show_all')}
@@ -193,7 +202,7 @@ export function FlagCollectionView({ collection, sectionId = 'collection', histo
           </>
         )}
 
-        <View style={styles.legend}>
+        {activeFilter !== 'historical' && <View style={styles.legend}>
           <Kicker>{t('collection.legend_progress', { count: mastery.found, total: mastery.total })}</Kicker>
           {modes.map(([mode, progress]) => (
             <View key={mode} style={styles.modeRow}>
@@ -205,8 +214,8 @@ export function FlagCollectionView({ collection, sectionId = 'collection', histo
               </Text>
             </View>
           ))}
-        </View>
         </View>}
+        </View>
       </View>
     </CollapsibleSection>
   )
@@ -254,6 +263,7 @@ const useStyles = makeStyles((colors) => ({
   pieceFlag: { width: 96, height: 64, borderRadius: radius.sm, overflow: 'hidden', backgroundColor: colors.surfaceHigh },
   quarter: { position: 'absolute', overflow: 'hidden' },
   cover: { ...StyleSheet.absoluteFill, backgroundColor: colors.borderStrong },
+  mysteryPiece: { ...StyleSheet.absoluteFill, backgroundColor: '#B89660', borderWidth: 1, borderColor: '#EFCB86' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
   cell: { width: CELL, height: CELL * 0.7, borderRadius: 6, borderWidth: 2, overflow: 'hidden', backgroundColor: colors.surfaceHigh },
   cellImage: { width: CELL - 4, height: CELL * 0.7 - 4 },

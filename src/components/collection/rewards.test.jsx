@@ -8,6 +8,7 @@ import FragmentToast from './FragmentToast'
 import XpToast from '../XpToast'
 import { revealLeagueFlags } from '../../utils/leagueFlagReveal'
 import { replayFlag } from './replay'
+import { ARCHIVE_CRACK, ARCHIVE_PACK_INTRO } from './historicalFlagSparks'
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key, opts) => (opts ? `${key} ${JSON.stringify(opts)}` : key), i18n: { language: 'en' } }),
@@ -57,9 +58,10 @@ describe('FlagUnlockOverlay', () => {
     expect(screen.getByText('collection.new_flag')).toBeTruthy()
     expect(screen.getAllByText('collection.rarity.legendary').length).toBeGreaterThan(0)
     expect(screen.getByText(/collection\.progress/).textContent).toContain('"count":2,"total":3')
-    expect(screen.queryByText('collection.tap_to_continue')).toBeNull()
+    expect(document.querySelector('.flag-reveal-buttons')).not.toHaveClass('flag-reveal-buttons--ready')
     settle()
     expect(screen.getByText('collection.view_collection')).toBeTruthy()
+    expect(document.querySelector('.flag-reveal-buttons')).toHaveClass('flag-reveal-buttons--ready')
     expect(document.activeElement).toBe(screen.getByText('collection.tap_to_continue'))
     fireEvent.click(screen.getByText('collection.tap_to_continue'))
     act(() => vi.advanceTimersByTime(300))
@@ -81,9 +83,19 @@ describe('FlagUnlockOverlay', () => {
     expect(screen.queryByText('collection.view_collection')).toBeNull()
     fireEvent.click(screen.getByText('collection.tap_to_continue'))
     act(() => vi.advanceTimersByTime(300))
-    expect(screen.getByRole('heading', { name: 'Soviet Union' })).toBeTruthy()
-    expect(screen.queryByText('collection.tap_to_continue')).toBeNull()
+    expect(screen.getByRole('heading', { name: 'collection.historical.current' })).toBeTruthy()
+    expect(document.querySelector('.flag-reveal-archive-window img')).toBeNull()
+    // Present in the layout from the start (so the frame never shifts), but hidden until revealed.
+    expect(document.querySelector('.flag-reveal-history > div').style.visibility).toBe('hidden')
+    expect(document.querySelector('.flag-reveal-buttons')).not.toHaveClass('flag-reveal-buttons--ready')
+    act(() => vi.advanceTimersByTime(ARCHIVE_PACK_INTRO + ARCHIVE_CRACK))
+    expect(document.querySelector('.flag-reveal-archive-window img')).toHaveAttribute('src', '/flags/historical/ussr.png')
+    expect(screen.queryByRole('heading', { name: 'Soviet Union' })).toBeNull()
     settle()
+    expect(screen.getByRole('heading', { name: 'Soviet Union' })).toBeTruthy()
+    expect(screen.getByText('1955–1991')).toBeTruthy()
+    expect(document.querySelector('.flag-reveal-history > div').style.visibility).toBe('visible')
+    expect(screen.getByText(/hammer and sickle/)).toBeTruthy()
     expect(screen.getByText('collection.view_collection')).toBeTruthy()
   })
 
@@ -152,6 +164,36 @@ describe('FlagUnlockOverlay', () => {
     settle()
     expect(screen.queryByText('collection.view_collection')).toBeNull()
     expect(screen.getByText('collection.tap_to_continue')).toBeTruthy()
+  })
+
+  it('replays an historical flag with its explanation and offers immediate dismissal', () => {
+    overlay()
+    act(() => replayFlag('ussr'))
+    expect(screen.getByRole('dialog')).toHaveClass('flag-reveal--historical')
+    expect(document.querySelector('.flag-reveal-archive-sparks')).toBeTruthy()
+    expect(document.querySelector('.flag-reveal-history > div').style.visibility).toBe('hidden')
+    expect(screen.queryByText('collection.new_flag')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'collection.historical.close_details' }))
+    act(() => vi.advanceTimersByTime(300))
+    expect(screen.queryByRole('dialog')).toBeNull()
+    act(() => replayFlag('ussr'))
+    settle()
+    expect(screen.getByText(/hammer and sickle/)).toBeTruthy()
+    expect(screen.getByRole('link', { name: 'collection.historical.source' })).toBeTruthy()
+  })
+
+  it('shows the historical explanation with no sparks in reduced motion', () => {
+    const original = Object.getOwnPropertyDescriptor(window, 'matchMedia')
+    Object.defineProperty(window, 'matchMedia', { configurable: true, value: () => ({ matches: true }) })
+    try {
+      overlay()
+      act(() => replayFlag('ussr'))
+      expect(screen.getByText(/hammer and sickle/)).toBeTruthy()
+      expect(document.querySelector('.flag-reveal-archive-sparks')).toBeNull()
+    } finally {
+      if (original) Object.defineProperty(window, 'matchMedia', original)
+      else Reflect.deleteProperty(window, 'matchMedia')
+    }
   })
 })
 

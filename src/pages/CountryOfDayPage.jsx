@@ -212,6 +212,13 @@ function Playing({ game }) {
             {!resolved && <span className="quiz-points">{t('country_of_day.tries_left', { count: triesLeft })}</span>}
           </div>
           <h1 className="quiz-question">{t(`country_of_day.step_${step}`)}</h1>
+          {/* From the second step on the country is known: name it (the flag step keeps the flag secret) */}
+          {stepIndex > 0 && (
+            <p className="cod-identity">
+              {step !== 'flag' && <img className="cod-identity__flag" src={flagSrc(country)} alt="" draggable="false" />}
+              <strong>{countryDisplayName(country, lang)}</strong>
+            </p>
+          )}
 
           <StepBody key={step} game={game} lang={lang} />
 

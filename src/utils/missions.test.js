@@ -238,14 +238,20 @@ describe('missions', () => {
     expect(value('week_perfect_hard_1', [game({ ...perfect, difficulty: 'Moyen' }), game({ ...perfect, difficulty: 'Difficile' })])).toBe(1)
   })
 
-  it('counts a flawless Hardcore game on Impossible toward the weekly mission', () => {
+  it.each([
+    [GAME_TYPES.PLACEMENT, 'Difficile'],
+    [GAME_TYPES.FLAGS, 'Difficile'],
+    [GAME_TYPES.CAPITALS, 'Difficile'],
+    [GAME_TYPES.HARDCORE, 'Impossible'],
+    [GAME_TYPES.MISSING_FLAG, 'Difficile'],
+  ])('counts a flawless %s game on %s toward the weekly mission', (gameType, difficulty) => {
     const now = Date.UTC(2026, 10, 24, 12)
-    const hardcore = game({ gameType: GAME_TYPES.HARDCORE, difficulty: 'Impossible', found: 56, total: 56, playedAt: now - HOUR })
+    const perfect = game({ gameType, difficulty, found: 56, total: 56, playedAt: now - HOUR })
     const games = [
-      hardcore,
-      { ...hardcore, found: 55 },
-      { ...hardcore, difficulty: 'Moyen' },
-      { ...hardcore, found: 9, total: 9 },
+      perfect,
+      { ...perfect, found: 55 },
+      { ...perfect, difficulty: 'Moyen' },
+      { ...perfect, found: 9, total: 9 },
     ]
     const mission = missionsAt(games, now).weekly.find(({ mission }) => mission.id === 'week_perfect_hard_3')
     expect(mission).toMatchObject({ progress: 1, done: false })

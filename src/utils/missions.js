@@ -54,10 +54,10 @@ export const LEVEL_STEP = 50
 // Id stored with the missions of a period once its bonus is paid.
 export const BONUS_ID = 'bonus'
 
-const PERFECT_TYPES = [GAME_TYPES.PLACEMENT, GAME_TYPES.FLAGS, GAME_TYPES.CAPITALS, GAME_TYPES.HARDCORE]
+const SETUP_TYPES = [GAME_TYPES.PLACEMENT, GAME_TYPES.FLAGS, GAME_TYPES.CAPITALS, GAME_TYPES.HARDCORE, GAME_TYPES.MISSING_FLAG]
 
 const isDaily = (game) => game.mode === 'daily'
-const isPerfect = (game) => PERFECT_TYPES.includes(game.gameType) && game.total >= 10 && game.found === game.total
+const isPerfect = (game) => SETUP_TYPES.includes(game.gameType) && game.total >= 10 && game.found === game.total
 const count = (games, predicate) => games.filter(predicate).length
 const sumFound = (games, gameType) =>
   games.reduce((sum, game) => (game.gameType === gameType && Number.isFinite(game.found) ? sum + game.found : sum), 0)
@@ -71,9 +71,8 @@ const isCountryOfDay = dailyOf(GAME_TYPES.COUNTRY_OF_DAY)
 const isChallengeOf10 = (game) => isChallenge(game) && game.score >= 10
 const isMulti = (game) => game.mode === 'multi'
 const HARD_DIFFICULTIES = ['Difficile', 'Impossible', 'Hardcore']
-const DIFFICULTY_TYPES = [...PERFECT_TYPES, GAME_TYPES.MISSING_FLAG]
 const isHardDifficulty = (game) => HARD_DIFFICULTIES.includes(game.difficulty)
-const isDifficult = (game) => DIFFICULTY_TYPES.includes(game.gameType) && isHardDifficulty(game)
+const isDifficult = (game) => SETUP_TYPES.includes(game.gameType) && isHardDifficulty(game)
 
 // `value(games)`: progress from the games of the period; weekly missions have a `tier` (WEEKLY_TIERS). `family`: a draw
 // never holds two missions of the same family (they would measure almost the same thing). Titles are in i18n under

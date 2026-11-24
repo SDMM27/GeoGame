@@ -6,9 +6,9 @@ Production branch: master (dev is promoted to master by a merge-commit PR).
 
 ## Product ideas
 
-By default, use the devil's advocate subagent when the user proposes a new feature or a significant change to GeoGame.
-Ask it to challenge the player value, tradeoffs, and smallest viable version, then include its main objection and your recommendation in the reply.
-Skip this for routine fixes and straightforward follow-ups.
+Use the devil's advocate subagent only when it is really necessary: a new feature or a significant change that questions a large part of how the game works.
+Ask it to challenge the player value, the tradeoffs and the smallest viable version, then include its main objection and your recommendation in the reply.
+Never for routine fixes, small tweaks or straightforward follow-ups.
 
 ## Firestore rules and indexes (shipper)
 

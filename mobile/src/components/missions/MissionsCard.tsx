@@ -198,7 +198,17 @@ export function MissionsCard({ uid, missions }: { uid: string | null | undefined
           {selected === 'daily' ? (
             <Bonus count={DAILY_MISSIONS} reward={{ xp: DAILY_BONUS_XP, fragments: DAILY_BONUS_FRAGMENTS }} paid={Boolean(missions.dailyBonus)} />
           ) : (
-            <Bonus count={WEEKLY_MISSIONS} reward={{ xp: WEEKLY_BONUS_XP, fragments: WEEKLY_BONUS_FRAGMENTS }} paid={Boolean(missions.weeklyBonus)} />
+            <>
+              <Bonus count={WEEKLY_MISSIONS} reward={{ xp: WEEKLY_BONUS_XP, fragments: WEEKLY_BONUS_FRAGMENTS }} paid={Boolean(missions.weeklyBonus)} />
+              {missions.weeklyBonus ? (
+                <>
+                  <Text variant="caption">{t('collection.historical.weekly_earned')}</Text>
+                  <Touchable accessibilityRole="link" onPress={() => router.push('/(tabs)/profile')}>
+                    <Text variant="caption" color={colors.highlight}>{t('collection.historical.weekly_collection')}</Text>
+                  </Touchable>
+                </>
+              ) : <Text variant="caption">{t('collection.historical.weekly_reward')}</Text>}
+            </>
           )}
         </View>
       )}

@@ -22,6 +22,13 @@
 .flag-collection-current-text small { color: var(--sd-muted); }
 .flag-collection-current-text > span { font-family: var(--sd-font-mono); font-variant-numeric: tabular-nums; }
 .flag-collection-current-text strong { font-size: 1.2rem; }
+.flag-collection-sigil { width: 1.15rem; height: 1.15rem; vertical-align: -0.12em; }
+.flag-collection-sigil circle, .flag-collection-sigil ellipse, .flag-collection-sigil line {
+  fill: none;
+  stroke: #efca84;
+  stroke-width: 5;
+  stroke-linecap: round;
+}
 .flag-collection-hint { max-width: 280px; }
 
 .flag-pieces {
@@ -103,3 +110,11 @@
 .flag-collection-legend li span:first-child { min-width: 5.5rem; }
 .flag-collection-legend li span:last-child { font-family: var(--sd-font-mono); font-variant-numeric: tabular-nums; }
 .flag-collection-legend small { font-size: 0.75rem; font-style: italic; }
+.flag-collection-filters { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.75rem; }
+.flag-collection-filters .flag-collection-toggle { display: inline-flex; align-items: center; gap: 0.35rem; }
+.flag-collection-filters [aria-pressed='true'] { border-color: var(--sd-accent-strong); color: var(--sd-ink); }
+.historical-album + .flag-collection { margin-top: 0.75rem; }
+.flag-piece--historical {
+  background: linear-gradient(140deg, #e8c785, #9a7849);
+  box-shadow: inset 0 0 0 1px #f6d995;
+}

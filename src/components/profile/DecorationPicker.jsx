@@ -4,11 +4,12 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDecoration } from '../../hooks/useDecoration'
 import { useXp } from '../../hooks/useXp'
-import { DEFAULT_DECORATION, FRAMES, NAME_COLORS, decorationStyle, isUnlocked, saveAvatarFlag, saveDecoration } from '../../utils/decorations'
+import { DEFAULT_DECORATION, FRAMES, NAME_COLORS, avatarFlagName, decorationStyle, isUnlocked, previewAvatarFlag, saveAvatarFlag, saveDecoration } from '../../utils/decorations'
+import { HISTORICAL_FLAGS } from '../../data/historicalFlags'
 import { FLAG_POOL } from '../../utils/flagCollectionData'
 import { readFlags } from '../../utils/flagCollection'
-import { getCountryName } from '../../utils/getCountryName'
-import { fetchPublicData, patchPublicData } from '../../utils/publicProfile'
+import { readHistoricalFlags } from '../../utils/historicalFlagCollection'
+import { fetchPublicData, onPublicDataPatched } from '../../utils/publicProfile'
 import { isTestMode } from '../../utils/testMode'
 import FlagTile from '../FlagTile'
 import { Avatar } from './ProfileBody'
@@ -47,7 +48,7 @@ function PickerDialog({ account, onClose }) {
   const [saving, setSaving] = useState(false)
   const [failed, setFailed] = useState(false)
   const [unlocked, setUnlocked] = useState(null)
-  const [rawFlags, setRawFlags] = useState(null)
+  const [publicData, setPublicData] = useState(null)
   // The preview's test mode lists every flag; the ones not really unlocked are only tried on locally
   const testMode = isTestMode()
   const [query, setQuery] = useState('')
@@ -62,20 +63,23 @@ function PickerDialog({ account, onClose }) {
   // The flags of the player's collection (the same source as the profile's collection section).
   useEffect(() => {
     let cancelled = false
-    fetchPublicData(account.uid).then((data) => {
+    const load = () => fetchPublicData(account.uid).then((data) => {
       if (cancelled) return
-      setRawFlags(data?.flags ?? null)
-      setUnlocked(readFlags(data, FLAG_POOL).unlocked)
+      setPublicData(data)
+      setUnlocked([...readFlags(data, FLAG_POOL).unlocked, ...readHistoricalFlags(data).unlocked])
     })
+    load()
+    const stop = onPublicDataPatched((uid) => uid === account.uid && load())
     return () => {
       cancelled = true
+      stop()
     }
   }, [account.uid])
 
   const flags = useMemo(() => {
     const collator = (a, b) => a.name.localeCompare(b.name, language)
-    const isos = testMode && unlocked ? FLAG_POOL.map((flag) => flag.iso) : unlocked ?? []
-    return isos.map((iso) => ({ iso, name: getCountryName(iso, language) ?? iso })).sort(collator)
+    const isos = testMode && unlocked ? [...FLAG_POOL.map((flag) => flag.iso), ...HISTORICAL_FLAGS.map((flag) => flag.id)] : unlocked ?? []
+    return isos.map((iso) => ({ iso, name: avatarFlagName(iso, language) })).sort(collator)
   }, [unlocked, language, testMode])
   const needle = query.trim().toLowerCase()
   const shownFlags = needle ? flags.filter((flag) => flag.name.toLowerCase().includes(needle)) : flags
@@ -107,8 +111,7 @@ function PickerDialog({ account, onClose }) {
     try {
       if (testMode && iso !== null && !(unlocked ?? []).includes(iso)) {
         // Test mode, a flag not in the collection: shown on this device only (firestore.rules would refuse it)
-        const flags = { unlocked: [], current: null, pieces: 0, ...rawFlags }
-        patchPublicData(account.uid, { avatarFlag: iso, flags: { ...flags, unlocked: [...(unlocked ?? []), iso] } })
+        previewAvatarFlag(account.uid, iso, publicData, unlocked ?? [])
         return
       }
       await saveAvatarFlag(account.uid, iso, unlocked ?? [])

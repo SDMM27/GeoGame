@@ -8,11 +8,13 @@ import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { handleXp } from '../../api/_lib/xp.mjs'
 import countriesMeta from '../../src/data/countries.meta.json' with { type: 'json' }
 import { flagPool, piecesOf } from '../../src/utils/flagCollection.js'
+import { HISTORICAL_PACK } from '../../src/utils/historicalFlagCollection.js'
 import { SCROLLS } from '../../src/data/scrolls.js'
 import { GAMES_PER_DAY, GAME_XP, grantXp, levelCost, levelOf, missionDayAt, readXp, weekKeyOf } from '../../src/utils/missions.js'
 import { PERFECT_SCORES } from '../../src/utils/perfectScores.js'
 import { PERFECT_FRAGMENTS, PERFECT_XP } from '../../src/utils/recordRewards.js'
 import { STARTER_SCROLL } from '../../src/utils/scrollCollection.js'
+import { GAME_TYPES } from '../../src/utils/gameTypes.js'
 
 const POOL = flagPool(countriesMeta.features)
 const PROJECT = 'geogame-sdmm'
@@ -74,6 +76,80 @@ describe('requests', () => {
 // Total XP that is one game (GAME_XP) short of reaching `level`.
 const justBelow = (level) => Array.from({ length: level - 1 }, (_, index) => levelCost(index + 1)).reduce((sum, cost) => sum + cost, 0) - GAME_XP
 const scrollsOf = async (uid) => (await db.doc(`users/${uid}`).get()).data().scrolls
+
+describe('historical flag targets', () => {
+  it('queues a mystery pack when the weekly bonus is paid, once per week', async () => {
+    const ref = db.doc('users/alice')
+    for (let week = 0; week < 2; week += 1) {
+      const monday = NOW + week * 7 * DAY
+      const now = monday + 5 * DAY
+      const games = [
+        ...Object.values(GAME_TYPES).map((gameType) => ({ gameType, found: 0, playedAt: monday })),
+        { gameType: 'PLACEMENT', found: 250, playedAt: monday },
+        ...Array.from({ length: 3 }, () => ({ gameType: 'HARDCORE', playedAt: monday })),
+        ...Array.from({ length: 3 }, () => ({ mode: 'ascension', playedAt: monday })),
+        ...Array.from({ length: 20 }, () => ({ mode: 'daily', solved: true, playedAt: monday })),
+        ...Array.from({ length: 3 }, (_, index) => ({
+          gameType: 'DAILY_CHALLENGE', mode: 'daily', solved: true, score: 10,
+          playedAt: monday + index * DAY, dailyKey: missionDayAt(monday + index * DAY),
+        })),
+      ]
+      await addGames('alice', games)
+      const claim = await call('alice', now)
+      expect(claim.body.xp.weekMissions).toContain('bonus')
+      expect(claim.body.historicalPackQueued).toBe(true)
+      const stored = (await ref.get()).data().historicalFlags
+      expect(stored?.next === HISTORICAL_PACK || stored?.active === HISTORICAL_PACK).toBe(true)
+      expect((await call('alice', now)).body.historicalPackQueued).toBeUndefined()
+    }
+  })
+
+  it('activates the queued pack on the next fragments when nothing is being assembled', async () => {
+    const ref = db.doc('users/alice')
+    await ref.update({
+      xp: { total: justBelow(2), level: 1 },
+      flags: { unlocked: [], current: null, pieces: 0 },
+      historicalFlags: { active: null, progress: {}, unlocked: [], next: HISTORICAL_PACK },
+    })
+    await addGames('alice', [{}])
+    const { body } = await call('alice')
+    expect(body.historicalFragments).toBeGreaterThan(0)
+    expect(body.unlockedHistoricalFlags).toEqual([])
+    expect((await ref.get()).data().historicalFlags).toMatchObject({ active: HISTORICAL_PACK, progress: { [HISTORICAL_PACK]: body.historicalFragments } })
+  })
+
+  it('pays historical progress and XP once, then reverts to classic on completion', async () => {
+    const ref = db.doc('users/alice')
+    await ref.update({
+      xp: { total: justBelow(2), level: 1 },
+      historicalFlags: { active: 'ussr', progress: { ussr: 9 }, unlocked: [] },
+    })
+    await addGames('alice', [{}])
+    const { body } = await call('alice')
+    expect(body.historicalFragments).toBe(1)
+    expect(body.classicFragments).toBe(body.fragments - 1)
+    expect(body.unlockedHistoricalFlags).toEqual(['ussr'])
+    const state = { active: body.historicalFlags.active, progress: {}, unlocked: ['ussr'] }
+    expect((await ref.get()).data().historicalFlags).toEqual(state)
+    expect((await call('alice')).body.unlockedHistoricalFlags).toEqual([])
+    expect((await ref.get()).data().historicalFlags).toEqual(state)
+  })
+
+  it('draws a mystery historical flag at fragment ten and persists the unlock once', async () => {
+    const ref = db.doc('users/alice')
+    await ref.update({
+      xp: { total: justBelow(2), level: 1 },
+      historicalFlags: { active: HISTORICAL_PACK, progress: { [HISTORICAL_PACK]: 9 }, unlocked: ['ussr'] },
+    })
+    await addGames('alice', [{}])
+    const { body } = await call('alice')
+    expect(body.unlockedHistoricalFlags).toHaveLength(1)
+    const [unlocked] = body.unlockedHistoricalFlags
+    expect(unlocked).not.toBe('ussr')
+    expect((await ref.get()).data().historicalFlags.unlocked).toEqual(['ussr', unlocked])
+    expect((await call('alice')).body.unlockedHistoricalFlags).toEqual([])
+  })
+})
 
 describe('paying XP', () => {
   it('starts at level 1 with nothing to pay', async () => {

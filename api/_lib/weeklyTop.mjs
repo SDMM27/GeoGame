@@ -13,8 +13,10 @@ import { Timestamp } from 'firebase-admin/firestore'
 import { SCROLLS } from '../../src/data/scrolls.js'
 import countriesMeta from '../../src/data/countries.meta.json' with { type: 'json' }
 import { previousDayKey } from '../../src/utils/dailyGames.js'
-import { addFragments, flagPool, readFlags } from '../../src/utils/flagCollection.js'
+import { flagPool } from '../../src/utils/flagCollection.js'
 import { GAME_TYPES } from '../../src/utils/gameTypes.js'
+import { randomInt } from 'node:crypto'
+import { awardFlagFragments } from '../../src/utils/historicalFlagCollection.js'
 import { LEAGUE_MIN_PLAYED, LEAGUE_REWARDS } from '../../src/utils/leagueRewards.js'
 import { missionDayAt, weekDays, weekKeyOf } from '../../src/utils/missions.js'
 import { LEAGUE_WIN_SEALS, payScrolls } from '../../src/utils/scrollCollection.js'
@@ -101,15 +103,21 @@ async function closeLastWeek({ db, today, now }) {
     for (const user of users) {
       if (!user.exists || !user.data().username) continue
       const reward = rewarded.find((player) => player.uid === user.id).reward
-      const update = { flags: addFragments(readFlags(user.data(), POOL), reward, POOL, user.id).state }
+      const { flags, historicalFlags, unlockedFlags, unlockedHistoricalFlags } = awardFlagFragments(user.data(), reward, POOL, user.id, { drawPackIndex: randomInt })
+      const update = { flags, ...(historicalFlags && { historicalFlags }) }
       if (user.id === champion) {
         update.league = { wins: winsOf(user.data()) + 1, lastWin: week }
         update.scrolls = payScrolls(user.data(), LEAGUE_WIN_SEALS, SCROLLS, user.id).state
       }
       transaction.update(user.ref, update)
-      paid.set(user.id, reward)
+      const flagReveal = unlockedFlags.length || unlockedHistoricalFlags.length ? {
+        unlocked: unlockedFlags,
+        collectionCount: flags.unlocked.length,
+        ...(unlockedHistoricalFlags.length > 0 && { historical: unlockedHistoricalFlags }),
+      } : null
+      paid.set(user.id, { reward, ...(flagReveal && { flagReveal }) })
     }
-    const result = players.map((player) => ({ ...player, reward: paid.get(player.uid) ?? 0 }))
+    const result = players.map((player) => ({ ...player, ...(paid.get(player.uid) ?? { reward: 0 }) }))
     transaction.set(lastRef, { week, players: result, closedAt: Timestamp.fromMillis(now) })
     return week
   })

@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from 'react'
-import { fetchLastWeek, podiumResult, previousWeekKey } from '../utils/league'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { fetchLastWeek, paidLeagueResult, PODIUM_SIZE, previousWeekKey } from '../utils/league'
+import { revealLeagueFlags } from '../utils/leagueFlagReveal'
 import { serverNow } from '../utils/serverTime'
 
 // The device remembers the last week it looked at, per account: the victory shows once per device.
@@ -23,15 +24,17 @@ function setSeen(uid, week) {
 
 /**
  * The podium finish of the account `uid` (null for a visitor) in the week that just ended, once per device:
- * { result: { week, rank, points, reward } | null, dismiss }. Once the week is stored on the device nothing is read, so
- * it costs about one read a week. While the server hasn't closed the week yet (weeklyTop/last is older), nothing is
- * stored and the next visit asks again. Failures are silent.
+ * { result: { week, rank, points, reward, flagReveal? } | null, dismiss }. A podium result is marked seen when
+ * dismissed, which also hands its flag unlocks to the global reveal overlay. Outside the podium, flags are
+ * revealed directly. A week that has not closed is checked again on the next visit.
  */
 export function useLeagueVictory(uid) {
-  const [result, setResult] = useState(null)
+  const [victory, setVictory] = useState(null)
+  const dismissed = useRef(null)
+  const result = victory && victory.uid === uid ? victory.result : null
 
   useEffect(() => {
-    setResult(null)
+    setVictory(null)
     if (!uid) return undefined
     const week = previousWeekKey(serverNow())
     if (getSeen(uid) === week) return undefined
@@ -39,8 +42,12 @@ export function useLeagueVictory(uid) {
     fetchLastWeek()
       .then((last) => {
         if (cancelled || last?.week !== week) return
-        setSeen(uid, week)
-        setResult(podiumResult(last, uid))
+        const paid = paidLeagueResult(last, uid)
+        if (paid && paid.rank <= PODIUM_SIZE) setVictory({ uid, result: paid })
+        else {
+          revealLeagueFlags(uid, paid?.flagReveal)
+          setSeen(uid, week)
+        }
       })
       .catch(() => {})
     return () => {
@@ -48,6 +55,12 @@ export function useLeagueVictory(uid) {
     }
   }, [uid])
 
-  const dismiss = useCallback(() => setResult(null), [])
+  const dismiss = useCallback(() => {
+    if (!result || dismissed.current === result) return
+    dismissed.current = result
+    revealLeagueFlags(uid, result.flagReveal)
+    setSeen(uid, result.week)
+    setVictory(null)
+  }, [result, uid])
   return { result, dismiss }
 }

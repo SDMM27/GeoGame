@@ -1,0 +1,4 @@
+.historical-pack { display: flex; flex-wrap: wrap; gap: 0.75rem; padding: 0.85rem; border: 1px solid var(--sd-line); border-radius: 8px; background: var(--sd-surface-2); }
+.historical-pack small { color: var(--sd-muted); }
+.historical-pack p { margin: 0; }
+.historical-pack { flex-direction: column; align-items: flex-start; }

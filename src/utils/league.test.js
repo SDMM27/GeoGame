@@ -100,6 +100,13 @@ describe('podiumResult', () => {
     expect(podiumResult(last, 'me')).toEqual({ week: '2026-W41', rank: 3, points: 20, reward: 2 })
   })
 
+  it('passes the exact flag reveal when the weekly close saved it', () => {
+    const flagReveal = { unlocked: ['fr', 'de'], collectionCount: 42 }
+    const paid = (reveal) => ({ ...last, players: [player('x', 40, { reward: 10, flagReveal: reveal })] })
+    expect(podiumResult(paid(flagReveal), 'x').flagReveal).toEqual(flagReveal)
+    expect(podiumResult(paid({ ...flagReveal, collectionCount: 0 }), 'x').flagReveal).toBeUndefined()
+  })
+
   it('is null off the podium, unpaid, unranked, signed out or without a last week', () => {
     const unpaid = { week: '2026-W41', players: [player('x', 40, { reward: 0 }), player('y', 30, { reward: 3 })] }
     const deep = { week: '2026-W41', players: [player('a', 9, { reward: 1 }), player('b', 8, { reward: 1 }), player('c', 7, { reward: 1 }), player('d', 6, { reward: 1 })] }

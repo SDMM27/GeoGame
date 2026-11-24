@@ -4,6 +4,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react'
 import DecorationPicker from './DecorationPicker'
 import { saveAvatarFlag, saveDecoration } from '../../utils/decorations'
+import { fetchPublicData } from '../../utils/publicProfile'
 
 const account = { uid: 'me', username: 'Alice' }
 
@@ -34,6 +35,13 @@ beforeEach(() => {
 })
 
 describe('DecorationPicker', () => {
+  it('equips an unlocked historical flag through the existing picker', async () => {
+    fetchPublicData.mockResolvedValueOnce({ historicalFlags: { unlocked: ['ussr'] } })
+    open()
+    fireEvent.click(await screen.findByText('Union soviétique'))
+    await waitFor(() => expect(saveAvatarFlag).toHaveBeenCalledWith('me', 'ussr', ['ussr']))
+    expect(screen.queryByText('Chine des Qing')).toBeNull()
+  })
   it('opens a dialog with the current frame and color pressed', () => {
     open()
     expect(screen.getByRole('dialog')).toBeTruthy()

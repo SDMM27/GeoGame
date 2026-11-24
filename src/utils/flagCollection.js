@@ -40,7 +40,7 @@ export const streakFragments = (count) =>
   (count > 0 && count % 7 === 0 ? STREAK_WEEK_FRAGMENTS : 0) + (STREAK_MILESTONE_FRAGMENTS[count] ?? 0)
 
 export const RARITIES = ['common', 'uncommon', 'rare', 'legendary']
-export const RARITY_COLORS = { common: '#9AA5B1', uncommon: '#4CAF7A', rare: '#4A90E2', legendary: '#C792FF' }
+export const RARITY_COLORS = { common: '#9AA5B1', uncommon: '#4CAF7A', rare: '#4A90E2', legendary: '#F5B83D' }
 // Odds of being drawn as the next flag, relative to each other.
 export const RARITY_WEIGHTS = { common: 4, uncommon: 3, rare: 2, legendary: 1 }
 // Pieces that rebuild a flag of each rarity.
@@ -92,14 +92,15 @@ export function seedOf(text) {
 }
 
 // The next flag among those not unlocked (weighted by rarity), or null when none is left. Same seed, same flag.
-function drawFlag(unlocked, pool, seed) {
+export function drawFlag(unlocked, pool, seed) {
   const taken = new Set(unlocked)
   const left = pool.filter((flag) => !taken.has(flag.iso))
   if (left.length === 0) return null
-  const total = left.reduce((sum, flag) => sum + RARITY_WEIGHTS[flag.rarity], 0)
+  const weight = (flag) => flag.weight ?? RARITY_WEIGHTS[flag.rarity]
+  const total = left.reduce((sum, flag) => sum + weight(flag), 0)
   let roll = mulberry32(seedOf(seed))() * total
   for (const flag of left) {
-    roll -= RARITY_WEIGHTS[flag.rarity]
+    roll -= weight(flag)
     if (roll < 0) return flag.iso
   }
   return left[left.length - 1].iso

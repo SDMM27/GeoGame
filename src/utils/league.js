@@ -4,6 +4,7 @@
 import { doc, getDoc } from 'firebase/firestore'
 import { firestore } from '../Firebase'
 import { previousDayKey } from './dailyGames'
+import { isHistoricalFlag } from './historicalFlagCollection'
 import { readSnapshot, writeSnapshot } from './localSnapshot'
 import { missionDayAt, weekDays, weekKeyOf } from './missions'
 
@@ -13,9 +14,17 @@ export const PODIUM_SIZE = 3
 
 const isPlayer = (entry) => typeof entry?.uid === 'string' && typeof entry.name === 'string'
 const count = (value) => (Number.isFinite(value) ? value : 0)
+const readFlagReveal = (entry) => {
+  const reveal = entry.flagReveal
+  if (!Array.isArray(reveal?.unlocked) || !reveal.unlocked.every((iso) => typeof iso === 'string')) return {}
+  if (!Number.isInteger(reveal.collectionCount) || reveal.collectionCount < reveal.unlocked.length) return {}
+  const historical = Array.isArray(reveal.historical) ? reveal.historical.filter(isHistoricalFlag) : []
+  if (!reveal.unlocked.length && !historical.length) return {}
+  return { flagReveal: { unlocked: reveal.unlocked, collectionCount: reveal.collectionCount, ...(historical.length > 0 && { historical }) } }
+}
 const readPlayers = (list) =>
   Array.isArray(list)
-    ? list.filter(isPlayer).map((entry) => ({ uid: entry.uid, name: entry.name, points: count(entry.points), played: count(entry.played), golds: count(entry.golds), reward: count(entry.reward) }))
+    ? list.filter(isPlayer).map((entry) => ({ uid: entry.uid, name: entry.name, points: count(entry.points), played: count(entry.played), golds: count(entry.golds), reward: count(entry.reward), ...readFlagReveal(entry) }))
     : []
 
 const readWeek = (snapshot, ...fields) => {
@@ -45,12 +54,17 @@ export async function fetchLastWeek() {
 // The week that ended before the one `now` is in: '2026-W41' on Wednesday 14 October 2026.
 export const previousWeekKey = (now) => weekKeyOf(previousDayKey(weekDays(missionDayAt(now))[0]))
 
-// { week, rank, points, reward } when `uid` finished 1st to 3rd of `last` ({ week, players }) and was paid, else null.
-export function podiumResult(last, uid) {
+// { week, rank, points, reward, flagReveal? } for any player who earned fragments.
+export function paidLeagueResult(last, uid) {
   const index = last && uid ? last.players.findIndex((player) => player.uid === uid) : -1
   const player = last?.players[index]
-  if (!player || index >= PODIUM_SIZE || player.reward <= 0) return null
-  return { week: last.week, rank: index + 1, points: player.points, reward: player.reward }
+  if (!player || player.reward <= 0) return null
+  return { week: last.week, rank: index + 1, points: player.points, reward: player.reward, ...readFlagReveal(player) }
+}
+
+export function podiumResult(last, uid) {
+  const result = paidLeagueResult(last, uid)
+  return result && result.rank <= PODIUM_SIZE ? result : null
 }
 
 /**

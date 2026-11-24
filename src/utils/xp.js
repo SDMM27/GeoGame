@@ -48,18 +48,24 @@ export async function claimXp(uid, { again = false } = {}) {
       pushApi ??= import('./pushApi')
       const response = await (await pushApi).callPush('xp', {})
       if (response?.status !== 200 || !response.body?.xp) return null
-      const { xp, gained, levelUp, flags, fragments, rewards, records, unlockedFlags, seals, scrolls, unlockedScrolls } = response.body
+      const {
+        xp, gained, levelUp, flags, fragments, rewards, records, unlockedFlags, seals, scrolls, unlockedScrolls,
+        classicFragments, historicalFragments, historicalFlags, unlockedHistoricalFlags,
+      } = response.body
       // An older server answers without flags or scrolls: keep what the cache holds
-      patchPublicData(uid, { xp, ...(flags && { flags }), ...(scrolls && { scrolls }) })
+      patchPublicData(uid, { xp, ...(flags && { flags }), ...(scrolls && { scrolls }), ...(historicalFlags && { historicalFlags }) })
       claimListeners.forEach((listener) =>
         listener({
+          uid,
           gained,
           levelUp: Boolean(levelUp),
           level: xp.level,
-          fragments: fragments ?? 0,
+          fragments: classicFragments ?? fragments ?? 0,
+          historicalFragments: historicalFragments ?? 0,
           rewards: rewards ?? [],
           records: records ?? [],
           unlockedFlags: unlockedFlags ?? [],
+          unlockedHistoricalFlags: unlockedHistoricalFlags ?? [],
           seals: seals ?? 0,
           scrolls: scrolls ?? null,
           unlockedScrolls: unlockedScrolls ?? [],

@@ -149,6 +149,7 @@ export default function MissionsCard({ missions }) {
             bonusDone={missions.dailyBonus}
           />
         ) : (
+          <>
           <MissionList
             entries={weekly}
             reward={weeklyReward}
@@ -157,6 +158,12 @@ export default function MissionsCard({ missions }) {
             bonusFragments={WEEKLY_BONUS_FRAGMENTS}
             bonusDone={missions.weeklyBonus}
           />
+          <p className="missions-bonus">
+            {missions.weeklyBonus ? (
+              <><span>{t('collection.historical.weekly_earned')}</span>{' '}<Link to="/account">{t('collection.historical.weekly_collection')}</Link></>
+            ) : t('collection.historical.weekly_reward')}
+          </p>
+          </>
         )}
       </div>
     </article>

@@ -10,12 +10,14 @@ export type FlagsState = { unlocked: string[]; current: string | null; pieces: n
 // What the dailies and the streak paid (grantXp in @shared/utils/missions): { kind, fragments, streak? }.
 export type Reward = { kind: 'dailies_all' | 'dailies_won_3' | 'dailies_won_all' | 'streak'; fragments: number; streak?: number }
 export type Claim = {
+  uid?: string
   gained: number
   levelUp: boolean
   level: number
   fragments?: number
   rewards?: Reward[]
   unlockedFlags?: string[]
+  unlockedHistoricalFlags?: string[]
   // Scroll seals paid, the account's scrolls after the claim, and the scrolls opened (starter gift included)
   seals?: number
   scrolls?: { unlocked: string[]; seals: number } | null

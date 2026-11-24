@@ -302,6 +302,18 @@ describe('avatar flag', () => {
   it('refuses unlocking a flag along with wearing it', async () => {
     await assertFails(as('alice').doc('users/alice').update({ avatarFlag: 'BR', flags: { unlocked: ['BR'], current: null, pieces: 0 } }))
   })
+
+  it('only permits equipping historical flags already unlocked by the server', async () => {
+    const ref = as('alice').doc('users/alice')
+    await assertFails(ref.update({ avatarFlag: 'ussr' }))
+    await assertFails(ref.update({ avatarFlag: 'ussr', historicalFlags: { unlocked: ['ussr'] } }))
+    await env.withSecurityRulesDisabled((context) => context.firestore().doc('users/alice').update({ historicalFlags: { unlocked: ['ussr'] } }))
+    await assertSucceeds(ref.update({ avatarFlag: 'ussr' }))
+    await assertFails(ref.update({ avatarFlag: 'qing' }))
+    await assertFails(as('mallory').doc('users/alice').update({ avatarFlag: 'ussr' }))
+    await unlock(['FR'])
+    await assertSucceeds(ref.update({ avatarFlag: 'FR' }))
+  })
 })
 
 describe('XP', () => {

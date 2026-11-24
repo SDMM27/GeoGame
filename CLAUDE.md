@@ -4,6 +4,12 @@ Base branch: dev
 
 Production branch: master (dev is promoted to master by a merge-commit PR).
 
+## Product ideas
+
+By default, use the devil's advocate subagent when the user proposes a new feature or a significant change to GeoGame.
+Ask it to challenge the player value, tradeoffs, and smallest viable version, then include its main objection and your recommendation in the reply.
+Skip this for routine fixes and straightforward follow-ups.
+
 ## Firestore rules and indexes (shipper)
 
 The website, the app and their previews all use the same Firebase project (`geogame-sdmm`), and merging a PR does

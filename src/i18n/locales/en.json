@@ -1595,7 +1595,25 @@
     },
     "new_flag": "New flag!",
     "view_collection": "View collection",
-    "tap_to_continue": "Tap to continue"
+    "tap_to_continue": "Tap to continue",
+    "skip_remaining": "Skip remaining animations",
+    "filter_all": "All",
+    "filter_classic": "Classic",
+    "replay_animation": "Replay animation",
+    "historical": {
+      "title": "Historical flags",
+      "hint": "Choose a flag to assemble with the next fragments you earn. Each flag takes {{total}} fragments.",
+      "active": "In progress",
+      "unlocked": "Flag unlocked",
+      "source": "Historical source",
+      "select": "Assemble this flag",
+      "resume": "Resume this flag",
+      "next_fragments": "Your next fragments will go toward this flag.",
+      "back_to_classic": "Resume the classic collection",
+      "classic_paused": "Classic flag paused",
+      "load_error": "Could not load the historical album.",
+      "error": "Could not change the active flag. Try again."
+    }
   },
   "country_of_day": {
     "intro": "One country a day, the same for everyone: guess it in 4 steps, then get to know it.",

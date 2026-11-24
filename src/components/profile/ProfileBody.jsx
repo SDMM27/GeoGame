@@ -8,10 +8,9 @@ import { useBadges } from '../../hooks/useBadges'
 import { usePlayerProfile } from '../../hooks/usePlayerProfile'
 import { TIER_COLORS } from '../../utils/achievements'
 import { badgeSummary, readBadges } from '../../utils/badges'
-import { decorationStyle } from '../../utils/decorations'
+import { avatarFlagName, decorationStyle } from '../../utils/decorations'
 import FlagTile from '../FlagTile'
 import { GAME_TYPES } from '../../utils/gameTypes'
-import { getCountryName } from '../../utils/getCountryName'
 import GameEmblem from '../GameEmblem'
 import { describeBest, describeDetails, describeMode, describeResult, formatPlayedAt } from '../../utils/profileFormat'
 import { dailyTypesOn, dayKey, formatPlayTime } from '../../utils/profileStats'
@@ -44,7 +43,7 @@ function AvatarFlag({ iso, size, fallback }) {
   const [failed, setFailed] = useState(false)
   useEffect(() => setFailed(false), [iso])
   if (failed) return fallback
-  const country = getCountryName(iso, i18n.language) ?? iso
+  const country = avatarFlagName(iso, i18n.language)
   return (
     <FlagTile
       iso={iso}

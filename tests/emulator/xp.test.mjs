@@ -41,6 +41,9 @@ async function clearFirestore() {
 }
 
 const call = (uid, now = NOW) => handleXp({ db, auth, idToken: tokens[uid], now, Timestamp })
+const selectHistorical = (id, uid = 'alice') => handleXp({
+  db, auth, idToken: tokens.alice, body: { action: 'selectHistoricalFlag', uid, id },
+})
 const xpOf = async (uid) => (await db.doc(`users/${uid}`).get()).data().xp
 
 async function addGames(uid, games) {
@@ -74,6 +77,39 @@ describe('requests', () => {
 // Total XP that is one game (GAME_XP) short of reaching `level`.
 const justBelow = (level) => Array.from({ length: level - 1 }, (_, index) => levelCost(index + 1)).reduce((sum, cost) => sum + cost, 0) - GAME_XP
 const scrollsOf = async (uid) => (await db.doc(`users/${uid}`).get()).data().scrolls
+
+describe('historical flag targets', () => {
+  it('switches and pauses targets without losing progress or editing the classic flag', async () => {
+    const ref = db.doc('users/alice')
+    const flags = { unlocked: [], current: 'fr', pieces: 1 }
+    const progress = { ussr: 6, qing: 3 }
+    await ref.update({ flags, historicalFlags: { active: 'ussr', progress, unlocked: ['fiji-kingdom'] } })
+
+    expect((await selectHistorical('qing', 'carol')).status).toBe(403)
+    expect((await selectHistorical('unknown')).status).toBe(400)
+    expect((await selectHistorical('fiji-kingdom')).status).toBe(409)
+    expect((await selectHistorical('qing')).body.historicalFlags).toEqual({ active: 'qing', progress, unlocked: ['fiji-kingdom'] })
+    expect((await selectHistorical(null)).body.historicalFlags).toEqual({ active: null, progress, unlocked: ['fiji-kingdom'] })
+    expect((await ref.get()).data()).toMatchObject({ flags, historicalFlags: { active: null, progress } })
+  })
+
+  it('pays historical progress and XP once, then reverts to classic on completion', async () => {
+    const ref = db.doc('users/alice')
+    await ref.update({
+      xp: { total: justBelow(2), level: 1 },
+      historicalFlags: { active: 'ussr', progress: { ussr: 9 }, unlocked: [] },
+    })
+    await addGames('alice', [{}])
+    const { body } = await call('alice')
+    expect(body.historicalFragments).toBe(1)
+    expect(body.classicFragments).toBe(body.fragments - 1)
+    expect(body.unlockedHistoricalFlags).toEqual(['ussr'])
+    const state = { active: null, progress: {}, unlocked: ['ussr'] }
+    expect((await ref.get()).data().historicalFlags).toEqual(state)
+    expect((await call('alice')).body.unlockedHistoricalFlags).toEqual([])
+    expect((await ref.get()).data().historicalFlags).toEqual(state)
+  })
+})
 
 describe('paying XP', () => {
   it('starts at level 1 with nothing to pay', async () => {

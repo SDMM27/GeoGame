@@ -18,7 +18,8 @@
 // `scores` documents; users/{uid}.records = { best, perfect, day, dayPaid } keeps what was seen and paid. The first claim
 // only seeds it (and pays the perfect cells already held, once). The records' XP counts toward the levels of the same claim.
 import countriesMeta from '../../src/data/countries.meta.json' with { type: 'json' }
-import { addFragments, flagPool, readFlags } from '../../src/utils/flagCollection.js'
+import { flagPool } from '../../src/utils/flagCollection.js'
+import { awardFlagFragments, isHistoricalFlag, readHistoricalFlags } from '../../src/utils/historicalFlagCollection.js'
 import { SCROLLS } from '../../src/data/scrolls.js'
 import { grantXp, missionDayAt, readXp, seedStreak, weekKeyOf } from '../../src/utils/missions.js'
 import { payScrolls } from '../../src/utils/scrollCollection.js'
@@ -55,7 +56,8 @@ const toGame = (snapshot) => {
 }
 
 /** Pays what the player's recent games and records earn: { xp, gained, levelUp, flags, fragments, rewards, records,
- *  unlockedFlags, seals, scrolls, unlockedScrolls }: `records` details the record rewards (grantRecords); the fragments (missions, levels, dailies, streak) go to the flag collection and the seals
+ *  unlockedFlags, historicalFlags, unlockedHistoricalFlags, classicFragments, historicalFragments, seals, scrolls,
+ *  unlockedScrolls }: `records` details the record rewards (grantRecords); the fragments (missions, levels, dailies, streak) go to the selected flag collection and the seals
  *  (weekly bonus, levels) to the scroll collection in the same transaction as the XP; `rewards` details the fragments of
  *  the dailies and the streak (grantXp); `unlockedScrolls` includes the starter scroll when it was just granted. */
 export async function claimXp({ db, uid, now = Date.now(), Timestamp }) {
@@ -92,22 +94,46 @@ export async function claimXp({ db, uid, now = Date.now(), Timestamp }) {
     const { seals, rewards, levelUp, state } = grant
     const gained = records.gained + grant.gained
     const fragments = records.fragments + grant.fragments
-    const collected = addFragments(readFlags(user.data(), POOL), fragments, POOL, uid)
+    const collection = awardFlagFragments(user.data(), fragments, POOL, uid)
     const paid = payScrolls(user.data(), seals, SCROLLS, uid)
     const changes = {}
     const stored = user.data().xp
     if (gained > 0 || fragments > 0 || stored?.day !== day || stored?.week !== week || JSON.stringify(stored?.streak) !== JSON.stringify(state.streak)) changes.xp = state
     if (records.changed) changes.records = records.state
-    if (fragments > 0) changes.flags = collected.state
+    if (collection.classicFragments > 0) changes.flags = collection.flags
+    if (collection.historicalFlags) changes.historicalFlags = collection.historicalFlags
     if (paid.changed) changes.scrolls = paid.state
     if (Object.keys(changes).length > 0) transaction.update(userRef, changes)
-    return reply(200, { xp: state, gained, levelUp, flags: collected.state, fragments, rewards, records: records.rewards, unlockedFlags: collected.unlocked, seals, scrolls: paid.state, unlockedScrolls: paid.unlocked })
+    return reply(200, {
+      xp: state, gained, levelUp, fragments, rewards, records: records.rewards,
+      ...collection, seals, scrolls: paid.state, unlockedScrolls: paid.unlocked,
+    })
   })
 }
 
-/** POST /api/xp: no body. */
-export async function handleXp({ db, auth, idToken, now = Date.now(), Timestamp }) {
+async function selectHistoricalFlag({ db, uid, id }) {
+  if (id !== null && !isHistoricalFlag(id)) return reply(400, { error: 'unknown_historical_flag' })
+  const userRef = db.doc(`users/${uid}`)
+  return db.runTransaction(async (transaction) => {
+    const user = await transaction.get(userRef)
+    if (!user.exists || !user.data().username) return reply(403, { error: 'no_account' })
+    const historicalFlags = readHistoricalFlags(user.data())
+    if (historicalFlags.unlocked.includes(id)) return reply(409, { error: 'already_unlocked' })
+    if (historicalFlags.active !== id) {
+      historicalFlags.active = id
+      transaction.update(userRef, { historicalFlags })
+    }
+    return reply(200, { historicalFlags })
+  })
+}
+
+/** POST /api/xp: an empty body claims XP; the historical flag action selects the next reward target. */
+export async function handleXp({ db, auth, idToken, body, now = Date.now(), Timestamp }) {
   const uid = await verifiedUid(auth, idToken)
   if (!uid) return reply(401, { error: 'unauthorized' })
+  if (body?.action === 'selectHistoricalFlag') {
+    if (body.uid !== uid) return reply(403, { error: 'account_mismatch' })
+    return selectHistoricalFlag({ db, uid, id: body.id })
+  }
   return claimXp({ db, uid, now, Timestamp })
 }

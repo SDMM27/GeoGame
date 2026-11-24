@@ -13,6 +13,7 @@ jest.mock('@shared/utils/flagCollectionData', () => {
   }
 })
 jest.mock('@shared/utils/publicProfile', () => ({ onPublicDataPatched: () => () => {} }))
+jest.mock('@shared/utils/historicalFlagCollectionData', () => ({ useHistoricalFlags: jest.fn() }))
 // Name = the iso upper-cased, so the sort is easy to read
 jest.mock('@shared/utils/getCountryName', () => ({ getCountryName: (iso: string) => iso.toUpperCase() }))
 // Reanimated and worklets need native code: their jest mocks (no useReducedMotion needed here)

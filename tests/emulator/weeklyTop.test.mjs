@@ -7,6 +7,7 @@ import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import handler from '../../api/weekly-top.mjs'
 import { LEAGUE_MIN_PLAYED, LEAGUE_REWARDS, computeWeeklyTop, refreshWeeklyTop, refreshWeeklyTopThrottled } from '../../api/_lib/weeklyTop.mjs'
 import countriesMeta from '../../src/data/countries.meta.json'
+import { HISTORICAL_FLAGS } from '../../src/data/historicalFlags.js'
 import { flagPool, piecesOf, readFlags } from '../../src/utils/flagCollection.js'
 
 const PROJECT = 'geogame-sdmm'
@@ -194,6 +195,24 @@ describe('refreshWeeklyTop, the end of the week', () => {
     const { flags } = await collectedBy('p1')
     const pieces = flags.unlocked.reduce((sum, iso) => sum + piecesOf(iso, POOL), flags.pieces)
     expect(pieces).toBe(LEAGUE_REWARDS[1])
+    expect(flags.unlocked.length).toBeGreaterThan(0)
+    const last = (await db.doc('weeklyTop/last').get()).data()
+    expect(last.players[0].flagReveal).toEqual({ unlocked: flags.unlocked, collectionCount: flags.unlocked.length })
+  })
+
+  it('can pay the whole first-place reward into a selected historical flag', async () => {
+    const [{ id }] = HISTORICAL_FLAGS
+    const flags = { current: POOL[0].iso, unlocked: [], pieces: 1 }
+    await account('p1', { flags, historicalFlags: { active: id, unlocked: [], progress: {} } })
+    await playLastWeek('p1', 1)
+    await refreshWeeklyTop({ db, now: NOW })
+
+    const player = (await db.doc('users/p1').get()).data()
+    expect(player.flags).toEqual(flags)
+    expect(player.historicalFlags).toEqual({ active: null, unlocked: [id], progress: {} })
+    const last = (await db.doc('weeklyTop/last').get()).data()
+    expect(last.players[0].reward).toBe(10)
+    expect(last.players[0].flagReveal).toEqual({ unlocked: [], collectionCount: 0, historical: [id] })
   })
 
   it('gives the champion title to rank 1 only, and adds to the wins they already have', async () => {

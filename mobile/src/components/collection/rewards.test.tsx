@@ -1,4 +1,5 @@
 import { act, create } from 'react-test-renderer'
+import { revealLeagueFlags } from '@shared/utils/leagueFlagReveal'
 
 import { FlagUnlockOverlay } from './FlagUnlockOverlay'
 import { FragmentToast } from './FragmentToast'
@@ -76,6 +77,43 @@ describe('FlagUnlockOverlay', () => {
     })
     expect(tree.toJSON()).toBeNull()
     expect(mockPush).not.toHaveBeenCalled()
+  })
+
+  it('presents the league reveal only for the signed-in account', () => {
+    let tree!: ReturnType<typeof create>
+    act(() => {
+      tree = create(<FlagUnlockOverlay />)
+    })
+    const flagReveal = { unlocked: ['fr'], collectionCount: 1 }
+    act(() => revealLeagueFlags('different-account', flagReveal))
+    expect(tree.toJSON()).toBeNull()
+    act(() => revealLeagueFlags('u1', flagReveal))
+    expect(texts(tree)).toContain('France')
+    expect(texts(tree)).toContain('collection.new_flag')
+    act(() => tree.unmount())
+  })
+
+  it('plays the full league award before offering the collection shortcut', () => {
+    let tree!: ReturnType<typeof create>
+    act(() => {
+      tree = create(<FlagUnlockOverlay />)
+    })
+    act(() => revealLeagueFlags('u1', { unlocked: ['fr'], collectionCount: 1, historical: ['ussr'] }))
+    expect(texts(tree)).toContain('France')
+    act(() => { jest.advanceTimersByTime(4000) })
+    expect(texts(tree)).not.toContain('collection.view_collection')
+    const button = tree.root.findAll((node) => node.props.accessibilityLabel === 'collection.tap_to_continue' && typeof node.props.onPress === 'function')[0]
+    act(() => {
+      button.props.onPress()
+      button.props.onPress()
+    })
+    act(() => { jest.advanceTimersByTime(300) })
+    expect(texts(tree)).toContain('Union soviétique')
+    expect(texts(tree)).not.toContain('collection.view_collection')
+    act(() => { jest.advanceTimersByTime(4000) })
+    expect(texts(tree)).toContain('collection.view_collection')
+    expect(mockPush).not.toHaveBeenCalled()
+    act(() => tree.unmount())
   })
 })
 

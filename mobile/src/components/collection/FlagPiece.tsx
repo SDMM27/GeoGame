@@ -1,6 +1,6 @@
 // One piece of a flag cut by pieceGrid (see @shared/utils/flagCollection): the flag image shifted so only piece `index`
 // of a cols x rows grid shows. Fills its parent, which positions and sizes it.
-import { Image, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native'
+import { Image, StyleSheet, View, type ImageSourcePropType, type StyleProp, type ViewStyle } from 'react-native'
 
 import { getFlag } from '@/flags'
 
@@ -10,14 +10,15 @@ export function FlagPiece({
   cols,
   rows,
   style,
+  source = getFlag(iso),
 }: {
   iso: string
   index: number
   cols: number
   rows: number
   style?: StyleProp<ViewStyle>
+  source?: ImageSourcePropType | null
 }) {
-  const source = getFlag(iso)
   if (source == null) return null
   return (
     <View pointerEvents="none" style={[styles.piece, style]}>

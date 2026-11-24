@@ -8,11 +8,12 @@ import { Modal, Pressable, ScrollView, TextInput, View } from 'react-native'
 
 import { useDecoration } from '@shared/hooks/useDecoration'
 import { useXp } from '@shared/hooks/useXp'
-import { DEFAULT_DECORATION, decorationStyle, FRAMES, isUnlocked, NAME_COLORS, saveAvatarFlag, saveDecoration } from '@shared/utils/decorations'
+import { avatarFlagName, DEFAULT_DECORATION, decorationStyle, FRAMES, isUnlocked, NAME_COLORS, previewAvatarFlag, saveAvatarFlag, saveDecoration } from '@shared/utils/decorations'
+import { HISTORICAL_FLAGS } from '@shared/data/historicalFlags'
 import { readFlags } from '@shared/utils/flagCollection'
 import { FLAG_POOL } from '@shared/utils/flagCollectionData'
-import { getCountryName } from '@shared/utils/getCountryName'
-import { fetchPublicData, onPublicDataPatched, patchPublicData } from '@shared/utils/publicProfile'
+import { readHistoricalFlags } from '@shared/utils/historicalFlagCollection'
+import { fetchPublicData, onPublicDataPatched } from '@shared/utils/publicProfile'
 
 import { Kicker, ScreenTitle } from '@/components/flight'
 import { Button, Text, Touchable } from '@/components/ui'
@@ -34,7 +35,7 @@ function useCollectionFlags(uid: string) {
     const load = () =>
       fetchPublicData(uid)
         .then((data: { flags?: Record<string, unknown> } | null) => {
-          if (!cancelled) setState({ unlocked: readFlags(data, FLAG_POOL).unlocked, raw: data?.flags ?? null })
+          if (!cancelled) setState({ unlocked: [...readFlags(data, FLAG_POOL).unlocked, ...readHistoricalFlags(data).unlocked], raw: data })
         })
         .catch((error: unknown) => console.warn('[decoration]', error))
     load()
@@ -50,8 +51,8 @@ function useCollectionFlags(uid: string) {
 // The flags to list, sorted by name in `lang`: the collection's, or in test mode every flag; empty until loaded (outside test mode).
 function useListedFlags(unlocked: string[], testMode: boolean, lang: string): string[] {
   return useMemo(() => {
-    const name = (iso: string) => (getCountryName(iso, lang) as string) || iso
-    const isos = testMode ? (FLAG_POOL as { iso: string }[]).map((flag) => flag.iso) : unlocked
+    const name = (iso: string) => avatarFlagName(iso, lang)
+    const isos = testMode ? [...FLAG_POOL.map((flag: { iso: string }) => flag.iso), ...HISTORICAL_FLAGS.map((flag: { id: string }) => flag.id)] : unlocked
     return [...isos].sort((a, b) => name(a).localeCompare(name(b), lang))
   }, [unlocked, testMode, lang])
 }
@@ -97,7 +98,7 @@ export function DecorationPicker({ uid, username }: { uid: string; username: str
     try {
       if (testMode && iso !== null && !unlocked.includes(iso)) {
         // Test mode, a flag not in the collection: shown on this device only (firestore.rules would refuse it)
-        patchPublicData(uid, { avatarFlag: iso, flags: { current: null, pieces: 0, ...raw, unlocked: [...unlocked, iso] } })
+        previewAvatarFlag(uid, iso, raw, unlocked)
         return
       }
       await saveAvatarFlag(uid, iso, unlocked)
@@ -109,7 +110,7 @@ export function DecorationPicker({ uid, username }: { uid: string; username: str
     }
   }
 
-  const countryName = (iso: string) => (getCountryName(iso, i18n.language) as string) || iso
+  const countryName = (iso: string) => avatarFlagName(iso, i18n.language)
   const query = fold(search.trim())
   const matching = query ? flags.filter((iso) => fold(countryName(iso)).includes(query)) : flags
   const listed = showAll || query ? matching : matching.slice(0, FLAGS_SHOWN)

@@ -48,6 +48,19 @@ describe('claimXp', () => {
     expect(heard).toHaveBeenCalledWith(expect.objectContaining({ records }))
   })
 
+  it('reports classic and historical fragments separately for a split payout', async () => {
+    const historicalFlags = { active: null, progress: {}, unlocked: ['ussr'] }
+    callPush.mockResolvedValue({ status: 200, body: {
+      xp, gained: 0, fragments: 4, classicFragments: 1, historicalFragments: 3, unlockedHistoricalFlags: ['ussr'], historicalFlags,
+    } })
+    const heard = vi.fn()
+    const off = onXpClaimed(heard)
+    await claimXp('u1')
+    off()
+    expect(patchPublicData).toHaveBeenCalledWith('u1', { xp, historicalFlags })
+    expect(heard).toHaveBeenCalledWith(expect.objectContaining({ fragments: 1, historicalFragments: 3, unlockedHistoricalFlags: ['ussr'] }))
+  })
+
   it('starts another claim after the running one with again, and shares it otherwise', async () => {
     let release
     callPush.mockImplementationOnce(() => new Promise((resolve) => (release = () => resolve({ status: 200, body: { xp, gained: 0 } }))))

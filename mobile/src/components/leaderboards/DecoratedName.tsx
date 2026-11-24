@@ -9,7 +9,7 @@ import { decorationStyle } from '@shared/utils/decorations'
 
 import { ringBorder } from '@/components/profile/decorationStyle'
 import { FlagDisc } from '@/components/profile/ProfileSections'
-import { getFlag } from '@/flags'
+import { getAvatarFlag } from '@/historicalFlags'
 import { makeStyles } from '@/theme'
 import { Text } from '../ui'
 
@@ -34,7 +34,7 @@ export function DecoratedName({
   const ring = ringBorder(frame)
   return (
     <View style={[styles.name, fill && { flex: 1 }]}>
-      {flag && getFlag(flag) != null ? (
+      {flag && getAvatarFlag(flag) != null ? (
         <View style={[styles.marker, styles.flagMarker, ring ? [ring, { borderWidth: 2 }] : null]} testID="name-flag">
           <FlagDisc iso={flag} size={ring ? 8 : 10} />
         </View>

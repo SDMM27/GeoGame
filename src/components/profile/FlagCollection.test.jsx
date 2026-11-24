@@ -29,6 +29,20 @@ const grid = () => [...document.querySelectorAll('.flag-collection-item button')
 afterEach(cleanup)
 
 describe('FlagCollectionView', () => {
+  it('includes historical cards in the same collection and filters both types', () => {
+    const flags = { unlocked: ['F00'], current: null, pieces: 0 }
+    const historicalAlbum = { state: { active: null, unlocked: ['ussr'], progress: {} } }
+    render(<FlagCollectionView flags={flags} historicalAlbum={historicalAlbum} own />)
+    expect(screen.getByText(/"count":2,"total":47/)).toBeTruthy()
+    expect(screen.getByRole('button', { name: /Soviet Union/ })).toBeTruthy()
+    expect(grid()).toEqual(['name-F00'])
+    fireEvent.click(screen.getByRole('button', { name: 'collection.historical.title' }))
+    expect(screen.getByText(/"count":1,"total":7/)).toBeTruthy()
+    expect(grid()).toEqual([])
+    fireEvent.click(screen.getByRole('button', { name: 'collection.filter_classic' }))
+    expect(screen.queryByRole('button', { name: /Soviet Union/ })).toBeNull()
+    expect(grid()).toEqual(['name-F00'])
+  })
   it('shows only the pieces won of the current flag and hides its name', () => {
     // F01 is uncommon: 3 pieces
     view({ unlocked: [], current: 'F01', pieces: 2 })

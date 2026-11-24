@@ -29,11 +29,11 @@ export function flagsAfter(claim, uid) {
 }
 
 // Style of one piece (a cell of a cols x rows grid) showing only its part of the flag image.
-export function pieceStyle(iso, index, cols, rows) {
+export function pieceStyle(iso, index, cols, rows, imageUrl = `/flags/${iso.toLowerCase()}.png`) {
   const col = index % cols
   const row = Math.floor(index / cols)
   return {
-    backgroundImage: `url(/flags/${iso.toLowerCase()}.png)`,
+    backgroundImage: `url(${imageUrl})`,
     backgroundSize: `${cols * 100}% ${rows * 100}%`,
     backgroundPosition: `${cols > 1 ? (col / (cols - 1)) * 100 : 0}% ${rows > 1 ? (row / (rows - 1)) * 100 : 0}%`,
   }

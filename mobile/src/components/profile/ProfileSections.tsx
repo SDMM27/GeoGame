@@ -20,7 +20,7 @@ import { CollapsibleSection } from '@/components/CollapsibleSection'
 import { BadgeStrip } from '@/components/profile/BadgeStrip'
 import { Stamp } from '@/components/flight'
 import { Button, Segmented, Text, Touchable } from '@/components/ui'
-import { getFlag } from '@/flags'
+import { getAvatarFlag } from '@/historicalFlags'
 import { getGameByType } from '@/games'
 import GameEmblem from '@/components/GameEmblem'
 import { darkColors, fonts, makeStyles, radius, space, useColors, useTheme } from '@/theme'
@@ -83,7 +83,7 @@ export const flagRadius = (size: number) => Math.round(size * 0.24)
 // cropping them to the square lost half of them (the canton of the US, the stars of Australia...): the whole flag sits
 // over a blurred, enlarged, darkened copy of itself that fills the bands above and below.
 export function FlagDisc({ iso, size }: { iso: string; size: number }) {
-  const source = getFlag(iso)
+  const source = getAvatarFlag(iso)
   if (source == null) return null
   const blur = Math.max(2, Math.round(size / 10))
   return (
@@ -117,7 +117,7 @@ export function Avatar({
 }) {
   const worn = flag ?? decorationStyle(decoration).flag
   const disc =
-    worn && getFlag(worn) != null ? (
+    worn && getAvatarFlag(worn) != null ? (
       <FlagDisc iso={worn} size={size} />
     ) : (
       <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: avatarColor(username), alignItems: 'center', justifyContent: 'center' }}>
@@ -130,7 +130,7 @@ export function Avatar({
   const ring = ringBorder(decorationStyle(decoration).frame)
   const outer = size + RING_ROOM * 2
   const ringSize = size + (RING_GAP + (ring?.borderWidth ?? 0)) * 2
-  const squared = Boolean(worn && getFlag(worn) != null)
+  const squared = Boolean(worn && getAvatarFlag(worn) != null)
   return (
     <View style={{ width: outer, height: outer, alignItems: 'center', justifyContent: 'center' }}>
       <View style={[{ width: ringSize, height: ringSize, borderRadius: squared ? flagRadius(ringSize) : ringSize / 2, alignItems: 'center', justifyContent: 'center' }, ring]}>

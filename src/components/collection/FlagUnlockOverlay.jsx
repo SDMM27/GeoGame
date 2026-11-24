@@ -1,13 +1,16 @@
-// Full-screen reward when the server unlocks flags (onXpClaimed in utils/xp): the flag's pieces fly together, a burst in
+// Full-screen reward when the server unlocks flags: the flag's pieces fly together, a burst in
 // the rarity color, then the name and a shortcut to the collection. Several flags play one after another.
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAccount } from '../../auth'
+import { useFlagRevealQueue } from '../../hooks/useFlagRevealQueue'
 import { onXpClaimed } from '../../utils/xp'
 import { pieceGrid, piecesFor } from '../../utils/flagCollection'
 import { FLAG_POOL } from '../../utils/flagCollectionData'
+import { HISTORICAL_FLAGS, HISTORICAL_FLAG_COLOR, HISTORICAL_FLAG_COST } from '../../data/historicalFlags'
 import { getCountryName } from '../../utils/getCountryName'
+import { onLeagueFlagReveal } from '../../utils/leagueFlagReveal'
 import { flagsAfter, pieceStyle, rarityColor, rarityOf } from './claim'
 import { setFlagOverlayOpen } from './busy'
 import { onReplayFlag } from './replay'
@@ -27,41 +30,30 @@ export default function FlagUnlockOverlay() {
   const { account } = useAccount()
   const uid = account?.uid
   const navigate = useNavigate()
-  // replay: a flag of the collection clicked again, not a new one
-  const [queue, setQueue] = useState([])
-  const nextId = useRef(0)
+  const { queue, store } = useFlagRevealQueue(uid)
   const opener = useRef(null)
 
-  useEffect(
-    () =>
-      onXpClaimed((claim) => {
-        const isos = claim.unlockedFlags ?? []
-        if (isos.length === 0) return
-        // Right away, so that the scroll reveal of the same claim waits for this overlay (busy.js)
-        setFlagOverlayOpen(true)
-        const flags = flagsAfter(claim, uid)
-        const first = nextId.current
-        nextId.current += isos.length
-        // The cache already holds every flag of the claim: the n-th one from the end counts n fewer
-        const items = isos.map((iso, index) => ({
-          id: first + index,
-          iso,
-          count: flags ? flags.unlocked.length - (isos.length - 1 - index) : null,
-        }))
-        setQueue((current) => [...current, ...items])
-      }),
-    [uid]
-  )
-  useEffect(
-    () =>
-      onReplayFlag((iso) => {
-        nextId.current += 1
-        const id = nextId.current
-        // Only when nothing plays: a click must not queue behind (or interrupt) a real unlock
-        setQueue((current) => (current.length > 0 ? current : [{ id, iso, count: null, replay: true }]))
-      }),
-    []
-  )
+  useEffect(() => {
+    const enqueue = (isos, collectionCount, historical = []) => {
+      if (!isos.length && !historical.length) return
+      // Right away, so that a concurrent scroll reveal waits for this overlay (busy.js).
+      setFlagOverlayOpen(true)
+      store.enqueue(isos, collectionCount, historical)
+    }
+
+    const stopXp = onXpClaimed((claim) => {
+      if (claim.uid && claim.uid !== uid) return
+      enqueue(claim.unlockedFlags ?? [], flagsAfter(claim, uid)?.unlocked.length, claim.unlockedHistoricalFlags)
+    })
+    const stopLeague = onLeagueFlagReveal((reveal) => {
+      if (reveal.uid === uid) enqueue(reveal.unlocked, reveal.collectionCount, reveal.historical)
+    })
+    return () => {
+      stopXp()
+      stopLeague()
+    }
+  }, [store, uid])
+  useEffect(() => onReplayFlag(store.replay), [store])
 
   // Focus goes back to where it was once the last flag is closed
   const open = queue.length > 0
@@ -76,30 +68,36 @@ export default function FlagUnlockOverlay() {
 
   const item = queue[0]
   if (!item) return null
+  const advance = () => store.advance(item.id)
   return (
     <FlagReveal
-      key={item.id}
+      key={`${uid}:${item.id}`}
       item={item}
-      onNext={() => setQueue((current) => current.slice(1))}
-      onView={() => {
-        setQueue([])
-        navigate('/account')
-      }}
+      onNext={advance}
+      onSkip={queue.length > 1 ? () => store.skipThrough(queue[queue.length - 1].id) : undefined}
+      onView={queue.length === 1 ? () => {
+        advance()
+        if (!store.getSnapshot().length) navigate('/account')
+      } : undefined}
     />
   )
 }
 
-function FlagReveal({ item, onNext, onView }) {
+function FlagReveal({ item, onNext, onView, onSkip }) {
   const { t, i18n } = useTranslation()
   const reduced = useMemo(prefersReducedMotion, [])
-  const rarity = rarityOf(item.iso)
-  const color = rarityColor(rarity)
-  const cost = piecesFor(rarity)
-  const { cols, rows } = pieceGrid(cost)
-  const name = getCountryName(item.iso, i18n.language) || item.iso
-  const rarityLabel = t(`collection.rarity.${rarity}`)
+  const historical = HISTORICAL_FLAGS.find(({ id }) => id === item.iso)
+  const rarity = historical ? 'legendary' : rarityOf(item.iso)
+  const color = historical ? HISTORICAL_FLAG_COLOR : rarityColor(rarity)
+  const cost = historical ? HISTORICAL_FLAG_COST : piecesFor(rarity)
+  const { cols, rows } = historical ? { cols: 5, rows: 2 } : pieceGrid(cost)
+  const language = i18n.language?.startsWith('fr') ? 'fr' : 'en'
+  const name = historical?.name[language] ?? (getCountryName(item.iso, i18n.language) || item.iso)
+  const rarityLabel = t(historical ? 'collection.historical.title' : `collection.rarity.${rarity}`)
+  const imageUrl = historical ? `/flags/historical/${item.iso}.png` : `/flags/${item.iso.toLowerCase()}.png`
   const [ready, setReady] = useState(false)
   const [leaving, setLeaving] = useState(false)
+  const exitTimer = useRef(null)
   const [announcement, setAnnouncement] = useState('')
   const continueRef = useRef(null)
   // Where each piece flies in from
@@ -129,15 +127,17 @@ function FlagReveal({ item, onNext, onView }) {
     if (ready) continueRef.current?.focus()
   }, [ready])
 
-  const leave = (view) => {
-    if (leaving) return
+  useEffect(() => () => clearTimeout(exitTimer.current), [])
+
+  const leave = (next) => {
+    if (!ready || exitTimer.current !== null) return
     setLeaving(true)
-    setTimeout(view ? onView : onNext, EXIT)
+    exitTimer.current = setTimeout(next, EXIT)
   }
   useEffect(() => {
     if (!ready) return undefined
     const onKey = (event) => {
-      if (event.key === 'Escape') leave(false)
+      if (event.key === 'Escape') leave(onNext)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -147,7 +147,7 @@ function FlagReveal({ item, onNext, onView }) {
   const vars = { '--rarity': color, '--landed': `${landed}ms`, '--start': `${START}ms`, '--stagger': `${STAGGER}ms`, '--flight': `${FLIGHT}ms`, '--rays': RAY_OPACITY[rarity] }
   return (
     <div className={className} style={vars} role="dialog" aria-modal="true" aria-labelledby="flag-reveal-name">
-      <div className="flag-reveal-backdrop" onClick={() => ready && leave(false)} />
+      <div className="flag-reveal-backdrop" onClick={() => leave(onNext)} />
       <div className="flag-reveal-content">
         <div className="flag-reveal-stage" aria-hidden="true">
           <div className="flag-reveal-glow" />
@@ -169,14 +169,14 @@ function FlagReveal({ item, onNext, onView }) {
                       '--fy': `${from.y}px`,
                       '--fr': `${from.rotation}deg`,
                       '--delay': `calc(var(--start) + ${index} * var(--stagger))`,
-                      ...pieceStyle(item.iso, index, cols, rows),
+                      ...pieceStyle(item.iso, index, cols, rows, imageUrl),
                     }}
                   />
                 ))}
               </div>
             )}
             <div className="flag-reveal-flag">
-              <img src={`/flags/${item.iso.toLowerCase()}.png`} alt="" />
+              <img src={imageUrl} alt="" />
               <span className="flag-reveal-shine" />
               <span className="flag-reveal-flash" />
             </div>
@@ -217,15 +217,20 @@ function FlagReveal({ item, onNext, onView }) {
 
         {ready && (
           <div className="flag-reveal-buttons">
-            {!item.replay && (
-              <button type="button" className="flag-reveal-view" onClick={() => leave(true)}>
+            {!item.replay && onView && (
+              <button type="button" className="flag-reveal-view" onClick={() => leave(onView)}>
                 {t('collection.view_collection')}
               </button>
             )}
-            <button type="button" className="flag-reveal-continue" ref={continueRef} onClick={() => leave(false)}>
+            <button type="button" className="flag-reveal-continue" ref={continueRef} onClick={() => leave(onNext)}>
               {t('collection.tap_to_continue')}
             </button>
           </div>
+        )}
+        {onSkip && (
+          <button type="button" className="flag-reveal-continue" onClick={onSkip}>
+            {t('collection.skip_remaining')}
+          </button>
         )}
       </div>
       <div className="flag-reveal-sr" aria-live="polite">{announcement}</div>

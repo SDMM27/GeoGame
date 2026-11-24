@@ -7,12 +7,15 @@
 // missions.js); flag fragments (step 6 of docs/plan-fonctionnalites.md) will add more kinds. firestore.rules keeps
 // the level of each `level` item (decorationLevel) and refuses a locked one; a test checks both lists match.
 //
-// users/{uid}.avatarFlag: the ISO code of a flag of the player's collection (flagCollection.js), shown as the profile
+// users/{uid}.avatarFlag: the id of a flag of the player's collection, shown as the profile
 // picture instead of the initial; absent for none. A field of its own, not part of `decoration`, so an older app
-// saving { frame, color } can't wipe it. firestore.rules (validAvatarFlag) only takes a flag in flags.unlocked.
+// saving { frame, color } can't wipe it. firestore.rules (validAvatarFlag) verifies ownership.
 import { deleteField, doc, updateDoc } from 'firebase/firestore'
 import { firestore } from '../Firebase'
 import { cachedPublicData, fetchPublicData, patchPublicData } from './publicProfile'
+import { HISTORICAL_FLAGS } from '../data/historicalFlags'
+import { readHistoricalFlags, isHistoricalFlag } from './historicalFlagCollection'
+import { getCountryName } from './getCountryName'
 
 const STARTER = { kind: 'starter' }
 const atLevel = (level) => ({ kind: 'level', level })
@@ -70,7 +73,7 @@ export function isUnlocked(item, progress = {}) {
 // The flag a users/{uid} document wears: an ISO code of its own collection, or null.
 export function readAvatarFlag(data) {
   const iso = data?.avatarFlag
-  const unlocked = data?.flags?.unlocked
+  const unlocked = isHistoricalFlag(iso) ? readHistoricalFlags(data).unlocked : data?.flags?.unlocked
   return typeof iso === 'string' && Array.isArray(unlocked) && unlocked.includes(iso) ? iso : null
 }
 
@@ -99,7 +102,20 @@ export const isDefaultDecoration = (decoration) =>
   decoration?.frame === DEFAULT_DECORATION.frame && decoration?.color === DEFAULT_DECORATION.color && !decoration?.flag
 
 // The image of a flag (public/flags on the website; the app maps it to its own copy).
-export const flagImagePath = (iso) => `/flags/${iso.toLowerCase()}.png`
+export const flagImagePath = (iso) => isHistoricalFlag(iso) ? `/flags/historical/${iso}.png` : `/flags/${iso.toLowerCase()}.png`
+
+export function avatarFlagName(iso, language) {
+  const historical = HISTORICAL_FLAGS.find((flag) => flag.id === iso)
+  return historical?.name[language?.startsWith('fr') ? 'fr' : 'en'] ?? getCountryName(iso, language) ?? iso
+}
+
+export function previewAvatarFlag(uid, iso, data, unlocked) {
+  const historical = readHistoricalFlags(data)
+  const collection = isHistoricalFlag(iso)
+    ? { historicalFlags: { ...historical, unlocked: [...historical.unlocked, iso] } }
+    : { flags: { current: null, pieces: 0, ...data?.flags, unlocked: [...unlocked.filter((id) => !isHistoricalFlag(id)), iso] } }
+  patchPublicData(uid, { avatarFlag: iso, ...collection })
+}
 
 // Wears a flag of the collection (`iso`), or takes it off (null). Throws on a flag not in `unlocked`, or when the
 // write fails.

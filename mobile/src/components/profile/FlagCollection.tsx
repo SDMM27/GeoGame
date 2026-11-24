@@ -5,17 +5,21 @@ import { useTranslation } from 'react-i18next'
 import { Image, StyleSheet, View } from 'react-native'
 
 import { fetchCollection, FLAG_POOL } from '@shared/utils/flagCollectionData'
+import { HISTORICAL_FLAGS } from '@shared/data/historicalFlags'
 import { pieceGrid, piecesFor, RARITIES, RARITY_COLORS } from '@shared/utils/flagCollection'
 import { getCountryName } from '@shared/utils/getCountryName'
+import { useHistoricalFlags } from '@shared/utils/historicalFlagCollectionData'
 import { onPublicDataPatched } from '@shared/utils/publicProfile'
 
 import { FlagPiece } from '@/components/collection/FlagPiece'
 import { CollapsibleSection } from '@/components/CollapsibleSection'
 import { replayFlag } from '@/components/collection/replay'
 import { Kicker } from '@/components/flight'
-import { Text, Touchable } from '@/components/ui'
+import { Segmented, Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
 import { makeStyles, radius, space, useColors } from '@/theme'
+
+import { HistoricalFlagAlbumView, type HistoricalAlbum } from './HistoricalFlagAlbum'
 
 type Rarity = 'common' | 'uncommon' | 'rare' | 'legendary'
 type Progress = { found: number; total: number }
@@ -79,13 +83,21 @@ function RarityCount({ rarity, count }: { rarity: Rarity; count: number }) {
   )
 }
 
-export function FlagCollectionView({ collection, sectionId = 'collection' }: { collection: Collection; sectionId?: string }) {
+type Filter = 'all' | 'classic' | 'historical'
+
+export function FlagCollectionView({ collection, sectionId = 'collection', historicalAlbum, own = false }: { collection: Collection; sectionId?: string; historicalAlbum?: HistoricalAlbum; own?: boolean }) {
   const { t, i18n } = useTranslation()
   const styles = useStyles()
   const colors = useColors()
   const [showAll, setShowAll] = useState(false)
+  const [filter, setFilter] = useState<Filter>('all')
   const { flags, mastery } = collection
   const total = FLAG_POOL.length
+  const historicalCount = historicalAlbum?.state?.unlocked.length ?? 0
+  const hasHistorical = historicalAlbum && (own || historicalCount > 0)
+  const activeFilter = hasHistorical ? filter : 'all'
+  const count = (activeFilter === 'historical' ? 0 : flags.unlocked.length) + (activeFilter === 'classic' ? 0 : historicalCount)
+  const shownTotal = (activeFilter === 'historical' ? 0 : total) + (historicalAlbum && activeFilter !== 'classic' ? HISTORICAL_FLAGS.length : 0)
   const sorted = useMemo(() => sortFlags(flags.unlocked, i18n.language), [flags.unlocked, i18n.language])
   const counts = useMemo(() => {
     const result: Record<Rarity, number> = { common: 0, uncommon: 0, rare: 0, legendary: 0 }
@@ -93,7 +105,7 @@ export function FlagCollectionView({ collection, sectionId = 'collection' }: { c
     return result
   }, [flags.unlocked])
   const shown = showAll ? sorted : sorted.slice(0, FIRST)
-  const complete = flags.unlocked.length >= total
+  const complete = flags.unlocked.length >= total && count >= shownTotal
   const cost = piecesFor(flags.current ? RARITY_OF.get(flags.current) : undefined)
   const nothing = flags.unlocked.length === 0 && !flags.current
   const modes = [
@@ -105,14 +117,25 @@ export function FlagCollectionView({ collection, sectionId = 'collection' }: { c
 
   // The title already says "flags" and leaves little room on a phone: only the numbers fit next to it.
   const summary = (
-    <Text variant="caption" numberOfLines={1} accessibilityLabel={t('collection.progress', { count: flags.unlocked.length, total })}>
-      {flags.unlocked.length} / {total}
+    <Text variant="caption" numberOfLines={1} accessibilityLabel={t('collection.progress', { count, total: shownTotal })}>
+      {count} / {shownTotal}
     </Text>
   )
 
   return (
     <CollapsibleSection id={sectionId} title={t('collection.title')} summary={summary} defaultOpen>
-      <View style={styles.card}>
+      <View style={styles.sections}>
+        {hasHistorical && <Segmented
+          value={activeFilter}
+          onChange={setFilter}
+          options={[
+            { value: 'all', label: t('collection.filter_all') },
+            { value: 'classic', label: t('collection.filter_classic') },
+            { value: 'historical', label: t('collection.historical.title') },
+          ]}
+        />}
+        {hasHistorical && activeFilter !== 'classic' && <HistoricalFlagAlbumView album={historicalAlbum} own={own} />}
+        {activeFilter !== 'historical' && <View style={styles.card}>
         {complete ? (
           <Text variant="bodyStrong" color={colors.accent}>
             {t('collection.complete')}
@@ -123,7 +146,7 @@ export function FlagCollectionView({ collection, sectionId = 'collection' }: { c
           <View style={styles.current}>
             <PieceFlag iso={flags.current} pieces={flags.pieces} cost={cost} />
             <View style={{ flex: 1, gap: 2 }}>
-              <Kicker>{t('collection.current')}</Kicker>
+              <Kicker>{t(own && historicalAlbum?.state?.active ? 'collection.historical.classic_paused' : 'collection.current')}</Kicker>
               <Text variant="bodyStrong">?</Text>
               <Text variant="caption" color={colors.accent}>
                 {t('collection.pieces', { count: flags.pieces, total: cost })}
@@ -183,6 +206,7 @@ export function FlagCollectionView({ collection, sectionId = 'collection' }: { c
             </View>
           ))}
         </View>
+        </View>}
       </View>
     </CollapsibleSection>
   )
@@ -191,6 +215,7 @@ export function FlagCollectionView({ collection, sectionId = 'collection' }: { c
 // Renders nothing while the collection loads.
 export function FlagCollection({ uid, own = false }: { uid: string; own?: boolean }) {
   const [collection, setCollection] = useState<{ uid: string; value: Collection } | null>(null)
+  const historicalAlbum = useHistoricalFlags(uid)
   useEffect(() => {
     let cancelled = false
     const load = () =>
@@ -204,11 +229,16 @@ export function FlagCollection({ uid, own = false }: { uid: string; own?: boolea
       stop()
     }
   }, [uid])
-  return collection?.uid === uid ? <FlagCollectionView collection={collection.value} sectionId={own ? 'own.collection' : 'player.collection'} /> : null
+  if (collection?.uid !== uid) return null
+  const sectionId = own ? 'own.collection' : 'player.collection'
+  return (
+    <FlagCollectionView key={uid} collection={collection.value} sectionId={sectionId} historicalAlbum={historicalAlbum} own={own} />
+  )
 }
 
 const CELL = 44
 const useStyles = makeStyles((colors) => ({
+  sections: { gap: space.md },
   card: {
     gap: space.md,
     backgroundColor: colors.board,

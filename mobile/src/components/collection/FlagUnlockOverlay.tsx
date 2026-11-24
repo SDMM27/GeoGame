@@ -1,11 +1,11 @@
-// Full-screen reward when the server unlocks flags (onXpClaimed in @shared/utils/xp): the flag's pieces fly together,
+// Full-screen reward when the server unlocks flags: the flag's pieces fly together,
 // a burst in the rarity color, then the name and a shortcut to the collection. Several flags play one after another.
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import * as Haptics from 'expo-haptics'
 import { router } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { AccessibilityInfo, Image, Pressable, StyleSheet, View } from 'react-native'
+import { AccessibilityInfo, Image, Pressable, StyleSheet, View, type ImageSourcePropType } from 'react-native'
 import Animated, {
   Easing,
   interpolate,
@@ -21,9 +21,12 @@ import Animated, {
 } from 'react-native-reanimated'
 
 import { pieceGrid, piecesFor } from '@shared/utils/flagCollection'
+import { HISTORICAL_FLAGS, HISTORICAL_FLAG_COLOR, HISTORICAL_FLAG_COST } from '@shared/data/historicalFlags'
 import { FLAG_POOL } from '@shared/utils/flagCollectionData'
 import { getCountryName } from '@shared/utils/getCountryName'
+import { onLeagueFlagReveal } from '@shared/utils/leagueFlagReveal'
 import { onXpClaimed } from '@shared/utils/xp'
+import { useFlagRevealQueue } from '@shared/hooks/useFlagRevealQueue'
 
 import { useAccount } from '@/account/auth'
 import { flagsAfter, haptic, rarityColor, rarityOf, type Claim, type Rarity } from '@/components/collection/claim'
@@ -33,6 +36,7 @@ import { onReplayFlag } from '@/components/collection/replay'
 import { Kicker } from '@/components/flight'
 import { Button, Text, Touchable } from '@/components/ui'
 import { getFlag } from '@/flags'
+import { getHistoricalFlag } from '@/historicalFlags'
 import { fonts, makeStyles, radius, space, useColors } from '@/theme'
 
 // replay: a flag of the collection tapped again, not a new one
@@ -59,38 +63,29 @@ const centered = (size: number, x = 0, y = 0) => ({
 export function FlagUnlockOverlay() {
   const { account } = useAccount()
   const uid = account?.uid
-  const [queue, setQueue] = useState<Item[]>([])
-  const nextId = useRef(0)
+  const { queue, store } = useFlagRevealQueue(uid)
 
-  useEffect(
-    () =>
-      onXpClaimed((claim: Claim) => {
-        const isos = claim.unlockedFlags ?? []
-        if (isos.length === 0) return
-        // Right away, so that the scroll reveal of the same claim waits for this overlay (busy.ts)
-        setFlagOverlayOpen(true)
-        const flags = flagsAfter(claim, uid)
-        const first = nextId.current
-        nextId.current += isos.length
-        // The cache already holds every flag of the claim: the n-th one from the end counts n fewer
-        const items = isos.map((iso, index) => ({
-          id: first + index,
-          iso,
-          count: flags ? flags.unlocked.length - (isos.length - 1 - index) : null,
-        }))
-        setQueue((current) => [...current, ...items])
-      }),
-    [uid],
-  )
-  useEffect(
-    () =>
-      onReplayFlag((iso) => {
-        nextId.current += 1
-        // Only when nothing plays: a tap must not queue behind (or interrupt) a real unlock
-        setQueue((current) => (current.length > 0 ? current : [{ id: nextId.current, iso, count: null, replay: true }]))
-      }),
-    [],
-  )
+  useEffect(() => {
+    const enqueue = (isos: string[], collectionCount?: number, historical: string[] = []) => {
+      if (!isos.length && !historical.length) return
+      // Right away, so that a concurrent scroll reveal waits for this overlay (busy.ts).
+      setFlagOverlayOpen(true)
+      store.enqueue(isos, collectionCount, historical)
+    }
+
+    const stopXp = onXpClaimed((claim: Claim) => {
+      if (claim.uid && claim.uid !== uid) return
+      enqueue(claim.unlockedFlags ?? [], flagsAfter(claim, uid)?.unlocked.length, claim.unlockedHistoricalFlags)
+    })
+    const stopLeague = onLeagueFlagReveal((reveal: { uid: string; unlocked: string[]; collectionCount: number; historical?: string[] }) => {
+      if (reveal.uid === uid) enqueue(reveal.unlocked, reveal.collectionCount, reveal.historical)
+    })
+    return () => {
+      stopXp()
+      stopLeague()
+    }
+  }, [store, uid])
+  useEffect(() => onReplayFlag(store.replay), [store])
 
   const open = queue.length > 0
   useEffect(() => {
@@ -100,33 +95,37 @@ export function FlagUnlockOverlay() {
 
   const item = queue[0]
   if (!item) return null
+  const advance = () => store.advance(item.id)
   return (
     <FlagReveal
-      key={item.id}
+      key={`${uid}:${item.id}`}
       item={item}
-      onNext={() => setQueue((current) => current.slice(1))}
-      onView={() => {
-        setQueue([])
-        router.push('/(tabs)/profile')
-      }}
+      onNext={advance}
+      onSkip={queue.length > 1 ? () => store.skipThrough(queue[queue.length - 1].id) : undefined}
+      onView={queue.length === 1 ? () => {
+        advance()
+        if (!store.getSnapshot().length) router.push('/(tabs)/profile')
+      } : undefined}
     />
   )
 }
 
-function FlagReveal({ item, onNext, onView }: { item: Item; onNext: () => void; onView: () => void }) {
+function FlagReveal({ item, onNext, onView, onSkip }: { item: Item; onNext: () => void; onView?: () => void; onSkip?: () => void }) {
   const colors = useColors()
   const styles = useStyles()
   const { t, i18n } = useTranslation()
   const reduced = useReducedMotion()
-  const rarity = rarityOf(item.iso)
-  const color = rarityColor(rarity)
-  const cost = piecesFor(rarity)
-  const { cols, rows } = pieceGrid(cost)
-  const name = (getCountryName(item.iso, i18n.language) as string) || item.iso
-  const rarityLabel = t(`collection.rarity.${rarity}`)
-  const source = getFlag(item.iso)
+  const historical = HISTORICAL_FLAGS.find(({ id }: { id: string }) => id === item.iso)
+  const rarity = historical ? 'legendary' : rarityOf(item.iso)
+  const color = historical ? HISTORICAL_FLAG_COLOR : rarityColor(rarity)
+  const cost = historical ? HISTORICAL_FLAG_COST : piecesFor(rarity)
+  const { cols, rows } = historical ? { cols: 5, rows: 2 } : pieceGrid(cost)
+  const language = i18n.language?.startsWith('fr') ? 'fr' : 'en'
+  const name = historical?.name[language] ?? ((getCountryName(item.iso, i18n.language) as string) || item.iso)
+  const rarityLabel = t(historical ? 'collection.historical.title' : `collection.rarity.${rarity}`)
+  const source = historical ? getHistoricalFlag(item.iso) : getFlag(item.iso)
   const [ready, setReady] = useState(false)
-  const [leaving, setLeaving] = useState(false)
+  const exitTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   // Where each piece flies in from
   const [scatter] = useState(() =>
     Array.from({ length: cost }, () => ({ x: (Math.random() * 2 - 1) * 180, y: (Math.random() * 2 - 1) * 260, rotation: (Math.random() * 2 - 1) * 45 })),
@@ -180,11 +179,14 @@ function FlagReveal({ item, onNext, onView }: { item: Item; onNext: () => void; 
     AccessibilityInfo.announceForAccessibility(`${name} – ${rarityLabel}`)
   }, [name, rarityLabel])
 
-  const leave = (view: boolean) => {
-    if (leaving) return
-    setLeaving(true)
+  useEffect(() => () => {
+    if (exitTimer.current !== null) clearTimeout(exitTimer.current)
+  }, [])
+
+  const leave = (next: () => void) => {
+    if (!ready || exitTimer.current !== null) return
     exit.set(withTiming(1, { duration: EXIT }))
-    setTimeout(view ? onView : onNext, EXIT)
+    exitTimer.current = setTimeout(next, EXIT)
   }
 
   const rootStyle = useAnimatedStyle(() => ({ opacity: 1 - exit.get() }))
@@ -208,9 +210,7 @@ function FlagReveal({ item, onNext, onView }: { item: Item; onNext: () => void; 
       <Pressable
         accessible={false}
         style={StyleSheet.absoluteFill}
-        onPress={() => {
-          if (ready) leave(false)
-        }}
+        onPress={() => leave(onNext)}
       />
       <View pointerEvents="box-none" style={styles.content}>
         <View pointerEvents="none" style={styles.stage}>
@@ -232,7 +232,7 @@ function FlagReveal({ item, onNext, onView }: { item: Item; onNext: () => void; 
             {!reduced && (
               <Animated.View style={[StyleSheet.absoluteFill, piecesStyle]}>
                 {scatter.map((from, index) => (
-                  <FlyingPiece key={index} iso={item.iso} index={index} cols={cols} rows={rows} from={from} delay={START + index * STAGGER} />
+                  <FlyingPiece key={index} iso={item.iso} source={source} index={index} cols={cols} rows={rows} from={from} delay={START + index * STAGGER} />
                 ))}
               </Animated.View>
             )}
@@ -273,11 +273,14 @@ function FlagReveal({ item, onNext, onView }: { item: Item; onNext: () => void; 
         </Animated.View>
 
         <Animated.View style={[styles.buttons, buttonsStyle]} pointerEvents={ready ? 'auto' : 'none'}>
-          {!item.replay && <Button label={t('collection.view_collection')} color={color} onPress={() => leave(true)} />}
-          <Touchable accessibilityRole="button" accessibilityLabel={t('collection.tap_to_continue')} onPress={() => leave(false)} style={styles.secondary}>
+          {ready && !item.replay && onView && <Button label={t('collection.view_collection')} color={color} onPress={() => leave(onView)} />}
+          <Touchable accessibilityRole="button" accessibilityLabel={t('collection.tap_to_continue')} onPress={() => leave(onNext)} style={styles.secondary}>
             <Text variant="caption">{t('collection.tap_to_continue')}</Text>
           </Touchable>
         </Animated.View>
+        {onSkip && <Touchable accessibilityRole="button" onPress={onSkip} style={styles.secondary}>
+          <Text variant="caption">{t('collection.skip_remaining')}</Text>
+        </Touchable>}
       </View>
     </Animated.View>
   )
@@ -286,6 +289,7 @@ function FlagReveal({ item, onNext, onView }: { item: Item; onNext: () => void; 
 // One piece that flies from a random spot and lands in its cell.
 function FlyingPiece({
   iso,
+  source,
   index,
   cols,
   rows,
@@ -293,6 +297,7 @@ function FlyingPiece({
   delay,
 }: {
   iso: string
+  source: ImageSourcePropType | null
   index: number
   cols: number
   rows: number
@@ -316,7 +321,7 @@ function FlyingPiece({
         { position: 'absolute', left: (index % cols) * (W / cols), top: Math.floor(index / cols) * (H / rows), width: W / cols, height: H / rows },
         style,
       ]}>
-      <FlagPiece iso={iso} index={index} cols={cols} rows={rows} />
+      <FlagPiece iso={iso} source={source} index={index} cols={cols} rows={rows} />
     </Animated.View>
   )
 }

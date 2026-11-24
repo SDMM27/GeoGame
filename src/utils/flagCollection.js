@@ -40,7 +40,7 @@ export const streakFragments = (count) =>
   (count > 0 && count % 7 === 0 ? STREAK_WEEK_FRAGMENTS : 0) + (STREAK_MILESTONE_FRAGMENTS[count] ?? 0)
 
 export const RARITIES = ['common', 'uncommon', 'rare', 'legendary']
-export const RARITY_COLORS = { common: '#9AA5B1', uncommon: '#4CAF7A', rare: '#4A90E2', legendary: '#C792FF' }
+export const RARITY_COLORS = { common: '#9AA5B1', uncommon: '#4CAF7A', rare: '#4A90E2', legendary: '#F5B83D' }
 // Odds of being drawn as the next flag, relative to each other.
 export const RARITY_WEIGHTS = { common: 4, uncommon: 3, rare: 2, legendary: 1 }
 // Pieces that rebuild a flag of each rarity.

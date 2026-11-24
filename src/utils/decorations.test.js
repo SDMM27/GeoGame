@@ -5,6 +5,8 @@ import {
   FRAMES,
   NAME_COLORS,
   decorationStyle,
+  avatarFlagName,
+  flagImagePath,
   isDefaultDecoration,
   isUnlocked,
   readAvatarFlag,
@@ -33,6 +35,13 @@ describe('decorations', () => {
     expect(readAvatarFlag({ avatarFlag: 'FR' })).toBe(null)
     expect(readAvatarFlag({ avatarFlag: 3, flags: { unlocked: [3] } })).toBe(null)
     expect(readDecoration({ avatarFlag: 'JP', flags: { unlocked: ['JP'] } })).toEqual({ ...DEFAULT_DECORATION, flag: 'JP' })
+  })
+
+  it('resolves an owned historical avatar to its image and localized name', () => {
+    expect(readAvatarFlag({ avatarFlag: 'ussr', historicalFlags: { unlocked: ['ussr'] } })).toBe('ussr')
+    expect(readAvatarFlag({ avatarFlag: 'ussr', historicalFlags: { unlocked: ['qing'] } })).toBeNull()
+    expect(flagImagePath('ussr')).toBe('/flags/historical/ussr.png')
+    expect(avatarFlagName('ussr', 'fr')).toBe('Union soviétique')
   })
 
   it('gives what to draw', () => {

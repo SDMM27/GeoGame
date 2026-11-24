@@ -1595,7 +1595,25 @@
     },
     "new_flag": "Nieuwe vlag!",
     "view_collection": "Collectie bekijken",
-    "tap_to_continue": "Tik om door te gaan"
+    "tap_to_continue": "Tik om door te gaan",
+    "skip_remaining": "Resterende animaties overslaan",
+    "filter_all": "Alles",
+    "filter_classic": "Klassiek",
+    "replay_animation": "Animatie opnieuw afspelen",
+    "historical": {
+      "title": "Historische vlaggen",
+      "hint": "Kies een vlag om met je volgende verdiende fragmenten samen te stellen. Elke vlag kost {{total}} fragmenten.",
+      "active": "In uitvoering",
+      "unlocked": "Vlag ontgrendeld",
+      "source": "Historische bron",
+      "select": "Deze vlag samenstellen",
+      "resume": "Verder met deze vlag",
+      "next_fragments": "Je volgende fragmenten gaan naar deze vlag.",
+      "back_to_classic": "Verder met de klassieke collectie",
+      "classic_paused": "Klassieke vlag gepauzeerd",
+      "load_error": "Het historische album kon niet worden geladen.",
+      "error": "De vlag kon niet worden gewijzigd. Probeer het opnieuw."
+    }
   },
   "country_of_day": {
     "intro": "Elke dag één land, voor iedereen hetzelfde: raad het in 4 stappen en leer het daarna kennen.",

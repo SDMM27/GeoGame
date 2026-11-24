@@ -177,10 +177,13 @@ service cloud.firestore {
     }
 
     // users/{uid}.avatarFlag (src/utils/decorations.js): the flag shown as the profile picture, removed for none. Only a
-    // flag of the account's own collection (users/{uid}.flags.unlocked, written by the server only).
+    // flag of the account's own classic or historical collection (both written by the server).
     function validAvatarFlag(next, current) {
       return !('avatarFlag' in next)
-        || (next.avatarFlag is string && next.avatarFlag in current.get('flags', {}).get('unlocked', []));
+        || (next.avatarFlag is string && (
+          next.avatarFlag in current.get('flags', {}).get('unlocked', [])
+          || next.avatarFlag in current.get('historicalFlags', {}).get('unlocked', [])
+        ));
     }
 
     // users/{uid}.xp (src/utils/missions.js), users/{uid}.flags (src/utils/flagCollection.js) and users/{uid}.scrolls

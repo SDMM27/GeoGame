@@ -1595,7 +1595,25 @@
     },
     "new_flag": "Nova bandeira!",
     "view_collection": "Ver coleção",
-    "tap_to_continue": "Toque para continuar"
+    "tap_to_continue": "Toque para continuar",
+    "skip_remaining": "Ignorar as animações restantes",
+    "filter_all": "Todos",
+    "filter_classic": "Clássicos",
+    "replay_animation": "Repetir animação",
+    "historical": {
+      "title": "Bandeiras históricas",
+      "hint": "Escolha uma bandeira para montar com os próximos fragmentos que você ganhar. Cada bandeira requer {{total}} fragmentos.",
+      "active": "Em andamento",
+      "unlocked": "Bandeira desbloqueada",
+      "source": "Fonte histórica",
+      "select": "Montar esta bandeira",
+      "resume": "Retomar esta bandeira",
+      "next_fragments": "Seus próximos fragmentos vão para esta bandeira.",
+      "back_to_classic": "Retomar a coleção clássica",
+      "classic_paused": "Bandeira clássica em pausa",
+      "load_error": "Não foi possível carregar o álbum histórico.",
+      "error": "Não foi possível trocar a bandeira. Tente novamente."
+    }
   },
   "country_of_day": {
     "intro": "Um país por dia, o mesmo para todos: adivinha-o em 4 etapas e fica a conhecê-lo.",

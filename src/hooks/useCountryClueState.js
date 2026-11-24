@@ -6,8 +6,8 @@ import countries from '../data/countriesWithDifficulty_FR.json'
 import { checkAnswer, normalize } from '../utils/normalizeAnswer'
 import { hasCountryGeometry, collectCoordinates, getRingAreaKm2, getCountryAreaKm2, getGeographicCenter, EARTH_RADIUS_KM } from '../utils/countryArea'
 import { getCountryName, getAllCountryNames } from '../utils/getCountryName'
-import { LANGUAGE_CODES, localeOf, toLanguage } from '../i18n/languages'
-import countryAliases from '../data/countryAliases.json'
+import { localeOf, toLanguage } from '../i18n/languages'
+import { buildCountryLookup } from '../utils/countryLookup'
 import useDailyKey from './useDailyKey'
 import { STABLE_DAILY_PICK_SINCE, pickDaily } from '../utils/dailyPick'
 
@@ -44,41 +44,9 @@ const COUNTRY_POPULATION_MAP = new Map(
   COUNTRY_CLUE_COUNTRIES.map((country) => [country.properties.ADMIN, country.properties.population ?? 0])
 )
 
-const COUNTRY_LOOKUP = (() => {
-  const entries = new Map()
-
-  COUNTRY_CLUE_COUNTRIES.forEach((country) => {
-    const names = [country.properties.ADMIN, ...(country.properties.aliases ?? [])]
-    names.forEach((name) => {
-      entries.set(normalize(name), country)
-    })
-  })
-
-  // Also index EN and RU names so players can type in those languages
-  for (const feature of COUNTRY_CLUE_COUNTRIES) {
-    const iso = feature.properties.ISO_A2
-    for (const lang of LANGUAGE_CODES) {
-      const name = getCountryName(iso, lang)
-      if (name) {
-        const key = normalize(name)
-        if (!entries.has(key)) entries.set(key, feature)
-      }
-    }
-  }
-
-  // Extend with abbreviations and colloquial names (USA, UK, РФ, etc.)
-  for (const feature of COUNTRY_CLUE_COUNTRIES) {
-    const iso = feature.properties.ISO_A2?.toUpperCase()
-    if (!iso) continue
-    const extraAliases = countryAliases[iso] ?? []
-    for (const alias of extraAliases) {
-      const key = normalize(alias)
-      if (!entries.has(key)) entries.set(key, feature)
-    }
-  }
-
-  return entries
-})()
+// Nom canonique prioritaire sur les alias : « Saint-Martin » (MF) n'est pas écrasé
+// par l'alias « Saint-Martin » de « Sint Maarten » (SX)
+const COUNTRY_LOOKUP = buildCountryLookup(COUNTRY_CLUE_COUNTRIES)
 
 export function getCountryByName(name) {
   return COUNTRY_CLUE_COUNTRIES.find((country) => country.properties.ADMIN === name) ?? null
@@ -454,15 +422,20 @@ export default function useCountryClueState(mode, options = {}) {
 
     const nextGuess = inputValue.trim()
     const normalizedGuess = normalize(nextGuess)
-    const alreadyTried = guesses.some((guess) => guess.normalizedInput === normalizedGuess)
-    if (alreadyTried) {
-      toast.info(t('toasts.already_proposed'), { containerId: 'topRightToast' })
-      return
-    }
-
     const guessedCountry = COUNTRY_LOOKUP.get(normalizedGuess)
     if (!guessedCountry) {
       toast.error(t('survival.not_a_country'), { containerId: 'topRightToast' })
+      return
+    }
+
+    // Déjà proposé : même saisie, ou même pays saisi sous un autre nom
+    // (ex. « Sint Maarten » puis « Saint-Martin (partie néerlandaise)")
+    const guessedIso = guessedCountry.properties.ISO_A2 ?? null
+    const alreadyTried = guesses.some(
+      (guess) => guess.normalizedInput === normalizedGuess || (guess.isoA2 != null && guess.isoA2 === guessedIso)
+    )
+    if (alreadyTried) {
+      toast.info(t('toasts.already_proposed'), { containerId: 'topRightToast' })
       return
     }
 

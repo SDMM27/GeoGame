@@ -8,6 +8,23 @@
   margin: 8px 0 16px;
 }
 
+/* The country of the day, named from the second step on (no flag image on the flag step) */
+.cod-identity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: -8px 0 16px;
+  color: var(--sd-accent-strong);
+  font-size: 1.05rem;
+}
+
+.cod-identity__flag {
+  height: 22px;
+  width: auto;
+  border-radius: 3px;
+  box-shadow: var(--gg-shadow);
+}
+
 .cod-dots {
   display: inline-flex;
   gap: 6px;

@@ -28,6 +28,73 @@ function authRequest(action, data) {
   })
 }
 
+async function latestEmailAction(type, email) {
+  const response = await fetch(`http://${process.env.FIREBASE_AUTH_EMULATOR_HOST}/emulator/v1/projects/geogame-sdmm/oobCodes`)
+  const { oobCodes } = await response.json()
+  return oobCodes.findLast((code) => code.requestType === type && (code.newEmail ?? code.email) === email).oobCode
+}
+
+it('links a verified email to the player UID and shares a single password across both recovery methods', async () => {
+  const provider = getUsernamePasswordProvider(auth)
+  const suffix = Date.now().toString(36)
+  const username = `Atlas ${suffix}`
+  const email = `atlas-${suffix}@example.test`
+  const occupied = await auth.createUser({ email: `occupied-${suffix}@example.test`, password: 'legacy-example-password' })
+  const initial = 'a single initial passphrase'
+  const next = 'another passphrase from email reset'
+  const recovered = 'another passphrase from the backup code'
+  const call = (action, password, fields, idToken) => usernameAccount({
+    db, auth, provider, idToken, allow: async () => true, validatePassword: async () => null,
+    body: { action, username, password, ...fields },
+  })
+  const { body: { recoveryCode } } = await call('signup', initial)
+  const { body: { token, uid } } = await call('signin', initial)
+  try {
+    const { idToken } = await (await authRequest('signInWithCustomToken', { token })).json()
+    expect((await call('email-start', initial, { email })).status).toBe(401)
+    expect((await call('email-start', 'incorrect', { email }, idToken)).status).toBe(401)
+    expect(await call('email-start', initial, { email: occupied.email }, idToken)).toEqual({
+      status: 409, body: { error: 'link_email_in_use' },
+    })
+    expect(await call('email-start', initial, { email: email.toUpperCase() }, idToken)).toEqual({
+      status: 200, body: { pendingEmail: email },
+    })
+    expect(await call('email-status', undefined, {}, idToken)).toEqual({
+      status: 200, body: { linkedEmail: null, pendingEmail: email },
+    })
+    expect((await call('email-finish', initial, {}, idToken)).body.error).toBe('link_email_unverified')
+    expect((await auth.getUser(uid)).email).toBeUndefined()
+    const verification = await latestEmailAction('VERIFY_AND_CHANGE_EMAIL', email)
+    expect((await authRequest('update', { oobCode: verification })).ok).toBe(true)
+    expect((await auth.getUserByEmail(email)).uid).toMatch(/^username-credential:/)
+    expect((await auth.getUser(uid)).email).toBeUndefined()
+    expect(await call('email-finish', initial, {}, idToken)).toEqual({ status: 200, body: { linkedEmail: email } })
+    expect((await auth.getUserByEmail(email))).toMatchObject({ uid, emailVerified: true })
+    await expect(auth.getUser(usernameCredentialUid(uid))).rejects.toMatchObject({ code: 'auth/user-not-found' })
+    expect((await call('signin', initial)).body).toEqual({ uid, email })
+    expect(await (await authRequest('signInWithPassword', { email, password: initial })).json()).toMatchObject({ localId: uid })
+
+    expect((await authRequest('sendOobCode', { requestType: 'PASSWORD_RESET', email })).ok).toBe(true)
+    const resetCode = await latestEmailAction('PASSWORD_RESET', email)
+    expect((await authRequest('resetPassword', { oobCode: resetCode, newPassword: next })).ok).toBe(true)
+    expect((await call('signin', initial)).status).toBe(401)
+    expect((await call('signin', next)).body.uid).toBe(uid)
+    expect(await (await authRequest('signInWithPassword', { email, password: next })).json()).toMatchObject({ localId: uid })
+
+    const result = await call('recover', recovered, { recoveryCode })
+    expect(result.status).toBe(200)
+    expect(result.body.recoveryCode).not.toBe(recoveryCode)
+    expect((await call('signin', next)).status).toBe(401)
+    expect((await call('signin', recovered)).body.uid).toBe(uid)
+    expect(await (await authRequest('signInWithPassword', { email, password: recovered })).json()).toMatchObject({ localId: uid })
+    expect((await db.doc(`users/${uid}`).get()).data()).toMatchObject({ username, usernamePassword: true })
+  } finally {
+    await deleteAccountData({ db, auth, uid })
+    await auth.deleteUser(occupied.uid)
+  }
+  await expect(auth.getUserByEmail(email)).rejects.toMatchObject({ code: 'auth/user-not-found' })
+}, 30000)
+
 it('restores username ownership after a native provider link or direct Auth erasure', async () => {
   const provider = getUsernamePasswordProvider(auth)
   const username = `Explorateur ${Date.now().toString(36)}`

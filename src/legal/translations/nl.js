@@ -21,7 +21,7 @@ export default {
           {
             list: [
               'je e-mailadres als je je met een e-mailadres registreert of inlogt met Google. Firebase Authentication beheert het wachtwoord van accounts die met een e-mailadres zijn aangemaakt. Als je inlogt met Google, ontvangen we ook het ID van je Google-account (Google kan ook je naam en profielfoto doorgeven, die wij niet gebruiken);',
-              'als je een account met een gebruikersnaam en wachtwoord aanmaakt, vragen we geen persoonlijk e-mailadres. Onze server verwerkt je wachtwoord kortstondig. Firebase Authentication controleert het met een automatisch aangemaakt technisch alias dat geen berichten kan ontvangen. GeoGame bewaart alleen een hash van je herstelcode;',
+              'als je een account met een gebruikersnaam en wachtwoord aanmaakt, vragen we geen persoonlijk e-mailadres. Onze server verwerkt je wachtwoord kortstondig. Firebase Authentication controleert het met een automatisch aangemaakt technisch alias dat geen berichten kan ontvangen. GeoGame bewaart alleen een hash van je herstelcode Als je een e-mailadres toevoegt en bevestigt, bewaart Firebase Authentication het voor inloggen en wachtwoordherstel.;',
               'je gebruikersnaam, de aanmaakdatum van het account en je inloggegevens;',
               'je spelgeschiedenis (spel, modus, score, tijd, datum) en je scores in de ranglijsten, inclusief de geprobeerde antwoorden bij de dagelijkse uitdagingen;',
               'je vriendschapsverzoeken, je vrienden en de kameruitnodigingen die je verstuurt of ontvangt;',

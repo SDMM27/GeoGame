@@ -10,6 +10,8 @@ const RATE_LIMITS = {
   signin: { ip: 80, key: 25 },
   recover: { ip: 15, key: 8 },
   rotate: { ip: 15, key: 8 },
+  'email-start': { ip: 12, key: 5 },
+  'email-finish': { ip: 30, key: 12 },
 }
 
 export function usernameRequestIp(req) {

@@ -1,15 +1,17 @@
 import React from 'react'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import AccountPage from './AccountPage'
 import { account as labels } from '../i18n/locales/fr.json'
+import { UsernameAccountError } from '../utils/usernameAccount'
 
 const auth = vi.hoisted(() => ({
   available: vi.fn(),
   signUp: vi.fn(),
   signIn: vi.fn(),
   recover: vi.fn(),
+  signUpEmail: vi.fn(),
   signInEmail: vi.fn(),
   resetPassword: vi.fn(),
 }))
@@ -21,11 +23,12 @@ vi.mock('../auth', () => ({
 vi.mock('../components/NavBar', () => ({ default: () => null }))
 vi.mock('../utils/account', async (importOriginal) => ({
   ...(await importOriginal()),
+  signUp: auth.signUpEmail,
   signIn: auth.signInEmail,
   resetPassword: auth.resetPassword,
 }))
-vi.mock('../utils/usernameAccount', () => ({
-  USERNAME_PASSWORD_MIN: 15,
+vi.mock('../utils/usernameAccount', async (importOriginal) => ({
+  ...(await importOriginal()),
   usernameAccountAvailable: auth.available,
   signUpWithUsername: auth.signUp,
   signInWithUsername: auth.signIn,
@@ -39,12 +42,12 @@ function renderAccount() {
 
 function fillUsernameAndPassword(username, password) {
   fireEvent.change(screen.getByPlaceholderText(labels.username_placeholder), { target: { value: username } })
-  fireEvent.change(screen.getByLabelText(new RegExp(labels.password, 'i')), { target: { value: password } })
+  fireEvent.change(screen.getByLabelText(labels.password), { target: { value: password } })
 }
 
 function fillIdentifierAndPassword(identifier, password) {
   fireEvent.change(screen.getByPlaceholderText(labels.identifier_placeholder), { target: { value: identifier } })
-  fireEvent.change(screen.getByLabelText(new RegExp(labels.password, 'i')), { target: { value: password } })
+  fireEvent.change(screen.getByLabelText(labels.password), { target: { value: password } })
 }
 
 async function selectUsernameMethod() {
@@ -78,6 +81,14 @@ describe('username accounts', () => {
     const username = 'Atlas'
     const password = 'a long offline passphrase'
     fillUsernameAndPassword(username, password)
+    const confirmation = screen.getByLabelText(labels.confirm_password)
+    fireEvent.change(confirmation, { target: { value: `${password} ` } })
+    fireEvent.click(screen.getByRole('button', { name: labels.signup }))
+    expect(screen.getByRole('alert')).toHaveTextContent(labels.errors.password_mismatch)
+    expect(auth.signUp).not.toHaveBeenCalled()
+
+    fireEvent.change(confirmation, { target: { value: password } })
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: labels.signup }))
 
     expect(await screen.findByText('first-recovery-code')).toBeInTheDocument()
@@ -93,6 +104,39 @@ describe('username accounts', () => {
     fireEvent.click(screen.getByRole('button', { name: labels.signin }))
     await waitFor(() => expect(auth.signIn).toHaveBeenCalledWith(auth, { username, password }))
     expect(auth.signInEmail).not.toHaveBeenCalled()
+  })
+
+  it('confirms email signup passwords and toggles visibility without submitting or losing the value', async () => {
+    renderAccount()
+    fireEvent.click(screen.getByRole('tab', { name: labels.signup_tab }))
+    await screen.findByRole('button', { name: labels.method_username })
+
+    const username = 'Atlas'
+    const email = 'toi@exemple.com'
+    const password = 'a long offline passphrase'
+    fillUsernameAndPassword(username, password)
+    fireEvent.change(screen.getByLabelText(labels.email), { target: { value: email } })
+    const passwordInput = screen.getByLabelText(labels.password)
+    const confirmation = screen.getByLabelText(labels.confirm_password)
+    expect(passwordInput).toHaveAttribute('type', 'password')
+    expect(confirmation).toBeRequired()
+    fireEvent.click(screen.getByRole('button', { name: labels.signup }))
+    expect(auth.signUpEmail).not.toHaveBeenCalled()
+
+    const [togglePassword, toggleConfirmation] = screen.getAllByRole('button', { name: labels.show_password })
+    fireEvent.click(togglePassword)
+    expect(passwordInput).toHaveAttribute('type', 'text')
+    expect(passwordInput).toHaveValue(password)
+    expect(confirmation).toHaveAttribute('type', 'password')
+    fireEvent.click(toggleConfirmation)
+    expect(confirmation).toHaveAttribute('type', 'text')
+    fireEvent.click(togglePassword)
+    expect(passwordInput).toHaveAttribute('type', 'password')
+    expect(auth.signUpEmail).not.toHaveBeenCalled()
+
+    fireEvent.change(confirmation, { target: { value: password } })
+    fireEvent.click(screen.getByRole('button', { name: labels.signup }))
+    expect(auth.signUpEmail).toHaveBeenCalledWith(auth, { email, password, username })
   })
 
   it('signs in with an email through the combined field', async () => {
@@ -117,8 +161,10 @@ describe('username accounts', () => {
     await waitFor(() => expect(auth.resetPassword).toHaveBeenCalledWith(auth, 'toi@exemple.com'))
   })
 
-  it('recovers a username account from the combined field and shows the replacement code', async () => {
-    auth.recover.mockResolvedValue('replacement-recovery-code')
+  it('shows progress during recovery, enables retry on failure and shows the replacement code on success', async () => {
+    let rejectRecovery
+    auth.recover.mockImplementationOnce(() => new Promise((_, reject) => { rejectRecovery = reject }))
+    auth.recover.mockResolvedValueOnce('replacement-recovery-code')
     renderAccount()
     await waitFor(() => expect(screen.getByLabelText(labels.identifier)).toBeInTheDocument())
     fireEvent.change(screen.getByPlaceholderText(labels.identifier_placeholder), { target: { value: 'Atlas' } })
@@ -130,9 +176,24 @@ describe('username accounts', () => {
     const username = 'Atlas'
     const password = 'an even longer passphrase'
     const recoveryCode = 'first-recovery-code'
-    fillUsernameAndPassword(username, password)
+    expect(screen.getByPlaceholderText(labels.username_placeholder)).toHaveValue(username)
+    fireEvent.change(screen.getByLabelText(labels.password), { target: { value: password } })
     fireEvent.change(screen.getByLabelText(labels.recovery_code), { target: { value: recoveryCode } })
     fireEvent.click(screen.getByRole('button', { name: labels.recover_submit }))
+
+    const pending = screen.getByRole('button', { name: labels.recovery_pending })
+    expect(pending).toBeDisabled()
+    expect(pending).toHaveAttribute('aria-busy', 'true')
+    expect(screen.getByRole('status')).toHaveTextContent(labels.recovery_pending)
+    expect(screen.getByRole('button', { name: labels.back_to_signin })).toBeDisabled()
+    fireEvent.click(pending)
+    expect(auth.recover).toHaveBeenCalledOnce()
+
+    await act(async () => { rejectRecovery(new UsernameAccountError('invalid_recovery_code')) })
+    expect(screen.getByRole('alert')).toHaveTextContent(labels.errors.invalid_recovery_code)
+    const retry = screen.getByRole('button', { name: labels.recover_submit })
+    expect(retry).toBeEnabled()
+    fireEvent.click(retry)
 
     expect(await screen.findByText('replacement-recovery-code')).toBeInTheDocument()
     expect(auth.recover).toHaveBeenCalledWith({ username, password, recoveryCode })

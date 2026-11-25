@@ -10,6 +10,7 @@ import { getFirestore } from 'firebase-admin/firestore'
 import { cleanupExpired } from './_lib/cleanupExpired.mjs'
 import { isCronAuthorized } from './_lib/cronAuth.mjs'
 import { deleteInactiveAccounts } from './_lib/deleteAccount.mjs'
+import { discardExpiredEmailProofs } from './_lib/usernameAccountEmail.mjs'
 
 function adminApp() {
   if (getApps().length) return getApps()[0]
@@ -27,7 +28,12 @@ export default async function handler(req, res) {
   try {
     const app = adminApp()
     const db = getFirestore(app)
-    const deleted = { ...(await cleanupExpired({ db })), ...(await deleteInactiveAccounts({ db, auth: getAuth(app) })) }
+    const auth = getAuth(app)
+    const deleted = {
+      ...(await cleanupExpired({ db })),
+      ...(await deleteInactiveAccounts({ db, auth })),
+      expiredEmailProofs: await discardExpiredEmailProofs({ db, auth }),
+    }
     console.log('[cleanup-expired]', deleted)
     return res.status(200).json({ deleted })
   } catch (error) {

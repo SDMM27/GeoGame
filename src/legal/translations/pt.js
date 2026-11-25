@@ -21,7 +21,7 @@ export default {
           {
             list: [
               'seu endereço de e-mail se você se cadastrar com e-mail ou entrar com o Google. O Firebase Authentication gerencia a senha das contas criadas com e-mail. Se você entrar com o Google, também receberemos o identificador da sua conta Google (o Google pode enviar seu nome e sua foto de perfil, que não usamos);',
-              'se você criar uma conta com nome de usuário e senha, não pedimos seu endereço de e-mail pessoal. Nosso servidor processa a senha brevemente. O Firebase Authentication verifica a senha usando um alias técnico gerado automaticamente que não pode receber mensagens. O GeoGame guarda apenas um hash do código de recuperação;',
+              'se você criar uma conta com nome de usuário e senha, não pedimos seu endereço de e-mail pessoal. Nosso servidor processa a senha brevemente. O Firebase Authentication verifica a senha usando um alias técnico gerado automaticamente que não pode receber mensagens. O GeoGame guarda apenas um hash do código de recuperação Se você adicionar e verificar um endereço de e-mail, o Firebase Authentication o guarda para login e redefinição de senha.;',
               'seu nome de usuário, a data de criação da conta e as datas de login;',
               'o histórico das suas partidas (jogo, modo, pontuação, tempo, data) e suas pontuações nos rankings, incluindo as respostas tentadas nos desafios do dia;',
               'seus pedidos de amizade, seus amigos e os convites para salas que você envia ou recebe;',

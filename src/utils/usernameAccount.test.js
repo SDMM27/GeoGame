@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { signInWithCustomToken, signOut } from 'firebase/auth'
+import { signInWithCustomToken, signInWithEmailAndPassword, signOut } from 'firebase/auth'
 import { deleteAccount } from './account'
 import {
   recoverUsernameAccount, rotateUsernameRecoveryCode, signInWithUsername,
@@ -9,6 +9,7 @@ import {
 vi.mock('firebase/auth', async (importOriginal) => ({
   ...await importOriginal(),
   signInWithCustomToken: vi.fn().mockResolvedValue(undefined),
+  signInWithEmailAndPassword: vi.fn(),
   signOut: vi.fn().mockResolvedValue(undefined),
 }))
 
@@ -76,6 +77,19 @@ describe('username account API origin', () => {
 
     expect(fetcher.mock.calls.map(([url]) => url))
       .toEqual([apiPath, apiPath, `https://api.example.org${apiPath}`, apiPath])
+  })
+
+  it('signs in a linked username through the canonical Firebase password credential', async () => {
+    const email = 'atlas@example.test'
+    const uid = 'player-1'
+    mockFetch().mockResolvedValueOnce({ ok: true, json: async () => ({ email, uid }) })
+    signInWithEmailAndPassword.mockResolvedValueOnce({ user: { uid } })
+    const auth = { currentUser: null }
+
+    await signInWithUsername(auth, credentials)
+
+    expect(signInWithEmailAndPassword).toHaveBeenCalledWith(auth, email, credentials.password)
+    expect(signInWithCustomToken).not.toHaveBeenCalled()
   })
 
   it('uses the preview API for username reauthentication and deletion, while keeping legacy deletion relative', async () => {

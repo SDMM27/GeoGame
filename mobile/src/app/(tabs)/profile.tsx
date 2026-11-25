@@ -2,7 +2,7 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { router, useIsFocused } from 'expo-router'
 import { openBrowserAsync } from 'expo-web-browser'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState, type Ref } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Switch, TextInput, View, type TextInputProps } from 'react-native'
 import Animated, { FadeIn } from 'react-native-reanimated'
@@ -27,6 +27,7 @@ import {
 } from '@shared/utils/usernameAccount'
 import { useDecoration } from '@shared/hooks/useDecoration'
 import { useFriendships } from '@shared/hooks/usePlayerProfile'
+import { useUsernameEmailLink } from '@shared/hooks/useUsernameEmailLink'
 import { decorationStyle } from '@shared/utils/decorations'
 import { LEGAL_PATHS } from '@shared/legal/legalInfo'
 
@@ -83,13 +84,42 @@ function LegalLinks() {
   )
 }
 
-function Field({ label, hint, ...props }: TextInputProps & { label: string; hint?: string }) {
+function Field({ label, hint, passwordToggle, inputRef, ...props }: TextInputProps & {
+  label: string
+  hint?: string
+  passwordToggle?: boolean
+  inputRef?: Ref<TextInput>
+}) {
   const styles = useStyles()
   const colors = useColors()
+  const { t } = useTranslation()
+  const [visible, setVisible] = useState(false)
+  const input = (
+    <TextInput
+      ref={inputRef}
+      accessibilityLabel={label}
+      placeholderTextColor={colors.textMuted}
+      autoCorrect={false}
+      secureTextEntry={passwordToggle && !visible}
+      style={[styles.input, passwordToggle && styles.passwordInput]}
+      {...props}
+    />
+  )
   return (
     <View style={{ gap: space.sm }}>
       <Text variant="label">{label}</Text>
-      <TextInput placeholderTextColor={colors.textMuted} autoCorrect={false} style={styles.input} {...props} />
+      {passwordToggle ? (
+        <View>
+          {input}
+          <Touchable
+            accessibilityRole="button"
+            accessibilityLabel={t(visible ? 'account.hide_password' : 'account.show_password')}
+            style={styles.passwordToggle}
+            onPress={() => setVisible((value) => !value)}>
+            <MaterialCommunityIcons name={visible ? 'eye-off-outline' : 'eye-outline'} size={22} color={colors.textMuted} />
+          </Touchable>
+        </View>
+      ) : input}
       {hint ? <Text variant="caption">{hint}</Text> : null}
     </View>
   )
@@ -172,6 +202,8 @@ function AuthForm() {
   const [email, setEmail] = useState('')
   const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmation, setConfirmation] = useState('')
+  const confirmationInput = useRef<TextInput>(null)
   const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -188,6 +220,7 @@ function AuthForm() {
 
   const resetFormMessages = () => {
     setPassword('')
+    setConfirmation('')
     setRecoveryCode('')
     setIdentifier('')
     setError(null)
@@ -203,20 +236,28 @@ function AuthForm() {
   const recovering = mode === 'recover'
   const usingUsername = method === 'username'
   const newPassword = signingUp || recovering
+  const recoveringPending = recovering && submitting
+  const visibleError = error === 'password_mismatch' && password === confirmation ? null : error
   // Sign-in with a single "email or username" field when username accounts exist.
   const combinedLogin = !signingUp && !recovering && usernameAvailable
   const showUsername = !combinedLogin && (signingUp || recovering || usingUsername)
   const showEmail = !combinedLogin && !recovering && !usingUsername
   const canSubmit = password !== '' &&
-    (combinedLogin ? identifier.trim() !== '' : (usingUsername || email.trim() !== '')) &&
+    (!combinedLogin || identifier.trim() !== '') &&
     (!showUsername || username.trim() !== '') &&
-    (!recovering || recoveryCode.trim() !== '')
+    (!showEmail || email.trim() !== '') &&
+    (!recovering || recoveryCode.trim() !== '') &&
+    (!signingUp || confirmation !== '')
 
   const onSubmit = async () => {
     if (submitting || !canSubmit) return
+    setNotice(null)
+    if (signingUp && password !== confirmation) {
+      setError('password_mismatch')
+      return
+    }
     setSubmitting(true)
     setError(null)
-    setNotice(null)
     try {
       if (recovering) {
         const code = await recoverUsernameAccount({ username, password, recoveryCode, apiOrigin: API_ORIGIN })
@@ -250,6 +291,7 @@ function AuthForm() {
     const loginId = (combinedLogin ? identifier : email).trim()
     // A username (no '@') has no email to reset: it goes through the recovery code instead.
     if (usernameAvailable && loginId && !loginId.includes('@')) {
+      setUsername(loginId)
       switchMode('recover')
       return
     }
@@ -336,7 +378,7 @@ function AuthForm() {
           maxLength={USERNAME_MAX}
           autoCapitalize="none"
           autoComplete={signingUp ? 'username-new' : 'username'}
-          textContentType={usingUsername ? 'username' : 'nickname'}
+          textContentType={recovering || usingUsername ? 'username' : 'nickname'}
         />
       )}
       {showEmail && (
@@ -363,29 +405,51 @@ function AuthForm() {
         />
       )}
       <Field
+        key={`${mode}-${method}`}
         label={t('account.password')}
         value={password}
         onChangeText={setPassword}
         placeholder={signingUp && !usingUsername ? t('account.password_placeholder') : undefined}
-        hint={usingUsername && newPassword ? t('account.username_password_hint') : undefined}
-        secureTextEntry
+        hint={recovering || (signingUp && usingUsername) ? t('account.username_password_hint') : undefined}
+        passwordToggle
         autoCapitalize="none"
         autoComplete={newPassword ? 'new-password' : 'current-password'}
         textContentType={newPassword ? 'newPassword' : 'password'}
-        returnKeyType="go"
-        onSubmitEditing={onSubmit}
+        returnKeyType={signingUp ? 'next' : 'go'}
+        submitBehavior={signingUp ? 'submit' : undefined}
+        onSubmitEditing={signingUp ? () => confirmationInput.current?.focus() : onSubmit}
       />
+      {signingUp && (
+        <Field
+          key={`confirmation-${method}`}
+          inputRef={confirmationInput}
+          label={t('account.confirm_password')}
+          value={confirmation}
+          onChangeText={setConfirmation}
+          passwordToggle
+          autoCapitalize="none"
+          autoComplete="new-password"
+          textContentType="newPassword"
+          returnKeyType="go"
+          onSubmitEditing={onSubmit}
+        />
+      )}
 
-      {error && <Message kind="error" text={t(`account.errors.${error}`)} />}
+      {visibleError && <Message kind="error" text={t(`account.errors.${visibleError}`)} />}
       {notice && <Message kind="notice" text={notice} />}
       {signingUp && <SignupNotice />}
 
       <Button
-        label={t(recovering ? 'account.recover_submit' : signingUp ? 'account.signup' : 'account.signin')}
+        label={t(recoveringPending ? 'account.recovery_pending' : recovering ? 'account.recover_submit' : signingUp ? 'account.signup' : 'account.signin')}
         onPress={onSubmit}
         loading={submitting}
         disabled={!canSubmit}
       />
+      {recoveringPending && (
+        <Text variant="caption" accessibilityLiveRegion="polite" style={styles.recoveryStatus}>
+          {t('account.recovery_pending')}
+        </Text>
+      )}
       {mode === 'signin' && (
         <Touchable accessibilityRole="button" disabled={submitting} onPress={onForgot} style={styles.link}>
           <Text variant="bodyStrong" color={colors.accent} style={{ fontSize: 14 }}>
@@ -510,6 +574,39 @@ function RecoveryCodeSettings({ username }: { username: string }) {
   )
 }
 
+function EmailLinkSettings({ account }: { account: Account }) {
+  const { t } = useTranslation()
+  const styles = useStyles()
+  const link = useUsernameEmailLink(auth, account, API_ORIGIN)
+  return (
+    <View style={styles.card}>
+      <Text variant="heading">{t('account.link_email_title')}</Text>
+      {link.linkedEmail ? (
+        <Message kind="notice" text={t('account.link_email_linked', { email: link.linkedEmail })} />
+      ) : (
+        <>
+          <Text variant="caption">
+            {link.pendingEmail ? t('account.link_email_sent', { email: link.pendingEmail }) : t('account.link_email_intro')}
+          </Text>
+          {!link.pendingEmail && (
+            <Field label={t('account.email')} value={link.email} onChangeText={link.setEmail} keyboardType="email-address"
+              autoCapitalize="none" autoComplete="email" textContentType="emailAddress" maxLength={254} />
+          )}
+          <Field key={link.pendingEmail || 'new-email'} label={t('account.password')} value={link.password}
+            onChangeText={link.setPassword} passwordToggle autoCapitalize="none" autoComplete="current-password"
+            textContentType="password" returnKeyType="go" onSubmitEditing={link.submit} />
+          {link.error && <Message kind="error" text={t(`account.errors.${link.error}`)} />}
+          <Button label={t(link.pendingEmail ? 'account.link_email_confirm' : 'account.link_email_send')}
+            loading={link.submitting} disabled={!link.canSubmit} onPress={link.submit} />
+          {link.pendingEmail && (
+            <Button label={t('account.link_email_other')} variant="ghost" disabled={link.submitting} onPress={link.useAnotherEmail} />
+          )}
+        </>
+      )}
+    </View>
+  )
+}
+
 function AccountSettings({ account }: { account: Account }) {
   const styles = useStyles()
   const colors = useColors()
@@ -554,7 +651,12 @@ function AccountSettings({ account }: { account: Account }) {
 
         <NotificationsCard uid={account.uid} />
 
-        {!deleting && account.usernamePassword && account.username && <RecoveryCodeSettings username={account.username} />}
+        {!deleting && account.usernamePassword && account.username && (
+          <>
+            <EmailLinkSettings account={account} />
+            <RecoveryCodeSettings username={account.username} />
+          </>
+        )}
 
         {deleting ? (
           <View style={styles.card}>
@@ -780,6 +882,9 @@ const useStyles = makeStyles((colors) => ({
     fontFamily: fonts.bodyMedium,
     fontSize: 16,
   },
+  passwordInput: { paddingEnd: 56 },
+  passwordToggle: { position: 'absolute', end: 4, top: 4, width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
+  recoveryStatus: { textAlign: 'center' },
   recoveryCode: {
     backgroundColor: colors.bg,
     borderColor: colors.border,

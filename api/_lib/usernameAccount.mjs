@@ -3,12 +3,14 @@ import { setTimeout as delay } from 'node:timers/promises'
 import { FieldValue } from 'firebase-admin/firestore'
 
 import { checkNewPassword, checkPasswordInput, checkRateLimit, normalizeUsername, usernameKey, validateUsername } from './usernameAccountPolicy.mjs'
+import { activationEmail, emailLinkInProgress, eraseUsernameEmailProof, usernameAccountEmail, usernamePasswordProof } from './usernameAccountEmail.mjs'
 
 const PROVISIONING_MS = 15 * 60 * 1000
 const RECOVERY_MS = 2 * 60 * 1000
 const RECOVERY_CODE_PATTERN = /^[A-Za-z0-9_-]{22}$/
 const USERNAME_UID_PATTERN = /^[a-f0-9-]{36}$/
-const ACTIONS = new Set(['signup', 'signin', 'recover', 'rotate'])
+const EMAIL_ACTIONS = new Set(['email-status', 'email-start', 'email-finish'])
+const ACTIONS = new Set(['signup', 'signin', 'recover', 'rotate', ...EMAIL_ACTIONS])
 
 const reply = (status, body) => ({ status, body })
 const failure = (status, error) => reply(status, { error })
@@ -112,25 +114,27 @@ async function lookup(db, key) {
 
 const sameActive = (snapshot, revision) => snapshot.data()?.state === 'active' && snapshot.data()?.revision === revision
 
-async function signin({ db, issueToken, provider, account, password }) {
-  if (account?.data.state !== 'active' || !await provider.verify(account.uid, password)) {
-    return failure(401, 'wrong_credentials')
-  }
-  const token = await issueToken(account.uid)
+async function signin({ db, issueToken, provider, account, password, clock }) {
+  if (account?.data.state !== 'active') return failure(401, 'wrong_credentials')
+  const proof = await usernamePasswordProof(provider, account, password)
+  if (!proof) return failure(401, 'wrong_credentials')
+  // Use native password sign-in for linked accounts. An email reset then invalidates all previous
+  // login proofs without leaving a custom token that could be exchanged after the reset.
+  const session = proof.email ? { email: proof.email } : { token: await issueToken(account.uid) }
   const current = await db.runTransaction(async (transaction) => {
     const snapshot = await transaction.get(account.ref)
     // Check for concurrent recovery or deletion and clear any stale inactivity observation.
-    if (!sameActive(snapshot, account.data.revision)) return false
+    if (!sameActive(snapshot, account.data.revision) || emailLinkInProgress(snapshot.data(), clock())) return false
     if (snapshot.data().missingPlayerSince != null) {
       transaction.update(account.ref, { missingPlayerSince: FieldValue.delete() })
     }
     return true
   })
   if (!current) return failure(401, 'wrong_credentials')
-  return reply(200, { token, uid: account.uid })
+  return reply(200, { ...session, uid: account.uid })
 }
 
-async function disableAndUnlinkIdentity(auth, uid, username) {
+async function disableAndUnlinkIdentity(auth, uid, username, linkedEmail) {
   const disable = () => auth.updateUser(uid, { disabled: true, displayName: username })
   let user
   try {
@@ -148,7 +152,9 @@ async function disableAndUnlinkIdentity(auth, uid, username) {
   }
 
   const providers = new Set(user.providerData.map(({ providerId }) => providerId))
-  if (user.email) providers.add('password')
+  const keepEmail = linkedEmail && user.emailVerified && user.email?.toLowerCase() === linkedEmail
+  if (keepEmail) providers.delete('password')
+  else if (user.email) providers.add('password')
   if (user.phoneNumber) providers.add('phone')
   const hasFactors = (identity) => Boolean(identity.multiFactor?.enrolledFactors.length)
   if (providers.size || hasFactors(user)) {
@@ -157,7 +163,8 @@ async function disableAndUnlinkIdentity(auth, uid, username) {
       ...(hasFactors(user) ? { multiFactor: { enrolledFactors: null } } : {}),
     })
   }
-  if (!user.disabled || user.providerData.length || user.email || user.phoneNumber || hasFactors(user)) {
+  if (!user.disabled || user.providerData.some(({ providerId }) => !keepEmail || providerId !== 'password')
+    || (!keepEmail && user.email) || user.phoneNumber || hasFactors(user)) {
     throw new Error('Username Firebase identity could not be isolated')
   }
 }
@@ -169,25 +176,38 @@ async function recover({ db, auth, provider, account, password, recoveryCode, cl
   const lock = await db.runTransaction(async (transaction) => {
     const data = (await transaction.get(ref)).data()
     if (!data || !['active', 'recovering'].includes(data.state) || !validRecoveryCode(recoveryCode, data.recoveryHash)) {
-      return 'invalid_recovery_code'
+      return { error: 'invalid_recovery_code' }
     }
     const now = clock()
-    if (data.state === 'recovering' && data.leaseUntil > now) return 'too_many_requests'
+    if ((data.state === 'recovering' && data.leaseUntil > now) || emailLinkInProgress(data, now)) {
+      return { error: 'too_many_requests' }
+    }
     transaction.update(ref, {
       state: 'recovering', operation, leaseUntil: now + RECOVERY_MS,
       ...(data.missingPlayerSince != null ? { missingPlayerSince: FieldValue.delete() } : {}),
     })
-    return null
+    return { linkedEmail: activationEmail(data), emailProofUid: data.emailProof?.uid }
   })
-  if (lock) return failure(lock === 'too_many_requests' ? 429 : 401, lock)
+  if (lock.error) return failure(lock.error === 'too_many_requests' ? 429 : 401, lock.error)
   // Once the lease commits, signin cannot deliver another token. Wait until every preceding
   // custom token expires, then move the whole-second Firebase refresh-token cutoff past it.
   const revokeAfter = (Math.floor(clock() / 1000) + exchangeWindowSeconds + 1) * 1000
 
   // Keep the current code usable after the lease expires if Firebase fails mid-recovery.
   // The credential is unavailable for sign-in until both writes and the final transaction finish.
-  await disableAndUnlinkIdentity(auth, uid, username)
-  await provider.setPassword(uid, password)
+  let linkedEmail = lock.linkedEmail
+  if (lock.emailProofUid) await eraseUsernameEmailProof(db, auth, lock.emailProofUid)
+  await disableAndUnlinkIdentity(auth, uid, username, linkedEmail)
+  if (linkedEmail) {
+    try {
+      await auth.updateUser(uid, { email: linkedEmail, emailVerified: true, password })
+    } catch (error) {
+      if (error?.code !== 'auth/email-already-exists') throw error
+      // The original Auth record may have been erased and its old address claimed in the meantime.
+      linkedEmail = null
+    }
+  }
+  if (!linkedEmail) await provider.setPassword(uid, password)
   const remaining = revokeAfter - clock()
   if (remaining > 0) await wait(remaining)
   await auth.revokeRefreshTokens(uid)
@@ -209,21 +229,24 @@ async function recover({ db, auth, provider, account, password, recoveryCode, cl
   const replacement = newCode()
   await db.runTransaction(async (transaction) => {
     const data = await requireCurrentLease(transaction)
-    transaction.set(ref, { key: data.key, recoveryHash: hashCode(replacement), revision: data.revision + 1, state: 'active' })
+    transaction.set(ref, {
+      key: data.key, recoveryHash: hashCode(replacement), revision: data.revision + 1, state: 'active',
+      ...(linkedEmail ? { linkedEmail } : {}),
+    })
   })
   return reply(200, { recoveryCode: replacement })
 }
 
-async function rotate({ db, auth, provider, account, password, idToken }) {
+async function rotate({ db, auth, provider, account, password, idToken, clock }) {
   if (!idToken) return failure(401, 'wrong_credentials')
   const decoded = await auth.verifyIdToken(idToken, true).catch(() => null)
-  if (account?.data.state !== 'active' || account.uid !== decoded?.uid || !await provider.verify(account.uid, password)) {
+  if (account?.data.state !== 'active' || account.uid !== decoded?.uid || !await usernamePasswordProof(provider, account, password)) {
     return failure(401, 'wrong_credentials')
   }
   const recoveryCode = newCode()
   const changed = await db.runTransaction(async (transaction) => {
     const snapshot = await transaction.get(account.ref)
-    if (!sameActive(snapshot, account.data.revision)) return false
+    if (!sameActive(snapshot, account.data.revision) || emailLinkInProgress(snapshot.data(), clock())) return false
     transaction.update(account.ref, { recoveryHash: hashCode(recoveryCode), revision: account.data.revision + 1 })
     return true
   })
@@ -245,6 +268,7 @@ export async function removeUsernameCredential({
   const remove = await db.runTransaction(async (transaction) => {
     const data = (await transaction.get(ref)).data()
     if (!data) return false
+    if (emailLinkInProgress(data, clock())) throw new Error('Username email link in progress')
     if (expectedMissingSince !== undefined) {
       if (!canObserveMissingUsernamePlayer(data, observationNow) || data.missingPlayerSince !== expectedMissingSince) return false
     } else if (data.state === 'recovering' && data.leaseUntil > clock()) {
@@ -252,7 +276,10 @@ export async function removeUsernameCredential({
     }
     if (['provisioning', 'discarding'].includes(data.state)) throw new Error('Username provisioning in progress')
     if (data.state !== 'deleting') {
-      transaction.set(ref, { state: 'deleting', key: data.key, deletionStartedAt: FieldValue.serverTimestamp() })
+      transaction.set(ref, {
+        state: 'deleting', key: data.key, deletionStartedAt: FieldValue.serverTimestamp(),
+        ...(data.emailProof?.uid ? { emailProofUid: data.emailProof.uid } : {}),
+      })
     }
     return true
   })
@@ -273,13 +300,14 @@ export async function removeUsernameCredential({
     if (remaining > 0 && deferWait) return { ref, key: marker.key, pending: true }
     if (remaining > 0) await wait(remaining)
   }
+  if (marker.emailProofUid) await eraseUsernameEmailProof(db, auth, marker.emailProofUid)
   await provider.remove(uid)
   return { ref, key: marker.key, pending: false }
 }
 
 export async function usernameAccount({
   db, auth, provider, body, idToken, ip, clock = Date.now, allow = checkRateLimit, validatePassword = checkNewPassword,
-  issueToken = (uid) => auth.createCustomToken(uid, { geogameUsernamePassword: true }), wait = delay, exchangeWindowSeconds = 0,
+  issueToken = (uid) => auth.createCustomToken(uid, { geogameUsernamePassword: true }), wait = delay, exchangeWindowSeconds = 0, sendProof,
 }) {
   if (!provider) return failure(503, 'not_enabled')
   const { action, password } = body ?? {}
@@ -291,18 +319,31 @@ export async function usernameAccount({
   // A later update to the profanity list must not lock existing players out.
   if (invalidUsername && invalidUsername !== 'username_forbidden') return failure(401, invalidProof)
   const key = usernameKey(username)
+  if (action === 'email-status') {
+    const account = await lookup(db, key)
+    return usernameAccountEmail({ db, auth, provider, account, action, body, idToken, clock, sendProof })
+  }
   if (!await allow(db, { ip, key, action })) return failure(429, 'too_many_requests')
   const newPassword = action === 'signup' || action === 'recover'
-  if (!checkPasswordInput(password)) return failure(newPassword ? 400 : 401, newPassword ? 'weak_password' : invalidProof)
+  const account = action === 'signup' ? null : await lookup(db, key)
+  // Native email resets use the Firebase project's password policy. A password accepted
+  // by Firebase for the linked account must work with its username as well.
+  const acceptsNativePassword = !newPassword && account?.data && activationEmail(account.data)
+  const passwordValid = acceptsNativePassword
+    ? typeof password === 'string' && password.length > 0 && password.length <= 4096
+    : checkPasswordInput(password)
+  if (!passwordValid) return failure(newPassword ? 400 : 401, newPassword ? 'weak_password' : invalidProof)
 
   if (action === 'signup') {
     const invalid = await validatePassword(password, username)
     if (invalid) return failure(400, invalid)
     return signup({ db, auth, provider, username, key, password, clock })
   }
-  const account = await lookup(db, key)
-  if (action === 'signin') return signin({ db, issueToken, provider, account, password })
-  if (action === 'rotate') return rotate({ db, auth, provider, account, password, idToken })
+  if (EMAIL_ACTIONS.has(action)) {
+    return usernameAccountEmail({ db, auth, provider, account, action, body, idToken, clock, sendProof, wait, exchangeWindowSeconds })
+  }
+  if (action === 'signin') return signin({ db, issueToken, provider, account, password, clock })
+  if (action === 'rotate') return rotate({ db, auth, provider, account, password, idToken, clock })
 
   const recoveryCode = typeof body.recoveryCode === 'string' ? body.recoveryCode.trim() : ''
   if (!RECOVERY_CODE_PATTERN.test(recoveryCode) || !validRecoveryCode(recoveryCode, account?.data.recoveryHash)) {

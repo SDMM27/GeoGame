@@ -1,4 +1,4 @@
-import { signInWithCustomToken } from 'firebase/auth'
+import { signInWithCustomToken, signInWithEmailAndPassword, signOut } from 'firebase/auth'
 
 export { USERNAME_PASSWORD_MIN, USERNAME_PASSWORD_MAX } from './usernamePasswordLimits.mjs'
 
@@ -9,6 +9,7 @@ const SITE_ORIGIN = 'https://geo-game.app'
 const API_ERRORS = new Set([
   'username_length', 'username_chars', 'username_forbidden', 'username_taken',
   'wrong_credentials', 'not_enabled', 'too_many_requests', 'password_compromised', 'invalid_recovery_code',
+  'invalid_email', 'link_email_in_use', 'link_email_expired', 'link_email_unverified', 'link_email_exists', 'link_email_finish',
 ])
 
 export class UsernameAccountError extends Error {
@@ -32,13 +33,13 @@ export async function usernameAccountAvailable(apiOrigin = usernameAccountApiOri
   }
 }
 
-async function request(action, { username, password, recoveryCode, apiOrigin = usernameAccountApiOrigin() }, idToken) {
+async function request(action, { username, password, recoveryCode, email, apiOrigin = usernameAccountApiOrigin() }, idToken) {
   const headers = { 'Content-Type': 'application/json' }
   if (idToken) headers.Authorization = `Bearer ${idToken}`
   const response = await fetch(`${apiOrigin}${PATH}`, {
     method: 'POST',
     headers,
-    body: JSON.stringify({ action, username, password, recoveryCode }),
+    body: JSON.stringify({ action, username, password, recoveryCode, email }),
   }).catch(() => { throw new UsernameAccountError('network') })
   const data = await response.json().catch(() => null)
   if (response.ok && data) return data
@@ -59,11 +60,20 @@ export const signUpWithUsername = (credentials) => requestRecoveryCode('signup',
 export const recoverUsernameAccount = (credentials) => requestRecoveryCode('recover', credentials)
 
 export async function signInWithUsername(auth, credentials) {
-  const { token, uid } = await request('signin', credentials)
-  if (typeof token !== 'string' || !token || typeof uid !== 'string') throw new UsernameAccountError('generic')
+  const { token, uid, email } = await request('signin', credentials)
+  if (typeof uid !== 'string' || !uid) throw new UsernameAccountError('generic')
   if (credentials.expectedUid && (uid !== credentials.expectedUid || auth.currentUser?.uid !== uid)) {
     throw new UsernameAccountError('wrong_credentials')
   }
+  if (typeof email === 'string' && email) {
+    const { user } = await signInWithEmailAndPassword(auth, email, credentials.password)
+    if (user.uid !== uid) {
+      await signOut(auth).catch(() => {})
+      throw new UsernameAccountError('wrong_credentials')
+    }
+    return
+  }
+  if (typeof token !== 'string' || !token) throw new UsernameAccountError('generic')
   await signInWithCustomToken(auth, token)
 }
 
@@ -71,3 +81,12 @@ export async function rotateUsernameRecoveryCode(auth, credentials) {
   if (!auth.currentUser) throw new UsernameAccountError('wrong_credentials')
   return requestRecoveryCode('rotate', credentials, await auth.currentUser.getIdToken())
 }
+
+async function requestEmailLink(auth, action, credentials) {
+  if (!auth.currentUser) throw new UsernameAccountError('wrong_credentials')
+  return request(action, credentials, await auth.currentUser.getIdToken())
+}
+
+export const usernameEmailStatus = (auth, credentials) => requestEmailLink(auth, 'email-status', credentials)
+export const startUsernameEmailLink = (auth, credentials) => requestEmailLink(auth, 'email-start', credentials)
+export const finishUsernameEmailLink = (auth, credentials) => requestEmailLink(auth, 'email-finish', credentials)

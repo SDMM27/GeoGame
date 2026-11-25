@@ -319,9 +319,17 @@ export async function usernameAccount({
   // A later update to the profanity list must not lock existing players out.
   if (invalidUsername && invalidUsername !== 'username_forbidden') return failure(401, invalidProof)
   const key = usernameKey(username)
+  let playerUid
+  if (EMAIL_ACTIONS.has(action)) {
+    const decoded = idToken && await auth.verifyIdToken(idToken, true).catch(() => null)
+    playerUid = decoded?.uid
+    if (!playerUid || !USERNAME_UID_PATTERN.test(playerUid)) return failure(401, 'wrong_credentials')
+  }
   if (action === 'email-status') {
-    const account = await lookup(db, key)
-    return usernameAccountEmail({ db, auth, provider, account, action, body, idToken, clock, sendProof })
+    const ref = credentialsRef(db, playerUid)
+    const data = (await ref.get()).data()
+    const account = data?.key === key ? { uid: playerUid, ref, data } : null
+    return usernameAccountEmail({ db, auth, provider, account, action, body, playerUid, clock })
   }
   if (!await allow(db, { ip, key, action })) return failure(429, 'too_many_requests')
   const newPassword = action === 'signup' || action === 'recover'
@@ -340,7 +348,7 @@ export async function usernameAccount({
     return signup({ db, auth, provider, username, key, password, clock })
   }
   if (EMAIL_ACTIONS.has(action)) {
-    return usernameAccountEmail({ db, auth, provider, account, action, body, idToken, clock, sendProof, wait, exchangeWindowSeconds })
+    return usernameAccountEmail({ db, auth, provider, account, action, body, playerUid, clock, sendProof, wait, exchangeWindowSeconds })
   }
   if (action === 'signin') return signin({ db, issueToken, provider, account, password, clock })
   if (action === 'rotate') return rotate({ db, auth, provider, account, password, idToken, clock })

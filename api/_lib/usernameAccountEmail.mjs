@@ -195,9 +195,8 @@ async function finish({ db, auth, provider, account, password, clock, wait, exch
   return reply(200, { linkedEmail: proof.email })
 }
 
-export async function usernameAccountEmail({ db, auth, provider, account, action, body, idToken, clock, sendProof, wait, exchangeWindowSeconds }) {
-  const decoded = idToken && await auth.verifyIdToken(idToken, true).catch(() => null)
-  if (!account || account.uid !== decoded?.uid || account.data.state !== 'active') return failure(401, 'wrong_credentials')
+export async function usernameAccountEmail({ db, auth, provider, account, action, body, playerUid, clock, sendProof, wait, exchangeWindowSeconds }) {
+  if (!account || account.uid !== playerUid || account.data.state !== 'active') return failure(401, 'wrong_credentials')
   const { data } = account
   if (action === 'email-status') {
     const pending = data.emailProof

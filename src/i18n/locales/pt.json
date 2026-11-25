@@ -714,6 +714,8 @@
       "cancelled": "Login cancelado."
     },
     "google": "Continuar com o Google",
+    "identifier": "E-mail ou nome de usuário",
+    "identifier_placeholder": "voce@exemplo.com ou seu nome de usuário",
     "or": "ou",
     "choose_title": "Escolha seu nome de usuário",
     "choose_intro": "Suas pontuações vão aparecer com este nome. Ele ficará reservado para sua conta.",

@@ -714,6 +714,8 @@
       "cancelled": "Inicio de sesión cancelado."
     },
     "google": "Continuar con Google",
+    "identifier": "Correo o nombre de usuario",
+    "identifier_placeholder": "tu@ejemplo.com o tu nombre de usuario",
     "or": "o",
     "choose_title": "Elige tu nombre de usuario",
     "choose_intro": "Tus puntuaciones aparecerán con este nombre. Quedará reservado para tu cuenta.",

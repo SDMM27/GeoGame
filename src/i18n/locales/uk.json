@@ -728,6 +728,8 @@
       "cancelled": "Вхід скасовано."
     },
     "google": "Увійти через Google",
+    "identifier": "Email або нік",
+    "identifier_placeholder": "ty@pryklad.com або твій нік",
     "or": "або",
     "choose_title": "Обери нік",
     "choose_intro": "Під цим іменем будуть видимі твої результати. Нік закріпиться за твоїм акаунтом.",

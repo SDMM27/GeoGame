@@ -96,6 +96,7 @@ function AuthForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [username, setUsername] = useState('')
+  const [identifier, setIdentifier] = useState('')
   const [error, setError] = useState(null)
   const [notice, setNotice] = useState(null)
   const [submitting, setSubmitting] = useState(false)
@@ -113,6 +114,7 @@ function AuthForm() {
   const resetFormMessages = () => {
     setPassword('')
     setRecoveryCode('')
+    setIdentifier('')
     setError(null)
     setNotice(null)
   }
@@ -126,6 +128,8 @@ function AuthForm() {
   const recovering = mode === 'recover'
   const usingUsername = method === 'username'
   const newPassword = signingUp || recovering
+  // Sign-in with a single "email or username" field when username accounts exist.
+  const combinedLogin = !signingUp && !recovering && usernameAvailable
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -134,17 +138,24 @@ function AuthForm() {
     setError(null)
     setNotice(null)
     try {
-      if (recovering || (usingUsername && signingUp)) {
-        const code = recovering
-          ? await recoverUsernameAccount({ username, password, recoveryCode })
-          : await signUpWithUsername({ username, password })
+      if (recovering) {
+        const code = await recoverUsernameAccount({ username, password, recoveryCode })
         resetFormMessages()
         setIssuedCode(code)
         setSubmitting(false)
-      } else if (usingUsername) {
-        await signInWithUsername(auth, { username, password })
+      } else if (signingUp && usingUsername) {
+        const code = await signUpWithUsername({ username, password })
+        resetFormMessages()
+        setIssuedCode(code)
+        setSubmitting(false)
       } else if (signingUp) {
         await signUp(auth, { email, password, username })
+      } else if (combinedLogin) {
+        // Usernames can't contain '@' (usernameRules), so the identifier routes unambiguously.
+        if (identifier.includes('@')) await signIn(auth, { email: identifier, password })
+        else await signInWithUsername(auth, { username: identifier, password })
+      } else if (usingUsername) {
+        await signInWithUsername(auth, { username, password })
       } else {
         await signIn(auth, { email, password })
       }
@@ -156,7 +167,9 @@ function AuthForm() {
 
   const handleForgot = async () => {
     if (submitting) return
-    if (usingUsername) {
+    const loginId = (combinedLogin ? identifier : email).trim()
+    // A username (no '@') has no email to reset: it goes through the recovery code instead.
+    if (usernameAvailable && loginId && !loginId.includes('@')) {
       switchMode('recover')
       return
     }
@@ -164,8 +177,8 @@ function AuthForm() {
     setError(null)
     setNotice(null)
     try {
-      await resetPassword(auth, email)
-      setNotice(t('account.reset_sent', { email: email.trim() }))
+      await resetPassword(auth, loginId)
+      setNotice(t('account.reset_sent', { email: loginId }))
     } catch (err) {
       setError(accountErrorKey(err))
     } finally {
@@ -216,7 +229,7 @@ function AuthForm() {
           <div className="account-divider">
             <span>{t('account.or')}</span>
           </div>
-          {usernameAvailable && (
+          {usernameAvailable && signingUp && (
             <div className="account-tabs">
               {['email', 'username'].map((option) => (
                 <button
@@ -240,7 +253,19 @@ function AuthForm() {
       )}
 
       <form onSubmit={handleSubmit} className="account-form">
-        {(signingUp || usingUsername) && (
+        {combinedLogin && (
+          <label className="account-field">
+            <span>{t('account.identifier')}</span>
+            <input
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+              placeholder={t('account.identifier_placeholder')}
+              autoComplete="username"
+              required
+            />
+          </label>
+        )}
+        {!combinedLogin && (signingUp || recovering || usingUsername) && (
           <label className="account-field">
             <span>{t('account.username')}</span>
             <input
@@ -254,7 +279,7 @@ function AuthForm() {
             {signingUp && <small>{t('account.username_hint')}</small>}
           </label>
         )}
-        {!usingUsername && (
+        {!combinedLogin && !recovering && !usingUsername && (
           <label className="account-field">
             <span>{t('account.email')}</span>
             <input

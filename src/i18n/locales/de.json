@@ -714,6 +714,8 @@
       "cancelled": "Anmeldung abgebrochen."
     },
     "google": "Weiter mit Google",
+    "identifier": "E-Mail oder Benutzername",
+    "identifier_placeholder": "du@beispiel.de oder dein Benutzername",
     "or": "oder",
     "choose_title": "Wähle deinen Benutzernamen",
     "choose_intro": "Deine Punktzahlen erscheinen unter diesem Namen. Er wird für dein Konto reserviert.",

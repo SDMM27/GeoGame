@@ -26,7 +26,7 @@ import {
 import { firestore } from '../Firebase'
 import { setOwnUid, writeSnapshot } from './localSnapshot'
 import { normalizeUsername, usernameKey, validateUsername } from './usernameRules.mjs'
-import { signInWithUsername, UsernameAccountError } from './usernameAccount'
+import { signInWithUsername, usernameAccountApiOrigin, UsernameAccountError } from './usernameAccount'
 
 export { normalizeUsername, USERNAME_MIN, USERNAME_MAX, validateUsername } from './usernameRules.mjs'
 export const PASSWORD_MIN = 6
@@ -224,8 +224,8 @@ export function resetPassword(auth, email) {
 
 // Deleting needs a recent sign-in: the password is asked again, or Google's `reauthenticate` (accountGoogle.js).
 // The data goes on the server (api/delete-account): profile, history, friends, leaderboard entries, then the account.
-// `apiOrigin`: '' on the site (same origin), the site's address in the app.
-export async function deleteAccount(auth, { password, username, reauthenticate, apiOrigin = '' }) {
+// Username deletion uses the same endpoint origin for fresh authentication and deletion.
+export async function deleteAccount(auth, { password, username, reauthenticate, apiOrigin = username ? usernameAccountApiOrigin() : '' }) {
   const user = auth.currentUser
   if (!user) return
   if (username) await signInWithUsername(auth, { username, password, apiOrigin, expectedUid: user.uid })

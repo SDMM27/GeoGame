@@ -714,6 +714,8 @@
       "cancelled": "Accesso annullato."
     },
     "google": "Continua con Google",
+    "identifier": "Email o nome utente",
+    "identifier_placeholder": "tu@esempio.com o il tuo nome utente",
     "or": "oppure",
     "choose_title": "Scegli il tuo nome utente",
     "choose_intro": "I tuoi punteggi appariranno con questo nome. Sarà riservato al tuo account.",

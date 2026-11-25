@@ -714,6 +714,8 @@
       "cancelled": "Sign-in cancelled."
     },
     "google": "Continue with Google",
+    "identifier": "Email or username",
+    "identifier_placeholder": "you@example.com or your username",
     "or": "or",
     "choose_title": "Choose your username",
     "choose_intro": "Your scores will show under this name. It will be reserved for your account.",

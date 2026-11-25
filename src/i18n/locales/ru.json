@@ -728,6 +728,8 @@
       "cancelled": "Вход отменён."
     },
     "google": "Войти через Google",
+    "identifier": "Email или ник",
+    "identifier_placeholder": "ty@primer.com или твой ник",
     "or": "или",
     "choose_title": "Выбери ник",
     "choose_intro": "Под этим именем будут видны твои результаты. Ник закрепится за твоим аккаунтом.",

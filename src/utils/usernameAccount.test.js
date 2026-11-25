@@ -30,13 +30,18 @@ describe('username account API origin', () => {
   beforeEach(() => vi.clearAllMocks())
   afterEach(() => vi.unstubAllGlobals())
 
-  it.each([previewHost, 'geo-game-git-feature-x-sdmms-projects.vercel.app'])(
-    'uses production for the owned branch preview %s',
+  it.each([
+    previewHost,
+    'geo-game-git-feature-x-sdmms-projects.vercel.app',
+    'geo-game-ln93w5gmf-sdmms-projects.vercel.app',
+  ])(
+    'uses production for the owned preview %s',
     (hostname) => expect(usernameAccountApiOrigin(hostname)).toBe(origin),
   )
 
   it.each([
     'localhost', 'geo-game.app', 'geo-game-delta.vercel.app',
+    'geo-game-sdmms-projects.vercel.app',
     'geogame-app-git-dev-sdmms-projects.vercel.app',
     'geo-game-git-dev-other-team.vercel.app',
     'geo-game-git-dev-sdmms-projects.vercel.app.example.org',

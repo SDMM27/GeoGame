@@ -21,7 +21,7 @@ export default {
           {
             list: [
               'deine E-Mail-Adresse, wenn du dich mit einer E-Mail-Adresse registrierst oder dich mit Google anmeldest. Firebase Authentication verwaltet das Passwort für Konten mit E-Mail-Adresse. Bei der Anmeldung mit Google erhalten wir auch die Kennung deines Google-Kontos (Google kann auch deinen Namen und dein Profilbild übermitteln, die wir nicht verwenden);',
-              'wenn du ein Konto mit Benutzername und Passwort erstellst, fragen wir nach keiner E-Mail-Adresse. Unser Server verarbeitet dein Passwort kurzzeitig. Amazon Cognito speichert die zur Prüfung nötigen Daten. GeoGame speichert nur einen Hash des Wiederherstellungscodes;',
+              'wenn du ein Konto mit Benutzername und Passwort erstellst, fragen wir nach keiner persönlichen E-Mail-Adresse. Unser Server verarbeitet dein Passwort kurzzeitig. Firebase Authentication prüft es mit einem automatisch erzeugten technischen Alias, der keine Nachrichten empfangen kann. GeoGame speichert nur einen Hash des Wiederherstellungscodes;',
               'deinen Benutzernamen, das Erstellungsdatum des Kontos und deine Anmeldedaten;',
               'deinen Spielverlauf (Spiel, Modus, Punktzahl, Zeit, Datum) und deine Punktzahlen in den Ranglisten, einschließlich der probierten Antworten bei den Tageschallenges;',
               'deine Freundschaftsanfragen, deine Freunde und die Raumeinladungen, die du sendest oder erhältst;',
@@ -61,7 +61,6 @@ export default {
           {
             list: [
               'Google (Firebase Authentication, Cloud Firestore, App Check, reCAPTCHA Enterprise): Konten, Datenbank und Missbrauchsschutz;',
-              'Amazon Web Services (Amazon Cognito): Anmeldung bei Konten ohne E-Mail-Adresse;',
               'Vercel Inc.: Hosting der Website und der Serverfunktionen, Reichweitenmessung;',
               'Expo (650 Industries, Inc.): Zustellung von Benachrichtigungen und App-Updates;',
               'Push-Dienste der Browser (je nach Gerät Apple, Google, Mozilla oder Microsoft): Zustellung der Benachrichtigungen der Web-App;',

@@ -21,7 +21,7 @@ export default {
           {
             list: [
               'seu endereço de e-mail se você se cadastrar com e-mail ou entrar com o Google. O Firebase Authentication gerencia a senha das contas criadas com e-mail. Se você entrar com o Google, também receberemos o identificador da sua conta Google (o Google pode enviar seu nome e sua foto de perfil, que não usamos);',
-              'se você criar uma conta com nome de usuário e senha, não pedimos seu endereço de e-mail. Nosso servidor processa a senha brevemente. O Amazon Cognito guarda os dados necessários para verificá-la. O GeoGame guarda apenas um hash do código de recuperação;',
+              'se você criar uma conta com nome de usuário e senha, não pedimos seu endereço de e-mail pessoal. Nosso servidor processa a senha brevemente. O Firebase Authentication verifica a senha usando um alias técnico gerado automaticamente que não pode receber mensagens. O GeoGame guarda apenas um hash do código de recuperação;',
               'seu nome de usuário, a data de criação da conta e as datas de login;',
               'o histórico das suas partidas (jogo, modo, pontuação, tempo, data) e suas pontuações nos rankings, incluindo as respostas tentadas nos desafios do dia;',
               'seus pedidos de amizade, seus amigos e os convites para salas que você envia ou recebe;',
@@ -61,7 +61,6 @@ export default {
           {
             list: [
               'Google (Firebase Authentication, Cloud Firestore, App Check, reCAPTCHA Enterprise): contas, banco de dados e proteção contra abusos;',
-              'Amazon Web Services (Amazon Cognito): autenticação de contas sem e-mail;',
               'Vercel Inc.: hospedagem do site e das funções de servidor, medição de audiência;',
               'Expo (650 Industries, Inc.): envio de notificações e atualizações do app;',
               'serviços push dos navegadores (Apple, Google, Mozilla ou Microsoft, conforme o aparelho): envio das notificações do web app;',

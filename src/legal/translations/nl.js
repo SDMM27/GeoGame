@@ -21,7 +21,7 @@ export default {
           {
             list: [
               'je e-mailadres als je je met een e-mailadres registreert of inlogt met Google. Firebase Authentication beheert het wachtwoord van accounts die met een e-mailadres zijn aangemaakt. Als je inlogt met Google, ontvangen we ook het ID van je Google-account (Google kan ook je naam en profielfoto doorgeven, die wij niet gebruiken);',
-              'als je een account met een gebruikersnaam en wachtwoord aanmaakt, vragen we geen e-mailadres. Onze server verwerkt je wachtwoord kortstondig. Amazon Cognito bewaart de gegevens die nodig zijn om het te controleren. GeoGame bewaart alleen een hash van je herstelcode;',
+              'als je een account met een gebruikersnaam en wachtwoord aanmaakt, vragen we geen persoonlijk e-mailadres. Onze server verwerkt je wachtwoord kortstondig. Firebase Authentication controleert het met een automatisch aangemaakt technisch alias dat geen berichten kan ontvangen. GeoGame bewaart alleen een hash van je herstelcode;',
               'je gebruikersnaam, de aanmaakdatum van het account en je inloggegevens;',
               'je spelgeschiedenis (spel, modus, score, tijd, datum) en je scores in de ranglijsten, inclusief de geprobeerde antwoorden bij de dagelijkse uitdagingen;',
               'je vriendschapsverzoeken, je vrienden en de kameruitnodigingen die je verstuurt of ontvangt;',
@@ -61,7 +61,6 @@ export default {
           {
             list: [
               'Google (Firebase Authentication, Cloud Firestore, App Check, reCAPTCHA Enterprise): accounts, database en bescherming tegen misbruik;',
-              'Amazon Web Services (Amazon Cognito): authenticatie voor accounts zonder e-mailadres;',
               'Vercel Inc.: hosting van de website en de serverfuncties, bereiksmeting;',
               'Expo (650 Industries, Inc.): bezorging van meldingen en app-updates;',
               'Pushdiensten van browsers (afhankelijk van het apparaat Apple, Google, Mozilla of Microsoft): bezorging van de meldingen van de webapp;',

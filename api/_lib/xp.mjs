@@ -25,6 +25,7 @@ import { SCROLLS } from '../../src/data/scrolls.js'
 import { BONUS_ID, grantXp, missionDayAt, readXp, seedStreak, weekKeyOf } from '../../src/utils/missions.js'
 import { payScrolls } from '../../src/utils/scrollCollection.js'
 import { bestScoresOf, grantRecords, readRecords } from '../../src/utils/recordRewards.js'
+import { callerUid as verifiedUid } from './playerAuth.mjs'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 // The games of the current week (Paris) are within the last 8 days whatever the time zone offset.
@@ -41,15 +42,6 @@ const MAX_SCORES = 200
 const POOL = flagPool(countriesMeta.features)
 
 const reply = (status, body) => ({ status, body })
-
-async function verifiedUid(auth, idToken) {
-  if (!idToken) return null
-  try {
-    return (await auth.verifyIdToken(idToken)).uid
-  } catch {
-    return null
-  }
-}
 
 const toGame = (snapshot) => {
   const data = snapshot.data()

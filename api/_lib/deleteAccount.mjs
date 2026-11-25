@@ -9,6 +9,7 @@ import { Timestamp } from 'firebase-admin/firestore'
 import { discardExpiredUsernameSignups, hasUsernameCredential, removeUsernameCredential } from './usernameAccount.mjs'
 import { getUsernamePasswordProvider } from './usernameAccountProvider.mjs'
 import { USERNAME_TOKEN_EXCHANGE_SECONDS } from './usernameAccountToken.mjs'
+import { isUsernameCredentialUid } from './usernameCredentialUid.mjs'
 
 // The account's owner must have signed in again just before (like Firebase's own deleteUser on the client).
 export const RECENT_SIGN_IN_MS = 5 * 60 * 1000
@@ -27,7 +28,7 @@ async function deleteRefs(db, refs) {
 }
 
 // `db` and `auth`: firebase-admin Firestore and Auth. Returns how many documents went, besides users/{uid}.
-export async function deleteAccountData({ db, auth, uid, getUsernameProvider = getUsernamePasswordProvider, deferUsernameWait = false }) {
+export async function deleteAccountData({ db, auth, uid, getUsernameProvider = () => getUsernamePasswordProvider(auth), deferUsernameWait = false }) {
   const credentials = await removeUsernameCredential({
     db, auth, uid, getProvider: getUsernameProvider, deferWait: deferUsernameWait,
     exchangeWindowSeconds: process.env.FIREBASE_AUTH_EMULATOR_HOST ? 0 : USERNAME_TOKEN_EXCHANGE_SECONDS,
@@ -102,6 +103,7 @@ export async function deleteAccount({ db, auth, idToken, now = Date.now() }) {
   } catch {
     return reply(401, { error: 'unauthenticated' })
   }
+  if (isUsernameCredentialUid(decoded.uid)) return reply(401, { error: 'unauthenticated' })
   if (now - decoded.auth_time * 1000 > RECENT_SIGN_IN_MS) return reply(403, { error: 'requires_recent_login' })
   if ((decoded.firebase?.sign_in_provider !== 'custom' || decoded.geogameUsernamePassword !== true)
     && await hasUsernameCredential(db, decoded.uid)) return reply(403, { error: 'requires_recent_login' })
@@ -117,7 +119,7 @@ export function lastActivity(user) {
 }
 
 // Daily cleanup: accounts unused for INACTIVE_ACCOUNT_MS, at most `limit` per run (the next runs take the rest).
-export async function deleteInactiveAccounts({ db, auth, now = Date.now(), limit = 50, getUsernameProvider = getUsernamePasswordProvider }) {
+export async function deleteInactiveAccounts({ db, auth, now = Date.now(), limit = 50, getUsernameProvider = () => getUsernamePasswordProvider(auth) }) {
   const staged = await discardExpiredUsernameSignups({ db, auth, getProvider: getUsernameProvider, now, limit })
   const pending = await db.collection('usernameCredentials')
     .where('deletionStartedAt', '<=', Timestamp.fromMillis(now - RECENT_SIGN_IN_MS)).limit(limit).get()
@@ -134,6 +136,8 @@ export async function deleteInactiveAccounts({ db, auth, now = Date.now(), limit
     const page = await auth.listUsers(1000, pageToken)
     for (const user of page.users) {
       if (deleted + scheduled >= limit) return result()
+      // The password identity is removed with its player, regardless of its own last sign-in.
+      if (isUsernameCredentialUid(user.uid)) continue
       const last = lastActivity(user)
       // No date at all: never deleted on a guess.
       if (last > 0 && now - last > INACTIVE_ACCOUNT_MS) {

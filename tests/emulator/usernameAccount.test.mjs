@@ -8,6 +8,8 @@ import { deleteAccount, deleteAccountData } from '../../api/_lib/deleteAccount.m
 import { migrateSession } from '../../api/_lib/migrateSession.mjs'
 import { hasUsernameCredential, usernameAccount } from '../../api/_lib/usernameAccount.mjs'
 import { checkRateLimit } from '../../api/_lib/usernameAccountPolicy.mjs'
+import { getUsernamePasswordProvider } from '../../api/_lib/usernameAccountProvider.mjs'
+import { usernameCredentialUid } from '../../api/_lib/usernameCredentialUid.mjs'
 
 const app = initializeApp({ projectId: 'geogame-sdmm' }, 'username-account-integration')
 const db = getFirestore(app)
@@ -27,16 +29,10 @@ function authRequest(action, data) {
 }
 
 it('restores username ownership after a native provider link or direct Auth erasure', async () => {
-  const passwords = new Map()
-  const provider = {
-    create: async (uid, password) => passwords.set(uid, password),
-    verify: async (uid, password) => passwords.get(uid) === password,
-    setPassword: async (uid, password) => passwords.set(uid, password),
-    remove: async (uid) => passwords.delete(uid),
-  }
+  const provider = getUsernamePasswordProvider(auth)
   const username = `Explorateur ${Date.now().toString(36)}`
-  const initial = 'un chemin pour explorer les îles'
-  const next = 'uniquement des alizés au retour'
+  const initial = 'un chemin pour explorer les i\u0302les'
+  const next = `${'🧭'.repeat(127)}!`
   const nativeProof = { email: `${Date.now()}@example.test`, password: 'native-provider-password' }
   const call = (action, password, fields) => usernameAccount({
     db, auth, provider, allow: vi.fn(async () => true), validatePassword: vi.fn(async () => null),
@@ -44,8 +40,14 @@ it('restores username ownership after a native provider link or direct Auth eras
   })
   const { status, body: { recoveryCode } } = await call('signup', initial)
   expect(status).toBe(201)
-  const { body: { token, uid } } = await call('signin', initial)
+  const { body: { token, uid } } = await call('signin', initial.normalize('NFC'))
+  const credentialUid = usernameCredentialUid(uid)
   try {
+    const credential = await auth.getUser(credentialUid)
+    expect(credential.email).toMatch(/^[0-9a-f]{48}@accounts\.geogame\.invalid$/)
+    expect(credential.emailVerified).toBe(false)
+    expect((await db.doc(`users/${credentialUid}`).get()).exists).toBe(false)
+
     const response = await authRequest('signInWithCustomToken', { token })
     expect(response.ok).toBe(true)
     const { idToken } = await response.json()
@@ -81,6 +83,7 @@ it('restores username ownership after a native provider link or direct Auth eras
     expect((await call('signin', next)).body.uid).toBe(uid)
 
     await auth.deleteUser(uid)
+    await auth.deleteUser(credentialUid)
     const restored = await call('recover', initial, { recoveryCode: recovered.body.recoveryCode })
     expect(restored.status).toBe(200)
     expect((await auth.getUser(uid)).disabled).toBe(false)
@@ -88,7 +91,7 @@ it('restores username ownership after a native provider link or direct Auth eras
   } finally {
     await deleteAccountData({ db, auth, uid, getUsernameProvider: () => provider })
   }
-  expect(passwords.has(uid)).toBe(false)
+  await expect(auth.getUser(credentialUid)).rejects.toMatchObject({ code: 'auth/user-not-found' })
   expect((await db.doc(`usernameCredentials/${uid}`).get()).exists).toBe(false)
   expect((await db.doc(`usernames/${username.toLowerCase()}`).get()).exists).toBe(false)
   await expect(auth.getUser(uid)).rejects.toMatchObject({ code: 'auth/user-not-found' })

@@ -1,9 +1,10 @@
 // Carrying a session over from the Firebase JS SDK to React Native Firebase (the app's native auth): the app sends the
 // refresh token of its old session, and gets a custom token for the same account to sign in with. Called by
 // POST /api/migrate-session. The refresh token is exchanged here, so a token that is dead or revoked gets nothing.
+import { isUsernameCredentialUid } from './usernameCredentialUid.mjs'
 
 // Public key of the web app (same as src/Firebase.js): identifies the project, grants nothing by itself.
-const WEB_API_KEY = 'AIzaSyAe2bQDVUJUX9wicXL_BvSF8SQKj0xlTWQ'
+export const WEB_API_KEY = 'AIzaSyAe2bQDVUJUX9wicXL_BvSF8SQKj0xlTWQ'
 
 const reply = (status, body) => ({ status, body })
 
@@ -44,7 +45,9 @@ export async function migrateSession({ auth, refreshToken, isUsernameAccount, fe
     decoded = await auth.verifyIdToken(idToken, true)
     // Modern username/password sessions already use the native SDK. They must not be exchanged
     // for a migration token with a longer lifetime than their own sign-in bridge issues.
-    if (decoded.geogameUsernamePassword === true) return reply(401, { error: 'unauthenticated' })
+    if (decoded.geogameUsernamePassword === true || isUsernameCredentialUid(decoded.uid)) {
+      return reply(401, { error: 'unauthenticated' })
+    }
   } catch {
     return reply(401, { error: 'unauthenticated' })
   }

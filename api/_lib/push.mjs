@@ -103,12 +103,4 @@ async function sendWeb(devices, message, webPush) {
   return results.filter(Boolean).length
 }
 
-// Verified uid of the caller's Firebase ID token, or null.
-export async function callerUid(auth, idToken) {
-  if (!idToken) return null
-  try {
-    return (await auth.verifyIdToken(idToken)).uid
-  } catch {
-    return null
-  }
-}
+export { callerUid } from './playerAuth.mjs'

@@ -92,7 +92,7 @@ async function signup({ db, auth, provider, username, key, password, clock }) {
     if (provisioned) await discardProvisioning({ db, auth, provider, ref }).catch(() => {})
     throw error
   }
-  // The same name can be claimed by email/Google during Cognito account creation.
+  // The same name can be claimed by email/Google while the password identity is created.
   await discardProvisioning({ db, auth, provider, ref })
   return failure(409, 'username_taken')
 }
@@ -112,7 +112,7 @@ async function signin({ issueToken, provider, account, password }) {
     return failure(401, 'wrong_credentials')
   }
   const token = await issueToken(account.uid)
-  // The password may have changed (or the account may have been deleted) while Cognito verified it.
+  // The password may have changed (or the account may have been deleted) during verification.
   if (!sameActive(await account.ref.get(), account.data.revision)) return failure(401, 'wrong_credentials')
   return reply(200, { token, uid: account.uid })
 }
@@ -124,8 +124,8 @@ async function disableAndUnlinkIdentity(auth, uid, username) {
     user = await disable()
   } catch (error) {
     if (error?.code !== 'auth/user-not-found') throw error
-    // A holder of a Firebase session can delete the Auth record directly. Firestore and Cognito
-    // still identify the original account, so restore only the disabled identity at its original UID.
+    // A holder of a Firebase session can delete the Auth record directly. Restore the disabled
+    // player identity at its original UID using the authoritative username record.
     try {
       user = await auth.createUser({ uid, displayName: username, disabled: true })
     } catch (error) {
@@ -140,8 +140,8 @@ async function disableAndUnlinkIdentity(auth, uid, username) {
   const hasFactors = (identity) => Boolean(identity.multiFactor?.enrolledFactors.length)
   if (providers.size || hasFactors(user)) {
     user = await auth.updateUser(uid, {
-      providersToUnlink: [...providers],
-      multiFactor: { enrolledFactors: null },
+      ...(providers.size ? { providersToUnlink: [...providers] } : {}),
+      ...(hasFactors(user) ? { multiFactor: { enrolledFactors: null } } : {}),
     })
   }
   if (!user.disabled || user.providerData.length || user.email || user.phoneNumber || hasFactors(user)) {
@@ -168,7 +168,7 @@ async function recover({ db, auth, provider, account, password, recoveryCode, cl
   // custom token expires, then move the whole-second Firebase refresh-token cutoff past it.
   const revokeAfter = (Math.floor(clock() / 1000) + exchangeWindowSeconds + 1) * 1000
 
-  // Keep the current code usable after the lease expires if Cognito or Firebase fails mid-recovery.
+  // Keep the current code usable after the lease expires if Firebase fails mid-recovery.
   // The credential is unavailable for sign-in until both writes and the final transaction finish.
   await disableAndUnlinkIdentity(auth, uid, username)
   await provider.setPassword(uid, password)
@@ -214,7 +214,7 @@ async function rotate({ db, auth, provider, account, password, idToken }) {
   return changed ? reply(200, { recoveryCode }) : failure(401, 'wrong_credentials')
 }
 
-// Also called by inactive-account cleanup. A deletion tombstone blocks signin/recovery if Cognito is
+// Also called by inactive-account cleanup. A deletion tombstone blocks signin/recovery if Auth is
 // temporarily unreachable. The provider's delete operation is idempotent, including for a missing user.
 export async function removeUsernameCredential({
   db, auth, uid, getProvider, clock = Date.now, wait = delay, exchangeWindowSeconds = 0, deferWait = false,

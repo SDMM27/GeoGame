@@ -22,14 +22,15 @@ export function usernameRequestIp(req) {
 }
 
 export async function checkRateLimit(db, { ip, key, action }, now = Date.now()) {
-  const secret = process.env.USERNAME_AUTH_PEPPER
+  const secret = process.env.FIREBASE_SERVICE_ACCOUNT
+    || (process.env.FIRESTORE_EMULATOR_HOST && process.env.FIREBASE_AUTH_EMULATOR_HOST ? 'local-username-auth-rate-limits' : '')
   const limits = RATE_LIMITS[action]
   if (!ip || !secret || !limits) return false
 
   const entries = [[`ip:${ip}`, limits.ip], [`key:${key}`, limits.key]]
   const windowStart = now - now % WINDOW_MS
   const refs = entries.map(([subject]) => {
-    const id = createHmac('sha256', Buffer.from(secret, 'hex')).update(`rate\0${windowStart}\0${action}\0${subject}`).digest('hex')
+    const id = createHmac('sha256', secret).update(`username-auth-rate\0${windowStart}\0${action}\0${subject}`).digest('hex')
     return db.doc(`usernameAuthLimits/${id}`)
   })
   return db.runTransaction(async (transaction) => {

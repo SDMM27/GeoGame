@@ -14,6 +14,12 @@ function adminApp() {
   return initializeApp({ credential: cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)) })
 }
 
+function usernameAuthAvailable() {
+  const { FIRESTORE_EMULATOR_HOST, FIREBASE_AUTH_EMULATOR_HOST, FIREBASE_SERVICE_ACCOUNT } = process.env
+  if (FIRESTORE_EMULATOR_HOST || FIREBASE_AUTH_EMULATOR_HOST) return Boolean(FIRESTORE_EMULATOR_HOST && FIREBASE_AUTH_EMULATOR_HOST)
+  return Boolean(FIREBASE_SERVICE_ACCOUNT)
+}
+
 export default async function usernameAccountRoute(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
@@ -23,14 +29,15 @@ export default async function usernameAccountRoute(req, res) {
   if (req.method !== 'POST' && req.method !== 'GET') return res.status(405).json({ error: 'method_not_allowed' })
 
   try {
-    const provider = getUsernamePasswordProvider()
-    if (req.method === 'GET') return res.status(200).json({ available: Boolean(provider) })
-    if (!provider) return res.status(503).json({ error: 'not_enabled' })
+    const available = usernameAuthAvailable()
+    if (req.method === 'GET') return res.status(200).json({ available })
+    if (!available) return res.status(503).json({ error: 'not_enabled' })
     if (!/^application\/json(?:\s*;|$)/i.test(req.headers['content-type'] ?? '')) {
       return res.status(415).json({ error: 'generic' })
     }
     const app = adminApp()
     const auth = getAuth(app)
+    const provider = getUsernamePasswordProvider(auth)
     const { status, body } = await usernameAccount({
       db: getFirestore(app),
       auth,

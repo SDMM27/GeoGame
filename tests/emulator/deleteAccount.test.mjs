@@ -6,6 +6,7 @@ import { getFirestore } from 'firebase-admin/firestore'
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import handler from '../../api/delete-account.mjs'
+import { usernameCredentialUid } from '../../api/_lib/usernameCredentialUid.mjs'
 import {
   INACTIVE_ACCOUNT_MS,
   RECENT_SIGN_IN_MS,
@@ -205,5 +206,17 @@ describe('deleteInactiveAccounts', () => {
     expect(await accountExists('alice')).toBe(false)
     expect(await exists('users/alice')).toBe(false)
     expect(await exists('scores/s1')).toBe(false)
+  })
+
+  it('does not erase an internal password identity based on its own inactivity', async () => {
+    const uid = usernameCredentialUid('b5db4a87-d01a-4265-b4eb-dedc618bcb82')
+    await auth.createUser({ uid })
+    try {
+      const later = Date.now() + INACTIVE_ACCOUNT_MS + 24 * 60 * 60 * 1000
+      await deleteInactiveAccounts({ db, auth, now: later, limit: 1000 })
+      expect(await accountExists(uid)).toBe(true)
+    } finally {
+      await auth.deleteUser(uid)
+    }
   })
 })

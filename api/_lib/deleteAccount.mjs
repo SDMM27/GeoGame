@@ -6,7 +6,7 @@
 // (elo, eloGains, eloDuelAccounts), the online status (presence/{uid}), then the Firebase Auth account. Rooms keep the pseudo until they expire (10 days at most, api/cleanup-expired.mjs).
 import { FieldValue, Timestamp } from 'firebase-admin/firestore'
 
-import { discardExpiredUsernameSignups, hasUsernameCredential, removeUsernameCredential } from './usernameAccount.mjs'
+import { canObserveMissingUsernamePlayer, discardExpiredUsernameSignups, hasUsernameCredential, removeUsernameCredential } from './usernameAccount.mjs'
 import { getUsernamePasswordProvider } from './usernameAccountProvider.mjs'
 import { USERNAME_TOKEN_EXCHANGE_SECONDS } from './usernameAccountToken.mjs'
 import { isUsernameCredentialUid, playerUidForUsernameCredential } from './usernameCredentialUid.mjs'
@@ -29,12 +29,12 @@ async function deleteRefs(db, refs) {
 
 // `db` and `auth`: firebase-admin Firestore and Auth. Returns how many documents went, besides users/{uid}.
 export async function deleteAccountData({
-  db, auth, uid, getUsernameProvider = () => getUsernamePasswordProvider(auth), deferUsernameWait = false, expectedMissingSince,
+  db, auth, uid, getUsernameProvider = () => getUsernamePasswordProvider(auth), deferUsernameWait = false, expectedMissingSince, observationNow,
 }) {
   const credentials = await removeUsernameCredential({
     db, auth, uid, getProvider: getUsernameProvider, deferWait: deferUsernameWait,
     exchangeWindowSeconds: process.env.FIREBASE_AUTH_EMULATOR_HOST ? 0 : USERNAME_TOKEN_EXCHANGE_SECONDS,
-    expectedMissingSince,
+    expectedMissingSince, observationNow,
   })
   if (credentials?.skipped) return { skipped: true }
   if (credentials?.pending) return { pending: true }
@@ -125,7 +125,7 @@ export function lastActivity(user) {
 async function observeMissingPlayer({ db, auth, uid, now }) {
   const ref = db.doc(`usernameCredentials/${uid}`)
   const observed = await ref.get()
-  if (observed.data()?.state !== 'active') return undefined
+  if (!canObserveMissingUsernamePlayer(observed.data(), now)) return undefined
 
   let missing = false
   try {
@@ -181,7 +181,7 @@ export async function deleteInactiveAccounts({ db, auth, now = Date.now(), limit
           expectedMissingSince = await observeMissingPlayer({ db, auth, uid, now })
           if (expectedMissingSince === undefined) continue
         }
-        const removal = await deleteAccountData({ db, auth, uid, getUsernameProvider, deferUsernameWait: true, expectedMissingSince })
+        const removal = await deleteAccountData({ db, auth, uid, getUsernameProvider, deferUsernameWait: true, expectedMissingSince, observationNow: now })
         if (removal.skipped) continue
         if (removal.pending) scheduled += 1
         else deleted += 1

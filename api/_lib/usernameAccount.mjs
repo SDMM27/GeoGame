@@ -21,6 +21,11 @@ export async function hasUsernameCredential(db, uid) {
   return typeof uid === 'string' && USERNAME_UID_PATTERN.test(uid) && (await credentialsRef(db, uid).get()).exists
 }
 
+export function canObserveMissingUsernamePlayer(data, now) {
+  return data?.state === 'active'
+    || (data?.state === 'recovering' && Number.isFinite(data.leaseUntil) && data.leaseUntil <= now)
+}
+
 function validRecoveryCode(code, hash) {
   return typeof hash === 'string' && /^[a-f0-9]{64}$/.test(hash)
     && timingSafeEqual(Buffer.from(hashCode(code), 'hex'), Buffer.from(hash, 'hex'))
@@ -168,7 +173,10 @@ async function recover({ db, auth, provider, account, password, recoveryCode, cl
     }
     const now = clock()
     if (data.state === 'recovering' && data.leaseUntil > now) return 'too_many_requests'
-    transaction.update(ref, { state: 'recovering', operation, leaseUntil: now + RECOVERY_MS })
+    transaction.update(ref, {
+      state: 'recovering', operation, leaseUntil: now + RECOVERY_MS,
+      ...(data.missingPlayerSince != null ? { missingPlayerSince: FieldValue.delete() } : {}),
+    })
     return null
   })
   if (lock) return failure(lock === 'too_many_requests' ? 429 : 401, lock)
@@ -225,7 +233,8 @@ async function rotate({ db, auth, provider, account, password, idToken }) {
 // Also called by inactive-account cleanup. A deletion tombstone blocks signin/recovery if Auth is
 // temporarily unreachable. The provider's delete operation is idempotent, including for a missing user.
 export async function removeUsernameCredential({
-  db, auth, uid, getProvider, clock = Date.now, wait = delay, exchangeWindowSeconds = 0, deferWait = false, expectedMissingSince,
+  db, auth, uid, getProvider, clock = Date.now, wait = delay, exchangeWindowSeconds = 0, deferWait = false,
+  expectedMissingSince, observationNow = clock(),
 }) {
   const absent = expectedMissingSince === undefined ? null : { skipped: true }
   if (!USERNAME_UID_PATTERN.test(uid)) return absent
@@ -236,8 +245,11 @@ export async function removeUsernameCredential({
   const remove = await db.runTransaction(async (transaction) => {
     const data = (await transaction.get(ref)).data()
     if (!data) return false
-    if (expectedMissingSince !== undefined && (data.state !== 'active' || data.missingPlayerSince !== expectedMissingSince)) return false
-    if (data.state === 'recovering' && data.leaseUntil > clock()) throw new Error('Username recovery in progress')
+    if (expectedMissingSince !== undefined) {
+      if (!canObserveMissingUsernamePlayer(data, observationNow) || data.missingPlayerSince !== expectedMissingSince) return false
+    } else if (data.state === 'recovering' && data.leaseUntil > clock()) {
+      throw new Error('Username recovery in progress')
+    }
     if (['provisioning', 'discarding'].includes(data.state)) throw new Error('Username provisioning in progress')
     if (data.state !== 'deleting') {
       transaction.set(ref, { state: 'deleting', key: data.key, deletionStartedAt: FieldValue.serverTimestamp() })

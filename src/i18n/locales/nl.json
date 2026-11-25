@@ -714,6 +714,8 @@
       "cancelled": "Inloggen geannuleerd."
     },
     "google": "Doorgaan met Google",
+    "identifier": "E-mail of gebruikersnaam",
+    "identifier_placeholder": "jij@voorbeeld.nl of je gebruikersnaam",
     "or": "of",
     "choose_title": "Kies je gebruikersnaam",
     "choose_intro": "Je scores verschijnen onder deze naam. Hij wordt voor jouw account gereserveerd.",

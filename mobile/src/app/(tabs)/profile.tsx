@@ -170,6 +170,7 @@ function AuthForm() {
   const [usernameAvailable, setUsernameAvailable] = useState(false)
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
+  const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
@@ -188,6 +189,7 @@ function AuthForm() {
   const resetFormMessages = () => {
     setPassword('')
     setRecoveryCode('')
+    setIdentifier('')
     setError(null)
     setNotice(null)
   }
@@ -201,10 +203,13 @@ function AuthForm() {
   const recovering = mode === 'recover'
   const usingUsername = method === 'username'
   const newPassword = signingUp || recovering
-  const needsUsername = signingUp || usingUsername
+  // Sign-in with a single "email or username" field when username accounts exist.
+  const combinedLogin = !signingUp && !recovering && usernameAvailable
+  const showUsername = !combinedLogin && (signingUp || recovering || usingUsername)
+  const showEmail = !combinedLogin && !recovering && !usingUsername
   const canSubmit = password !== '' &&
-    (usingUsername || email.trim() !== '') &&
-    (!needsUsername || username.trim() !== '') &&
+    (combinedLogin ? identifier.trim() !== '' : (usingUsername || email.trim() !== '')) &&
+    (!showUsername || username.trim() !== '') &&
     (!recovering || recoveryCode.trim() !== '')
 
   const onSubmit = async () => {
@@ -213,17 +218,24 @@ function AuthForm() {
     setError(null)
     setNotice(null)
     try {
-      if (recovering || (usingUsername && signingUp)) {
-        const code = recovering
-          ? await recoverUsernameAccount({ username, password, recoveryCode, apiOrigin: API_ORIGIN })
-          : await signUpWithUsername({ username, password, apiOrigin: API_ORIGIN })
+      if (recovering) {
+        const code = await recoverUsernameAccount({ username, password, recoveryCode, apiOrigin: API_ORIGIN })
         resetFormMessages()
         setIssuedCode(code)
         setSubmitting(false)
-      } else if (usingUsername) {
-        await signInWithUsername(auth, { username, password, apiOrigin: API_ORIGIN })
+      } else if (signingUp && usingUsername) {
+        const code = await signUpWithUsername({ username, password, apiOrigin: API_ORIGIN })
+        resetFormMessages()
+        setIssuedCode(code)
+        setSubmitting(false)
       } else if (signingUp) {
         await signUp(auth, { email, password, username })
+      } else if (combinedLogin) {
+        // Usernames can't contain '@' (usernameRules), so the identifier routes unambiguously.
+        if (identifier.includes('@')) await signIn(auth, { email: identifier, password })
+        else await signInWithUsername(auth, { username: identifier, password, apiOrigin: API_ORIGIN })
+      } else if (usingUsername) {
+        await signInWithUsername(auth, { username, password, apiOrigin: API_ORIGIN })
       } else {
         await signIn(auth, { email, password })
       }
@@ -235,7 +247,9 @@ function AuthForm() {
 
   const onForgot = async () => {
     if (submitting) return
-    if (usingUsername) {
+    const loginId = (combinedLogin ? identifier : email).trim()
+    // A username (no '@') has no email to reset: it goes through the recovery code instead.
+    if (usernameAvailable && loginId && !loginId.includes('@')) {
       switchMode('recover')
       return
     }
@@ -243,8 +257,8 @@ function AuthForm() {
     setError(null)
     setNotice(null)
     try {
-      await resetPassword(auth, email)
-      setNotice(t('account.reset_sent', { email: email.trim() }))
+      await resetPassword(auth, loginId)
+      setNotice(t('account.reset_sent', { email: loginId }))
     } catch (err) {
       setError(accountErrorKey(err))
     } finally {
@@ -284,7 +298,7 @@ function AuthForm() {
           />
           <Text variant="caption">{t(`account.${mode}_intro`)}</Text>
           <GoogleButton disabled={submitting} onError={setError} />
-          {usernameAvailable && (
+          {usernameAvailable && signingUp && (
             <Segmented<AuthMethod>
               value={method}
               options={[
@@ -301,7 +315,18 @@ function AuthForm() {
         </>
       )}
 
-      {needsUsername && (
+      {combinedLogin && (
+        <Field
+          label={t('account.identifier')}
+          value={identifier}
+          onChangeText={setIdentifier}
+          placeholder={t('account.identifier_placeholder')}
+          autoCapitalize="none"
+          autoComplete="username"
+          textContentType="username"
+        />
+      )}
+      {showUsername && (
         <Field
           label={t('account.username')}
           hint={signingUp ? t('account.username_hint') : undefined}
@@ -314,7 +339,7 @@ function AuthForm() {
           textContentType={usingUsername ? 'username' : 'nickname'}
         />
       )}
-      {!usingUsername && (
+      {showEmail && (
         <Field
           label={t('account.email')}
           value={email}

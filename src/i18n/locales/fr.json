@@ -714,6 +714,8 @@
       "cancelled": "Connexion annulée."
     },
     "google": "Continuer avec Google",
+    "identifier": "Email ou pseudo",
+    "identifier_placeholder": "toi@exemple.com ou ton pseudo",
     "or": "ou",
     "choose_title": "Choisis ton pseudo",
     "choose_intro": "C’est sous ce nom que tes scores apparaîtront. Il sera réservé à ton compte.",

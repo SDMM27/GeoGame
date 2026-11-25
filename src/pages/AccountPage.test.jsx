@@ -10,6 +10,8 @@ const auth = vi.hoisted(() => ({
   signUp: vi.fn(),
   signIn: vi.fn(),
   recover: vi.fn(),
+  signInEmail: vi.fn(),
+  resetPassword: vi.fn(),
 }))
 
 vi.mock('../auth', () => ({
@@ -17,6 +19,11 @@ vi.mock('../auth', () => ({
   useAccount: () => ({ loading: false, account: null }),
 }))
 vi.mock('../components/NavBar', () => ({ default: () => null }))
+vi.mock('../utils/account', async (importOriginal) => ({
+  ...(await importOriginal()),
+  signIn: auth.signInEmail,
+  resetPassword: auth.resetPassword,
+}))
 vi.mock('../utils/usernameAccount', () => ({
   USERNAME_PASSWORD_MIN: 15,
   usernameAccountAvailable: auth.available,
@@ -32,6 +39,11 @@ function renderAccount() {
 
 function fillUsernameAndPassword(username, password) {
   fireEvent.change(screen.getByPlaceholderText(labels.username_placeholder), { target: { value: username } })
+  fireEvent.change(screen.getByLabelText(new RegExp(labels.password, 'i')), { target: { value: password } })
+}
+
+function fillIdentifierAndPassword(identifier, password) {
+  fireEvent.change(screen.getByPlaceholderText(labels.identifier_placeholder), { target: { value: identifier } })
   fireEvent.change(screen.getByLabelText(new RegExp(labels.password, 'i')), { target: { value: password } })
 }
 
@@ -51,6 +63,7 @@ describe('username accounts', () => {
 
     await waitFor(() => expect(auth.available).toHaveBeenCalledOnce())
     expect(screen.queryByRole('button', { name: labels.method_username })).not.toBeInTheDocument()
+    expect(screen.queryByLabelText(labels.identifier)).not.toBeInTheDocument()
     expect(screen.getByLabelText(labels.email)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: labels.google })).toBeInTheDocument()
   })
@@ -74,15 +87,41 @@ describe('username accounts', () => {
     fireEvent.click(screen.getByRole('button', { name: labels.recovery_saved }))
     expect(screen.queryByText('first-recovery-code')).not.toBeInTheDocument()
     expect(screen.getByLabelText(labels.password)).toHaveValue('')
-    fillUsernameAndPassword(username, password)
+    // Sign-in has a single email-or-username field, no email/username tabs.
+    expect(screen.queryByRole('button', { name: labels.method_username })).not.toBeInTheDocument()
+    fillIdentifierAndPassword(username, password)
     fireEvent.click(screen.getByRole('button', { name: labels.signin }))
     await waitFor(() => expect(auth.signIn).toHaveBeenCalledWith(auth, { username, password }))
+    expect(auth.signInEmail).not.toHaveBeenCalled()
   })
 
-  it('recovers a username account and shows the replacement code', async () => {
+  it('signs in with an email through the combined field', async () => {
+    renderAccount()
+    await waitFor(() => expect(screen.getByLabelText(labels.identifier)).toBeInTheDocument())
+
+    fillIdentifierAndPassword('toi@exemple.com', 'secret-password')
+    fireEvent.click(screen.getByRole('button', { name: labels.signin }))
+
+    await waitFor(() => expect(auth.signInEmail).toHaveBeenCalledWith(auth, { email: 'toi@exemple.com', password: 'secret-password' }))
+    expect(auth.signIn).not.toHaveBeenCalled()
+  })
+
+  it('sends an email reset when the combined identifier is an email', async () => {
+    auth.resetPassword.mockResolvedValue(undefined)
+    renderAccount()
+    await waitFor(() => expect(screen.getByLabelText(labels.identifier)).toBeInTheDocument())
+
+    fireEvent.change(screen.getByPlaceholderText(labels.identifier_placeholder), { target: { value: 'toi@exemple.com' } })
+    fireEvent.click(screen.getByRole('button', { name: labels.forgot }))
+
+    await waitFor(() => expect(auth.resetPassword).toHaveBeenCalledWith(auth, 'toi@exemple.com'))
+  })
+
+  it('recovers a username account from the combined field and shows the replacement code', async () => {
     auth.recover.mockResolvedValue('replacement-recovery-code')
     renderAccount()
-    await selectUsernameMethod()
+    await waitFor(() => expect(screen.getByLabelText(labels.identifier)).toBeInTheDocument())
+    fireEvent.change(screen.getByPlaceholderText(labels.identifier_placeholder), { target: { value: 'Atlas' } })
     fireEvent.click(screen.getByRole('button', { name: labels.forgot }))
     expect(screen.getByRole('heading', { name: labels.recover_title })).toBeInTheDocument()
     expect(screen.getByText(labels.recovery_wait_hint)).toBeInTheDocument()

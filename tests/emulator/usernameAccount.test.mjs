@@ -98,15 +98,10 @@ it('restores username ownership after a native provider link or direct Auth eras
 })
 
 it('shares rate limits across network addresses and renews them in the next time window', async () => {
-  vi.stubEnv('USERNAME_AUTH_PEPPER', 'a'.repeat(64))
-  try {
-    const now = Date.now()
-    const key = `rate-test-${now}`
-    const attempt = (index, time = now) => checkRateLimit(db, { ip: `192.0.2.${index + 1}`, key, action: 'signup' }, time)
-    for (let index = 0; index < 6; index += 1) expect(await attempt(index)).toBe(true)
-    expect(await attempt(6)).toBe(false)
-    expect(await attempt(6, now + 15 * 60 * 1000)).toBe(true)
-  } finally {
-    vi.unstubAllEnvs()
-  }
+  const now = Date.now()
+  const key = `rate-test-${now}`
+  const attempt = (index, time = now) => checkRateLimit(db, { ip: `192.0.2.${index + 1}`, key, action: 'signup' }, time)
+  for (let index = 0; index < 6; index += 1) expect(await attempt(index)).toBe(true)
+  expect(await attempt(6)).toBe(false)
+  expect(await attempt(6, now + 15 * 60 * 1000)).toBe(true)
 })

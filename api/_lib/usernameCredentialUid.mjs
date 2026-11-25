@@ -5,6 +5,12 @@ export function isUsernameCredentialUid(uid) {
   return typeof uid === 'string' && uid.startsWith(PREFIX)
 }
 
+export function playerUidForUsernameCredential(uid) {
+  if (!isUsernameCredentialUid(uid)) return null
+  const playerUid = uid.slice(PREFIX.length)
+  return PLAYER_UID.test(playerUid) ? playerUid : null
+}
+
 export function usernameCredentialUid(uid) {
   if (typeof uid !== 'string' || !PLAYER_UID.test(uid)) throw new Error('Invalid player UID for username credential')
   return `${PREFIX}${uid}`

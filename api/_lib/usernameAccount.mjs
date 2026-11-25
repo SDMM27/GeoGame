@@ -107,13 +107,21 @@ async function lookup(db, key) {
 
 const sameActive = (snapshot, revision) => snapshot.data()?.state === 'active' && snapshot.data()?.revision === revision
 
-async function signin({ issueToken, provider, account, password }) {
+async function signin({ db, issueToken, provider, account, password }) {
   if (account?.data.state !== 'active' || !await provider.verify(account.uid, password)) {
     return failure(401, 'wrong_credentials')
   }
   const token = await issueToken(account.uid)
-  // The password may have changed (or the account may have been deleted) during verification.
-  if (!sameActive(await account.ref.get(), account.data.revision)) return failure(401, 'wrong_credentials')
+  const current = await db.runTransaction(async (transaction) => {
+    const snapshot = await transaction.get(account.ref)
+    // Check for concurrent recovery or deletion and clear any stale inactivity observation.
+    if (!sameActive(snapshot, account.data.revision)) return false
+    if (snapshot.data().missingPlayerSince != null) {
+      transaction.update(account.ref, { missingPlayerSince: FieldValue.delete() })
+    }
+    return true
+  })
+  if (!current) return failure(401, 'wrong_credentials')
   return reply(200, { token, uid: account.uid })
 }
 
@@ -217,16 +225,18 @@ async function rotate({ db, auth, provider, account, password, idToken }) {
 // Also called by inactive-account cleanup. A deletion tombstone blocks signin/recovery if Auth is
 // temporarily unreachable. The provider's delete operation is idempotent, including for a missing user.
 export async function removeUsernameCredential({
-  db, auth, uid, getProvider, clock = Date.now, wait = delay, exchangeWindowSeconds = 0, deferWait = false,
+  db, auth, uid, getProvider, clock = Date.now, wait = delay, exchangeWindowSeconds = 0, deferWait = false, expectedMissingSince,
 }) {
-  if (!USERNAME_UID_PATTERN.test(uid)) return null
+  const absent = expectedMissingSince === undefined ? null : { skipped: true }
+  if (!USERNAME_UID_PATTERN.test(uid)) return absent
   const ref = credentialsRef(db, uid)
-  if (!(await ref.get()).exists) return null
+  if (!(await ref.get()).exists) return absent
   const provider = getProvider()
   if (!provider) throw new Error('Username password provider unavailable for deletion')
   const remove = await db.runTransaction(async (transaction) => {
     const data = (await transaction.get(ref)).data()
     if (!data) return false
+    if (expectedMissingSince !== undefined && (data.state !== 'active' || data.missingPlayerSince !== expectedMissingSince)) return false
     if (data.state === 'recovering' && data.leaseUntil > clock()) throw new Error('Username recovery in progress')
     if (['provisioning', 'discarding'].includes(data.state)) throw new Error('Username provisioning in progress')
     if (data.state !== 'deleting') {
@@ -234,9 +244,9 @@ export async function removeUsernameCredential({
     }
     return true
   })
-  if (!remove) return null
+  if (!remove) return absent
   const marker = (await ref.get()).data()
-  if (!marker) return null
+  if (!marker) return absent
 
   // Disable Firebase sign-in while previously issued custom tokens can still be exchanged.
   // Deleting the Firebase user immediately would let a surviving token create it again.
@@ -279,7 +289,7 @@ export async function usernameAccount({
     return signup({ db, auth, provider, username, key, password, clock })
   }
   const account = await lookup(db, key)
-  if (action === 'signin') return signin({ issueToken, provider, account, password })
+  if (action === 'signin') return signin({ db, issueToken, provider, account, password })
   if (action === 'rotate') return rotate({ db, auth, provider, account, password, idToken })
 
   const recoveryCode = typeof body.recoveryCode === 'string' ? body.recoveryCode.trim() : ''

@@ -91,7 +91,7 @@ Avant d'activer l'option, vérifier l'inscription, la reconnexion sur un second 
 
 Les mots de passe sont vérifiés par Cognito. À l'inscription et à la récupération, [Pwned Passwords](https://haveibeenpwned.com/api/v3/#PwnedPasswords) reçoit un préfixe de cinq caractères du hash pour le contrôle des fuites. En cas d'indisponibilité de ce contrôle, seuls l'inscription et le changement de mot de passe sont interrompus. Firestore conserve le hash du code de secours et les compteurs d'essais sous des identifiants calculés côté serveur. Ces collections sont réservées au serveur par les règles Firestore.
 
-En production, le jeton intermédiaire de connexion doit être échangé dans les 30 secondes. Lors d'une récupération, l'API bloque les nouvelles connexions, attend la fin de cette fenêtre, puis révoque les jetons de renouvellement Firebase. Les jetons d'identité déjà délivrés peuvent rester valides jusqu'à leur expiration sur les accès qui ne vérifient pas la révocation. Conserver la configuration du pool tant que des comptes en dépendent, y compris pour terminer les suppressions.
+En production, le jeton intermédiaire de connexion doit être échangé dans les 30 secondes. Lors d'une récupération, l'API bloque les nouvelles connexions, retire les méthodes qui auraient été liées directement dans Firebase, attend la fin de cette fenêtre, puis révoque les jetons de renouvellement Firebase. Les jetons d'identité déjà délivrés peuvent rester valides jusqu'à leur expiration sur les accès qui ne vérifient pas la révocation. Conserver la configuration du pool tant que des comptes en dépendent, y compris pour terminer les suppressions.
 
 ## Firestore
 

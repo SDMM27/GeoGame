@@ -135,6 +135,15 @@ describe('cleanupExpired', () => {
     expect((await cleanupExpired({ db, now: NOW }))._clockSync).toBe(450)
     expect((await db.collection('_clockSync').get()).size).toBe(0)
   })
+
+  it('deletes expired username-auth counters while keeping active limits', async () => {
+    await db.doc('usernameAuthLimits/expired').set({ count: 3, expiresAt: NOW - 1000 })
+    await db.doc('usernameAuthLimits/current').set({ count: 2, expiresAt: NOW + 1000 })
+
+    expect((await cleanupExpired({ db, now: NOW })).usernameAuthLimits).toBe(1)
+    expect(await exists('usernameAuthLimits/expired')).toBe(false)
+    expect(await exists('usernameAuthLimits/current')).toBe(true)
+  })
 })
 
 describe('GET /api/cleanup-expired', () => {

@@ -74,9 +74,18 @@ function fixtures({ exchangeWindowSeconds = 0 } = {}) {
   }
   const users = new Map()
   const auth = {
-    createUser: vi.fn(async (user) => users.set(user.uid, user)),
+    createUser: vi.fn(async (user) => {
+      const identity = { disabled: false, providerData: [], ...user }
+      users.set(user.uid, identity)
+      return identity
+    }),
     deleteUser: vi.fn(async (uid) => users.delete(uid)),
-    updateUser: vi.fn(async (uid, data) => users.set(uid, { ...users.get(uid), ...data })),
+    updateUser: vi.fn(async (uid, data) => {
+      if (!users.has(uid)) throw Object.assign(new Error('missing user'), { code: 'auth/user-not-found' })
+      const identity = { ...users.get(uid), ...data }
+      users.set(uid, identity)
+      return identity
+    }),
     createCustomToken: vi.fn(async (uid) => `custom:${uid}`),
     verifyIdToken: vi.fn(async () => ({ uid: 'someone-else' })),
     revokeRefreshTokens: vi.fn(async () => {}),
@@ -109,7 +118,7 @@ describe('username account', () => {
   it('creates a Firebase account without email and signs in case-insensitively with the right password', async () => {
     const fixture = fixtures()
     const { uid, code, credential } = await register(fixture)
-    expect(fixture.users.get(uid)).toEqual({ uid, displayName: username })
+    expect(fixture.users.get(uid)).toEqual({ uid, displayName: username, disabled: false, providerData: [] })
     expect(fixture.docs.get(`users/${uid}`)).toMatchObject({ username, usernameKey, usernamePassword: true })
     expect(fixture.docs.get(credential).recoveryHash).toMatch(/^[0-9a-f]{64}$/)
     expect(JSON.stringify([...fixture.docs])).not.toContain(code)
@@ -197,13 +206,27 @@ describe('username account', () => {
 
   it('can retry recovery after the provider succeeds but Firebase revocation fails', async () => {
     const fixture = fixtures()
-    const { code } = await register(fixture)
+    const { code, uid } = await register(fixture)
     fixture.auth.revokeRefreshTokens.mockRejectedValueOnce(new Error('revocation unavailable'))
     await expect(fixture.call('recover', { password: nextPassword, recoveryCode: code })).rejects.toThrow('revocation unavailable')
+    expect(fixture.users.get(uid).disabled).toBe(true)
     expect((await fixture.call('signin', { password: nextPassword })).status).toBe(401)
     fixture.clock.mockReturnValue(3 * 60 * 1000)
     expect((await fixture.call('recover', { password: nextPassword, recoveryCode: code })).status).toBe(200)
+    expect(fixture.users.get(uid).disabled).toBe(false)
     expect((await fixture.call('signin', { password: nextPassword })).status).toBe(200)
+  })
+
+  it('keeps the code valid when the missing Firebase identity cannot be restored', async () => {
+    const fixture = fixtures()
+    const { code, uid } = await register(fixture)
+    fixture.users.delete(uid)
+    fixture.auth.createUser.mockRejectedValueOnce(new Error('restoration unavailable'))
+    await expect(fixture.call('recover', { password: nextPassword, recoveryCode: code })).rejects.toThrow('restoration unavailable')
+    expect(fixture.provider.setPassword).not.toHaveBeenCalled()
+    fixture.clock.mockReturnValue(3 * 60 * 1000)
+    expect((await fixture.call('recover', { password: nextPassword, recoveryCode: code })).status).toBe(200)
+    expect(fixture.users.get(uid)).toMatchObject({ uid, displayName: username, disabled: false })
   })
 
   it('waits for pre-recovery Firebase custom tokens to expire before revoking sessions', async () => {

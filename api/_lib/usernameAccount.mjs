@@ -17,6 +17,10 @@ const directoryRef = (db, key) => db.doc(`usernames/${key}`)
 const newCode = () => randomBytes(16).toString('base64url')
 const hashCode = (code) => createHash('sha256').update(code).digest('hex')
 
+export async function hasUsernameCredential(db, uid) {
+  return typeof uid === 'string' && USERNAME_UID_PATTERN.test(uid) && (await credentialsRef(db, uid).get()).exists
+}
+
 function validRecoveryCode(code, hash) {
   return typeof hash === 'string' && /^[a-f0-9]{64}$/.test(hash)
     && timingSafeEqual(Buffer.from(hashCode(code), 'hex'), Buffer.from(hash, 'hex'))
@@ -94,11 +98,11 @@ async function signup({ db, auth, provider, username, key, password, clock }) {
 }
 
 async function lookup(db, key) {
-  const uid = (await directoryRef(db, key).get()).data()?.uid
+  const { uid, username } = (await directoryRef(db, key).get()).data() ?? {}
   if (typeof uid !== 'string' || !USERNAME_UID_PATTERN.test(uid)) return null
   const ref = credentialsRef(db, uid)
   const data = (await ref.get()).data()
-  return data?.key === key ? { uid, ref, data } : null
+  return data?.key === key ? { uid, username, ref, data } : null
 }
 
 const sameActive = (snapshot, revision) => snapshot.data()?.state === 'active' && snapshot.data()?.revision === revision
@@ -113,9 +117,41 @@ async function signin({ issueToken, provider, account, password }) {
   return reply(200, { token, uid: account.uid })
 }
 
+async function disableAndUnlinkIdentity(auth, uid, username) {
+  const disable = () => auth.updateUser(uid, { disabled: true, displayName: username })
+  let user
+  try {
+    user = await disable()
+  } catch (error) {
+    if (error?.code !== 'auth/user-not-found') throw error
+    // A holder of a Firebase session can delete the Auth record directly. Firestore and Cognito
+    // still identify the original account, so restore only the disabled identity at its original UID.
+    try {
+      user = await auth.createUser({ uid, displayName: username, disabled: true })
+    } catch (error) {
+      if (error?.code !== 'auth/uid-already-exists') throw error
+      user = await disable()
+    }
+  }
+
+  const providers = new Set(user.providerData.map(({ providerId }) => providerId))
+  if (user.email) providers.add('password')
+  if (user.phoneNumber) providers.add('phone')
+  const hasFactors = (identity) => Boolean(identity.multiFactor?.enrolledFactors.length)
+  if (providers.size || hasFactors(user)) {
+    user = await auth.updateUser(uid, {
+      providersToUnlink: [...providers],
+      multiFactor: { enrolledFactors: null },
+    })
+  }
+  if (!user.disabled || user.providerData.length || user.email || user.phoneNumber || hasFactors(user)) {
+    throw new Error('Username Firebase identity could not be isolated')
+  }
+}
+
 async function recover({ db, auth, provider, account, password, recoveryCode, clock, wait, exchangeWindowSeconds }) {
   if (!account) return failure(401, 'invalid_recovery_code')
-  const { uid, ref } = account
+  const { uid, ref, username } = account
   const operation = randomUUID()
   const lock = await db.runTransaction(async (transaction) => {
     const data = (await transaction.get(ref)).data()
@@ -134,14 +170,29 @@ async function recover({ db, auth, provider, account, password, recoveryCode, cl
 
   // Keep the current code usable after the lease expires if Cognito or Firebase fails mid-recovery.
   // The credential is unavailable for sign-in until both writes and the final transaction finish.
+  await disableAndUnlinkIdentity(auth, uid, username)
   await provider.setPassword(uid, password)
   const remaining = revokeAfter - clock()
   if (remaining > 0) await wait(remaining)
   await auth.revokeRefreshTokens(uid)
+
+  // Renew the matching lease before re-enabling Firebase. A concurrent retry or deletion may
+  // not change ownership while we make the external write and commit the replacement code.
+  const requireCurrentLease = async (transaction) => {
+    const data = (await transaction.get(ref)).data()
+    if (data?.state !== 'recovering' || data.operation !== operation || data.leaseUntil <= clock()) {
+      throw new Error('Username recovery lease lost')
+    }
+    return data
+  }
+  await db.runTransaction(async (transaction) => {
+    await requireCurrentLease(transaction)
+    transaction.update(ref, { leaseUntil: clock() + RECOVERY_MS })
+  })
+  await auth.updateUser(uid, { disabled: false })
   const replacement = newCode()
   await db.runTransaction(async (transaction) => {
-    const data = (await transaction.get(ref)).data()
-    if (data?.state !== 'recovering' || data.operation !== operation) throw new Error('Username recovery lease lost')
+    const data = await requireCurrentLease(transaction)
     transaction.set(ref, { key: data.key, recoveryHash: hashCode(replacement), revision: data.revision + 1, state: 'active' })
   })
   return reply(200, { recoveryCode: replacement })
@@ -206,7 +257,7 @@ export async function removeUsernameCredential({
 
 export async function usernameAccount({
   db, auth, provider, body, idToken, ip, clock = Date.now, allow = checkRateLimit, validatePassword = checkNewPassword,
-  issueToken = (uid) => auth.createCustomToken(uid), wait = delay, exchangeWindowSeconds = 0,
+  issueToken = (uid) => auth.createCustomToken(uid, { geogameUsernamePassword: true }), wait = delay, exchangeWindowSeconds = 0,
 }) {
   if (!provider) return failure(503, 'not_enabled')
   const { action, password } = body ?? {}

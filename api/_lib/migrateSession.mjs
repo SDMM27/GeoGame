@@ -15,8 +15,9 @@ function tokenUrl(env) {
     : `https://securetoken.googleapis.com/v1/token?key=${key}`
 }
 
-// `auth`: firebase-admin Auth. `fetchImpl` and `env` can be replaced by tests.
-export async function migrateSession({ auth, refreshToken, fetchImpl = fetch, env = process.env }) {
+// `auth`: firebase-admin Auth. The lookup checks server-only username credentials even if a
+// Firebase-native provider is linked to that account and the new session lacks the bridge claim.
+export async function migrateSession({ auth, refreshToken, isUsernameAccount, fetchImpl = fetch, env = process.env }) {
   if (typeof refreshToken !== 'string' || !refreshToken) return reply(401, { error: 'unauthenticated' })
 
   let response
@@ -47,5 +48,6 @@ export async function migrateSession({ auth, refreshToken, fetchImpl = fetch, en
   } catch {
     return reply(401, { error: 'unauthenticated' })
   }
+  if (await isUsernameAccount(decoded.uid)) return reply(401, { error: 'unauthenticated' })
   return reply(200, { token: await auth.createCustomToken(decoded.uid) })
 }

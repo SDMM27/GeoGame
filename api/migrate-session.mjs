@@ -4,8 +4,10 @@
 // FIREBASE_AUTH_EMULATOR_HOST replace the key.
 import { cert, getApps, initializeApp } from 'firebase-admin/app'
 import { getAuth } from 'firebase-admin/auth'
+import { getFirestore } from 'firebase-admin/firestore'
 
 import { migrateSession } from './_lib/migrateSession.mjs'
+import { hasUsernameCredential } from './_lib/usernameAccount.mjs'
 import usernameAccountHandler from './_lib/usernameAccountRoute.mjs'
 
 function adminApp() {
@@ -25,7 +27,12 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'method_not_allowed' })
 
   try {
-    const { status, body } = await migrateSession({ auth: getAuth(adminApp()), refreshToken: req.body?.refreshToken })
+    const app = adminApp()
+    const { status, body } = await migrateSession({
+      auth: getAuth(app),
+      refreshToken: req.body?.refreshToken,
+      isUsernameAccount: (uid) => hasUsernameCredential(getFirestore(app), uid),
+    })
     return res.status(status).json(body)
   } catch (error) {
     console.error('[migrate-session]', error)

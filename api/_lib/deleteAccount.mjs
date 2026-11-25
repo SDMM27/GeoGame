@@ -6,7 +6,7 @@
 // (elo, eloGains, eloDuelAccounts), the online status (presence/{uid}), then the Firebase Auth account. Rooms keep the pseudo until they expire (10 days at most, api/cleanup-expired.mjs).
 import { Timestamp } from 'firebase-admin/firestore'
 
-import { discardExpiredUsernameSignups, removeUsernameCredential } from './usernameAccount.mjs'
+import { discardExpiredUsernameSignups, hasUsernameCredential, removeUsernameCredential } from './usernameAccount.mjs'
 import { getUsernamePasswordProvider } from './usernameAccountProvider.mjs'
 import { USERNAME_TOKEN_EXCHANGE_SECONDS } from './usernameAccountToken.mjs'
 
@@ -103,6 +103,8 @@ export async function deleteAccount({ db, auth, idToken, now = Date.now() }) {
     return reply(401, { error: 'unauthenticated' })
   }
   if (now - decoded.auth_time * 1000 > RECENT_SIGN_IN_MS) return reply(403, { error: 'requires_recent_login' })
+  if ((decoded.firebase?.sign_in_provider !== 'custom' || decoded.geogameUsernamePassword !== true)
+    && await hasUsernameCredential(db, decoded.uid)) return reply(403, { error: 'requires_recent_login' })
   await deleteAccountData({ db, auth, uid: decoded.uid })
   return reply(200, { deleted: true })
 }

@@ -9,6 +9,7 @@ import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest'
 const [host, port] = process.env.FIRESTORE_EMULATOR_HOST.split(':')
 const now = () => firebase.firestore.FieldValue.serverTimestamp()
 const NBSP = String.fromCharCode(160)
+const CREDENTIAL_UID = 'username-credential:123e4567-e89b-42d3-a456-426614174000'
 
 let env
 
@@ -47,6 +48,34 @@ beforeEach(async () => {
     const db = context.firestore()
     await db.doc('usernames/alice').set({ uid: 'alice', username: 'Alice' })
     await db.doc('users/alice').set({ username: 'Alice' })
+  })
+})
+
+describe('credential-only Firebase identities', () => {
+  it('can read public profiles but cannot claim a player name', async () => {
+    const db = as(CREDENTIAL_UID)
+    await assertSucceeds(db.doc('users/alice').get())
+    await assertSucceeds(db.doc('usernames/alice').get())
+    await assertFails(claim(db, CREDENTIAL_UID, 'Credential'))
+  })
+
+  it('cannot act as a player even with an existing profile', async () => {
+    const profile = `users/${CREDENTIAL_UID}`
+    const device = `${profile}/pushTokens/ExponentPushToken[abc]`
+    await env.withSecurityRulesDisabled(async (context) => {
+      const db = context.firestore()
+      const batch = db.batch()
+      batch.set(db.doc(profile), { username: 'Credential', usernameKey: 'credential' })
+      batch.set(db.doc('usernames/credential'), { uid: CREDENTIAL_UID, username: 'Credential' })
+      batch.set(db.doc(device), { token: 'ExponentPushToken[abc]' })
+      await batch.commit()
+    })
+
+    const db = as(CREDENTIAL_UID)
+    await assertFails(db.doc(profile).update({ communityAt: now() }))
+    await assertFails(db.doc(`${profile}/games/round`).set(game()))
+    await assertFails(db.doc(device).get())
+    await assertFails(db.collection('scores').add(score({ name: 'Credential', uid: CREDENTIAL_UID })))
   })
 })
 

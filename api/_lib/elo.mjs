@@ -24,6 +24,7 @@ import countriesMeta from '../../src/data/countries.meta.json' with { type: 'jso
 import { MASTERY_MODES } from '../../src/utils/flagCollection.js'
 import { rankResults } from '../../src/utils/multiplayerScoring.js'
 import { GAME_TYPES } from '../../src/utils/gameTypes.js'
+import { callerUid as verifiedUid } from './playerAuth.mjs'
 import {
   ELO_MODES,
   QUESTION_START,
@@ -56,15 +57,6 @@ const MASTERY_KEYS = { [GAME_TYPES.PLACEMENT]: 'placement', [GAME_TYPES.FLAGS]: 
 const countryKey = (name) => name.replace(/\//g, '_')
 
 const dayFormatter = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit' })
-
-async function verifiedUid(auth, idToken) {
-  if (!idToken) return null
-  try {
-    return (await auth.verifyIdToken(idToken)).uid
-  } catch {
-    return null
-  }
-}
 
 // The answers of a solo request, checked; null when malformed or when no country is known. One per country (the
 // first one); a country missing from countries.meta.json is skipped rather than losing the whole batch.

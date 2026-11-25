@@ -1,93 +1,98 @@
-import { createHmac, randomBytes } from 'node:crypto'
-import {
-  AdminCreateUserCommand,
-  AdminDeleteUserCommand,
-  AdminInitiateAuthCommand,
-  AdminSetUserPasswordCommand,
-  CognitoIdentityProviderClient,
-} from '@aws-sdk/client-cognito-identity-provider'
-import { awsCredentialsProvider } from '@vercel/oidc-aws-credentials-provider'
+import { randomBytes } from 'node:crypto'
 
+import { WEB_API_KEY } from './migrateSession.mjs'
+import { usernameCredentialUid } from './usernameCredentialUid.mjs'
+
+const ALIAS_DOMAIN = 'accounts.geogame.invalid'
+const ALIAS = /^[0-9a-f]{48}@accounts\.geogame\.invalid$/
 const TIMEOUT_MS = 8000
+const INVALID_PROOF = new Set(['EMAIL_NOT_FOUND', 'INVALID_PASSWORD', 'INVALID_LOGIN_CREDENTIALS', 'USER_DISABLED'])
+const THROTTLED = new Set(['QUOTA_EXCEEDED', 'TOO_MANY_ATTEMPTS_TRY_LATER', 'TOO_MANY_REQUESTS'])
 
-export function getUsernamePasswordProvider() {
-  const {
-    USERNAME_AUTH_POOL_ID: userPoolId,
-    USERNAME_AUTH_CLIENT_ID: clientId,
-    USERNAME_AUTH_PEPPER: pepper,
-    USERNAME_AUTH_AWS_ROLE_ARN: roleArn,
-  } = process.env
-  if (!userPoolId || !clientId || !/^[\da-f]{64}$/i.test(pepper ?? '')) return null
-  if (process.env.VERCEL === '1' && !roleArn) return null
+function providerError(code) {
+  const failure = new Error('Username credential provider error')
+  if (THROTTLED.has(code) || code === 'auth/too-many-requests') failure.code = 'too_many_requests'
+  return failure
+}
 
-  const region = userPoolId.split('_')[0]
-  const credentials = roleArn ? awsCredentialsProvider({ roleArn, clientConfig: { region } }) : undefined
-  const client = new CognitoIdentityProviderClient({ region, credentials, maxAttempts: 1 })
-  const send = (command) => client.send(command, { abortSignal: AbortSignal.timeout(TIMEOUT_MS) })
+function passwordUrl(env) {
+  const host = env.FIREBASE_AUTH_EMULATOR_HOST
+    ? `http://${env.FIREBASE_AUTH_EMULATOR_HOST}/identitytoolkit.googleapis.com`
+    : 'https://identitytoolkit.googleapis.com'
+  const key = encodeURIComponent(env.FIREBASE_WEB_API_KEY || WEB_API_KEY)
+  return `${host}/v1/accounts:signInWithPassword?key=${key}`
+}
 
-  // Cognito's admin password endpoint forbids spaces. A keyed, account-specific encoding lets users
-  // choose passphrases and keeps Cognito responsible for hashing and verifying stored credentials.
-  function providerPassword(uid, password) {
-    const hash = createHmac('sha256', Buffer.from(pepper, 'hex'))
-      .update('geogame-username-password-v1\0')
-      .update(uid)
-      .update('\0')
-      .update(password.normalize('NFC'))
-      .digest('base64url')
-    return `Aa1!${hash}`
+export function getUsernamePasswordProvider(auth, env = process.env, fetchImpl = fetch) {
+  async function getCredential(uid) {
+    let user
+    try {
+      user = await auth.getUser(uid)
+    } catch (error) {
+      if (error?.code === 'auth/user-not-found') return null
+      throw providerError(error?.code)
+    }
+    if (user.uid !== uid || !ALIAS.test(user.email ?? '')) throw providerError()
+    return user
   }
 
-  async function setPassword(uid, password) {
+  async function create(uid, password) {
     try {
-      await send(new AdminSetUserPasswordCommand({
-        UserPoolId: userPoolId, Username: uid, Password: providerPassword(uid, password), Permanent: true,
-      }))
+      await auth.createUser({
+        uid, email: `${randomBytes(24).toString('hex')}@${ALIAS_DOMAIN}`, password: password.normalize('NFC'),
+      })
     } catch (error) {
-      throw providerError(error)
+      throw providerError(error?.code)
     }
   }
 
   return {
-    async create(uid, password) {
-      try {
-        await send(new AdminCreateUserCommand({
-          UserPoolId: userPoolId,
-          Username: uid,
-          MessageAction: 'SUPPRESS',
-          TemporaryPassword: `Aa1!${randomBytes(32).toString('base64url')}`,
-        }))
-      } catch (error) {
-        throw providerError(error)
-      }
-      await setPassword(uid, password)
-    },
+    create: async (uid, password) => create(usernameCredentialUid(uid), password),
     async verify(uid, password) {
+      const credential = await getCredential(usernameCredentialUid(uid))
+      if (!credential || credential.disabled) return false
+      let response
+      let result
       try {
-        const result = await send(new AdminInitiateAuthCommand({
-          UserPoolId: userPoolId,
-          ClientId: clientId,
-          AuthFlow: 'ADMIN_USER_PASSWORD_AUTH',
-          AuthParameters: { USERNAME: uid, PASSWORD: providerPassword(uid, password) },
-        }))
-        return !!result.AuthenticationResult?.AccessToken && !result.ChallengeName
+        response = await fetchImpl(passwordUrl(env), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: credential.email, password: password.normalize('NFC'), returnSecureToken: true }),
+          redirect: 'error',
+          signal: AbortSignal.timeout(TIMEOUT_MS),
+        })
+        result = await response.json()
+      } catch {
+        throw providerError()
+      }
+      if (!response.ok) {
+        const message = result?.error?.message
+        const code = typeof message === 'string' ? message.split(' : ')[0] : undefined
+        if (response.status === 400 && INVALID_PROOF.has(code)) return false
+        throw providerError(response.status === 429 ? 'TOO_MANY_REQUESTS' : code)
+      }
+      // The credential session has no place in a player client. Retain only whether the UID matches.
+      if (result?.localId !== credential.uid) throw providerError()
+      return true
+    },
+    async setPassword(uid, password) {
+      const credentialUid = usernameCredentialUid(uid)
+      if (!await getCredential(credentialUid)) return create(credentialUid, password)
+      try {
+        await auth.updateUser(credentialUid, { password: password.normalize('NFC'), disabled: false })
       } catch (error) {
-        if (['NotAuthorizedException', 'UserNotFoundException'].includes(error?.name)) return false
-        throw providerError(error)
+        if (error?.code === 'auth/user-not-found') return create(credentialUid, password)
+        throw providerError(error?.code)
       }
     },
-    setPassword,
     async remove(uid) {
+      const credentialUid = usernameCredentialUid(uid)
+      if (!await getCredential(credentialUid)) return
       try {
-        await send(new AdminDeleteUserCommand({ UserPoolId: userPoolId, Username: uid }))
+        await auth.deleteUser(credentialUid)
       } catch (error) {
-        if (error?.name !== 'UserNotFoundException') throw providerError(error)
+        if (error?.code !== 'auth/user-not-found') throw providerError(error?.code)
       }
     },
   }
-}
-
-function providerError(error) {
-  const failure = new Error('Username credential provider error')
-  if (error?.name === 'TooManyRequestsException') failure.code = 'too_many_requests'
-  return failure
 }

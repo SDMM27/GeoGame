@@ -21,7 +21,7 @@ export default {
           {
             list: [
               'il tuo indirizzo email se ti registri con un indirizzo email o accedi con Google. Firebase Authentication gestisce la password degli account creati con un indirizzo email. Se accedi con Google, riceviamo anche l’identificativo del tuo account Google (Google può trasmettere anche il tuo nome e la tua foto profilo, che non usiamo);',
-              'se crei un account con nome utente e password, non ti chiediamo un indirizzo email. Il nostro server elabora brevemente la password. Amazon Cognito conserva i dati necessari per verificarla. GeoGame conserva solo un hash del codice di recupero;',
+              'se crei un account con nome utente e password, non ti chiediamo un indirizzo email personale. Il nostro server elabora brevemente la password. Firebase Authentication la verifica tramite un alias tecnico generato automaticamente, che non può ricevere messaggi. GeoGame conserva solo un hash del codice di recupero;',
               "il tuo nome utente, la data di creazione dell'account e le date di accesso;",
               'la cronologia delle tue partite (gioco, modalità, punteggio, tempo, data) e i tuoi punteggi nelle classifiche, comprese le risposte provate nelle sfide del giorno;',
               'le tue richieste di amicizia, i tuoi amici e gli inviti alle stanze che invii o ricevi;',
@@ -61,7 +61,6 @@ export default {
           {
             list: [
               'Google (Firebase Authentication, Cloud Firestore, App Check, reCAPTCHA Enterprise): account, database e protezione dagli abusi;',
-              'Amazon Web Services (Amazon Cognito): autenticazione degli account senza email;',
               'Vercel Inc.: hosting del sito e delle funzioni server, misurazione del pubblico;',
               "Expo (650 Industries, Inc.): invio delle notifiche e degli aggiornamenti dell'app;",
               'servizi push dei browser (Apple, Google, Mozilla o Microsoft a seconda del dispositivo): invio delle notifiche della web app;',

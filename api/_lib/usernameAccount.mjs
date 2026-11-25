@@ -21,6 +21,11 @@ export async function hasUsernameCredential(db, uid) {
   return typeof uid === 'string' && USERNAME_UID_PATTERN.test(uid) && (await credentialsRef(db, uid).get()).exists
 }
 
+export function canObserveMissingUsernamePlayer(data, now) {
+  return data?.state === 'active'
+    || (data?.state === 'recovering' && Number.isFinite(data.leaseUntil) && data.leaseUntil <= now)
+}
+
 function validRecoveryCode(code, hash) {
   return typeof hash === 'string' && /^[a-f0-9]{64}$/.test(hash)
     && timingSafeEqual(Buffer.from(hashCode(code), 'hex'), Buffer.from(hash, 'hex'))
@@ -92,7 +97,7 @@ async function signup({ db, auth, provider, username, key, password, clock }) {
     if (provisioned) await discardProvisioning({ db, auth, provider, ref }).catch(() => {})
     throw error
   }
-  // The same name can be claimed by email/Google during Cognito account creation.
+  // The same name can be claimed by email/Google while the password identity is created.
   await discardProvisioning({ db, auth, provider, ref })
   return failure(409, 'username_taken')
 }
@@ -107,13 +112,21 @@ async function lookup(db, key) {
 
 const sameActive = (snapshot, revision) => snapshot.data()?.state === 'active' && snapshot.data()?.revision === revision
 
-async function signin({ issueToken, provider, account, password }) {
+async function signin({ db, issueToken, provider, account, password }) {
   if (account?.data.state !== 'active' || !await provider.verify(account.uid, password)) {
     return failure(401, 'wrong_credentials')
   }
   const token = await issueToken(account.uid)
-  // The password may have changed (or the account may have been deleted) while Cognito verified it.
-  if (!sameActive(await account.ref.get(), account.data.revision)) return failure(401, 'wrong_credentials')
+  const current = await db.runTransaction(async (transaction) => {
+    const snapshot = await transaction.get(account.ref)
+    // Check for concurrent recovery or deletion and clear any stale inactivity observation.
+    if (!sameActive(snapshot, account.data.revision)) return false
+    if (snapshot.data().missingPlayerSince != null) {
+      transaction.update(account.ref, { missingPlayerSince: FieldValue.delete() })
+    }
+    return true
+  })
+  if (!current) return failure(401, 'wrong_credentials')
   return reply(200, { token, uid: account.uid })
 }
 
@@ -124,8 +137,8 @@ async function disableAndUnlinkIdentity(auth, uid, username) {
     user = await disable()
   } catch (error) {
     if (error?.code !== 'auth/user-not-found') throw error
-    // A holder of a Firebase session can delete the Auth record directly. Firestore and Cognito
-    // still identify the original account, so restore only the disabled identity at its original UID.
+    // A holder of a Firebase session can delete the Auth record directly. Restore the disabled
+    // player identity at its original UID using the authoritative username record.
     try {
       user = await auth.createUser({ uid, displayName: username, disabled: true })
     } catch (error) {
@@ -140,8 +153,8 @@ async function disableAndUnlinkIdentity(auth, uid, username) {
   const hasFactors = (identity) => Boolean(identity.multiFactor?.enrolledFactors.length)
   if (providers.size || hasFactors(user)) {
     user = await auth.updateUser(uid, {
-      providersToUnlink: [...providers],
-      multiFactor: { enrolledFactors: null },
+      ...(providers.size ? { providersToUnlink: [...providers] } : {}),
+      ...(hasFactors(user) ? { multiFactor: { enrolledFactors: null } } : {}),
     })
   }
   if (!user.disabled || user.providerData.length || user.email || user.phoneNumber || hasFactors(user)) {
@@ -160,7 +173,10 @@ async function recover({ db, auth, provider, account, password, recoveryCode, cl
     }
     const now = clock()
     if (data.state === 'recovering' && data.leaseUntil > now) return 'too_many_requests'
-    transaction.update(ref, { state: 'recovering', operation, leaseUntil: now + RECOVERY_MS })
+    transaction.update(ref, {
+      state: 'recovering', operation, leaseUntil: now + RECOVERY_MS,
+      ...(data.missingPlayerSince != null ? { missingPlayerSince: FieldValue.delete() } : {}),
+    })
     return null
   })
   if (lock) return failure(lock === 'too_many_requests' ? 429 : 401, lock)
@@ -168,7 +184,7 @@ async function recover({ db, auth, provider, account, password, recoveryCode, cl
   // custom token expires, then move the whole-second Firebase refresh-token cutoff past it.
   const revokeAfter = (Math.floor(clock() / 1000) + exchangeWindowSeconds + 1) * 1000
 
-  // Keep the current code usable after the lease expires if Cognito or Firebase fails mid-recovery.
+  // Keep the current code usable after the lease expires if Firebase fails mid-recovery.
   // The credential is unavailable for sign-in until both writes and the final transaction finish.
   await disableAndUnlinkIdentity(auth, uid, username)
   await provider.setPassword(uid, password)
@@ -214,29 +230,35 @@ async function rotate({ db, auth, provider, account, password, idToken }) {
   return changed ? reply(200, { recoveryCode }) : failure(401, 'wrong_credentials')
 }
 
-// Also called by inactive-account cleanup. A deletion tombstone blocks signin/recovery if Cognito is
+// Also called by inactive-account cleanup. A deletion tombstone blocks signin/recovery if Auth is
 // temporarily unreachable. The provider's delete operation is idempotent, including for a missing user.
 export async function removeUsernameCredential({
   db, auth, uid, getProvider, clock = Date.now, wait = delay, exchangeWindowSeconds = 0, deferWait = false,
+  expectedMissingSince, observationNow = clock(),
 }) {
-  if (!USERNAME_UID_PATTERN.test(uid)) return null
+  const absent = expectedMissingSince === undefined ? null : { skipped: true }
+  if (!USERNAME_UID_PATTERN.test(uid)) return absent
   const ref = credentialsRef(db, uid)
-  if (!(await ref.get()).exists) return null
+  if (!(await ref.get()).exists) return absent
   const provider = getProvider()
   if (!provider) throw new Error('Username password provider unavailable for deletion')
   const remove = await db.runTransaction(async (transaction) => {
     const data = (await transaction.get(ref)).data()
     if (!data) return false
-    if (data.state === 'recovering' && data.leaseUntil > clock()) throw new Error('Username recovery in progress')
+    if (expectedMissingSince !== undefined) {
+      if (!canObserveMissingUsernamePlayer(data, observationNow) || data.missingPlayerSince !== expectedMissingSince) return false
+    } else if (data.state === 'recovering' && data.leaseUntil > clock()) {
+      throw new Error('Username recovery in progress')
+    }
     if (['provisioning', 'discarding'].includes(data.state)) throw new Error('Username provisioning in progress')
     if (data.state !== 'deleting') {
       transaction.set(ref, { state: 'deleting', key: data.key, deletionStartedAt: FieldValue.serverTimestamp() })
     }
     return true
   })
-  if (!remove) return null
+  if (!remove) return absent
   const marker = (await ref.get()).data()
-  if (!marker) return null
+  if (!marker) return absent
 
   // Disable Firebase sign-in while previously issued custom tokens can still be exchanged.
   // Deleting the Firebase user immediately would let a surviving token create it again.
@@ -279,7 +301,7 @@ export async function usernameAccount({
     return signup({ db, auth, provider, username, key, password, clock })
   }
   const account = await lookup(db, key)
-  if (action === 'signin') return signin({ issueToken, provider, account, password })
+  if (action === 'signin') return signin({ db, issueToken, provider, account, password })
   if (action === 'rotate') return rotate({ db, auth, provider, account, password, idToken })
 
   const recoveryCode = typeof body.recoveryCode === 'string' ? body.recoveryCode.trim() : ''

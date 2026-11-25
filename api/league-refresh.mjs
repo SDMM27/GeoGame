@@ -7,6 +7,7 @@ import { getAuth } from 'firebase-admin/auth'
 import { getFirestore } from 'firebase-admin/firestore'
 
 import { refreshWeeklyTopThrottled } from './_lib/weeklyTop.mjs'
+import { callerUid } from './_lib/playerAuth.mjs'
 
 function adminApp() {
   if (getApps().length) return getApps()[0]
@@ -25,7 +26,7 @@ export default async function handler(req, res) {
   try {
     const app = adminApp()
     const idToken = req.headers.authorization?.replace(/^Bearer /, '')
-    const uid = idToken ? await getAuth(app).verifyIdToken(idToken).then((decoded) => decoded.uid, () => null) : null
+    const uid = await callerUid(getAuth(app), idToken)
     if (!uid) return res.status(401).json({ error: 'unauthorized' })
     return res.status(200).json(await refreshWeeklyTopThrottled({ db: getFirestore(app) }))
   } catch (error) {

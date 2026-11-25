@@ -33,7 +33,7 @@ const fr = {
           {
             list: [
               'votre adresse e-mail si vous vous inscrivez avec une adresse e-mail ou vous connectez avec Google. Firebase Authentication gère le mot de passe des comptes créés avec une adresse e-mail. Si vous vous connectez avec Google, nous recevons aussi l’identifiant de votre compte Google (Google peut également transmettre votre nom et votre photo de profil, que nous n’utilisons pas) ;',
-              'si vous créez un compte avec un pseudo et un mot de passe, aucune adresse e-mail n’est demandée. Notre serveur traite brièvement le mot de passe. Amazon Cognito conserve les données nécessaires pour le vérifier. GeoGame conserve uniquement une empreinte du code de secours ;',
+              'si vous créez un compte avec un pseudo et un mot de passe, aucune adresse e-mail personnelle n’est demandée. Notre serveur traite brièvement le mot de passe. Firebase Authentication le vérifie à l’aide d’un alias technique généré automatiquement, qui ne peut pas recevoir de messages. GeoGame conserve uniquement une empreinte du code de secours ;',
               'votre pseudo, la date de création du compte et les dates de connexion ;',
               'l’historique de vos parties (jeu, mode, score, temps, date) et vos scores dans les classements, y compris les réponses tentées aux défis du jour ;',
               'vos demandes d’amis, vos amis et les invitations à un salon que vous envoyez ou recevez ;',
@@ -73,7 +73,6 @@ const fr = {
           {
             list: [
               'Google (Firebase Authentication, Cloud Firestore, App Check, reCAPTCHA Enterprise) : comptes, base de données et protection contre les abus ;',
-              'Amazon Web Services (Amazon Cognito) : authentification des comptes sans e-mail ;',
               'Vercel Inc. : hébergement du site et des fonctions serveur, mesure d’audience ;',
               'Expo (650 Industries, Inc.) : envoi des notifications et des mises à jour de l’application ;',
               'les services de notification des navigateurs (Apple, Google, Mozilla, Microsoft selon votre appareil) : acheminement des notifications de l’app web ;',
@@ -345,7 +344,7 @@ const en = {
           {
             list: [
               'your email address if you sign up with an email address or sign in with Google. Firebase Authentication handles the password for accounts created with an email address. If you sign in with Google, we also receive your Google account ID (Google may also send your name and profile picture, which we do not use);',
-              'if you create an account with a username and password, we ask for no email address. Our server briefly processes your password. Amazon Cognito stores the data needed to verify it. GeoGame stores only a hash of the recovery code;',
+              'if you create an account with a username and password, we ask for no personal email address. Our server briefly processes your password. Firebase Authentication verifies it using an automatically generated technical alias that cannot receive messages. GeoGame stores only a hash of the recovery code;',
               'your username, the date your account was created and your sign-in dates;',
               'your game history (game, mode, score, time, date) and your scores in the leaderboards, including the answers you tried in the daily challenges;',
               'your friend requests, your friends, and the room invites you send or receive;',
@@ -385,7 +384,6 @@ const en = {
           {
             list: [
               'Google (Firebase Authentication, Cloud Firestore, App Check, reCAPTCHA Enterprise): accounts, database and abuse protection;',
-              'Amazon Web Services (Amazon Cognito): authentication for accounts without email;',
               'Vercel Inc.: hosting of the website and server functions, audience measurement;',
               'Expo (650 Industries, Inc.): delivery of notifications and app updates;',
               'browser push services (Apple, Google, Mozilla or Microsoft depending on your device): delivery of the web app’s notifications;',
@@ -655,7 +653,7 @@ const ru = {
           {
             list: [
               'ваш адрес электронной почты, если вы регистрируетесь с его помощью или входите через Google. Пароли аккаунтов, созданных с адресом электронной почты, обрабатывает Firebase Authentication. При входе через Google мы также получаем идентификатор вашего аккаунта Google (Google может передать ваше имя и фото профиля, которые мы не используем);',
-              'если вы создаёте аккаунт с никнеймом и паролем, адрес электронной почты не требуется. Наш сервер обрабатывает пароль только во время запроса. Amazon Cognito хранит данные для проверки пароля. GeoGame хранит только хеш кода восстановления;',
+              'если вы создаёте аккаунт с никнеймом и паролем, мы не запрашиваем личный адрес электронной почты. Наш сервер обрабатывает пароль только во время запроса. Firebase Authentication проверяет его с помощью автоматически созданного технического адреса, на который нельзя отправлять письма. GeoGame хранит только хеш кода восстановления;',
               'ваш никнейм, дату создания аккаунта и даты входа;',
               'историю ваших игр (игра, режим, очки, время, дата) и ваши результаты в таблицах рекордов, включая ответы в ежедневных заданиях;',
               'ваши заявки в друзья, список друзей и приглашения в комнаты, которые вы отправляете или получаете;',
@@ -695,7 +693,6 @@ const ru = {
           {
             list: [
               'Google (Firebase Authentication, Cloud Firestore, App Check, reCAPTCHA Enterprise): аккаунты, база данных и защита от злоупотреблений;',
-              'Amazon Web Services (Amazon Cognito): аутентификация аккаунтов без электронной почты;',
               'Vercel Inc.: хостинг сайта и серверных функций, статистика посещений;',
               'Expo (650 Industries, Inc.): доставка уведомлений и обновлений приложения;',
               'службы уведомлений браузеров (Apple, Google, Mozilla или Microsoft, в зависимости от устройства): доставка уведомлений веб-приложения;',

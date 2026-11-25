@@ -21,7 +21,7 @@ export default {
           {
             list: [
               'tu dirección de correo si te registras con ella o inicias sesión con Google. Firebase Authentication gestiona la contraseña de las cuentas creadas con correo. Si inicias sesión con Google, también recibimos el identificador de tu cuenta de Google (Google puede enviar tu nombre y tu foto de perfil, que no usamos);',
-              'si creas una cuenta con nombre de usuario y contraseña, no te pedimos una dirección de correo. Nuestro servidor procesa brevemente la contraseña. Amazon Cognito almacena los datos necesarios para verificarla. GeoGame solo guarda un hash del código de recuperación;',
+              'si creas una cuenta con nombre de usuario y contraseña, no te pedimos una dirección de correo personal. Nuestro servidor procesa brevemente la contraseña. Firebase Authentication la verifica mediante un alias técnico generado automáticamente que no puede recibir mensajes. GeoGame solo guarda un hash del código de recuperación;',
               'tu nombre de usuario, la fecha de creación de la cuenta y las fechas de inicio de sesión;',
               'el historial de tus partidas (juego, modo, puntuación, tiempo, fecha) y tus puntuaciones en las clasificaciones, incluidas las respuestas probadas en los retos del día;',
               'tus solicitudes de amistad, tus amigos y las invitaciones a salas que envías o recibes;',
@@ -61,7 +61,6 @@ export default {
           {
             list: [
               'Google (Firebase Authentication, Cloud Firestore, App Check, reCAPTCHA Enterprise): cuentas, base de datos y protección contra abusos;',
-              'Amazon Web Services (Amazon Cognito): autenticación de cuentas sin correo;',
               'Vercel Inc.: alojamiento del sitio web y de las funciones de servidor, medición de audiencia;',
               'Expo (650 Industries, Inc.): envío de notificaciones y actualizaciones de la app;',
               'servicios push de los navegadores (Apple, Google, Mozilla o Microsoft según tu dispositivo): envío de las notificaciones de la web app;',

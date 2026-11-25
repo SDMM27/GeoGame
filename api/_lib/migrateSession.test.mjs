@@ -2,6 +2,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import { migrateSession as migrate } from './migrateSession.mjs'
+import { usernameCredentialUid } from './usernameCredentialUid.mjs'
 
 const json = (status, body) => ({ status, ok: status >= 200 && status < 300, json: async () => body })
 const migrateSession = (options) => migrate({ isUsernameAccount: async () => false, ...options })
@@ -66,6 +67,15 @@ describe('migrateSession', () => {
       status: 401, body: { error: 'unauthenticated' },
     })
     expect(isUsernameAccount).toHaveBeenCalledWith('u1')
+    expect(auth.createCustomToken).not.toHaveBeenCalled()
+  })
+
+  it('does not migrate an internal password identity to a custom session', async () => {
+    const uid = usernameCredentialUid('b5db4a87-d01a-4265-b4eb-dedc618bcb82')
+    const { auth, fetchImpl } = setup({ verify: async () => ({ uid }) })
+    expect(await migrateSession({ auth, fetchImpl, refreshToken: 'refresh' })).toEqual({
+      status: 401, body: { error: 'unauthenticated' },
+    })
     expect(auth.createCustomToken).not.toHaveBeenCalled()
   })
 

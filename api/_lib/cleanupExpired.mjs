@@ -69,6 +69,7 @@ export async function cleanupExpired({ db, now = Date.now() }) {
       db.collection('invitePushLimits').where('start', '<', now - PUSH_BOOKKEEPING_MAX_AGE_MS),
       deleteDoc
     ),
+    usernameAuthLimits: await drain(db.collection('usernameAuthLimits').where('expiresAt', '<', now), deleteDoc),
     presence: await drain(db.collection('presence').where('expiresAt', '<', at(now)), deleteDoc),
     eloGains: await drain(db.collection('eloGains').where('at', '<', now - ELO_GAIN_MAX_AGE_MS), deleteDoc),
     eloDuels: await drain(db.collection('eloDuels').where('at', '<', now - ELO_DUEL_MAX_AGE_MS), deleteDoc),

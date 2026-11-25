@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import NavBar from '../components/NavBar'
@@ -16,6 +16,14 @@ import {
   signUp,
   USERNAME_MAX,
 } from '../utils/account'
+import {
+  recoverUsernameAccount,
+  rotateUsernameRecoveryCode,
+  signInWithUsername,
+  signUpWithUsername,
+  usernameAccountAvailable,
+  USERNAME_PASSWORD_MIN,
+} from '../utils/usernameAccount'
 import { reauthenticateWithGoogle, signInWithGoogle } from '../utils/accountGoogle'
 import FriendsPanel from '../components/profile/FriendsPanel'
 import ProfileBody from '../components/profile/ProfileBody'
@@ -28,7 +36,7 @@ import { useFriendships } from '../hooks/usePlayerProfile'
 import { useDecoration } from '../hooks/useDecoration'
 import './AccountPage.css'
 
-function GoogleButton({ onError }) {
+function GoogleButton({ disabled, onError }) {
   const { t } = useTranslation()
   const [pending, setPending] = useState(false)
 
@@ -45,7 +53,7 @@ function GoogleButton({ onError }) {
   }
 
   return (
-    <button type="button" className="account-google" onClick={handleClick} disabled={pending}>
+    <button type="button" className="account-google" onClick={handleClick} disabled={pending || disabled}>
       <svg viewBox="0 0 48 48" width="18" height="18" aria-hidden="true">
         <path
           fill="#FFC107"
@@ -66,30 +74,80 @@ function GoogleButton({ onError }) {
   )
 }
 
+function RecoveryCode({ code, onSaved }) {
+  const { t } = useTranslation()
+  return (
+    <>
+      <h2 className="account-section-title">{t('account.recovery_title')}</h2>
+      <p className="account-intro">{t('account.recovery_save_hint')}</p>
+      <code className="account-recovery-code">{code}</code>
+      <button type="button" className="account-submit" onClick={onSaved}>
+        {t('account.recovery_saved')}
+      </button>
+    </>
+  )
+}
+
 function AuthForm() {
   const { t } = useTranslation()
   const [mode, setMode] = useState('signin')
+  const [method, setMethod] = useState('email')
+  const [usernameAvailable, setUsernameAvailable] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [username, setUsername] = useState('')
   const [error, setError] = useState(null)
   const [notice, setNotice] = useState(null)
   const [submitting, setSubmitting] = useState(false)
+  const [recoveryCode, setRecoveryCode] = useState('')
+  const [issuedCode, setIssuedCode] = useState('')
 
-  const switchMode = (next) => {
-    setMode(next)
+  useEffect(() => {
+    let active = true
+    usernameAccountAvailable().then((available) => {
+      if (active) setUsernameAvailable(available)
+    }).catch(() => {})
+    return () => { active = false }
+  }, [])
+
+  const resetFormMessages = () => {
+    setPassword('')
+    setRecoveryCode('')
     setError(null)
     setNotice(null)
   }
 
+  const switchMode = (next) => {
+    setMode(next)
+    resetFormMessages()
+  }
+
+  const signingUp = mode === 'signup'
+  const recovering = mode === 'recover'
+  const usingUsername = method === 'username'
+  const newPassword = signingUp || recovering
+
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (submitting) return
     setSubmitting(true)
     setError(null)
     setNotice(null)
     try {
-      if (mode === 'signup') await signUp(auth, { email, password, username })
-      else await signIn(auth, { email, password })
+      if (recovering || (usingUsername && signingUp)) {
+        const code = recovering
+          ? await recoverUsernameAccount({ username, password, recoveryCode })
+          : await signUpWithUsername({ username, password })
+        resetFormMessages()
+        setIssuedCode(code)
+        setSubmitting(false)
+      } else if (usingUsername) {
+        await signInWithUsername(auth, { username, password })
+      } else if (signingUp) {
+        await signUp(auth, { email, password, username })
+      } else {
+        await signIn(auth, { email, password })
+      }
     } catch (err) {
       setError(accountErrorKey(err))
       setSubmitting(false)
@@ -97,6 +155,12 @@ function AuthForm() {
   }
 
   const handleForgot = async () => {
+    if (submitting) return
+    if (usingUsername) {
+      switchMode('recover')
+      return
+    }
+    setSubmitting(true)
     setError(null)
     setNotice(null)
     try {
@@ -104,34 +168,79 @@ function AuthForm() {
       setNotice(t('account.reset_sent', { email: email.trim() }))
     } catch (err) {
       setError(accountErrorKey(err))
+    } finally {
+      setSubmitting(false)
     }
+  }
+
+  if (issuedCode) {
+    return (
+      <div className="account-card">
+        <RecoveryCode code={issuedCode} onSaved={() => {
+          setIssuedCode('')
+          switchMode('signin')
+        }} />
+      </div>
+    )
   }
 
   return (
     <div className="account-card">
-      <div className="account-tabs" role="tablist">
-        {['signin', 'signup'].map((tab) => (
-          <button
-            key={tab}
-            type="button"
-            role="tab"
-            aria-selected={mode === tab}
-            className={`account-tab${mode === tab ? ' active' : ''}`}
-            onClick={() => switchMode(tab)}
-          >
-            {t(`account.${tab}_tab`)}
-          </button>
-        ))}
-      </div>
-      <p className="account-intro">{t(`account.${mode}_intro`)}</p>
+      {recovering ? (
+        <>
+          <h2 className="account-section-title">{t('account.recover_title')}</h2>
+          <p className="account-intro">{t('account.recovery_wait_hint')}</p>
+        </>
+      ) : (
+        <>
+          <div className="account-tabs" role="tablist">
+            {['signin', 'signup'].map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                role="tab"
+                aria-selected={mode === tab}
+                className={`account-tab${mode === tab ? ' active' : ''}`}
+                onClick={() => {
+                  if (tab !== mode) switchMode(tab)
+                }}
+                disabled={submitting}
+              >
+                {t(`account.${tab}_tab`)}
+              </button>
+            ))}
+          </div>
+          <p className="account-intro">{t(`account.${mode}_intro`)}</p>
 
-      <GoogleButton onError={setError} />
-      <div className="account-divider">
-        <span>{t('account.or')}</span>
-      </div>
+          <GoogleButton disabled={submitting} onError={setError} />
+          <div className="account-divider">
+            <span>{t('account.or')}</span>
+          </div>
+          {usernameAvailable && (
+            <div className="account-tabs">
+              {['email', 'username'].map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  aria-pressed={method === option}
+                  className={`account-tab${method === option ? ' active' : ''}`}
+                  disabled={submitting}
+                  onClick={() => {
+                    if (option === method) return
+                    setMethod(option)
+                    resetFormMessages()
+                  }}
+                >
+                  {t(`account.method_${option}`)}
+                </button>
+              ))}
+            </div>
+          )}
+        </>
+      )}
 
       <form onSubmit={handleSubmit} className="account-form">
-        {mode === 'signup' && (
+        {(signingUp || usingUsername) && (
           <label className="account-field">
             <span>{t('account.username')}</span>
             <input
@@ -139,46 +248,68 @@ function AuthForm() {
               onChange={(e) => setUsername(e.target.value)}
               placeholder={t('account.username_placeholder')}
               maxLength={USERNAME_MAX}
-              autoComplete="nickname"
+              autoComplete={usingUsername ? 'username' : 'nickname'}
               required
             />
-            <small>{t('account.username_hint')}</small>
+            {signingUp && <small>{t('account.username_hint')}</small>}
           </label>
         )}
-        <label className="account-field">
-          <span>{t('account.email')}</span>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder={t('account.email_placeholder')}
-            autoComplete="email"
-            required
-          />
-        </label>
+        {!usingUsername && (
+          <label className="account-field">
+            <span>{t('account.email')}</span>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder={t('account.email_placeholder')}
+              autoComplete="email"
+              required
+            />
+          </label>
+        )}
+        {recovering && (
+          <label className="account-field">
+            <span>{t('account.recovery_code')}</span>
+            <input
+              value={recoveryCode}
+              onChange={(e) => setRecoveryCode(e.target.value)}
+              autoComplete="off"
+              autoCapitalize="off"
+              spellCheck={false}
+              maxLength={128}
+              required
+            />
+          </label>
+        )}
         <label className="account-field">
           <span>{t('account.password')}</span>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder={mode === 'signup' ? t('account.password_placeholder') : ''}
-            autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
-            minLength={mode === 'signup' ? PASSWORD_MIN : undefined}
+            placeholder={signingUp && !usingUsername ? t('account.password_placeholder') : ''}
+            autoComplete={newPassword ? 'new-password' : 'current-password'}
+            minLength={newPassword ? (usingUsername ? USERNAME_PASSWORD_MIN : PASSWORD_MIN) : undefined}
             required
           />
+          {newPassword && usingUsername && <small>{t('account.username_password_hint')}</small>}
         </label>
 
         {error && <p className="account-error">{t(`account.errors.${error}`)}</p>}
         {notice && <p className="account-notice">{notice}</p>}
 
-        {mode === 'signup' && <SignupNotice />}
+        {signingUp && <SignupNotice />}
         <button type="submit" className="account-submit" disabled={submitting}>
-          {t(mode === 'signup' ? 'account.signup' : 'account.signin')}
+          {t(recovering ? 'account.recover_submit' : signingUp ? 'account.signup' : 'account.signin')}
         </button>
         {mode === 'signin' && (
-          <button type="button" className="account-link" onClick={handleForgot}>
+          <button type="button" className="account-link" disabled={submitting} onClick={handleForgot}>
             {t('account.forgot')}
+          </button>
+        )}
+        {recovering && (
+          <button type="button" className="account-link" disabled={submitting} onClick={() => switchMode('signin')}>
+            {t('account.back_to_signin')}
           </button>
         )}
       </form>
@@ -258,6 +389,70 @@ function ChooseUsername() {
   )
 }
 
+function RecoveryCodeSettings({ username }) {
+  const { t } = useTranslation()
+  const [replacing, setReplacing] = useState(false)
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState(null)
+  const [submitting, setSubmitting] = useState(false)
+  const [issuedCode, setIssuedCode] = useState('')
+
+  const close = () => {
+    setReplacing(false)
+    setPassword('')
+    setError(null)
+    setIssuedCode('')
+  }
+
+  const submit = async (event) => {
+    event.preventDefault()
+    if (submitting) return
+    setSubmitting(true)
+    setError(null)
+    try {
+      setIssuedCode(await rotateUsernameRecoveryCode(auth, { username, password }))
+      setPassword('')
+    } catch (err) {
+      setError(accountErrorKey(err))
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  if (issuedCode) return <RecoveryCode code={issuedCode} onSaved={close} />
+  if (!replacing) {
+    return (
+      <button type="button" className="account-link" onClick={() => setReplacing(true)}>
+        {t('account.recovery_replace')}
+      </button>
+    )
+  }
+  return (
+    <form className="account-form" onSubmit={submit}>
+      <p className="account-intro">{t('account.recovery_replace_intro')}</p>
+      <label className="account-field">
+        <span>{t('account.password')}</span>
+        <input
+          type="password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          autoComplete="current-password"
+          required
+        />
+      </label>
+      {error && <p className="account-error">{t(`account.errors.${error}`)}</p>}
+      <div className="account-row">
+        <button type="button" className="account-link" onClick={close} disabled={submitting}>
+          {t('account.cancel')}
+        </button>
+        <button type="submit" className="account-submit" disabled={submitting}>
+          {t('account.recovery_replace')}
+        </button>
+      </div>
+    </form>
+  )
+}
+
 function AccountSettings({ account }) {
   const { t } = useTranslation()
   const [deleting, setDeleting] = useState(false)
@@ -270,7 +465,10 @@ function AccountSettings({ account }) {
     setSubmitting(true)
     setError(null)
     try {
-      await deleteAccount(auth, account.hasPassword ? { password } : { reauthenticate: reauthenticateWithGoogle })
+      const proof = account.hasPassword
+        ? { password, username: account.usernamePassword ? account.username : undefined }
+        : { reauthenticate: reauthenticateWithGoogle }
+      await deleteAccount(auth, proof)
     } catch (err) {
       const key = accountErrorKey(err)
       if (key !== 'cancelled') setError(key)
@@ -279,14 +477,16 @@ function AccountSettings({ account }) {
   }
 
   return (
-    <CollapsibleSection id="own.settings" title={t('profile.settings_title')} summary={account.email}>
+    <CollapsibleSection id="own.settings" title={t('profile.settings_title')} summary={account.email ?? account.username}>
       <div className="account-card">
         <p className="account-label">{t('account.signed_in_as')}</p>
-        <p className="account-email">{account.email}</p>
+        <p className="account-email">{account.email ?? account.username}</p>
         <p className="account-intro">{t('account.prefill_hint')}</p>
         <button type="button" className="account-submit account-submit--secondary" onClick={() => signOut(auth)}>
           {t('account.signout')}
         </button>
+
+        {!deleting && account.usernamePassword && account.username && <RecoveryCodeSettings username={account.username} />}
 
         {deleting ? (
           <form onSubmit={handleDelete} className="account-form account-delete">

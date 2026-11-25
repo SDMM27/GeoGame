@@ -32,13 +32,15 @@ const fr = {
           'Avec un compte, nous traitons en plus :',
           {
             list: [
-              'votre adresse e-mail et votre mot de passe, que Firebase Authentication conserve chiffré : nous n’y avons jamais accès. Si vous vous connectez avec Google, nous recevons l’adresse e-mail et l’identifiant de votre compte Google (Google peut aussi transmettre votre nom et votre photo de profil, que nous n’utilisons pas) ;',
+              'votre adresse e-mail si vous vous inscrivez avec une adresse e-mail ou vous connectez avec Google. Firebase Authentication gère le mot de passe des comptes créés avec une adresse e-mail. Si vous vous connectez avec Google, nous recevons aussi l’identifiant de votre compte Google (Google peut également transmettre votre nom et votre photo de profil, que nous n’utilisons pas) ;',
+              'si vous créez un compte avec un pseudo et un mot de passe, aucune adresse e-mail n’est demandée. Notre serveur traite brièvement le mot de passe. Amazon Cognito conserve les données nécessaires pour le vérifier. GeoGame conserve uniquement une empreinte du code de secours ;',
               'votre pseudo, la date de création du compte et les dates de connexion ;',
               'l’historique de vos parties (jeu, mode, score, temps, date) et vos scores dans les classements, y compris les réponses tentées aux défis du jour ;',
               'vos demandes d’amis, vos amis et les invitations à un salon que vous envoyez ou recevez ;',
               'si vous autorisez les notifications, dans l’application ou dans l’app web ajoutée à l’écran d’accueil : un identifiant de notification de l’appareil (jeton Expo ou abonnement Web Push), la langue, le type d’appareil et votre choix pour le rappel quotidien.',
             ],
           },
+          'À la création ou à la réinitialisation du mot de passe d’un compte sans e-mail, nous vérifions s’il figure dans des fuites de données. Seuls les cinq premiers caractères de son empreinte SHA-1 sont envoyés à Pwned Passwords. Des compteurs pseudonymisés nous servent à limiter les tentatives.',
           'Pour tout le monde, nos hébergeurs traitent aussi l’adresse IP et les informations techniques de chaque requête (navigateur, appareil) pour faire fonctionner et sécuriser le service. Sur le site, la mesure d’audience Vercel Web Analytics fonctionne sans cookie et ne fournit que des statistiques de visites agrégées, et Firebase App Check utilise Google reCAPTCHA Enterprise, qui analyse des signaux du navigateur pour vérifier que les requêtes viennent bien du jeu.',
         ],
       },
@@ -71,6 +73,7 @@ const fr = {
           {
             list: [
               'Google (Firebase Authentication, Cloud Firestore, App Check, reCAPTCHA Enterprise) : comptes, base de données et protection contre les abus ;',
+              'Amazon Web Services (Amazon Cognito) : authentification des comptes sans e-mail ;',
               'Vercel Inc. : hébergement du site et des fonctions serveur, mesure d’audience ;',
               'Expo (650 Industries, Inc.) : envoi des notifications et des mises à jour de l’application ;',
               'les services de notification des navigateurs (Apple, Google, Mozilla, Microsoft selon votre appareil) : acheminement des notifications de l’app web ;',
@@ -87,6 +90,7 @@ const fr = {
           {
             list: [
               'Compte et données liées : tant que le compte existe. Un compte inutilisé pendant 3 ans (ni connexion, ni partie) est supprimé automatiquement avec toutes ses données.',
+              'Compteurs pseudonymisés de limitation des tentatives : les compteurs expirés sont effacés lors d’un nettoyage quotidien.',
               'Scores enregistrés sans compte : tant que le classement existe. Vous pouvez demander leur suppression.',
               'Salons multijoueurs : supprimés automatiquement à leur expiration, 10 jours au plus après leur création. Invitations : un jour au plus.',
               'Jetons de notification : jusqu’à la déconnexion de l’appareil, la suppression du compte, ou dès que l’appareil ne peut plus les recevoir.',
@@ -155,7 +159,7 @@ const fr = {
         id: 'account',
         title: 'Compte',
         blocks: [
-          'La création d’un compte est réservée aux personnes d’au moins 13 ans, et, entre 13 et 15 ans, à celles qui ont l’accord d’un parent. Vous vous engagez à fournir une adresse e-mail valide et à garder votre mot de passe confidentiel. Vous pouvez supprimer votre compte à tout moment ([Supprimer mon compte](/delete-account)).',
+          'La création d’un compte est réservée aux personnes d’au moins 13 ans, et, entre 13 et 15 ans, à celles qui ont l’accord d’un parent. Si vous fournissez une adresse e-mail, elle doit être valide. Gardez votre mot de passe et, le cas échéant, votre code de secours confidentiels. Vous pouvez supprimer votre compte à tout moment ([Supprimer mon compte](/delete-account)).',
         ],
       },
       {
@@ -281,7 +285,8 @@ const fr = {
         id: 'email',
         title: 'Sans accès à votre compte',
         blocks: [
-          'Écrivez à {email} depuis l’adresse e-mail de votre compte, en indiquant votre pseudo. Nous supprimons le compte dans un délai de 30 jours au plus et vous le confirmons.',
+          'Si vous avez un compte sans e-mail et que vous avez oublié votre mot de passe, utilisez le code de secours pour le réinitialiser, puis connectez-vous pour supprimer le compte.',
+          'Pour les autres demandes de suppression, écrivez à {email} en indiquant votre pseudo. Si une adresse e-mail est liée au compte, écrivez depuis cette adresse. Nous pouvons vous demander de prouver que le compte vous appartient. Ne communiquez jamais votre mot de passe ni votre code de secours.',
         ],
       },
       {
@@ -290,7 +295,7 @@ const fr = {
         blocks: [
           {
             list: [
-              'votre compte et votre adresse e-mail ;',
+              'votre compte, les données de connexion associées et votre adresse e-mail si elle est liée au compte ;',
               'votre pseudo, qui redevient disponible ;',
               'votre historique de parties et vos statistiques ;',
               'vos scores dans tous les classements ;',
@@ -339,13 +344,15 @@ const en = {
           'With an account, we also process:',
           {
             list: [
-              'your email address and your password, which Firebase Authentication stores encrypted: we never have access to it. If you sign in with Google, we receive the email address and identifier of your Google account (Google may also send your name and profile picture, which we do not use);',
+              'your email address if you sign up with an email address or sign in with Google. Firebase Authentication handles the password for accounts created with an email address. If you sign in with Google, we also receive your Google account ID (Google may also send your name and profile picture, which we do not use);',
+              'if you create an account with a username and password, we ask for no email address. Our server briefly processes your password. Amazon Cognito stores the data needed to verify it. GeoGame stores only a hash of the recovery code;',
               'your username, the date your account was created and your sign-in dates;',
               'your game history (game, mode, score, time, date) and your scores in the leaderboards, including the answers you tried in the daily challenges;',
               'your friend requests, your friends, and the room invites you send or receive;',
               'if you allow notifications, in the app or in the web app added to your home screen: a device notification identifier (Expo token or Web Push subscription), your language, your device type and your choice for the daily reminder.',
             ],
           },
+          'When you set or reset the password for an account without email, we check it against known data breaches. Only the first five characters of its SHA-1 hash are sent to Pwned Passwords. We use pseudonymised counters to limit attempts.',
           'For everyone, our hosting providers also process the IP address and technical information of each request (browser, device) to run and secure the service. On the website, Vercel Web Analytics measures audience without cookies and only provides aggregated visit statistics, and Firebase App Check uses Google reCAPTCHA Enterprise, which analyses browser signals to check that requests really come from the game.',
         ],
       },
@@ -378,6 +385,7 @@ const en = {
           {
             list: [
               'Google (Firebase Authentication, Cloud Firestore, App Check, reCAPTCHA Enterprise): accounts, database and abuse protection;',
+              'Amazon Web Services (Amazon Cognito): authentication for accounts without email;',
               'Vercel Inc.: hosting of the website and server functions, audience measurement;',
               'Expo (650 Industries, Inc.): delivery of notifications and app updates;',
               'browser push services (Apple, Google, Mozilla or Microsoft depending on your device): delivery of the web app’s notifications;',
@@ -394,6 +402,7 @@ const en = {
           {
             list: [
               'Account and related data: as long as the account exists. An account unused for 3 years (no sign-in, no game) is deleted automatically with all its data.',
+              'Pseudonymised rate-limit counters: expired counters are removed during a daily cleanup.',
               'Scores saved without an account: as long as the leaderboard exists. You can ask for them to be deleted.',
               'Multiplayer rooms: deleted automatically when they expire, at most 10 days after being created. Invites: one day at most.',
               'Notification tokens: until the device signs out, the account is deleted, or the device can no longer receive them.',
@@ -462,7 +471,7 @@ const en = {
         id: 'account',
         title: 'Account',
         blocks: [
-          'Creating an account is reserved for people aged 13 or over, and, between 13 and 15, for those who have a parent’s agreement. You agree to give a valid email address and to keep your password confidential. You can delete your account at any time ([Delete my account](/delete-account)).',
+          'Creating an account is reserved for people aged 13 or over, and, between 13 and 15, for those who have a parent’s agreement. If you provide an email address, it must be valid. Keep your password and any recovery code confidential. You can delete your account at any time ([Delete my account](/delete-account)).',
         ],
       },
       {
@@ -586,7 +595,8 @@ const en = {
         id: 'email',
         title: 'If you can no longer sign in',
         blocks: [
-          'Write to {email} from your account’s email address, giving your username. We delete the account within 30 days at most and confirm it to you.',
+          'If you have an account without email and forgot your password, use your recovery code to reset it, then sign in to delete the account.',
+          'For other deletion requests, write to {email} with your username. If an email address is linked to the account, write from that address. We may ask you to prove that the account belongs to you. Never share your password or recovery code.',
         ],
       },
       {
@@ -595,7 +605,7 @@ const en = {
         blocks: [
           {
             list: [
-              'your account and email address;',
+              'your account, its sign-in data and your email address if linked to the account;',
               'your username, which becomes available again;',
               'your game history and statistics;',
               'your scores in every leaderboard;',
@@ -644,13 +654,15 @@ const ru = {
           'С аккаунтом мы также обрабатываем:',
           {
             list: [
-              'ваш адрес электронной почты и пароль, который Firebase Authentication хранит в зашифрованном виде: у нас нет к нему доступа. Если вы входите через Google, мы получаем адрес почты и идентификатор вашего аккаунта Google (Google может также передать ваше имя и фото профиля, которые мы не используем);',
+              'ваш адрес электронной почты, если вы регистрируетесь с его помощью или входите через Google. Пароли аккаунтов, созданных с адресом электронной почты, обрабатывает Firebase Authentication. При входе через Google мы также получаем идентификатор вашего аккаунта Google (Google может передать ваше имя и фото профиля, которые мы не используем);',
+              'если вы создаёте аккаунт с никнеймом и паролем, адрес электронной почты не требуется. Наш сервер обрабатывает пароль только во время запроса. Amazon Cognito хранит данные для проверки пароля. GeoGame хранит только хеш кода восстановления;',
               'ваш никнейм, дату создания аккаунта и даты входа;',
               'историю ваших игр (игра, режим, очки, время, дата) и ваши результаты в таблицах рекордов, включая ответы в ежедневных заданиях;',
               'ваши заявки в друзья, список друзей и приглашения в комнаты, которые вы отправляете или получаете;',
               'если вы разрешили уведомления в приложении или в веб-приложении на главном экране: идентификатор уведомлений устройства (токен Expo или подписка Web Push), язык, тип устройства и ваш выбор для ежедневного напоминания.',
             ],
           },
+          'При создании или сбросе пароля для аккаунта без электронной почты мы проверяем, встречался ли он в известных утечках данных. В Pwned Passwords отправляются только первые пять символов хеша SHA-1. Для ограничения числа попыток используются псевдонимизированные счётчики.',
           'Для всех пользователей наши хостинг-провайдеры также обрабатывают IP-адрес и технические данные каждого запроса (браузер, устройство), чтобы сервис работал и был защищён. На сайте статистика Vercel Web Analytics работает без cookie и даёт только сводные данные о посещениях, а Firebase App Check использует Google reCAPTCHA Enterprise, который анализирует сигналы браузера, чтобы убедиться, что запросы действительно идут из игры.',
         ],
       },
@@ -683,6 +695,7 @@ const ru = {
           {
             list: [
               'Google (Firebase Authentication, Cloud Firestore, App Check, reCAPTCHA Enterprise): аккаунты, база данных и защита от злоупотреблений;',
+              'Amazon Web Services (Amazon Cognito): аутентификация аккаунтов без электронной почты;',
               'Vercel Inc.: хостинг сайта и серверных функций, статистика посещений;',
               'Expo (650 Industries, Inc.): доставка уведомлений и обновлений приложения;',
               'службы уведомлений браузеров (Apple, Google, Mozilla или Microsoft, в зависимости от устройства): доставка уведомлений веб-приложения;',
@@ -699,6 +712,7 @@ const ru = {
           {
             list: [
               'Аккаунт и связанные данные: пока существует аккаунт. Аккаунт, который не использовался 3 года (ни входов, ни игр), удаляется автоматически вместе со всеми данными.',
+              'Псевдонимизированные счётчики попыток: счётчики с истёкшим сроком действия удаляются при ежедневной очистке.',
               'Результаты, сохранённые без аккаунта: пока существует таблица рекордов. Вы можете попросить их удалить.',
               'Многопользовательские комнаты: удаляются автоматически по истечении срока, не позднее 10 дней после создания. Приглашения: не дольше одного дня.',
               'Токены уведомлений: до выхода из аккаунта на устройстве, удаления аккаунта или пока устройство может их получать.',
@@ -767,7 +781,7 @@ const ru = {
         id: 'account',
         title: 'Аккаунт',
         blocks: [
-          'Создать аккаунт можно с 13 лет, а с 13 до 15 лет — с согласия родителя. Вы обязуетесь указать действующий адрес почты и не раскрывать свой пароль. Вы можете удалить аккаунт в любой момент ([Удалить аккаунт](/delete-account)).',
+          'Создать аккаунт можно с 13 лет, а с 13 до 15 лет — с согласия родителя. Если вы указываете адрес электронной почты, он должен быть действующим. Не раскрывайте пароль и код восстановления, если он у вас есть. Вы можете удалить аккаунт в любой момент ([Удалить аккаунт](/delete-account)).',
         ],
       },
       {
@@ -891,7 +905,8 @@ const ru = {
         id: 'email',
         title: 'Если вы не можете войти',
         blocks: [
-          'Напишите на {email} с адреса почты вашего аккаунта и укажите никнейм. Мы удалим аккаунт не позднее чем через 30 дней и подтвердим это.',
+          'Если у вас аккаунт без электронной почты и вы забыли пароль, сбросьте его с помощью кода восстановления, затем войдите и удалите аккаунт.',
+          'В остальных случаях напишите на {email} и укажите никнейм. Если к аккаунту привязан адрес электронной почты, напишите с этого адреса. Мы можем попросить подтвердить, что аккаунт принадлежит вам. Никому не сообщайте свой пароль или код восстановления.',
         ],
       },
       {
@@ -900,7 +915,7 @@ const ru = {
         blocks: [
           {
             list: [
-              'ваш аккаунт и адрес почты;',
+              'ваш аккаунт, данные для входа и адрес электронной почты, если он привязан к аккаунту;',
               'ваш никнейм, который снова становится свободным;',
               'история игр и статистика;',
               'ваши результаты во всех таблицах рекордов;',

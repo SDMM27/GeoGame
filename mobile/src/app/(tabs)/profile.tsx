@@ -1,8 +1,8 @@
 // Profile tab: sign in or create an account (shared with the website), then the account itself.
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
-import { router } from 'expo-router'
+import { router, useIsFocused } from 'expo-router'
 import { openBrowserAsync } from 'expo-web-browser'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Switch, TextInput, View, type TextInputProps } from 'react-native'
 import Animated, { FadeIn } from 'react-native-reanimated'
@@ -18,6 +18,13 @@ import {
   signUp,
   USERNAME_MAX,
 } from '@shared/utils/account'
+import {
+  recoverUsernameAccount,
+  rotateUsernameRecoveryCode,
+  signInWithUsername,
+  signUpWithUsername,
+  usernameAccountAvailable,
+} from '@shared/utils/usernameAccount'
 import { useDecoration } from '@shared/hooks/useDecoration'
 import { useFriendships } from '@shared/hooks/usePlayerProfile'
 import { decorationStyle } from '@shared/utils/decorations'
@@ -41,6 +48,7 @@ import { fonts, makeStyles, radius, space, useColors, useThemePreference, type T
 const signOutDevice = () => forgetDevice().then(() => signOut(auth))
 
 type Mode = 'signin' | 'signup'
+type AuthMethod = 'email' | 'username'
 
 const openLegal = (path: string) => openBrowserAsync(legalUrl(path)).catch(() => {})
 
@@ -101,7 +109,7 @@ function Message({ text, kind }: { text: string; kind: 'error' | 'notice' }) {
 }
 
 // Only where Google sign-in is available (web and Android builds, see account/google.ts).
-function GoogleButton({ onError }: { onError: (key: string | null) => void }) {
+function GoogleButton({ disabled, onError }: { disabled: boolean; onError: (key: string | null) => void }) {
   const styles = useStyles()
   const colors = useColors()
   const { t } = useTranslation()
@@ -127,6 +135,7 @@ function GoogleButton({ onError }: { onError: (key: string | null) => void }) {
         label={t('account.google')}
         variant="secondary"
         onPress={onPress}
+        disabled={disabled}
         loading={pending}
         icon={<MaterialCommunityIcons name="google" size={20} color={colors.text} />}
       />
@@ -139,31 +148,85 @@ function GoogleButton({ onError }: { onError: (key: string | null) => void }) {
   )
 }
 
+function RecoveryCode({ code, onSaved }: { code: string; onSaved: () => void }) {
+  const styles = useStyles()
+  const { t } = useTranslation()
+  return (
+    <>
+      <Text variant="heading" accessibilityRole="header">{t('account.recovery_title')}</Text>
+      <Text variant="caption">{t('account.recovery_save_hint')}</Text>
+      <Text selectable style={styles.recoveryCode}>{code}</Text>
+      <Button label={t('account.recovery_saved')} onPress={onSaved} />
+    </>
+  )
+}
+
 function AuthForm() {
   const styles = useStyles()
   const colors = useColors()
   const { t } = useTranslation()
-  const [mode, setMode] = useState<Mode>('signin')
+  const [mode, setMode] = useState<Mode | 'recover'>('signin')
+  const [method, setMethod] = useState<AuthMethod>('email')
+  const [usernameAvailable, setUsernameAvailable] = useState(false)
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [recoveryCode, setRecoveryCode] = useState('')
+  const [issuedCode, setIssuedCode] = useState('')
 
-  const switchMode = (next: Mode) => {
-    setMode(next)
+  useEffect(() => {
+    let active = true
+    usernameAccountAvailable(API_ORIGIN).then((available: boolean) => {
+      if (active) setUsernameAvailable(available)
+    }).catch(() => {})
+    return () => { active = false }
+  }, [])
+
+  const resetFormMessages = () => {
+    setPassword('')
+    setRecoveryCode('')
     setError(null)
     setNotice(null)
   }
 
+  const switchMode = (next: Mode | 'recover') => {
+    setMode(next)
+    resetFormMessages()
+  }
+
+  const signingUp = mode === 'signup'
+  const recovering = mode === 'recover'
+  const usingUsername = method === 'username'
+  const newPassword = signingUp || recovering
+  const needsUsername = signingUp || usingUsername
+  const canSubmit = password !== '' &&
+    (usingUsername || email.trim() !== '') &&
+    (!needsUsername || username.trim() !== '') &&
+    (!recovering || recoveryCode.trim() !== '')
+
   const onSubmit = async () => {
+    if (submitting || !canSubmit) return
     setSubmitting(true)
     setError(null)
     setNotice(null)
     try {
-      if (mode === 'signup') await signUp(auth, { email, password, username })
-      else await signIn(auth, { email, password })
+      if (recovering || (usingUsername && signingUp)) {
+        const code = recovering
+          ? await recoverUsernameAccount({ username, password, recoveryCode, apiOrigin: API_ORIGIN })
+          : await signUpWithUsername({ username, password, apiOrigin: API_ORIGIN })
+        resetFormMessages()
+        setIssuedCode(code)
+        setSubmitting(false)
+      } else if (usingUsername) {
+        await signInWithUsername(auth, { username, password, apiOrigin: API_ORIGIN })
+      } else if (signingUp) {
+        await signUp(auth, { email, password, username })
+      } else {
+        await signIn(auth, { email, password })
+      }
     } catch (err) {
       setError(accountErrorKey(err))
       setSubmitting(false)
@@ -171,6 +234,12 @@ function AuthForm() {
   }
 
   const onForgot = async () => {
+    if (submitting) return
+    if (usingUsername) {
+      switchMode('recover')
+      return
+    }
+    setSubmitting(true)
     setError(null)
     setNotice(null)
     try {
@@ -178,77 +247,129 @@ function AuthForm() {
       setNotice(t('account.reset_sent', { email: email.trim() }))
     } catch (err) {
       setError(accountErrorKey(err))
+    } finally {
+      setSubmitting(false)
     }
   }
 
-  const canSubmit = email.trim() !== '' && password !== '' && (mode === 'signin' || username.trim() !== '')
+  if (issuedCode) {
+    return (
+      <View style={styles.card}>
+        <RecoveryCode code={issuedCode} onSaved={() => {
+          setIssuedCode('')
+          switchMode('signin')
+        }} />
+      </View>
+    )
+  }
 
   return (
     <View style={styles.card}>
-      <Segmented<Mode>
-        value={mode}
-        onChange={switchMode}
-        options={[
-          { value: 'signin', label: t('account.signin_tab') },
-          { value: 'signup', label: t('account.signup_tab') },
-        ]}
-      />
-      <Text variant="caption">{t(`account.${mode}_intro`)}</Text>
+      {mode === 'recover' ? (
+        <>
+          <Text variant="heading" accessibilityRole="header">{t('account.recover_title')}</Text>
+          <Text variant="caption">{t('account.recovery_wait_hint')}</Text>
+        </>
+      ) : (
+        <>
+          <Segmented<Mode>
+            value={mode}
+            onChange={(next) => {
+              if (!submitting && next !== mode) switchMode(next)
+            }}
+            options={[
+              { value: 'signin', label: t('account.signin_tab') },
+              { value: 'signup', label: t('account.signup_tab') },
+            ]}
+          />
+          <Text variant="caption">{t(`account.${mode}_intro`)}</Text>
+          <GoogleButton disabled={submitting} onError={setError} />
+          {usernameAvailable && (
+            <Segmented<AuthMethod>
+              value={method}
+              options={[
+                { value: 'email', label: t('account.method_email') },
+                { value: 'username', label: t('account.method_username') },
+              ]}
+              onChange={(next) => {
+                if (submitting || next === method) return
+                setMethod(next)
+                resetFormMessages()
+              }}
+            />
+          )}
+        </>
+      )}
 
-      <GoogleButton onError={setError} />
-
-      {mode === 'signup' && (
+      {needsUsername && (
         <Field
           label={t('account.username')}
-          hint={t('account.username_hint')}
+          hint={signingUp ? t('account.username_hint') : undefined}
           value={username}
           onChangeText={setUsername}
           placeholder={t('account.username_placeholder')}
           maxLength={USERNAME_MAX}
           autoCapitalize="none"
-          autoComplete="username-new"
-          textContentType="nickname"
+          autoComplete={signingUp ? 'username-new' : 'username'}
+          textContentType={usingUsername ? 'username' : 'nickname'}
         />
       )}
-      <Field
-        label={t('account.email')}
-        value={email}
-        onChangeText={setEmail}
-        placeholder={t('account.email_placeholder')}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        autoComplete="email"
-        textContentType="emailAddress"
-      />
+      {!usingUsername && (
+        <Field
+          label={t('account.email')}
+          value={email}
+          onChangeText={setEmail}
+          placeholder={t('account.email_placeholder')}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoComplete="email"
+          textContentType="emailAddress"
+        />
+      )}
+      {recovering && (
+        <Field
+          label={t('account.recovery_code')}
+          value={recoveryCode}
+          onChangeText={setRecoveryCode}
+          autoCapitalize="none"
+          autoComplete="off"
+          textContentType="none"
+          maxLength={128}
+        />
+      )}
       <Field
         label={t('account.password')}
         value={password}
         onChangeText={setPassword}
-        placeholder={mode === 'signup' ? t('account.password_placeholder') : undefined}
+        placeholder={signingUp && !usingUsername ? t('account.password_placeholder') : undefined}
+        hint={usingUsername && newPassword ? t('account.username_password_hint') : undefined}
         secureTextEntry
         autoCapitalize="none"
-        autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
-        textContentType={mode === 'signup' ? 'newPassword' : 'password'}
+        autoComplete={newPassword ? 'new-password' : 'current-password'}
+        textContentType={newPassword ? 'newPassword' : 'password'}
         returnKeyType="go"
-        onSubmitEditing={() => canSubmit && onSubmit()}
+        onSubmitEditing={onSubmit}
       />
 
       {error && <Message kind="error" text={t(`account.errors.${error}`)} />}
       {notice && <Message kind="notice" text={notice} />}
-      {mode === 'signup' && <SignupNotice />}
+      {signingUp && <SignupNotice />}
 
       <Button
-        label={t(mode === 'signup' ? 'account.signup' : 'account.signin')}
+        label={t(recovering ? 'account.recover_submit' : signingUp ? 'account.signup' : 'account.signin')}
         onPress={onSubmit}
         loading={submitting}
         disabled={!canSubmit}
       />
       {mode === 'signin' && (
-        <Touchable accessibilityRole="button" onPress={onForgot} style={styles.link}>
+        <Touchable accessibilityRole="button" disabled={submitting} onPress={onForgot} style={styles.link}>
           <Text variant="bodyStrong" color={colors.accent} style={{ fontSize: 14 }}>
             {t('account.forgot')}
           </Text>
         </Touchable>
+      )}
+      {recovering && (
+        <Button label={t('account.back_to_signin')} variant="ghost" disabled={submitting} onPress={() => switchMode('signin')} />
       )}
     </View>
   )
@@ -304,6 +425,66 @@ function ChooseUsername() {
   )
 }
 
+function RecoveryCodeSettings({ username }: { username: string }) {
+  const styles = useStyles()
+  const { t } = useTranslation()
+  const [replacing, setReplacing] = useState(false)
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+  const [issuedCode, setIssuedCode] = useState('')
+
+  const close = () => {
+    setReplacing(false)
+    setPassword('')
+    setError(null)
+    setIssuedCode('')
+  }
+
+  const submit = async () => {
+    if (submitting || !password) return
+    setSubmitting(true)
+    setError(null)
+    try {
+      setIssuedCode(await rotateUsernameRecoveryCode(auth, { username, password, apiOrigin: API_ORIGIN }))
+      setPassword('')
+    } catch (err) {
+      setError(accountErrorKey(err))
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  if (!replacing) {
+    return (
+      <Button label={t('account.recovery_replace')} variant="secondary" onPress={() => setReplacing(true)} />
+    )
+  }
+  return (
+    <View style={styles.card}>
+      {issuedCode ? <RecoveryCode code={issuedCode} onSaved={close} /> : (
+        <>
+          <Text variant="caption">{t('account.recovery_replace_intro')}</Text>
+          <Field
+            label={t('account.password')}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            autoCapitalize="none"
+            autoComplete="current-password"
+            textContentType="password"
+            returnKeyType="go"
+            onSubmitEditing={submit}
+          />
+          {error && <Message kind="error" text={t(`account.errors.${error}`)} />}
+          <Button label={t('account.recovery_replace')} onPress={submit} loading={submitting} disabled={!password} />
+          <Button label={t('account.cancel')} variant="ghost" onPress={close} disabled={submitting} />
+        </>
+      )}
+    </View>
+  )
+}
+
 function AccountSettings({ account }: { account: Account }) {
   const styles = useStyles()
   const colors = useColors()
@@ -318,7 +499,9 @@ function AccountSettings({ account }: { account: Account }) {
     setError(null)
     try {
       await forgetDevice()
-      const proof = account.hasPassword ? { password } : { reauthenticate: reauthenticateWithGoogle }
+      const proof = account.hasPassword
+        ? { password, username: account.usernamePassword ? account.username ?? undefined : undefined }
+        : { reauthenticate: reauthenticateWithGoogle }
       await deleteAccount(auth, { ...proof, apiOrigin: API_ORIGIN })
     } catch (err) {
       const key = accountErrorKey(err)
@@ -328,12 +511,12 @@ function AccountSettings({ account }: { account: Account }) {
   }
 
   return (
-    <CollapsibleSection id="own.settings" title={t('profile.settings_title')} summary={account.email ?? undefined}>
+    <CollapsibleSection id="own.settings" title={t('profile.settings_title')} summary={account.email ?? account.username ?? undefined}>
       <View style={{ gap: space.md }}>
         <View style={styles.card}>
           <View style={{ gap: 2 }}>
             <Text variant="label">{t('account.signed_in_as')}</Text>
-            <Text variant="bodyStrong">{account.email}</Text>
+            <Text variant="bodyStrong">{account.email ?? account.username}</Text>
           </View>
           <Text variant="caption">{t('account.prefill_hint')}</Text>
           <Button
@@ -345,6 +528,8 @@ function AccountSettings({ account }: { account: Account }) {
         </View>
 
         <NotificationsCard uid={account.uid} />
+
+        {!deleting && account.usernamePassword && account.username && <RecoveryCodeSettings username={account.username} />}
 
         {deleting ? (
           <View style={styles.card}>
@@ -449,7 +634,7 @@ function FriendsCard({ count, pending }: { count: number; pending: number }) {
   )
 }
 
-function Profile({ account }: { account: Account }) {
+function Profile({ account, focused }: { account: Account; focused: boolean }) {
   const styles = useStyles()
   const { t, i18n } = useTranslation()
   const friendships = useFriendships(account.uid)
@@ -496,7 +681,7 @@ function Profile({ account }: { account: Account }) {
         friendsCount={friendships.loading ? undefined : friendships.friends.length}
         onSeeHistory={() => router.push({ pathname: '/history', params: { uid: account.uid } })}
       />
-      <AccountSettings account={account} />
+      {focused && <AccountSettings account={account} />}
     </View>
   )
 }
@@ -526,6 +711,7 @@ export default function ProfileScreen() {
   const colors = useColors()
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
+  const focused = useIsFocused()
   const { loading, account } = useAccount()
   const signedIn = !!account && !account.needsUsername
 
@@ -544,7 +730,8 @@ export default function ProfileScreen() {
           <ActivityIndicator color={colors.accent} style={{ marginTop: space.xxl }} />
         ) : (
           <Animated.View key={!account ? 'form' : account.needsUsername ? 'choose' : 'profile'} entering={FadeIn.duration(200)}>
-            {!account ? <AuthForm /> : account.needsUsername ? <ChooseUsername /> : <Profile account={account} />}
+            {/* Tabs remain mounted when hidden. Drop passwords and recovery codes on blur. */}
+            {!account ? (focused && <AuthForm />) : account.needsUsername ? <ChooseUsername /> : <Profile account={account} focused={focused} />}
           </Animated.View>
         )}
         {!loading && <ThemeCard />}
@@ -567,6 +754,14 @@ const useStyles = makeStyles((colors) => ({
     color: colors.text,
     fontFamily: fonts.bodyMedium,
     fontSize: 16,
+  },
+  recoveryCode: {
+    backgroundColor: colors.bg,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    fontFamily: fonts.mono,
+    padding: space.md,
   },
   message: { borderRadius: radius.sm, paddingHorizontal: space.md, paddingVertical: space.sm },
   link: { alignSelf: 'center', paddingVertical: space.sm, paddingHorizontal: space.md },

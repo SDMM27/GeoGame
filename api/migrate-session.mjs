@@ -6,6 +6,7 @@ import { cert, getApps, initializeApp } from 'firebase-admin/app'
 import { getAuth } from 'firebase-admin/auth'
 
 import { migrateSession } from './_lib/migrateSession.mjs'
+import usernameAccountHandler from './_lib/usernameAccountRoute.mjs'
 
 function adminApp() {
   if (getApps().length) return getApps()[0]
@@ -14,6 +15,8 @@ function adminApp() {
 }
 
 export default async function handler(req, res) {
+  // The Vercel rewrite shares this function with /api/username-account to stay within the function limit.
+  if (req.query?.flow === 'username-account') return usernameAccountHandler(req, res)
   // Called from the app (another origin); the refresh token in the body is the credential, no cookies.
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')

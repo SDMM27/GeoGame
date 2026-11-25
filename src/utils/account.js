@@ -25,15 +25,13 @@ import {
 } from 'firebase/firestore'
 import { firestore } from '../Firebase'
 import { setOwnUid, writeSnapshot } from './localSnapshot'
-import { containsProfanity } from './profanity'
+import { normalizeUsername, usernameKey, validateUsername } from './usernameRules.mjs'
+import { signInWithUsername, UsernameAccountError } from './usernameAccount'
 
-export const USERNAME_MIN = 3
-export const USERNAME_MAX = 20
+export { normalizeUsername, USERNAME_MIN, USERNAME_MAX, validateUsername } from './usernameRules.mjs'
 export const PASSWORD_MIN = 6
 // Same key as the score and multiplayer forms, so they get prefilled with the account's username.
 export const PSEUDO_STORAGE_KEY = 'geogame_pseudo'
-
-const USERNAME_PATTERN = /^[\p{L}\p{N}][\p{L}\p{N} _.-]*$/u
 
 class AccountError extends Error {
   constructor(code) {
@@ -42,20 +40,7 @@ class AccountError extends Error {
   }
 }
 
-export function normalizeUsername(username) {
-  return username.trim().replace(/\s+/g, ' ')
-}
-
-// Returns an i18n error key (under `account.errors`), or null when the username is valid.
-export function validateUsername(username) {
-  const name = normalizeUsername(username)
-  if (name.length < USERNAME_MIN || name.length > USERNAME_MAX) return 'username_length'
-  if (!USERNAME_PATTERN.test(name)) return 'username_chars'
-  if (containsProfanity(name)) return 'username_forbidden'
-  return null
-}
-
-const usernameRef = (username) => doc(firestore, 'usernames', normalizeUsername(username).toLowerCase())
+const usernameRef = (username) => doc(firestore, 'usernames', usernameKey(username))
 const userRef = (uid) => doc(firestore, 'users', uid)
 
 // Listeners refreshed once a username is claimed, since that doesn't fire onAuthStateChanged.
@@ -69,7 +54,11 @@ const ACCOUNT_KEY = 'geogame_account'
 function readRemembered(uid) {
   try {
     const saved = JSON.parse(globalThis.localStorage?.getItem(ACCOUNT_KEY) ?? 'null')
-    return saved?.uid === uid && saved.username ? { username: saved.username, createdAt: saved.createdAt ?? null } : null
+    return saved?.uid === uid && saved.username ? {
+      username: saved.username,
+      createdAt: saved.createdAt ?? null,
+      usernamePassword: saved.usernamePassword === true,
+    } : null
   } catch {
     return null
   }
@@ -78,13 +67,25 @@ function readRemembered(uid) {
 function rememberAccount(uid, data) {
   try {
     const createdAt = data.createdAt?.toMillis?.() ?? null
-    globalThis.localStorage?.setItem(ACCOUNT_KEY, JSON.stringify({ uid, username: data.username, createdAt }))
+    const usernamePassword = data.usernamePassword === true
+    globalThis.localStorage?.setItem(ACCOUNT_KEY, JSON.stringify({ uid, username: data.username, createdAt, usernamePassword }))
   } catch {
     // Storage unavailable: the account is just loaded from the network every time.
   }
 }
 
-// { uid, email, username, createdAt, needsUsername, hasPassword } or null.
+function withProfile(account, { username, usernamePassword, createdAt }) {
+  return {
+    ...account,
+    username,
+    createdAt,
+    usernamePassword,
+    hasPassword: account.hasPassword || usernamePassword,
+    needsUsername: false,
+  }
+}
+
+// { uid, email, username, createdAt, needsUsername, hasPassword, usernamePassword } or null.
 // needsUsername: after a first Google sign-in, the player still has to pick a username.
 async function loadAccount(user) {
   if (!user) return null
@@ -99,19 +100,18 @@ async function loadAccount(user) {
     const remembered = readRemembered(user.uid)
     if (remembered) {
       getDoc(userRef(user.uid)).then((profile) => profile.exists() && rememberAccount(user.uid, profile.data())).catch(() => {})
-      return { ...account, ...remembered, needsUsername: false }
+      return withProfile(account, remembered)
     }
     const cached = await getDocFromCache(userRef(user.uid)).catch(() => null)
     const profile = cached?.exists() ? cached : await getDoc(userRef(user.uid))
     if (profile.exists()) rememberAccount(user.uid, profile.data())
-    return profile.exists()
-      ? {
-          ...account,
-          username: profile.data().username,
-          createdAt: profile.data().createdAt?.toMillis?.() ?? null,
-          needsUsername: false,
-        }
-      : { ...account, username: null, createdAt: null, needsUsername: true }
+    if (!profile.exists()) return { ...account, username: null, createdAt: null, needsUsername: true }
+    const data = profile.data()
+    return withProfile(account, {
+      username: data.username,
+      createdAt: data.createdAt?.toMillis?.() ?? null,
+      usernamePassword: data.usernamePassword === true,
+    })
   } catch (error) {
     // Offline: the display name is set to the username when it's claimed.
     console.warn('[account] profile', error?.code, error)
@@ -225,14 +225,17 @@ export function resetPassword(auth, email) {
 // Deleting needs a recent sign-in: the password is asked again, or Google's `reauthenticate` (accountGoogle.js).
 // The data goes on the server (api/delete-account): profile, history, friends, leaderboard entries, then the account.
 // `apiOrigin`: '' on the site (same origin), the site's address in the app.
-export async function deleteAccount(auth, { password, reauthenticate, apiOrigin = '' }) {
+export async function deleteAccount(auth, { password, username, reauthenticate, apiOrigin = '' }) {
   const user = auth.currentUser
   if (!user) return
-  if (password != null) await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, password))
+  if (username) await signInWithUsername(auth, { username, password, apiOrigin, expectedUid: user.uid })
+  else if (password != null) await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, password))
   else await reauthenticate(user)
+  const currentUser = auth.currentUser
+  if (!currentUser || currentUser.uid !== user.uid) throw new AccountError('wrong_credentials')
   const response = await fetch(`${apiOrigin}/api/delete-account`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${await user.getIdToken(true)}` },
+    headers: { Authorization: `Bearer ${await currentUser.getIdToken(true)}` },
   }).catch(() => {
     throw new AccountError('network')
   })
@@ -272,7 +275,7 @@ const FIREBASE_ERRORS = {
 // i18n key (under `account.errors`) for any error thrown by the functions above.
 // 'cancelled' (Google popup closed) is meant to be ignored, not shown.
 export function accountErrorKey(error) {
-  if (error instanceof AccountError) return error.code
+  if (error instanceof AccountError || error instanceof UsernameAccountError) return error.code
   const key = FIREBASE_ERRORS[error?.code] ?? 'generic'
   // Configuration problems and unknown errors are for the developer: keep the real cause in the logs.
   if (key === 'not_enabled' || key === 'generic') console.warn('[account]', error?.code, error)

@@ -52,6 +52,7 @@
 
 .account-error { color: var(--gg-danger-strong); background: var(--gg-danger-soft); border-radius: var(--sd-radius-sm); padding: 0.5rem 0.75rem; margin: 0; font-size: 0.9rem; }
 .account-notice { color: var(--gg-success-strong); background: var(--gg-success-soft); border-radius: var(--sd-radius-sm); padding: 0.5rem 0.75rem; margin: 0; font-size: 0.9rem; }
+.account-recovery-code { border: 1px solid var(--sd-line); border-radius: var(--sd-radius-sm); background: var(--sd-bg); font-family: var(--sd-font-mono); overflow-wrap: anywhere; padding: 0.65rem 0.8rem; }
 
 .account-submit {
   padding: 0.7rem 1rem;

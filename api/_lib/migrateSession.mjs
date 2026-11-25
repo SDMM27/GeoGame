@@ -41,6 +41,9 @@ export async function migrateSession({ auth, refreshToken, fetchImpl = fetch, en
   try {
     // checkRevoked: a session revoked since (password change, sign-out everywhere) isn't carried over.
     decoded = await auth.verifyIdToken(idToken, true)
+    // Modern username/password sessions already use the native SDK. They must not be exchanged
+    // for a migration token with a longer lifetime than their own sign-in bridge issues.
+    if (decoded.geogameUsernamePassword === true) return reply(401, { error: 'unauthenticated' })
   } catch {
     return reply(401, { error: 'unauthenticated' })
   }

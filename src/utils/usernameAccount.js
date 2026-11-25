@@ -3,7 +3,8 @@ import { signInWithCustomToken } from 'firebase/auth'
 export { USERNAME_PASSWORD_MIN, USERNAME_PASSWORD_MAX } from './usernamePasswordLimits.mjs'
 
 const PATH = '/api/username-account'
-const SITE_PREVIEW_HOST = /^geo-game-git-[a-z0-9-]+-sdmms-projects\.vercel\.app$/
+// Branch previews (geo-game-git-<branch>-…) and deployment previews (geo-game-<id>-…) both end in -sdmms-projects.vercel.app.
+const SITE_PREVIEW_HOST = /^geo-game-(?:git-[a-z0-9-]+|[a-z0-9]+)-sdmms-projects\.vercel\.app$/
 const SITE_ORIGIN = 'https://geo-game.app'
 const API_ERRORS = new Set([
   'username_length', 'username_chars', 'username_forbidden', 'username_taken',

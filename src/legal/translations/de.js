@@ -20,13 +20,15 @@ export default {
           'Mit einem Konto verarbeiten wir zusätzlich:',
           {
             list: [
-              'deine E-Mail-Adresse und dein Passwort, das Firebase Authentication verschlüsselt speichert: Wir haben nie Zugriff darauf. Wenn du dich mit Google anmeldest, erhalten wir die E-Mail-Adresse und die Kennung deines Google-Kontos (Google kann auch deinen Namen und dein Profilbild übermitteln, die wir nicht verwenden);',
+              'deine E-Mail-Adresse, wenn du dich mit einer E-Mail-Adresse registrierst oder dich mit Google anmeldest. Firebase Authentication verwaltet das Passwort für Konten mit E-Mail-Adresse. Bei der Anmeldung mit Google erhalten wir auch die Kennung deines Google-Kontos (Google kann auch deinen Namen und dein Profilbild übermitteln, die wir nicht verwenden);',
+              'wenn du ein Konto mit Benutzername und Passwort erstellst, fragen wir nach keiner E-Mail-Adresse. Unser Server verarbeitet dein Passwort kurzzeitig. Amazon Cognito speichert die zur Prüfung nötigen Daten. GeoGame speichert nur einen Hash des Wiederherstellungscodes;',
               'deinen Benutzernamen, das Erstellungsdatum des Kontos und deine Anmeldedaten;',
               'deinen Spielverlauf (Spiel, Modus, Punktzahl, Zeit, Datum) und deine Punktzahlen in den Ranglisten, einschließlich der probierten Antworten bei den Tageschallenges;',
               'deine Freundschaftsanfragen, deine Freunde und die Raumeinladungen, die du sendest oder erhältst;',
               'wenn du Benachrichtigungen erlaubst, in der App oder in der Web-App auf deinem Startbildschirm: eine Benachrichtigungskennung des Geräts (Expo-Token oder Web-Push-Abonnement), deine Sprache, deinen Gerätetyp und deine Wahl für die tägliche Erinnerung.',
             ],
           },
+          'Wenn du das Passwort eines Kontos ohne E-Mail-Adresse festlegst oder zurücksetzt, prüfen wir, ob es in bekannten Datenlecks vorkommt. Nur die ersten fünf Zeichen des SHA-1-Hashes werden an Pwned Passwords gesendet. Wir verwenden pseudonymisierte Zähler, um die Zahl der Versuche zu begrenzen.',
           'Für alle verarbeiten unsere Hosting-Anbieter außerdem die IP-Adresse und technische Informationen jeder Anfrage (Browser, Gerät), um den Dienst zu betreiben und abzusichern. Auf der Website misst Vercel Web Analytics die Reichweite ohne Cookies und liefert nur zusammengefasste Besuchsstatistiken, und Firebase App Check nutzt Google reCAPTCHA Enterprise, das Browsersignale auswertet, um zu prüfen, ob Anfragen wirklich vom Spiel stammen.',
         ],
       },
@@ -59,6 +61,7 @@ export default {
           {
             list: [
               'Google (Firebase Authentication, Cloud Firestore, App Check, reCAPTCHA Enterprise): Konten, Datenbank und Missbrauchsschutz;',
+              'Amazon Web Services (Amazon Cognito): Anmeldung bei Konten ohne E-Mail-Adresse;',
               'Vercel Inc.: Hosting der Website und der Serverfunktionen, Reichweitenmessung;',
               'Expo (650 Industries, Inc.): Zustellung von Benachrichtigungen und App-Updates;',
               'Push-Dienste der Browser (je nach Gerät Apple, Google, Mozilla oder Microsoft): Zustellung der Benachrichtigungen der Web-App;',
@@ -75,6 +78,7 @@ export default {
           {
             list: [
               'Konto und zugehörige Daten: solange das Konto besteht. Ein Konto, das 3 Jahre lang nicht genutzt wird (keine Anmeldung, kein Spiel), wird automatisch mit allen Daten gelöscht.',
+              'Pseudonymisierte Zähler zur Begrenzung der Versuche: Abgelaufene Zähler werden bei der täglichen Bereinigung gelöscht.',
               'Ohne Konto gespeicherte Punktzahlen: solange die Rangliste besteht. Du kannst ihre Löschung verlangen.',
               'Mehrspieler-Räume: werden beim Ablauf automatisch gelöscht, spätestens 10 Tage nach ihrer Erstellung. Einladungen: höchstens einen Tag.',
               'Benachrichtigungs-Token: bis sich das Gerät abmeldet, das Konto gelöscht wird oder das Gerät keine Benachrichtigungen mehr empfangen kann.',
@@ -143,7 +147,7 @@ export default {
         id: 'account',
         title: 'Konto',
         blocks: [
-          'Ein Konto dürfen nur Personen ab 13 Jahren erstellen, zwischen 13 und 15 Jahren nur mit Zustimmung eines Elternteils. Du verpflichtest dich, eine gültige E-Mail-Adresse anzugeben und dein Passwort geheim zu halten. Du kannst dein Konto jederzeit löschen ([Mein Konto löschen](/delete-account)).',
+          'Ein Konto dürfen nur Personen ab 13 Jahren erstellen, zwischen 13 und 15 Jahren nur mit Zustimmung eines Elternteils. Wenn du eine E-Mail-Adresse angibst, muss sie gültig sein. Halte dein Passwort und gegebenenfalls deinen Wiederherstellungscode geheim. Du kannst dein Konto jederzeit löschen ([Mein Konto löschen](/delete-account)).',
         ],
       },
       {
@@ -267,7 +271,8 @@ export default {
         id: 'email',
         title: 'Wenn du dich nicht mehr anmelden kannst',
         blocks: [
-          'Schreib an {email} von der E-Mail-Adresse deines Kontos aus und nenne deinen Benutzernamen. Wir löschen das Konto innerhalb von höchstens 30 Tagen und bestätigen es dir.',
+          'Wenn du für ein Konto ohne E-Mail-Adresse dein Passwort vergessen hast, setze es mit deinem Wiederherstellungscode zurück. Melde dich dann an, um das Konto zu löschen.',
+          'Für andere Löschanfragen schreib an {email} und nenne deinen Benutzernamen. Wenn eine E-Mail-Adresse mit dem Konto verknüpft ist, schreib von dieser Adresse aus. Wir können dich um einen Nachweis bitten, dass dir das Konto gehört. Gib niemals dein Passwort oder deinen Wiederherstellungscode weiter.',
         ],
       },
       {
@@ -276,7 +281,7 @@ export default {
         blocks: [
           {
             list: [
-              'dein Konto und deine E-Mail-Adresse;',
+              'dein Konto, die zugehörigen Anmeldedaten und deine E-Mail-Adresse, wenn sie mit dem Konto verknüpft ist;',
               'dein Benutzername, der wieder frei wird;',
               'dein Spielverlauf und deine Statistiken;',
               'deine Punktzahlen in allen Ranglisten;',

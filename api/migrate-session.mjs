@@ -4,8 +4,11 @@
 // FIREBASE_AUTH_EMULATOR_HOST replace the key.
 import { cert, getApps, initializeApp } from 'firebase-admin/app'
 import { getAuth } from 'firebase-admin/auth'
+import { getFirestore } from 'firebase-admin/firestore'
 
 import { migrateSession } from './_lib/migrateSession.mjs'
+import { hasUsernameCredential } from './_lib/usernameAccount.mjs'
+import usernameAccountHandler from './_lib/usernameAccountRoute.mjs'
 
 function adminApp() {
   if (getApps().length) return getApps()[0]
@@ -14,6 +17,8 @@ function adminApp() {
 }
 
 export default async function handler(req, res) {
+  // The Vercel rewrite shares this function with /api/username-account to stay within the function limit.
+  if (req.query?.flow === 'username-account') return usernameAccountHandler(req, res)
   // Called from the app (another origin); the refresh token in the body is the credential, no cookies.
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
@@ -22,7 +27,12 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'method_not_allowed' })
 
   try {
-    const { status, body } = await migrateSession({ auth: getAuth(adminApp()), refreshToken: req.body?.refreshToken })
+    const app = adminApp()
+    const { status, body } = await migrateSession({
+      auth: getAuth(app),
+      refreshToken: req.body?.refreshToken,
+      isUsernameAccount: (uid) => hasUsernameCredential(getFirestore(app), uid),
+    })
     return res.status(status).json(body)
   } catch (error) {
     console.error('[migrate-session]', error)

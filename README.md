@@ -66,6 +66,7 @@ Fonctions serverless Vercel déployées avec le site.
 | `POST /api/friend-push` | Envoie la notification push d'une demande d'ami envoyée ou acceptée (jeton Firebase de celui qui vient d'agir requis). |
 | `POST /api/daily-nudge` | Envoie à un ami la notification « viens me battre » après un défi du jour terminé (jeton Firebase requis ; l'expéditeur doit être ami avec lui et avoir joué ce défi aujourd'hui ; une fois par jeu, par ami et par jour). |
 | `POST /api/delete-account` | Supprime le compte et toutes ses données : profil, historique, jetons push, pseudo, scores des classements, signalements faits ou visant ses scores, amitiés, invitations, puis le compte Firebase Auth (`api/_lib/deleteAccount.mjs`). Jeton Firebase obtenu juste après une reconnexion (5 min au plus). Appelée par `deleteAccount` (`src/utils/account.js`) depuis le site et l'app ; en local avec `npm run dev`, `/api` n'est pas servi. |
+| `GET`, `POST /api/username-account` | Indique si les comptes sans e-mail sont disponibles. Gère l'inscription, la connexion et la récupération ou le remplacement du code de secours. |
 | `GET /api/cleanup-expired` | Supprime les salons, invitations et sondes expirés, et les comptes inutilisés depuis 3 ans (50 par passage au plus, durée annoncée dans la politique de confidentialité). Appelée chaque jour à 4 h par Vercel Cron (`vercel.json`). |
 | `GET /api/daily-reminder` | Rappelle les défis du jour aux joueurs connectés qui n'en ont fait aucun (désactivable par appareil dans le profil). Appelée chaque jour à 16 h UTC par Vercel Cron (`vercel.json`). |
 
@@ -77,6 +78,20 @@ Variables d'environnement du projet Vercel du site :
 - `CRON_SECRET` : chaîne aléatoire longue ; Vercel l'envoie en `Authorization: Bearer` à la tâche cron.
 
 Face aux émulateurs, `FIRESTORE_EMULATOR_HOST` (et `FIREBASE_AUTH_EMULATOR_HOST` pour `invite-push`) remplacent la clé. Ne commitez jamais de clé de compte de service.
+
+### Comptes sans e-mail
+
+Le site et l'app affichent l'option Pseudo quand l'API indique qu'elle est disponible. Utiliser un pool Amazon Cognito dédié avec identifiants `username`, aucun attribut e-mail ou téléphone obligatoire, création réservée aux administrateurs, pas de récupération native et pas de MFA sur ce pool. Configurer un client **sans secret** avec `ALLOW_ADMIN_USER_PASSWORD_AUTH` et `PreventUserExistenceErrors=ENABLED`. Le client et son pool restent côté serveur. Utiliser un pool et un projet Firebase isolés pour un essai de préproduction.
+
+- `USERNAME_AUTH_POOL_ID` et `USERNAME_AUTH_CLIENT_ID` identifient le pool et son client. La région est déduite de l'identifiant du pool.
+- `USERNAME_AUTH_AWS_ROLE_ARN` donne le rôle assumé depuis le [projet Vercel par OIDC](https://vercel.com/docs/oidc/aws). Limiter la confiance au projet et à l'environnement concernés et les droits au pool dédié. Le rôle nécessite `cognito-idp:AdminCreateUser`, `cognito-idp:AdminSetUserPassword`, `cognito-idp:AdminInitiateAuth` et `cognito-idp:AdminDeleteUser`. En exécution locale hors Vercel, le SDK peut utiliser le profil AWS local.
+- `USERNAME_AUTH_PEPPER` est une clé de 32 octets en hexadécimal, par exemple générée avec `openssl rand -hex 32`. La conserver comme secret et la sauvegarder. Elle doit rester stable pour que les mots de passe existants continuent à fonctionner.
+
+Avant d'activer l'option, vérifier l'inscription, la reconnexion sur un second appareil, la récupération, le rejet du code déjà utilisé et la suppression dans Firebase et Cognito. Pour une préproduction, pointer aussi l'app vers l'API de test avec `EXPO_PUBLIC_API_ORIGIN`.
+
+Les mots de passe sont vérifiés par Cognito. À l'inscription et à la récupération, [Pwned Passwords](https://haveibeenpwned.com/api/v3/#PwnedPasswords) reçoit un préfixe de cinq caractères du hash pour le contrôle des fuites. En cas d'indisponibilité de ce contrôle, seuls l'inscription et le changement de mot de passe sont interrompus. Firestore conserve le hash du code de secours et les compteurs d'essais sous des identifiants calculés côté serveur. Ces collections sont réservées au serveur par les règles Firestore.
+
+En production, le jeton intermédiaire de connexion doit être échangé dans les 30 secondes. Lors d'une récupération, l'API bloque les nouvelles connexions, retire les méthodes qui auraient été liées directement dans Firebase, attend la fin de cette fenêtre, puis révoque les jetons de renouvellement Firebase. Les jetons d'identité déjà délivrés peuvent rester valides jusqu'à leur expiration sur les accès qui ne vérifient pas la révocation. Conserver la configuration du pool tant que des comptes en dépendent, y compris pour terminer les suppressions.
 
 ## Firestore
 

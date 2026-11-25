@@ -210,7 +210,10 @@ service cloud.firestore {
         && getAfter(/databases/$(database)/documents/usernames/$(userKey(request.resource.data))).data.uid == uid
         && getAfter(/databases/$(database)/documents/usernames/$(userKey(request.resource.data))).data.username == request.resource.data.username;
       allow delete: if request.auth != null && request.auth.uid == uid
-        && (resource == null || !existsAfter(/databases/$(database)/documents/usernames/$(userKey(resource.data))));
+        && (resource == null || (
+          resource.data.get('usernamePassword', false) != true
+          && !existsAfter(/databases/$(database)/documents/usernames/$(userKey(resource.data)))
+        ));
 
       // Game history (src/utils/gameHistory.js): written once, never edited.
       match /games/{gameId} {

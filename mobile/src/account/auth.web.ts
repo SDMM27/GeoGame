@@ -16,6 +16,7 @@ export type Account = {
   // First Google sign-in: a username still has to be chosen.
   needsUsername: boolean
   hasPassword: boolean
+  usernamePassword?: boolean
   createdAt: number | null
 }
 

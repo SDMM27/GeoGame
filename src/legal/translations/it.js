@@ -20,13 +20,15 @@ export default {
           'Con un account trattiamo inoltre:',
           {
             list: [
-              'il tuo indirizzo email e la tua password, che Firebase Authentication conserva cifrata: non vi abbiamo mai accesso. Se accedi con Google, riceviamo l\'indirizzo email e l\'identificatore del tuo account Google (Google può anche trasmettere il tuo nome e la tua foto profilo, che non usiamo);',
+              'il tuo indirizzo email se ti registri con un indirizzo email o accedi con Google. Firebase Authentication gestisce la password degli account creati con un indirizzo email. Se accedi con Google, riceviamo anche l’identificativo del tuo account Google (Google può trasmettere anche il tuo nome e la tua foto profilo, che non usiamo);',
+              'se crei un account con nome utente e password, non ti chiediamo un indirizzo email. Il nostro server elabora brevemente la password. Amazon Cognito conserva i dati necessari per verificarla. GeoGame conserva solo un hash del codice di recupero;',
               "il tuo nome utente, la data di creazione dell'account e le date di accesso;",
               'la cronologia delle tue partite (gioco, modalità, punteggio, tempo, data) e i tuoi punteggi nelle classifiche, comprese le risposte provate nelle sfide del giorno;',
               'le tue richieste di amicizia, i tuoi amici e gli inviti alle stanze che invii o ricevi;',
               "se consenti le notifiche, nell'app o nella web app aggiunta alla schermata Home: un identificatore di notifica del dispositivo (token Expo o iscrizione Web Push), la tua lingua, il tipo di dispositivo e la tua scelta per il promemoria giornaliero.",
             ],
           },
+          'Quando imposti o reimposti la password di un account senza email, controlliamo se compare in violazioni di dati note. A Pwned Passwords inviamo solo i primi cinque caratteri del suo hash SHA-1. Usiamo contatori pseudonimizzati per limitare i tentativi.',
           "Per tutti, i nostri fornitori di hosting trattano anche l'indirizzo IP e le informazioni tecniche di ogni richiesta (browser, dispositivo) per far funzionare e proteggere il servizio. Sul sito, Vercel Web Analytics misura il pubblico senza cookie e fornisce solo statistiche aggregate sulle visite, e Firebase App Check usa Google reCAPTCHA Enterprise, che analizza segnali del browser per verificare che le richieste provengano davvero dal gioco.",
         ],
       },
@@ -59,6 +61,7 @@ export default {
           {
             list: [
               'Google (Firebase Authentication, Cloud Firestore, App Check, reCAPTCHA Enterprise): account, database e protezione dagli abusi;',
+              'Amazon Web Services (Amazon Cognito): autenticazione degli account senza email;',
               'Vercel Inc.: hosting del sito e delle funzioni server, misurazione del pubblico;',
               "Expo (650 Industries, Inc.): invio delle notifiche e degli aggiornamenti dell'app;",
               'servizi push dei browser (Apple, Google, Mozilla o Microsoft a seconda del dispositivo): invio delle notifiche della web app;',
@@ -75,6 +78,7 @@ export default {
           {
             list: [
               "Account e dati collegati: finché l'account esiste. Un account inutilizzato per 3 anni (nessun accesso, nessuna partita) viene eliminato automaticamente con tutti i suoi dati.",
+              'Contatori pseudonimizzati per limitare i tentativi: i contatori scaduti vengono eliminati durante una pulizia giornaliera.',
               'Punteggi salvati senza account: finché esiste la classifica. Puoi chiederne la cancellazione.',
               'Stanze multigiocatore: eliminate automaticamente alla scadenza, al massimo 10 giorni dopo la creazione. Inviti: al massimo un giorno.',
               "Token di notifica: finché il dispositivo non esce dall'account, l'account non viene eliminato o il dispositivo non può più riceverle.",
@@ -143,7 +147,7 @@ export default {
         id: 'account',
         title: 'Account',
         blocks: [
-          "La creazione di un account è riservata a chi ha almeno 13 anni e, tra i 13 e i 15 anni, a chi ha il consenso di un genitore. Ti impegni a fornire un indirizzo email valido e a mantenere riservata la tua password. Puoi eliminare il tuo account in qualsiasi momento ([Elimina il mio account](/delete-account)).",
+          'La creazione di un account è riservata a chi ha almeno 13 anni e, tra i 13 e i 15 anni, a chi ha il consenso di un genitore. Se fornisci un indirizzo email, deve essere valido. Tieni riservati la password e l’eventuale codice di recupero. Puoi eliminare il tuo account in qualsiasi momento ([Elimina il mio account](/delete-account)).',
         ],
       },
       {
@@ -267,7 +271,8 @@ export default {
         id: 'email',
         title: 'Se non riesci più ad accedere',
         blocks: [
-          "Scrivi a {email} dall'indirizzo email del tuo account, indicando il tuo nome utente. Eliminiamo l'account entro 30 giorni al massimo e te lo confermiamo.",
+          'Se hai un account senza email e hai dimenticato la password, usa il codice di recupero per reimpostarla. Poi accedi per eliminare l’account.',
+          'Per le altre richieste di eliminazione, scrivi a {email} indicando il tuo nome utente. Se all’account è associato un indirizzo email, scrivi da quell’indirizzo. Potremmo chiederti di dimostrare che l’account ti appartiene. Non condividere mai la password o il codice di recupero.',
         ],
       },
       {
@@ -276,7 +281,7 @@ export default {
         blocks: [
           {
             list: [
-              'il tuo account e il tuo indirizzo email;',
+              'il tuo account, i dati di accesso e l’indirizzo email se è associato all’account;',
               'il tuo nome utente, che torna disponibile;',
               'la cronologia delle tue partite e le tue statistiche;',
               'i tuoi punteggi in tutte le classifiche;',

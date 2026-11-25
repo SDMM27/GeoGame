@@ -8,12 +8,17 @@
     }
   ],
   "rewrites": [
+    { "source": "/api/username-account", "destination": "/api/migrate-session?flow=username-account" },
     {
       "source": "/:page(game|flag-game|capitals-game|border-guess|country-clue|voyage-voyage|ranking|country-of-the-day|challenge|survival|atlas|multiplayer|scores|privacy|terms)",
       "destination": "/:page/index.html"
     },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
+  "functions": {
+    "api/migrate-session.mjs": { "maxDuration": 60 },
+    "api/delete-account.mjs": { "maxDuration": 60 }
+  },
   "crons": [
     { "path": "/api/cleanup-expired", "schedule": "0 4 * * *" },
     { "path": "/api/daily-reminder", "schedule": "0 16 * * *" },

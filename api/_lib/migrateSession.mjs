@@ -15,8 +15,9 @@ function tokenUrl(env) {
     : `https://securetoken.googleapis.com/v1/token?key=${key}`
 }
 
-// `auth`: firebase-admin Auth. `fetchImpl` and `env` can be replaced by tests.
-export async function migrateSession({ auth, refreshToken, fetchImpl = fetch, env = process.env }) {
+// `auth`: firebase-admin Auth. The lookup checks server-only username credentials even if a
+// Firebase-native provider is linked to that account and the new session lacks the bridge claim.
+export async function migrateSession({ auth, refreshToken, isUsernameAccount, fetchImpl = fetch, env = process.env }) {
   if (typeof refreshToken !== 'string' || !refreshToken) return reply(401, { error: 'unauthenticated' })
 
   let response
@@ -41,8 +42,12 @@ export async function migrateSession({ auth, refreshToken, fetchImpl = fetch, en
   try {
     // checkRevoked: a session revoked since (password change, sign-out everywhere) isn't carried over.
     decoded = await auth.verifyIdToken(idToken, true)
+    // Modern username/password sessions already use the native SDK. They must not be exchanged
+    // for a migration token with a longer lifetime than their own sign-in bridge issues.
+    if (decoded.geogameUsernamePassword === true) return reply(401, { error: 'unauthenticated' })
   } catch {
     return reply(401, { error: 'unauthenticated' })
   }
+  if (await isUsernameAccount(decoded.uid)) return reply(401, { error: 'unauthenticated' })
   return reply(200, { token: await auth.createCustomToken(decoded.uid) })
 }

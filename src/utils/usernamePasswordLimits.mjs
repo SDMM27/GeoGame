@@ -1,0 +1,2 @@
+export const USERNAME_PASSWORD_MIN = 15
+export const USERNAME_PASSWORD_MAX = 128

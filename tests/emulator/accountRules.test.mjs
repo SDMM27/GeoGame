@@ -51,6 +51,24 @@ beforeEach(async () => {
 })
 
 describe('claiming a username', () => {
+  it('keeps username credentials private and reserves the account type marker for the server', async () => {
+    const credential = 'usernameCredentials/alice'
+    await env.withSecurityRulesDisabled((context) => context.firestore().doc(credential).set({ recoveryHash: 'test' }))
+    await assertFails(as('alice').doc(credential).get())
+    await assertFails(anonymous().doc(credential).get())
+    await assertFails(as('alice').doc(credential).update({ recoveryHash: 'other' }))
+    await assertFails(claim(as('bob'), 'bob', 'Bob', { user: { usernamePassword: true } }))
+  })
+
+  it('leaves deletion of username-password profiles and their directory entries to the server', async () => {
+    await env.withSecurityRulesDisabled((context) => context.firestore().doc('users/alice').update({ usernamePassword: true }))
+    const db = as('alice')
+    const removal = db.batch()
+    removal.delete(db.doc('users/alice'))
+    removal.delete(db.doc('usernames/alice'))
+    await assertFails(removal.commit())
+  })
+
   it('refuses an explicitly offensive username', async () => {
     await assertFails(claim(as('bob'), 'bob', 'Connard42'))
     await assertFails(claim(as('bob'), 'bob', 'ПИДОР'))

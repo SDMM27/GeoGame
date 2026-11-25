@@ -20,13 +20,15 @@ export default {
           'Con una cuenta, tratamos además:',
           {
             list: [
-              'tu dirección de correo y tu contraseña, que Firebase Authentication guarda cifrada: nunca tenemos acceso a ella. Si inicias sesión con Google, recibimos la dirección de correo y el identificador de tu cuenta de Google (Google también puede enviar tu nombre y tu foto de perfil, que no usamos);',
+              'tu dirección de correo si te registras con ella o inicias sesión con Google. Firebase Authentication gestiona la contraseña de las cuentas creadas con correo. Si inicias sesión con Google, también recibimos el identificador de tu cuenta de Google (Google puede enviar tu nombre y tu foto de perfil, que no usamos);',
+              'si creas una cuenta con nombre de usuario y contraseña, no te pedimos una dirección de correo. Nuestro servidor procesa brevemente la contraseña. Amazon Cognito almacena los datos necesarios para verificarla. GeoGame solo guarda un hash del código de recuperación;',
               'tu nombre de usuario, la fecha de creación de la cuenta y las fechas de inicio de sesión;',
               'el historial de tus partidas (juego, modo, puntuación, tiempo, fecha) y tus puntuaciones en las clasificaciones, incluidas las respuestas probadas en los retos del día;',
               'tus solicitudes de amistad, tus amigos y las invitaciones a salas que envías o recibes;',
               'si permites las notificaciones, en la app o en la web app añadida a tu pantalla de inicio: un identificador de notificaciones del dispositivo (token de Expo o suscripción Web Push), tu idioma, tu tipo de dispositivo y tu elección para el recordatorio diario.',
             ],
           },
+          'Al crear o restablecer la contraseña de una cuenta sin correo, comprobamos si aparece en filtraciones de datos conocidas. Solo enviamos a Pwned Passwords los primeros cinco caracteres de su hash SHA-1. Usamos contadores seudonimizados para limitar los intentos.',
           'Para todos, nuestros proveedores de alojamiento tratan también la dirección IP y la información técnica de cada solicitud (navegador, dispositivo) para hacer funcionar y proteger el servicio. En el sitio web, Vercel Web Analytics mide la audiencia sin cookies y solo ofrece estadísticas agregadas de visitas, y Firebase App Check usa Google reCAPTCHA Enterprise, que analiza señales del navegador para comprobar que las solicitudes vienen realmente del juego.',
         ],
       },
@@ -59,6 +61,7 @@ export default {
           {
             list: [
               'Google (Firebase Authentication, Cloud Firestore, App Check, reCAPTCHA Enterprise): cuentas, base de datos y protección contra abusos;',
+              'Amazon Web Services (Amazon Cognito): autenticación de cuentas sin correo;',
               'Vercel Inc.: alojamiento del sitio web y de las funciones de servidor, medición de audiencia;',
               'Expo (650 Industries, Inc.): envío de notificaciones y actualizaciones de la app;',
               'servicios push de los navegadores (Apple, Google, Mozilla o Microsoft según tu dispositivo): envío de las notificaciones de la web app;',
@@ -75,6 +78,7 @@ export default {
           {
             list: [
               'Cuenta y datos asociados: mientras exista la cuenta. Una cuenta sin usar durante 3 años (sin inicio de sesión ni partidas) se elimina automáticamente con todos sus datos.',
+              'Contadores seudonimizados para limitar los intentos: los contadores caducados se eliminan durante una limpieza diaria.',
               'Puntuaciones guardadas sin cuenta: mientras exista la clasificación. Puedes pedir que se eliminen.',
               'Salas multijugador: se eliminan automáticamente al caducar, como máximo 10 días después de crearse. Invitaciones: un día como máximo.',
               'Tokens de notificación: hasta que el dispositivo cierre sesión, se elimine la cuenta o el dispositivo ya no pueda recibirlas.',
@@ -143,7 +147,7 @@ export default {
         id: 'account',
         title: 'Cuenta',
         blocks: [
-          'La creación de una cuenta está reservada a personas de 13 años o más y, entre 13 y 15 años, a quienes tengan el permiso de uno de sus padres. Te comprometes a dar una dirección de correo válida y a mantener tu contraseña en secreto. Puedes eliminar tu cuenta en cualquier momento ([Eliminar mi cuenta](/delete-account)).',
+          'La creación de una cuenta está reservada a personas de 13 años o más y, entre 13 y 15 años, a quienes tengan el permiso de uno de sus padres. Si facilitas una dirección de correo, debe ser válida. Mantén en secreto tu contraseña y, si lo tienes, tu código de recuperación. Puedes eliminar tu cuenta en cualquier momento ([Eliminar mi cuenta](/delete-account)).',
         ],
       },
       {
@@ -267,7 +271,8 @@ export default {
         id: 'email',
         title: 'Si ya no puedes iniciar sesión',
         blocks: [
-          'Escribe a {email} desde la dirección de correo de tu cuenta, indicando tu nombre de usuario. Eliminamos la cuenta en un plazo máximo de 30 días y te lo confirmamos.',
+          'Si tienes una cuenta sin correo y has olvidado la contraseña, usa tu código de recuperación para restablecerla. Después, inicia sesión para eliminar la cuenta.',
+          'Para otras solicitudes de eliminación, escribe a {email} e indica tu nombre de usuario. Si hay un correo vinculado a la cuenta, escribe desde esa dirección. Podemos pedirte que demuestres que la cuenta te pertenece. Nunca compartas tu contraseña ni tu código de recuperación.',
         ],
       },
       {
@@ -276,7 +281,7 @@ export default {
         blocks: [
           {
             list: [
-              'tu cuenta y tu dirección de correo;',
+              'tu cuenta, sus datos de acceso y tu correo si está vinculado a la cuenta;',
               'tu nombre de usuario, que vuelve a quedar disponible;',
               'tu historial de partidas y tus estadísticas;',
               'tus puntuaciones en todas las clasificaciones;',

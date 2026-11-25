@@ -50,6 +50,25 @@
 }
 .account-form input:focus { outline: none; border-color: var(--sd-accent); }
 
+.account-password { position: relative; }
+.account-form .account-password input { box-sizing: border-box; width: 100%; min-height: 44px; padding-inline-end: 3rem; }
+.account-password input::-ms-reveal { display: none; }
+.account-password-toggle {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  width: 44px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: var(--sd-radius-sm);
+  color: var(--sd-muted);
+  cursor: pointer;
+}
+.account-password-toggle:hover { color: var(--sd-ink); }
+.account-password-toggle:focus-visible { outline: 2px solid var(--sd-accent); outline-offset: -3px; }
+
 .account-error { color: var(--gg-danger-strong); background: var(--gg-danger-soft); border-radius: var(--sd-radius-sm); padding: 0.5rem 0.75rem; margin: 0; font-size: 0.9rem; }
 .account-notice { color: var(--gg-success-strong); background: var(--gg-success-soft); border-radius: var(--sd-radius-sm); padding: 0.5rem 0.75rem; margin: 0; font-size: 0.9rem; }
 .account-recovery-code { border: 1px solid var(--sd-line); border-radius: var(--sd-radius-sm); background: var(--sd-bg); font-family: var(--sd-font-mono); overflow-wrap: anywhere; padding: 0.65rem 0.8rem; }
@@ -65,6 +84,25 @@
   cursor: pointer;
 }
 .account-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+.account-submit[aria-busy="true"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  opacity: 1;
+  cursor: wait;
+}
+.account-submit-spinner {
+  flex: 0 0 1em;
+  height: 1em;
+  box-sizing: border-box;
+  border: 2px solid currentColor;
+  border-inline-end-color: transparent;
+  border-radius: 50%;
+  animation: account-submit-spin 0.8s linear infinite;
+}
+@keyframes account-submit-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .account-submit-spinner { animation: none; } }
 .account-submit--secondary { background: var(--gg-tint-strong); color: var(--sd-ink); border: 1px solid var(--sd-line); }
 .account-submit--danger { background: var(--gg-danger); color: var(--gg-on-danger); }
 

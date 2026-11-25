@@ -15,12 +15,12 @@ function providerError(code) {
   return failure
 }
 
-function passwordUrl(env) {
+export function identityToolkitUrl(env, action) {
   const host = env.FIREBASE_AUTH_EMULATOR_HOST
     ? `http://${env.FIREBASE_AUTH_EMULATOR_HOST}/identitytoolkit.googleapis.com`
     : 'https://identitytoolkit.googleapis.com'
   const key = encodeURIComponent(env.FIREBASE_WEB_API_KEY || WEB_API_KEY)
-  return `${host}/v1/accounts:signInWithPassword?key=${key}`
+  return `${host}/v1/accounts:${action}?key=${key}`
 }
 
 export function getUsernamePasswordProvider(auth, env = process.env, fetchImpl = fetch) {
@@ -46,34 +46,46 @@ export function getUsernamePasswordProvider(auth, env = process.env, fetchImpl =
     }
   }
 
+  async function verifyPassword(credential, password) {
+    let response
+    let result
+    try {
+      response = await fetchImpl(identityToolkitUrl(env, 'signInWithPassword'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: credential.email, password, returnSecureToken: true }),
+        redirect: 'error',
+        signal: AbortSignal.timeout(TIMEOUT_MS),
+      })
+      result = await response.json()
+    } catch {
+      throw providerError()
+    }
+    if (!response.ok) {
+      const message = result?.error?.message
+      const code = typeof message === 'string' ? message.split(' : ')[0] : undefined
+      if (response.status === 400 && INVALID_PROOF.has(code)) return false
+      throw providerError(response.status === 429 ? 'TOO_MANY_REQUESTS' : code)
+    }
+    // Retain only whether the UID matches. This request verifies the password for our backend.
+    if (result?.localId !== credential.uid) throw providerError()
+    return true
+  }
+
   return {
     create: async (uid, password) => create(usernameCredentialUid(uid), password),
     async verify(uid, password) {
       const credential = await getCredential(usernameCredentialUid(uid))
-      if (!credential || credential.disabled) return false
-      let response
-      let result
-      try {
-        response = await fetchImpl(passwordUrl(env), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: credential.email, password: password.normalize('NFC'), returnSecureToken: true }),
-          redirect: 'error',
-          signal: AbortSignal.timeout(TIMEOUT_MS),
-        })
-        result = await response.json()
-      } catch {
-        throw providerError()
-      }
-      if (!response.ok) {
-        const message = result?.error?.message
-        const code = typeof message === 'string' ? message.split(' : ')[0] : undefined
-        if (response.status === 400 && INVALID_PROOF.has(code)) return false
-        throw providerError(response.status === 429 ? 'TOO_MANY_REQUESTS' : code)
-      }
-      // The credential session has no place in a player client. Retain only whether the UID matches.
-      if (result?.localId !== credential.uid) throw providerError()
-      return true
+      return Boolean(credential && !credential.disabled && await verifyPassword(credential, password.normalize('NFC')))
+    },
+    async verifyLinked(uid, email, password) {
+      const identity = await auth.getUser(uid).catch((error) => {
+        if (error?.code === 'auth/user-not-found') return null
+        throw error
+      })
+      if (!identity || !identity.emailVerified || identity.email?.toLowerCase() !== email) return null
+      if (identity.disabled) return false
+      return verifyPassword(identity, password)
     },
     async setPassword(uid, password) {
       const credentialUid = usernameCredentialUid(uid)

@@ -109,8 +109,13 @@ export async function deleteAccount({ db, auth, idToken, now = Date.now() }) {
   }
   if (isUsernameCredentialUid(decoded.uid)) return reply(401, { error: 'unauthenticated' })
   if (now - decoded.auth_time * 1000 > RECENT_SIGN_IN_MS) return reply(403, { error: 'requires_recent_login' })
-  if ((decoded.firebase?.sign_in_provider !== 'custom' || decoded.geogameUsernamePassword !== true)
-    && await hasUsernameCredential(db, decoded.uid)) return reply(403, { error: 'requires_recent_login' })
+  const usernameSession = decoded.firebase?.sign_in_provider === 'custom' && decoded.geogameUsernamePassword === true
+  if (!usernameSession && await hasUsernameCredential(db, decoded.uid)) {
+    const { linkedEmail } = (await db.doc(`usernameCredentials/${decoded.uid}`).get()).data() ?? {}
+    const nativeLinkSession = decoded.firebase?.sign_in_provider === 'password' && decoded.email_verified === true
+      && typeof linkedEmail === 'string' && decoded.email?.toLowerCase() === linkedEmail
+    if (!nativeLinkSession) return reply(403, { error: 'requires_recent_login' })
+  }
   await deleteAccountData({ db, auth, uid: decoded.uid })
   return reply(200, { deleted: true })
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useId, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import NavBar from '../components/NavBar'
@@ -34,6 +34,7 @@ import ScrollCollection from '../components/profile/ScrollCollection'
 import CollapsibleSection from '../components/CollapsibleSection'
 import { useFriendships } from '../hooks/usePlayerProfile'
 import { useDecoration } from '../hooks/useDecoration'
+import { useUsernameEmailLink } from '../hooks/useUsernameEmailLink'
 import './AccountPage.css'
 
 function GoogleButton({ disabled, onError }) {
@@ -88,6 +89,35 @@ function RecoveryCode({ code, onSaved }) {
   )
 }
 
+function PasswordField({ label, hint, ...inputProps }) {
+  const { t } = useTranslation()
+  const id = useId()
+  const [visible, setVisible] = useState(false)
+
+  return (
+    <div className="account-field">
+      <label htmlFor={id}>{label}</label>
+      <div className="account-password">
+        <input id={id} type={visible ? 'text' : 'password'} spellCheck={false} autoCapitalize="none" {...inputProps} />
+        <button
+          type="button"
+          className="account-password-toggle"
+          aria-label={t(visible ? 'account.hide_password' : 'account.show_password')}
+          aria-controls={id}
+          onClick={() => setVisible((value) => !value)}
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z" />
+            <circle cx="12" cy="12" r="3" />
+            {visible && <path d="m3 3 18 18" />}
+          </svg>
+        </button>
+      </div>
+      {hint && <small>{hint}</small>}
+    </div>
+  )
+}
+
 function AuthForm() {
   const { t } = useTranslation()
   const [mode, setMode] = useState('signin')
@@ -95,6 +125,7 @@ function AuthForm() {
   const [usernameAvailable, setUsernameAvailable] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmation, setConfirmation] = useState('')
   const [username, setUsername] = useState('')
   const [identifier, setIdentifier] = useState('')
   const [error, setError] = useState(null)
@@ -113,6 +144,7 @@ function AuthForm() {
 
   const resetFormMessages = () => {
     setPassword('')
+    setConfirmation('')
     setRecoveryCode('')
     setIdentifier('')
     setError(null)
@@ -128,15 +160,23 @@ function AuthForm() {
   const recovering = mode === 'recover'
   const usingUsername = method === 'username'
   const newPassword = signingUp || recovering
+  const usernamePassword = recovering || (signingUp && usingUsername)
+  const recoveringPending = recovering && submitting
+  const confirmationInvalid = error === 'password_mismatch' && password !== confirmation
+  const visibleError = error === 'password_mismatch' && !confirmationInvalid ? null : error
   // Sign-in with a single "email or username" field when username accounts exist.
   const combinedLogin = !signingUp && !recovering && usernameAvailable
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (submitting) return
+    setNotice(null)
+    if (signingUp && password !== confirmation) {
+      setError('password_mismatch')
+      return
+    }
     setSubmitting(true)
     setError(null)
-    setNotice(null)
     try {
       if (recovering) {
         const code = await recoverUsernameAccount({ username, password, recoveryCode })
@@ -170,6 +210,7 @@ function AuthForm() {
     const loginId = (combinedLogin ? identifier : email).trim()
     // A username (no '@') has no email to reset: it goes through the recovery code instead.
     if (usernameAvailable && loginId && !loginId.includes('@')) {
+      setUsername(loginId)
       switchMode('recover')
       return
     }
@@ -273,7 +314,7 @@ function AuthForm() {
               onChange={(e) => setUsername(e.target.value)}
               placeholder={t('account.username_placeholder')}
               maxLength={USERNAME_MAX}
-              autoComplete={usingUsername ? 'username' : 'nickname'}
+              autoComplete={recovering || usingUsername ? 'username' : 'nickname'}
               required
             />
             {signingUp && <small>{t('account.username_hint')}</small>}
@@ -306,27 +347,45 @@ function AuthForm() {
             />
           </label>
         )}
-        <label className="account-field">
-          <span>{t('account.password')}</span>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder={signingUp && !usingUsername ? t('account.password_placeholder') : ''}
-            autoComplete={newPassword ? 'new-password' : 'current-password'}
-            minLength={newPassword ? (usingUsername ? USERNAME_PASSWORD_MIN : PASSWORD_MIN) : undefined}
+        <PasswordField
+          key={`${mode}-${method}`}
+          label={t('account.password')}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder={signingUp && !usingUsername ? t('account.password_placeholder') : ''}
+          hint={usernamePassword ? t('account.username_password_hint') : undefined}
+          autoComplete={newPassword ? 'new-password' : 'current-password'}
+          minLength={newPassword ? (usernamePassword ? USERNAME_PASSWORD_MIN : PASSWORD_MIN) : undefined}
+          required
+        />
+        {signingUp && (
+          <PasswordField
+            key={`confirmation-${method}`}
+            label={t('account.confirm_password')}
+            value={confirmation}
+            onChange={(e) => setConfirmation(e.target.value)}
+            autoComplete="new-password"
+            aria-invalid={confirmationInvalid || undefined}
+            aria-describedby={confirmationInvalid ? 'account-password-mismatch' : undefined}
             required
           />
-          {newPassword && usingUsername && <small>{t('account.username_password_hint')}</small>}
-        </label>
+        )}
 
-        {error && <p className="account-error">{t(`account.errors.${error}`)}</p>}
+        {visibleError && (
+          <p id={confirmationInvalid ? 'account-password-mismatch' : undefined} className="account-error" role="alert">
+            {t(`account.errors.${visibleError}`)}
+          </p>
+        )}
         {notice && <p className="account-notice">{notice}</p>}
 
         {signingUp && <SignupNotice />}
-        <button type="submit" className="account-submit" disabled={submitting}>
-          {t(recovering ? 'account.recover_submit' : signingUp ? 'account.signup' : 'account.signin')}
+        <button type="submit" className="account-submit" disabled={submitting} aria-busy={recoveringPending || undefined}>
+          {recoveringPending && <span className="account-submit-spinner" aria-hidden="true" />}
+          {t(recoveringPending ? 'account.recovery_pending' : recovering ? 'account.recover_submit' : signingUp ? 'account.signup' : 'account.signin')}
         </button>
+        {recovering && (
+          <span className="gg-sr-only" role="status">{recoveringPending ? t('account.recovery_pending') : ''}</span>
+        )}
         {mode === 'signin' && (
           <button type="button" className="account-link" disabled={submitting} onClick={handleForgot}>
             {t('account.forgot')}
@@ -478,6 +537,52 @@ function RecoveryCodeSettings({ username }) {
   )
 }
 
+function EmailLinkSettings({ account }) {
+  const { t } = useTranslation()
+  const link = useUsernameEmailLink(auth, account)
+  return (
+    <form className="account-form account-delete" onSubmit={(event) => {
+      event.preventDefault()
+      link.submit()
+    }}>
+      <h3 className="account-section-title">{t('account.link_email_title')}</h3>
+      {link.linkedEmail ? (
+        <p className="account-notice" role="status">{t('account.link_email_linked', { email: link.linkedEmail })}</p>
+      ) : (
+        <>
+          <p className="account-intro">
+            {link.pendingEmail ? t('account.link_email_sent', { email: link.pendingEmail }) : t('account.link_email_intro')}
+          </p>
+          {!link.pendingEmail && (
+            <label className="account-field">
+              <span>{t('account.email')}</span>
+              <input type="email" value={link.email} onChange={(event) => link.setEmail(event.target.value)} autoComplete="email" maxLength={254} required />
+            </label>
+          )}
+          <PasswordField
+            key={link.pendingEmail || 'new-email'}
+            label={t('account.password')}
+            value={link.password}
+            onChange={(event) => link.setPassword(event.target.value)}
+            autoComplete="current-password"
+            required
+          />
+          {link.error && <p className="account-error" role="alert">{t(`account.errors.${link.error}`)}</p>}
+          <button type="submit" className="account-submit" disabled={link.submitting || !link.canSubmit} aria-busy={link.submitting || undefined}>
+            {link.submitting && <span className="account-submit-spinner" aria-hidden="true" />}
+            {t(link.pendingEmail ? 'account.link_email_confirm' : 'account.link_email_send')}
+          </button>
+          {link.pendingEmail && (
+            <button type="button" className="account-link" disabled={link.submitting} onClick={link.useAnotherEmail}>
+              {t('account.link_email_other')}
+            </button>
+          )}
+        </>
+      )}
+    </form>
+  )
+}
+
 function AccountSettings({ account }) {
   const { t } = useTranslation()
   const [deleting, setDeleting] = useState(false)
@@ -511,7 +616,12 @@ function AccountSettings({ account }) {
           {t('account.signout')}
         </button>
 
-        {!deleting && account.usernamePassword && account.username && <RecoveryCodeSettings username={account.username} />}
+        {!deleting && account.usernamePassword && account.username && (
+          <>
+            <EmailLinkSettings account={account} />
+            <RecoveryCodeSettings username={account.username} />
+          </>
+        )}
 
         {deleting ? (
           <form onSubmit={handleDelete} className="account-form account-delete">

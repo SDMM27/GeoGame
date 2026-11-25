@@ -3,6 +3,8 @@ import { signInWithCustomToken } from 'firebase/auth'
 export { USERNAME_PASSWORD_MIN, USERNAME_PASSWORD_MAX } from './usernamePasswordLimits.mjs'
 
 const PATH = '/api/username-account'
+const SITE_PREVIEW_HOST = /^geo-game-git-[a-z0-9-]+-sdmms-projects\.vercel\.app$/
+const SITE_ORIGIN = 'https://geo-game.app'
 const API_ERRORS = new Set([
   'username_length', 'username_chars', 'username_forbidden', 'username_taken',
   'wrong_credentials', 'not_enabled', 'too_many_requests', 'password_compromised', 'invalid_recovery_code',
@@ -15,7 +17,12 @@ export class UsernameAccountError extends Error {
   }
 }
 
-export async function usernameAccountAvailable(apiOrigin = '') {
+// Branch previews use the shared Firebase project, but its server credentials stay in production.
+export function usernameAccountApiOrigin(hostname = globalThis.location?.hostname) {
+  return SITE_PREVIEW_HOST.test(hostname) ? SITE_ORIGIN : ''
+}
+
+export async function usernameAccountAvailable(apiOrigin = usernameAccountApiOrigin()) {
   try {
     const response = await fetch(`${apiOrigin}${PATH}`)
     return response.ok && (await response.json()).available === true
@@ -24,7 +31,7 @@ export async function usernameAccountAvailable(apiOrigin = '') {
   }
 }
 
-async function request(action, { username, password, recoveryCode, apiOrigin = '' }, idToken) {
+async function request(action, { username, password, recoveryCode, apiOrigin = usernameAccountApiOrigin() }, idToken) {
   const headers = { 'Content-Type': 'application/json' }
   if (idToken) headers.Authorization = `Bearer ${idToken}`
   const response = await fetch(`${apiOrigin}${PATH}`, {

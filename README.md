@@ -66,6 +66,7 @@ Fonctions serverless Vercel déployées avec le site.
 | `POST /api/friend-push` | Envoie la notification push d'une demande d'ami envoyée ou acceptée (jeton Firebase de celui qui vient d'agir requis). |
 | `POST /api/daily-nudge` | Envoie à un ami la notification « viens me battre » après un défi du jour terminé (jeton Firebase requis ; l'expéditeur doit être ami avec lui et avoir joué ce défi aujourd'hui ; une fois par jeu, par ami et par jour). |
 | `POST /api/delete-account` | Supprime le compte et toutes ses données : profil, historique, jetons push, pseudo, scores des classements, signalements faits ou visant ses scores, amitiés, invitations, puis le compte Firebase Auth (`api/_lib/deleteAccount.mjs`). Jeton Firebase obtenu juste après une reconnexion (5 min au plus). Appelée par `deleteAccount` (`src/utils/account.js`) depuis le site et l'app ; en local avec `npm run dev`, `/api` n'est pas servi. |
+| `GET`, `POST /api/username-account` | Indique si les comptes sans e-mail sont disponibles. Gère l'inscription, la connexion et la récupération ou le remplacement du code de secours. |
 | `GET /api/cleanup-expired` | Supprime les salons, invitations et sondes expirés, et les comptes inutilisés depuis 3 ans (50 par passage au plus, durée annoncée dans la politique de confidentialité). Appelée chaque jour à 4 h par Vercel Cron (`vercel.json`). |
 | `GET /api/daily-reminder` | Rappelle les défis du jour aux joueurs connectés qui n'en ont fait aucun (désactivable par appareil dans le profil). Appelée chaque jour à 16 h UTC par Vercel Cron (`vercel.json`). |
 
@@ -77,6 +78,18 @@ Variables d'environnement du projet Vercel du site :
 - `CRON_SECRET` : chaîne aléatoire longue ; Vercel l'envoie en `Authorization: Bearer` à la tâche cron.
 
 Face aux émulateurs, `FIRESTORE_EMULATOR_HOST` (et `FIREBASE_AUTH_EMULATOR_HOST` pour `invite-push`) remplacent la clé. Ne commitez jamais de clé de compte de service.
+
+### Comptes sans e-mail
+
+Le site et l'app affichent l'option Pseudo dès que leur API dispose de la configuration Firebase habituelle. Activer la méthode de connexion e-mail et mot de passe dans Firebase Auth et utiliser `FIREBASE_SERVICE_ACCOUNT` côté serveur. `FIREBASE_WEB_API_KEY` permet de remplacer la clé Web par défaut du projet. Ce parcours utilise le projet Firebase existant et fonctionne dans les quotas de son offre actuelle.
+
+Firebase Auth vérifie le mot de passe avec une identité technique distincte du compte de jeu. Le serveur génère pour cette identité un alias aléatoire et non distribuable sous `.invalid`. Les joueurs choisissent un pseudo et un mot de passe. Le serveur seul utilise l'alias et les jetons de l'identité technique.
+
+Pour tester localement, démarrer les émulateurs Auth et Firestore et configurer `FIREBASE_AUTH_EMULATOR_HOST` et `FIRESTORE_EMULATOR_HOST` pour l'API de test. Vérifier l'inscription, la reconnexion sur un second appareil, la récupération, le rejet du code déjà utilisé et la suppression du compte de jeu et de l'identité technique. Pour tester l'app avec une autre API, indiquer son adresse via `EXPO_PUBLIC_API_ORIGIN`.
+
+À l'inscription et à la récupération, [Pwned Passwords](https://haveibeenpwned.com/api/v3/#PwnedPasswords) reçoit un préfixe de cinq caractères du hash pour le contrôle des fuites. En cas d'indisponibilité de ce contrôle, seuls l'inscription et le changement de mot de passe sont interrompus. Firestore conserve le hash du code de secours et les compteurs d'essais sous des identifiants calculés côté serveur. Ces collections sont réservées au serveur par les règles Firestore.
+
+En production, le jeton intermédiaire de connexion doit être échangé dans les 30 secondes. Lors d'une récupération, l'API bloque les nouvelles connexions, retire les méthodes qui auraient été liées directement au compte de jeu dans Firebase, attend la fin de cette fenêtre, puis révoque les jetons de renouvellement Firebase. Les jetons d'identité déjà délivrés peuvent rester valides jusqu'à leur expiration sur les accès qui ne vérifient pas la révocation.
 
 ## Firestore
 

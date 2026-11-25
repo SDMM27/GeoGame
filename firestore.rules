@@ -8,6 +8,11 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Firebase password credentials use a separate Auth identity with no access as a player.
+    function isPlayer() {
+      return request.auth != null && !request.auth.uid.matches('^username-credential:.*$');
+    }
+
     function isNumber(value) {
       return value is int || value is float;
     }
@@ -76,7 +81,7 @@ service cloud.firestore {
       return data.get('uid', null) == null
         ? visitorName(data.name)
           && !exists(/databases/$(database)/documents/usernames/$(data.name.lower()))
-        : request.auth != null
+        : isPlayer()
           && data.uid == request.auth.uid
           && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.username == data.name;
     }
@@ -100,14 +105,14 @@ service cloud.firestore {
     // A username can't be changed, nor can an account hold two: both documents are only deleted together.
     match /usernames/{name} {
       allow read: if true;
-      allow create: if request.auth != null
+      allow create: if isPlayer()
         && request.resource.data.keys().hasOnly(['uid', 'username'])
         && request.resource.data.uid == request.auth.uid
         && validUsername(request.resource.data.username)
         && validUsernameKey(name, request.resource.data.username)
         && !exists(/databases/$(database)/documents/users/$(request.auth.uid))
         && getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.username == request.resource.data.username;
-      allow delete: if request.auth != null && resource.data.uid == request.auth.uid
+      allow delete: if isPlayer() && resource.data.uid == request.auth.uid
         && !existsAfter(/databases/$(database)/documents/users/$(request.auth.uid));
     }
 
@@ -191,7 +196,7 @@ service cloud.firestore {
     // the hasOnly below keeps them out of any client update.
     match /users/{uid} {
       allow read: if true;
-      allow update: if request.auth != null && request.auth.uid == uid
+      allow update: if isPlayer() && request.auth.uid == uid
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['badges', 'challenges', 'decoration', 'avatarFlag'])
         && (!('decoration' in request.resource.data.diff(resource.data).affectedKeys()) || validDecoration(request.resource.data.decoration, playerLevel(resource.data)))
         && (!('avatarFlag' in request.resource.data.diff(resource.data).affectedKeys()) || validAvatarFlag(request.resource.data, resource.data))
@@ -199,18 +204,21 @@ service cloud.firestore {
         && (!('challenges' in request.resource.data.diff(resource.data).affectedKeys()) || validChallenges(request.resource.data.challenges));
       // Community directory (src/utils/community.js): users/{uid}.communityAt is the opt-in. Joining stamps the
       // server time, leaving removes the field. Nothing else changes with it.
-      allow update: if request.auth != null && request.auth.uid == uid
+      allow update: if isPlayer() && request.auth.uid == uid
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['communityAt'])
         && (!('communityAt' in request.resource.data) || request.resource.data.communityAt == request.time);
-      allow create: if request.auth != null && request.auth.uid == uid
+      allow create: if isPlayer() && request.auth.uid == uid
         && request.resource.data.keys().hasOnly(['username', 'usernameKey', 'createdAt'])
         && request.resource.data.createdAt == request.time
         && validUsername(request.resource.data.username)
         && validUsernameKey(userKey(request.resource.data), request.resource.data.username)
         && getAfter(/databases/$(database)/documents/usernames/$(userKey(request.resource.data))).data.uid == uid
         && getAfter(/databases/$(database)/documents/usernames/$(userKey(request.resource.data))).data.username == request.resource.data.username;
-      allow delete: if request.auth != null && request.auth.uid == uid
-        && (resource == null || !existsAfter(/databases/$(database)/documents/usernames/$(userKey(resource.data))));
+      allow delete: if isPlayer() && request.auth.uid == uid
+        && (resource == null || (
+          resource.data.get('usernamePassword', false) != true
+          && !existsAfter(/databases/$(database)/documents/usernames/$(userKey(resource.data)))
+        ));
 
       // Game history (src/utils/gameHistory.js): written once, never edited.
       match /games/{gameId} {
@@ -248,14 +256,14 @@ service cloud.firestore {
         }
 
         allow read: if true;
-        allow create: if request.auth != null && request.auth.uid == uid && validGame(request.resource.data);
-        allow delete: if request.auth != null && request.auth.uid == uid;
+        allow create: if isPlayer() && request.auth.uid == uid && validGame(request.resource.data);
+        allow delete: if isPlayer() && request.auth.uid == uid;
       }
 
       // This account's devices for push notifications (mobile/src/notifications/push.ts), read by api/invite-push.
       match /pushTokens/{token} {
-        allow read, delete: if request.auth != null && request.auth.uid == uid;
-        allow create, update: if request.auth != null && request.auth.uid == uid
+        allow read, delete: if isPlayer() && request.auth.uid == uid;
+        allow create, update: if isPlayer() && request.auth.uid == uid
           && request.resource.data.keys().hasOnly(['token', 'lang', 'platform', 'updatedAt', 'subscription', 'dailyReminder'])
           && request.resource.data.token == token
           // Daily challenge reminder (api/daily-reminder): on unless turned off on this device.
@@ -292,17 +300,17 @@ service cloud.firestore {
           && data.usernames[data.users[1]] == get(/databases/$(database)/documents/users/$(data.users[1])).data.username;
       }
 
-      allow read: if request.auth != null && request.auth.uid in resource.data.users;
-      allow create: if request.auth != null && validNewFriendship(request.resource.data);
+      allow read: if isPlayer() && request.auth.uid in resource.data.users;
+      allow create: if isPlayer() && validNewFriendship(request.resource.data);
       // Only the recipient accepts, and nothing else changes.
-      allow update: if request.auth != null
+      allow update: if isPlayer()
         && request.auth.uid in resource.data.users
         && request.auth.uid != resource.data.requester
         && resource.data.status == 'pending'
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'acceptedAt'])
         && request.resource.data.status == 'accepted'
         && request.resource.data.acceptedAt == request.time;
-      allow delete: if request.auth != null && request.auth.uid in resource.data.users;
+      allow delete: if isPlayer() && request.auth.uid in resource.data.users;
     }
 
     // Presence (src/utils/presence.js): presence/{uid} = { at, room, game, expiresAt }, when the player was last seen
@@ -325,12 +333,12 @@ service cloud.firestore {
         return exists(friendship) && get(friendship).data.status == 'accepted';
       }
 
-      allow get: if request.auth != null && (request.auth.uid == uid || isFriend(uid));
+      allow get: if isPlayer() && (request.auth.uid == uid || isFriend(uid));
       allow list: if false;
-      allow create, update: if request.auth != null && request.auth.uid == uid
+      allow create, update: if isPlayer() && request.auth.uid == uid
         && get(/databases/$(database)/documents/users/$(uid)).data.get('username', null) is string
         && validPresence(request.resource.data);
-      allow delete: if request.auth != null && request.auth.uid == uid;
+      allow delete: if isPlayer() && request.auth.uid == uid;
     }
 
     // Room invites between friends (src/utils/invites.js): invites/{room}_{to}
@@ -355,13 +363,13 @@ service cloud.firestore {
           && isFriendship(get(/databases/$(database)/documents/friendships/$(friendshipOf(data.from, data.to))).data, data);
       }
 
-      allow read: if request.auth != null
+      allow read: if isPlayer()
         && (request.auth.uid == resource.data.to || request.auth.uid == resource.data.from);
       // Opening a room clears the invite to it, whether there is one or not.
-      allow delete: if request.auth != null
+      allow delete: if isPlayer()
         && (resource == null || request.auth.uid == resource.data.to || request.auth.uid == resource.data.from);
-      allow create: if request.auth != null && validInvite(request.resource.data);
-      allow update: if request.auth != null && validInvite(request.resource.data)
+      allow create: if isPlayer() && validInvite(request.resource.data);
+      allow update: if isPlayer() && validInvite(request.resource.data)
         && request.resource.data.to == resource.data.to;
     }
 
@@ -880,14 +888,14 @@ service cloud.firestore {
               // visitor's score
               ? entryId == 'v_' + data.scoreId && data.get('uid', null) == null
               // account's score, written by its owner
-              : request.auth != null
+              : isPlayer()
                 && entryId == request.auth.uid
                 && score.uid == request.auth.uid
                 && data.get('uid', request.auth.uid) == request.auth.uid);
       }
 
       allow read: if dayOver()
-        || (request.auth != null && exists(/databases/$(database)/documents/daily_answers/$(dailyKey)/$(gameType)/$(request.auth.uid)));
+        || (isPlayer() && exists(/databases/$(database)/documents/daily_answers/$(dailyKey)/$(gameType)/$(request.auth.uid)));
       allow create: if validAnswers(request.resource.data);
     }
 
@@ -971,7 +979,7 @@ service cloud.firestore {
         && player.keys().hasOnly(['pseudo', 'uid', 'seenAt'])
         && player.keys().hasAll(['pseudo'])
         && validName(player.pseudo)
-        && (player.get('uid', null) == null || (request.auth != null && player.uid == request.auth.uid))
+        && (player.get('uid', null) == null || (isPlayer() && player.uid == request.auth.uid))
         && (player.get('seenAt', null) == null || player.seenAt == request.time);
     }
 
@@ -1198,7 +1206,7 @@ service cloud.firestore {
           && data.keys().hasAll(['reporter', 'targetCollection', 'targetId', 'reason', 'createdAt'])
           && data.reporter is string
           && (request.auth != null
-              ? data.reporter == request.auth.uid
+              ? isPlayer() && data.reporter == request.auth.uid
               : data.reporter.matches('^v-[A-Za-z0-9-]{8,64}$'))
           && data.targetCollection in ['scores', 'ascension_scores', 'daily_scores', 'survival_scores']
           && data.targetId is string && data.targetId.matches('^[A-Za-z0-9]{1,64}$')

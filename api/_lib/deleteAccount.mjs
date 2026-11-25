@@ -4,6 +4,12 @@
 // reports made by it or about those entries, friendships, invites sent and received, the push bookkeeping
 // (invitePushLimits, dailyReminderPushes, friendPushes, dailyNudges sent or received), the Elo ratings and the countries won
 // (elo, eloGains, eloDuelAccounts), the online status (presence/{uid}), then the Firebase Auth account. Rooms keep the pseudo until they expire (10 days at most, api/cleanup-expired.mjs).
+import { FieldValue, Timestamp } from 'firebase-admin/firestore'
+
+import { canObserveMissingUsernamePlayer, discardExpiredUsernameSignups, hasUsernameCredential, removeUsernameCredential } from './usernameAccount.mjs'
+import { getUsernamePasswordProvider } from './usernameAccountProvider.mjs'
+import { USERNAME_TOKEN_EXCHANGE_SECONDS } from './usernameAccountToken.mjs'
+import { isUsernameCredentialUid, playerUidForUsernameCredential } from './usernameCredentialUid.mjs'
 
 // The account's owner must have signed in again just before (like Firebase's own deleteUser on the client).
 export const RECENT_SIGN_IN_MS = 5 * 60 * 1000
@@ -22,7 +28,16 @@ async function deleteRefs(db, refs) {
 }
 
 // `db` and `auth`: firebase-admin Firestore and Auth. Returns how many documents went, besides users/{uid}.
-export async function deleteAccountData({ db, auth, uid }) {
+export async function deleteAccountData({
+  db, auth, uid, getUsernameProvider = () => getUsernamePasswordProvider(auth), deferUsernameWait = false, expectedMissingSince, observationNow,
+}) {
+  const credentials = await removeUsernameCredential({
+    db, auth, uid, getProvider: getUsernameProvider, deferWait: deferUsernameWait,
+    exchangeWindowSeconds: process.env.FIREBASE_AUTH_EMULATOR_HOST ? 0 : USERNAME_TOKEN_EXCHANGE_SECONDS,
+    expectedMissingSince, observationNow,
+  })
+  if (credentials?.skipped) return { skipped: true }
+  if (credentials?.pending) return { pending: true }
   const userRef = db.doc(`users/${uid}`)
   const [profile, friendships, invitesSent, invitesReceived, nudgesSent, nudgesReceived, reportsMade, eloGains, eloDuelAccounts, ...scores] = await Promise.all([
     userRef.get(),
@@ -52,21 +67,25 @@ export async function deleteAccountData({ db, auth, uid }) {
     ...invitesSent.docs, ...invitesReceived.docs, ...nudgesSent.docs, ...nudgesReceived.docs, ...eloGains.docs, ...eloDuelAccounts.docs]) {
     refs.set(snapshot.ref.path, snapshot.ref)
   }
-  if (profile.exists) {
-    const { username, usernameKey } = profile.data()
-    const key = usernameKey ?? username?.toLowerCase()
-    // Only if it is still this account's (it always should be).
-    if (key) {
-      const claimed = await db.doc(`usernames/${key}`).get()
-      if (claimed.exists && claimed.data().uid === uid) refs.set(claimed.ref.path, claimed.ref)
-    }
-  }
+  const { username, usernameKey } = profile.data() ?? {}
+  // The deletion marker retains the key if an earlier attempt has already deleted the profile.
+  const key = usernameKey ?? username?.toLowerCase() ?? credentials?.key
   // Push bookkeeping (api/_lib/push.mjs, friendPush.mjs, dailyReminder.mjs, dailyNudge.mjs) and the Elo ratings and mastery, server only.
   for (const path of [`invitePushLimits/${uid}`, `dailyReminderPushes/${uid}`, `elo/${uid}`, `mastery/${uid}`, `presence/${uid}`,
     ...friendships.docs.flatMap((friendship) => [`friendPushes/${friendship.id}_request`, `friendPushes/${friendship.id}_accepted`])]) {
     refs.set(path, db.doc(path))
   }
+  const releaseName = () => db.runTransaction(async (transaction) => {
+    const claimed = key ? await transaction.get(db.doc(`usernames/${key}`)) : null
+    const ownsName = claimed?.data()?.uid === uid
+    if (ownsName) transaction.delete(claimed.ref)
+    if (credentials) transaction.delete(credentials.ref)
+    return ownsName
+  })
   await deleteRefs(db, [...refs.values()])
+  // Preserve the legacy cleanup order. No-email accounts keep the name reserved until Firebase erasure;
+  // their deletion marker makes it possible to retry if a later operation fails.
+  let released = !credentials && key ? await releaseName() : false
   // The profile with its subcollections (games, pushTokens), which deleting the document alone would leave behind.
   await db.recursiveDelete(userRef)
 
@@ -75,7 +94,8 @@ export async function deleteAccountData({ db, auth, uid }) {
   } catch (error) {
     if (error?.code !== 'auth/user-not-found') throw error
   }
-  return { deleted: refs.size }
+  if (credentials) released = await releaseName()
+  return { deleted: refs.size + Number(released) }
 }
 
 // POST /api/delete-account, with the ID token of the account to delete (fresh, after signing in again).
@@ -87,7 +107,10 @@ export async function deleteAccount({ db, auth, idToken, now = Date.now() }) {
   } catch {
     return reply(401, { error: 'unauthenticated' })
   }
+  if (isUsernameCredentialUid(decoded.uid)) return reply(401, { error: 'unauthenticated' })
   if (now - decoded.auth_time * 1000 > RECENT_SIGN_IN_MS) return reply(403, { error: 'requires_recent_login' })
+  if ((decoded.firebase?.sign_in_provider !== 'custom' || decoded.geogameUsernamePassword !== true)
+    && await hasUsernameCredential(db, decoded.uid)) return reply(403, { error: 'requires_recent_login' })
   await deleteAccountData({ db, auth, uid: decoded.uid })
   return reply(200, { deleted: true })
 }
@@ -99,22 +122,72 @@ export function lastActivity(user) {
   return Math.max(...[creationTime, lastSignInTime, lastRefreshTime].map((time) => (time ? Date.parse(time) : 0)))
 }
 
+async function observeMissingPlayer({ db, auth, uid, now }) {
+  const ref = db.doc(`usernameCredentials/${uid}`)
+  const observed = await ref.get()
+  if (!canObserveMissingUsernamePlayer(observed.data(), now)) return undefined
+
+  let missing = false
+  try {
+    await auth.getUser(uid)
+  } catch (error) {
+    if (error?.code !== 'auth/user-not-found') throw error
+    missing = true
+  }
+
+  return db.runTransaction(async (transaction) => {
+    const current = await transaction.get(ref)
+    // An intervening sign-in, recovery, or deletion can invalidate the Auth observation.
+    if (!current.updateTime?.isEqual(observed.updateTime)) return undefined
+    const { missingPlayerSince } = current.data()
+    if (!missing) {
+      if (missingPlayerSince != null) transaction.update(ref, { missingPlayerSince: FieldValue.delete() })
+    } else if (!Number.isFinite(missingPlayerSince)) {
+      // The password identity's last activity cannot tell us when the player identity was lost.
+      transaction.update(ref, { missingPlayerSince: now })
+    } else if (now - missingPlayerSince > INACTIVE_ACCOUNT_MS) {
+      return missingPlayerSince
+    }
+    return undefined
+  })
+}
+
 // Daily cleanup: accounts unused for INACTIVE_ACCOUNT_MS, at most `limit` per run (the next runs take the rest).
-export async function deleteInactiveAccounts({ db, auth, now = Date.now(), limit = 50 }) {
+export async function deleteInactiveAccounts({ db, auth, now = Date.now(), limit = 50, getUsernameProvider = () => getUsernamePasswordProvider(auth) }) {
+  const staged = await discardExpiredUsernameSignups({ db, auth, getProvider: getUsernameProvider, now, limit })
+  const pending = await db.collection('usernameCredentials')
+    .where('deletionStartedAt', '<=', Timestamp.fromMillis(now - RECENT_SIGN_IN_MS)).limit(limit).get()
+  for (const doc of pending.docs) await deleteAccountData({ db, auth, uid: doc.id, getUsernameProvider })
+  const counts = {
+    ...(staged ? { discardedUsernameSignups: staged } : {}),
+    ...(pending.size ? { resumedUsernameDeletions: pending.size } : {}),
+  }
   let deleted = 0
+  let scheduled = 0
+  const result = () => ({ inactiveAccounts: deleted, ...counts, ...(scheduled ? { scheduledUsernameDeletions: scheduled } : {}) })
   let pageToken
   do {
     const page = await auth.listUsers(1000, pageToken)
     for (const user of page.users) {
-      if (deleted >= limit) return { inactiveAccounts: deleted }
+      if (deleted + scheduled >= limit) return result()
       const last = lastActivity(user)
       // No date at all: never deleted on a guess.
       if (last > 0 && now - last > INACTIVE_ACCOUNT_MS) {
-        await deleteAccountData({ db, auth, uid: user.uid })
-        deleted += 1
+        let uid = user.uid
+        let expectedMissingSince
+        if (isUsernameCredentialUid(uid)) {
+          uid = playerUidForUsernameCredential(uid)
+          if (!uid) continue
+          expectedMissingSince = await observeMissingPlayer({ db, auth, uid, now })
+          if (expectedMissingSince === undefined) continue
+        }
+        const removal = await deleteAccountData({ db, auth, uid, getUsernameProvider, deferUsernameWait: true, expectedMissingSince, observationNow: now })
+        if (removal.skipped) continue
+        if (removal.pending) scheduled += 1
+        else deleted += 1
       }
     }
     pageToken = page.pageToken
   } while (pageToken)
-  return { inactiveAccounts: deleted }
+  return result()
 }

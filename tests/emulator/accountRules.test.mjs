@@ -9,6 +9,7 @@ import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest'
 const [host, port] = process.env.FIRESTORE_EMULATOR_HOST.split(':')
 const now = () => firebase.firestore.FieldValue.serverTimestamp()
 const NBSP = String.fromCharCode(160)
+const CREDENTIAL_UID = 'username-credential:123e4567-e89b-42d3-a456-426614174000'
 
 let env
 
@@ -50,7 +51,53 @@ beforeEach(async () => {
   })
 })
 
+describe('credential-only Firebase identities', () => {
+  it('can read public profiles but cannot claim a player name', async () => {
+    const db = as(CREDENTIAL_UID)
+    await assertSucceeds(db.doc('users/alice').get())
+    await assertSucceeds(db.doc('usernames/alice').get())
+    await assertFails(claim(db, CREDENTIAL_UID, 'Credential'))
+  })
+
+  it('cannot act as a player even with an existing profile', async () => {
+    const profile = `users/${CREDENTIAL_UID}`
+    const device = `${profile}/pushTokens/ExponentPushToken[abc]`
+    await env.withSecurityRulesDisabled(async (context) => {
+      const db = context.firestore()
+      const batch = db.batch()
+      batch.set(db.doc(profile), { username: 'Credential', usernameKey: 'credential' })
+      batch.set(db.doc('usernames/credential'), { uid: CREDENTIAL_UID, username: 'Credential' })
+      batch.set(db.doc(device), { token: 'ExponentPushToken[abc]' })
+      await batch.commit()
+    })
+
+    const db = as(CREDENTIAL_UID)
+    await assertFails(db.doc(profile).update({ communityAt: now() }))
+    await assertFails(db.doc(`${profile}/games/round`).set(game()))
+    await assertFails(db.doc(device).get())
+    await assertFails(db.collection('scores').add(score({ name: 'Credential', uid: CREDENTIAL_UID })))
+  })
+})
+
 describe('claiming a username', () => {
+  it('keeps username credentials private and reserves the account type marker for the server', async () => {
+    const credential = 'usernameCredentials/alice'
+    await env.withSecurityRulesDisabled((context) => context.firestore().doc(credential).set({ recoveryHash: 'test' }))
+    await assertFails(as('alice').doc(credential).get())
+    await assertFails(anonymous().doc(credential).get())
+    await assertFails(as('alice').doc(credential).update({ recoveryHash: 'other' }))
+    await assertFails(claim(as('bob'), 'bob', 'Bob', { user: { usernamePassword: true } }))
+  })
+
+  it('leaves deletion of username-password profiles and their directory entries to the server', async () => {
+    await env.withSecurityRulesDisabled((context) => context.firestore().doc('users/alice').update({ usernamePassword: true }))
+    const db = as('alice')
+    const removal = db.batch()
+    removal.delete(db.doc('users/alice'))
+    removal.delete(db.doc('usernames/alice'))
+    await assertFails(removal.commit())
+  })
+
   it('refuses an explicitly offensive username', async () => {
     await assertFails(claim(as('bob'), 'bob', 'Connard42'))
     await assertFails(claim(as('bob'), 'bob', 'ПИДОР'))

@@ -1,15 +1,20 @@
 // @vitest-environment node
 // api/delete-account and the deletion of inactive accounts, against the Auth and Firestore emulators (npm run test:emulator).
+import { createHash, randomUUID } from 'node:crypto'
 import { getApps, initializeApp } from 'firebase-admin/app'
 import { getAuth } from 'firebase-admin/auth'
 import { getFirestore } from 'firebase-admin/firestore'
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import handler from '../../api/delete-account.mjs'
+import { usernameAccount } from '../../api/_lib/usernameAccount.mjs'
+import { getUsernamePasswordProvider } from '../../api/_lib/usernameAccountProvider.mjs'
+import { usernameCredentialUid } from '../../api/_lib/usernameCredentialUid.mjs'
 import {
   INACTIVE_ACCOUNT_MS,
   RECENT_SIGN_IN_MS,
   deleteAccount,
+  deleteAccountData,
   deleteInactiveAccounts,
   lastActivity,
 } from '../../api/_lib/deleteAccount.mjs'
@@ -36,6 +41,33 @@ async function clearFirestore() {
 
 const exists = async (path) => (await db.doc(path).get()).exists
 const accountExists = (uid) => auth.getUser(uid).then(() => true, () => false)
+
+async function detachedUsernameFixture() {
+  const uid = randomUUID()
+  const credentialUid = usernameCredentialUid(uid)
+  const username = `Orphan ${uid.slice(0, 8)}`
+  const key = username.toLowerCase()
+  const password = 'a username passphrase for tests'
+  const provider = getUsernamePasswordProvider(auth)
+  await provider.create(uid, password)
+  const verifier = await auth.getUser(credentialUid)
+  const profile = db.doc(`users/${uid}`)
+  const directory = db.doc(`usernames/${key}`)
+  const record = db.doc(`usernameCredentials/${uid}`)
+  await Promise.all([
+    profile.set({ username, usernameKey: key, usernamePassword: true }),
+    directory.set({ uid, username }),
+    record.set({ key, revision: 0, state: 'active' }),
+  ])
+  // Only expose this verifier to the scan while keeping real Auth reads and writes.
+  const isolatedAuth = Object.create(auth)
+  isolatedAuth.listUsers = async () => ({ users: [verifier] })
+  const scan = (now) => deleteInactiveAccounts({ db, auth: isolatedAuth, now, getUsernameProvider: () => provider })
+  return {
+    uid, credentialUid, username, password, provider, profile, directory, record, scan,
+    firstObservation: lastActivity(verifier) + INACTIVE_ACCOUNT_MS + 1,
+  }
+}
 
 // Alice's data, and Bob's and Carol's, which must stay.
 const ALICE = [
@@ -205,5 +237,95 @@ describe('deleteInactiveAccounts', () => {
     expect(await accountExists('alice')).toBe(false)
     expect(await exists('users/alice')).toBe(false)
     expect(await exists('scores/s1')).toBe(false)
+  })
+
+  it('does not erase an internal password identity based on its own inactivity', async () => {
+    const uid = usernameCredentialUid('b5db4a87-d01a-4265-b4eb-dedc618bcb82')
+    await auth.createUser({ uid })
+    try {
+      const later = Date.now() + INACTIVE_ACCOUNT_MS + 24 * 60 * 60 * 1000
+      await deleteInactiveAccounts({ db, auth, now: later, limit: 1000 })
+      expect(await accountExists(uid)).toBe(true)
+    } finally {
+      await auth.deleteUser(uid)
+    }
+  })
+
+  it('preserves a live recovery lease, then waits for three years of observed player absence before erasing', async () => {
+    const { uid, credentialUid, profile, directory, record, scan, firstObservation } = await detachedUsernameFixture()
+    try {
+      const leaseUntil = firstObservation + 1
+      await record.update({ state: 'recovering', leaseUntil })
+      expect(await scan(firstObservation)).toEqual({ inactiveAccounts: 0 })
+      expect((await record.get()).data().missingPlayerSince).toBeUndefined()
+      expect(await scan(leaseUntil)).toEqual({ inactiveAccounts: 0 })
+      expect((await record.get()).data().missingPlayerSince).toBe(leaseUntil)
+      const stale = await deleteAccountData({ db, auth, uid, expectedMissingSince: leaseUntil, observationNow: firstObservation })
+      expect(stale).toEqual({ skipped: true })
+      expect(await scan(leaseUntil + INACTIVE_ACCOUNT_MS)).toEqual({ inactiveAccounts: 0 })
+      expect(await accountExists(credentialUid)).toBe(true)
+      expect(await scan(leaseUntil + INACTIVE_ACCOUNT_MS + 1)).toEqual({ inactiveAccounts: 1 })
+      expect(await accountExists(credentialUid)).toBe(false)
+      expect((await profile.get()).exists).toBe(false)
+      expect((await directory.get()).exists).toBe(false)
+      expect((await record.get()).exists).toBe(false)
+    } finally {
+      if (await accountExists(credentialUid)) await auth.deleteUser(credentialUid)
+    }
+  })
+
+  it('invalidates the previous absence observation when recovery restarts, even if Auth fails', async () => {
+    const { uid, credentialUid, username, password, provider, profile, record, scan, firstObservation } = await detachedUsernameFixture()
+    try {
+      const recoveryCode = 'a'.repeat(22)
+      await record.update({
+        recoveryHash: createHash('sha256').update(recoveryCode).digest('hex'),
+        state: 'recovering', leaseUntil: firstObservation - 1,
+      })
+      await scan(firstObservation)
+      expect((await record.get()).data().missingPlayerSince).toBe(firstObservation)
+      const failingAuth = Object.create(auth)
+      failingAuth.updateUser = async () => { throw new Error('Test Auth outage') }
+      await expect(usernameAccount({
+        db, auth: failingAuth, provider, body: { action: 'recover', username, password, recoveryCode },
+        allow: async () => true, validatePassword: async () => null, clock: () => firstObservation + 1,
+      })).rejects.toThrow('Test Auth outage')
+      expect((await record.get()).data().missingPlayerSince).toBeUndefined()
+      const later = firstObservation + INACTIVE_ACCOUNT_MS + 1
+      expect(await deleteAccountData({ db, auth, uid, expectedMissingSince: firstObservation, observationNow: later }))
+        .toEqual({ skipped: true })
+      expect(await scan(later)).toEqual({ inactiveAccounts: 0 })
+      expect((await record.get()).data().missingPlayerSince).toBe(later)
+      expect((await profile.get()).exists).toBe(true)
+      expect(await accountExists(credentialUid)).toBe(true)
+    } finally {
+      if (await accountExists(credentialUid)) await auth.deleteUser(credentialUid)
+    }
+  })
+
+  it('clears an absence marker on sign-in or restoration and aborts deletion with a stale observation', async () => {
+    const { uid, credentialUid, username, password, provider, profile, record, scan, firstObservation } = await detachedUsernameFixture()
+    try {
+      await scan(firstObservation)
+      expect((await record.get()).data().missingPlayerSince).toBe(firstObservation)
+      const result = await usernameAccount({
+        db, auth, provider, body: { action: 'signin', username, password }, allow: async () => true,
+      })
+      expect(result.status).toBe(200)
+      expect((await record.get()).data().missingPlayerSince).toBeUndefined()
+      expect(await deleteAccountData({ db, auth, uid, expectedMissingSince: firstObservation })).toEqual({ skipped: true })
+      expect((await profile.get()).exists).toBe(true)
+      expect(await accountExists(credentialUid)).toBe(true)
+
+      await scan(firstObservation + 1)
+      expect((await record.get()).data().missingPlayerSince).toBe(firstObservation + 1)
+      await auth.createUser({ uid })
+      expect(await scan(firstObservation + INACTIVE_ACCOUNT_MS + 2)).toEqual({ inactiveAccounts: 0 })
+      expect((await record.get()).data().missingPlayerSince).toBeUndefined()
+      expect(await accountExists(credentialUid)).toBe(true)
+    } finally {
+      if (await accountExists(uid)) await auth.deleteUser(uid)
+      if (await accountExists(credentialUid)) await auth.deleteUser(credentialUid)
+    }
   })
 })

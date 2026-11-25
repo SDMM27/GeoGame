@@ -6,7 +6,7 @@ export const LEGAL_INFO = {
   editor: 'DON Sacha',
   email: 'appgeogame@gmail.com',
   // Date of the last change to the texts in documents.js (YYYY-MM-DD).
-  updated: '2026-10-12',
+  updated: '2026-11-25',
 }
 
 // Paths of the legal pages, shared by the site's routes and the app's links (mobile/src/links.ts).

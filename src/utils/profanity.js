@@ -12,7 +12,7 @@
 // across alphabets in both directions (a Cyrillic "с" in "сonnard", Latin "pидор"). Russian is also matched
 // when written in Latin letters ("pidor", "blyat"). It is a deterrent, not a guarantee: determined players can
 // always find a spelling that gets through.
-import banned from '../data/bannedWords.json'
+import banned from '../data/bannedWords.json' with { type: 'json' }
 
 const MAX_LENGTH = 200 // usernames are 20 characters at most; this only bounds the work on absurd input
 

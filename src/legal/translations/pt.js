@@ -20,13 +20,15 @@ export default {
           'Com uma conta, tratamos também:',
           {
             list: [
-              'seu endereço de e-mail e sua senha, que o Firebase Authentication guarda criptografada: nunca temos acesso a ela. Se você entrar com o Google, recebemos o endereço de e-mail e o identificador da sua conta Google (o Google também pode enviar seu nome e sua foto de perfil, que não usamos);',
+              'seu endereço de e-mail se você se cadastrar com e-mail ou entrar com o Google. O Firebase Authentication gerencia a senha das contas criadas com e-mail. Se você entrar com o Google, também receberemos o identificador da sua conta Google (o Google pode enviar seu nome e sua foto de perfil, que não usamos);',
+              'se você criar uma conta com nome de usuário e senha, não pedimos seu endereço de e-mail pessoal. Nosso servidor processa a senha brevemente. O Firebase Authentication verifica a senha usando um alias técnico gerado automaticamente que não pode receber mensagens. O GeoGame guarda apenas um hash do código de recuperação;',
               'seu nome de usuário, a data de criação da conta e as datas de login;',
               'o histórico das suas partidas (jogo, modo, pontuação, tempo, data) e suas pontuações nos rankings, incluindo as respostas tentadas nos desafios do dia;',
               'seus pedidos de amizade, seus amigos e os convites para salas que você envia ou recebe;',
               'se você permitir notificações, no app ou no web app adicionado à tela inicial: um identificador de notificações do aparelho (token Expo ou assinatura Web Push), seu idioma, seu tipo de aparelho e sua escolha para o lembrete diário.',
             ],
           },
+          'Ao criar ou redefinir a senha de uma conta sem e-mail, verificamos se ela aparece em vazamentos de dados conhecidos. Apenas os cinco primeiros caracteres do hash SHA-1 são enviados ao Pwned Passwords. Usamos contadores pseudonimizados para limitar as tentativas.',
           'Para todos, nossos provedores de hospedagem também tratam o endereço IP e as informações técnicas de cada solicitação (navegador, aparelho) para fazer o serviço funcionar e protegê-lo. No site, o Vercel Web Analytics mede a audiência sem cookies e só fornece estatísticas agregadas de visitas, e o Firebase App Check usa o Google reCAPTCHA Enterprise, que analisa sinais do navegador para verificar se as solicitações vêm mesmo do jogo.',
         ],
       },
@@ -75,6 +77,7 @@ export default {
           {
             list: [
               'Conta e dados associados: enquanto a conta existir. Uma conta sem uso por 3 anos (sem login nem partidas) é excluída automaticamente com todos os seus dados.',
+              'Contadores pseudonimizados para limitar as tentativas: os contadores expirados são excluídos durante uma limpeza diária.',
               'Pontuações salvas sem conta: enquanto o ranking existir. Você pode pedir a exclusão.',
               'Salas multijogador: excluídas automaticamente quando expiram, no máximo 10 dias após a criação. Convites: um dia no máximo.',
               'Tokens de notificação: até o aparelho sair da conta, a conta ser excluída ou o aparelho não poder mais recebê-las.',
@@ -143,7 +146,7 @@ export default {
         id: 'account',
         title: 'Conta',
         blocks: [
-          'A criação de conta é reservada a pessoas com 13 anos ou mais e, entre 13 e 15 anos, a quem tiver a autorização de um responsável. Você se compromete a informar um e-mail válido e a manter sua senha em sigilo. Você pode excluir sua conta a qualquer momento ([Excluir minha conta](/delete-account)).',
+          'A criação de conta é reservada a pessoas com 13 anos ou mais e, entre 13 e 15 anos, a quem tiver a autorização de um responsável. Se você informar um e-mail, ele precisa ser válido. Mantenha a senha e, se tiver um, o código de recuperação em sigilo. Você pode excluir sua conta a qualquer momento ([Excluir minha conta](/delete-account)).',
         ],
       },
       {
@@ -267,7 +270,8 @@ export default {
         id: 'email',
         title: 'Se você não consegue mais entrar',
         blocks: [
-          'Escreva para {email} a partir do e-mail da sua conta, informando seu nome de usuário. Excluímos a conta em até 30 dias e confirmamos para você.',
+          'Se você tiver uma conta sem e-mail e esqueceu a senha, use o código de recuperação para redefini-la. Depois, entre para excluir a conta.',
+          'Para outras solicitações de exclusão, escreva para {email} informando seu nome de usuário. Se houver um e-mail vinculado à conta, escreva usando esse endereço. Podemos pedir uma comprovação de que a conta é sua. Nunca compartilhe sua senha ou seu código de recuperação.',
         ],
       },
       {
@@ -276,7 +280,7 @@ export default {
         blocks: [
           {
             list: [
-              'sua conta e seu endereço de e-mail;',
+              'sua conta, os dados de acesso e seu e-mail, caso esteja vinculado à conta;',
               'seu nome de usuário, que volta a ficar disponível;',
               'seu histórico de partidas e suas estatísticas;',
               'suas pontuações em todos os rankings;',

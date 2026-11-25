@@ -20,13 +20,15 @@ export default {
           'Met een account verwerken we daarnaast:',
           {
             list: [
-              'je e-mailadres en je wachtwoord, dat Firebase Authentication versleuteld bewaart: wij hebben er nooit toegang toe. Als je inlogt met Google, ontvangen we het e-mailadres en de id van je Google-account (Google kan ook je naam en profielfoto doorgeven, die wij niet gebruiken);',
+              'je e-mailadres als je je met een e-mailadres registreert of inlogt met Google. Firebase Authentication beheert het wachtwoord van accounts die met een e-mailadres zijn aangemaakt. Als je inlogt met Google, ontvangen we ook het ID van je Google-account (Google kan ook je naam en profielfoto doorgeven, die wij niet gebruiken);',
+              'als je een account met een gebruikersnaam en wachtwoord aanmaakt, vragen we geen persoonlijk e-mailadres. Onze server verwerkt je wachtwoord kortstondig. Firebase Authentication controleert het met een automatisch aangemaakt technisch alias dat geen berichten kan ontvangen. GeoGame bewaart alleen een hash van je herstelcode;',
               'je gebruikersnaam, de aanmaakdatum van het account en je inloggegevens;',
               'je spelgeschiedenis (spel, modus, score, tijd, datum) en je scores in de ranglijsten, inclusief de geprobeerde antwoorden bij de dagelijkse uitdagingen;',
               'je vriendschapsverzoeken, je vrienden en de kameruitnodigingen die je verstuurt of ontvangt;',
               'als je meldingen toestaat, in de app of in de webapp op je beginscherm: een meldings-id van het apparaat (Expo-token of web-pushabonnement), je taal, je type apparaat en je keuze voor de dagelijkse herinnering.',
             ],
           },
+          'Als je het wachtwoord van een account zonder e-mailadres instelt of opnieuw instelt, controleren we of het in bekende datalekken voorkomt. Alleen de eerste vijf tekens van de SHA-1-hash worden naar Pwned Passwords gestuurd. We gebruiken gepseudonimiseerde tellers om het aantal pogingen te beperken.',
           'Voor iedereen verwerken onze hostingproviders bovendien het IP-adres en technische gegevens van elk verzoek (browser, apparaat) om de dienst te laten werken en te beveiligen. Op de website meet Vercel Web Analytics het bereik zonder cookies en levert alleen samengevatte bezoekcijfers, en Firebase App Check gebruikt Google reCAPTCHA Enterprise, dat browsersignalen analyseert om te controleren of verzoeken echt van het spel komen.',
         ],
       },
@@ -75,6 +77,7 @@ export default {
           {
             list: [
               'Account en bijbehorende gegevens: zolang het account bestaat. Een account dat 3 jaar niet wordt gebruikt (geen login, geen spel) wordt automatisch verwijderd, met alle gegevens.',
+              'Gepseudonimiseerde tellers om het aantal pogingen te beperken: verlopen tellers worden tijdens een dagelijkse opschoning verwijderd.',
               'Scores die zonder account zijn opgeslagen: zolang de ranglijst bestaat. Je kunt vragen ze te verwijderen.',
               'Multiplayerkamers: worden automatisch verwijderd wanneer ze verlopen, uiterlijk 10 dagen na het aanmaken. Uitnodigingen: ten hoogste één dag.',
               'Meldingstokens: tot het apparaat zich afmeldt, het account wordt verwijderd of het apparaat geen meldingen meer kan ontvangen.',
@@ -143,7 +146,7 @@ export default {
         id: 'account',
         title: 'Account',
         blocks: [
-          'Een account kunnen alleen personen vanaf 13 jaar aanmaken, tussen 13 en 15 jaar alleen met toestemming van een ouder. Je verbindt je ertoe een geldig e-mailadres op te geven en je wachtwoord geheim te houden. Je kunt je account op elk moment verwijderen ([Mijn account verwijderen](/delete-account)).',
+          'Een account kunnen alleen personen vanaf 13 jaar aanmaken, tussen 13 en 15 jaar alleen met toestemming van een ouder. Als je een e-mailadres opgeeft, moet het geldig zijn. Houd je wachtwoord en eventuele herstelcode geheim. Je kunt je account op elk moment verwijderen ([Mijn account verwijderen](/delete-account)).',
         ],
       },
       {
@@ -267,7 +270,8 @@ export default {
         id: 'email',
         title: 'Als je niet meer kunt inloggen',
         blocks: [
-          'Schrijf naar {email} vanaf het e-mailadres van je account en vermeld je gebruikersnaam. We verwijderen het account binnen maximaal 30 dagen en bevestigen dit aan je.',
+          'Als je voor een account zonder e-mailadres je wachtwoord bent vergeten, stel het dan opnieuw in met je herstelcode. Log daarna in om je account te verwijderen.',
+          'Schrijf voor andere verwijderingsverzoeken naar {email} en vermeld je gebruikersnaam. Als er een e-mailadres aan het account is gekoppeld, schrijf dan vanaf dat adres. We kunnen je vragen te bewijzen dat het account van jou is. Deel nooit je wachtwoord of herstelcode.',
         ],
       },
       {
@@ -276,7 +280,7 @@ export default {
         blocks: [
           {
             list: [
-              'je account en je e-mailadres;',
+              'je account, de bijbehorende inloggegevens en je e-mailadres als het aan het account is gekoppeld;',
               'je gebruikersnaam, die weer beschikbaar komt;',
               'je spelgeschiedenis en je statistieken;',
               'je scores in alle ranglijsten;',

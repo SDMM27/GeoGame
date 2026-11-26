@@ -12,6 +12,7 @@ const RATE_LIMITS = {
   rotate: { ip: 15, key: 8 },
   'email-start': { ip: 12, key: 5 },
   'email-finish': { ip: 30, key: 12 },
+  changePassword: { ip: 15, key: 8 },
 }
 
 export function usernameRequestIp(req) {

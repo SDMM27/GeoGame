@@ -33,13 +33,13 @@ export async function usernameAccountAvailable(apiOrigin = usernameAccountApiOri
   }
 }
 
-async function request(action, { username, password, recoveryCode, email, apiOrigin = usernameAccountApiOrigin() }, idToken) {
+async function request(action, { username, password, newPassword, recoveryCode, email, apiOrigin = usernameAccountApiOrigin() }, idToken) {
   const headers = { 'Content-Type': 'application/json' }
   if (idToken) headers.Authorization = `Bearer ${idToken}`
   const response = await fetch(`${apiOrigin}${PATH}`, {
     method: 'POST',
     headers,
-    body: JSON.stringify({ action, username, password, recoveryCode, email }),
+    body: JSON.stringify({ action, username, password, newPassword, recoveryCode, email }),
   }).catch(() => { throw new UsernameAccountError('network') })
   const data = await response.json().catch(() => null)
   if (response.ok && data) return data
@@ -90,3 +90,8 @@ async function requestEmailLink(auth, action, credentials) {
 export const usernameEmailStatus = (auth, credentials) => requestEmailLink(auth, 'email-status', credentials)
 export const startUsernameEmailLink = (auth, credentials) => requestEmailLink(auth, 'email-start', credentials)
 export const finishUsernameEmailLink = (auth, credentials) => requestEmailLink(auth, 'email-finish', credentials)
+
+export async function changeUsernamePassword(user, credentials) {
+  const { changed } = await request('changePassword', credentials, await user.getIdToken())
+  if (changed !== true) throw new UsernameAccountError('generic')
+}

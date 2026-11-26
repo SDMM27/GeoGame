@@ -84,4 +84,30 @@ describe('Firebase username credential provider', () => {
     await provider.remove(uid)
     expect(auth.deleteUser).toHaveBeenCalledWith(credentialUid)
   })
+
+  it('updates only the existing credential selected by the password proof', async () => {
+    const { auth, provider } = setup()
+    await provider.changePassword(uid, password)
+    expect(auth.updateUser).toHaveBeenCalledWith(credentialUid, { password: password.normalize('NFC') })
+    auth.getUser.mockRejectedValueOnce(missing)
+    await expect(provider.changePassword(uid, password)).rejects.toThrow('Username credential provider error')
+    expect(auth.createUser).not.toHaveBeenCalled()
+  })
+
+  it('uses fresh Firebase proof for a linked password and rejects a revoked proof', async () => {
+    const { auth, provider, request } = setup()
+    const linkedEmail = 'player@example.com'
+    const newPassword = 'the new passphrase'
+    auth.getUser.mockResolvedValue({ uid, email: linkedEmail, emailVerified: true })
+    request.mockResolvedValueOnce({ ok: true, json: async () => ({ localId: uid, idToken: 'fresh' }) })
+    request.mockResolvedValueOnce({ ok: true, json: async () => ({ localId: uid }) })
+    expect(await provider.changeLinkedPassword(uid, linkedEmail, password, newPassword)).toBe(true)
+    expect(request).toHaveBeenNthCalledWith(2, expect.stringContaining('accounts:update?'), expect.objectContaining({
+      body: JSON.stringify({ idToken: 'fresh', password: newPassword, returnSecureToken: false }),
+    }))
+    request.mockResolvedValueOnce({ ok: true, json: async () => ({ localId: uid, idToken: 'revoked' }) })
+    request.mockResolvedValueOnce({ ok: false, status: 400, json: async () => ({ error: { message: 'TOKEN_EXPIRED' } }) })
+    expect(await provider.changeLinkedPassword(uid, linkedEmail, password, newPassword)).toBe(false)
+    expect(auth.updateUser).not.toHaveBeenCalled()
+  })
 })

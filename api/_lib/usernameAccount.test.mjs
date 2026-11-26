@@ -96,7 +96,12 @@ function fixtures({ exchangeWindowSeconds = 0 } = {}) {
     verify: vi.fn(async (uid, value) => passwords.get(uid) === value),
     verifyLinked: vi.fn(async (uid, _email, value) => passwords.get(uid) === value),
     setPassword: vi.fn(async (uid, value) => passwords.set(uid, value)),
-    changePassword: vi.fn(async (uid, value) => passwords.set(uid, value)),
+    changePassword: vi.fn(async (uid, value) => { passwords.set(uid, value); return true }),
+    changeLinkedPassword: vi.fn(async (uid, _email, current, value) => {
+      if (passwords.get(uid) !== current) return false
+      passwords.set(uid, value)
+      return true
+    }),
     remove: vi.fn(async (uid) => passwords.delete(uid)),
   }
   const wait = vi.fn(async () => {})
@@ -167,9 +172,22 @@ describe('username account', () => {
     fixture.auth.verifyIdToken.mockResolvedValue({ uid })
 
     expect((await fixture.call('changePassword', { newPassword: nextPassword }, 'session')).status).toBe(200)
-    expect(fixture.provider.changePassword).toHaveBeenCalledWith(uid, nextPassword, email)
+    expect(fixture.provider.changeLinkedPassword).toHaveBeenCalledWith(uid, email, password, nextPassword)
     expect((await fixture.call('signin')).status).toBe(401)
     expect(await fixture.call('signin', { password: nextPassword })).toEqual({ status: 200, body: { email, uid } })
+  })
+
+  it('rejects a change when the linked password was reset while validating the new password', async () => {
+    const fixture = fixtures()
+    const { uid, credential } = await register(fixture)
+    fixture.docs.get(credential).linkedEmail = 'player@example.com'
+    fixture.auth.verifyIdToken.mockResolvedValue({ uid })
+    fixture.validatePassword.mockImplementationOnce(async () => {
+      fixture.passwords.set(uid, 'passphrase from a concurrent email reset')
+      return null
+    })
+    expect((await fixture.call('changePassword', { newPassword: nextPassword }, 'session')).status).toBe(401)
+    expect((await fixture.call('signin', { password: 'passphrase from a concurrent email reset' })).status).toBe(200)
   })
 
   it('creates a Firebase account without email and signs in case-insensitively with the right password', async () => {

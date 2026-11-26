@@ -274,14 +274,16 @@ async function changePassword({ db, auth, account, provider, password, idToken, 
   })
   if (!locked) return failure(409, 'wrong_credentials')
   // If the provider response is ambiguous, let the lease expire before accepting another write.
-  await provider.changePassword(account.uid, newPassword, proof.email)
+  const changed = proof.email
+    ? await provider.changeLinkedPassword(account.uid, proof.email, password, newPassword)
+    : await provider.changePassword(account.uid, newPassword)
   await db.runTransaction(async (transaction) => {
     const snapshot = await transaction.get(account.ref)
     if (sameActive(snapshot, revision)) {
       transaction.update(account.ref, { passwordChangeUntil: FieldValue.delete() })
     }
   })
-  return reply(200, { changed: true })
+  return changed ? reply(200, { changed: true }) : failure(401, 'wrong_credentials')
 }
 
 // Also called by inactive-account cleanup. A deletion tombstone blocks signin/recovery if Auth is

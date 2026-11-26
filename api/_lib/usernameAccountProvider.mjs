@@ -7,6 +7,7 @@ const ALIAS_DOMAIN = 'accounts.geogame.invalid'
 const ALIAS = /^[0-9a-f]{48}@accounts\.geogame\.invalid$/
 const TIMEOUT_MS = 8000
 const INVALID_PROOF = new Set(['EMAIL_NOT_FOUND', 'INVALID_PASSWORD', 'INVALID_LOGIN_CREDENTIALS', 'USER_DISABLED'])
+const EXPIRED_PROOF = new Set(['CREDENTIAL_TOO_OLD_LOGIN_AGAIN', 'TOKEN_EXPIRED', 'INVALID_ID_TOKEN', 'USER_NOT_FOUND', 'USER_DISABLED'])
 const THROTTLED = new Set(['QUOTA_EXCEEDED', 'TOO_MANY_ATTEMPTS_TRY_LATER', 'TOO_MANY_REQUESTS'])
 
 function providerError(code) {
@@ -46,14 +47,14 @@ export function getUsernamePasswordProvider(auth, env = process.env, fetchImpl =
     }
   }
 
-  async function verifyPassword(credential, password) {
+  async function request(action, body, invalidCodes) {
     let response
     let result
     try {
-      response = await fetchImpl(identityToolkitUrl(env, 'signInWithPassword'), {
+      response = await fetchImpl(identityToolkitUrl(env, action), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: credential.email, password, returnSecureToken: true }),
+        body: JSON.stringify(body),
         redirect: 'error',
         signal: AbortSignal.timeout(TIMEOUT_MS),
       })
@@ -64,28 +65,36 @@ export function getUsernamePasswordProvider(auth, env = process.env, fetchImpl =
     if (!response.ok) {
       const message = result?.error?.message
       const code = typeof message === 'string' ? message.split(' : ')[0] : undefined
-      if (response.status === 400 && INVALID_PROOF.has(code)) return false
+      if ([400, 401].includes(response.status) && invalidCodes.has(code)) return null
       throw providerError(response.status === 429 ? 'TOO_MANY_REQUESTS' : code)
     }
-    // Retain only whether the UID matches. This request verifies the password for our backend.
-    if (result?.localId !== credential.uid) throw providerError()
-    return true
+    if (!result || typeof result !== 'object') throw providerError()
+    return result
+  }
+
+  async function signIn(credential, password) {
+    const result = await request('signInWithPassword', { email: credential.email, password, returnSecureToken: true }, INVALID_PROOF)
+    if (result && result.localId !== credential.uid) throw providerError()
+    return result
+  }
+
+  async function getLinkedIdentity(uid, email) {
+    const identity = await auth.getUser(uid).catch((error) => {
+      if (error?.code === 'auth/user-not-found') return null
+      throw error
+    })
+    return identity?.emailVerified && identity.email?.toLowerCase() === email ? identity : null
   }
 
   return {
     create: async (uid, password) => create(usernameCredentialUid(uid), password),
     async verify(uid, password) {
       const credential = await getCredential(usernameCredentialUid(uid))
-      return Boolean(credential && !credential.disabled && await verifyPassword(credential, password.normalize('NFC')))
+      return Boolean(credential && !credential.disabled && await signIn(credential, password.normalize('NFC')))
     },
     async verifyLinked(uid, email, password) {
-      const identity = await auth.getUser(uid).catch((error) => {
-        if (error?.code === 'auth/user-not-found') return null
-        throw error
-      })
-      if (!identity || !identity.emailVerified || identity.email?.toLowerCase() !== email) return null
-      if (identity.disabled) return false
-      return verifyPassword(identity, password)
+      const identity = await getLinkedIdentity(uid, email)
+      return identity ? !identity.disabled && Boolean(await signIn(identity, password)) : null
     },
     async setPassword(uid, password) {
       const credentialUid = usernameCredentialUid(uid)
@@ -97,16 +106,28 @@ export function getUsernamePasswordProvider(auth, env = process.env, fetchImpl =
         throw providerError(error?.code)
       }
     },
-    async changePassword(uid, password, linkedEmail) {
+    async changePassword(uid, password) {
+      const credentialUid = usernameCredentialUid(uid)
+      const credential = await getCredential(credentialUid)
+      if (!credential || credential.disabled) throw providerError()
       try {
-        const credentialUid = linkedEmail ? uid : usernameCredentialUid(uid)
-        const identity = linkedEmail ? await auth.getUser(uid) : await getCredential(credentialUid)
-        if (!identity || identity.disabled
-          || (linkedEmail && (!identity.emailVerified || identity.email?.toLowerCase() !== linkedEmail))) throw providerError()
-        await auth.updateUser(credentialUid, { password: linkedEmail ? password : password.normalize('NFC') })
+        await auth.updateUser(credentialUid, { password: password.normalize('NFC') })
       } catch (error) {
         throw providerError(error?.code)
       }
+      return true
+    },
+    async changeLinkedPassword(uid, email, password, newPassword) {
+      const identity = await getLinkedIdentity(uid, email)
+      if (!identity || identity.disabled) return false
+      // A native email reset can race with our Firestore lease. Use a fresh password
+      // sign-in and let Firebase enforce the validity of its proof at the write.
+      const session = await signIn(identity, password)
+      if (!session) return false
+      if (!session.idToken) throw providerError()
+      const result = await request('update', { idToken: session.idToken, password: newPassword, returnSecureToken: false }, EXPIRED_PROOF)
+      if (result && result.localId !== uid) throw providerError()
+      return Boolean(result)
     },
     async remove(uid) {
       const credentialUid = usernameCredentialUid(uid)

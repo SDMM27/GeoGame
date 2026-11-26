@@ -11,6 +11,7 @@ const failure = (status, error) => reply(status, { error })
 const proofRef = (db, uid) => db.doc(`usernameEmailProofs/${uid}`)
 
 export const emailLinkInProgress = (data, now) => data.emailProof?.leaseUntil > now
+export const passwordChangeInProgress = (data, now) => data?.passwordChangeUntil > now
 
 export function activationEmail(data) {
   return data.linkedEmail ?? (data.emailProof?.confirmed ? data.emailProof.email : null)
@@ -88,7 +89,8 @@ async function start({ db, auth, account, email, clock, sendProof = sendUsername
   const staged = await db.runTransaction(async (transaction) => {
     const current = (await transaction.get(ref)).data()
     if (current?.state !== 'active' || current.revision !== data.revision || current.linkedEmail
-      || current.emailProof?.confirmed || emailLinkInProgress(current, clock())) return null
+      || current.emailProof?.confirmed || emailLinkInProgress(current, clock())
+      || passwordChangeInProgress(current, clock())) return null
     transaction.create(tracked, { playerUid: uid, expiresAt: proof.expiresAt })
     transaction.update(ref, { emailProof: proof })
     return { previous: current.emailProof?.uid }
@@ -141,7 +143,8 @@ async function finish({ db, auth, provider, account, password, clock, wait, exch
   const locked = await db.runTransaction(async (transaction) => {
     const current = (await transaction.get(ref)).data()
     if (current?.state !== 'active' || current.revision !== data.revision || current.linkedEmail
-      || current.emailProof?.uid !== proof.uid || emailLinkInProgress(current, clock())) return false
+      || current.emailProof?.uid !== proof.uid || emailLinkInProgress(current, clock())
+      || passwordChangeInProgress(current, clock())) return false
     transaction.update(ref, { emailProof: { ...proof, confirmed: true, leaseUntil } })
     return true
   })
@@ -206,6 +209,7 @@ export async function usernameAccountEmail({ db, auth, provider, account, action
     })
   }
 
+  if (passwordChangeInProgress(data, clock())) return failure(429, 'too_many_requests')
   if (!await usernamePasswordProof(provider, account, body.password)) return failure(401, 'wrong_credentials')
   if (action === 'email-finish') {
     return finish({ db, auth, provider, account, password: body.password, clock, wait, exchangeWindowSeconds })

@@ -41,6 +41,7 @@ it('links a verified email to the player UID and shares a single password across
   const email = `atlas-${suffix}@example.test`
   const occupied = await auth.createUser({ email: `occupied-${suffix}@example.test`, password: 'legacy-example-password' })
   const initial = 'a single initial passphrase'
+  const changed = 'another passphrase from profile settings'
   const next = 'another passphrase from email reset'
   const recovered = 'another passphrase from the backup code'
   const call = (action, password, fields, idToken) => usernameAccount({
@@ -72,12 +73,20 @@ it('links a verified email to the player UID and shares a single password across
     expect((await auth.getUserByEmail(email))).toMatchObject({ uid, emailVerified: true })
     await expect(auth.getUser(usernameCredentialUid(uid))).rejects.toMatchObject({ code: 'auth/user-not-found' })
     expect((await call('signin', initial)).body).toEqual({ uid, email })
-    expect(await (await authRequest('signInWithPassword', { email, password: initial })).json()).toMatchObject({ localId: uid })
+    const linkedSession = await (await authRequest('signInWithPassword', { email, password: initial })).json()
+    expect(linkedSession.localId).toBe(uid)
+    expect(await call('changePassword', initial, { newPassword: changed }, linkedSession.idToken)).toEqual({
+      status: 200, body: { changed: true },
+    })
+    expect((await call('signin', initial)).status).toBe(401)
+    expect((await authRequest('signInWithPassword', { email, password: initial })).ok).toBe(false)
+    expect((await call('signin', changed)).body.uid).toBe(uid)
+    expect(await (await authRequest('signInWithPassword', { email, password: changed })).json()).toMatchObject({ localId: uid })
 
     expect((await authRequest('sendOobCode', { requestType: 'PASSWORD_RESET', email })).ok).toBe(true)
     const resetCode = await latestEmailAction('PASSWORD_RESET', email)
     expect((await authRequest('resetPassword', { oobCode: resetCode, newPassword: next })).ok).toBe(true)
-    expect((await call('signin', initial)).status).toBe(401)
+    expect((await call('signin', changed)).status).toBe(401)
     expect((await call('signin', next)).body.uid).toBe(uid)
     expect(await (await authRequest('signInWithPassword', { email, password: next })).json()).toMatchObject({ localId: uid })
 

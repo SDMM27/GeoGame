@@ -28,7 +28,7 @@ export default {
               'si permites las notificaciones, en la app o en la web app añadida a tu pantalla de inicio: un identificador de notificaciones del dispositivo (token de Expo o suscripción Web Push), tu idioma, tu tipo de dispositivo y tu elección para el recordatorio diario.',
             ],
           },
-          'Al crear o restablecer la contraseña de una cuenta sin correo, comprobamos si aparece en filtraciones de datos conocidas. Solo enviamos a Pwned Passwords los primeros cinco caracteres de su hash SHA-1. Usamos contadores seudonimizados para limitar los intentos.',
+          'Al crear, cambiar o restablecer la contraseña de una cuenta con nombre de usuario en GeoGame, comprobamos si aparece en filtraciones de datos conocidas. Solo enviamos a Pwned Passwords los primeros cinco caracteres de su hash SHA-1. Usamos contadores seudonimizados para limitar los intentos.',
           'Para todos, nuestros proveedores de alojamiento tratan también la dirección IP y la información técnica de cada solicitud (navegador, dispositivo) para hacer funcionar y proteger el servicio. En el sitio web, Vercel Web Analytics mide la audiencia sin cookies y solo ofrece estadísticas agregadas de visitas, y Firebase App Check usa Google reCAPTCHA Enterprise, que analiza señales del navegador para comprobar que las solicitudes vienen realmente del juego.',
         ],
       },

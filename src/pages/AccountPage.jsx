@@ -7,6 +7,7 @@ import { LEGAL_PATHS } from '../legal/legalInfo'
 import { auth, useAccount } from '../auth'
 import {
   accountErrorKey,
+  changeAccountPassword,
   chooseUsername,
   deleteAccount,
   PASSWORD_MIN,
@@ -583,6 +584,80 @@ function EmailLinkSettings({ account }) {
   )
 }
 
+function PasswordSettings({ account }) {
+  const { t } = useTranslation()
+  const [open, setOpen] = useState(false)
+  const [password, setPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmation, setConfirmation] = useState('')
+  const [error, setError] = useState(null)
+  const [saved, setSaved] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+
+  const close = () => {
+    setOpen(false)
+    setPassword('')
+    setNewPassword('')
+    setConfirmation('')
+    setError(null)
+  }
+
+  const submit = async (event) => {
+    event.preventDefault()
+    if (submitting) return
+    if (newPassword !== confirmation) {
+      setError('password_mismatch')
+      return
+    }
+    setSubmitting(true)
+    setError(null)
+    try {
+      await changeAccountPassword(auth, account, { password, newPassword })
+      close()
+      setSaved(true)
+    } catch (err) {
+      setError(accountErrorKey(err))
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  if (!open) {
+    return (
+      <>
+        <button type="button" className="account-link" onClick={() => { setSaved(false); setOpen(true) }}>
+          {t('account.change_password')}
+        </button>
+        {saved && <p className="account-notice" role="status">{t('account.password_changed')}</p>}
+      </>
+    )
+  }
+
+  return (
+    <form className="account-form" onSubmit={submit}>
+      {[
+        ['current_password', password, setPassword, 'current-password'],
+        ['new_password', newPassword, setNewPassword, 'new-password'],
+        ['confirm_password', confirmation, setConfirmation, 'new-password'],
+      ].map(([label, value, setValue, autoComplete]) => (
+        <label className="account-field" key={label}>
+          <span>{t(`account.${label}`)}</span>
+          <input type="password" value={value} onChange={(e) => setValue(e.target.value)} autoComplete={autoComplete} required disabled={submitting} />
+        </label>
+      ))}
+      {error && <p className="account-error" role="alert">{t(`account.errors.${error}`)}</p>}
+      <div className="account-row">
+        <button type="button" className="account-link" onClick={close} disabled={submitting}>
+          {t('account.cancel')}
+        </button>
+        <button type="submit" className="account-submit" disabled={submitting}>
+          {t('account.change_password')}
+        </button>
+      </div>
+    </form>
+  )
+}
+
 function AccountSettings({ account }) {
   const { t } = useTranslation()
   const [deleting, setDeleting] = useState(false)
@@ -616,6 +691,7 @@ function AccountSettings({ account }) {
           {t('account.signout')}
         </button>
 
+        {!deleting && account.hasPassword && <PasswordSettings key={account.uid} account={account} />}
         {!deleting && account.usernamePassword && account.username && (
           <>
             <EmailLinkSettings account={account} />

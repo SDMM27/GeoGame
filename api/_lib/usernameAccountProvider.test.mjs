@@ -84,4 +84,17 @@ describe('Firebase username credential provider', () => {
     await provider.remove(uid)
     expect(auth.deleteUser).toHaveBeenCalledWith(credentialUid)
   })
+
+  it('updates only the existing credential selected by the password proof', async () => {
+    const { auth, provider } = setup()
+    await provider.changePassword(uid, password)
+    expect(auth.updateUser).toHaveBeenCalledWith(credentialUid, { password: password.normalize('NFC') })
+    const linkedEmail = 'player@example.com'
+    auth.getUser.mockResolvedValueOnce({ uid, email: linkedEmail, emailVerified: true })
+    await provider.changePassword(uid, password, linkedEmail)
+    expect(auth.updateUser).toHaveBeenLastCalledWith(uid, { password })
+    auth.getUser.mockRejectedValueOnce(missing)
+    await expect(provider.changePassword(uid, password)).rejects.toThrow('Username credential provider error')
+    expect(auth.createUser).not.toHaveBeenCalled()
+  })
 })

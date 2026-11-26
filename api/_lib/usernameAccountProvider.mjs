@@ -97,6 +97,17 @@ export function getUsernamePasswordProvider(auth, env = process.env, fetchImpl =
         throw providerError(error?.code)
       }
     },
+    async changePassword(uid, password, linkedEmail) {
+      try {
+        const credentialUid = linkedEmail ? uid : usernameCredentialUid(uid)
+        const identity = linkedEmail ? await auth.getUser(uid) : await getCredential(credentialUid)
+        if (!identity || identity.disabled
+          || (linkedEmail && (!identity.emailVerified || identity.email?.toLowerCase() !== linkedEmail))) throw providerError()
+        await auth.updateUser(credentialUid, { password: linkedEmail ? password : password.normalize('NFC') })
+      } catch (error) {
+        throw providerError(error?.code)
+      }
+    },
     async remove(uid) {
       const credentialUid = usernameCredentialUid(uid)
       if (!await getCredential(credentialUid)) return

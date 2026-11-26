@@ -28,7 +28,7 @@ export default {
               'als je meldingen toestaat, in de app of in de webapp op je beginscherm: een meldings-id van het apparaat (Expo-token of web-pushabonnement), je taal, je type apparaat en je keuze voor de dagelijkse herinnering.',
             ],
           },
-          'Als je het wachtwoord van een account zonder e-mailadres instelt of opnieuw instelt, controleren we of het in bekende datalekken voorkomt. Alleen de eerste vijf tekens van de SHA-1-hash worden naar Pwned Passwords gestuurd. We gebruiken gepseudonimiseerde tellers om het aantal pogingen te beperken.',
+          'Als je het wachtwoord van een account met gebruikersnaam in GeoGame instelt, wijzigt of opnieuw instelt, controleren we of het in bekende datalekken voorkomt. Alleen de eerste vijf tekens van de SHA-1-hash worden naar Pwned Passwords gestuurd. We gebruiken gepseudonimiseerde tellers om het aantal pogingen te beperken.',
           'Voor iedereen verwerken onze hostingproviders bovendien het IP-adres en technische gegevens van elk verzoek (browser, apparaat) om de dienst te laten werken en te beveiligen. Op de website meet Vercel Web Analytics het bereik zonder cookies en levert alleen samengevatte bezoekcijfers, en Firebase App Check gebruikt Google reCAPTCHA Enterprise, dat browsersignalen analyseert om te controleren of verzoeken echt van het spel komen.',
         ],
       },

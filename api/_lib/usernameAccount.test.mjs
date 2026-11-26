@@ -94,7 +94,14 @@ function fixtures({ exchangeWindowSeconds = 0 } = {}) {
   const provider = {
     create: vi.fn(async (uid, value) => passwords.set(uid, value)),
     verify: vi.fn(async (uid, value) => passwords.get(uid) === value),
+    verifyLinked: vi.fn(async (uid, _email, value) => passwords.get(uid) === value),
     setPassword: vi.fn(async (uid, value) => passwords.set(uid, value)),
+    changePassword: vi.fn(async (uid, value) => { passwords.set(uid, value); return true }),
+    changeLinkedPassword: vi.fn(async (uid, _email, current, value) => {
+      if (passwords.get(uid) !== current) return false
+      passwords.set(uid, value)
+      return true
+    }),
     remove: vi.fn(async (uid) => passwords.delete(uid)),
   }
   const wait = vi.fn(async () => {})
@@ -115,6 +122,74 @@ async function register(fixture) {
 }
 
 describe('username account', () => {
+  it('requires a matching session and password to change the password without rotating the recovery code', async () => {
+    const fixture = fixtures()
+    const { uid, credential } = await register(fixture)
+    const recoveryHash = fixture.docs.get(credential).recoveryHash
+    const change = { newPassword: nextPassword }
+    expect((await fixture.call('changePassword', change, 'other-session')).status).toBe(401)
+    fixture.auth.verifyIdToken.mockResolvedValue({ uid })
+    expect((await fixture.call('changePassword', { ...change, password: 'incorrect' }, 'session')).status).toBe(401)
+    fixture.validatePassword.mockResolvedValueOnce('password_compromised')
+    expect(await fixture.call('changePassword', change, 'session')).toEqual({
+      status: 400, body: { error: 'password_compromised' },
+    })
+    expect(fixture.provider.changePassword).not.toHaveBeenCalled()
+    expect(await fixture.call('changePassword', change, 'session')).toEqual({ status: 200, body: { changed: true } })
+    expect(fixture.docs.get(credential).recoveryHash).toBe(recoveryHash)
+    expect((await fixture.call('signin')).status).toBe(401)
+    expect((await fixture.call('signin', { password: nextPassword })).status).toBe(200)
+  })
+
+  it('serializes password changes with recovery', async () => {
+    const fixture = fixtures()
+    const { uid, code } = await register(fixture)
+    fixture.auth.verifyIdToken.mockResolvedValue({ uid })
+    const started = deferred()
+    const release = deferred()
+    fixture.provider.changePassword.mockImplementationOnce(async () => {
+      started.resolve()
+      await release.promise
+    })
+    const changing = fixture.call('changePassword', { newPassword: nextPassword }, 'session')
+    await started.promise
+    try {
+      expect(await fixture.call('recover', { recoveryCode: code, password: nextPassword })).toEqual({
+        status: 429, body: { error: 'too_many_requests' },
+      })
+      expect((await fixture.call('changePassword', { newPassword: nextPassword }, 'session')).status).toBe(401)
+    } finally {
+      release.resolve()
+      await changing
+    }
+  })
+
+  it('changes the canonical password of a username account with a linked email', async () => {
+    const fixture = fixtures()
+    const { uid, credential } = await register(fixture)
+    const email = 'player@example.com'
+    fixture.docs.get(credential).linkedEmail = email
+    fixture.auth.verifyIdToken.mockResolvedValue({ uid })
+
+    expect((await fixture.call('changePassword', { newPassword: nextPassword }, 'session')).status).toBe(200)
+    expect(fixture.provider.changeLinkedPassword).toHaveBeenCalledWith(uid, email, password, nextPassword)
+    expect((await fixture.call('signin')).status).toBe(401)
+    expect(await fixture.call('signin', { password: nextPassword })).toEqual({ status: 200, body: { email, uid } })
+  })
+
+  it('rejects a change when the linked password was reset while validating the new password', async () => {
+    const fixture = fixtures()
+    const { uid, credential } = await register(fixture)
+    fixture.docs.get(credential).linkedEmail = 'player@example.com'
+    fixture.auth.verifyIdToken.mockResolvedValue({ uid })
+    fixture.validatePassword.mockImplementationOnce(async () => {
+      fixture.passwords.set(uid, 'passphrase from a concurrent email reset')
+      return null
+    })
+    expect((await fixture.call('changePassword', { newPassword: nextPassword }, 'session')).status).toBe(401)
+    expect((await fixture.call('signin', { password: 'passphrase from a concurrent email reset' })).status).toBe(200)
+  })
+
   it('creates a Firebase account without email and signs in case-insensitively with the right password', async () => {
     const fixture = fixtures()
     const { uid, code, credential } = await register(fixture)

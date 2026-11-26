@@ -28,7 +28,7 @@ export default {
               'wenn du Benachrichtigungen erlaubst, in der App oder in der Web-App auf deinem Startbildschirm: eine Benachrichtigungskennung des Geräts (Expo-Token oder Web-Push-Abonnement), deine Sprache, deinen Gerätetyp und deine Wahl für die tägliche Erinnerung.',
             ],
           },
-          'Wenn du das Passwort eines Kontos ohne E-Mail-Adresse festlegst oder zurücksetzt, prüfen wir, ob es in bekannten Datenlecks vorkommt. Nur die ersten fünf Zeichen des SHA-1-Hashes werden an Pwned Passwords gesendet. Wir verwenden pseudonymisierte Zähler, um die Zahl der Versuche zu begrenzen.',
+          'Wenn du das Passwort eines Kontos mit Benutzernamen in GeoGame festlegst, änderst oder zurücksetzt, prüfen wir, ob es in bekannten Datenlecks vorkommt. Nur die ersten fünf Zeichen des SHA-1-Hashes werden an Pwned Passwords gesendet. Wir verwenden pseudonymisierte Zähler, um die Zahl der Versuche zu begrenzen.',
           'Für alle verarbeiten unsere Hosting-Anbieter außerdem die IP-Adresse und technische Informationen jeder Anfrage (Browser, Gerät), um den Dienst zu betreiben und abzusichern. Auf der Website misst Vercel Web Analytics die Reichweite ohne Cookies und liefert nur zusammengefasste Besuchsstatistiken, und Firebase App Check nutzt Google reCAPTCHA Enterprise, das Browsersignale auswertet, um zu prüfen, ob Anfragen wirklich vom Spiel stammen.',
         ],
       },

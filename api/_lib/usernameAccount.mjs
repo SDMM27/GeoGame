@@ -3,14 +3,14 @@ import { setTimeout as delay } from 'node:timers/promises'
 import { FieldValue } from 'firebase-admin/firestore'
 
 import { checkNewPassword, checkPasswordInput, checkRateLimit, normalizeUsername, usernameKey, validateUsername } from './usernameAccountPolicy.mjs'
-import { activationEmail, emailLinkInProgress, eraseUsernameEmailProof, usernameAccountEmail, usernamePasswordProof } from './usernameAccountEmail.mjs'
+import { activationEmail, emailLinkInProgress, eraseUsernameEmailProof, passwordChangeInProgress, usernameAccountEmail, usernamePasswordProof } from './usernameAccountEmail.mjs'
 
 const PROVISIONING_MS = 15 * 60 * 1000
 const RECOVERY_MS = 2 * 60 * 1000
 const RECOVERY_CODE_PATTERN = /^[A-Za-z0-9_-]{22}$/
 const USERNAME_UID_PATTERN = /^[a-f0-9-]{36}$/
 const EMAIL_ACTIONS = new Set(['email-status', 'email-start', 'email-finish'])
-const ACTIONS = new Set(['signup', 'signin', 'recover', 'rotate', ...EMAIL_ACTIONS])
+const ACTIONS = new Set(['signup', 'signin', 'recover', 'rotate', 'changePassword', ...EMAIL_ACTIONS])
 
 const reply = (status, body) => ({ status, body })
 const failure = (status, error) => reply(status, { error })
@@ -24,7 +24,7 @@ export async function hasUsernameCredential(db, uid) {
 }
 
 export function canObserveMissingUsernamePlayer(data, now) {
-  return data?.state === 'active'
+  return (data?.state === 'active' && !passwordChangeInProgress(data, now))
     || (data?.state === 'recovering' && Number.isFinite(data.leaseUntil) && data.leaseUntil <= now)
 }
 
@@ -115,7 +115,7 @@ async function lookup(db, key) {
 const sameActive = (snapshot, revision) => snapshot.data()?.state === 'active' && snapshot.data()?.revision === revision
 
 async function signin({ db, issueToken, provider, account, password, clock }) {
-  if (account?.data.state !== 'active') return failure(401, 'wrong_credentials')
+  if (account?.data.state !== 'active' || passwordChangeInProgress(account.data, clock())) return failure(401, 'wrong_credentials')
   const proof = await usernamePasswordProof(provider, account, password)
   if (!proof) return failure(401, 'wrong_credentials')
   // Use native password sign-in for linked accounts. An email reset then invalidates all previous
@@ -179,7 +179,7 @@ async function recover({ db, auth, provider, account, password, recoveryCode, cl
       return { error: 'invalid_recovery_code' }
     }
     const now = clock()
-    if ((data.state === 'recovering' && data.leaseUntil > now) || emailLinkInProgress(data, now)) {
+    if ((data.state === 'recovering' && data.leaseUntil > now) || emailLinkInProgress(data, now) || passwordChangeInProgress(data, now)) {
       return { error: 'too_many_requests' }
     }
     transaction.update(ref, {
@@ -237,12 +237,15 @@ async function recover({ db, auth, provider, account, password, recoveryCode, cl
   return reply(200, { recoveryCode: replacement })
 }
 
-async function rotate({ db, auth, provider, account, password, idToken, clock }) {
-  if (!idToken) return failure(401, 'wrong_credentials')
+async function checkAccountProof({ auth, provider, account, password, idToken, clock }) {
+  if (!idToken || account?.data.state !== 'active' || passwordChangeInProgress(account.data, clock())
+    || emailLinkInProgress(account.data, clock())) return false
   const decoded = await auth.verifyIdToken(idToken, true).catch(() => null)
-  if (account?.data.state !== 'active' || account.uid !== decoded?.uid || !await usernamePasswordProof(provider, account, password)) {
-    return failure(401, 'wrong_credentials')
-  }
+  return account.uid === decoded?.uid && await usernamePasswordProof(provider, account, password)
+}
+
+async function rotate({ db, account, clock, ...proof }) {
+  if (!await checkAccountProof({ account, clock, ...proof })) return failure(401, 'wrong_credentials')
   const recoveryCode = newCode()
   const changed = await db.runTransaction(async (transaction) => {
     const snapshot = await transaction.get(account.ref)
@@ -251,6 +254,36 @@ async function rotate({ db, auth, provider, account, password, idToken, clock })
     return true
   })
   return changed ? reply(200, { recoveryCode }) : failure(401, 'wrong_credentials')
+}
+
+async function changePassword({ db, auth, account, provider, password, idToken, clock, newPassword, validatePassword }) {
+  const proof = await checkAccountProof({ auth, account, provider, password, idToken, clock })
+  if (!proof) return failure(401, 'wrong_credentials')
+  if (!checkPasswordInput(newPassword)) return failure(400, 'weak_password')
+  const invalid = await validatePassword(newPassword, account.username)
+  if (invalid) return failure(400, invalid)
+
+  // Fence operations that verified the previous password before the provider write.
+  const revision = account.data.revision + 1
+  const locked = await db.runTransaction(async (transaction) => {
+    const snapshot = await transaction.get(account.ref)
+    const now = clock()
+    if (!sameActive(snapshot, account.data.revision) || emailLinkInProgress(snapshot.data(), now)) return false
+    transaction.update(account.ref, { revision, passwordChangeUntil: now + RECOVERY_MS })
+    return true
+  })
+  if (!locked) return failure(409, 'wrong_credentials')
+  // If the provider response is ambiguous, let the lease expire before accepting another write.
+  const changed = proof.email
+    ? await provider.changeLinkedPassword(account.uid, proof.email, password, newPassword)
+    : await provider.changePassword(account.uid, newPassword)
+  await db.runTransaction(async (transaction) => {
+    const snapshot = await transaction.get(account.ref)
+    if (sameActive(snapshot, revision)) {
+      transaction.update(account.ref, { passwordChangeUntil: FieldValue.delete() })
+    }
+  })
+  return changed ? reply(200, { changed: true }) : failure(401, 'wrong_credentials')
 }
 
 // Also called by inactive-account cleanup. A deletion tombstone blocks signin/recovery if Auth is
@@ -271,8 +304,8 @@ export async function removeUsernameCredential({
     if (emailLinkInProgress(data, clock())) throw new Error('Username email link in progress')
     if (expectedMissingSince !== undefined) {
       if (!canObserveMissingUsernamePlayer(data, observationNow) || data.missingPlayerSince !== expectedMissingSince) return false
-    } else if (data.state === 'recovering' && data.leaseUntil > clock()) {
-      throw new Error('Username recovery in progress')
+    } else if ((data.state === 'recovering' && data.leaseUntil > clock()) || passwordChangeInProgress(data, clock())) {
+      throw new Error('Username credential update in progress')
     }
     if (['provisioning', 'discarding'].includes(data.state)) throw new Error('Username provisioning in progress')
     if (data.state !== 'deleting') {
@@ -352,6 +385,9 @@ export async function usernameAccount({
   }
   if (action === 'signin') return signin({ db, issueToken, provider, account, password, clock })
   if (action === 'rotate') return rotate({ db, auth, provider, account, password, idToken, clock })
+  if (action === 'changePassword') {
+    return changePassword({ db, auth, provider, account, password, idToken, clock, newPassword: body.newPassword, validatePassword })
+  }
 
   const recoveryCode = typeof body.recoveryCode === 'string' ? body.recoveryCode.trim() : ''
   if (!RECOVERY_CODE_PATTERN.test(recoveryCode) || !validRecoveryCode(recoveryCode, account?.data.recoveryHash)) {

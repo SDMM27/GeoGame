@@ -14,6 +14,7 @@ import {
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
+  updatePassword,
   updateProfile,
 } from 'firebase/auth'
 import {
@@ -26,7 +27,7 @@ import {
 import { firestore } from '../Firebase'
 import { setOwnUid, writeSnapshot } from './localSnapshot'
 import { normalizeUsername, usernameKey, validateUsername } from './usernameRules.mjs'
-import { signInWithUsername, usernameAccountApiOrigin, UsernameAccountError } from './usernameAccount'
+import { changeUsernamePassword, signInWithUsername, usernameAccountApiOrigin, UsernameAccountError } from './usernameAccount'
 
 export { normalizeUsername, USERNAME_MIN, USERNAME_MAX, validateUsername } from './usernameRules.mjs'
 export const PASSWORD_MIN = 6
@@ -220,6 +221,20 @@ export function signOut(auth) {
 
 export function resetPassword(auth, email) {
   return sendPasswordResetEmail(auth, email.trim())
+}
+
+export async function changeAccountPassword(auth, account, { password, newPassword, apiOrigin = undefined }) {
+  const user = auth.currentUser
+  if (user?.uid !== account.uid || !account.hasPassword) throw new AccountError('wrong_credentials')
+  if (account.usernamePassword) {
+    await changeUsernamePassword(user, { username: account.username, password, newPassword, apiOrigin })
+    return
+  }
+  if (!user.email || !user.providerData.some(({ providerId }) => providerId === 'password')) {
+    throw new AccountError('wrong_credentials')
+  }
+  await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, password))
+  await updatePassword(user, newPassword)
 }
 
 // Deleting needs a recent sign-in: the password is asked again, or Google's `reauthenticate` (accountGoogle.js).

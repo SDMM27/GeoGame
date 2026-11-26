@@ -10,6 +10,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import {
   accountErrorKey,
+  changeAccountPassword,
   chooseUsername,
   deleteAccount,
   resetPassword,
@@ -607,6 +608,80 @@ function EmailLinkSettings({ account }: { account: Account }) {
   )
 }
 
+function PasswordSettings({ account }: { account: Account }) {
+  const styles = useStyles()
+  const { t } = useTranslation()
+  const [open, setOpen] = useState(false)
+  const [password, setPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmation, setConfirmation] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [saved, setSaved] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const complete = Boolean(password && newPassword && confirmation)
+
+  const close = () => {
+    setOpen(false)
+    setPassword('')
+    setNewPassword('')
+    setConfirmation('')
+    setError(null)
+  }
+
+  const submit = async () => {
+    if (submitting || !complete) return
+    if (newPassword !== confirmation) {
+      setError('password_mismatch')
+      return
+    }
+    setSubmitting(true)
+    setError(null)
+    try {
+      await changeAccountPassword(auth, account, { password, newPassword, apiOrigin: API_ORIGIN })
+      close()
+      setSaved(true)
+    } catch (err) {
+      setError(accountErrorKey(err))
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  if (!open) {
+    return (
+      <>
+        <Button label={t('account.change_password')} variant="secondary" onPress={() => { setSaved(false); setOpen(true) }} />
+        {saved && <Message kind="notice" text={t('account.password_changed')} />}
+      </>
+    )
+  }
+
+  return (
+    <View style={styles.card}>
+      {([
+        ['current_password', password, setPassword, 'current-password', 'password'],
+        ['new_password', newPassword, setNewPassword, 'new-password', 'newPassword'],
+        ['confirm_new_password', confirmation, setConfirmation, 'new-password', 'newPassword'],
+      ] as const).map(([label, value, setValue, autoComplete, textContentType]) => (
+        <Field
+          key={label}
+          label={t(`account.${label}`)}
+          value={value}
+          onChangeText={setValue}
+          secureTextEntry
+          autoCapitalize="none"
+          autoComplete={autoComplete}
+          textContentType={textContentType}
+          editable={!submitting}
+        />
+      ))}
+      {error && <Message kind="error" text={t(`account.errors.${error}`)} />}
+      <Button label={t('account.change_password')} onPress={submit} loading={submitting} disabled={!complete} />
+      <Button label={t('account.cancel')} variant="ghost" onPress={close} disabled={submitting} />
+    </View>
+  )
+}
+
 function AccountSettings({ account }: { account: Account }) {
   const styles = useStyles()
   const colors = useColors()
@@ -651,6 +726,7 @@ function AccountSettings({ account }: { account: Account }) {
 
         <NotificationsCard uid={account.uid} />
 
+        {!deleting && account.hasPassword && <PasswordSettings key={account.uid} account={account} />}
         {!deleting && account.usernamePassword && account.username && (
           <>
             <EmailLinkSettings account={account} />

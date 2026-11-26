@@ -638,7 +638,7 @@ function PasswordSettings({ account }) {
       {[
         ['current_password', password, setPassword, 'current-password'],
         ['new_password', newPassword, setNewPassword, 'new-password'],
-        ['confirm_password', confirmation, setConfirmation, 'new-password'],
+        ['confirm_new_password', confirmation, setConfirmation, 'new-password'],
       ].map(([label, value, setValue, autoComplete]) => (
         <label className="account-field" key={label}>
           <span>{t(`account.${label}`)}</span>

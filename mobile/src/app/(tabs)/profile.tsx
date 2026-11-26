@@ -661,7 +661,7 @@ function PasswordSettings({ account }: { account: Account }) {
       {([
         ['current_password', password, setPassword, 'current-password', 'password'],
         ['new_password', newPassword, setNewPassword, 'new-password', 'newPassword'],
-        ['confirm_password', confirmation, setConfirmation, 'new-password', 'newPassword'],
+        ['confirm_new_password', confirmation, setConfirmation, 'new-password', 'newPassword'],
       ] as const).map(([label, value, setValue, autoComplete, textContentType]) => (
         <Field
           key={label}

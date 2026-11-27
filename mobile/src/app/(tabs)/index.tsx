@@ -16,7 +16,7 @@ import { LanguageButton } from '@/components/LanguageButton'
 import { LeagueCard } from '@/components/league/LeagueCard'
 import { LeagueVictoryOverlay } from '@/components/league/LeagueVictoryOverlay'
 import { BoardStrip, DepartureRow, DeparturesBoard, ExpandableDeparture, Kicker, ScreenTitle, useAccordion, type DepartureTone } from '@/components/flight'
-import GameEmblem from '@/components/GameEmblem'
+import GameEmblem, { flightCode } from '@/components/GameEmblem'
 import { FlapText } from '@/components/flight/FlapText'
 import { useDailyCountdown } from '@/components/home/dailyCountdown'
 import { useDiscoButtonStyle } from '@/components/home/discoAccent'
@@ -321,8 +321,8 @@ export default function HomeScreen() {
               />
             ))}
             <Touchable accessibilityRole="button" accessibilityLabel={`${t('atlas.title')}, ${t('atlas.subtitle')}`} onPress={() => router.push('/atlas')} style={styles.atlasRow}>
-              <MaterialCommunityIcons name="earth" size={24} color={colors.highlight} style={{ width: 30, textAlign: 'center' }} />
-              <Text style={styles.atlasCode}>ATL</Text>
+              <GameEmblem game="atlas" size={30} color={colors.highlight} />
+              <Text style={styles.atlasCode}>{flightCode('atlas')}</Text>
               <Text style={styles.atlasName} numberOfLines={1}>
                 {upper(t('atlas.title'))}
               </Text>

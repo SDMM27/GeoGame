@@ -5,6 +5,7 @@
 import { GAME_TYPES } from './gameTypes'
 
 export const GAME_EMBLEMS = {
+  atlas: { code: 'ATL', d: 'M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3zM9 3v15M15 6v15' },
   daily_challenge: {
     code: 'DEF',
     d: 'M3 12a9 9 0 1 0 18 0a9 9 0 1 0-18 0M7 12a5 5 0 1 0 10 0a5 5 0 1 0-10 0M11.99 12h.02M12 1v4M12 19v4M1 12h4M19 12h4',

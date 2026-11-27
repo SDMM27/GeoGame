@@ -71,7 +71,7 @@ export default function HomePage() {
       status: i === 0 ? "boarding" : "on_time",
       onClick: () => setConfigGameId(game.id),
     })),
-    { id: "atlas", title: t("atlas.title"), description: t("atlas.subtitle"), status: "open", onClick: () => navigate("/atlas") },
+    { id: "atlas", game: "atlas", title: t("atlas.title"), description: t("atlas.subtitle"), status: "open", onClick: () => navigate("/atlas") },
   ];
 
   return (

@@ -5,8 +5,8 @@ import { useTranslation } from 'react-i18next'
 import FlapText from './FlapText'
 import GameEmblem, { flightCode } from '../../../components/GameEmblem'
 
-// `rows`: { id, title, description, status: 'boarding' | 'on_time' | 'open', onClick, game? } (`game`: the emblem and
-// flight code to show, none for a row that is not a game)
+// `rows`: { id, title, description, status: 'boarding' | 'on_time' | 'open', onClick, game? }
+// The optional `game` field selects the emblem and flight code.
 export default function DeparturesBoard({ rows, labelledBy }) {
   const { t, i18n } = useTranslation()
   const upper = (text) => text.toLocaleUpperCase(i18n.resolvedLanguage)

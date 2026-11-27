@@ -77,6 +77,7 @@
   /* One color per game, as in the app (src/utils/roomGames.js builds these names). --game-* fills icons, chips and
      bars; --game-*-ink is the text-safe shade. */
   --game-placement: #7aa2ff;     --game-placement-ink: #3557c9;
+  --game-atlas: var(--game-placement); --game-atlas-ink: var(--game-placement-ink);
   --game-flags: #ff7a6b;         --game-flags-ink: #c0392b;
   --game-capitals: #f5b83d;      --game-capitals-ink: #8a5a00;
   --game-border-guess: #c792ff;  --game-border-guess-ink: #7c4dff;

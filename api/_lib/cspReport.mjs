@@ -46,6 +46,26 @@ function documentKind(value, host) {
   }
 }
 
+function readReportBody(req) {
+  // Vercel replays the buffered body through data/end listeners on the incoming request.
+  return new Promise((resolve, reject) => {
+    const chunks = []
+    let bytes = 0
+    req.on('error', reject)
+    req.on('data', (chunk) => {
+      if (bytes > MAX_BYTES) return
+      bytes += chunk.byteLength
+      if (bytes > MAX_BYTES) {
+        chunks.length = 0
+        resolve(null)
+      } else {
+        chunks.push(chunk)
+      }
+    })
+    req.on('end', () => resolve(Buffer.concat(chunks, bytes <= MAX_BYTES ? bytes : 0)))
+  })
+}
+
 export default async function cspReportHandler(req, res) {
   res.setHeader('Cache-Control', 'no-store')
   res.setHeader('X-Robots-Tag', 'noindex')
@@ -59,21 +79,11 @@ export default async function cspReportHandler(req, res) {
   if (!legacy && contentType !== 'application/reports+json') return res.status(415).end()
   if (Number(req.headers['content-length']) > MAX_BYTES) return res.status(413).end()
 
-  const decoder = new TextDecoder('utf-8', { fatal: true })
-  let bytes = 0
-  let text = ''
   let payload
   try {
-    // Vercel exposes the raw request stream until its lazy body getter is read.
-    for await (const chunk of req.iterator({ destroyOnReturn: false })) {
-      bytes += chunk.byteLength
-      if (bytes > MAX_BYTES) {
-        req.resume()
-        return res.status(413).end()
-      }
-      text += decoder.decode(chunk, { stream: true })
-    }
-    payload = JSON.parse(text + decoder.decode())
+    const body = await readReportBody(req)
+    if (body === null) return res.status(413).end()
+    payload = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(body))
   } catch {
     return res.status(400).end()
   }

@@ -1,13 +1,20 @@
 // @vitest-environment node
 import { afterEach, expect, it, vi } from 'vitest'
 
-import { Readable } from 'node:stream'
+import { PassThrough, Readable } from 'node:stream'
 
 import handler from '../api/migrate-session.mjs'
 
 const origin = 'https://preview.example.test'
 async function request(method, body, contentType = 'application/reports+json') {
-  const req = Readable.from(body === undefined ? [] : [Buffer.from(body)])
+  // The Vercel Node adapter replays the body through the data/end events after consuming the original stream.
+  const req = Readable.from([])
+  const replay = new PassThrough()
+  const originalOn = req.on.bind(req)
+  req.read = replay.read.bind(replay)
+  req.on = req.addListener = (event, callback) =>
+    event === 'data' || event === 'end' ? replay.on(event, callback) : originalOn(event, callback)
+  replay.end(body)
   req.method = method
   req.query = { flow: 'csp-report' }
   req.headers = { host: new URL(origin).host, 'content-type': contentType }

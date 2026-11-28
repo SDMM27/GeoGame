@@ -61,7 +61,22 @@ const isPerfect = (game) => SETUP_TYPES.includes(game.gameType) && game.total >=
 const count = (games, predicate) => games.filter(predicate).length
 const sumFound = (games, gameType) =>
   games.reduce((sum, game) => (game.gameType === gameType && Number.isFinite(game.found) ? sum + game.found : sum), 0)
-const allFound = (games) => games.reduce((sum, game) => (Number.isFinite(game.found) ? sum + game.found : sum), 0)
+/**
+ * The countries a game of any type found, for the "find N countries" missions: `found` when the game records it
+ * (Placement, Flags, Capitals, rounds), the right answers of the quizzes and the Daily Challenge (`correct`), the rounds
+ * won in Survival (`score`), the countries of the path in Voyage Voyage (`attempts`, steps of the path found), and 1 for
+ * a daily found / ranked (Border Guess, Country Clue, daily Quiz, Country of the Day, Ranking). Read from the records the
+ * clients already write, so the games of the installed apps count too.
+ */
+export function countriesFound(game) {
+  const amount = (value) => (Number.isFinite(value) && value > 0 ? Math.floor(value) : 0)
+  if (Number.isFinite(game.found)) return amount(game.found)
+  if (Number.isFinite(game.correct)) return amount(game.correct)
+  if (game.gameType === GAME_TYPES.SURVIVAL) return amount(game.score)
+  if (game.gameType === GAME_TYPES.VOYAGE_VOYAGE) return amount(game.attempts)
+  return game.solved === true ? 1 : 0
+}
+const allFound = (games) => games.reduce((sum, game) => sum + countriesFound(game), 0)
 const distinct = (values) => new Set(values).size
 const ofType = (gameType) => (game) => game.gameType === gameType
 const dailyOf = (gameType) => (game) => isDaily(game) && game.gameType === gameType

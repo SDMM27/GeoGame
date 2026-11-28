@@ -8,6 +8,7 @@
     }
   ],
   "rewrites": [
+    { "source": "/api/csp-report", "destination": "/api/migrate-session?flow=csp-report" },
     { "source": "/api/username-account", "destination": "/api/migrate-session?flow=username-account" },
     {
       "source": "/:page(game|flag-game|capitals-game|border-guess|country-clue|voyage-voyage|ranking|country-of-the-day|challenge|survival|atlas|multiplayer|scores|privacy|terms)",

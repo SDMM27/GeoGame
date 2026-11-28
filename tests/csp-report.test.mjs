@@ -1,17 +1,28 @@
 // @vitest-environment node
 import { afterEach, expect, it, vi } from 'vitest'
 
-import handler from '../api/csp-report.mjs'
+import { Readable } from 'node:stream'
+
+import handler from '../api/migrate-session.mjs'
 
 const origin = 'https://preview.example.test'
-const endpoint = origin + '/api/csp-report'
+async function request(method, body, contentType = 'application/reports+json') {
+  const req = Readable.from(body === undefined ? [] : [Buffer.from(body)])
+  req.method = method
+  req.query = { flow: 'csp-report' }
+  req.headers = { host: new URL(origin).host, 'content-type': contentType }
+  const headers = new Headers()
+  const res = {
+    headers,
+    setHeader: (name, value) => headers.set(name, value),
+    status(code) { this.status = code; return this },
+    end() { return this },
+  }
+  return handler(req, res)
+}
 
-function post(body, contentType = 'application/reports+json') {
-  return handler.fetch(new Request(endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': contentType },
-    body: typeof body === 'string' ? body : JSON.stringify(body),
-  }))
+function post(body, contentType) {
+  return request('POST', typeof body === 'string' ? body : JSON.stringify(body), contentType)
 }
 
 afterEach(() => vi.restoreAllMocks())
@@ -57,7 +68,7 @@ it('accepts Reporting API batches and discards unrelated and unrecognized report
 })
 
 it('rejects unsupported methods, unsupported media, invalid JSON and oversized bodies', async () => {
-  const response = await handler.fetch(new Request(endpoint))
+  const response = await request('GET')
   expect(response.status).toBe(405)
   expect(response.headers.get('allow')).toBe('POST')
   expect((await post({}, 'application/json')).status).toBe(415)

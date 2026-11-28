@@ -9,6 +9,7 @@ import { getFirestore } from 'firebase-admin/firestore'
 import { migrateSession } from './_lib/migrateSession.mjs'
 import { hasUsernameCredential } from './_lib/usernameAccount.mjs'
 import usernameAccountHandler from './_lib/usernameAccountRoute.mjs'
+import cspReportHandler from './_lib/cspReport.mjs'
 
 function adminApp() {
   if (getApps().length) return getApps()[0]
@@ -17,8 +18,9 @@ function adminApp() {
 }
 
 export default async function handler(req, res) {
-  // The Vercel rewrite shares this function with /api/username-account to stay within the function limit.
+  // The Vercel rewrite shares this function with /api/username-account and /api/csp-report to stay within the function limit.
   if (req.query?.flow === 'username-account') return usernameAccountHandler(req, res)
+  if (req.query?.flow === 'csp-report') return cspReportHandler(req, res)
   // Called from the app (another origin); the refresh token in the body is the credential, no cookies.
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')

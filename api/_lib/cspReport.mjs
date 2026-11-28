@@ -17,13 +17,13 @@ const knownExternalHosts = new Set([
   'identitytoolkit.googleapis.com', 'securetoken.googleapis.com',
 ])
 
-function resourceKind(value, origin) {
+function resourceKind(value, host) {
   if (typeof value !== 'string' || !value) return 'unknown'
   if (resourceKinds.has(value)) return value
   try {
     const resource = new URL(value)
     if (resource.protocol === 'data:' || resource.protocol === 'blob:') return resource.protocol
-    if (resource.origin === origin) return 'same-origin'
+    if (resource.host === host) return 'same-origin'
     if (knownExternalHosts.has(resource.hostname)) return resource.hostname
     if (resource.hostname.endsWith('.basemaps.cartocdn.com')) return 'cartocdn'
     return 'other'
@@ -32,11 +32,11 @@ function resourceKind(value, origin) {
   }
 }
 
-function documentKind(value, origin) {
+function documentKind(value, host) {
   if (typeof value !== 'string') return 'other'
   try {
     const page = new URL(value)
-    if (page.origin !== origin) return 'other'
+    if (page.host !== host) return 'other'
     if (page.pathname === '/') return 'home'
     if (page.pathname.startsWith('/player/')) return 'player'
     if (page.pathname.startsWith('/multiplayer/room/') || page.pathname.startsWith('/room/')) return 'room'
@@ -46,47 +46,42 @@ function documentKind(value, origin) {
   }
 }
 
-function reply(status, extraHeaders) {
-  return new Response(null, {
-    status,
-    headers: { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex', ...extraHeaders },
-  })
-}
+export default async function cspReportHandler(req, res) {
+  res.setHeader('Cache-Control', 'no-store')
+  res.setHeader('X-Robots-Tag', 'noindex')
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST')
+    return res.status(405).end()
+  }
 
-async function fetch(request) {
-  if (request.method !== 'POST') return reply(405, { Allow: 'POST' })
-
-  const contentType = request.headers.get('content-type')?.split(';', 1)[0].trim().toLowerCase()
+  const contentType = req.headers['content-type']?.split(';', 1)[0].trim().toLowerCase()
   const legacy = contentType === 'application/csp-report'
-  if (!legacy && contentType !== 'application/reports+json') return reply(415)
-  if (Number(request.headers.get('content-length')) > MAX_BYTES) return reply(413)
-  if (!request.body) return reply(400)
+  if (!legacy && contentType !== 'application/reports+json') return res.status(415).end()
+  if (Number(req.headers['content-length']) > MAX_BYTES) return res.status(413).end()
 
-  const reader = request.body.getReader()
   const decoder = new TextDecoder('utf-8', { fatal: true })
   let bytes = 0
   let text = ''
   let payload
   try {
-    for (;;) {
-      const { value, done } = await reader.read()
-      if (done) break
-      bytes += value.byteLength
+    // Vercel exposes the raw request stream until its lazy body getter is read.
+    for await (const chunk of req.iterator({ destroyOnReturn: false })) {
+      bytes += chunk.byteLength
       if (bytes > MAX_BYTES) {
-        await reader.cancel()
-        return reply(413)
+        req.resume()
+        return res.status(413).end()
       }
-      text += decoder.decode(value, { stream: true })
+      text += decoder.decode(chunk, { stream: true })
     }
     payload = JSON.parse(text + decoder.decode())
   } catch {
-    return reply(400)
+    return res.status(400).end()
   }
 
   const reports = legacy ? [payload?.['csp-report']] : payload
-  if (!Array.isArray(reports)) return reply(400)
+  if (!Array.isArray(reports)) return res.status(400).end()
 
-  const origin = new URL(request.url).origin
+  const host = req.headers.host
   const violations = []
   for (const report of reports.slice(0, MAX_REPORTS)) {
     if (!legacy && report?.type !== 'csp-violation') continue
@@ -97,12 +92,10 @@ async function fetch(request) {
     // Browser reports can contain user identifiers, URLs and source code. Log fixed categories only.
     violations.push({
       directive,
-      document: documentKind(legacy ? body['document-uri'] : body.documentURL, origin),
-      resource: resourceKind(legacy ? body['blocked-uri'] : body.blockedURL, origin),
+      document: documentKind(legacy ? body['document-uri'] : body.documentURL, host),
+      resource: resourceKind(legacy ? body['blocked-uri'] : body.blockedURL, host),
     })
   }
   if (violations.length) console.info('[csp-report]', JSON.stringify(violations))
-  return reply(204)
+  return res.status(204).end()
 }
-
-export default { fetch }

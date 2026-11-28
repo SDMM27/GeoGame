@@ -142,8 +142,11 @@ jobs:
           version=$(jq -r '.[0].appVersion' build.json)
           runtime=$(jq -r ".[0].runtime.version // .[0].runtimeVersion // \"$RUNTIME\"" build.json)
           curl -sSfL "$url" -o geogame.apk
-          sdkmanager 'build-tools;35.0.0'
-          signer=$(bash ../scripts/verify-release-apk.sh "$ANDROID_HOME/build-tools/35.0.0/apksigner")
+          apksigner="$ANDROID_HOME/build-tools/35.0.0/apksigner"
+          if [[ ! -x "$apksigner" ]]; then
+            "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'build-tools;35.0.0'
+          fi
+          signer=$(bash ../scripts/verify-release-apk.sh "$apksigner")
           # Read by the app (useNewerApk in mobile/src/updates.ts) to tell an APK that no update can reach any more.
           jq -n --arg runtime "$runtime" --arg version "$version" '{runtimeVersion: $runtime, appVersion: $version}' > latest.json
           printf '%s\n\n' "$MESSAGE" > release-notes.md

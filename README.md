@@ -79,6 +79,8 @@ Variables d'environnement du projet Vercel du site :
 
 Face aux émulateurs, `FIRESTORE_EMULATOR_HOST` (et `FIREBASE_AUTH_EMULATOR_HOST` pour `invite-push`) remplacent la clé. Ne commitez jamais de clé de compte de service.
 
+Voir la [préparation du staging Firebase](docs/firebase-staging.md) pour isoler les aperçus de `dev` et l’APK interne.
+
 ### Comptes sans e-mail
 
 Le site et l'app affichent l'option Pseudo dès que leur API dispose de la configuration Firebase habituelle. Activer la méthode de connexion e-mail et mot de passe dans Firebase Auth et utiliser `FIREBASE_SERVICE_ACCOUNT` côté serveur. `FIREBASE_WEB_API_KEY` permet de remplacer la clé Web par défaut du projet. Ce parcours utilise le projet Firebase existant et fonctionne dans les quotas de son offre actuelle.

@@ -1,0 +1,4 @@
+Contact: mailto:appgeogame@gmail.com
+Expires: 2027-11-26T00:00:00Z
+Preferred-Languages: fr, en
+Canonical: https://geo-game.app/.well-known/security.txt

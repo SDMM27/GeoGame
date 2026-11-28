@@ -61,19 +61,23 @@ const isPerfect = (game) => SETUP_TYPES.includes(game.gameType) && game.total >=
 const count = (games, predicate) => games.filter(predicate).length
 const sumFound = (games, gameType) =>
   games.reduce((sum, game) => (game.gameType === gameType && Number.isFinite(game.found) ? sum + game.found : sum), 0)
+// Games that never count toward the "find N countries" missions (nothing is found there: countries are ranked or
+// chained), whatever their record says (a multiplayer round of them records `found`).
+const NOT_FINDING_TYPES = [GAME_TYPES.RANKING, GAME_TYPES.VOYAGE_VOYAGE]
+
 /**
  * The countries a game of any type found, for the "find N countries" missions: `found` when the game records it
  * (Placement, Flags, Capitals, rounds), the right answers of the quizzes and the Daily Challenge (`correct`), the rounds
- * won in Survival (`score`), the countries of the path in Voyage Voyage (`attempts`, steps of the path found), and 1 for
- * a daily found / ranked (Border Guess, Country Clue, daily Quiz, Country of the Day, Ranking). Read from the records the
- * clients already write, so the games of the installed apps count too.
+ * won in Survival (`score`), and 1 for a country found in one go (Border Guess and Country Clue, daily or infinite,
+ * daily Quiz, Country of the Day). Ranking and Voyage Voyage count 0. Read from the records the clients already write,
+ * so the games of the installed apps count too.
  */
 export function countriesFound(game) {
+  if (NOT_FINDING_TYPES.includes(game.gameType)) return 0
   const amount = (value) => (Number.isFinite(value) && value > 0 ? Math.floor(value) : 0)
   if (Number.isFinite(game.found)) return amount(game.found)
   if (Number.isFinite(game.correct)) return amount(game.correct)
   if (game.gameType === GAME_TYPES.SURVIVAL) return amount(game.score)
-  if (game.gameType === GAME_TYPES.VOYAGE_VOYAGE) return amount(game.attempts)
   return game.solved === true ? 1 : 0
 }
 const allFound = (games) => games.reduce((sum, game) => sum + countriesFound(game), 0)

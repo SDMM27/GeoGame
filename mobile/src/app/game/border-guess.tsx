@@ -14,6 +14,7 @@ import { GAME_TYPES } from '@shared/utils/gameTypes'
 import { getCountryName } from '@shared/utils/getCountryName'
 
 import { useAccount } from '@/account/auth'
+import { useRecordGame } from '@/account/history'
 import { DailyLeaderboard } from '@/components/game/DailyLeaderboard'
 import { DailyPlayedElsewhere } from '@/components/game/DailyPlayedElsewhere'
 import { GameHud } from '@/components/game/GameHud'
@@ -82,6 +83,12 @@ function BorderGuessGame({ mode, play }: { mode: string; play?: RoomPlay }) {
   const locked = isComplete || (isDaily && !hasStarted)
   const answer = getCountryName(currentCountryISO, i18n.language) || answerName
   useAnnounceResult(isComplete, isSolved, answer)
+  // Each country of the infinite mode is a game of the history (it counts for the "find N countries" missions).
+  useRecordGame(
+    isComplete && !isDaily && !play
+      ? { gameType: GAME_TYPES.BORDER_GUESS, mode: 'infinite', solved: isSolved, attempts: guesses.length }
+      : null
+  )
   const attemptsLabel = guesses.length === 1 ? t('units.attempt_one') : t('units.attempt_other')
   // Keep the silhouette compact so the latest guesses stay on screen, smaller still while typing.
   const { height: windowHeight } = useWindowDimensions()

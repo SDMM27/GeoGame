@@ -216,14 +216,19 @@ describe('missions', () => {
       game({ gameType: 'QUIZ', mode: 'infinite', found: undefined, correct: 7, answered: 9 }),
       game({ gameType: 'DAILY_CHALLENGE', mode: 'daily', found: undefined, correct: 9, score: 9, solved: true }),
       game({ gameType: 'SURVIVAL', mode: 'survival', found: undefined, score: 12, total: 13 }),
-      game({ gameType: 'VOYAGE_VOYAGE', mode: 'daily', found: undefined, solved: true, attempts: 5 }),
       game({ gameType: 'BORDER_GUESS', mode: 'daily', found: undefined, solved: true }),
+      game({ gameType: 'BORDER_GUESS', mode: 'infinite', found: undefined, solved: true }),
+      game({ gameType: 'COUNTRY_CLUE', mode: 'infinite', found: undefined, solved: true }),
       game({ gameType: 'COUNTRY_CLUE', mode: 'daily', found: undefined, solved: false }),
       game({ gameType: 'COUNTRY_OF_DAY', mode: 'daily', found: undefined, solved: true }),
+      game({ gameType: 'VOYAGE_VOYAGE', mode: 'daily', found: undefined, solved: true, attempts: 5 }),
+      game({ gameType: 'RANKING', mode: 'daily', found: undefined, solved: true, score: 80 }),
+      game({ gameType: 'RANKING', mode: 'multi', found: 4, total: 5 }),
+      game({ gameType: 'VOYAGE_VOYAGE', mode: 'multi', found: 3, total: 5 }),
     ]
-    expect(anyGame.map(countriesFound)).toEqual([30, 7, 9, 12, 5, 1, 0, 1])
-    expect(value('week_found_medium_1000', anyGame)).toBe(65)
-    expect(value('found_50', anyGame)).toBe(65)
+    expect(anyGame.map(countriesFound)).toEqual([30, 7, 9, 12, 1, 1, 1, 0, 1, 0, 0, 0, 0])
+    expect(value('week_found_medium_1000', anyGame)).toBe(62)
+    expect(value('found_50', anyGame)).toBe(62)
     expect(value('week_flags_60', [game({ found: 30 }), game({ gameType: 'CAPITALS', found: 25 })])).toBe(30)
     expect(value('week_placement_60', [game({ gameType: 'PLACEMENT', found: 12 }), game({ found: 25 })])).toBe(12)
     expect(value('week_capitals_40', [game({ gameType: 'CAPITALS', found: 12 }), game({ found: 25 })])).toBe(12)

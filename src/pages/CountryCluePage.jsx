@@ -120,10 +120,13 @@ export default function CountryCluePage() {
     enabled: mode === 'daily',
   })
 
+  // Each country of the infinite mode is a game of the history too (it counts for the "find N countries" missions).
   useRecordGame(
     isComplete && mode === 'daily'
       ? { gameType: GAME_TYPES.COUNTRY_CLUE, mode: 'daily', dailyKey, solved: isSolved, attempts: guesses.length, elapsedTime }
-      : null
+      : isComplete && mode === 'infinite'
+        ? { gameType: GAME_TYPES.COUNTRY_CLUE, mode: 'infinite', solved: isSolved, attempts: guesses.length }
+        : null
   )
 
   const inputRef = useRef(null)

@@ -142,10 +142,15 @@ jobs:
           version=$(jq -r '.[0].appVersion' build.json)
           runtime=$(jq -r ".[0].runtime.version // .[0].runtimeVersion // \"$RUNTIME\"" build.json)
           curl -sSfL "$url" -o geogame.apk
+          sdkmanager 'build-tools;35.0.0'
+          signer=$(bash ../scripts/verify-release-apk.sh "$ANDROID_HOME/build-tools/35.0.0/apksigner")
           # Read by the app (useNewerApk in mobile/src/updates.ts) to tell an APK that no update can reach any more.
           jq -n --arg runtime "$runtime" --arg version "$version" '{runtimeVersion: $runtime, appVersion: $version}' > latest.json
-          gh release create "v$version-${runtime:0:7}" geogame.apk latest.json --repo SDMM27/GeoGame-releases \
-            --title "GeoGame $version (${runtime:0:7})" --notes "$MESSAGE" --latest
+          printf '%s\n\n' "$MESSAGE" > release-notes.md
+          printf '%s\n\n' 'Verify the download with `sha256sum -c geogame.apk.sha256`.' >> release-notes.md
+          printf 'Check the signature with `apksigner verify --print-certs geogame.apk`. Signing certificate SHA-256: `%s`.\n' "$signer" >> release-notes.md
+          gh release create "v$version-${runtime:0:7}" geogame.apk geogame.apk.sha256 latest.json --repo SDMM27/GeoGame-releases \
+            --title "GeoGame $version (${runtime:0:7})" --notes-file release-notes.md --latest
         env:
           RUNTIME: ${{ needs.update.outputs.preview_runtime }}
           GH_TOKEN: ${{ secrets.RELEASES_TOKEN }}
